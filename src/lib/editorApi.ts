@@ -73,6 +73,7 @@ export async function createRound(pack_id: string, position: number, mechanic: M
   const { data, error } = await supabase.from('pack_rounds').insert({
     pack_id, position, mechanic, title_lines: [title.toUpperCase()],
     rules: [], settings: defaults,
+    timer_seconds: 30, answers_reveal: 'after_round',
   }).select().single()
   if (error) throw error
   void log('round', data.id, 'create', { mechanic })
@@ -98,14 +99,27 @@ export async function deleteRound(id: string) {  // только owner (RLS)
 }
 
 // ── Вопросы ──
-export async function createQuestion(round_id: string, position: number) {
+export async function createQuestion(round_id: string, mode: 'free_text' | 'crossword_word' = 'free_text') {
+  // позиция: max по всем (включая скрытые) + 1 — иначе конфликт unique(round_id, position)
+  const { data: maxRow } = await supabase.from('pack_questions')
+    .select('position').eq('round_id', round_id)
+    .order('position', { ascending: false }).limit(1).maybeSingle()
+  const position = (maxRow?.position ?? -1) + 1
+  const answer = mode === 'crossword_word'
+    ? { mode, word: '' }
+    : { mode, correct: '', display: '' }
   const { data, error } = await supabase.from('pack_questions').insert({
-    round_id, position,
-    answer: { mode: 'free_text', correct: '', display: '' },
+    round_id, position, answer,
   }).select().single()
   if (error) throw error
   void log('question', data.id, 'create')
   return data as Question
+}
+
+export async function deleteQuestion(id: string) {  // только owner (RLS)
+  const { error } = await supabase.from('pack_questions').delete().eq('id', id)
+  if (error) throw error
+  void log('question', id, 'update', { deleted: true })
 }
 
 export async function updateQuestion(id: string, patch: Partial<Question>) {

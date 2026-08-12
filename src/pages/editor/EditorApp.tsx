@@ -132,7 +132,7 @@ function PackScreen({ packId, user, onBack }: {
   const [problems, setProblems] = useState<Problem[] | null>(null)
   const [adding, setAdding] = useState(false)
 
-  const reload = () => void loadPack(packId, true).then(setPack).catch(() => {})
+  const reload = () => void loadPack(packId, true, true).then(setPack).catch(() => {})
   useEffect(reload, [packId])
 
   if (!pack) return <div>Загрузка пакета…</div>

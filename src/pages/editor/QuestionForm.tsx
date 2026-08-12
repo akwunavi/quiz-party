@@ -25,66 +25,70 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
   const original = round.questions[qIdx]
   const [q, setQ] = useState<Question>(original)
   const [saving, setSaving] = useState(false)
-  const [savedAt, setSavedAt] = useState<number | null>(null)
 
   useEffect(() => setQ(original), [original])
 
-  const save = async (patch: Partial<Question>) => {
-    const next = { ...q, ...patch }
-    setQ(next)
+  // Локальный буфер: НИЧЕГО не уходит в БД до кнопки «Сохранить».
+  // Исключение: загрузка медиа-файлов сохраняется сразу (файл уже в Storage).
+  const save = (patch: Partial<Question>) => setQ(prev => ({ ...prev, ...patch }))
+  const persistAll = async (close: boolean) => {
     setSaving(true)
     try {
-      await updateQuestion(q.id, patch)
-      setSavedAt(Date.now())
+      const { id: _id, round_id: _r, position: _p, ...fields } = q
+      await updateQuestion(q.id, fields)
+      onChanged()
+      if (close) onBack()
     } finally { setSaving(false) }
   }
 
-  const setAnswer = (answer: AnswerSpec) => void save({ answer })
+  const setAnswer = (answer: AnswerSpec) => save({ answer })
   const media = q.media
 
   return (
     <div>
-      <p><button onClick={() => { onBack(); onChanged() }}>← Раунд</button>{' '}
-        <span style={{ opacity: .5 }}>
-          {saving ? 'сохраняю…' : savedAt ? 'сохранено ✓' : ''}
-        </span></p>
-      <h3>Вопрос {qIdx + 1}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h3 style={{ margin: 0 }}>Вопрос {qIdx + 1}</h3>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button disabled={saving} style={{ background: '#dcfce7' }}
+            onClick={() => void persistAll(true)}>💾 Сохранить и закрыть</button>
+          <button disabled={saving} onClick={() => void persistAll(false)}>Сохранить</button>
+          <button onClick={onBack}>✕ Закрыть без сохранения</button>
+        </div>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* ── Контент ── */}
         <div>
           <label><b>Текст вопроса</b></label>
           <textarea value={q.question_text} rows={5} style={{ width: '100%', padding: 8 }}
-            onChange={e => setQ({ ...q, question_text: e.target.value })}
-            onBlur={() => void save({ question_text: q.question_text })} />
+            onChange={e => save({ question_text: e.target.value })} />
 
           <MediaSlot label="Медиа вопроса (до 4)" packId={pack.id}
             paths={media.question ?? []} max={4}
-            onChange={paths => void save({ media: { ...media, question: paths } })} />
+            onChange={paths => save({ media: { ...media, question: paths } })} />
           {(media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m)) && (
             <label style={{ display: 'block' }}>
               <input type="checkbox" checked={!!media.hidden}
-                onChange={e => void save({ media: { ...media, hidden: e.target.checked } })} />
+                onChange={e => save({ media: { ...media, hidden: e.target.checked } })} />
               {' '}видео скрыто — только звук
             </label>
           )}
           <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"
-            onChange={paths => void save({ media: { ...media, voice: paths[0] ?? null } })} />
+            onChange={paths => save({ media: { ...media, voice: paths[0] ?? null } })} />
           <MediaSlot label="Медиа ответа" packId={pack.id}
             paths={media.answer ?? []} max={4}
-            onChange={paths => void save({ media: { ...media, answer: paths } })} />
+            onChange={paths => save({ media: { ...media, answer: paths } })} />
 
           <label><b>Пояснение к ответу</b> (answer_note)</label>
           <input value={q.answer_note ?? ''} style={{ width: '100%', padding: 6 }}
-            onChange={e => setQ({ ...q, answer_note: e.target.value })}
-            onBlur={() => void save({ answer_note: q.answer_note || null })} />
+            onChange={e => save({ answer_note: e.target.value || null })} />
 
           {round.mechanic === 'rebus' && <RebusService q={q} onSave={save} />}
           {round.mechanic === 'thematic_x2' && (
             <label style={{ display: 'block', marginTop: 8 }}>
               <input type="checkbox" checked={q.is_final_question}
-                onChange={e => void save({ is_final_question: e.target.checked })} />
+                onChange={e => save({ is_final_question: e.target.checked })} />
               {' '}это финальный вопрос-тема (×2)
             </label>
           )}
@@ -101,17 +105,14 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
           </label>
           <AnswerEditor spec={q.answer} onChange={setAnswer} />
 
-          {/* ── Превью ── */}
-          <div style={{ marginTop: 16, padding: 10, background: '#f9fafb', borderRadius: 8 }}>
-            <b>Превью (игрок):</b>
-            <PlayerPreview q={q} />
-          </div>
+          <Preview q={q} />
+
         </div>
       </div>
 
       <div style={{ marginTop: 16 }}>
         Статус:{' '}
-        <button onClick={() => void save({ status: q.status === 'ready' ? 'draft' : 'ready' })}
+        <button onClick={() => save({ status: q.status === 'ready' ? 'draft' : 'ready' })}
           style={{ background: q.status === 'ready' ? '#dcfce7' : '#fef9c3' }}>
           {q.status === 'ready' ? '✅ Готов (нажми, чтобы вернуть в черновик)' : '🟡 Черновик (нажми, чтобы отметить готовым)'}
         </button>
@@ -138,13 +139,9 @@ function AnswerEditor({ spec, onChange }: { spec: AnswerSpec; onChange: (a: Answ
   switch (spec.mode) {
     case 'free_text': return (
       <div>
-        <label>Правильный ответ <span style={{ opacity: .5 }}>(варианты через « / »)</span></label>
+        <label>Правильный ответ <span style={{ opacity: .5 }}>(доп. принимаемые варианты — через « / », на экране покажется первый)</span></label>
         <input value={spec.correct} style={{ width: '100%', padding: 6 }}
-          onChange={e => onChange({ ...spec, correct: e.target.value })} />
-        <label>Как показать на проекторе</label>
-        <input value={typeof spec.display === 'string' ? spec.display : spec.display.join(' / ')}
-          style={{ width: '100%', padding: 6 }}
-          onChange={e => onChange({ ...spec, display: e.target.value })} />
+          onChange={e => onChange({ ...spec, correct: e.target.value, display: e.target.value.split('/')[0].trim() })} />
       </div>
     )
     case 'choice': return (
@@ -276,7 +273,7 @@ function RebusService({ q, onSave }: { q: Question; onSave: (p: Partial<Question
 }
 
 // ── Слот медиа ──
-function MediaSlot({ label, packId, paths, max, accept, onChange }: {
+export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
   label: string; packId: string; paths: string[]; max: number
   accept?: string; onChange: (paths: string[]) => void
 }) {
@@ -295,12 +292,16 @@ function MediaSlot({ label, packId, paths, max, accept, onChange }: {
           </span>
         ))}
         {paths.length < max && (
-          <input type="file" accept={accept} disabled={busy}
+          <input type="file" accept={accept} disabled={busy} multiple={max > 1}
             onChange={async e => {
-              const f = e.target.files?.[0]
-              if (!f) return
+              const files = Array.from(e.target.files ?? []).slice(0, max - paths.length)
+              if (files.length === 0) return
               setBusy(true); setErr('')
-              try { onChange([...paths, await uploadMedia(packId, f)]) }
+              try {
+                const uploaded: string[] = []
+                for (const f of files) uploaded.push(await uploadMedia(packId, f))
+                onChange([...paths, ...uploaded])
+              }
               catch (ex) { setErr(ex instanceof Error ? ex.message : 'ошибка загрузки') }
               finally { setBusy(false); e.target.value = '' }
             }} />
@@ -312,22 +313,66 @@ function MediaSlot({ label, packId, paths, max, accept, onChange }: {
   )
 }
 
-// ── Превью телефона ──
-function PlayerPreview({ q }: { q: Question }) {
+
+
+// ── Превью: проектор и телефон (ровно как в игре) ──
+function Preview({ q }: { q: Question }) {
+  const [tab, setTab] = useState<'host' | 'player'>('host')
   const a = q.answer
+  const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   return (
-    <div style={{ maxWidth: 300, border: '1px solid #ddd', borderRadius: 12, padding: 10, background: '#fff' }}>
-      <p style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{q.question_text || '(текст вопроса)'}</p>
-      {(q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m)).map((m, i) =>
-        <img key={i} src={mediaUrl(m)} alt="" style={{ maxWidth: '100%', borderRadius: 6 }} />)}
-      {a.mode === 'choice' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-          {a.choices.map(c => <button key={c.key}>{c.key}</button>)}
+    <div style={{ marginTop: 16 }}>
+      <div style={{ display: 'flex', gap: 4 }}>
+        <button onClick={() => setTab('host')}
+          style={{ fontWeight: tab === 'host' ? 700 : 400 }}>📺 Проектор</button>
+        <button onClick={() => setTab('player')}
+          style={{ fontWeight: tab === 'player' ? 700 : 400 }}>📱 Телефон игрока</button>
+      </div>
+      {tab === 'host' ? (
+        <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12,
+          background: '#111', color: '#fff' }}>
+          <div style={{ fontSize: 16, whiteSpace: 'pre-wrap' }}>
+            {q.question_text || '(текст вопроса)'}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+            {imgs.map((m, i) =>
+              <img key={i} src={mediaUrl(m)} alt="" style={{ maxHeight: 90, borderRadius: 4 }} />)}
+          </div>
+          {a.mode === 'choice' && (
+            <div style={{ marginTop: 8 }}>
+              {a.choices.map(c => <div key={c.key}>{c.key} — {c.text || '…'}</div>)}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ maxWidth: 280, border: '1px solid #ddd', borderRadius: 14, padding: 10, background: '#fff' }}>
+          <p style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{q.question_text || '(текст вопроса)'}</p>
+          {a.mode === 'free_text' || a.mode === 'none' ? (
+            <div style={{ display: 'flex', gap: 4 }}>
+              <input placeholder="Ваш ответ" readOnly style={{ flex: 1, padding: 6 }} />
+              <button disabled>Отправить</button>
+            </div>
+          ) : a.mode === 'choice' ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+              {a.choices.map(c => <button key={c.key} disabled style={{ padding: 10 }}>{c.key}</button>)}
+            </div>
+          ) : a.mode === 'order' ? (
+            <div>
+              <div style={{ border: '1px dashed #999', padding: 6, fontSize: 12 }}>Тапайте варианты по порядку</div>
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                {a.choices.map(c => <button key={c.key} disabled>{c.key}</button>)}
+              </div>
+            </div>
+          ) : a.mode === 'match' ? (
+            <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
+              <div>{a.left.map(l => <button key={l} disabled style={{ display: 'block', margin: 2 }}>{l}</button>)}</div>
+              <div>{a.right.map(r => <button key={r} disabled style={{ display: 'block', margin: 2 }}>{r}</button>)}</div>
+            </div>
+          ) : (
+            <div style={{ fontSize: 12, opacity: .6 }}>[сетка кроссворда — экран этапа 5]</div>
+          )}
         </div>
       )}
-      {a.mode === 'free_text' && <input placeholder="Ваш ответ" style={{ width: '100%' }} readOnly />}
-      {a.mode === 'order' && <div style={{ fontSize: 12, opacity: .6 }}>[порядок тапами: {a.choices.map(c => c.key).join(' ')}]</div>}
-      {a.mode === 'match' && <div style={{ fontSize: 12, opacity: .6 }}>[сопоставление {a.left.join(',')} ↔ {a.right.join(',')}]</div>}
     </div>
   )
 }

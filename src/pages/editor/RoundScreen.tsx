@@ -1,14 +1,27 @@
 import { useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { metaLine } from '../../lib/packLoader'
-import { updateRound, createQuestion, hideQuestion } from '../../lib/editorApi'
+import { updateRound, createQuestion, hideQuestion, deleteQuestion } from '../../lib/editorApi'
 import { generateCrossword, type CrosswordInput } from '../../lib/crossword'
 import { QuestionForm } from './QuestionForm'
 import { EditableText, MECHANIC_NAMES } from './EditorApp'
 import type { EditorUser } from '../../lib/auth'
+import { MediaSlot } from './QuestionForm'
 import type { CrosswordGrid, JeopardyTheme } from '../../types/quiz'
 
 // ═══ Экран раунда: настройки механики + вопросы ═══
+
+function answerSnippet(q: { answer: { mode: string } }): string {
+  const a = q.answer as Record<string, unknown>
+  switch (a.mode) {
+    case 'free_text': return String(a.correct ?? '').split('/')[0].trim()
+    case 'choice': return String(a.correct_choice ?? '')
+    case 'order': return String(a.correct_order ?? '')
+    case 'match': return Array.isArray(a.correct_pairs) ? (a.correct_pairs as string[]).join(' ') : ''
+    case 'crossword_word': return String(a.word ?? '')
+    default: return ''
+  }
+}
 
 export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   pack: LoadedPack; roundIdx: number; user: EditorUser
@@ -18,10 +31,6 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   const [openQIdx, setOpenQIdx] = useState<number | null>(null)
   const locked = pack.status === 'active' && user.role !== 'owner'
 
-  if (openQIdx !== null && round.questions[openQIdx]) {
-    return <QuestionForm pack={pack} round={round} qIdx={openQIdx}
-      onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
-  }
 
   const patch = async (p: Parameters<typeof updateRound>[1]) => {
     await updateRound(round.id, p); onChanged()
@@ -29,6 +38,18 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
   return (
     <div>
+      {openQIdx !== null && round.questions[openQIdx] && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 100,
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto',
+        }} onClick={e => { if (e.target === e.currentTarget) setOpenQIdx(null) }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 16, margin: '4vh 8px',
+            maxWidth: 860, width: '100%' }}>
+            <QuestionForm pack={pack} round={round} qIdx={openQIdx}
+              onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
+          </div>
+        </div>
+      )}
       <p><button onClick={onBack}>← {pack.name}</button></p>
       <h3>Раунд {roundIdx + 1} · {MECHANIC_NAMES[round.mechanic]}</h3>
 
@@ -53,11 +74,6 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               <option value="never">не показывать</option>
             </select>
           </td></tr>
-          <tr><td>Вне зачёта:</td><td>
-            <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
-              onChange={e => void patch({ off_scoreboard: e.target.checked })} />
-            <span style={{ opacity: .5 }}> (разогрев: баллы не идут в табло)</span>
-          </td></tr>
           <tr><td>metaLine:</td><td>
             <code>{metaLine(round)}</code>{' '}
             <EditableText value={round.meta_line_override ?? ''} disabled={locked}
@@ -67,6 +83,16 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <tr><td style={{ verticalAlign: 'top' }}>Правила:</td><td>
             <RulesEditor rules={round.rules} disabled={locked}
               onSave={rules => void patch({ rules })} />
+          </td></tr>
+          <tr><td>Музыка/озвучка правил:</td><td>
+            <MediaSlot label="" packId={pack.id} accept="audio/*"
+              paths={round.rules_audio ? [round.rules_audio] : []} max={1}
+              onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
+          </td></tr>
+          <tr><td>Вне зачёта:</td><td>
+            <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
+              onChange={e => void patch({ off_scoreboard: e.target.checked })} />
+            <span style={{ opacity: .5 }}> (разогрев: баллы не идут в табло)</span>
           </td></tr>
         </tbody>
       </table>
@@ -82,21 +108,31 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <div key={q.id} style={{
             display: 'flex', justifyContent: 'space-between',
             border: '1px solid #ddd', borderRadius: 8, padding: 8, marginBottom: 6,
+            opacity: q.hidden ? .45 : 1, background: q.hidden ? '#f3f4f6' : undefined,
           }}>
             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
               <b>{i + 1}.</b> {q.question_text || <i style={{ opacity: .5 }}>(пусто)</i>}
-              {' '}<span style={{ opacity: .5 }}>{q.answer.mode}</span>
-              {' '}{q.status === 'ready' ? '✅' : '🟡'}
+              {answerSnippet(q) && <span style={{ color: '#16a34a' }}> → {answerSnippet(q)}</span>}
+              {' '}{q.hidden ? '(скрыт)' : q.status === 'ready' ? '✅' : '🟡'}
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
-              <button onClick={() => setOpenQIdx(i)}>Открыть</button>
-              {!locked && <button title="Скрыть (мягкое удаление)"
-                onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>🗂</button>}
+              {!q.hidden && <button onClick={() => setOpenQIdx(i)}>Открыть</button>}
+              {!locked && (q.hidden
+                ? <button title="Вернуть в игру"
+                    onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>↩</button>
+                : <button title="Скрыть: остаётся в списке, в игре не показывается"
+                    onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>👁</button>)}
+              {user.role === 'owner' && <button title="Удалить безвозвратно"
+                onClick={async () => {
+                  if (confirm('Удалить вопрос безвозвратно?')) { await deleteQuestion(q.id); onChanged() }
+                }}>🗑</button>}
             </div>
           </div>
         ))}
         {!locked && <button onClick={async () => {
-          await createQuestion(round.id, round.questions.length); onChanged()
+          await createQuestion(round.id,
+            round.mechanic === 'crossword' ? 'crossword_word' : 'free_text')
+          onChanged()
         }}>+ Вопрос</button>}
       </>}
     </div>
@@ -119,9 +155,10 @@ function RulesEditor({ rules, onSave, disabled }: {
         </div>
       ))}
       {!disabled && <>
-        <button onClick={() => { setItems([...items, '']); setDirty(true) }}>+ правило</button>
-        {dirty && <button onClick={() => { onSave(items.filter(s => s.trim())); setDirty(false) }}
-          style={{ marginLeft: 6, background: '#dcfce7' }}>Сохранить правила</button>}
+        <button title="Добавить правило" onClick={() => { setItems([...items, '']); setDirty(true) }}>＋</button>
+        {dirty && <button title="Сохранить правила"
+          onClick={() => { onSave(items.filter(s => s.trim())); setDirty(false) }}
+          style={{ marginLeft: 6, background: '#dcfce7' }}>✔</button>}
       </>}
     </div>
   )
@@ -136,7 +173,7 @@ function CrosswordEditor({ round, locked, onChanged }: {
   const settings = round.settings as { grid: CrosswordGrid | null }
 
   const inputs: CrosswordInput[] = round.questions
-    .filter(q => q.answer.mode === 'crossword_word')
+    .filter(q => !q.hidden && q.answer.mode === 'crossword_word')
     .map(q => ({ word: (q.answer as { word: string }).word, clue: q.question_text }))
 
   const canGenerate = inputs.length >= 6 && inputs.length <= 10 &&
