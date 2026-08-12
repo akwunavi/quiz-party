@@ -1,0 +1,66 @@
+// ═══ Действия ведущего/игры (перенос модели старого проекта) ═══
+import { supabase } from './supabase'
+
+export async function selectPackAndStart(packId: string) {
+  const game_id = crypto.randomUUID()
+  const { error } = await supabase.from('game_state').update({
+    game_id, pack_id: packId, phase: 'lobby',
+    round_number: 0, question_index: 0,
+    timer_started_at: null, reveal: false, completed_rounds: [],
+  }).eq('id', 1)
+  if (error) throw error
+  await supabase.from('packs').update({ status: 'active' }).eq('id', packId)
+  return game_id
+}
+
+export async function setPhase(phase: string) {
+  const { error } = await supabase.from('game_state').update({ phase }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function gotoRound(round_number: number) {
+  const { error } = await supabase.from('game_state').update({
+    phase: 'round_intro', round_number, question_index: 0,
+    timer_started_at: null, reveal: false,
+  }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function gotoQuestion(question_index: number, startTimer = true) {
+  const { error } = await supabase.from('game_state').update({
+    phase: 'question', question_index,
+    timer_started_at: startTimer ? new Date().toISOString() : null,
+    reveal: false,
+  }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function revealAnswer() {
+  const { error } = await supabase.from('game_state').update({ reveal: true }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function markRoundCompleted(completed: number[]) {
+  const { error } = await supabase.from('game_state')
+    .update({ completed_rounds: completed }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function finishGame(packId: string | null) {
+  await supabase.from('game_state').update({ phase: 'finale' }).eq('id', 1)
+  if (packId) await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
+}
+
+export async function registerTeam(name: string, color: string, game_id: string) {
+  const { data, error } = await supabase.from('teams')
+    .upsert({ name, color, game_id, last_seen_at: new Date().toISOString() }, { onConflict: 'name' })
+    .select().single()
+  if (error) throw error
+  return data
+}
+
+/** Heartbeat игрока — раз в полинг обновляем last_seen_at. */
+export async function heartbeat(teamId: string) {
+  await supabase.from('teams')
+    .update({ last_seen_at: new Date().toISOString() }).eq('id', teamId)
+}
