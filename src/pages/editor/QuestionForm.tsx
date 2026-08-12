@@ -53,9 +53,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0 }}>Вопрос {qIdx + 1}</h3>
         <div style={{ display: 'flex', gap: 8 }}>
-          <IconBtn label="Сохранить" icon="💾" color="#16a34a"
-            disabled={saving} onClick={() => void persistAll(true)} />
-          <IconBtn label="Закрыть" icon="✕" color="#6b7280" onClick={onBack} />
+          <button disabled={saving} onClick={() => void persistAll(true)}
+            style={{ padding: '9px 22px', fontWeight: 700 }}>Сохранить</button>
+          <button onClick={onBack} style={{ padding: '9px 22px', opacity: .8 }}>Закрыть</button>
         </div>
       </div>
       {errors.length > 0 && (
@@ -74,11 +74,11 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
           <MediaSlot label="Медиа вопроса (до 4)" packId={pack.id}
             paths={media.question ?? []} max={4}
             onChange={paths => save({ media: { ...media, question: paths } })} />
-          {(media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m)) && (
-            <label style={{ display: 'block' }}>
+          {(media.question ?? []).some(m => /\.(mp4|webm|mp3|wav)$/i.test(m)) && (
+            <label style={{ display: 'block', margin: '4px 0' }}>
               <input type="checkbox" checked={!!media.hidden}
                 onChange={e => save({ media: { ...media, hidden: e.target.checked } })} />
-              {' '}видео скрыто — только звук
+              {' '}не показывать видео/обложку на экране — только звук
             </label>
           )}
           <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
@@ -414,15 +414,3 @@ function questionErrors(q: Question): string[] {
   return errs
 }
 
-function IconBtn({ label, icon, color, onClick, disabled }: {
-  label: string; icon: string; color: string; onClick: () => void; disabled?: boolean
-}) {
-  return (
-    <button onClick={onClick} disabled={disabled} style={{
-      display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
-      borderRadius: 8, border: 'none', cursor: 'pointer',
-      background: color, color: '#fff', fontSize: 14, fontWeight: 600,
-      opacity: disabled ? .5 : 1,
-    }}>{icon} {label}</button>
-  )
-}

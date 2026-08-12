@@ -3,7 +3,10 @@ import { useGameState } from '../hooks/useGameState'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, scoredRounds, type LoadedPack } from '../lib/packLoader'
-import { gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame } from '../lib/gameActions'
+import {
+  gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
+  gotoAnswers, showScoreboard, startBreak, startTimer, setPhase, startAnswerTime,
+} from '../lib/gameActions'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { computeTotals } from '../lib/totals'
@@ -43,6 +46,21 @@ export function AdminPage() {
         ))}
       </div>
 
+      {/* Текущая фаза + переходы (синхронно с проектором) */}
+      <div style={{ padding: 8, border: '1px solid #22314f', borderRadius: 8, marginBottom: 10 }}>
+        <div style={{ opacity: .6, fontSize: 12 }}>ФАЗА: <b>{gameState.phase}</b>
+          {round && <> · раунд {gameState.round_number} · вопрос {gameState.question_index + 1}</>}</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+          <button onClick={() => void setPhase('round_intro')}>Титул раунда</button>
+          <button onClick={() => void gotoQuestion(gameState.question_index)}>К вопросам</button>
+          <button onClick={() => void startTimer()}>▶ Запустить таймер</button>
+          <button onClick={() => void startAnswerTime()}>Время ответов</button>
+          <button onClick={() => void gotoAnswers(0)}>Разбор ответов</button>
+          <button onClick={() => void showScoreboard()}>Табло</button>
+          <button onClick={() => void startBreak()}>Перерыв</button>
+        </div>
+      </div>
+
       {/* Навигация */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
         {pack.rounds.map((r, i) => (
@@ -59,9 +77,9 @@ export function AdminPage() {
       {round && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
           {round.questions.map((_, i) => (
-            <button key={i} onClick={() => void gotoQuestion(i)} style={{
-              fontWeight: i === gameState.question_index ? 700 : 400,
-            }}>{i + 1}</button>
+            <button key={i} style={{ fontWeight: i === gameState.question_index ? 700 : 400 }}
+              onClick={() => gameState.phase === 'show_answers'
+                ? void gotoAnswers(i) : void gotoQuestion(i)}>{i + 1}</button>
           ))}
           <button onClick={() => void revealAnswer()}>Показать ответ</button>
         </div>

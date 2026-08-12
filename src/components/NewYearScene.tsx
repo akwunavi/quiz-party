@@ -15,21 +15,21 @@ export function NewYearScene() {
 
 /** Гирлянда по верхней кромке: провис-кривая + лампочки, мерцающие вразнобой. */
 function Garland() {
-  const bulbs = Array.from({ length: 22 }, (_, i) => i)
+  const bulbs = Array.from({ length: 16 }, (_, i) => i)
   const colors = ['#ff5a5f', '#ffd166', '#7cc7ff', '#8ce99a', '#f9a8d4']
   return (
-    <svg className="ny-garland" viewBox="0 0 1000 90" preserveAspectRatio="none" aria-hidden>
-      <path d="M0,10 Q125,70 250,20 T500,20 T750,20 T1000,10"
-        fill="none" stroke="#2f4f2f" strokeWidth="2.5" />
+    <svg className="ny-garland" viewBox="0 0 1000 130" preserveAspectRatio="none" aria-hidden>
+      <path d="M0,14 Q125,96 250,28 T500,28 T750,28 T1000,14"
+        fill="none" stroke="#3c5f3c" strokeWidth="3.5" />
       {bulbs.map(i => {
         const t = i / (bulbs.length - 1)
         const x = t * 1000
         // повторяем форму провиса синусом — лампочки «сидят» на проводе
-        const y = 18 + Math.abs(Math.sin(t * Math.PI * 4)) * 34
+        const y = 24 + Math.abs(Math.sin(t * Math.PI * 4)) * 48
         return (
           <g key={i}>
-            <line x1={x} y1={y - 6} x2={x} y2={y} stroke="#2f4f2f" strokeWidth="1.5" />
-            <circle className="ny-bulb" cx={x} cy={y + 5} r="6"
+            <line x1={x} y1={y - 9} x2={x} y2={y} stroke="#3c5f3c" strokeWidth="2.5" />
+            <circle className="ny-bulb" cx={x} cy={y + 10} r="11"
               fill={colors[i % colors.length]}
               style={{ animationDelay: `${(i % 5) * 0.4 + Math.random() * 0.3}s` }} />
           </g>
@@ -74,10 +74,11 @@ function Snowfall() {
     addEventListener('resize', onResize)
 
     // три слоя параллакса: дальний мелкий и медленный, ближний крупный и быстрый
+    // мелкие частые снежинки — не «тучки»: маленький радиус, много, мягкая прозрачность
     const layers = [
-      { n: 45, r: [0.8, 1.6], s: [0.25, 0.5], a: 0.35, sway: 14 },
-      { n: 30, r: [1.8, 2.8], s: [0.6, 1.0], a: 0.6, sway: 22 },
-      { n: 14, r: [3.2, 5.0], s: [1.1, 1.8], a: 0.85, sway: 34 },
+      { n: 130, r: [0.5, 0.9], s: [0.28, 0.55], a: 0.30, sway: 10 },
+      { n: 80,  r: [0.9, 1.4], s: [0.55, 0.95], a: 0.45, sway: 16 },
+      { n: 34,  r: [1.5, 2.2], s: [1.0, 1.6],  a: 0.62, sway: 24 },
     ]
     const flakes = layers.flatMap((L, li) =>
       Array.from({ length: L.n }, () => ({

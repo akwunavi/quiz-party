@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { metaLine } from '../../lib/packLoader'
 import { updateRound, createQuestion, hideQuestion, deleteQuestion, defaultModeFor } from '../../lib/editorApi'
@@ -29,6 +29,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 }) {
   const round = pack.rounds[roundIdx]
   const [openQIdx, setOpenQIdx] = useState<number | null>(null)
+  const backdropDown = useRef(false)
   const locked = pack.status === 'active' && user.role !== 'owner'
 
 
@@ -40,12 +41,19 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
     <div>
       {openQIdx !== null && round.questions[openQIdx] && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 100,
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', zIndex: 100,
           display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto',
-        }} onClick={e => { if (e.target === e.currentTarget) setOpenQIdx(null) }}>
+        }}
+          onMouseDown={e => { backdropDown.current = e.target === e.currentTarget }}
+          onClick={e => {
+            // закрываем только если и нажатие, и отпускание были на фоне
+            // (иначе выделение текста, закончившееся на фоне, закрывало модалку)
+            if (e.target === e.currentTarget && backdropDown.current) setOpenQIdx(null)
+            backdropDown.current = false
+          }}>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--neon)',
             boxShadow: '0 0 30px rgba(0,229,255,.25)',
-            borderRadius: 12, padding: 16, margin: '4vh 8px', maxWidth: 860, width: '100%' }}>
+            borderRadius: 12, padding: 20, margin: '3vh 8px', maxWidth: 1120, width: '96%' }}>
             <QuestionForm pack={pack} round={round} qIdx={openQIdx}
               onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
           </div>
@@ -76,10 +84,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             </select>
           </td></tr>
           <tr><td>metaLine:</td><td>
-            <code>{metaLine(round)}</code>{' '}
-            <EditableText value={round.meta_line_override ?? ''} disabled={locked}
-              onSave={v => void patch({ meta_line_override: v.trim() || null })} />
-            <span style={{ opacity: .5 }}> (пусто = автогенерация)</span>
+            <EditableText value={round.meta_line_override ?? metaLine(round)} disabled={locked}
+              onSave={v => void patch({ meta_line_override: v.trim() === metaLine(round) ? null : (v.trim() || null) })} />
+            <span style={{ opacity: .5 }}> (правишь текущий текст; сотри всё = автогенерация)</span>
           </td></tr>
           <tr><td style={{ verticalAlign: 'top' }}>Правила:</td><td>
             <RulesEditor rules={round.rules} disabled={locked}
@@ -89,6 +96,26 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <MediaSlot label="" packId={pack.id} accept="audio/*"
               paths={round.rules_audio ? [round.rules_audio] : []} max={1}
               onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
+          </td></tr>
+          <tr><td>Фоновая музыка вопросов:</td><td>
+            <MediaSlot label="" packId={pack.id} accept="audio/*"
+              paths={(round.settings as { bg_music?: string }).bg_music ? [(round.settings as { bg_music: string }).bg_music] : []} max={1}
+              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
+            <span style={{ opacity: .5 }}>играет во время таймера, если у вопроса нет своего аудио/видео</span>
+          </td></tr>
+          <tr><td>После раунда:</td><td>
+            <label><input type="checkbox"
+              checked={!!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after}
+              disabled={locked}
+              onChange={e => void patch({ settings: { ...round.settings, show_scoreboard_after: e.target.checked } as never })} />
+              {' '}показать табло</label>
+            {'  '}
+            <label style={{ marginLeft: 16 }}>перерыв, мин:{' '}
+              <input type="number" min={0} max={60} style={{ width: 64 }}
+                value={(round.settings as { break_after_minutes?: number }).break_after_minutes ?? 0}
+                disabled={locked}
+                onChange={e => void patch({ settings: { ...round.settings, break_after_minutes: Number(e.target.value) || undefined } as never })} />
+              {' '}(0 = без перерыва)</label>
           </td></tr>
           <tr><td>Вне зачёта:</td><td>
             <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
@@ -119,14 +146,13 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <div style={{ display: 'flex', gap: 4 }}>
               {!q.hidden && <button onClick={() => setOpenQIdx(i)}>Открыть</button>}
               {!locked && (q.hidden
-                ? <button title="Вернуть в игру"
-                    onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>↩</button>
-                : <button title="Скрыть: остаётся в списке, в игре не показывается"
-                    onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>👁</button>)}
-              {user.role === 'owner' && <button title="Удалить безвозвратно"
+                ? <button onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>Вернуть</button>
+                : <button title="Остаётся в списке, в игре не показывается"
+                    onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>Скрыть</button>)}
+              {user.role === 'owner' && <button style={{ borderColor: '#ff3b5c', color: '#ff8fa3' }}
                 onClick={async () => {
                   if (confirm('Удалить вопрос безвозвратно?')) { await deleteQuestion(q.id); onChanged() }
-                }}>🗑</button>}
+                }}>Удалить</button>}
             </div>
           </div>
         ))}
@@ -159,7 +185,7 @@ function RulesEditor({ rules, onSave, disabled }: {
         <button title="Добавить правило" onClick={() => { setItems([...items, '']); setDirty(true) }}>＋</button>
         {dirty && <button title="Сохранить правила"
           onClick={() => { onSave(items.filter(s => s.trim())); setDirty(false) }}
-          style={{ marginLeft: 6, background: '#dcfce7' }}>✔</button>}
+          style={{ marginLeft: 6 }}>Сохранить правила</button>}
       </>}
     </div>
   )

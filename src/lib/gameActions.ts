@@ -26,11 +26,46 @@ export async function gotoRound(round_number: number) {
   if (error) throw error
 }
 
-export async function gotoQuestion(question_index: number, startTimer = true) {
+export async function gotoQuestion(question_index: number) {
+  // Таймер НЕ стартует здесь: хост запустит его после окончания озвучки
   const { error } = await supabase.from('game_state').update({
     phase: 'question', question_index,
-    timer_started_at: startTimer ? new Date().toISOString() : null,
-    reveal: false,
+    timer_started_at: null, reveal: false,
+  }).eq('id', 1)
+  if (error) throw error
+}
+
+/** Старт таймера (вызывается хостом после озвучки вопроса). */
+export async function startTimer() {
+  const { error } = await supabase.from('game_state')
+    .update({ timer_started_at: new Date().toISOString() }).eq('id', 1)
+  if (error) throw error
+}
+
+/** «Время ответов»: минута на подумать перед разбором (как в старом проекте). */
+export async function startAnswerTime() {
+  const { error } = await supabase.from('game_state').update({
+    phase: 'answer_time', timer_started_at: new Date().toISOString(), reveal: false,
+  }).eq('id', 1)
+  if (error) throw error
+}
+
+/** Фаза показа ответов раунда: по одному, как в старом проекте. */
+export async function gotoAnswers(question_index: number, revealed = false) {
+  const { error } = await supabase.from('game_state').update({
+    phase: 'show_answers', question_index, reveal: revealed, timer_started_at: null,
+  }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function showScoreboard() {
+  const { error } = await supabase.from('game_state').update({ phase: 'scoreboard' }).eq('id', 1)
+  if (error) throw error
+}
+
+export async function startBreak() {
+  const { error } = await supabase.from('game_state').update({
+    phase: 'break', timer_started_at: new Date().toISOString(),
   }).eq('id', 1)
   if (error) throw error
 }

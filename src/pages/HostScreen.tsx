@@ -3,7 +3,7 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
-  startTimer, gotoAnswers, showScoreboard, startBreak,
+  startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { SnowCurtain } from '../components/NewYearScene'
@@ -88,9 +88,11 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            <p style={{ margin: 0, opacity: .8 }}>Подключение игроков</p>
-            <img alt="QR" className="lobby-qr"
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(playerUrl)}`} />
+            <div className="qr-card hud-frame">
+              <div className="mono-tag">ПОДКЛЮЧЕНИЕ ИГРОКОВ</div>
+              <img alt="QR" className="lobby-qr"
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(playerUrl)}`} />
+            </div>
             <div className="lobby-teams">
               {teams.length === 0
                 ? <span style={{ opacity: .5 }}>ждём команды…</span>
@@ -102,7 +104,7 @@ function HostInner({ gameState, pack }: {
                 ))}
             </div>
             <div className="host-actions">
-              <button className="ghost" onClick={() => {
+              <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
               }}>⟲ Сменить пакет</button>
               <button onClick={() => void gotoRound(0)}>К первому раунду →</button>
@@ -133,7 +135,7 @@ function HostInner({ gameState, pack }: {
             </div>
           ))}
         </div>
-        {round.rules_audio && <audio autoPlay controls src={mediaUrl(round.rules_audio)} />}
+        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
         {round.mechanic === 'crossword' && grid && (
           /* только пустая сетка — без слов, ответов и определений */
           <CrosswordView grid={grid} cellSize={Math.min(34, Math.floor(innerWidth * .5 / grid.cols))} />
@@ -150,7 +152,7 @@ function HostInner({ gameState, pack }: {
     const media = q.media.question ?? []
     const imgs = media.filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
     const avs = media.filter(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
-    const split = q.question_text.trim() && imgs.length > 0 && imgs.length <= 2 && !q.media.hidden
+    const split = !!q.question_text.trim() && imgs.length === 1 && !q.media.hidden
     const choices = q.answer.mode === 'choice' ? q.answer.choices
       : q.answer.mode === 'order' ? q.answer.choices : null
 
@@ -186,7 +188,7 @@ function HostInner({ gameState, pack }: {
           ? (q.media.hidden
             ? <video key={i} autoPlay src={mediaUrl(m)} style={{ width: 1, height: 1, opacity: 0 }} />
             : <video key={i} autoPlay controls src={mediaUrl(m)} style={{ maxHeight: '46vh', borderRadius: 14 }} />)
-          : <audio key={i} autoPlay controls src={mediaUrl(m)} />)}
+          : <audio key={i} autoPlay src={mediaUrl(m)} />)}
 
         {choices && (
           <div className="choices-grid">
@@ -216,11 +218,15 @@ function HostInner({ gameState, pack }: {
           {gameState.question_index + 1 < round.questions.length
             ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
             : round.answers_reveal === 'after_round'
-              ? <button onClick={() => void gotoAnswers(0)}>Время ответов →</button>
+              ? <button onClick={() => void startAnswerTime()}>Время ответов →</button>
               : <AfterRoundNav pack={pack} gameState={gameState} />}
         </div>
       </div>
     )
+  }
+
+  if (gameState.phase === 'answer_time') {
+    return <AnswerTime pack={pack} round={round} gameState={gameState} />
   }
 
   if (gameState.phase === 'show_answers' && q) {
@@ -323,6 +329,19 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
   )
 }
 
+/** Стабильное перемешивание: порядок фиксирован для конкретного вопроса. */
+function shuffleStable<T>(arr: T[], seedStr: string): T[] {
+  let s = 0
+  for (const ch of seedStr) s = (s * 31 + ch.charCodeAt(0)) >>> 0
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) >>> 0
+    const j = s % (i + 1)
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
 function displayRoundNumber(pack: LoadedPack, idx: number): string {
   const r = pack.rounds[idx]
   if (r.off_scoreboard) return '0'
@@ -336,7 +355,11 @@ function displayAnswer(q: Question): string {
   const d = a.display
   if (Array.isArray(d)) return d.join(' · ')
   if (typeof d === 'string' && d) return d
-  if (typeof a.correct === 'string') return String(a.correct).split('/')[0].trim()
+  if (typeof a.correct === 'string' && a.correct) return String(a.correct).split('/')[0].trim()
+  if (typeof a.word === 'string' && a.word) return a.word.toUpperCase()
+  if (typeof a.correct_choice === 'string' && a.correct_choice) return a.correct_choice
+  if (typeof a.correct_order === 'string' && a.correct_order) return a.correct_order
+  if (Array.isArray(a.correct_pairs)) return (a.correct_pairs as string[]).join('  ')
   return '—'
 }
 
@@ -385,6 +408,53 @@ function QuestionAudio({ q, round, timerRunning }: {
   return null
 }
 
+/** «Время ответов»: минута на дозаполнение, крупный таймер, контроль связи —
+ *  видно, чьи ответы уже долетели (перенос AnswerTimeSlide старого проекта). */
+function AnswerTime({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const seconds = (round.settings as { answerTimeSeconds?: number }).answerTimeSeconds ?? 60
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const totalQ = round.questions.filter(q => !q.hidden).length
+
+  // фоновая музыка на время раздумий — как в старом
+  useEffect(() => {
+    const bg = (round.settings as { bg_music?: string }).bg_music
+    if (!bg || document.hidden) return
+    const a = new Audio(mediaUrl(bg))
+    a.loop = true; a.volume = 0.6
+    a.play().catch(() => {})
+    return () => a.pause()
+  }, [round.id])
+
+  return (
+    <div className="host-screen grid-bg">
+      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
+      <Title theme={pack.theme} lines={['ОТВЕЧАЙТЕ!']} />
+      <div className="meta-line">КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ</div>
+      <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
+      <div className="answer-time-teams">
+        {teams.map(t => {
+          const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
+          const done = got >= totalQ
+          return (
+            <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
+              <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
+            </div>
+          )
+        })}
+      </div>
+      <div className="host-actions">
+        <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1)}>← Назад</button>
+        <button onClick={() => void gotoAnswers(0)}>К ответам →</button>
+      </div>
+    </div>
+  )
+}
+
 /** Показ ответов раунда: вопрос остаётся, ответ появляется под ним,
  *  справа — ответы команд крупно (перенос старого ShowAnswers). */
 function ShowAnswers({ pack, round, q, gameState }: {
@@ -396,6 +466,10 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const revealed = gameState.reveal
   const teams = useTeams(gameState.game_id)
+  const [allTeams, setAllTeams] = useState<{ id: string; name: string; color: string }[]>([])
+  useEffect(() => {
+    void supabase.from('teams').select('id,name,color').then(({ data }) => setAllTeams(data ?? []))
+  }, [])
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const total = round.questions.length
   const step = gameState.question_index
@@ -434,7 +508,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {choices ? (
                 <div className="choices-grid" style={{ width: '100%' }}>
-                  {choices.map((c, i) => (
+                  {shuffleStable(choices, q.id).map((c, i) => (
                     <div key={c.key}
                       className={`choice-plate${c.key === (q.answer as { correct_choice?: string }).correct_choice ? ' correct' : ''}`}
                       style={{ animationDelay: `${i * 0.4}s` }}>
@@ -456,7 +530,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
           <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
           {rows.map(a => {
-            const team = teams.find(t => t.id === a.team_id)
+            const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
             return (
               <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${a.is_correct === true ? 'var(--ok)' : a.is_correct === false ? 'var(--danger)' : 'var(--dim)'}`,
