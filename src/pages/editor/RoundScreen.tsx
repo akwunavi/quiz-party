@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { metaLine } from '../../lib/packLoader'
-import { updateRound, createQuestion, hideQuestion, deleteQuestion } from '../../lib/editorApi'
+import { updateRound, createQuestion, hideQuestion, deleteQuestion, defaultModeFor } from '../../lib/editorApi'
 import { generateCrossword, type CrosswordInput } from '../../lib/crossword'
 import { QuestionForm } from './QuestionForm'
 import { EditableText, MECHANIC_NAMES } from './EditorApp'
@@ -130,9 +130,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </div>
         ))}
         {!locked && <button onClick={async () => {
-          await createQuestion(round.id,
-            round.mechanic === 'crossword' ? 'crossword_word' : 'free_text')
+          await createQuestion(round.id, defaultModeFor(round.mechanic))
           onChanged()
+          setOpenQIdx(round.questions.length)  // новый — в конце списка, модалка сразу
         }}>+ Вопрос</button>}
       </>}
     </div>

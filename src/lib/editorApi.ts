@@ -99,7 +99,15 @@ export async function deleteRound(id: string) {  // только owner (RLS)
 }
 
 // ── Вопросы ──
-export async function createQuestion(round_id: string, mode: 'free_text' | 'crossword_word' = 'free_text') {
+export type NewQuestionMode = 'free_text' | 'crossword_word' | 'choice'
+
+export function defaultModeFor(mechanic: string): NewQuestionMode {
+  if (mechanic === 'crossword') return 'crossword_word'
+  if (mechanic === 'test_stop' || mechanic === 'stakes_unique') return 'choice'
+  return 'free_text'
+}
+
+export async function createQuestion(round_id: string, mode: NewQuestionMode = 'free_text') {
   // позиция: max по всем (включая скрытые) + 1 — иначе конфликт unique(round_id, position)
   const { data: maxRow } = await supabase.from('pack_questions')
     .select('position').eq('round_id', round_id)
@@ -107,7 +115,9 @@ export async function createQuestion(round_id: string, mode: 'free_text' | 'cros
   const position = (maxRow?.position ?? -1) + 1
   const answer = mode === 'crossword_word'
     ? { mode, word: '' }
-    : { mode, correct: '', display: '' }
+    : mode === 'choice'
+      ? { mode, choices: ['А', 'Б', 'В', 'Г'].map(k => ({ key: k, text: '' })), correct_choice: '', display: '' }
+      : { mode, correct: '', display: '' }
   const { data, error } = await supabase.from('pack_questions').insert({
     round_id, position, answer,
   }).select().single()

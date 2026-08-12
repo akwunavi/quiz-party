@@ -75,7 +75,7 @@ export function scoredRounds(pack: LoadedPack): LoadedRound[] {
 /** Автогенерация metaLine: «10 ВОПРОСОВ · 30 СЕК · 1 БАЛЛ» */
 export function metaLine(round: LoadedRound): string {
   if (round.meta_line_override) return round.meta_line_override
-  const n = round.questions.length
+  const n = round.questions.filter(q => !q.hidden).length
   const parts = [`${n} ВОПРОС${n % 10 === 1 && n % 100 !== 11 ? '' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'А' : 'ОВ'}`,
     `${round.timer_seconds} СЕК`]
   const s = round.settings as Record<string, unknown>

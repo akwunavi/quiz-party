@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, type LoadedPack } from '../lib/packLoader'
-import { selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame } from '../lib/gameActions'
+import { selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame } from '../lib/gameActions'
 import { Timer } from '../components/Timer'
 import type { Pack, Question } from '../types/quiz'
 
@@ -68,6 +68,9 @@ export function HostScreen() {
                 К первому раунду →
               </button>
             )}
+            <button style={{ opacity: .7 }} onClick={() => {
+              if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
+            }}>⟲ Сменить пакет</button>
           </>
         )}
       </Center>
@@ -133,7 +136,9 @@ export function HostScreen() {
 
   if (gameState.phase === 'finale') {
     return <Center><h1 style={{ fontSize: '4rem' }}>ФИНАЛ</h1>
-      <p>Итоги — в админке; экран финала с фейерверком приедет с темами (этап 5а).</p></Center>
+      <p>Итоги — в админке; экран финала с фейерверком приедет с темами (этап 5а).</p>
+      <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
+    </Center>
   }
 
   return <Center>Фаза: {gameState.phase}</Center>

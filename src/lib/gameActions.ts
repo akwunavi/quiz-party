@@ -64,3 +64,14 @@ export async function heartbeat(teamId: string) {
   await supabase.from('teams')
     .update({ last_seen_at: new Date().toISOString() }).eq('id', teamId)
 }
+
+/** Полный сброс игры: активный пакет возвращается в ready, состояние — в лобби без пакета. */
+export async function resetGame() {
+  await supabase.from('packs').update({ status: 'ready' }).eq('status', 'active')
+  const { error } = await supabase.from('game_state').update({
+    game_id: crypto.randomUUID(), pack_id: null, phase: 'lobby',
+    round_number: 0, question_index: 0,
+    timer_started_at: null, reveal: false, completed_rounds: [],
+  }).eq('id', 1)
+  if (error) throw error
+}

@@ -3,7 +3,7 @@ import { useGameState } from '../hooks/useGameState'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, scoredRounds, type LoadedPack } from '../lib/packLoader'
-import { gotoRound, gotoQuestion, revealAnswer, finishGame } from '../lib/gameActions'
+import { gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame } from '../lib/gameActions'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import {
@@ -53,6 +53,10 @@ export function AdminPage() {
           }}>Р{i}</button>
         ))}
         <button onClick={() => void finishGame(gameState.pack_id)}>Финал</button>
+        <button style={{ color: '#b91c1c' }} onClick={() => {
+          if (confirm('Сбросить игру полностью (счёт останется в БД, экраны вернутся к выбору пакета)?'))
+            void resetGame()
+        }}>⟲ Сбросить игру</button>
       </div>
       {round && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>

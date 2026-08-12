@@ -13,7 +13,9 @@ export function validatePack(pack: LoadedPack): Problem[] {
   const problems: Problem[] = []
   if (pack.rounds.length === 0) problems.push({ roundIdx: -1, text: 'В пакете нет раундов' })
 
-  pack.rounds.forEach((round, ri) => {
+  pack.rounds.forEach((rawRound, ri) => {
+    // скрытые вопросы в игре не участвуют — валидатор их полностью игнорирует
+    const round = { ...rawRound, questions: rawRound.questions.filter(q => !q.hidden) }
     if (round.questions.length === 0)
       problems.push({ roundIdx: ri, text: 'Нет вопросов' })
     if (round.title_lines.length === 0 || !round.title_lines.join('').trim())

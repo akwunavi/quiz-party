@@ -25,6 +25,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
   const original = round.questions[qIdx]
   const [q, setQ] = useState<Question>(original)
   const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
 
   useEffect(() => setQ(original), [original])
 
@@ -34,10 +35,13 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
   const persistAll = async (close: boolean) => {
     setSaving(true)
     try {
-      const { id: _id, round_id: _r, position: _p, ...fields } = q
+      const errs = questionErrors(q)
+      const status = errs.length === 0 ? 'ready' as const : 'draft' as const
+      const { id: _id, round_id: _r, position: _p, ...fields } = { ...q, status }
       await updateQuestion(q.id, fields)
+      setErrors(errs)
       onChanged()
-      if (close) onBack()
+      if (close && errs.length === 0) onBack()   // с ошибками остаёмся: видно, что дозаполнить
     } finally { setSaving(false) }
   }
 
@@ -46,15 +50,19 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0 }}>Вопрос {qIdx + 1}</h3>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button disabled={saving} style={{ background: '#dcfce7' }}
-            onClick={() => void persistAll(true)}>💾 Сохранить и закрыть</button>
-          <button disabled={saving} onClick={() => void persistAll(false)}>Сохранить</button>
-          <button onClick={onBack}>✕ Закрыть без сохранения</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <IconBtn label="Сохранить" icon="💾" color="#16a34a"
+            disabled={saving} onClick={() => void persistAll(true)} />
+          <IconBtn label="Закрыть" icon="✕" color="#6b7280" onClick={onBack} />
         </div>
       </div>
+      {errors.length > 0 && (
+        <div style={{ margin: '8px 0', padding: 8, background: '#fef2f2', borderRadius: 8, color: '#b91c1c' }}>
+          Не заполнено: {errors.join('; ')} — сохранено как черновик.
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* ── Контент ── */}
@@ -103,21 +111,14 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
                 <option key={m} value={m}>{MODE_NAMES[m]}</option>)}
             </select>
           </label>
-          <AnswerEditor spec={q.answer} onChange={setAnswer} />
+          <AnswerEditor spec={q.answer} onChange={setAnswer}
+            imgs={(media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))} />
 
           <Preview q={q} />
 
         </div>
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        Статус:{' '}
-        <button onClick={() => save({ status: q.status === 'ready' ? 'draft' : 'ready' })}
-          style={{ background: q.status === 'ready' ? '#dcfce7' : '#fef9c3' }}>
-          {q.status === 'ready' ? '✅ Готов (нажми, чтобы вернуть в черновик)' : '🟡 Черновик (нажми, чтобы отметить готовым)'}
-        </button>
-        <span style={{ opacity: .5 }}> — полная валидация запускается на пакете кнопкой «Проверить готовность»</span>
-      </div>
     </div>
   )
 }
@@ -135,7 +136,9 @@ function defaultAnswer(mode: AnswerSpec['mode']): AnswerSpec {
 }
 
 // ── Редакторы по типам ──
-function AnswerEditor({ spec, onChange }: { spec: AnswerSpec; onChange: (a: AnswerSpec) => void }) {
+function AnswerEditor({ spec, onChange, imgs }: {
+  spec: AnswerSpec; onChange: (a: AnswerSpec) => void; imgs: string[]
+}) {
   switch (spec.mode) {
     case 'free_text': return (
       <div>
@@ -146,27 +149,38 @@ function AnswerEditor({ spec, onChange }: { spec: AnswerSpec; onChange: (a: Answ
     )
     case 'choice': return (
       <div>
-        {spec.choices.map((c, i) => (
-          <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 4, alignItems: 'center' }}>
-            <input type="radio" name="correct" checked={spec.correct_choice === c.key}
-              title="верный вариант"
-              onChange={() => onChange({ ...spec, correct_choice: c.key, display: `${c.key} — ${c.text}` })} />
-            <b>{c.key}</b>
-            <input value={c.text} style={{ flex: 1, padding: 4 }}
-              onChange={e => onChange({
-                ...spec,
-                choices: spec.choices.map((x, xi) => xi === i ? { ...x, text: e.target.value } : x),
-              })} />
-            <button onClick={() => onChange({
-              ...spec, choices: spec.choices.filter((_, xi) => xi !== i),
-            })}>✕</button>
-          </div>
-        ))}
+        <div style={{ opacity: .6, fontSize: 13, marginBottom: 4 }}>
+          Если варианты — картинки: тексты оставь пустыми, буква = картинка по порядку (А — первая…).
+        </div>
+        {spec.choices.map((c, i) => {
+          const thumb = imgs.length === spec.choices.length ? imgs[i] : null
+          const isCorrect = spec.correct_choice === c.key
+          return (
+            <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 4, alignItems: 'center' }}>
+              <b style={{ width: 18 }}>{c.key}</b>
+              {thumb && <img src={mediaUrl(thumb)} alt="" style={{ height: 28, borderRadius: 4 }} />}
+              <input value={c.text} placeholder={thumb ? '(картинка)' : 'текст варианта'}
+                style={{ flex: 1, padding: 4 }}
+                onChange={e => onChange({
+                  ...spec,
+                  choices: spec.choices.map((x, xi) => xi === i ? { ...x, text: e.target.value } : x),
+                })} />
+              <button onClick={() => onChange({ ...spec, correct_choice: c.key, display: `${c.key}${c.text ? ' — ' + c.text : ''}` })}
+                style={{
+                  padding: '4px 10px', borderRadius: 6,
+                  background: isCorrect ? '#16a34a' : '#f3f4f6',
+                  color: isCorrect ? '#fff' : '#111', fontWeight: isCorrect ? 700 : 400,
+                }}>{isCorrect ? '✓ верный' : 'верный?'}</button>
+              <button onClick={() => onChange({
+                ...spec, choices: spec.choices.filter((_, xi) => xi !== i),
+              })}>✕</button>
+            </div>
+          )
+        })}
         <button onClick={() => {
           const key = String.fromCharCode('А'.charCodeAt(0) + spec.choices.length)
           onChange({ ...spec, choices: [...spec.choices, { key, text: '' }] })
         }}>+ вариант</button>
-        {!spec.correct_choice && <div style={{ color: '#f43f5e' }}>⚠ отметь верный вариант радиокнопкой</div>}
       </div>
     )
     case 'order': return (
@@ -194,7 +208,7 @@ function AnswerEditor({ spec, onChange }: { spec: AnswerSpec; onChange: (a: Answ
       </div>
     )
     case 'match': return (
-      <MatchEditor spec={spec} onChange={onChange} />
+      <MatchEditor spec={spec} onChange={onChange} imgs={imgs} />
     )
     case 'crossword_word': return (
       <div>
@@ -214,8 +228,8 @@ function AnswerEditor({ spec, onChange }: { spec: AnswerSpec; onChange: (a: Answ
   }
 }
 
-function MatchEditor({ spec, onChange }: {
-  spec: Extract<AnswerSpec, { mode: 'match' }>; onChange: (a: AnswerSpec) => void
+function MatchEditor({ spec, onChange, imgs }: {
+  spec: Extract<AnswerSpec, { mode: 'match' }>; onChange: (a: AnswerSpec) => void; imgs: string[]
 }) {
   const [selLeft, setSelLeft] = useState<string | null>(null)
   const pairOf = (l: string) => spec.correct_pairs.find(p => p.startsWith(l))?.slice(l.length)
@@ -226,11 +240,14 @@ function MatchEditor({ spec, onChange }: {
         Левые = номера медиа/треков, правые = буквы вариантов из текста вопроса.
       </div>
       <div style={{ display: 'flex', gap: 24, marginTop: 6 }}>
-        <div>{spec.left.map(l => (
+        <div>{spec.left.map((l, i) => (
           <button key={l} onClick={() => setSelLeft(l)} style={{
-            display: 'block', margin: 3, padding: 8, minWidth: 56,
+            display: 'flex', alignItems: 'center', gap: 6, margin: 3, padding: 8, minWidth: 56,
             background: selLeft === l ? '#eab308' : pairOf(l) ? '#dcfce7' : undefined,
-          }}>{l}{pairOf(l) ? `–${pairOf(l)}` : ''}</button>
+          }}>
+            {imgs[i] && <img src={mediaUrl(imgs[i])} alt="" style={{ height: 24, borderRadius: 3 }} />}
+            {l}{pairOf(l) ? `–${pairOf(l)}` : ''}
+          </button>
         ))}</div>
         <div>{spec.right.map(r => (
           <button key={r} disabled={!selLeft} onClick={() => {
@@ -374,5 +391,38 @@ function Preview({ q }: { q: Question }) {
         </div>
       )}
     </div>
+  )
+}
+
+
+function questionErrors(q: Question): string[] {
+  const errs: string[] = []
+  const a = q.answer
+  const hasMedia = (q.media.question ?? []).length > 0
+  if (!q.question_text.trim() && !hasMedia) errs.push('текст вопроса (или медиа)')
+  switch (a.mode) {
+    case 'free_text': if (!a.correct.trim()) errs.push('правильный ответ'); break
+    case 'choice':
+      if (a.choices.length < 2) errs.push('минимум 2 варианта')
+      if (!a.correct_choice) errs.push('верный вариант')
+      break
+    case 'order': if (a.correct_order.length !== a.choices.length) errs.push('полный правильный порядок'); break
+    case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
+    case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
+    case 'none': break
+  }
+  return errs
+}
+
+function IconBtn({ label, icon, color, onClick, disabled }: {
+  label: string; icon: string; color: string; onClick: () => void; disabled?: boolean
+}) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
+      borderRadius: 8, border: 'none', cursor: 'pointer',
+      background: color, color: '#fff', fontSize: 14, fontWeight: 600,
+      opacity: disabled ? .5 : 1,
+    }}>{icon} {label}</button>
   )
 }
