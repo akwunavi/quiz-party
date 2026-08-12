@@ -53,7 +53,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           }}>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--neon)',
             boxShadow: '0 0 30px rgba(0,229,255,.25)',
-            borderRadius: 12, padding: 20, margin: '3vh 8px', maxWidth: 1120, width: '96%' }}>
+            borderRadius: 12, padding: 22, margin: '2vh 6px', maxWidth: 1400, width: '98%' }}>
             <QuestionForm pack={pack} round={round} qIdx={openQIdx}
               onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
           </div>
@@ -128,7 +128,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
       {round.mechanic === 'crossword' &&
         <CrosswordEditor round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'jeopardy' &&
-        <JeopardyEditor round={round} locked={locked} onChanged={onChanged} />}
+        <JeopardyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {round.mechanic !== 'jeopardy' && <>
         <h4>Вопросы</h4>
@@ -276,8 +276,8 @@ function GridView({ grid }: { grid: CrosswordGrid }) {
 }
 
 // ── Jeopardy: темы × плитки ──
-function JeopardyEditor({ round, locked, onChanged }: {
-  round: LoadedRound; locked: boolean; onChanged: () => void
+function JeopardyEditor({ pack, round, locked, onChanged }: {
+  pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
 }) {
   const settings = round.settings as { themes: JeopardyTheme[] }
   const [themes, setThemes] = useState<JeopardyTheme[]>(settings.themes ?? [])
@@ -290,7 +290,9 @@ function JeopardyEditor({ round, locked, onChanged }: {
 
   return (
     <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #3a4a6b', borderRadius: 8 }}>
-      <b>Темы × плитки</b> (аудио — путь в Storage; загрузка файлов плиток — из формы вопроса пока не нужна, вставляй путь после загрузки в любом вопросе или через Supabase Dashboard → Storage)
+      <b>Темы × плитки.</b> Механика раунда: таймера нет, ведущий открывает плитку,
+      играет трек, ответ показывается сразу по кнопке, баллы = цена плитки.
+      Аудио загружай кнопкой в строке плитки — файл уходит в Storage (не в Codespace).
       {themes.map((t, ti) => (
         <div key={ti} style={{ margin: '8px 0', padding: 8, background: 'var(--panel2)', borderRadius: 6 }}>
           <input value={t.name} placeholder={`Тема ${ti + 1}`} disabled={locked}
@@ -302,10 +304,10 @@ function JeopardyEditor({ round, locked, onChanged }: {
               {t.tiles.map((tile, i) => (
                 <tr key={i}>
                   <td><b>{tile.value}</b></td>
-                  <td><input value={tile.audio} placeholder="pack-…/song.mp3" disabled={locked}
-                    style={{ width: 240, padding: 3 }}
-                    onChange={e => upd(ts => ts.map((x, xi) => xi === ti ? {
-                      ...x, tiles: x.tiles.map((tl, tli) => tli === i ? { ...tl, audio: e.target.value } : tl),
+                  <td><MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+                    paths={tile.audio ? [tile.audio] : []}
+                    onChange={paths => upd(ts => ts.map((x, xi) => xi === ti ? {
+                      ...x, tiles: x.tiles.map((tl, tli) => tli === i ? { ...tl, audio: paths[0] ?? '' } : tl),
                     } : x))} /></td>
                   <td><input value={tile.correct} placeholder="ответ" disabled={locked}
                     style={{ width: 180, padding: 3 }}

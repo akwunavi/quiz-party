@@ -280,11 +280,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 @keyframes shiver { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-2px) rotate(-1deg) }
   75% { transform: translateX(2px) rotate(1deg) } }
 /* сосульки под кольцом на последних секундах */
-.ny-timer.low::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: -6px; height: 16px;
-  background: radial-gradient(ellipse 18% 100% at 15% 0, #dff1ff 60%, transparent 62%),
-              radial-gradient(ellipse 14% 130% at 45% 0, #dff1ff 60%, transparent 62%),
-              radial-gradient(ellipse 20% 90%  at 78% 0, #dff1ff 60%, transparent 62%);
-  opacity: .85; animation: iceGrow .4s ease forwards; }
 @keyframes iceGrow { from { transform: scaleY(0); opacity: 0 } to { transform: none; opacity: .85 } }
 
 /* — плашки вариантов: ледяное стекло — */
@@ -305,7 +300,7 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 
 /* QR-карточка в лобби */
 .qr-card { display: flex; flex-direction: column; align-items: center; gap: 10px;
-  padding: 18px 20px; background: rgba(255,255,255,.06);
+  padding: 16px 18px; background: rgba(8,26,52,.72); box-shadow: 0 8px 30px rgba(0,0,0,.45);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 12px;
   backdrop-filter: blur(4px); }
 .qr-card .lobby-qr { border-radius: 8px; padding: 6px; background: #fff; }
@@ -374,3 +369,74 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .at-team { padding: 10px 22px; border: 2px solid var(--dim); border-radius: 10px;
   font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; }
 .at-team.done { border-color: var(--ok); box-shadow: 0 0 16px color-mix(in srgb, var(--ok) 35%, transparent); }
+
+/* Ответ: золотая подсветка верного, приглушение неверных */
+.answer-reveal { border-color: rgba(255,215,0,.55); background: rgba(255,215,0,.08); }
+.answer-label { color: #ffd700; }
+.answer-main { color: #ffe680; text-shadow: 0 0 22px rgba(255,215,0,.45); }
+.choice-plate.correct { border-color: #ffd700; border-left-color: #ffd700;
+  background: rgba(255,215,0,.14); box-shadow: 0 0 22px rgba(255,215,0,.35); }
+.choice-plate.dimmed { opacity: .32; filter: grayscale(.85); }
+.choice-img { display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px; border: 2px solid var(--dim); border-radius: 10px; }
+.choice-img img { max-height: 22vh; border-radius: 6px; }
+.choice-img.correct { border-color: #ffd700; box-shadow: 0 0 22px rgba(255,215,0,.4); }
+.choice-img.dimmed { opacity: .3; filter: grayscale(.9); }
+.choice-imgs { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+/* Сопоставление на экране ответа: картинка → буква/текст */
+.match-answer { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.match-answer .pair { display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px; border: 1px solid rgba(255,215,0,.45); border-radius: 10px; }
+.match-answer .pair img { max-height: 18vh; border-radius: 6px; }
+.match-answer .pair .lbl { font-family: var(--font-display); color: #ffd700; }
+
+/* Кроссворд-раунд: сетка слева, титул и правила справа */
+.cw-layout { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,1fr);
+  gap: clamp(20px, 4vw, 60px); align-items: center; width: min(96vw, 1600px); }
+.cw-layout .side { text-align: left; display: flex; flex-direction: column; gap: 14px; }
+.cw-layout .side .neon-title { text-align: left; font-size: clamp(40px, 6vw, 96px); }
+@media (max-width: 900px) { .cw-layout { grid-template-columns: 1fr; } }
+
+/* Табло: пошаговое раскрытие */
+.sb-row { animation: sbIn .55s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes sbIn { from { opacity: 0; transform: translateY(26px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* Игрок: кнопки не вылезают */
+.pl-input-row { display: flex; gap: 8px; align-items: stretch; }
+.pl-input-row input { flex: 1 1 auto; min-width: 0; }
+.pl-input-row button { flex: 0 0 auto; white-space: nowrap; padding: 10px 14px; font-size: 14px;
+  clip-path: none; border-radius: 8px; }
+
+/* ═══ Ледяная рамка вопроса с сосульками (НГ-тема) ═══ */
+.theme-new_year .q-frame {
+  position: relative; padding: clamp(20px, 3vw, 38px) clamp(24px, 4vw, 52px);
+  border: 2px solid rgba(198,230,255,.5); border-radius: 14px;
+  background: linear-gradient(180deg, rgba(180,220,255,.10), rgba(120,180,240,.04));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 0 30px rgba(124,199,255,.18);
+  overflow: visible;
+}
+/* блик, медленно пробегающий по льду */
+.theme-new_year .q-frame::before {
+  content: ''; position: absolute; inset: 0; border-radius: 12px; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.16) 48%, transparent 60%);
+  background-size: 260% 100%; animation: iceShine 7s ease-in-out infinite;
+}
+@keyframes iceShine { 0%,100% { background-position: 130% 0; } 50% { background-position: -30% 0; } }
+
+/* сосульки: свисают с нижнего края рамки, каждая своей длины */
+.icicles { position: absolute; left: 6px; right: 6px; bottom: -2px; height: 0; pointer-events: none; }
+.icicle {
+  position: absolute; top: 0; width: 9px;
+  background: linear-gradient(180deg, rgba(226,244,255,.95), rgba(150,205,245,.75) 55%, rgba(190,230,255,.15));
+  border-radius: 0 0 60% 60% / 0 0 100% 100%;
+  clip-path: polygon(0 0, 100% 0, 62% 78%, 50% 100%, 38% 78%);
+  filter: drop-shadow(0 2px 4px rgba(60,110,160,.45));
+  transform-origin: top center;
+  animation: icicleSway 4.5s ease-in-out infinite, icicleGrow .7s cubic-bezier(.2,.9,.3,1.2) both;
+}
+@keyframes icicleGrow { from { transform: scaleY(.15); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+@keyframes icicleSway { 0%,100% { rotate: 0deg; } 50% { rotate: 1.2deg; } }
+/* на последних секундах лёд «нарастает» и подсвечивается */
+.q-frame.low .icicle { animation: icicleSway 2.2s ease-in-out infinite; height: calc(var(--len) * 1.35) !important;
+  filter: drop-shadow(0 0 8px rgba(180,225,255,.8)); }

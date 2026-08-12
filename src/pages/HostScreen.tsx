@@ -124,22 +124,37 @@ function HostInner({ gameState, pack }: {
     const grid = (round.settings as { grid?: CrosswordGrid }).grid
     return (
       <div className="host-screen grid-bg">
-        <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
-        <Title theme={pack.theme} lines={round.title_lines} />
-        <Deco theme={pack.theme} />
-        <div className="meta-line">{metaLine(round)}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: '72vw' }}>
-          {round.rules.map((r, i) => (
-            <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
-              <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
-            </div>
-          ))}
-        </div>
         {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
-        {round.mechanic === 'crossword' && grid && (
-          /* только пустая сетка — без слов, ответов и определений */
-          <CrosswordView grid={grid} cellSize={Math.min(34, Math.floor(innerWidth * .5 / grid.cols))} />
-        )}
+        {round.mechanic === 'crossword' && grid ? (
+          <div className="cw-layout">
+            {/* только пустая сетка — без слов и определений */}
+            <CrosswordView grid={grid}
+              cellSize={Math.max(18, Math.min(44,
+                Math.floor(Math.min(innerWidth * .48 / grid.cols, innerHeight * .8 / grid.rows))))} />
+            <div className="side">
+              <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
+              <Title theme={pack.theme} lines={round.title_lines} />
+              <div className="meta-line" style={{ alignSelf: 'flex-start' }}>{metaLine(round)}</div>
+              {round.rules.map((r, i) => (
+                <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.5}s` }}>
+                  <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (<>
+          <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
+          <Title theme={pack.theme} lines={round.title_lines} />
+          <Deco theme={pack.theme} />
+          <div className="meta-line">{metaLine(round)}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: '72vw' }}>
+            {round.rules.map((r, i) => (
+              <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
+                <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
+              </div>
+            ))}
+          </div>
+        </>)}
         <div className="host-actions">
           <button onClick={() => void gotoQuestion(0)}>Первый вопрос →</button>
         </div>
@@ -155,26 +170,38 @@ function HostInner({ gameState, pack }: {
     const split = !!q.question_text.trim() && imgs.length === 1 && !q.media.hidden
     const choices = q.answer.mode === 'choice' ? q.answer.choices
       : q.answer.mode === 'order' ? q.answer.choices : null
+    const isNY = pack.theme === 'new_year'
+    const timeLow = !!gameState.timer_started_at &&
+      (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
+    const frameCls = isNY ? `q-frame${timeLow ? ' low' : ''}` : ''
 
     return (
       <div className="host-screen grid-bg">
-        <QuestionAudio q={q} round={round} timerRunning={!!gameState.timer_started_at} />
+        {round.mechanic !== 'jeopardy' &&
+          <QuestionAudio q={q} round={round} timerRunning={!!gameState.timer_started_at} />}
         <div className="host-topbar">
           <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
             <b>{gameState.question_index + 1}</b> / {round.questions.length}</span>
-          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds} theme={pack.theme} />
+          {round.mechanic !== 'jeopardy' &&
+            <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds} theme={pack.theme} />}
         </div>
 
         {split ? (
-          <div className="q-split">
+          <div className={frameCls}>
+            {isNY && <Icicles seed={q.id} low={timeLow} />}
+            <div className="q-split">
             <WindText key={q.id} text={q.question_text} />
             <div className="q-media-grid">
               {imgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
             </div>
+            </div>
           </div>
         ) : (
           <>
-            <WindText key={q.id} text={q.question_text} />
+            <div className={frameCls}>
+              {isNY && <Icicles seed={q.id} low={timeLow} />}
+              <WindText key={q.id} text={q.question_text} />
+            </div>
             {!q.media.hidden && imgs.length > 0 && (
               <div className="q-media-grid" style={{ maxWidth: '92vw' }}>
                 {imgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt=""
@@ -200,7 +227,7 @@ function HostInner({ gameState, pack }: {
           </div>
         )}
 
-        {round.answers_reveal === 'after_question' && gameState.reveal && (
+        {(round.answers_reveal === 'after_question' || round.mechanic === 'jeopardy') && gameState.reveal && (
           <div className="answer-reveal hud-frame">
             <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
             <div className="answer-main">{displayAnswer(q)}</div>
@@ -213,7 +240,7 @@ function HostInner({ gameState, pack }: {
 
         <div className="host-actions">
           <BackBtn gameState={gameState} />
-          {round.answers_reveal === 'after_question' && !gameState.reveal &&
+          {(round.answers_reveal === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
             <button onClick={() => void revealAnswer()}>Показать ответ</button>}
           {gameState.question_index + 1 < round.questions.length
             ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
@@ -253,6 +280,33 @@ function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGa
   return gameState.question_index > 0
     ? <button className="ghost" onClick={() => void gotoQuestion(gameState.question_index - 1)}>← Назад</button>
     : <button className="ghost" onClick={() => void setPhase('round_intro')}>← К титулу</button>
+}
+
+/** Ледяная рамка с сосульками (только НГ-тема). */
+function Icicles({ seed, low }: { seed: string; low: boolean }) {
+  const items = useMemo(() => {
+    let s = 0
+    for (const ch of seed) s = (s * 31 + ch.charCodeAt(0)) >>> 0
+    const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 }
+    const n = 16
+    return Array.from({ length: n }, (_, i) => ({
+      left: (i + 0.5) * (100 / n) + (rnd() - 0.5) * 2.5,
+      len: 12 + rnd() * 30,
+      delay: rnd() * 0.5,
+      sway: 3 + rnd() * 3,
+    }))
+  }, [seed])
+  return (
+    <div className="icicles">
+      {items.map((it, i) => (
+        <span key={i} className="icicle" style={{
+          left: `${it.left}%`, height: it.len, ['--len' as string]: `${it.len}px`,
+          animationDelay: `${it.delay}s, ${it.delay}s`,
+          animationDuration: `${it.sway}s, .7s`,
+        }} />
+      ))}
+    </div>
+  )
 }
 
 /** Появление текста «ветром»: по словам с каскадной задержкой. */
@@ -493,6 +547,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
   }, [revealed, step, rows.length])
 
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
+  const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
 
   return (
     <div className="host-screen grid-bg" style={{ justifyContent: 'flex-start' }}>
@@ -506,15 +561,31 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && (
             <div className="answer-reveal hud-frame">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              {choices ? (
+              {q.answer.mode === 'match' ? (
+                <MatchAnswer q={q} />
+              ) : choices && imgChoices.length === choices.length ? (
+                <div className="choice-imgs">
+                  {shuffleStable(choices.map((c, i) => ({ c, img: imgChoices[i] })), q.id).map(({ c, img }) => {
+                    const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
+                    return (
+                      <div key={c.key} className={`choice-img${ok ? ' correct' : ' dimmed'}`}>
+                        <img src={mediaUrl(img)} alt="" />
+                        <span className="key">{c.key}{c.text ? ` — ${c.text}` : ''}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : choices ? (
                 <div className="choices-grid" style={{ width: '100%' }}>
-                  {shuffleStable(choices, q.id).map((c, i) => (
-                    <div key={c.key}
-                      className={`choice-plate${c.key === (q.answer as { correct_choice?: string }).correct_choice ? ' correct' : ''}`}
-                      style={{ animationDelay: `${i * 0.4}s` }}>
-                      <span className="key">{c.key}</span>{c.text}
-                    </div>
-                  ))}
+                  {shuffleStable(choices, q.id).map((c, i) => {
+                    const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
+                    return (
+                      <div key={c.key} className={`choice-plate${ok ? ' correct' : ' dimmed'}`}
+                        style={{ animationDelay: `${i * 0.4}s` }}>
+                        <span className="key">{c.key}</span>{c.text}
+                      </div>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="answer-main">{displayAnswer(q)}</div>
@@ -558,6 +629,26 @@ function ShowAnswers({ pack, round, q, gameState }: {
   )
 }
 
+/** Сопоставление на экране ответа: картинка №N с правильной буквой (перенос MatchAnswerGrid). */
+function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][number] }) {
+  if (q.answer.mode !== 'match') return null
+  const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  const pairs = q.answer.correct_pairs
+  return (
+    <div className="match-answer">
+      {q.answer.left.map((l, i) => {
+        const right = pairs.find(p => p.startsWith(l))?.slice(l.length) ?? '—'
+        return (
+          <div key={l} className="pair">
+            {imgs[i] && <img src={mediaUrl(imgs[i])} alt="" />}
+            <span className="lbl">{l} → {right}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 /** Навигация после раунда: табло → перерыв → следующий раунд/финал (по флагам раунда). */
 function AfterRoundNav({ pack, gameState }: {
   pack: LoadedPack
@@ -586,6 +677,16 @@ function ScoreboardScreen({ pack, gameState }: {
   const perRound = computeRoundScores(pack, teams, answers)
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
   const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
+  // раскрытие интригой: с последнего места, по одной строке каждые 2.2 сек
+  const [revealed, setRevealed] = useState(0)
+  useEffect(() => {
+    setRevealed(0)
+    if (ranked.length === 0) return
+    const t = setInterval(() => setRevealed(p => (p >= ranked.length ? p : p + 1)), 2200)
+    return () => clearInterval(t)
+  }, [ranked.length, gameState.round_number])
+  const visible = ranked.slice(Math.max(0, ranked.length - revealed))
+  const medals = ['🥇', '🥈', '🥉']
   return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
@@ -599,14 +700,16 @@ function ScoreboardScreen({ pack, gameState }: {
           </tr>
         </thead>
         <tbody>
-          {ranked.map((t, pos) => (
-            <tr key={t.id} className={pos === 0 ? 'leader' : ''}>
-              <td>{pos === 0 ? '🏆' : pos + 1}</td>
+          {visible.map(t => {
+            const pos = ranked.indexOf(t)
+            return (
+            <tr key={t.id} className={`sb-row${pos === 0 ? ' leader' : ''}`}>
+              <td>{medals[pos] ?? pos + 1}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>{t.name}</td>
               {(perRound.get(t.id) ?? scored.map(() => 0)).map((v, i) => <td key={i}>{v}</td>)}
               <td className="total">{totals.get(t.id) ?? 0}</td>
             </tr>
-          ))}
+          )})}
         </tbody>
       </table>
       <div className="host-actions">
