@@ -6,10 +6,7 @@ import { loadPack, scoredRounds, type LoadedPack } from '../lib/packLoader'
 import { gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame } from '../lib/gameActions'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
-import {
-  scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
-  scoreThematic, type ScoredAnswer,
-} from '../lib/scoring'
+import { computeTotals } from '../lib/totals'
 import type { Answer, Question } from '../types/quiz'
 
 // ═══ Админка (телефон ведущего) ═══
@@ -27,11 +24,12 @@ export function AdminPage() {
     if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
   }, [gameState?.pack_id])
 
-  if (!gameState || !pack) return <div style={{ padding: 16 }}>Загрузка… (игра не начата?)</div>
+  if (!gameState || !pack) return <div className="cyber" style={{ padding: 16, minHeight: '100vh' }}>Загрузка… (игра не начата?)</div>
   const round = pack.rounds[gameState.round_number]
   const q = round?.questions[gameState.question_index]
 
   return (
+    <div className="cyber" style={{ minHeight: '100vh' }}>
     <div style={{ padding: 12, maxWidth: 640, margin: '0 auto', fontSize: 14 }}>
       <h3>Админка · {pack.name}</h3>
 
@@ -99,6 +97,7 @@ export function AdminPage() {
       <Scoreboard pack={pack} gameId={gameState.game_id} teams={teams} doubled={doubled}
         currentRound={gameState.round_number} />
     </div>
+    </div>
   )
 }
 
@@ -157,35 +156,9 @@ function Scoreboard({ pack, gameId, teams, doubled, currentRound }: {
   currentRound: number
 }) {
   const allAnswers = useAnswers(gameId)
-  const totals = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const t of teams) {
-      let total = 0
-      pack.rounds.forEach((round, ri) => {
-        if (round.off_scoreboard) return
-        const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
-          const a = allAnswers.find(x => x.team_id === t.id && x.question_ref === `q-${q.id}`)
-          return {
-            questionIndex: qi,
-            isCorrect: a ? (a.is_correct ?? autocheck(q.answer, a.answer_text)) : null,
-            stake: a?.stake ?? null,
-          }
-        })
-        const s = round.settings as Record<string, unknown>
-        switch (round.mechanic) {
-          case 'test_stop': total += scoreTestStop(rows); break
-          case 'stakes_unique': total += scoreStakesUnique(rows); break
-          case 'stakes_free': total += scoreStakesFree(rows); break
-          case 'thematic_x2':
-            total += scoreThematic(rows, ri === currentRound ? !!doubled[t.id] : false); break
-          default:
-            total += scoreStandard(rows, (s.pointsPerQuestion as number | undefined) ?? 1)
-        }
-      })
-      map.set(t.id, total)
-    }
-    return map
-  }, [pack, teams, allAnswers, doubled, currentRound])
+  const totals = useMemo(
+    () => computeTotals(pack, teams as never, allAnswers, doubled, currentRound),
+    [pack, teams, allAnswers, doubled, currentRound])
 
   const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
   return (

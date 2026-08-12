@@ -43,8 +43,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 100,
           display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto',
         }} onClick={e => { if (e.target === e.currentTarget) setOpenQIdx(null) }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 16, margin: '4vh 8px',
-            maxWidth: 860, width: '100%' }}>
+          <div style={{ background: 'var(--panel)', border: '1px solid var(--neon)',
+            boxShadow: '0 0 30px rgba(0,229,255,.25)',
+            borderRadius: 12, padding: 16, margin: '4vh 8px', maxWidth: 860, width: '100%' }}>
             <QuestionForm pack={pack} round={round} qIdx={openQIdx}
               onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
           </div>
@@ -107,8 +108,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         {round.questions.map((q, i) => (
           <div key={q.id} style={{
             display: 'flex', justifyContent: 'space-between',
-            border: '1px solid #ddd', borderRadius: 8, padding: 8, marginBottom: 6,
-            opacity: q.hidden ? .45 : 1, background: q.hidden ? '#f3f4f6' : undefined,
+            border: '1px solid #22314f', borderRadius: 8, padding: 8, marginBottom: 6,
+            opacity: q.hidden ? .45 : 1, background: q.hidden ? '#101827' : undefined,
           }}>
             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
               <b>{i + 1}.</b> {q.question_text || <i style={{ opacity: .5 }}>(пусто)</i>}
@@ -180,7 +181,7 @@ function CrosswordEditor({ round, locked, onChanged }: {
     inputs.every(i => i.word.trim())
 
   return (
-    <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #999', borderRadius: 8 }}>
+    <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #3a4a6b', borderRadius: 8 }}>
       <b>Сетка кроссворда</b> — слова добавляй как вопросы (тип «Слово кроссворда»),
       определение = текст вопроса. Сейчас слов: {inputs.length} (нужно 6–10).
       <div style={{ margin: '8px 0', display: 'flex', gap: 6 }}>
@@ -262,10 +263,10 @@ function JeopardyEditor({ round, locked, onChanged }: {
   }
 
   return (
-    <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #999', borderRadius: 8 }}>
+    <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #3a4a6b', borderRadius: 8 }}>
       <b>Темы × плитки</b> (аудио — путь в Storage; загрузка файлов плиток — из формы вопроса пока не нужна, вставляй путь после загрузки в любом вопросе или через Supabase Dashboard → Storage)
       {themes.map((t, ti) => (
-        <div key={ti} style={{ margin: '8px 0', padding: 8, background: '#f9fafb', borderRadius: 6 }}>
+        <div key={ti} style={{ margin: '8px 0', padding: 8, background: 'var(--panel2)', borderRadius: 6 }}>
           <input value={t.name} placeholder={`Тема ${ti + 1}`} disabled={locked}
             onChange={e => upd(ts => ts.map((x, i) => i === ti ? { ...x, name: e.target.value } : x))}
             style={{ padding: 4, fontWeight: 700 }} />

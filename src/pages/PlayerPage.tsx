@@ -5,7 +5,9 @@ import { registerTeam, heartbeat } from '../lib/gameActions'
 import { enqueueAnswer } from '../lib/answerQueue'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { Timer } from '../components/Timer'
-import type { AnswerSpec, Team } from '../types/quiz'
+import type { AnswerSpec, Team, CrosswordGrid } from '../types/quiz'
+import { ThemeLayer } from '../components/ThemeLayer'
+import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 
 // ═══ Экран игрока (телефон) ═══
 // Регистрация команды → ответы по типам (free_text/choice/order/match).
@@ -17,13 +19,23 @@ const TEAM_LS = 'qp-team'
 export function PlayerPage() {
   const { gameState } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
+  useEffect(() => {
+    if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
+    else setPack(null)
+  }, [gameState?.pack_id])
+  return (
+    <ThemeLayer theme={pack?.theme ?? 'classic'}>
+      <PlayerInner gameState={gameState} pack={pack} />
+    </ThemeLayer>
+  )
+}
+
+function PlayerInner({ gameState, pack }: {
+  gameState: ReturnType<typeof useGameState>['gameState']; pack: LoadedPack | null
+}) {
   const [team, setTeam] = useState<Team | null>(() => {
     try { return JSON.parse(localStorage.getItem(TEAM_LS) ?? 'null') } catch { return null }
   })
-
-  useEffect(() => {
-    if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
-  }, [gameState?.pack_id])
 
   // heartbeat: раз в 5 сек, чтобы админ видел «живость»
   useEffect(() => {
@@ -46,6 +58,22 @@ export function PlayerPage() {
 
   if (gameState.phase === 'round_intro')
     return <P><ConnectionDot />Раунд скоро начнётся — смотрите на экран</P>
+
+  if (gameState.phase === 'question' && round && q && round.mechanic === 'crossword') {
+    const grid = (round.settings as { grid?: CrosswordGrid }).grid
+    return (
+      <div style={{ padding: 12, maxWidth: 480, margin: '0 auto' }}>
+        <ConnectionDot />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: team.color, fontWeight: 700 }}>{team.name}</span>
+          <Timer startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+        </div>
+        {grid
+          ? <CrosswordPlayer grid={grid} round={round} q={q} team={team} gameState={gameState} />
+          : <p>Сетка не найдена — сообщите ведущему</p>}
+      </div>
+    )
+  }
 
   if (gameState.phase === 'question' && round && q) {
     return (
@@ -72,6 +100,58 @@ export function PlayerPage() {
 
   if (gameState.phase === 'finale') return <P>Игра окончена — итоги на экране!</P>
   return <P><ConnectionDot />Смотрите на экран</P>
+}
+
+// ── Кроссворд на телефоне: сетка постоянно, текущее слово подсвечено,
+//    ввод целиком; длиннее — обрежется, короче — клетки остаются пустыми ──
+function CrosswordPlayer({ grid, round, q, team, gameState }: {
+  grid: CrosswordGrid
+  round: NonNullable<LoadedPack['rounds'][number]>
+  q: NonNullable<LoadedPack['rounds'][number]>['questions'][number]
+  team: Team
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const lsKey = `qp-cw-${gameState.game_id}-${round.id}`
+  const [byWord, setByWord] = useState<Record<string, string>>(() => {
+    try { return JSON.parse(localStorage.getItem(lsKey) ?? '{}') } catch { return {} }
+  })
+  const [input, setInput] = useState('')
+
+  const currentWord = q.answer.mode === 'crossword_word'
+    ? q.answer.word.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, '') : ''
+  const placement = grid.words.find(w => w.word === currentWord)
+  useEffect(() => { setInput(byWord[currentWord] ?? '') }, [q.id])
+
+  const send = () => {
+    const next = { ...byWord, [currentWord]: input.trim() }
+    setByWord(next)
+    localStorage.setItem(lsKey, JSON.stringify(next))
+    void enqueueAnswer({
+      team_id: team.id, game_id: gameState.game_id,
+      question_ref: `q-${q.id}`, round_number: gameState.round_number,
+      answer_text: input.trim(),
+    })
+  }
+
+  return (
+    <div>
+      <CrosswordView grid={grid} cellSize={Math.min(30, Math.floor(340 / grid.cols))}
+        currentWordNumber={placement?.number} currentDir={placement?.dir}
+        letters={lettersFromAnswers(grid, byWord)} />
+      <p style={{ whiteSpace: 'pre-wrap', marginTop: 10 }}>
+        {placement && <b>{placement.number} {placement.dir === 'across' ? '→' : '↓'} · </b>}
+        {q.question_text}
+      </p>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input value={input} onChange={e => setInput(e.target.value)}
+          placeholder="Слово целиком" style={{ flex: 1, fontSize: '1.1rem', padding: 8 }} />
+        <button disabled={!input.trim()} onClick={send}>
+          {byWord[currentWord] ? 'Исправить' : 'Отправить'}
+        </button>
+      </div>
+      {byWord[currentWord] && <p style={{ opacity: .7 }}>Отправлено: {byWord[currentWord]}</p>}
+    </div>
+  )
 }
 
 function stakesFor(mechanic: string, settings: unknown): number[] | null {

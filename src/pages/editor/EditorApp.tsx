@@ -24,8 +24,8 @@ export const MECHANIC_NAMES: Record<MechanicKey, string> = {
 
 export function EditorApp() {
   const { user, setUser, loading } = useEditorUser()
-  if (loading) return <div style={{ padding: 24 }}>Загрузка…</div>
-  if (!user) return <Login onDone={setUser} />
+  if (loading) return <div className="cyber" style={{ padding: 24, minHeight: '100vh' }}>Загрузка…</div>
+  if (!user) return <div className="cyber" style={{ minHeight: '100vh' }}><Login onDone={setUser} /></div>
   return <EditorMain user={user} onLogout={async () => { await signOut(); setUser(null) }} />
 }
 
@@ -62,6 +62,7 @@ function EditorMain({ user, onLogout }: { user: EditorUser; onLogout: () => void
   useEffect(reload, [])
 
   return (
+    <div className="cyber" style={{ minHeight: '100vh' }}>
     <div style={{ maxWidth: 900, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0 }}>Редактор пакетов</h2>
@@ -74,6 +75,7 @@ function EditorMain({ user, onLogout }: { user: EditorUser; onLogout: () => void
         ? <PackScreen packId={openPackId} user={user}
             onBack={() => { setOpenPackId(null); reload() }} />
         : <PackList packs={packs} user={user} onOpen={setOpenPackId} onChanged={reload} />}
+    </div>
     </div>
   )
 }
@@ -101,13 +103,13 @@ function PackList({ packs, user, onOpen, onChanged }: {
       {packs.map(p => (
         <div key={p.id} style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 8,
+          border: '1px solid #22314f', borderRadius: 8, padding: 12, marginBottom: 8,
         }}>
           <div>
             <b>{p.name}</b>{' '}
             <span style={{
               padding: '2px 8px', borderRadius: 10, fontSize: 12,
-              background: p.status === 'ready' ? '#dcfce7' : p.status === 'active' ? '#fee2e2' : '#f3f4f6',
+              background: p.status === 'ready' ? '#0f3d2e' : p.status === 'active' ? '#4a1220' : '#1a2440', border: '1px solid #22314f',
             }}>{STATUS_RU[p.status]}</span>
             {' '}<span style={{ opacity: .5, fontSize: 12 }}>тема: {p.theme}</span>
           </div>
@@ -171,7 +173,7 @@ function PackScreen({ packId, user, onBack }: {
 
       {problems && (
         <div style={{ margin: '12px 0', padding: 10, borderRadius: 8,
-          background: problems.length ? '#fef2f2' : '#f0fdf4' }}>
+          background: problems.length ? '#2a1218' : '#0f2b1f' }}>
           {problems.length === 0 ? '✅ Пакет готов — статус переключён.' : <>
             <b>Проблемы ({problems.length}):</b>
             <ul>
@@ -192,7 +194,7 @@ function PackScreen({ packId, user, onBack }: {
       {pack.rounds.map((r, i) => (
         <div key={r.id} style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          border: '1px solid #ddd', borderRadius: 8, padding: 10, marginBottom: 6,
+          border: '1px solid #22314f', borderRadius: 8, padding: 10, marginBottom: 6,
         }}>
           <div>
             <b>{i + 1}. {r.title_lines.join(' ') || '(без названия)'}</b>

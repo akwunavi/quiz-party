@@ -3,7 +3,12 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, type LoadedPack } from '../lib/packLoader'
 import { selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame } from '../lib/gameActions'
 import { Timer } from '../components/Timer'
-import type { Pack, Question } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid } from '../types/quiz'
+import { ThemeLayer } from '../components/ThemeLayer'
+import { CrosswordView } from '../components/CrosswordView'
+import { computeTotals } from '../lib/totals'
+import { useTeams } from '../hooks/useTeams'
+import { useAnswers } from '../hooks/useAnswers'
 
 // ═══ Экран хоста (проектор) ═══
 // До старта: выбор пакета. После: титулы раундов → вопросы → reveal → финал.
@@ -11,14 +16,26 @@ import type { Pack, Question } from '../types/quiz'
 
 export function HostScreen() {
   const { gameState } = useGameState()
-  const [packs, setPacks] = useState<Pack[]>([])
   const [pack, setPack] = useState<LoadedPack | null>(null)
-  const [selectedId, setSelectedId] = useState('')
-
-  useEffect(() => { void listPacks().then(setPacks).catch(() => setPacks([])) }, [])
   useEffect(() => {
     if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
+    else setPack(null)
   }, [gameState?.pack_id])
+  return (
+    <ThemeLayer theme={pack?.theme ?? 'classic'} isProjector>
+      <HostInner gameState={gameState} pack={pack} setPack={setPack} />
+    </ThemeLayer>
+  )
+}
+
+function HostInner({ gameState, pack }: {
+  gameState: ReturnType<typeof useGameState>['gameState']
+  pack: LoadedPack | null
+  setPack: (p: LoadedPack | null) => void
+}) {
+  const [packs, setPacks] = useState<Pack[]>([])
+  const [selectedId, setSelectedId] = useState('')
+  useEffect(() => { void listPacks().then(setPacks).catch(() => setPacks([])) }, [])
 
   const playerUrl = useMemo(() => {
     const base = `${location.origin}${location.pathname}#/player`
@@ -31,7 +48,7 @@ export function HostScreen() {
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <Center>
-        <h1 style={{ fontSize: '4rem', margin: 0 }}>QUIZ PARTY</h1>
+        <h1 className="game-title">QUIZ PARTY</h1>
         {!gameState.pack_id ? (
           <div style={{ marginTop: 24 }}>
             <select value={selectedId} onChange={e => setSelectedId(e.target.value)}
@@ -93,6 +110,10 @@ export function HostScreen() {
         <ul style={{ textAlign: 'left', fontSize: '1.2rem' }}>
           {round.rules.map((r, i) => <li key={i}>{r}</li>)}
         </ul>
+        {round.rules_audio && <audio autoPlay controls src={mediaUrl(round.rules_audio)} />}
+        {round.mechanic === 'crossword' && (round.settings as { grid?: CrosswordGrid }).grid && (
+          <CrosswordView grid={(round.settings as { grid: CrosswordGrid }).grid} cellSize={34} />
+        )}
         <button onClick={() => void gotoQuestion(0)}>Первый вопрос →</button>
       </Center>
     )
@@ -108,6 +129,7 @@ export function HostScreen() {
           <Timer startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
         </div>
         <h2 style={{ fontSize: '2rem', whiteSpace: 'pre-wrap' }}>{q.question_text}</h2>
+        {q.media.voice && <audio autoPlay src={mediaUrl(q.media.voice)} />}
         {!q.media.hidden && media.length > 0 && (
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {media.map((m, i) => <MediaItem key={i} src={m} />)}
@@ -135,10 +157,7 @@ export function HostScreen() {
   }
 
   if (gameState.phase === 'finale') {
-    return <Center><h1 style={{ fontSize: '4rem' }}>ФИНАЛ</h1>
-      <p>Итоги — в админке; экран финала с фейерверком приедет с темами (этап 5а).</p>
-      <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
-    </Center>
+    return <Finale pack={pack} gameId={gameState.game_id} />
   }
 
   return <Center>Фаза: {gameState.phase}</Center>
@@ -176,6 +195,41 @@ export function mediaUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path
   const base = import.meta.env.VITE_SUPABASE_URL
   return `${base}/storage/v1/object/public/quiz-media/${path.replace(/^\//, '')}`
+}
+
+function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
+  const teams = useTeams(gameId)
+  const answers = useAnswers(gameId)
+  const totals = computeTotals(pack, teams, answers)
+  const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
+  const top = ranked.slice(0, 3)
+  const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
+  return (
+    <Center>
+      {Array.from({ length: 14 }, (_, i) => (
+        <span key={i} className="firework" style={{
+          left: `${6 + i * 6.5}%`,
+          background: colors[i % colors.length],
+          animationDelay: `${(i % 7) * 0.23}s`,
+        }} />
+      ))}
+      <h1 className="game-title">ФИНАЛ</h1>
+      <div className="pedestal">
+        {[1, 0, 2].map(pos => top[pos] && (
+          <div key={pos} className="step" style={{ paddingBottom: 18 + (2 - pos) * 26 }}>
+            <div style={{ fontSize: '2rem' }}>{['🥇', '🥈', '🥉'][pos]}</div>
+            <b style={{ color: top[pos].color }}>{top[pos].name}</b>
+            <div className="num">{totals.get(top[pos].id) ?? 0}</div>
+          </div>
+        ))}
+      </div>
+      <ol style={{ fontSize: '1.2rem' }}>
+        {ranked.map(t => <li key={t.id}><span style={{ color: t.color }}>{t.name}</span> — {totals.get(t.id) ?? 0}</li>)}
+      </ol>
+      <p style={{ opacity: .6 }}>Точный счёт (с ручными правками и ×2) — в админке.</p>
+      <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
+    </Center>
+  )
 }
 
 function Center({ children }: { children: React.ReactNode }) {

@@ -59,7 +59,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
         </div>
       </div>
       {errors.length > 0 && (
-        <div style={{ margin: '8px 0', padding: 8, background: '#fef2f2', borderRadius: 8, color: '#b91c1c' }}>
+        <div style={{ margin: '8px 0', padding: 8, background: '#2a1218', borderRadius: 8, color: '#ff8fa3' }}>
           Не заполнено: {errors.join('; ')} — сохранено как черновик.
         </div>
       )}
@@ -271,7 +271,7 @@ function RebusService({ q, onSave }: { q: Question; onSave: (p: Partial<Question
   const ok = expected && correct &&
     expected === correct.toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]/g, '')
   return (
-    <div style={{ marginTop: 8, padding: 8, border: '1px dashed #999', borderRadius: 6 }}>
+    <div style={{ marginTop: 8, padding: 8, border: '1px dashed #3a4a6b', borderRadius: 6 }}>
       <b>Ребус (служебное):</b>
       <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
         <input placeholder="слово картинки 1" value={w1} style={{ padding: 4 }}
@@ -301,7 +301,7 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
       <label><b>{label}</b></label>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         {paths.map((p, i) => (
-          <span key={i} style={{ fontSize: 12, background: '#f3f4f6', padding: '2px 6px', borderRadius: 6 }}>
+          <span key={i} style={{ fontSize: 12, background: 'var(--panel2)', padding: '2px 6px', borderRadius: 6 }}>
             {/\.(mp3|wav)$/i.test(p) ? '🎵' : /\.(mp4|webm)$/i.test(p) ? '🎬'
               : <img src={mediaUrl(p)} alt="" style={{ height: 36, verticalAlign: 'middle' }} />}
             {' '}{p.split('/').pop()}
@@ -346,8 +346,8 @@ function Preview({ q }: { q: Question }) {
           style={{ fontWeight: tab === 'player' ? 700 : 400 }}>📱 Телефон игрока</button>
       </div>
       {tab === 'host' ? (
-        <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12,
-          background: '#111', color: '#fff' }}>
+        <div style={{ border: '1px solid #22314f', borderRadius: 8, padding: 12,
+          background: '#05070c', color: '#e8ecf8' }}>
           <div style={{ fontSize: 16, whiteSpace: 'pre-wrap' }}>
             {q.question_text || '(текст вопроса)'}
           </div>
@@ -362,7 +362,7 @@ function Preview({ q }: { q: Question }) {
           )}
         </div>
       ) : (
-        <div style={{ maxWidth: 280, border: '1px solid #ddd', borderRadius: 14, padding: 10, background: '#fff' }}>
+        <div style={{ maxWidth: 280, border: '1px solid #22314f', borderRadius: 14, padding: 10, background: 'var(--panel2)' }}>
           <p style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{q.question_text || '(текст вопроса)'}</p>
           {a.mode === 'free_text' || a.mode === 'none' ? (
             <div style={{ display: 'flex', gap: 4 }}>
@@ -375,7 +375,7 @@ function Preview({ q }: { q: Question }) {
             </div>
           ) : a.mode === 'order' ? (
             <div>
-              <div style={{ border: '1px dashed #999', padding: 6, fontSize: 12 }}>Тапайте варианты по порядку</div>
+              <div style={{ border: '1px dashed #3a4a6b', padding: 6, fontSize: 12 }}>Тапайте варианты по порядку</div>
               <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
                 {a.choices.map(c => <button key={c.key} disabled>{c.key}</button>)}
               </div>
