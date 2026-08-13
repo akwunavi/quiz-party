@@ -75,10 +75,50 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'show_answers' && round)
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
       label={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'jeopardy')
+    return <JeopardyPlayer team={team} gameState={gameState}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if ((phase === 'question' || phase === 'answer_time') && round)
     return <AnswerForm team={team} round={round} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
+}
+
+/** Своя игра у игрока: ведущий открывает плитку — команда пишет ответ.
+ *  Ответ уходит с меткой плитки, которую ведущий видит в модалке по скорости. */
+function JeopardyPlayer({ team, gameState, roundLabel }: {
+  team: Team; roundLabel: string
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [draft, setDraft] = useState('')
+  const [sent, setSent] = useState<string | null>(null)
+  return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        <div className="pl-notice acc">СВОЯ ИГРА · СЛУШАЙ ТРЕК НА ЭКРАНЕ</div>
+        <div className="pl-card">
+          <div className="pl-qlabel">ОТВЕТ НА ОТКРЫТУЮ ПЛИТКУ</div>
+          <div className="pl-card-body">
+            <div className="pl-input-col">
+              <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
+              <button className="pl-send" disabled={!draft.trim()} onClick={() => {
+                void enqueueAnswer({
+                  team_id: team.id, game_id: gameState.game_id,
+                  question_ref: `q-t${gameState.question_index}`,
+                  round_number: gameState.round_number, answer_text: draft.trim(),
+                })
+                setSent(draft.trim())
+              }}>{sent ? 'Изменить ответ' : 'Отправить'}</button>
+            </div>
+            {sent && <div className="pl-sent">Отправлено: {sent}</div>}
+            <div className="ed-hint">Кто ответит быстрее — тот выше в списке у ведущего</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // ═══ Список вопросов раунда (перенос старой механики) ═══

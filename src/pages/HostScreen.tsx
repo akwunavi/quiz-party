@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
@@ -193,6 +193,8 @@ function HostInner({ gameState, pack }: {
           <QuestionAudio q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
+          <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
         </>}
         <div className="host-topbar">
           <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
@@ -225,14 +227,14 @@ function HostInner({ gameState, pack }: {
                 /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
                 ? <div className={`img-answers n${Math.min(imgs.length, 4)}`}>
                     {imgs.map((m, i) => (
-                      <figure key={i} className="img-answer">
-                        <img src={mediaUrl(m)} alt="" />
-                        <figcaption>
+                      <div key={i} className="img-answer">
+                        <span className="ia-key">
                           {q.answer.mode === 'match' ? i + 1 : (choices?.[i]?.key ?? '')}
-                          {q.answer.mode === 'choice' && choices?.[i]?.text
-                            ? ` · ${choices[i].text}` : ''}
-                        </figcaption>
-                      </figure>
+                        </span>
+                        <img src={mediaUrl(m)} alt="" />
+                        {q.answer.mode === 'choice' && choices?.[i]?.text &&
+                          <span className="ia-text">{choices[i].text}</span>}
+                      </div>
                     ))}
                   </div>
                 : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}`}>
@@ -412,14 +414,32 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
   }, [startedAt, seconds])
   const low = left <= 10
   if (theme === 'new_year') {
-    const R = 46, C = 2 * Math.PI * R
+    const R = 44, C = 2 * Math.PI * R
     const frac = Math.max(0, Math.min(1, left / seconds))
+    // Рождественский венок: хвойное кольцо + ягоды + бант; «выгорает» по кругу
+    const needles = Array.from({ length: 40 }, (_, i) => {
+      const ang = (i / 40) * Math.PI * 2
+      const len = 7 + (i % 3) * 3
+      return { x1: 55 + Math.cos(ang) * (R - 5), y1: 55 + Math.sin(ang) * (R - 5),
+        x2: 55 + Math.cos(ang) * (R + len - 5), y2: 55 + Math.sin(ang) * (R + len - 5),
+        rot: (ang * 180) / Math.PI }
+    })
+    const berries = Array.from({ length: 7 }, (_, i) => {
+      const ang = (i / 7) * Math.PI * 2 + 0.4
+      return { cx: 55 + Math.cos(ang) * R, cy: 55 + Math.sin(ang) * R }
+    })
     return (
-      <div className={`ny-timer${low ? ' low' : ''}`}>
+      <div className={`ny-wreath${low ? ' low' : ''}`}>
         <svg viewBox="0 0 110 110">
-          <circle className="ring-bg" cx="55" cy="55" r={R} />
-          <circle className="ring-fg" cx="55" cy="55" r={R}
+          {needles.map((n, i) => (
+            <line key={i} x1={n.x1} y1={n.y1} x2={n.x2} y2={n.y2}
+              stroke={i % 4 === 0 ? '#1f6b3a' : '#2f8f4e'} strokeWidth="3" strokeLinecap="round" />
+          ))}
+          <circle className="wr-bg" cx="55" cy="55" r={R} />
+          <circle className="wr-fg" cx="55" cy="55" r={R}
             strokeDasharray={C} strokeDashoffset={C * (1 - frac)} />
+          {berries.map((b, i) => <circle key={i} className="wr-berry" cx={b.cx} cy={b.cy} r="3.4" />)}
+          <path className="wr-bow" d="M46,99 q9,-9 18,0 q-9,5 -18,0" />
         </svg>
         <span className="val">{left}</span>
       </div>
@@ -639,10 +659,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 <div className="choices-grid" style={{ width: '100%' }}>
                   {choices.map(c => {
                     const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
-                    const order = shuffleStable(choices.map(x => x.key), q.id).indexOf(c.key)
+                    // сначала два неверных, потом остальные, верный — последним
+                    const wrongs = choices.filter(x =>
+                      x.key !== (q.answer as { correct_choice?: string }).correct_choice)
+                    const seq = [...shuffleStable(wrongs, q.id).map(x => x.key),
+                      (q.answer as { correct_choice?: string }).correct_choice ?? '']
+                    const order = seq.indexOf(c.key)
                     return (
                       <div key={c.key} className={`choice-plate${ok ? ' correct' : ' dimmed'}`}
-                        style={{ animationDelay: `${order * 0.4}s` }}>
+                        style={{ animationDelay: `${order * 0.75}s` }}>
                         <span className="key">{c.key}</span>{c.text}
                       </div>
                     )
@@ -717,6 +742,19 @@ function ShowAnswers({ pack, round, q, gameState }: {
   )
 }
 
+/** Автопоказ ответа: как только таймер вышел — открываем ответ сам. */
+function AutoReveal({ enabled, startedAt, seconds }: {
+  enabled: boolean; startedAt: string | null; seconds: number
+}) {
+  useEffect(() => {
+    if (!enabled || !startedAt || document.hidden) return
+    const ms = new Date(startedAt).getTime() + seconds * 1000 - Date.now()
+    const t = setTimeout(() => { void revealAnswer() }, Math.max(0, ms))
+    return () => clearTimeout(t)
+  }, [enabled, startedAt, seconds])
+  return null
+}
+
 /** Автопролистывание: через N сек после конца таймера — следующий вопрос. */
 function AutoAdvance({ round, gameState, isLast }: {
   round: LoadedPack['rounds'][number]
@@ -746,7 +784,6 @@ function JeopardyBoard({ pack, round, gameState }: {
   const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
   const [active, setActive] = useState<{ t: number; i: number } | null>(null)
   const [opened, setOpened] = useState<string[]>([])
-  const [reveal, setReveal] = useState(false)
 
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
@@ -758,52 +795,138 @@ function JeopardyBoard({ pack, round, gameState }: {
     </div>
   )
 
-  if (active) {
-    const tile = themes[active.t].tiles[active.i]
-    return (
-      <div className="host-screen grid-bg">
-        <div className="mono-tag">{themes[active.t].name} · {tile.value}</div>
-        {tile.audio && <audio autoPlay controls src={mediaUrl(tile.audio)} />}
-        {reveal && (
-          <div className="answer-reveal hud-frame">
-            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <div className="answer-main">{tile.correct}</div>
-          </div>
-        )}
-        <div className="host-actions">
-          {!reveal
-            ? <button onClick={() => setReveal(true)}>Показать ответ</button>
-            : <button onClick={() => {
-                setOpened(o => [...o, `${active.t}-${active.i}`])
-                setActive(null); setReveal(false)
-              }}>К доске →</button>}
-        </div>
-      </div>
-    )
-  }
-
-  const allOpened = themes.every((t, ti) => t.tiles.every((_, i) => opened.includes(`${ti}-${i}`)))
+  const rows = Math.max(...themes.map(t => t.tiles.length))
   return (
-    <div className="host-screen grid-bg">
-      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} · ВЫБИРАЙТЕ ПЛИТКУ</div>
-      <div className="jp-board">
+    <div className="host-screen grid-bg jp-screen">
+      <h1 className="neon-title jp-title">{round.title_lines.join(' ') || 'СВОЯ ИГРА'}</h1>
+      <div className="jp-board" style={{
+        gridTemplateColumns: `repeat(${themes.length}, minmax(0, 1fr))`,
+        gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
+      }}>
         {themes.map((t, ti) => (
-          <div key={ti} className="jp-theme">
-            <div className="jp-theme-name">{t.name || `Тема ${ti + 1}`}</div>
-            {t.tiles.map((tile, i) => {
-              const done = opened.includes(`${ti}-${i}`)
-              return (
-                <button key={i} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
-                  onClick={() => setActive({ t: ti, i })}>{done ? '✓' : tile.value}</button>
-              )
-            })}
+          <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
+            {t.name || `Тема ${ti + 1}`}
           </div>
         ))}
+        {themes.map((t, ti) => t.tiles.map((tile, i) => {
+          const done = opened.includes(`${ti}-${i}`)
+          return (
+            <button key={`${ti}-${i}`} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
+              style={{ gridColumn: ti + 1, gridRow: i + 2 }}
+              onClick={() => setActive({ t: ti, i })}>{done ? '·' : tile.value}</button>
+          )
+        }))}
       </div>
       <div className="host-actions">
-        {allOpened && (gameState.round_number + 1 < pack.rounds.length
-          ? <button onClick={() => void gotoRound(gameState.round_number + 1)}>Следующий раунд →</button>
-          : <button onClick={() => void finishGame(gameState.pack_id)}>Финал →</button>)}
+        <button onClick={() => {
+          if (gameState.round_number + 1 < pack.rounds.length) void gotoRound(gameState.round_number + 1)
+          else void finishGame(gameState.pack_id)
+        }}>Завершить раунд →</button>
+      </div>
+      {active && (
+        <TileModal round={round} gameState={gameState}
+          theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
+          refKey={`t${active.t}-${active.i}`}
+          onClose={() => { setOpened(o => [...o, `${active.t}-${active.i}`]); setActive(null) }} />
+      )}
+    </div>
+  )
+}
+
+/** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
+ *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
+function TileModal({ round, gameState, theme, tile, refKey, onClose }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  theme: JeopardyTheme
+  tile: { value: number; audio: string; correct: string }
+  refKey: string
+  onClose: () => void
+}) {
+  const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const timerRef = useRef<number | null>(null)
+  const [remaining, setRemaining] = useState(clipSeconds)
+  const [playing, setPlaying] = useState(false)
+  const [showAnswer, setShowAnswer] = useState(false)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const teams = useTeams(gameState.game_id)
+
+  const play = () => {
+    audioRef.current?.pause()
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (document.hidden || !tile.audio) { setPlaying(false); return }
+    const audio = new Audio(mediaUrl(tile.audio))
+    audioRef.current = audio
+    setRemaining(clipSeconds); setPlaying(true)
+    audio.play().catch(() => setPlaying(false))
+    timerRef.current = window.setInterval(() => {
+      setRemaining(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          audio.pause(); setPlaying(false); return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+  useEffect(() => {
+    play()
+    return () => { audioRef.current?.pause(); if (timerRef.current) clearInterval(timerRef.current) }
+  }, [refKey])
+
+  const rows = answers
+    .filter(a => a.question_ref === `q-${refKey}`)
+    .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
+
+  const grade = async (id: string, correct: boolean) => {
+    await supabase.from('answers').update({ is_correct: correct }).eq('id', id)
+  }
+
+  return (
+    <div className="jp-overlay">
+      <div className="jp-modal hud-frame">
+        <div className="jp-modal-head">
+          <div>
+            <div className="jp-modal-theme">{theme.name}</div>
+            <div className="mono-tag">ПЛИТКА · {tile.value}</div>
+          </div>
+          <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>
+        </div>
+
+        {showAnswer && (
+          <div className="answer-reveal hud-frame" style={{ padding: '12px 18px' }}>
+            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+            <div className="answer-main" style={{ fontSize: 'clamp(24px,3vw,40px)' }}>{tile.correct}</div>
+          </div>
+        )}
+
+        <div className="jp-answers">
+          <div className="mono-tag">ОТВЕТЫ (ПО СКОРОСТИ)</div>
+          {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>ждём ответы…</div>}
+          {rows.map((a, pos) => {
+            const team = teams.find(t => t.id === a.team_id)
+            return (
+              <div key={a.id} className="jp-answer" style={{
+                borderLeft: `3px solid ${a.is_correct === true ? 'var(--ok)' : a.is_correct === false ? 'var(--danger)' : 'var(--dim)'}`,
+              }}>
+                <span className="pos">#{pos + 1}</span>
+                <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
+                <span className="txt">{a.answer_text || '—'}</span>
+                <button className="jp-grade ok" disabled={a.is_correct != null}
+                  onClick={() => void grade(a.id, true)}>✓</button>
+                <button className="jp-grade no" disabled={a.is_correct != null}
+                  onClick={() => void grade(a.id, false)}>✗</button>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="jp-modal-foot">
+          {!showAnswer && <button onClick={() => setShowAnswer(true)}>Показать ответ</button>}
+          <button className="ghost" onClick={play}>↻ Переслушать</button>
+          <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
+        </div>
       </div>
     </div>
   )
