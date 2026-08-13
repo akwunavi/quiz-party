@@ -859,3 +859,36 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 /* Редактор: разносим «+ Трек» и «+ Тема» */
 .mel-add-track { margin-top: 8px; }
 .mel-add-theme { margin-top: 22px; border-top: 1px solid var(--ed-line); padding-top: 16px; }
+
+/* Гирлянда занимает верх — прижимаем контент ниже (мелодия, своя игра, «120 сек») */
+.theme-new_year .mel-screen, .theme-new_year .jp-screen { padding-top: 118px; }
+.theme-new_year .sprint-screen { padding-top: 96px; }
+.mel-title, .jp-title { font-size: clamp(20px, 2.6vw, 40px); margin: 0; line-height: 1.1; }
+.mel-board, .jp-board { max-height: calc(100vh - 250px); }
+
+/* 6: новогодний вид доски мелодии — подарки с лентой и снежные шапки на темах */
+.theme-new_year .mel-theme { position: relative; overflow: visible;
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(124,199,255,.05));
+  border: 1px solid rgba(198,230,255,.45); color: #fff;
+  text-shadow: 0 1px 0 #cfe8ff, 0 0 16px rgba(124,199,255,.5); }
+.theme-new_year .mel-theme::before { content: ''; position: absolute; left: -2px; right: -2px; top: -7px;
+  height: 10px;
+  background: radial-gradient(ellipse 40% 100% at 18% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 44% 120% at 50% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 38% 90%  at 82% 100%, #fff 60%, transparent 62%);
+  filter: drop-shadow(0 2px 2px rgba(90,140,190,.4)); }
+.theme-new_year .mel-tile { position: relative; overflow: hidden; }
+.theme-new_year .mel-tile::before { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 46%, rgba(230,57,70,.55) 46%,
+    rgba(230,57,70,.55) 54%, transparent 54%),
+    linear-gradient(0deg, transparent 46%, rgba(230,57,70,.35) 46%,
+    rgba(230,57,70,.35) 54%, transparent 54%);
+  pointer-events: none; }
+.theme-new_year .mel-tile.done::before { opacity: .15; }
+.theme-new_year .mel-tile.spin { animation: giftShake .35s ease-in-out infinite; }
+@keyframes giftShake { 0%,100% { transform: rotate(-1.5deg) scale(1.03); }
+  50% { transform: rotate(1.5deg) scale(1.06); } }
+
+/* подсказка по баллам */
+.mel-points-hint { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em;
+  color: var(--answer); text-align: center; }

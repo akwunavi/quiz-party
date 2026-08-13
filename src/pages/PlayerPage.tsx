@@ -135,7 +135,8 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
   const [draft, setDraft] = useState('')
   const [bid, setBid] = useState<number | null>(null)
   const [sent, setSent] = useState<string | null>(null)
-  useEffect(() => { setBid(null); setDraft(''); setSent(null) }, [m.key, m.stage])
+  // сбрасываем поля только при СМЕНЕ ТРЕКА (иначе ответ стирался при переходе стадии)
+  useEffect(() => { setBid(null); setDraft(''); setSent(null) }, [m.key])
 
   const send = (ref: string, text: string) => void enqueueAnswer({
     team_id: team.id, game_id: gameState.game_id, question_ref: ref,
@@ -198,19 +199,23 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
                       onClick={() => { setBid(v); send(`q-mel-${m.key}-bid`, String(v)) }}>{v}</button>
                   ))}
                 </div>
-                {bid
-                  ? <div className="pl-sent">Ставка отправлена: {bid} сек · можно изменить</div>
-                  : <div className="ed-hint">2–5 сек — 2 балла, 6–10 сек — 1 балл</div>}
+                <div className="mel-points-hint">2–5 сек → 2 балла · 6–10 сек → 1 балл</div>
+                {bid && <div className="pl-sent">Ставка отправлена: {bid} сек · можно изменить</div>}
               </div>
             </div>
           )}
 
           {stage === 'bids' && (myTurn
             ? <Wait text="ВЫ ИГРАЕТЕ!" sub="Ждите включения музыки" />
-            : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Ставка была меньше" />)}
+            : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Если не угадают — ход перейдёт к вам, 0.5 балла" />)}
 
           {(stage === 'snippet' || stage === 'answering' || stage === 'passed') && (myTurn ? (
-            <div className="pl-card"><div className="pl-qlabel">ВАШ ХОД — НАЗОВИТЕ ТРЕК</div>
+            <div className="pl-card">
+              <div className="pl-qlabel">ВАШ ХОД — НАЗОВИТЕ ТРЕК</div>
+              <div className="mel-points-hint">
+                {m.turn === 0 ? `за верный ответ — ${(Number(bid) || 10) <= 5 ? 2 : 1} балла`
+                  : 'за верный ответ — 0.5 балла'}
+              </div>
               <div className="pl-card-body">
                 <div className="pl-input-col">
                   <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
@@ -222,7 +227,8 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
                 {sent && <div className="pl-sent">Отправлено: {sent}</div>}
               </div>
             </div>
-          ) : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Слушайте трек — вдруг ход перейдёт к вам" />)}
+          ) : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ"
+                sub="Слушайте трек — если не угадают, ход перейдёт к вам (0.5 балла)" />)}
         </>)}
       </div>
     </div>

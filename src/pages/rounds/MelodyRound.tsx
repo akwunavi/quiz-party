@@ -44,7 +44,7 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   // выбор трека командой: игрок пишет ключ в melody.pick → сразу слушаем
   useEffect(() => {
-    if (!m.pick || document.hidden) return
+    if (!m.pick) return   // обрабатываем всегда: проектор может быть во второй вкладке
     void saveMelody({ ...m, key: m.pick, pick: undefined, stage: 'listen',
       deadline: inSec(3), order: undefined, turn: 0, chooser: undefined })
   }, [m.pick])
@@ -158,6 +158,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   return (
     <div className="host-screen grid-bg mel-screen">
       <h1 className="neon-title mel-title">{round.title_lines.join(' ') || 'УГАДАЙ МЕЛОДИЮ'}</h1>
+      {pack.theme === 'new_year' && <div className="title-deco">🎄 ♪ 🎁 ♪ 🎄</div>}
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
 
@@ -191,6 +192,8 @@ export function MelodyBoard({ pack, round, gameState }: {
 
             {m.stage === 'bidding' && (<>
               <div className="mel-big">ЗА СКОЛЬКО СЕКУНД УГАДАЕТЕ?</div>
+              <div className="mel-points-hint">2–5 сек → 2 балла · 6–10 сек → 1 балл ·
+                передача хода → 0.5 балла</div>
               <div className="mel-bids">
                 {teams.map(t => {
                   const b = bids.find(x => x.team_id === t.id)
@@ -238,6 +241,10 @@ export function MelodyBoard({ pack, round, gameState }: {
               <div className="mel-big" style={{ color: currentTeam?.color }}>
                 {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
               </div>
+              <div className="mel-points-hint">
+                {m.stage === 'passed' ? 'за верный ответ — 0.5 балла'
+                  : `ставка ${bidSec} сек → за верный ответ ${bidSec <= 5 ? 2 : 1} балла`}
+              </div>
               <div className="mel-answer">
                 {ans?.answer_text ? <>Ответ: <b>{ans.answer_text}</b></>
                   : <span style={{ opacity: .6 }}>ждём ответ…</span>}
@@ -280,19 +287,28 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
   const free = keys.filter(k => !played.includes(k))
   const [cursor, setCursor] = useState(0)
 
+  // один управляющий цикл на всю анимацию: ритм считаем из ref, чтобы не плодить таймеры
+  const leftRef = useRef(spinLeft)
+  leftRef.current = spinLeft
   useEffect(() => {
     if (!spinning || free.length === 0) return
     let stop = false
+    let timer: number | undefined
     const step = () => {
       if (stop) return
-      // прыгаем в случайную плитку, а не по порядку
-      setCursor(Math.floor(Math.random() * free.length))
-      const p = 1 - Math.max(0, spinLeft) / Math.max(1, spinTotal)
-      setTimeout(step, 60 + p * p * 420)
+      setCursor(c => {
+        // прыгаем в случайную, но не в ту же самую
+        let n = Math.floor(Math.random() * free.length)
+        if (free.length > 1 && n === c) n = (n + 1) % free.length
+        return n
+      })
+      const p = 1 - Math.max(0, leftRef.current) / Math.max(1, spinTotal)
+      // 180мс в начале → ~900мс в конце: видно каждую плитку, без мельтешения
+      timer = window.setTimeout(step, 180 + p * p * 720)
     }
-    const t = setTimeout(step, 60)
-    return () => { stop = true; clearTimeout(t) }
-  }, [spinning, spinLeft <= 1])
+    timer = window.setTimeout(step, 180)
+    return () => { stop = true; if (timer) clearTimeout(timer) }
+  }, [spinning])
 
   const highlighted = spinning
     ? (spinLeft <= 1 ? spinKey : free[cursor % Math.max(1, free.length)])
