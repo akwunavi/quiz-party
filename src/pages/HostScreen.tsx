@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
-import { listPacks, loadPack, metaLine, type LoadedPack } from '../lib/packLoader'
+import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime,
@@ -13,7 +13,7 @@ import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -163,6 +163,11 @@ function HostInner({ gameState, pack }: {
     )
   }
 
+  // ── Своя игра: сетка плиток ──
+  if (gameState.phase === 'question' && round.mechanic === 'jeopardy') {
+    return <JeopardyBoard pack={pack} round={round} gameState={gameState} />
+  }
+
   // ── Вопрос ──
   if (gameState.phase === 'question' && q) {
     const media = q.media.question ?? []
@@ -175,11 +180,16 @@ function HostInner({ gameState, pack }: {
     const timeLow = !!gameState.timer_started_at &&
       (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
     const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}` : ''
+    const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
+      ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
 
     return (
       <div className="host-screen grid-bg">
-        {round.mechanic !== 'jeopardy' &&
-          <QuestionAudio q={q} round={round} timerRunning={!!gameState.timer_started_at} />}
+        {round.mechanic !== 'jeopardy' && <>
+          <QuestionAudio q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
+          <AutoAdvance round={round} gameState={gameState}
+            isLast={gameState.question_index + 1 >= round.questions.length} />
+        </>}
         <div className="host-topbar">
           <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
             <b>{gameState.question_index + 1}</b> / {round.questions.length}</span>
@@ -244,7 +254,7 @@ function HostInner({ gameState, pack }: {
           </div>
         )}
 
-        {(round.answers_reveal === 'after_question' || round.mechanic === 'jeopardy') && gameState.reveal && (
+        {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && gameState.reveal && (
           <div className="answer-reveal hud-frame">
             <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
             <div className="answer-main">{displayAnswer(q)}</div>
@@ -257,11 +267,11 @@ function HostInner({ gameState, pack }: {
 
         <div className="host-actions">
           <BackBtn gameState={gameState} />
-          {(round.answers_reveal === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
+          {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
             <button onClick={() => void revealAnswer()}>Показать ответ</button>}
           {gameState.question_index + 1 < round.questions.length
             ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
-            : round.answers_reveal === 'after_round'
+            : revealMode === 'after_round'
               ? <button onClick={() => void startAnswerTime()}>Время ответов →</button>
               : <AfterRoundNav pack={pack} gameState={gameState} />}
         </div>
@@ -289,7 +299,14 @@ function HostInner({ gameState, pack }: {
     return <Finale pack={pack} gameId={gameState.game_id} />
   }
 
-  return <div className="host-screen grid-bg">Фаза: {gameState.phase}</div>
+  return <div className="host-screen grid-bg">
+    <div className="mono-tag">ФАЗА: {gameState.phase}</div>
+    {gameState.phase === 'question' && !q &&
+      <p style={{ opacity: .7 }}>В этом раунде нет вопросов — добавь их в редакторе</p>}
+    <div className="host-actions">
+      <button onClick={() => void setPhase('round_intro')}>← К титулу раунда</button>
+    </div>
+  </div>
 }
 
 /** «Назад»: предыдущий вопрос или титул раунда; между раундами не ходит (п.12). */
@@ -305,7 +322,7 @@ function Icicles({ seed, low }: { seed: string; low: boolean }) {
     let s = 0
     for (const ch of seed) s = (s * 31 + ch.charCodeAt(0)) >>> 0
     const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 }
-    const n = 34
+    const n = 60
     return Array.from({ length: n }, (_, i) => ({
       left: (i + 0.5) * (100 / n) + (rnd() - 0.5) * 2.5,
       len: 8 + rnd() * 34,
@@ -401,6 +418,18 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
 }
 
 /** Стабильное перемешивание: порядок фиксирован для конкретного вопроса. */
+/** Ребус: подсвечиваем 3 последние буквы первого слова и 3 первые второго. */
+function rebusCaption(word: string | undefined, isFirst: boolean) {
+  const w = (word ?? '').trim()
+  if (!w) return null
+  const cut = isFirst ? Math.max(0, w.length - 3) : 3
+  const plain = isFirst ? w.slice(0, cut) : w.slice(cut)
+  const hot = isFirst ? w.slice(cut) : w.slice(0, cut)
+  return isFirst
+    ? <>{plain}<b className="rebus-hot">{hot}</b></>
+    : <><b className="rebus-hot">{hot}</b>{plain}</>
+}
+
 function shuffleStable<T>(arr: T[], seedStr: string): T[] {
   let s = 0
   for (const ch of seedStr) s = (s * 31 + ch.charCodeAt(0)) >>> 0
@@ -413,13 +442,6 @@ function shuffleStable<T>(arr: T[], seedStr: string): T[] {
   return a
 }
 
-function displayRoundNumber(pack: LoadedPack, idx: number): string {
-  const r = pack.rounds[idx]
-  if (r.off_scoreboard) return '0'
-  let n = 0
-  for (let i = 0; i <= idx; i++) if (!pack.rounds[i].off_scoreboard) n++
-  return String(n)
-}
 
 function displayAnswer(q: Question): string {
   const a = q.answer as unknown as Record<string, unknown>
@@ -443,10 +465,11 @@ export function mediaUrl(path: string): string {
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
  *  скрытая вкладка (второй проектор) молчит. */
-function QuestionAudio({ q, round, timerRunning }: {
+function QuestionAudio({ q, round, timerRunning, pack }: {
   q: LoadedPack['rounds'][number]['questions'][number]
   round: LoadedPack['rounds'][number]
   timerRunning: boolean
+  pack?: LoadedPack
 }) {
   const hasOwnAV = (q.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
 
@@ -468,7 +491,7 @@ function QuestionAudio({ q, round, timerRunning }: {
 
   // фоновая музыка раунда, пока тикает таймер
   useEffect(() => {
-    const bg = (round.settings as { bg_music?: string }).bg_music
+    const bg = (round.settings as { bg_music?: string }).bg_music ?? pack?.settings?.bg_music
     if (!timerRunning || !bg || hasOwnAV || document.hidden) return
     const a = new Audio(mediaUrl(bg))
     a.loop = true; a.volume = 0.6
@@ -617,7 +640,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     .map((m, i) => (
                       <figure key={i} className="q-img">
                         <img src={mediaUrl(m)} alt="" />
-                        <figcaption>{i === 0 ? q.service.word1 : q.service.word2}</figcaption>
+                        <figcaption>{rebusCaption(i === 0 ? q.service.word1 : q.service.word2, i === 0)}</figcaption>
                       </figure>
                     ))}
                 </div>
@@ -656,6 +679,98 @@ function ShowAnswers({ pack, round, q, gameState }: {
           : step < total - 1
             ? <button onClick={() => void gotoAnswers(step + 1)}>Следующий вопрос →</button>
             : <AfterRoundNav pack={pack} gameState={gameState} />}
+      </div>
+    </div>
+  )
+}
+
+/** Автопролистывание: через N сек после конца таймера — следующий вопрос. */
+function AutoAdvance({ round, gameState, isLast }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  isLast: boolean
+}) {
+  const sec = (round.settings as { autoAdvanceSec?: number }).autoAdvanceSec ?? 0
+  useEffect(() => {
+    if (!sec || !gameState.timer_started_at || isLast || document.hidden) return
+    const started = new Date(gameState.timer_started_at).getTime()
+    const fireAt = started + (round.timer_seconds + sec) * 1000
+    const ms = fireAt - Date.now()
+    if (ms <= 0) return
+    const t = setTimeout(() => { void gotoQuestion(gameState.question_index + 1) }, ms)
+    return () => clearTimeout(t)
+  }, [gameState.timer_started_at, gameState.question_index, sec])
+  return null
+}
+
+/** Своя игра: доска тем и плиток. Клик по плитке — играет трек, ответ по кнопке.
+ *  Открытые плитки гаснут. Тем может быть любое количество (1..6). */
+function JeopardyBoard({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
+  const [active, setActive] = useState<{ t: number; i: number } | null>(null)
+  const [opened, setOpened] = useState<string[]>([])
+  const [reveal, setReveal] = useState(false)
+
+  if (themes.length === 0) return (
+    <div className="host-screen grid-bg">
+      <div className="mono-tag">СВОЯ ИГРА</div>
+      <p>Темы не заполнены — добавь их в редакторе раунда</p>
+      <div className="host-actions">
+        <button onClick={() => void setPhase('round_intro')}>← К титулу</button>
+      </div>
+    </div>
+  )
+
+  if (active) {
+    const tile = themes[active.t].tiles[active.i]
+    return (
+      <div className="host-screen grid-bg">
+        <div className="mono-tag">{themes[active.t].name} · {tile.value}</div>
+        {tile.audio && <audio autoPlay controls src={mediaUrl(tile.audio)} />}
+        {reveal && (
+          <div className="answer-reveal hud-frame">
+            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+            <div className="answer-main">{tile.correct}</div>
+          </div>
+        )}
+        <div className="host-actions">
+          {!reveal
+            ? <button onClick={() => setReveal(true)}>Показать ответ</button>
+            : <button onClick={() => {
+                setOpened(o => [...o, `${active.t}-${active.i}`])
+                setActive(null); setReveal(false)
+              }}>К доске →</button>}
+        </div>
+      </div>
+    )
+  }
+
+  const allOpened = themes.every((t, ti) => t.tiles.every((_, i) => opened.includes(`${ti}-${i}`)))
+  return (
+    <div className="host-screen grid-bg">
+      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} · ВЫБИРАЙТЕ ПЛИТКУ</div>
+      <div className="jp-board">
+        {themes.map((t, ti) => (
+          <div key={ti} className="jp-theme">
+            <div className="jp-theme-name">{t.name || `Тема ${ti + 1}`}</div>
+            {t.tiles.map((tile, i) => {
+              const done = opened.includes(`${ti}-${i}`)
+              return (
+                <button key={i} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
+                  onClick={() => setActive({ t: ti, i })}>{done ? '✓' : tile.value}</button>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+      <div className="host-actions">
+        {allOpened && (gameState.round_number + 1 < pack.rounds.length
+          ? <button onClick={() => void gotoRound(gameState.round_number + 1)}>Следующий раунд →</button>
+          : <button onClick={() => void finishGame(gameState.pack_id)}>Финал →</button>)}
       </div>
     </div>
   )

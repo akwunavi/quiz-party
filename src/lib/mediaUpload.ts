@@ -3,7 +3,16 @@ import { supabase } from './supabase'
 import { compressImage } from './imageCompress'
 
 /** Возвращает путь внутри бакета (его храним в question.media). */
+export const MAX_AUDIO_VIDEO_MB = 5
+export const MAX_IMAGE_MB = 15
+
 export async function uploadMedia(packId: string, file: File): Promise<string> {
+  const isAV = /^(audio|video)\//.test(file.type)
+  const limitMb = isAV ? MAX_AUDIO_VIDEO_MB : MAX_IMAGE_MB
+  if (file.size > limitMb * 1024 * 1024) {
+    throw new Error(`Файл ${(file.size / 1048576).toFixed(1)} МБ — больше лимита ${limitMb} МБ. `
+      + (isAV ? 'Сожми аудио (128 kbps) или обрежь фрагмент.' : 'Уменьши изображение.'))
+  }
   const prepared = await compressImage(file)
   const safe = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_')
   const path = `pack-${packId}/${Date.now()}-${safe}`
@@ -21,4 +30,15 @@ export async function mediaExists(path: string): Promise<boolean> {
     .list(dir, { search: name })
   if (error) return false
   return (data ?? []).some(f => f.name === name)
+}
+
+
+/** Суммарный объём медиа пакета в мегабайтах. */
+export async function packMediaSize(packId: string): Promise<number> {
+  const { data, error } = await supabase.storage.from('quiz-media')
+    .list(`pack-${packId}`, { limit: 1000 })
+  if (error) throw error
+  const bytes = (data ?? []).reduce((s, f) =>
+    s + Number((f.metadata as { size?: number } | null)?.size ?? 0), 0)
+  return Math.round(bytes / 1048576 * 10) / 10
 }

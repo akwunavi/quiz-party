@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
-import { loadPack, metaLine, type LoadedPack } from '../lib/packLoader'
+import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart,
@@ -45,7 +45,7 @@ export function AdminPage() {
       </div>
 
       <div className="adm-status">
-        {pack ? `${pack.name} · Р${gameState.round_number}` : 'пакет не выбран'} · {phase}
+        {pack ? `${pack.name} · Р${displayRoundNumber(pack, gameState.round_number)}` : 'пакет не выбран'} · {phase}
         {round && (phase === 'question' || phase === 'show_answers')
           ? ` · ${gameState.question_index + 1}/${round.questions.length}` : ''}
       </div>
@@ -162,7 +162,7 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
         {pack.rounds.map((r, i) => (
           <button key={r.id} className={`adm-round${current === i ? ' active' : ''}`}
             onClick={() => void gotoRound(i)}>
-            Р{i} {r.title_lines.join(' ')}
+            Р{displayRoundNumber(pack, i)} {r.title_lines.join(' ')}
           </button>
         ))}
       </div>

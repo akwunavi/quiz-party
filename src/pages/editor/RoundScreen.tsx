@@ -79,10 +79,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <span style={{ opacity: .5 }}> (строки через /)</span>
           </td></tr>
           {!isJeopardy && <tr><td>Таймер:</td><td>
-            <select value={round.timer_seconds} disabled={locked}
-              onChange={e => void patch({ timer_seconds: Number(e.target.value) })}>
-              {[20, 30, 45, 60, 90, 120].map(s => <option key={s} value={s}>{s} сек</option>)}
-            </select>
+            <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
+              onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
+            <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </td></tr>}
           {!isJeopardy && <tr><td>Показ ответов:</td><td>
             <select value={round.answers_reveal} disabled={locked}
@@ -160,39 +159,26 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
         {!isJeopardy && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
-            <select value={round.timer_seconds} disabled={locked}
-              onChange={e => void patch({ timer_seconds: Number(e.target.value) })}>
-              {[20, 30, 45, 60, 90, 120].map(s => <option key={s} value={s}>{s} сек</option>)}
-            </select>
+            <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
+              onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
+            <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </div>
-          <div className="ed-field"><label>Когда показывать ответы</label>
-            <select value={round.answers_reveal} disabled={locked}
-              onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
-              <option value="after_question">сразу после вопроса</option>
-              <option value="after_round">в конце раунда</option>
-              <option value="never">не показывать</option>
-            </select>
-          </div>
-          <div className="ed-field"><label>Правок ответа</label>
-            <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
-              onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
-              <option value={0}>без правок</option><option value={1}>1</option>
-              <option value={2}>2</option><option value={3}>3</option>
-              <option value={-1}>без ограничений</option>
-            </select>
-            <div className="ed-hint">Стереть ответ игрок может всегда</div>
+          <div className="ed-field"><label>Автопролистывание</label>
+            <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+              через
+              <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
+                value={(round.settings as { autoAdvanceSec?: number }).autoAdvanceSec ?? 0}
+                onChange={e => void patch({ settings: { ...round.settings, autoAdvanceSec: Number(e.target.value) || undefined } as never })} />
+              сек после таймера
+            </label>
+            <div className="ed-hint">0 — листает ведущий вручную</div>
           </div>
           <div className="ed-field"><label>Музыка правил</label>
             <MediaSlot label="" packId={pack.id} accept="audio/*"
               paths={round.rules_audio ? [round.rules_audio] : []} max={1}
               onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
           </div>
-          <div className="ed-field"><label>Фоновая музыка вопросов</label>
-            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
-              paths={(round.settings as { bg_music?: string }).bg_music ? [(round.settings as { bg_music: string }).bg_music] : []}
-              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
-            <div className="ed-hint">Если пусто — берётся общая музыка пакета</div>
-          </div>
+
         </>}
 
         <div className="ed-field"><label>Короткая подсказка (на проекторе)</label>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
-import { loadPack, type LoadedPack, type LoadedRound } from '../lib/packLoader'
+import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
 import { registerTeam, heartbeat } from '../lib/gameActions'
 import { enqueueAnswer } from '../lib/answerQueue'
 import { ConnectionDot } from '../components/ConnectionDot'
@@ -67,25 +67,33 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   const phase = gameState.phase
 
   if (!pack || phase === 'lobby') return <Waiting team={team} message="ОЖИДАЕМ НАЧАЛА ИГРЫ" />
-  if (phase === 'round_intro') return <Waiting team={team} message={`РАУНД ${gameState.round_number}`} sub="Слушай правила" />
+  if (phase === 'round_intro') return <Waiting team={team}
+    message={`РАУНД ${pack ? displayRoundNumber(pack, gameState.round_number) : ''}`} sub="Слушай правила" />
   if (phase === 'scoreboard') return <Waiting team={team} message="ПОДВОДИМ ИТОГИ…" />
   if (phase === 'break') return <Waiting team={team} message="ПЕРЕРЫВ" sub="Разомнись, налей выпить :)" />
   if (phase === 'finale') return <Waiting team={team} message="ИГРА ЗАВЕРШЕНА" sub="Спасибо за игру! Смотри на проектор 🎉" />
   if (phase === 'show_answers' && round)
-    return <PlayerReview team={team} round={round} roundNumber={gameState.round_number} />
+    return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
+      label={displayRoundNumber(pack, gameState.round_number)} />
   if ((phase === 'question' || phase === 'answer_time') && round)
-    return <AnswerForm team={team} round={round} gameState={gameState} />
+    return <AnswerForm team={team} round={round} gameState={gameState}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
 }
 
 // ═══ Список вопросов раунда (перенос старой механики) ═══
 interface LocalState { answers: Record<number, string>; stakes: Record<number, number>; edits: Record<number, number> }
 
-function AnswerForm({ team, round, gameState }: {
-  team: Team; round: LoadedRound
+function AnswerForm({ team, round, gameState, roundLabel }: {
+  team: Team; round: LoadedRound; roundLabel: string
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const questions = round.questions.filter(q => !q.hidden)
+  if (questions.length === 0) return (
+    <div className="pl-center"><ConnectionDot />
+      <div className="pl-wait">В раунде нет вопросов</div>
+      <div className="pl-wait-sub">Сообщите ведущему</div></div>
+  )
   const isStakes = round.mechanic === 'stakes_unique' || round.mechanic === 'stakes_free'
   const uniqueStakes = round.mechanic === 'stakes_unique'
   const stakeValues = (round.settings as { stakesValues?: number[] }).stakesValues ?? []
@@ -156,7 +164,7 @@ function AnswerForm({ team, round, gameState }: {
 
   return (
     <div className="pl-root">
-      <PlayerHeader team={team} round={gameState.round_number} />
+      <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       {gameState.phase === 'answer_time' &&
         <div className="pl-notice acc">ВРЕМЯ ОТВЕТОВ — ПРОВЕРЬТЕ И ДОЗАПОЛНИТЕ</div>}
@@ -270,11 +278,12 @@ function Picker({ spec, value, locked, onChange }: {
   }
   // free_text / crossword_word / none
   return (
-    <div className="pl-input-row">
+    <div className="pl-input-col">
       <input value={draft} disabled={locked} onChange={e => setDraft(e.target.value)}
-        placeholder={spec.mode === 'crossword_word' ? 'Слово целиком' : 'Ваш ответ'} />
-      <button disabled={locked || !draft.trim()} onClick={() => onChange(draft.trim())}>
-        {value ? 'Изменить' : 'Отправить'}
+        placeholder="Ответ" />
+      <button className="pl-send" disabled={locked || !draft.trim()}
+        onClick={() => onChange(draft.trim())}>
+        {value ? 'Изменить ответ' : 'Отправить'}
       </button>
     </div>
   )
@@ -309,8 +318,8 @@ function MatchPicker({ spec, value, locked, onChange }: {
 }
 
 /** Разбор своих ответов на фазе показа ответов (перенос PlayerReview). */
-function PlayerReview({ team, round, roundNumber }: {
-  team: Team; round: LoadedRound; roundNumber: number
+function PlayerReview({ team, round, roundNumber, label }: {
+  team: Team; round: LoadedRound; roundNumber: number; label: string
 }) {
   const [marks, setMarks] = useState<Answer[]>([])
   useEffect(() => {
@@ -327,7 +336,7 @@ function PlayerReview({ team, round, roundNumber }: {
 
   return (
     <div className="pl-root">
-      <PlayerHeader team={team} round={roundNumber} />
+      <PlayerHeader team={team} round={label} />
       <div className="pl-notice acc">СЕЙЧАС УЗНАЕМ ПРАВИЛЬНЫЕ ОТВЕТЫ!</div>
       <div className="pl-list">
         {round.questions.filter(q => !q.hidden).map((q: Question, i) => {
@@ -352,7 +361,7 @@ function PlayerReview({ team, round, roundNumber }: {
   )
 }
 
-function PlayerHeader({ team, round }: { team: Team; round: number }) {
+function PlayerHeader({ team, round }: { team: Team; round: string }) {
   return (
     <div className="pl-header">
       <span style={{ color: team.color }}>{team.name}</span>

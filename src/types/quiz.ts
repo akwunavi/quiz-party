@@ -9,6 +9,7 @@ export type ThemeKey = 'classic' | 'new_year'
 export interface PackSettings {
   bg_music?: string          // общая фоновая музыка вопросов
   title_music?: string       // музыка титульного экрана
+  finale_music?: string      // музыка табло/финала
   timer_seconds?: number     // дефолтный таймер раундов
   max_edits?: number         // дефолт правок ответа
   answers_reveal?: AnswersReveal

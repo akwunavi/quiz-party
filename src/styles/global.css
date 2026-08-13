@@ -606,3 +606,37 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 /* предпросмотр во весь экран */
 .pv-backdrop { position: fixed; inset: 0; z-index: 120; background: #000; }
 .pv-close { position: fixed; top: 16px; right: 16px; z-index: 130; }
+
+/* Игрок: поле и кнопка в столбик — кнопка не уезжает никогда */
+.pl-input-col { display: flex; flex-direction: column; gap: 8px; }
+.pl-input-col input { width: 100%; font-size: 16px; }
+.pl-send { width: 100%; clip-path: none; border-radius: 8px; padding: 12px; font-size: 15px; }
+
+/* Своя игра: доска плиток */
+.jp-board { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+.jp-theme { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+.jp-theme-name { font-family: var(--font-display); font-size: clamp(15px, 1.6vw, 22px);
+  text-align: center; color: var(--accent); text-transform: uppercase; }
+.jp-tile { font-family: var(--font-digits); font-size: clamp(22px, 2.6vw, 40px);
+  padding: clamp(14px, 2vh, 26px) 0; width: 100%; }
+.jp-tile.done { opacity: .25; }
+
+.rebus-hot { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,.6); }
+/* Сосульки заметно чаще */
+.icicle { width: 6px; }
+/* Ответ: новогодняя подача вместо плоского жёлтого */
+.answer-reveal { position: relative; overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,215,0,.14), rgba(124,199,255,.06));
+  border-color: rgba(255,215,0,.55);
+  box-shadow: 0 0 30px rgba(255,215,0,.25), inset 0 1px 0 rgba(255,255,255,.35); }
+.answer-reveal::before { content: '★'; position: absolute; top: 6px; left: 12px;
+  color: #ffd700; opacity: .5; font-size: 18px; }
+.answer-reveal::after { content: '★'; position: absolute; top: 6px; right: 12px;
+  color: #ffd700; opacity: .5; font-size: 18px; }
+/* Кнопки проектора в новогодней теме — «леденцовые» */
+.theme-new_year .host-actions button {
+  background: linear-gradient(180deg, #12467f, #0d2a55);
+  border: 1px solid rgba(198,230,255,.55); border-radius: 10px; clip-path: none;
+  box-shadow: 0 3px 0 rgba(255,255,255,.18), 0 0 18px rgba(124,199,255,.25); }
+.theme-new_year .host-actions button::before { content: '❄ '; opacity: .8; }
+.theme-new_year .host-actions button:hover { filter: brightness(1.2); }

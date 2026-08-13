@@ -100,3 +100,14 @@ export function metaLine(round: LoadedRound): string {
   }
   return parts.join(' · ')
 }
+
+/** Видимый номер раунда: зачётные нумеруются с 1, вне зачёта — 0 (разогрев).
+ *  ОДНА функция для проектора, игрока и админки — иначе рассинхрон. */
+export function displayRoundNumber(pack: LoadedPack, idx: number): string {
+  const r = pack.rounds[idx]
+  if (!r) return String(idx)
+  if (r.off_scoreboard) return '0'
+  let n = 0
+  for (let i = 0; i <= idx; i++) if (!pack.rounds[i].off_scoreboard) n++
+  return String(n)
+}

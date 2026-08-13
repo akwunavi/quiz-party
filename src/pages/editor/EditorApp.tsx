@@ -6,6 +6,7 @@ import {
   createRound, swapRounds, deleteRound,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
+import { packMediaSize } from '../../lib/mediaUpload'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
 import type { Pack, MechanicKey } from '../../types/quiz'
@@ -139,6 +140,12 @@ function PackScreen({ packId, user, onBack }: {
   const reload = () => void loadPack(packId, true, true).then(setPack).catch(() => {})
   useEffect(reload, [packId])
 
+  // суммарный объём медиа пакета в Storage
+  const [mediaSizeMb, setMediaSizeMb] = useState<number | null>(null)
+  useEffect(() => {
+    void packMediaSize(packId).then(mb => setMediaSizeMb(mb)).catch(() => setMediaSizeMb(null))
+  }, [packId, pack?.updated_at])
+
   if (!pack) return <div>Загрузка пакета…</div>
   const locked = pack.status === 'active' && user.role !== 'owner'
 
@@ -156,7 +163,7 @@ function PackScreen({ packId, user, onBack }: {
             onSave={async v => { await renamePack(pack.id, v); reload() }} />
         </div>
       </div>
-      <div className="ed-card"><h4>Пакет</h4>
+      <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}</h4>
         <div className="ed-grid2">
           <div className="ed-field"><label>Статус</label>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -181,6 +188,15 @@ function PackScreen({ packId, user, onBack }: {
               <option value="new_year">Новый год</option>
             </select>
           </div>
+          <div className="ed-field"><label>Финальная музыка (табло/финал)</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={pack.settings?.finale_music ? [pack.settings.finale_music] : []}
+              onChange={async paths => {
+                await setPackSettings(pack.id, { ...(pack.settings ?? {}), finale_music: paths[0] })
+                reload()
+              }} />
+            <div className="ed-hint">Если пусто — играет общая фоновая музыка</div>
+          </div>
           <div className="ed-field"><label>Общая фоновая музыка вопросов</label>
             <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
               paths={pack.settings?.bg_music ? [pack.settings.bg_music] : []}
@@ -189,6 +205,22 @@ function PackScreen({ packId, user, onBack }: {
                 reload()
               }} />
             <div className="ed-hint">Один трек на весь пакет — экономит место. Раунд может переопределить</div>
+          </div>
+          <div className="ed-field"><label>Показ ответов (по умолчанию)</label>
+            <select value={pack.settings?.answers_reveal ?? 'after_round'}
+              onChange={async ev => { await setPackSettings(pack.id, { ...(pack.settings ?? {}), answers_reveal: ev.target.value as never }); reload() }}>
+              <option value="after_question">сразу после вопроса</option>
+              <option value="after_round">в конце раунда</option>
+              <option value="never">не показывать</option>
+            </select>
+          </div>
+          <div className="ed-field"><label>Правок ответа (по умолчанию)</label>
+            <select value={pack.settings?.max_edits ?? 2}
+              onChange={async ev => { await setPackSettings(pack.id, { ...(pack.settings ?? {}), max_edits: Number(ev.target.value) }); reload() }}>
+              <option value={0}>без правок</option><option value={1}>1</option>
+              <option value={2}>2</option><option value={3}>3</option>
+              <option value={-1}>без ограничений</option>
+            </select>
           </div>
           <div className="ed-field"><label>Музыка титульного экрана</label>
             <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
