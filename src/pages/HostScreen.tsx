@@ -642,7 +642,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
       if (ok === null) return
       void supabase.from('answers').update({ is_correct: ok }).eq('id', a.id).then(() => {})
     })
-  }, [revealed, step, rows.length])
+  }, [revealed, step, rows.length, rows.map(r => r.answer_text).join('|')])
 
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
@@ -736,16 +736,19 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
           {rows.map(a => {
             const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
+            // приоритет: ручная оценка админа → автопроверка на лету
+            const shown = a.is_correct ?? (revealed ? autocheck(q.answer, a.answer_text) : null)
             return (
               <div key={a.id} className="team-answer" style={{
-                borderLeft: `5px solid ${a.is_correct === true ? 'var(--ok)' : a.is_correct === false ? 'var(--danger)' : 'var(--dim)'}`,
+                borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
                 <span className="text">{a.answer_text || '—'}
-                  {a.stake != null && <span style={{ color: 'var(--accent)', fontSize: 18 }}> · ставка {a.stake}</span>}</span>
-                {a.is_correct != null &&
-                  <span className="mark" style={{ color: a.is_correct ? 'var(--ok)' : 'var(--danger)' }}>
-                    {a.is_correct ? '✓' : '✗'}</span>}
+                  {a.stake != null && a.stake !== 0 &&
+                    <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
+                {shown != null &&
+                  <span className="mark" style={{ color: shown ? 'var(--ok)' : 'var(--danger)' }}>
+                    {shown ? '✓' : '✗'}</span>}
               </div>
             )
           })}
@@ -834,7 +837,13 @@ function JeopardyBoard({ pack, round, gameState }: {
           return (
             <button key={`${ti}-${i}`} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
               style={{ gridColumn: ti + 1, gridRow: i + 2 }}
-              onClick={() => setActive({ t: ti, i })}>{done ? '·' : tile.value}</button>
+              onClick={() => {
+                // синхронизируем номер открытой плитки с игроками:
+                // они шлют ответ по question_index, модалка читает по нему же
+                const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+                void gotoQuestion(flat)
+                setActive({ t: ti, i })
+              }}>{done ? '·' : tile.value}</button>
           )
         }))}
       </div>
@@ -847,7 +856,7 @@ function JeopardyBoard({ pack, round, gameState }: {
       {active && (
         <TileModal round={round} gameState={gameState}
           theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
-          refKey={`t${active.t}-${active.i}`}
+          refKey={`t${themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}`}
           onClose={() => { setOpened(o => [...o, `${active.t}-${active.i}`]); setActive(null) }} />
       )}
     </div>

@@ -106,10 +106,10 @@ function JeopardyPlayer({ team, gameState, roundLabel }: {
           <div className="pl-card-body">
             <div className="pl-input-col">
               <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
-              <button className="pl-send" disabled={!draft.trim()} onClick={() => {
+              <button className="pl-send" disabled={!draft.trim() || draft.trim() === sent} onClick={() => {
                 void enqueueAnswer({
                   team_id: team.id, game_id: gameState.game_id,
-                  question_ref: `q-t${gameState.question_index}`,
+                  question_ref: `q-t${gameState.question_index}`,  // номер открытой плитки, синхронно с проектором
                   round_number: gameState.round_number, answer_text: draft.trim(),
                 })
                 setSent(draft.trim())
