@@ -180,6 +180,10 @@ function HostInner({ gameState, pack }: {
     const timeLow = !!gameState.timer_started_at &&
       (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
     const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}` : ''
+    // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
+    const lettered = !q.media.hidden && imgs.length > 1 && (
+      (q.answer.mode === 'choice' && q.answer.choices.length === imgs.length) ||
+      (q.answer.mode === 'match' && q.answer.left.length === imgs.length))
     const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
 
@@ -217,14 +221,25 @@ function HostInner({ gameState, pack }: {
               <WindText key={q.id} text={q.question_text} />
             </div>
             {!q.media.hidden && imgs.length > 0 && (
-              <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}${choices ? ' with-choices' : ''}`}>
-                {imgs.map((m, i) => (
-                  <figure key={i} className="q-img">
-                    <img src={mediaUrl(m)} alt="" />
-                    {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}
-                  </figure>
-                ))}
-              </div>
+              lettered
+                /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
+                ? <div className={`img-answers n${Math.min(imgs.length, 4)}`}>
+                    {imgs.map((m, i) => (
+                      <figure key={i} className="img-answer">
+                        <img src={mediaUrl(m)} alt="" />
+                        <figcaption>
+                          {q.answer.mode === 'match' ? i + 1 : (choices?.[i]?.key ?? '')}
+                          {q.answer.mode === 'choice' && choices?.[i]?.text
+                            ? ` · ${choices[i].text}` : ''}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}`}>
+                    {imgs.map((m, i) => (
+                      <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
+                    ))}
+                  </div>
             )}
           </>
         )}
@@ -244,7 +259,7 @@ function HostInner({ gameState, pack }: {
             ))}
           </div>
         )}
-        {choices && (
+        {choices && !lettered && (
           <div className="choices-grid">
             {choices.map((c, i) => (
               <div key={c.key} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
@@ -444,6 +459,7 @@ function shuffleStable<T>(arr: T[], seedStr: string): T[] {
 
 
 function displayAnswer(q: Question): string {
+  const empty = '⚠ ответ не заполнен в редакторе'
   const a = q.answer as unknown as Record<string, unknown>
   const d = a.display
   if (Array.isArray(d)) return d.join(' · ')
@@ -452,8 +468,9 @@ function displayAnswer(q: Question): string {
   if (typeof a.word === 'string' && a.word) return a.word.toUpperCase()
   if (typeof a.correct_choice === 'string' && a.correct_choice) return a.correct_choice
   if (typeof a.correct_order === 'string' && a.correct_order) return a.correct_order
-  if (Array.isArray(a.correct_pairs)) return (a.correct_pairs as string[]).join('  ')
-  return '—'
+  if (Array.isArray(a.correct_pairs) && a.correct_pairs.length)
+    return (a.correct_pairs as string[]).join('  ')
+  return empty
 }
 
 export function mediaUrl(path: string): string {
@@ -631,6 +648,20 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     )
                   })}
                 </div>
+              ) : q.answer.mode === 'order' ? (
+                <div className="order-answer">
+                  {q.answer.correct_order.split('').map((k, i) => {
+                    const c = (q.answer as { choices: { key: string; text: string }[] })
+                      .choices.find(x => x.key === k)
+                    return (
+                      <div key={i} className="order-step">
+                        <span className="pos">{i + 1}</span>
+                        <span className="key">{k}</span>
+                        <span className="txt">{c?.text ?? ''}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               ) : (
                 <div className="answer-main">{displayAnswer(q)}</div>
               )}
@@ -646,6 +677,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 </div>
               )}
               {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
+              {q.answer.mode === 'choice' && !(q.answer as { correct_choice?: string }).correct_choice &&
+                <div style={{ color: '#ff8fa3' }}>⚠ в редакторе не отмечен верный вариант</div>}
               <div className="q-media-grid answer-media">
                 {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
               </div>

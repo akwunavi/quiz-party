@@ -3,12 +3,15 @@ import { supabase } from './supabase'
 import { compressImage } from './imageCompress'
 
 /** Возвращает путь внутри бакета (его храним в question.media). */
-export const MAX_AUDIO_VIDEO_MB = 5
-export const MAX_IMAGE_MB = 15
+export const MAX_AUDIO_MB = 5
+export const MAX_VIDEO_MB = 20
+export const MAX_IMAGE_MB = 3
 
 export async function uploadMedia(packId: string, file: File): Promise<string> {
-  const isAV = /^(audio|video)\//.test(file.type)
-  const limitMb = isAV ? MAX_AUDIO_VIDEO_MB : MAX_IMAGE_MB
+  const isAudio = /^audio\//.test(file.type)
+  const isVideo = /^video\//.test(file.type)
+  const isAV = isAudio || isVideo
+  const limitMb = isAudio ? MAX_AUDIO_MB : isVideo ? MAX_VIDEO_MB : MAX_IMAGE_MB
   if (file.size > limitMb * 1024 * 1024) {
     throw new Error(`Файл ${(file.size / 1048576).toFixed(1)} МБ — больше лимита ${limitMb} МБ. `
       + (isAV ? 'Сожми аудио (128 kbps) или обрежь фрагмент.' : 'Уменьши изображение.'))

@@ -208,7 +208,9 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
               </div>
               {isOpen && isUnlocked && (
                 <div className="pl-card-body">
-                  {q.question_text && <div className="pl-qtext">{q.question_text}</div>}
+                  {q.question_text
+                    ? <div className="pl-qtext">{q.question_text}</div>
+                    : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
                   {isStakes && (
                     <div className="pl-stakes">
                       {stakeValues.map(v => (
