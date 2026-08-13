@@ -1097,19 +1097,29 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
           animationDelay: `${(i % 7) * 0.23}s`,
         }} />
       ))}
-      <h1 className="round-title title-anim">ФИНАЛ</h1>
-      <div className="pedestal">
+      <div className="mono-tag">ИТОГИ ИГРЫ</div>
+      <Title theme={pack.theme} lines={['ПОБЕДИТЕЛИ']} />
+      <div className="fin-podium">
         {[1, 0, 2].map(pos => top[pos] && (
-          <div key={pos} className="step" style={{ paddingBottom: 18 + (2 - pos) * 26 }}>
-            <div style={{ fontSize: '2rem' }}>{['🥇', '🥈', '🥉'][pos]}</div>
-            <b style={{ color: top[pos].color }}>{top[pos].name}</b>
-            <div className="num">{totals.get(top[pos].id) ?? 0}</div>
+          <div key={pos} className={`fin-step p${pos + 1}`}>
+            <div className="fin-medal">{['🥇', '🥈', '🥉'][pos]}</div>
+            <div className="fin-name" style={{ color: top[pos].color }}>{top[pos].name}</div>
+            <div className="fin-score">{totals.get(top[pos].id) ?? 0}</div>
+            <div className="fin-place">{pos + 1} место</div>
           </div>
         ))}
       </div>
-      <ol style={{ fontSize: '1.2rem' }}>
-        {ranked.map(t => <li key={t.id}><span style={{ color: t.color }}>{t.name}</span> — {totals.get(t.id) ?? 0}</li>)}
-      </ol>
+      {ranked.length > 3 && (
+        <div className="fin-rest">
+          {ranked.slice(3).map((t, i) => (
+            <div key={t.id} className="fin-row">
+              <span className="num">{i + 4}</span>
+              <span style={{ color: t.color }}>{t.name}</span>
+              <span className="num">{totals.get(t.id) ?? 0}</span>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="host-actions">
         <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
       </div>
