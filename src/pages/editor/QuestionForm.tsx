@@ -227,8 +227,11 @@ function AnswerEditor({ spec, onChange, imgs }: {
       <div>
         <label>Слово (ответ в сетке)</label>
         <input value={spec.word} style={{ width: '100%', padding: 6 }}
-          onChange={e => onChange({ ...spec, word: e.target.value })} />
-        <div style={{ opacity: .6, fontSize: 13 }}>Определение — это текст вопроса слева.</div>
+          onChange={e => onChange({ ...spec, word: e.target.value })}
+          onBlur={e => onChange({ ...spec,
+            word: e.target.value.trim().replace(/[\s-]+/g, '') })} />
+        <div className="ed-hint">Определение — это текст вопроса слева.
+          Пробелы и дефисы убираются автоматически: «Куала-Лумпур» → «КУАЛАЛУМПУР».</div>
       </div>
     )
     case 'none': return (

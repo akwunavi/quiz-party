@@ -84,6 +84,21 @@ export function scoredRounds(pack: LoadedPack): LoadedRound[] {
 /** Автогенерация metaLine: «10 ВОПРОСОВ · 30 СЕК · 1 БАЛЛ» */
 export function metaLine(round: LoadedRound): string {
   if (round.meta_line_override) return round.meta_line_override
+  if (round.mechanic === 'melody') {
+    const themes = (round.settings as { themes?: { tracks: unknown[] }[] }).themes ?? []
+    const tracks = themes.reduce((s, t) => s + t.tracks.length, 0)
+    return `${themes.length} ТЕМ · ${tracks} ТРЕКОВ · СТАВКА СЕКУНДАМИ`
+  }
+  if (round.mechanic === 'jeopardy') {
+    const themes = (round.settings as { themes?: { tiles: unknown[] }[] }).themes ?? []
+    const tiles = themes.reduce((s, t) => s + t.tiles.length, 0)
+    return `${themes.length} ТЕМ · ${tiles} ПЛИТОК · ЦЕНА = БАЛЛЫ`
+  }
+  if (round.mechanic === 'sprint') {
+    const s = round.settings as { pointsPerQuestion?: number; allCorrectBonus?: number }
+    const n = round.questions.filter(q => !q.hidden).length
+    return `${n} ВОПРОСОВ · ${round.timer_seconds} СЕК · ${s.pointsPerQuestion ?? 2} БАЛЛА · +${s.allCorrectBonus ?? 5} ЗА ВСЕ`
+  }
   const n = round.questions.filter(q => !q.hidden).length
   const parts = [`${n} ВОПРОС${n % 10 === 1 && n % 100 !== 11 ? '' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'А' : 'ОВ'}`,
     `${round.timer_seconds} СЕК`]

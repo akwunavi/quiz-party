@@ -149,7 +149,8 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
       <div className="pl-list">
         {(stage === 'idle' || stage === 'spinning' || stage === 'done') &&
           <div className="pl-wait" style={{ padding: 30 }}>ЖДИТЕ НАЧАЛА РАУНДА</div>}
-        {stage === 'listen' && <div className="pl-wait" style={{ padding: 30 }}>СЛУШАЕМ…</div>}
+        {stage === 'listen' && <div className="pl-wait" style={{ padding: 30 }}>СЛУШАЕМ 1 СЕКУНДУ…</div>}
+        {stage === 'snippet' && <div className="pl-wait" style={{ padding: 30 }}>ИГРАЕТ ТРЕК…</div>}
 
         {stage === 'bidding' && (
           <div className="pl-card"><div className="pl-qlabel">ЗА СКОЛЬКО СЕКУНД УГАДАЕТЕ?</div>
@@ -165,13 +166,13 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
           </div>
         )}
 
-        {(stage === 'bids' || stage === 'answering' || stage === 'passed') && (
+        {(stage === 'answering' || stage === 'passed') && (
           myTurn ? (
             <div className="pl-card"><div className="pl-qlabel">ВАШ ХОД — НАЗОВИТЕ ТРЕК</div>
               <div className="pl-card-body">
                 <div className="pl-input-col">
                   <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
-                  <button className="pl-send" disabled={!draft.trim() || stage === 'bids'}
+                  <button className="pl-send" disabled={!draft.trim()}
                     onClick={() => send(`q-mel-${m.key}`, draft.trim())}>Отправить</button>
                 </div>
               </div>

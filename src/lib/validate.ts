@@ -26,8 +26,10 @@ export function validatePack(pack: LoadedPack): Problem[] {
   pack.rounds.forEach((rawRound, ri) => {
     // скрытые вопросы в игре не участвуют — валидатор их полностью игнорирует
     const round = { ...rawRound, questions: rawRound.questions.filter(q => !q.hidden) }
-    if (round.questions.length === 0)
+    const noQuestions = round.mechanic === 'jeopardy' || round.mechanic === 'melody'
+    if (!noQuestions && round.questions.length === 0)
       problems.push({ roundIdx: ri, text: 'Нет вопросов' })
+    if (round.mechanic === 'melody') validateMelody(round, ri, problems)
     if (round.title_lines.length === 0 || !round.title_lines.join('').trim())
       problems.push({ roundIdx: ri, text: 'Нет заголовка раунда' })
     if (round.rules.length === 0)
@@ -63,8 +65,6 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
   if (text !== text.trim()) push('Лишние пробелы в начале/конце текста вопроса')
   if (/ {2,}/.test(text)) push('Двойные пробелы в тексте вопроса')
   if (/\s+[,.!?]/.test(text)) push('Пробел перед знаком препинания')
-  if (text.trim() && !/[?!.…»)]$/.test(text.trim()))
-    push('Текст вопроса не заканчивается знаком препинания')
   if (/\b([а-яa-z]{3,})\s+\1\b/i.test(text)) push('Похоже, слово повторяется дважды')
 
   const answerText = a.mode === 'free_text' ? a.correct
@@ -108,11 +108,8 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
     }
     case 'crossword_word':
       if (!a.word.trim()) push('Не задано слово кроссворда')
-      else {
-        if (a.word.trim().length < 3) push('Слово кроссворда короче 3 букв')
-        if (/\s/.test(a.word.trim())) push('В слове кроссворда есть пробел')
-        if (/[^А-Яа-яЁёA-Za-z0-9]/.test(a.word.trim())) push('В слове кроссворда есть символы кроме букв')
-      }
+      else if (a.word.replace(/[^А-Яа-яЁёA-Za-z0-9]/g, '').length < 3)
+        push('Слово кроссворда короче 3 букв')
       break
     case 'none':
       break
@@ -134,6 +131,20 @@ function validateCrossword(round: LoadedRound, ri: number, out: Problem[]) {
   const n = round.questions.length
   if (n < 6 || n > 10)
     out.push({ roundIdx: ri, text: `Кроссворд: слов ${n}, должно быть 6–10` })
+}
+
+function validateMelody(round: LoadedRound, ri: number, out: Problem[]) {
+  const s = round.settings as { themes?: { name: string; tracks: { audio: string; correct: string }[] }[] }
+  const themes = s.themes ?? []
+  if (themes.length === 0) out.push({ roundIdx: ri, text: 'Мелодия: нет тем' })
+  themes.forEach((t, ti) => {
+    if (!t.name.trim()) out.push({ roundIdx: ri, text: `Мелодия: тема ${ti + 1} без названия` })
+    if (t.tracks.length === 0) out.push({ roundIdx: ri, text: `Мелодия: «${t.name || ti + 1}» — нет треков` })
+    t.tracks.forEach((tr, i) => {
+      if (!tr.audio) out.push({ roundIdx: ri, text: `Мелодия: «${t.name || ti + 1}», трек ${i + 1}: нет файла` })
+      if (!tr.correct.trim()) out.push({ roundIdx: ri, text: `Мелодия: «${t.name || ti + 1}», трек ${i + 1}: нет ответа` })
+    })
+  })
 }
 
 function validateJeopardy(round: LoadedRound, ri: number, out: Problem[]) {

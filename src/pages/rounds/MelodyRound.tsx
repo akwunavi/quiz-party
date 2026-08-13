@@ -1,8 +1,11 @@
 // ═══ «УГАДАЙ МЕЛОДИЮ»: аукцион секунд ═══
-// Стадии (живут в game_state.melody, чтобы телефоны видели то же самое):
-// idle → spinning (10с рандом) → listen (1 сек трека) → bidding (10с ставки 2–10)
-// → bids (показ ставок) → answering (30с первой команде, фоновая музыка)
-// → passed (вторая по ставке слушает трек целиком + 10с) → done
+// Состояние — в game_state.melody, единый автомат с ДЕДЛАЙНАМИ (не setTimeout),
+// поэтому проектор и телефоны всегда в одной стадии, даже после перезагрузки.
+//
+// spinning (барабан по плиткам, БЕЗ модалки) → listen (1 сек трека)
+// → bidding (ставки 2–10) → bids (показ, кто играет) → snippet (интервал играет)
+// → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
+// → done (трек закрыт)
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { mediaUrl } from '../HostScreen'
@@ -11,9 +14,10 @@ import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodySettings, MelodyState, MelodyTheme } from '../../types/quiz'
 
-export async function setMelody(patch: MelodyState) {
-  await supabase.from('game_state').update({ melody: patch }).eq('id', 1)
+async function saveMelody(next: MelodyState) {
+  await supabase.from('game_state').update({ melody: next }).eq('id', 1)
 }
+const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
 export function MelodyBoard({ pack, round, gameState }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -24,6 +28,79 @@ export function MelodyBoard({ pack, round, gameState }: {
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const played = m.played ?? []
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
+
+  const deadline = m.deadline ? new Date(m.deadline).getTime() : 0
+  const left = deadline ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0
+  const expired = !!deadline && now >= deadline
+
+  const [ti, i] = (m.key ?? '0-0').split('-').map(Number)
+  const track = themes[ti]?.tracks[i]
+  const bidRef = `q-mel-${m.key}-bid`
+  const ansRef = `q-mel-${m.key}`
+  const bids = answers.filter(a => a.question_ref === bidRef)
+
+  // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
+  useEffect(() => {
+    if (!expired || document.hidden) return
+    if (m.stage === 'spinning') {
+      void saveMelody({ ...m, stage: 'listen', deadline: inSec(2) })
+    } else if (m.stage === 'bidding') {
+      const order = bids
+        .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
+        .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
+        .map(b => b.id)
+      void saveMelody({ ...m, stage: 'bids', order, turn: 0, deadline: undefined })
+    } else if (m.stage === 'snippet') {
+      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+    } else if (m.stage === 'answering' || m.stage === 'passed') {
+      void saveMelody({ ...m, deadline: undefined })   // время вышло — судит ведущий
+    }
+  }, [expired, m.stage])
+
+  // ── 1 секунда трека на стадии listen ──
+  useEffect(() => {
+    if (m.stage !== 'listen' || !track?.audio || document.hidden) return
+    const a = new Audio(mediaUrl(track.audio))
+    audioRef.current = a
+    a.play().catch(() => {})
+    const stop = setTimeout(() => {
+      a.pause()
+      void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
+    }, 1000)
+    return () => { clearTimeout(stop); a.pause() }
+  }, [m.stage, m.key])
+
+  // ── выбранный интервал ──
+  useEffect(() => {
+    if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
+    const a = new Audio(mediaUrl(track.audio))
+    audioRef.current = a
+    a.play().catch(() => {})
+    return () => a.pause()
+  }, [m.stage, m.key])
+
+  // ── фоновая музыка на время размышления ──
+  useEffect(() => {
+    const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
+    if (m.stage !== 'answering' || !bg || document.hidden) return
+    const a = new Audio(mediaUrl(bg))
+    a.loop = true; a.volume = .45
+    a.play().catch(() => {})
+    return () => a.pause()
+  }, [m.stage])
+
+  // ── вторая команда: трек целиком, по окончании — окно на ответ ──
+  useEffect(() => {
+    if (m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
+    const a = new Audio(mediaUrl(track.audio))
+    audioRef.current = a
+    a.play().catch(() => {})
+    a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
+    return () => a.pause()
+  }, [m.stage])
 
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
@@ -32,224 +109,180 @@ export function MelodyBoard({ pack, round, gameState }: {
     </div>
   )
 
-  const allKeys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
+  const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
   const freeKeys = allKeys.filter(k => !played.includes(k))
+  const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
+
+  const startSpin = () => {
+    const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
+    void saveMelody({ ...m, key: target, stage: 'spinning', deadline: inSec(s.spinSec ?? 10),
+      order: undefined, turn: 0, chooser: undefined })
+  }
+
+  const currentId = m.order?.[m.turn ?? 0]
+  const currentTeam = teams.find(t => t.id === currentId)
+  const bidSec = Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
+  const ans = answers.find(a => a.question_ref === ansRef && a.team_id === currentId)
+
+  const grade = async (correct: boolean) => {
+    if (!ans) return
+    const isFirst = (m.turn ?? 0) === 0
+    const pts = correct ? (isFirst ? (bidSec <= 5 ? 2 : 1) : 0.5) : 0
+    await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
+    if (correct) await saveMelody({ ...m, stage: 'done', deadline: undefined,
+      played: [...played, m.key!], chooser: currentId })
+  }
+  const pass = async () => {
+    if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
+      await saveMelody({ ...m, stage: 'passed', turn: 1, deadline: undefined })
+    } else {
+      await saveMelody({ ...m, stage: 'done', deadline: undefined, played: [...played, m.key!] })
+    }
+  }
 
   return (
     <div className="host-screen grid-bg mel-screen">
       <h1 className="neon-title mel-title">{round.title_lines.join(' ') || 'УГАДАЙ МЕЛОДИЮ'}</h1>
-      <div className="mel-board" style={{ gridTemplateColumns: `repeat(${themes.length}, minmax(0,1fr))` }}>
-        {themes.map((t, ti) => (
-          <div key={`h${ti}`} className="mel-theme">{t.name || `Тема ${ti + 1}`}</div>
-        ))}
-        {themes.map((t, ti) => t.tracks.map((_, i) => {
-          const key = `${ti}-${i}`
-          const done = played.includes(key)
-          const spinning = m.stage === 'spinning' && m.key === key
-          return (
-            <div key={key} className={`mel-tile${done ? ' done' : ''}${spinning ? ' spin' : ''}`}
-              style={{ gridColumn: ti + 1, gridRow: i + 2 }}>{done ? '·' : i + 1}</div>
-          )
-        }))}
-      </div>
+      <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
+        spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
 
-      {(!m.stage || m.stage === 'idle' || m.stage === 'done') && (
+      {idle && (
         <div className="host-actions">
           {freeKeys.length > 0
-            ? <button onClick={() => void startSpin(freeKeys, s)}>
-                {played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
+            ? <button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
             : <div className="mono-tag">ВСЕ ТРЕКИ ОТЫГРАНЫ</div>}
         </div>
       )}
 
-      {m.stage && m.stage !== 'idle' && m.stage !== 'done' && (
-        <MelodyStage pack={pack} round={round} gameState={gameState} m={m}
-          themes={themes} settings={s} teams={teams} answers={answers} />
+      {/* модалка появляется только с момента прослушивания, на барабане её нет */}
+      {m.stage && !idle && m.stage !== 'spinning' && (
+        <div className="mel-overlay">
+          <div className="mel-modal hud-frame">
+            <div className="mel-modal-head">
+              <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
+              {!!deadline && <div className="mel-count">{left}</div>}
+            </div>
+
+            {m.stage === 'listen' && <div className="mel-big">СЛУШАЕМ 1 СЕКУНДУ…</div>}
+
+            {m.stage === 'bidding' && (<>
+              <div className="mel-big">ЗА СКОЛЬКО СЕКУНД УГАДАЕТЕ?</div>
+              <div className="mel-bids">
+                {teams.map(t => {
+                  const b = bids.find(x => x.team_id === t.id)
+                  return <div key={t.id} className={`mel-bid-row${b ? ' win' : ''}`}>
+                    <span style={{ color: t.color }}>{t.name}</span>
+                    <b>{b ? 'ставка принята ✓' : '…'}</b><span /></div>
+                })}
+              </div>
+            </>)}
+
+            {m.stage === 'bids' && (<>
+              <div className="mono-tag">СТАВКИ КОМАНД</div>
+              <div className="mel-bids">
+                {(m.order ?? []).map((id, pos) => {
+                  const t = teams.find(x => x.id === id)
+                  const b = bids.find(x => x.team_id === id)
+                  return (
+                    <div key={id} className={`mel-bid-row${pos === 0 ? ' win' : ''}`}>
+                      <span style={{ color: t?.color }}>{t?.name}</span>
+                      <b>{b?.answer_text} сек</b>
+                      {pos === 0 ? <span className="mel-win-tag">ИГРАЕТ</span> : <span />}
+                    </div>
+                  )
+                })}
+                {(m.order ?? []).length === 0 && <div style={{ opacity: .6 }}>ставок нет</div>}
+              </div>
+              <div className="mel-actions">
+                <button disabled={!currentId}
+                  onClick={() => void saveMelody({ ...m, stage: 'snippet', deadline: inSec(bidSec || 5) })}>
+                  Играем {bidSec || 5} сек →
+                </button>
+                <button className="ghost dark"
+                  onClick={() => void saveMelody({ ...m, stage: 'done', deadline: undefined,
+                    played: [...played, m.key!] })}>Пропустить трек</button>
+              </div>
+            </>)}
+
+            {m.stage === 'snippet' && (
+              <div className="mel-big" style={{ color: currentTeam?.color }}>
+                {currentTeam?.name} · играет {bidSec} сек
+              </div>
+            )}
+
+            {(m.stage === 'answering' || m.stage === 'passed') && (<>
+              <div className="mel-big" style={{ color: currentTeam?.color }}>
+                {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
+              </div>
+              <div className="mel-answer">
+                {ans?.answer_text ? <>Ответ: <b>{ans.answer_text}</b></>
+                  : <span style={{ opacity: .6 }}>ждём ответ…</span>}
+              </div>
+              {ans?.is_correct === true && (
+                <div className="answer-reveal hud-frame">
+                  <div className="answer-label">ВЕРНО ✓</div>
+                  <div className="answer-main">{track?.correct}</div>
+                </div>
+              )}
+              <div className="mel-actions">
+                <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
+                <button className="ghost" disabled={!ans} onClick={() => void grade(false)}>✗ Неверно</button>
+                <button className="ghost dark" onClick={() => void pass()}>
+                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? 'Передать ход →' : 'Закрыть трек'}
+                </button>
+              </div>
+            </>)}
+          </div>
+        </div>
       )}
     </div>
   )
 }
 
-async function startSpin(freeKeys: string[], s: MelodySettings) {
-  const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
-  await setMelody({ stage: 'spinning', key: target, startedAt: new Date().toISOString(),
-    played: undefined })
-  // визуальный «барабан» крутится на проекторе, по окончании — стадия listen
-  setTimeout(() => { void setMelody({ stage: 'listen', key: target, startedAt: new Date().toISOString() }) },
-    (s.spinSec ?? 10) * 1000)
-}
-
-function MelodyStage({ pack, round, gameState, m, themes, settings, teams, answers }: {
-  pack: LoadedPack; round: LoadedRound; gameState: GameState
-  m: MelodyState; themes: MelodyTheme[]; settings: MelodySettings
-  teams: { id: string; name: string; color: string }[]
-  answers: { id: string; team_id: string; question_ref: string; answer_text: string; is_correct: boolean | null; updated_at: string }[]
+/** Барабан: подсветка бежит по плиткам и замедляется к концу. */
+function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: {
+  themes: MelodyTheme[]; played: string[]
+  spinning: boolean; spinKey?: string; spinLeft: number; spinTotal: number
 }) {
-  const [ti, i] = (m.key ?? '0-0').split('-').map(Number)
-  const track = themes[ti]?.tracks[i]
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [left, setLeft] = useState(0)
-  const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
+  const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
+  const free = keys.filter(k => !played.includes(k))
+  const [cursor, setCursor] = useState(0)
 
-  // общий обратный отсчёт стадии
-  const stageSec = m.stage === 'spinning' ? (settings.spinSec ?? 10)
-    : m.stage === 'bidding' ? (settings.bidSec ?? 10)
-    : m.stage === 'answering' ? (settings.answerSec ?? 30)
-    : m.stage === 'passed' ? (settings.passAnswerSec ?? 10) : 0
   useEffect(() => {
-    if (!m.startedAt || !stageSec) return
-    const tick = () => setLeft(Math.max(0, Math.round(
-      stageSec - (Date.now() - new Date(m.startedAt!).getTime()) / 1000)))
-    tick()
-    const t = setInterval(tick, 250)
-    return () => clearInterval(t)
-  }, [m.startedAt, m.stage])
-
-  // 1 секунда трека на стадии listen → сразу ставки
-  useEffect(() => {
-    if (m.stage !== 'listen' || !track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
-    audioRef.current = a
-    a.play().catch(() => {})
-    const stop = setTimeout(() => {
-      a.pause()
-      void setMelody({ ...m, stage: 'bidding', startedAt: new Date().toISOString() })
-    }, 1000)
-    return () => { clearTimeout(stop); a.pause() }
-  }, [m.stage])
-
-  // ставки закончились → показываем и определяем очередь
-  useEffect(() => {
-    if (m.stage !== 'bidding' || !m.startedAt || document.hidden) return
-    const ms = new Date(m.startedAt).getTime() + (settings.bidSec ?? 10) * 1000 - Date.now()
-    const t = setTimeout(() => {
-      const bids = answers.filter(a => a.question_ref === `q-mel-${m.key}-bid`)
-        .map(a => ({ team: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
-        .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
-      void setMelody({ ...m, stage: 'bids', order: bids.map(b => b.team), turn: 0,
-        startedAt: new Date().toISOString() })
-    }, Math.max(0, ms))
-    return () => clearTimeout(t)
-  }, [m.stage, answers.length])
-
-  // отыгрыш выбранного интервала → таймер на ответ + фоновая музыка
-  const playSnippet = (sec: number) => {
-    if (!track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
-    audioRef.current = a
-    a.play().catch(() => {})
-    setTimeout(() => {
-      a.pause()
-      void setMelody({ ...m, stage: 'answering', startedAt: new Date().toISOString() })
-    }, sec * 1000)
-  }
-  useEffect(() => {
-    if (m.stage !== 'answering' || !bgMusic || document.hidden) return
-    const a = new Audio(mediaUrl(bgMusic))
-    a.loop = true; a.volume = .5
-    a.play().catch(() => {})
-    return () => a.pause()
-  }, [m.stage])
-
-  // вторая команда: полный трек, потом окно на ответ
-  useEffect(() => {
-    if (m.stage !== 'passed' || !track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
-    audioRef.current = a
-    a.play().catch(() => {})
-    a.onended = () => void setMelody({ ...m, stage: 'passed', startedAt: new Date().toISOString() })
-    return () => { a.pause() }
-  }, [m.stage])
-
-  const bids = answers.filter(a => a.question_ref === `q-mel-${m.key}-bid`)
-  const current = m.order?.[m.turn ?? 0]
-  const currentTeam = teams.find(t => t.id === current)
-  const bidSec = Number(bids.find(b => b.team_id === current)?.answer_text) || 0
-  const ans = answers.find(a => a.question_ref === `q-mel-${m.key}` && a.team_id === current)
-
-  const grade = async (correct: boolean) => {
-    if (!ans) return
-    // баллы: 1-я команда 2 (ставка 2–5) / 1 (6–10), 2-я команда 0.5
-    const isFirst = (m.turn ?? 0) === 0
-    const pts = correct ? (isFirst ? (bidSec <= 5 ? 2 : 1) : 0.5) : 0
-    await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
-    if (correct) {
-      await setMelody({ ...m, stage: 'done', played: [...(m.played ?? []), m.key!], chooser: current })
+    if (!spinning || free.length === 0) return
+    let stop = false
+    let idx = 0
+    const step = () => {
+      if (stop) return
+      idx = (idx + 1) % free.length
+      setCursor(idx)
+      // замедление: чем меньше осталось, тем длиннее пауза
+      const p = 1 - Math.max(0, spinLeft) / Math.max(1, spinTotal)  // 0 → 1
+      const delay = 70 + p * p * 520
+      setTimeout(step, delay)
     }
-  }
-  const pass = async () => {
-    if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
-      await setMelody({ ...m, stage: 'passed', turn: 1, startedAt: new Date().toISOString() })
-    } else {
-      await setMelody({ ...m, stage: 'done', played: [...(m.played ?? []), m.key!], chooser: undefined })
-    }
-  }
+    const t = setTimeout(step, 70)
+    return () => { stop = true; clearTimeout(t) }
+  }, [spinning, spinLeft <= 1])
+
+  const highlighted = spinning
+    ? (spinLeft <= 1 ? spinKey : free[cursor % Math.max(1, free.length)])
+    : undefined
 
   return (
-    <div className="mel-overlay">
-      <div className="mel-modal hud-frame">
-        <div className="mel-modal-head">
-          <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
-          {stageSec > 0 && <div className="mel-count">{left}</div>}
-        </div>
-
-        {m.stage === 'spinning' && <div className="mel-big">ВЫБИРАЕМ ТРЕК…</div>}
-        {m.stage === 'listen' && <div className="mel-big">СЛУШАЕМ 1 СЕКУНДУ</div>}
-        {m.stage === 'bidding' && (
-          <>
-            <div className="mel-big">ЗА СКОЛЬКО СЕКУНД УГАДАЕТЕ?</div>
-            <div className="mel-bids">
-              {teams.map(t => {
-                const b = bids.find(x => x.team_id === t.id)
-                return <span key={t.id} className={`mel-bid${b ? ' set' : ''}`}
-                  style={{ color: t.color }}>{t.name}{b ? ' ✓' : ' …'}</span>
-              })}
-            </div>
-          </>
-        )}
-        {m.stage === 'bids' && (
-          <>
-            <div className="mono-tag">СТАВКИ КОМАНД</div>
-            <div className="mel-bids">
-              {(m.order ?? []).map((id, pos) => {
-                const t = teams.find(x => x.id === id)
-                const b = bids.find(x => x.team_id === id)
-                return (
-                  <div key={id} className={`mel-bid-row${pos === 0 ? ' win' : ''}`}>
-                    <span style={{ color: t?.color }}>{t?.name}</span>
-                    <b>{b?.answer_text} сек</b>
-                    {pos === 0 && <span className="mel-win-tag">ИГРАЕТ</span>}
-                  </div>
-                )
-              })}
-            </div>
-            <div className="mel-actions">
-              <button onClick={() => playSnippet(bidSec || 5)}>Играем {bidSec || 5} сек →</button>
-            </div>
-          </>
-        )}
-        {(m.stage === 'answering' || m.stage === 'passed') && (
-          <>
-            <div className="mel-big" style={{ color: currentTeam?.color }}>
-              {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name}
-            </div>
-            <div className="mel-answer">{ans?.answer_text
-              ? <>Ответ: <b>{ans.answer_text}</b></>
-              : <span style={{ opacity: .6 }}>ждём ответ…</span>}</div>
-            {ans?.is_correct === true && (
-              <div className="answer-reveal hud-frame">
-                <div className="answer-label">ВЕРНО ✓</div>
-                <div className="answer-main">{track?.correct}</div>
-              </div>
-            )}
-            <div className="mel-actions">
-              <button onClick={() => void grade(true)}>✓ Верно</button>
-              <button className="ghost" onClick={() => void grade(false)}>✗ Неверно</button>
-              <button className="ghost dark" onClick={() => void pass()}>Передать ход →</button>
-            </div>
-          </>
-        )}
-      </div>
+    <div className="mel-board" style={{ gridTemplateColumns: `repeat(${themes.length}, minmax(0,1fr))` }}>
+      {themes.map((t, ti) => (
+        <div key={`h${ti}`} className="mel-theme">{t.name || `Тема ${ti + 1}`}</div>
+      ))}
+      {themes.map((t, ti) => t.tracks.map((_, i) => {
+        const key = `${ti}-${i}`
+        const done = played.includes(key)
+        const hot = highlighted === key
+        return (
+          <div key={key} className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}`}
+            style={{ gridColumn: ti + 1, gridRow: i + 2 }}>{done ? '·' : i + 1}</div>
+        )
+      }))}
     </div>
   )
 }

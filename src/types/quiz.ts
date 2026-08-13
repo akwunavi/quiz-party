@@ -179,11 +179,12 @@ export interface Question {
 
 // ── Игра ───────────────────────────────────────────────
 export interface MelodyState {
-  key?: string                  // 't0-1' — тема-трек
-  stage?: 'idle' | 'spinning' | 'listen' | 'bidding' | 'bids' | 'answering' | 'passed' | 'done'
+  key?: string                  // '0-1' — тема-трек
+  stage?: 'idle' | 'spinning' | 'listen' | 'bidding' | 'bids' | 'snippet'
+    | 'answering' | 'passed' | 'done'
   order?: string[]              // очередь команд по ставкам (id)
   turn?: number                 // индекс текущей команды в order
-  startedAt?: string            // старт текущей стадии
+  deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
   played?: string[]             // отыгранные треки
   chooser?: string              // team_id, кто выбирает следующий трек
 }

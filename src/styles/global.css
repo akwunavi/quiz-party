@@ -281,7 +281,10 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 
 /* — правила: примерзают слева со льдинкой — */
 .theme-new_year .rule-item { animation: iceIn .6s cubic-bezier(.3,1.2,.4,1) forwards; }
-.theme-new_year .rule-item .idx::before { content: '❅ '; color: #bfe3ff; }
+/* снежинка перед номером правила — вне анимации, поэтому не прыгает */
+.theme-new_year .rule-item { position: relative; padding-left: 26px; }
+.theme-new_year .rule-item::before { content: '❅'; position: absolute; left: 0; top: .15em;
+  color: #bfe3ff; opacity: .85; }
 @keyframes iceIn { from { opacity: 0; transform: translateX(-30px) skewX(-6deg); filter: blur(3px); }
   to { opacity: 1; transform: none; filter: none; } }
 

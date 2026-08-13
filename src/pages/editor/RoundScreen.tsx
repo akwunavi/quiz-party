@@ -36,6 +36,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
 
   const isJeopardy = round.mechanic === 'jeopardy'
+  // в этих механиках контент задаётся не вопросами, а темами/треками
+  const noQuestions = isJeopardy || round.mechanic === 'melody'
 
   const patch = async (p: Parameters<typeof updateRound>[1]) => {
     await updateRound(round.id, p); onChanged()
@@ -72,18 +74,23 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
       </div>
 
       <div className="ed-card"><h4>Настройки раунда</h4><div className="ed-grid2">
+        {round.mechanic === 'melody' &&
+          <div className="ed-hint" style={{ gridColumn: '1 / -1' }}>
+            В этом раунде контент задаётся темами и треками ниже — блок вопросов и
+            общий таймер не используются, тайминги стадий настраиваются отдельно.
+          </div>}
         <table style={{ display: 'none' }}><tbody>
           <tr><td>Заголовок (проектор):</td><td>
             <EditableText value={round.title_lines.join(' / ')} disabled={locked}
               onSave={v => void patch({ title_lines: v.split('/').map(s => s.trim()).filter(Boolean) })} />
             <span style={{ opacity: .5 }}> (строки через /)</span>
           </td></tr>
-          {!isJeopardy && <tr><td>Таймер:</td><td>
+          {!noQuestions && <tr><td>Таймер:</td><td>
             <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
               onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
             <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </td></tr>}
-          {!isJeopardy && <tr><td>Показ ответов:</td><td>
+          {!noQuestions && <tr><td>Показ ответов:</td><td>
             <select value={round.answers_reveal} disabled={locked}
               onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
               <option value="after_question">сразу после вопроса</option>
@@ -91,7 +98,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               <option value="never">не показывать</option>
             </select>
           </td></tr>}
-          {!isJeopardy && <tr><td>Правок ответа:</td><td>
+          {!noQuestions && <tr><td>Правок ответа:</td><td>
             <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
               onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
               <option value={0}>без правок</option>
@@ -111,7 +118,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <RulesEditor rules={round.rules} disabled={locked}
               onSave={rules => void patch({ rules })} />
           </td></tr>
-          {!isJeopardy && <tr><td>Музыка/озвучка правил:</td><td>
+          {!noQuestions && <tr><td>Музыка/озвучка правил:</td><td>
             <MediaSlot label="" packId={pack.id} accept="audio/*"
               paths={round.rules_audio ? [round.rules_audio] : []} max={1}
               onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
@@ -136,7 +143,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
                 onChange={e => void patch({ settings: { ...round.settings, break_after_minutes: Number(e.target.value) || undefined } as never })} />
               {' '}(0 = без перерыва)</label>
           </td></tr>
-          {!isJeopardy && <tr><td>Вне зачёта:</td><td>
+          {!noQuestions && <tr><td>Вне зачёта:</td><td>
             <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
               onChange={e => void patch({ off_scoreboard: e.target.checked })} />
             <span style={{ opacity: .5 }}> (разогрев: баллы не идут в табло)</span>
@@ -157,7 +164,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </label>
         </div>
 
-        {!isJeopardy && <>
+        {!noQuestions && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
             <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
               onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
@@ -216,7 +223,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
       {round.mechanic === 'melody' &&
         <MelodyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
-      {round.mechanic !== 'jeopardy' && <>
+      {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
         {round.questions.map((q, i) => (
           <div key={q.id} className={`ed-row${q.hidden ? ' hidden-row' : ''}`}>
