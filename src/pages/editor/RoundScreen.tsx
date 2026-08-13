@@ -529,19 +529,21 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
                   ? { ...x, tracks: x.tracks.filter((_, yi) => yi !== i) } : x))}>🗑</button>
             </div>
           ))}
-          {!locked && <button style={{ marginTop: 6 }}
+          {!locked && <button className="mel-add-track"
             onClick={() => upd(ts => ts.map((x, i) => i === ti
-              ? { ...x, tracks: [...x.tracks, { audio: '', correct: '' }] } : x))}>+ Трек</button>}
+              ? { ...x, tracks: [...x.tracks, { audio: '', correct: '' }] } : x))}>+ Трек в эту тему</button>}
         </div>
       ))}
-      {!locked && <>
-        <button onClick={() => upd(ts => [...ts, { name: '', tracks: [{ audio: '', correct: '' }] }])}>
-          + Тема</button>
-        {dirty && <button style={{ marginLeft: 8 }} onClick={async () => {
-          await updateRound(round.id, { settings: { ...round.settings, themes } as never })
-          setDirty(false); onChanged()
-        }}>Сохранить темы</button>}
-      </>}
+      {!locked && (
+        <div className="mel-add-theme" style={{ display: 'flex', gap: 16 }}>
+          <button onClick={() => upd(ts => [...ts, { name: '', tracks: [{ audio: '', correct: '' }] }])}>
+            + Новая тема</button>
+          {dirty && <button onClick={async () => {
+            await updateRound(round.id, { settings: { ...round.settings, themes } as never })
+            setDirty(false); onChanged()
+          }}>Сохранить темы</button>}
+        </div>
+      )}
     </div>
   )
 }

@@ -42,6 +42,13 @@ export function MelodyBoard({ pack, round, gameState }: {
   const ansRef = `q-mel-${m.key}`
   const bids = answers.filter(a => a.question_ref === bidRef)
 
+  // выбор трека командой: игрок пишет ключ в melody.pick → сразу слушаем
+  useEffect(() => {
+    if (!m.pick || document.hidden) return
+    void saveMelody({ ...m, key: m.pick, pick: undefined, stage: 'listen',
+      deadline: inSec(3), order: undefined, turn: 0, chooser: undefined })
+  }, [m.pick])
+
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
     if (!expired || document.hidden) return
@@ -65,12 +72,18 @@ export function MelodyBoard({ pack, round, gameState }: {
     if (m.stage !== 'listen' || !track?.audio || document.hidden) return
     const a = new Audio(mediaUrl(track.audio))
     audioRef.current = a
-    a.play().catch(() => {})
-    const stop = setTimeout(() => {
-      a.pause()
+    let stop: number | undefined
+    // отсчёт секунды начинается, когда звук РЕАЛЬНО пошёл (иначе съедается буферизацией)
+    a.addEventListener('playing', () => {
+      stop = window.setTimeout(() => {
+        a.pause()
+        void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
+      }, 1000)
+    }, { once: true })
+    a.play().catch(() => {
       void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
-    }, 1000)
-    return () => { clearTimeout(stop); a.pause() }
+    })
+    return () => { if (stop) clearTimeout(stop); a.pause() }
   }, [m.stage, m.key])
 
   // ── выбранный интервал ──
@@ -112,6 +125,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
   const freeKeys = allKeys.filter(k => !played.includes(k))
   const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
+  const chooserTeam = teams.find(t => t.id === m.chooser)
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
@@ -131,6 +145,7 @@ export function MelodyBoard({ pack, round, gameState }: {
     await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
     if (correct) await saveMelody({ ...m, stage: 'done', deadline: undefined,
       played: [...played, m.key!], chooser: currentId })
+    else await saveMelody({ ...m, deadline: undefined })  // время стоп, ждём передачи хода
   }
   const pass = async () => {
     if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
@@ -146,7 +161,16 @@ export function MelodyBoard({ pack, round, gameState }: {
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
 
-      {idle && (
+      {idle && freeKeys.length > 0 && m.chooser && (
+        <div className="mel-choosing">
+          <div className="mel-big" style={{ color: chooserTeam?.color }}>
+            {chooserTeam?.name} выбирает следующий трек на телефоне
+          </div>
+          <button className="ghost dark" onClick={() =>
+            void saveMelody({ ...m, chooser: undefined })}>Выбрать рулеткой</button>
+        </div>
+      )}
+      {idle && !m.chooser && (
         <div className="host-actions">
           {freeKeys.length > 0
             ? <button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
@@ -224,10 +248,18 @@ export function MelodyBoard({ pack, round, gameState }: {
                   <div className="answer-main">{track?.correct}</div>
                 </div>
               )}
+              {ans?.is_correct === false && (
+                <div className="mel-wrong">
+                  ✗ НЕВЕРНО · ответ не раскрываем
+                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
+                    ? ' — передайте ход второй команде' : ' — трек закрывается'}
+                </div>
+              )}
               <div className="mel-actions">
                 <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
                 <button className="ghost" disabled={!ans} onClick={() => void grade(false)}>✗ Неверно</button>
-                <button className="ghost dark" onClick={() => void pass()}>
+                <button className={ans?.is_correct === false ? '' : 'ghost dark'}
+                  onClick={() => void pass()}>
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? 'Передать ход →' : 'Закрыть трек'}
                 </button>
               </div>
@@ -251,17 +283,14 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
   useEffect(() => {
     if (!spinning || free.length === 0) return
     let stop = false
-    let idx = 0
     const step = () => {
       if (stop) return
-      idx = (idx + 1) % free.length
-      setCursor(idx)
-      // замедление: чем меньше осталось, тем длиннее пауза
-      const p = 1 - Math.max(0, spinLeft) / Math.max(1, spinTotal)  // 0 → 1
-      const delay = 70 + p * p * 520
-      setTimeout(step, delay)
+      // прыгаем в случайную плитку, а не по порядку
+      setCursor(Math.floor(Math.random() * free.length))
+      const p = 1 - Math.max(0, spinLeft) / Math.max(1, spinTotal)
+      setTimeout(step, 60 + p * p * 420)
     }
-    const t = setTimeout(step, 70)
+    const t = setTimeout(step, 60)
     return () => { stop = true; clearTimeout(t) }
   }, [spinning, spinLeft <= 1])
 

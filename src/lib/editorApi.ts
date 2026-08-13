@@ -78,7 +78,7 @@ export async function createRound(pack_id: string, position: number, mechanic: M
     : mechanic === 'sprint'
       ? { pointsPerQuestion: 2, allCorrectBonus: 5, startDelaySec: 5, afterTimerSec: 5 }
     : mechanic === 'melody'
-      ? { themes: [], spinSec: 10, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
+      ? { themes: [], spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
     : {}
   const { data, error } = await supabase.from('pack_rounds').insert({
     pack_id, position, mechanic, title_lines: [title.toUpperCase()],

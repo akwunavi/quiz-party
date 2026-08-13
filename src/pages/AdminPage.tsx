@@ -249,6 +249,12 @@ function RoundView({ pack, round, gameState, teams, answers }: {
 
         <TeamRandomizer />
 
+        {round.mechanic === 'melody' && (
+          <button className="adm-link" onClick={async () => {
+            if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
+            await supabase.from('game_state').update({ melody: {} }).eq('id', 1)
+          }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
+        )}
         <button className="adm-link danger" onClick={() => {
           if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
         }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>

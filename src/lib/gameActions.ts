@@ -106,7 +106,7 @@ export async function resetGame() {
   const { error } = await supabase.from('game_state').update({
     game_id: crypto.randomUUID(), pack_id: null, phase: 'lobby',
     round_number: 0, question_index: 0,
-    timer_started_at: null, reveal: false, completed_rounds: [],
+    timer_started_at: null, reveal: false, completed_rounds: [], melody: {},
   }).eq('id', 1)
   if (error) throw error
 }

@@ -87,7 +87,7 @@ export interface SprintSettings {
 }
 export interface MelodySettings {
   themes: MelodyTheme[]
-  spinSec?: number              // анимация выбора (10)
+  spinSec?: number              // анимация выбора (5)
   bidSec?: number               // совещание по ставке (10)
   answerSec?: number            // на ответ первой команде (30)
   passAnswerSec?: number        // на ответ второй после полного трека (10)
@@ -187,6 +187,7 @@ export interface MelodyState {
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
   played?: string[]             // отыгранные треки
   chooser?: string              // team_id, кто выбирает следующий трек
+  pick?: string                 // ключ трека, выбранный командой на телефоне
 }
 
 export interface GameState {
