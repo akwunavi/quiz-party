@@ -67,6 +67,15 @@ export async function listPacks(): Promise<Pack[]> {
   return (data ?? []) as Pack[]
 }
 
+/** Значение настройки раунда с фолбэком на общие настройки пакета. */
+export function roundSetting<T>(pack: LoadedPack, round: LoadedRound, key: string, fallback: T): T {
+  const rs = round.settings as Record<string, unknown>
+  if (rs[key] !== undefined && rs[key] !== null) return rs[key] as T
+  const ps = (pack.settings ?? {}) as Record<string, unknown>
+  if (ps[key] !== undefined && ps[key] !== null) return ps[key] as T
+  return fallback
+}
+
 /** Раунды, участвующие в зачёте (для табло/финала). */
 export function scoredRounds(pack: LoadedPack): LoadedRound[] {
   return pack.rounds.filter(r => !r.off_scoreboard)

@@ -4,6 +4,7 @@ import { metaLine } from '../../lib/packLoader'
 import { updateRound, createQuestion, hideQuestion, deleteQuestion, defaultModeFor } from '../../lib/editorApi'
 import { generateCrossword, type CrosswordInput } from '../../lib/crossword'
 import { QuestionForm } from './QuestionForm'
+import { QuestionPreview } from './QuestionPreview'
 import { EditableText, MECHANIC_NAMES } from './EditorApp'
 import type { EditorUser } from '../../lib/auth'
 import { MediaSlot } from './QuestionForm'
@@ -29,6 +30,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 }) {
   const round = pack.rounds[roundIdx]
   const [openQIdx, setOpenQIdx] = useState<number | null>(null)
+  const [previewIdx, setPreviewIdx] = useState<number | null>(null)
   const backdropDown = useRef(false)
   const locked = pack.status === 'active' && user.role !== 'owner'
 
@@ -42,10 +44,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   return (
     <div>
       {openQIdx !== null && round.questions[openQIdx] && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', zIndex: 100,
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto',
-        }}
+        <div className="qm-backdrop"
           onMouseDown={e => { backdropDown.current = e.target === e.currentTarget }}
           onClick={e => {
             // закрываем только если и нажатие, и отпускание были на фоне
@@ -53,19 +52,27 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             if (e.target === e.currentTarget && backdropDown.current) setOpenQIdx(null)
             backdropDown.current = false
           }}>
-          <div style={{ background: 'var(--panel)', border: '1px solid var(--neon)',
-            boxShadow: '0 0 30px rgba(0,229,255,.25)',
-            borderRadius: 12, padding: 22, margin: '2vh 6px', maxWidth: 1600, width: '99%' }}>
+          <div className="qm-window">
             <QuestionForm pack={pack} round={round} qIdx={openQIdx}
-              onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged} />
+              onBack={() => { setOpenQIdx(null); onChanged() }} onChanged={onChanged}
+              onPreview={() => { setPreviewIdx(openQIdx); }} />
           </div>
         </div>
       )}
-      <p><button onClick={onBack}>← {pack.name}</button></p>
-      <h3>Раунд {roundIdx + 1} · {MECHANIC_NAMES[round.mechanic]}</h3>
+      {previewIdx !== null && round.questions[previewIdx] && (
+        <QuestionPreview pack={pack} round={round} q={round.questions[previewIdx]}
+          onClose={() => setPreviewIdx(null)} />
+      )}
+      <div className="ed-crumb">
+        <button className="ico" data-tip="К пакету" onClick={onBack}>←</button>
+        <div>
+          <div className="ed-h">Раунд {roundIdx + 1} · {round.title_lines.join(' ') || 'без названия'}</div>
+          <div className="ed-sub">{MECHANIC_NAMES[round.mechanic]}</div>
+        </div>
+      </div>
 
-      <table className="ed-settings" style={{ borderSpacing: 8 }}>
-        <tbody>
+      <div className="ed-card"><h4>Настройки раунда</h4><div className="ed-grid2">
+        <table style={{ display: 'none' }}><tbody>
           <tr><td>Заголовок (проектор):</td><td>
             <EditableText value={round.title_lines.join(' / ')} disabled={locked}
               onSave={v => void patch({ title_lines: v.split('/').map(s => s.trim()).filter(Boolean) })} />
@@ -135,8 +142,84 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               onChange={e => void patch({ off_scoreboard: e.target.checked })} />
             <span style={{ opacity: .5 }}> (разогрев: баллы не идут в табло)</span>
           </td></tr>}
-        </tbody>
-      </table>
+        </tbody></table>
+
+        <div className="ed-field"><label>Заголовок на проекторе</label>
+          <EditableText value={round.title_lines.join(' / ')} disabled={locked}
+            onSave={v => void patch({ title_lines: v.split('/').map(s => s.trim()).filter(Boolean) })} />
+          <div className="ed-hint">Несколько строк — через « / »</div>
+        </div>
+
+        <div className="ed-field"><label>Разогрев</label>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
+              onChange={e => void patch({ off_scoreboard: e.target.checked })} />
+            баллы не идут в общий зачёт
+          </label>
+        </div>
+
+        {!isJeopardy && <>
+          <div className="ed-field"><label>Таймер на вопрос</label>
+            <select value={round.timer_seconds} disabled={locked}
+              onChange={e => void patch({ timer_seconds: Number(e.target.value) })}>
+              {[20, 30, 45, 60, 90, 120].map(s => <option key={s} value={s}>{s} сек</option>)}
+            </select>
+          </div>
+          <div className="ed-field"><label>Когда показывать ответы</label>
+            <select value={round.answers_reveal} disabled={locked}
+              onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
+              <option value="after_question">сразу после вопроса</option>
+              <option value="after_round">в конце раунда</option>
+              <option value="never">не показывать</option>
+            </select>
+          </div>
+          <div className="ed-field"><label>Правок ответа</label>
+            <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
+              onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
+              <option value={0}>без правок</option><option value={1}>1</option>
+              <option value={2}>2</option><option value={3}>3</option>
+              <option value={-1}>без ограничений</option>
+            </select>
+            <div className="ed-hint">Стереть ответ игрок может всегда</div>
+          </div>
+          <div className="ed-field"><label>Музыка правил</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*"
+              paths={round.rules_audio ? [round.rules_audio] : []} max={1}
+              onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
+          </div>
+          <div className="ed-field"><label>Фоновая музыка вопросов</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={(round.settings as { bg_music?: string }).bg_music ? [(round.settings as { bg_music: string }).bg_music] : []}
+              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
+            <div className="ed-hint">Если пусто — берётся общая музыка пакета</div>
+          </div>
+        </>}
+
+        <div className="ed-field"><label>Короткая подсказка (на проекторе)</label>
+          <EditableText value={round.meta_line_override ?? metaLine(round)} disabled={locked}
+            onSave={v => void patch({ meta_line_override: v.trim() === metaLine(round) ? null : (v.trim() || null) })} />
+          <div className="ed-hint">Строка под заголовком раунда. Сотри всё — вернётся автотекст</div>
+        </div>
+
+        <div className="ed-field"><label>После раунда</label>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            <input type="checkbox" disabled={locked}
+              checked={!!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after}
+              onChange={e => void patch({ settings: { ...round.settings, show_scoreboard_after: e.target.checked } as never })} />
+            показать табло
+          </label>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            перерыв, мин:
+            <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
+              value={(round.settings as { break_after_minutes?: number }).break_after_minutes ?? 0}
+              onChange={e => void patch({ settings: { ...round.settings, break_after_minutes: Number(e.target.value) || undefined } as never })} />
+          </label>
+        </div>
+
+        <div className="ed-field" style={{ gridColumn: '1 / -1' }}><label>Правила раунда</label>
+          <RulesEditor rules={round.rules} disabled={locked} onSave={rules => void patch({ rules })} />
+        </div>
+      </div></div>
 
       {round.mechanic === 'crossword' &&
         <CrosswordEditor round={round} locked={locked} onChanged={onChanged} />}
@@ -144,40 +227,45 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <JeopardyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {round.mechanic !== 'jeopardy' && <>
-        <h4>Вопросы</h4>
+        <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
         {round.questions.map((q, i) => (
-          <div key={q.id} style={{
-            display: 'flex', justifyContent: 'space-between',
-            border: '1px solid #22314f', borderRadius: 8, padding: 8, marginBottom: 6,
-            opacity: q.hidden ? .45 : 1, background: q.hidden ? '#101827' : undefined,
-          }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <b>{i + 1}.</b> {q.question_text || <i style={{ opacity: .5 }}>(пусто)</i>}
+          <div key={q.id} className={`ed-row${q.hidden ? ' hidden-row' : ''}`}>
+            <div className="ed-num">{i + 1}</div>
+            <div className="ed-row-main">
+              <div className="ed-row-text">
+                {q.question_text || <i style={{ opacity: .5 }}>(текст не задан — только медиа)</i>}
               </div>
-              {answerSnippet(q)
-                ? <div style={{ color: '#7ef29a', fontSize: 13 }}>→ {answerSnippet(q)}</div>
-                : <div style={{ color: '#ff8fa3', fontSize: 13 }}>→ ответ не задан</div>}
-              {q.hidden && <span style={{ opacity: .6, fontSize: 12 }}> (скрыт)</span>}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                {answerSnippet(q)
+                  ? <span className="ed-answer-chip">✓ <span>{answerSnippet(q)}</span></span>
+                  : <span className="ed-answer-chip empty">ответ не задан</span>}
+                {(q.media.question ?? []).length > 0 &&
+                  <span className="ed-row-meta">🖼 {(q.media.question ?? []).length}</span>}
+                {q.hidden && <span className="ed-row-meta">скрыт из игры</span>}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 4 }}>
-              {!q.hidden && <button onClick={() => setOpenQIdx(i)}>Открыть</button>}
+            <div className="ed-actions">
+              <button className="ico" data-tip="Предпросмотр" onClick={() => setPreviewIdx(i)}>👁‍🗨</button>
+              {!q.hidden && <button className="ico" data-tip="Редактировать"
+                onClick={() => setOpenQIdx(i)}>✏️</button>}
               {!locked && (q.hidden
-                ? <button onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>Вернуть</button>
-                : <button title="Остаётся в списке, в игре не показывается"
-                    onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>Скрыть</button>)}
-              {user.role === 'owner' && <button style={{ borderColor: '#ff3b5c', color: '#ff8fa3' }}
+                ? <button className="ico" data-tip="Вернуть в игру"
+                    onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>👁</button>
+                : <button className="ico" data-tip="Скрыть из игры"
+                    onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>🚫</button>)}
+              {user.role === 'owner' && <button className="ico danger" data-tip="Удалить"
                 onClick={async () => {
                   if (confirm('Удалить вопрос безвозвратно?')) { await deleteQuestion(q.id); onChanged() }
-                }}>Удалить</button>}
+                }}>🗑</button>}
             </div>
           </div>
         ))}
-        {!locked && <button onClick={async () => {
+        {!locked && <button style={{ marginTop: 6 }} onClick={async () => {
           await createQuestion(round.id, defaultModeFor(round.mechanic))
           onChanged()
-          setOpenQIdx(round.questions.length)  // новый — в конце списка, модалка сразу
-        }}>+ Вопрос</button>}
+          setOpenQIdx(round.questions.length)
+        }}>+ Добавить вопрос</button>}
+        </div>
       </>}
     </div>
   )

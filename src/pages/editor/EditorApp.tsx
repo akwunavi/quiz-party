@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { useEditorUser, signIn, signOut, type EditorUser } from '../../lib/auth'
 import { listPacks, loadPack, type LoadedPack } from '../../lib/packLoader'
 import {
-  createPack, renamePack, setPackStatus, setPackTheme, duplicatePack,
+  createPack, renamePack, setPackStatus, setPackTheme, setPackSettings, duplicatePack,
   createRound, swapRounds, deleteRound,
 } from '../../lib/editorApi'
+import { MediaSlot } from './QuestionForm'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
 import type { Pack, MechanicKey } from '../../types/quiz'
@@ -63,9 +64,10 @@ function EditorMain({ user, onLogout }: { user: EditorUser; onLogout: () => void
 
   return (
     <div className="cyber" style={{ minHeight: '100vh' }}>
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0 }}>Редактор пакетов</h2>
+    <div className="ed-page">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+        <h2 style={{ margin: 0, fontFamily: 'Rajdhani, sans-serif' }}>
+          {openPackId ? '' : 'Редактор пакетов'}</h2>
         <div>
           {user.display_name} ({user.role === 'owner' ? 'владелец' : 'редактор'})
           {' '}<button onClick={onLogout}>Выйти</button>
@@ -113,7 +115,7 @@ function PackList({ packs, user, onOpen, onChanged }: {
             }}>{STATUS_RU[p.status]}</span>
             {' '}<span style={{ opacity: .5, fontSize: 12 }}>тема: {p.theme}</span>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => onOpen(p.id)}>Открыть</button>
             <button onClick={async () => { await duplicatePack(p.id); onChanged() }}>Дублировать</button>
             {user.role === 'owner' && p.status !== 'archived' &&
@@ -147,28 +149,56 @@ function PackScreen({ packId, user, onBack }: {
 
   return (
     <div>
-      <p><button onClick={onBack}>← Пакеты</button></p>
-      <h3>
-        <EditableText value={pack.name} disabled={locked}
-          onSave={async v => { await renamePack(pack.id, v); reload() }} />
-      </h3>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        Статус: <b>{STATUS_RU[pack.status]}</b>
-        {user.role === 'owner' && <>
-          {pack.status === 'draft' && <button onClick={async () => {
-            const probs = validatePack(pack)
-            setProblems(probs)
-            if (probs.length === 0) { await setPackStatus(pack.id, 'ready'); reload() }
-          }}>Проверить готовность → Готов</button>}
-          {(pack.status === 'ready' || pack.status === 'active') &&
-            <button onClick={async () => { await setPackStatus(pack.id, 'draft'); reload() }}>Вернуть в черновик</button>}
-        </>}
-        Тема:
-        <select value={pack.theme} disabled={locked}
-          onChange={async e => { await setPackTheme(pack.id, e.target.value); reload() }}>
-          <option value="classic">Классика</option>
-          <option value="new_year">Новый год</option>
-        </select>
+      <div className="ed-crumb">
+        <button className="ico" data-tip="К списку пакетов" onClick={onBack}>←</button>
+        <div className="ed-h">
+          <EditableText value={pack.name} disabled={locked}
+            onSave={async v => { await renamePack(pack.id, v); reload() }} />
+        </div>
+      </div>
+      <div className="ed-card"><h4>Пакет</h4>
+        <div className="ed-grid2">
+          <div className="ed-field"><label>Статус</label>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <b>{STATUS_RU[pack.status]}</b>
+              {user.role === 'owner' && <>
+                <button onClick={async () => {
+                  const probs = validatePack(pack)
+                  setProblems(probs)
+                  if (probs.length === 0 && pack.status === 'draft') { await setPackStatus(pack.id, 'ready'); reload() }
+                }}>Проверить</button>
+                {pack.status !== 'draft' &&
+                  <button onClick={async () => { await setPackStatus(pack.id, 'draft'); reload() }}>
+                    В черновик</button>}
+              </>}
+            </div>
+            <div className="ed-hint">«Проверить» ищет проблемы в любой момент, даже если пакет готов</div>
+          </div>
+          <div className="ed-field"><label>Тема оформления</label>
+            <select value={pack.theme} disabled={locked}
+              onChange={async e => { await setPackTheme(pack.id, e.target.value); reload() }}>
+              <option value="classic">Классика</option>
+              <option value="new_year">Новый год</option>
+            </select>
+          </div>
+          <div className="ed-field"><label>Общая фоновая музыка вопросов</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={pack.settings?.bg_music ? [pack.settings.bg_music] : []}
+              onChange={async paths => {
+                await setPackSettings(pack.id, { ...(pack.settings ?? {}), bg_music: paths[0] })
+                reload()
+              }} />
+            <div className="ed-hint">Один трек на весь пакет — экономит место. Раунд может переопределить</div>
+          </div>
+          <div className="ed-field"><label>Музыка титульного экрана</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={pack.settings?.title_music ? [pack.settings.title_music] : []}
+              onChange={async paths => {
+                await setPackSettings(pack.id, { ...(pack.settings ?? {}), title_music: paths[0] })
+                reload()
+              }} />
+          </div>
+        </div>
       </div>
 
       {problems && (
@@ -190,30 +220,32 @@ function PackScreen({ packId, user, onBack }: {
         </div>
       )}
 
-      <h4>Раунды</h4>
+      <div className="ed-card"><h4>Раунды</h4>
       {pack.rounds.map((r, i) => (
-        <div key={r.id} style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          border: '1px solid #22314f', borderRadius: 8, padding: 10, marginBottom: 6,
-        }}>
-          <div>
-            <b>{i + 1}. {r.title_lines.join(' ') || '(без названия)'}</b>
-            {' '}<span style={{ opacity: .6 }}>{MECHANIC_NAMES[r.mechanic]}</span>
-            {' '}· {r.questions.length} вопр.
-            {r.off_scoreboard && ' · вне зачёта'}
+        <div key={r.id} className="ed-row">
+          <div className="ed-num">{i + 1}</div>
+          <div className="ed-row-main">
+            <div className="ed-row-title">{r.title_lines.join(' ') || '(без названия)'}</div>
+            <div className="ed-row-meta">
+              {MECHANIC_NAMES[r.mechanic]}{r.off_scoreboard && ' · разогрев, вне зачёта'}
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button disabled={i === 0 || locked}
+          <span className="ed-count" title="Количество вопросов в раунде">
+            {r.questions.filter(q => !q.hidden).length}
+          </span>
+          <div className="ed-actions">
+            <button className="ico" data-tip="Выше" disabled={i === 0 || locked}
               onClick={async () => { await swapRounds(pack.rounds[i], pack.rounds[i - 1]); reload() }}>↑</button>
-            <button disabled={i === pack.rounds.length - 1 || locked}
+            <button className="ico" data-tip="Ниже" disabled={i === pack.rounds.length - 1 || locked}
               onClick={async () => { await swapRounds(pack.rounds[i], pack.rounds[i + 1]); reload() }}>↓</button>
-            <button onClick={() => setOpenRoundIdx(i)}>Открыть</button>
+            <button className="ico" data-tip="Редактировать" onClick={() => setOpenRoundIdx(i)}>✏️</button>
             {user.role === 'owner' &&
-              <button onClick={async () => {
-                if (confirm(`Удалить раунд «${r.title_lines.join(' ')}» со всеми вопросами?`)) {
-                  await deleteRound(r.id); reload()
-                }
-              }}>✕</button>}
+              <button className="ico danger" data-tip="Удалить раунд"
+                onClick={async () => {
+                  if (confirm(`Удалить раунд «${r.title_lines.join(' ')}» со всеми вопросами?`)) {
+                    await deleteRound(r.id); reload()
+                  }
+                }}>🗑</button>}
           </div>
         </div>
       ))}
@@ -221,7 +253,8 @@ function PackScreen({ packId, user, onBack }: {
       {!locked && (adding
         ? <AddRound packId={pack.id} nextPos={pack.rounds.length}
             onDone={() => { setAdding(false); reload() }} />
-        : <button onClick={() => setAdding(true)}>+ Добавить раунд</button>)}
+        : <button style={{ marginTop: 6 }} onClick={() => setAdding(true)}>+ Добавить раунд</button>)}
+      </div>
     </div>
   )
 }

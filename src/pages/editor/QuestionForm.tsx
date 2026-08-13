@@ -10,17 +10,26 @@ import type { AnswerSpec, ChoiceOption, Question } from '../../types/quiz'
 // Автосохранение при каждом изменении (с дебаунсом через кнопку «Сохранить» + on-blur).
 
 const MODE_NAMES: Record<AnswerSpec['mode'], string> = {
-  free_text: 'Свободный текст',
-  choice: 'Варианты А-Г',
+  free_text: 'Текстовый вопрос',
+  choice: 'Вопрос с вариантами',
   order: 'Порядок',
   match: 'Сопоставление',
-  crossword_word: 'Слово кроссворда',
-  none: 'Без автопроверки',
+  crossword_word: 'Кроссворд',
+  none: 'Ручная проверка',
 }
 
-export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
+const MODE_HINTS: Record<AnswerSpec['mode'], string> = {
+  free_text: 'Игрок пишет ответ словом. Можно указать несколько принимаемых вариантов через « / » — проверка автоматическая, с допуском на опечатки.',
+  choice: 'Игрок жмёт букву А–Г. Варианты могут быть текстом или картинками (тогда тексты оставь пустыми — буква = картинка по порядку).',
+  order: 'Игрок расставляет варианты в правильной последовательности тапами.',
+  match: 'Игрок соединяет номера (картинки/треки на экране) с буквами вариантов.',
+  crossword_word: 'Слово вписывается в общую сетку кроссворда. Текст вопроса = определение.',
+  none: 'Автопроверки нет: ответ показывается на экране, а верность каждой команды ты отмечаешь вручную в админке. Для вопросов, где ответ нельзя сверить машинально.',
+}
+
+export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }: {
   pack: LoadedPack; round: LoadedRound; qIdx: number
-  onBack: () => void; onChanged: () => void
+  onBack: () => void; onChanged: () => void; onPreview?: () => void
 }) {
   const original = round.questions[qIdx]
   const [q, setQ] = useState<Question>(original)
@@ -50,26 +59,24 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0 }}>Вопрос {qIdx + 1}</h3>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button disabled={saving} onClick={() => void persistAll(true)}
-            style={{ padding: '9px 22px', fontWeight: 700 }}>Сохранить</button>
-          <button onClick={onBack} style={{ padding: '9px 22px', opacity: .8 }}>Закрыть</button>
+      <div className="qm-head">
+        <div>
+          <div className="ed-h">Вопрос {qIdx + 1}</div>
+          <div className="ed-sub">{round.title_lines.join(' ')}</div>
         </div>
+        {onPreview && <button className="ico" data-tip="Предпросмотр на весь экран"
+          onClick={onPreview}>👁‍🗨</button>}
       </div>
       {errors.length > 0 && (
-        <div style={{ margin: '8px 0', padding: 8, background: '#2a1218', borderRadius: 8, color: '#ff8fa3' }}>
-          Не заполнено: {errors.join('; ')} — сохранено как черновик.
-        </div>
+        <div className="qm-alert">Не заполнено: {errors.join('; ')} — сохранено как черновик.</div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+      <div className="qm-body">
         {/* ── Контент ── */}
         <div>
-          <label><b>Текст вопроса</b></label>
+          <div className="ed-field"><label>Текст вопроса</label>
           <textarea value={q.question_text} rows={5} style={{ width: '100%', padding: 8 }}
-            onChange={e => save({ question_text: e.target.value })} />
+            onChange={e => save({ question_text: e.target.value })} /></div>
 
           <MediaSlot label="Медиа вопроса (до 4)" packId={pack.id}
             paths={media.question ?? []} max={4}
@@ -88,9 +95,10 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
             paths={media.answer ?? []} max={4}
             onChange={paths => save({ media: { ...media, answer: paths } })} />
 
-          <label><b>Пояснение к ответу</b> (answer_note)</label>
+          <div className="ed-field"><label>Пояснение к ответу</label>
           <input value={q.answer_note ?? ''} style={{ width: '100%', padding: 6 }}
             onChange={e => save({ answer_note: e.target.value || null })} />
+            <div className="ed-hint">Короткий комментарий: почему такой ответ. Показывается на экране под ответом</div></div>
 
           {round.mechanic === 'rebus' && <RebusService q={q} onSave={save} />}
           {round.mechanic === 'thematic_x2' && (
@@ -104,19 +112,24 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
 
         {/* ── Ответ ── */}
         <div>
-          <label style={{ display: 'block', marginBottom: 14 }}><b>Тип ответа</b>{' '}
+          <div className="ed-field" style={{ marginBottom: 18 }}>
+            <label>Тип вопроса</label>
             <select value={q.answer.mode}
               onChange={e => setAnswer(defaultAnswer(e.target.value as AnswerSpec['mode']))}>
               {(Object.keys(MODE_NAMES) as AnswerSpec['mode'][]).map(m =>
                 <option key={m} value={m}>{MODE_NAMES[m]}</option>)}
             </select>
-          </label>
+            <div className="ed-hint">{MODE_HINTS[q.answer.mode]}</div>
+          </div>
           <AnswerEditor spec={q.answer} onChange={setAnswer}
             imgs={(media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))} />
 
-          <Preview q={q} />
 
         </div>
+      </div>
+      <div className="qm-foot">
+        <button onClick={onBack}>Закрыть без сохранения</button>
+        <button className="save" disabled={saving} onClick={() => void persistAll(true)}>Сохранить</button>
       </div>
 
     </div>
@@ -350,69 +363,9 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
 
 
 
-// ── Превью: проектор и телефон (ровно как в игре) ──
-function Preview({ q }: { q: Question }) {
-  const [tab, setTab] = useState<'host' | 'player'>('host')
-  const a = q.answer
-  const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  return (
-    <div style={{ marginTop: 16 }}>
-      <div style={{ display: 'flex', gap: 4 }}>
-        <button onClick={() => setTab('host')}
-          style={{ fontWeight: tab === 'host' ? 700 : 400 }}>📺 Проектор</button>
-        <button onClick={() => setTab('player')}
-          style={{ fontWeight: tab === 'player' ? 700 : 400 }}>📱 Телефон игрока</button>
-      </div>
-      {tab === 'host' ? (
-        <div style={{ border: '1px solid #22314f', borderRadius: 8, padding: 12,
-          background: '#05070c', color: '#e8ecf8' }}>
-          <div style={{ fontSize: 16, whiteSpace: 'pre-wrap' }}>
-            {q.question_text || '(текст вопроса)'}
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-            {imgs.map((m, i) =>
-              <img key={i} src={mediaUrl(m)} alt="" style={{ maxHeight: 90, borderRadius: 4 }} />)}
-          </div>
-          {a.mode === 'choice' && (
-            <div style={{ marginTop: 8 }}>
-              {a.choices.map(c => <div key={c.key}>{c.key} — {c.text || '…'}</div>)}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div style={{ maxWidth: 280, border: '1px solid #22314f', borderRadius: 14, padding: 10, background: 'var(--panel2)' }}>
-          <p style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{q.question_text || '(текст вопроса)'}</p>
-          {a.mode === 'free_text' || a.mode === 'none' ? (
-            <div style={{ display: 'flex', gap: 4 }}>
-              <input placeholder="Ваш ответ" readOnly style={{ flex: 1, padding: 6 }} />
-              <button disabled>Отправить</button>
-            </div>
-          ) : a.mode === 'choice' ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-              {a.choices.map(c => <button key={c.key} disabled style={{ padding: 10 }}>{c.key}</button>)}
-            </div>
-          ) : a.mode === 'order' ? (
-            <div>
-              <div style={{ border: '1px dashed #3a4a6b', padding: 6, fontSize: 12 }}>Тапайте варианты по порядку</div>
-              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
-                {a.choices.map(c => <button key={c.key} disabled>{c.key}</button>)}
-              </div>
-            </div>
-          ) : a.mode === 'match' ? (
-            <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
-              <div>{a.left.map(l => <button key={l} disabled style={{ display: 'block', margin: 2 }}>{l}</button>)}</div>
-              <div>{a.right.map(r => <button key={r} disabled style={{ display: 'block', margin: 2 }}>{r}</button>)}</div>
-            </div>
-          ) : (
-            <div style={{ fontSize: 12, opacity: .6 }}>[сетка кроссворда — экран этапа 5]</div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
 
 
+/** Быстрая проверка перед сохранением: что не заполнено. */
 function questionErrors(q: Question): string[] {
   const errs: string[] = []
   const a = q.answer
@@ -427,8 +380,7 @@ function questionErrors(q: Question): string[] {
     case 'order': if (a.correct_order.length !== a.choices.length) errs.push('полный правильный порядок'); break
     case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
     case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
-    case 'none': break
+    case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
   }
   return errs
 }
-

@@ -6,11 +6,20 @@
 export type PackStatus = 'draft' | 'ready' | 'active' | 'played' | 'archived'
 export type ThemeKey = 'classic' | 'new_year'
 
+export interface PackSettings {
+  bg_music?: string          // общая фоновая музыка вопросов
+  title_music?: string       // музыка титульного экрана
+  timer_seconds?: number     // дефолтный таймер раундов
+  max_edits?: number         // дефолт правок ответа
+  answers_reveal?: AnswersReveal
+}
+
 export interface Pack {
   id: string
   name: string
   status: PackStatus
   theme: ThemeKey
+  settings?: PackSettings
   created_at: string
   updated_at: string
 }

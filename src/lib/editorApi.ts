@@ -31,6 +31,12 @@ export async function setPackStatus(id: string, status: Pack['status']) {
   void log('pack', id, 'status', { status })
 }
 
+export async function setPackSettings(id: string, settings: Record<string, unknown>) {
+  const { error } = await supabase.from('packs').update({ settings }).eq('id', id)
+  if (error) throw error
+  void log('pack', id, 'update', { settings: Object.keys(settings) })
+}
+
 export async function setPackTheme(id: string, theme: string) {
   const { error } = await supabase.from('packs').update({ theme }).eq('id', id)
   if (error) throw error
