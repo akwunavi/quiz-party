@@ -109,7 +109,8 @@ function AnswerForm({ team, round, gameState }: {
   // вопрос доступен, только если зачитан
   const unlocked = (i: number) =>
     gameState.phase === 'answer_time' ? true : i <= gameState.question_index
-  const locked = (i: number) => (state.edits[i] ?? 0) >= 2
+  const maxEdits = (round.settings as { maxEdits?: number }).maxEdits ?? 2
+  const locked = (i: number) => maxEdits >= 0 && (state.edits[i] ?? 0) > maxEdits
 
   const push = (qIdx: number, text: string, stake?: number | null) => {
     const q = questions[qIdx]
@@ -122,6 +123,14 @@ function AnswerForm({ team, round, gameState }: {
   const setAnswer = (i: number, text: string) => {
     setState(s => ({ ...s, answers: { ...s.answers, [i]: text }, edits: { ...s.edits, [i]: (s.edits[i] ?? 0) + 1 } }))
     push(i, text)
+  }
+  // Стереть ответ можно ВСЕГДА, независимо от лимита правок (как в старом проекте)
+  const clearAnswer = (i: number) => {
+    setState(s => {
+      const answers = { ...s.answers }; delete answers[i]
+      return { ...s, answers }
+    })
+    push(i, '')
   }
   const setStake = (i: number, v: number) => {
     setState(s => ({ ...s, stakes: { ...s.stakes, [i]: v } }))
@@ -203,7 +212,17 @@ function AnswerForm({ team, round, gameState }: {
                   )}
                   <Picker spec={q.answer} value={state.answers[i] ?? ''} locked={isLocked}
                     onChange={text => setAnswer(i, text)} />
-                  {state.answers[i] && <div className="pl-sent">Отправлено: {state.answers[i]}</div>}
+                  <div className="pl-row-bottom">
+                    {state.answers[i] && <span className="pl-sent">Отправлено: {state.answers[i]}</span>}
+                    {state.answers[i] && (
+                      <button className="pl-erase" onClick={() => clearAnswer(i)}>Стереть</button>
+                    )}
+                    {maxEdits >= 0 && (
+                      <span className="pl-sent">
+                        правок: {Math.max(0, (state.edits[i] ?? 0) - 1)}/{maxEdits}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

@@ -120,6 +120,7 @@ export interface MatchAnswer {
   mode: 'match'
   left: string[]
   right: string[]
+  right_labels?: string[]      // подписи вариантов для экрана вопроса
   correct_pairs: string[]       // ["1А","2В",...]
   display: string | string[]
 }

@@ -156,7 +156,8 @@ function HostInner({ gameState, pack }: {
           </div>
         </>)}
         <div className="host-actions">
-          <button onClick={() => void gotoQuestion(0)}>Первый вопрос →</button>
+          <button onClick={() => void gotoQuestion(0)}>
+            {round.mechanic === 'jeopardy' ? 'Начать раунд →' : 'Первый вопрос →'}</button>
         </div>
       </div>
     )
@@ -173,7 +174,7 @@ function HostInner({ gameState, pack }: {
     const isNY = pack.theme === 'new_year'
     const timeLow = !!gameState.timer_started_at &&
       (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
-    const frameCls = isNY ? `q-frame${timeLow ? ' low' : ''}` : ''
+    const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}` : ''
 
     return (
       <div className="host-screen grid-bg">
@@ -191,8 +192,11 @@ function HostInner({ gameState, pack }: {
             {isNY && <Icicles seed={q.id} low={timeLow} />}
             <div className="q-split">
             <WindText key={q.id} text={q.question_text} />
-            <div className="q-media-grid">
-              {imgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
+            <div className="q-media-grid n1">
+              {imgs.map((m, i) => (
+                <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
+                  {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
+              ))}
             </div>
             </div>
           </div>
@@ -203,9 +207,13 @@ function HostInner({ gameState, pack }: {
               <WindText key={q.id} text={q.question_text} />
             </div>
             {!q.media.hidden && imgs.length > 0 && (
-              <div className="q-media-grid" style={{ maxWidth: '92vw' }}>
-                {imgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt=""
-                  style={{ maxHeight: imgs.length > 2 ? '34vh' : '48vh' }} />)}
+              <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}${choices ? ' with-choices' : ''}`}>
+                {imgs.map((m, i) => (
+                  <figure key={i} className="q-img">
+                    <img src={mediaUrl(m)} alt="" />
+                    {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}
+                  </figure>
+                ))}
               </div>
             )}
           </>
@@ -217,6 +225,15 @@ function HostInner({ gameState, pack }: {
             : <video key={i} autoPlay controls src={mediaUrl(m)} style={{ maxHeight: '46vh', borderRadius: 14 }} />)
           : <audio key={i} autoPlay src={mediaUrl(m)} />)}
 
+        {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && (
+          <div className="choices-grid">
+            {q.answer.right.map((r, i) => (
+              <div key={r} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
+                <span className="key">{r}</span>{(q.answer as { right_labels?: string[] }).right_labels?.[i] ?? ''}
+              </div>
+            ))}
+          </div>
+        )}
         {choices && (
           <div className="choices-grid">
             {choices.map((c, i) => (
@@ -288,10 +305,10 @@ function Icicles({ seed, low }: { seed: string; low: boolean }) {
     let s = 0
     for (const ch of seed) s = (s * 31 + ch.charCodeAt(0)) >>> 0
     const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 }
-    const n = 16
+    const n = 34
     return Array.from({ length: n }, (_, i) => ({
       left: (i + 0.5) * (100 / n) + (rnd() - 0.5) * 2.5,
-      len: 12 + rnd() * 30,
+      len: 8 + rnd() * 34,
       delay: rnd() * 0.5,
       sway: 3 + rnd() * 3,
     }))
@@ -565,10 +582,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 <MatchAnswer q={q} />
               ) : choices && imgChoices.length === choices.length ? (
                 <div className="choice-imgs">
-                  {shuffleStable(choices.map((c, i) => ({ c, img: imgChoices[i] })), q.id).map(({ c, img }) => {
+                  {choices.map((c, i) => {
+                    const img = imgChoices[i]
                     const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
+                    const order = shuffleStable(choices.map(x => x.key), q.id).indexOf(c.key)
                     return (
-                      <div key={c.key} className={`choice-img${ok ? ' correct' : ' dimmed'}`}>
+                      <div key={c.key} className={`choice-img${ok ? ' correct' : ' dimmed'}`}
+                        style={{ animationDelay: `${order * 0.35}s` }}>
                         <img src={mediaUrl(img)} alt="" />
                         <span className="key">{c.key}{c.text ? ` — ${c.text}` : ''}</span>
                       </div>
@@ -577,11 +597,12 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 </div>
               ) : choices ? (
                 <div className="choices-grid" style={{ width: '100%' }}>
-                  {shuffleStable(choices, q.id).map((c, i) => {
+                  {choices.map(c => {
                     const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
+                    const order = shuffleStable(choices.map(x => x.key), q.id).indexOf(c.key)
                     return (
                       <div key={c.key} className={`choice-plate${ok ? ' correct' : ' dimmed'}`}
-                        style={{ animationDelay: `${i * 0.4}s` }}>
+                        style={{ animationDelay: `${order * 0.4}s` }}>
                         <span className="key">{c.key}</span>{c.text}
                       </div>
                     )
@@ -590,8 +611,19 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ) : (
                 <div className="answer-main">{displayAnswer(q)}</div>
               )}
+              {round.mechanic === 'rebus' && (
+                <div className="rebus-answer">
+                  {(q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+                    .map((m, i) => (
+                      <figure key={i} className="q-img">
+                        <img src={mediaUrl(m)} alt="" />
+                        <figcaption>{i === 0 ? q.service.word1 : q.service.word2}</figcaption>
+                      </figure>
+                    ))}
+                </div>
+              )}
               {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
-              <div className="q-media-grid" style={{ maxHeight: '30vh' }}>
+              <div className="q-media-grid answer-media">
                 {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
               </div>
             </div>

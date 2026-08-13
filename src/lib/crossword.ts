@@ -16,7 +16,7 @@ const norm = (w: string) => w.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-�
 
 interface Cell { ch: string }
 type Board = Map<string, Cell>  // "row,col" → буква
-interface Placed { word: string; clue: string; dir: 'across' | 'down'; row: number; col: number }
+interface Placed { word: string; clue: string; dir: 'across' | 'down'; row: number; col: number; srcIndex: number }
 
 const key = (r: number, c: number) => `${r},${c}`
 
@@ -54,16 +54,16 @@ function place(board: Board, word: string, r: number, c: number, dir: 'across' |
 
 interface Attempt { placed: Placed[]; board: Board; crossings: number }
 
-function tryLayout(words: CrosswordInput[], rng: () => number): Attempt {
+function tryLayout(words: (CrosswordInput & { srcIndex: number })[], rng: () => number): Attempt {
   const board: Board = new Map()
   const placed: Placed[] = []
   let crossings = 0
 
-  for (const { word: raw, clue } of words) {
+  for (const { word: raw, clue, srcIndex } of words) {
     const word = norm(raw)
     if (placed.length === 0) {
       place(board, word, 0, 0, 'across')
-      placed.push({ word, clue, dir: 'across', row: 0, col: 0 })
+      placed.push({ word, clue, dir: 'across', row: 0, col: 0, srcIndex })
       continue
     }
     // все кандидаты: каждая буква нового слова × каждая совпадающая буква на доске
@@ -90,7 +90,7 @@ function tryLayout(words: CrosswordInput[], rng: () => number): Attempt {
     candidates.sort((a, b) => b.cross - a.cross || rng() - 0.5)
     const best = candidates[0]
     place(board, word, best.r, best.c, best.dir)
-    placed.push({ word, clue, dir: best.dir, row: best.r, col: best.c })
+    placed.push({ word, clue, dir: best.dir, row: best.r, col: best.c, srcIndex })
     crossings += best.cross
   }
   return { placed, board, crossings }
@@ -125,7 +125,8 @@ export function generateCrossword(
 
   let best: Attempt | null = null
   for (let i = 0; i < attempts; i++) {
-    const order = shuffled(inputs, rng)
+    const indexed = inputs.map((x, i) => ({ ...x, srcIndex: i }))
+    const order = shuffled(indexed, rng)
       .sort((a, b) => (i % 3 === 0 ? norm(b.word).length - norm(a.word).length : 0)) // треть попыток — длинные первыми
     const attempt = tryLayout(order, rng)
     if (!best) { best = attempt; continue }
@@ -174,9 +175,13 @@ function toGrid(placed: Placed[]): CrosswordGrid {
   ).values()].sort((a, b) => a.row - b.row || a.col - b.col)
   const numberOf = new Map(starts.map((s, i) => [key(s.row, s.col), i + 1]))
 
+  // Нумерация: номер = порядок слова во ВХОДНОМ списке (= номер вопроса),
+  // а не классическая нумерация по сетке — так игрокам не путаться.
   const words: CrosswordWordPlacement[] = shifted.map(p => ({
     word: p.word, clue: p.clue, dir: p.dir, row: p.row, col: p.col,
-    number: numberOf.get(key(p.row, p.col))!,
+    number: (p as { srcIndex?: number }).srcIndex != null
+      ? (p as { srcIndex: number }).srcIndex + 1
+      : numberOf.get(key(p.row, p.col))!,
   }))
   return { rows: maxR - minR + 1, cols: maxC - minC + 1, words }
 }

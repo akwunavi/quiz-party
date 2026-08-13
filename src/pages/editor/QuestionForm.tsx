@@ -64,7 +64,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
         {/* ── Контент ── */}
         <div>
           <label><b>Текст вопроса</b></label>
@@ -104,7 +104,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged }: {
 
         {/* ── Ответ ── */}
         <div>
-          <label><b>Тип ответа</b>{' '}
+          <label style={{ display: 'block', marginBottom: 14 }}><b>Тип ответа</b>{' '}
             <select value={q.answer.mode}
               onChange={e => setAnswer(defaultAnswer(e.target.value as AnswerSpec['mode']))}>
               {(Object.keys(MODE_NAMES) as AnswerSpec['mode'][]).map(m =>
@@ -238,6 +238,24 @@ function MatchEditor({ spec, onChange, imgs }: {
       <div style={{ opacity: .6, fontSize: 13 }}>
         Связи: тапни слева (1), потом справа (Б) — пара «1Б» соберётся сама.
         Левые = номера медиа/треков, правые = буквы вариантов из текста вопроса.
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <div style={{ opacity: .7, fontSize: 13, marginBottom: 4 }}>
+          Подписи вариантов (показываются на экране вопроса, по одному на строку):
+        </div>
+        {spec.right.map((r, i) => (
+          <div key={r} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+            <b style={{ width: 20 }}>{r}</b>
+            <input style={{ flex: 1, padding: 4 }}
+              value={(spec.right_labels ?? [])[i] ?? ''}
+              placeholder="текст варианта"
+              onChange={e => {
+                const labels = [...(spec.right_labels ?? spec.right.map(() => ''))]
+                labels[i] = e.target.value
+                onChange({ ...spec, right_labels: labels })
+              }} />
+          </div>
+        ))}
       </div>
       <div style={{ display: 'flex', gap: 24, marginTop: 6 }}>
         <div>{spec.left.map((l, i) => (
