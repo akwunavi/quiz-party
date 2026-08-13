@@ -839,11 +839,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .mel-choosing { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .mel-wrong { color: var(--danger); font-family: 'Rajdhani', sans-serif;
   font-size: clamp(16px, 1.8vw, 24px); text-align: center; }
-.theme-new_year .mel-tile { background: linear-gradient(180deg, #12467f, #0d2a55);
-  border: 1px solid rgba(198,230,255,.45); border-radius: 12px; }
-.theme-new_year .mel-tile::after { content: '♪'; display: block; font-size: .45em; opacity: .55; }
-.theme-new_year .mel-tile.spin { background: linear-gradient(180deg, #1d6fc4, #12467f);
-  border-color: #dff1ff; box-shadow: 0 0 26px rgba(223,241,255,.7); }
 .theme-new_year .mel-theme { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,.35);
   background: rgba(255,255,255,.06); border-color: rgba(198,230,255,.35); }
 .theme-new_year .mel-modal { background: linear-gradient(180deg, #0d2a55, #071630);
@@ -877,15 +872,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
               radial-gradient(ellipse 44% 120% at 50% 100%, #fff 60%, transparent 62%),
               radial-gradient(ellipse 38% 90%  at 82% 100%, #fff 60%, transparent 62%);
   filter: drop-shadow(0 2px 2px rgba(90,140,190,.4)); }
-.theme-new_year .mel-tile { position: relative; overflow: hidden; }
-.theme-new_year .mel-tile::before { content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent 46%, rgba(230,57,70,.55) 46%,
-    rgba(230,57,70,.55) 54%, transparent 54%),
-    linear-gradient(0deg, transparent 46%, rgba(230,57,70,.35) 46%,
-    rgba(230,57,70,.35) 54%, transparent 54%);
-  pointer-events: none; }
-.theme-new_year .mel-tile.done::before { opacity: .15; }
-.theme-new_year .mel-tile.spin { animation: giftShake .35s ease-in-out infinite; }
 @keyframes giftShake { 0%,100% { transform: rotate(-1.5deg) scale(1.03); }
   50% { transform: rotate(1.5deg) scale(1.06); } }
 
@@ -947,3 +933,35 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
               radial-gradient(ellipse 44% 120% at 52% 100%, #fff 60%, transparent 62%),
               radial-gradient(ellipse 38% 90%  at 84% 100%, #fff 60%, transparent 62%);
   filter: drop-shadow(0 2px 3px rgba(90,140,190,.45)); }
+
+/* ── Плитки мелодии: ёлочные шары ── */
+.mel-tile { position: relative; background: transparent; border: none; }
+.mel-tile .ball { position: relative; width: min(100%, 108px); aspect-ratio: 1;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 32% 28%, #7fd4ff 0%, #2a7fd4 45%, #10336b 100%);
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.45), inset 6px 6px 16px rgba(255,255,255,.35),
+    0 6px 18px rgba(0,0,0,.45);
+  font-family: var(--font-digits); font-size: clamp(18px, 2.2vw, 34px); color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+/* блик */
+.mel-tile .ball::before { content: ''; position: absolute; top: 12%; left: 20%;
+  width: 26%; height: 18%; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(255,255,255,0)); }
+/* крепление-колпачок и петелька */
+.mel-tile .ball::after { content: ''; position: absolute; top: -13%; left: 50%;
+  transform: translateX(-50%); width: 26%; height: 16%;
+  border-radius: 3px 3px 1px 1px;
+  background: linear-gradient(180deg, #f0d089, #b8892f);
+  box-shadow: 0 -6px 0 -2px transparent, inset 0 -2px 3px rgba(0,0,0,.35); }
+.mel-tile.done .ball { filter: grayscale(.85) brightness(.5); box-shadow: none; }
+.mel-tile.spin .ball { animation: ballSwing .5s ease-in-out infinite;
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+    0 0 34px rgba(140,215,255,.9); }
+@keyframes ballSwing { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+/* цвета шаров по колонкам */
+.mel-tile[data-c="1"] .ball { background: radial-gradient(circle at 32% 28%, #ff9a9a 0%, #d4342a 45%, #6b1010 100%); }
+.mel-tile[data-c="2"] .ball { background: radial-gradient(circle at 32% 28%, #ffe6a1 0%, #e0a92c 45%, #6b4a10 100%); }
+.mel-tile[data-c="3"] .ball { background: radial-gradient(circle at 32% 28%, #b9f5c8 0%, #35a35a 45%, #10401f 100%); }
+
+.mel-tile { display: flex; align-items: center; justify-content: center; min-height: 0; }
+.mel-board { align-items: center; }

@@ -14,6 +14,19 @@ import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodySettings, MelodyState, MelodyTheme } from '../../types/quiz'
 
+/** Завершение раунда мелодии: дальше по пакету или в финал. */
+async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
+  const next = gameState.round_number + 1
+  if (next < pack.rounds.length) {
+    await supabase.from('game_state').update({
+      phase: 'round_intro', round_number: next, question_index: 0,
+      timer_started_at: null, reveal: false, melody: {},
+    }).eq('id', 1)
+  } else {
+    await supabase.from('game_state').update({ phase: 'finale' }).eq('id', 1)
+  }
+}
+
 async function saveMelody(next: MelodyState) {
   await supabase.from('game_state').update({ melody: next }).eq('id', 1)
 }
@@ -55,10 +68,13 @@ export function MelodyBoard({ pack, round, gameState }: {
     if (m.stage === 'spinning') {
       void saveMelody({ ...m, stage: 'listen', deadline: inSec(2) })
     } else if (m.stage === 'bidding') {
-      const order = bids
+      const bidders = bids
         .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
         .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
         .map(b => b.id)
+      // команды без ставки — в конец очереди: если первая не угадает,
+      // ход всё равно есть кому передать
+      const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
       void saveMelody({ ...m, stage: 'bids', order, turn: 0, deadline: undefined })
     } else if (m.stage === 'snippet') {
       void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
@@ -129,8 +145,14 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
-    void saveMelody({ ...m, key: target, stage: 'spinning', deadline: inSec(s.spinSec ?? 10),
-      order: undefined, turn: 0, chooser: undefined })
+    // одна плитка осталась — крутить нечего, запускаем сразу
+    if (freeKeys.length === 1) {
+      void saveMelody({ ...m, key: target, stage: 'listen', deadline: inSec(3),
+        order: undefined, turn: 0, chooser: undefined })
+      return
+    }
+    void saveMelody({ ...m, key: target, stage: 'spinning',
+      deadline: inSec(Math.min(s.spinSec ?? 5, 8)), order: undefined, turn: 0, chooser: undefined })
   }
 
   const currentId = m.order?.[m.turn ?? 0]
@@ -175,7 +197,11 @@ export function MelodyBoard({ pack, round, gameState }: {
         <div className="host-actions">
           {freeKeys.length > 0
             ? <button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
-            : <div className="mono-tag">ВСЕ ТРЕКИ ОТЫГРАНЫ</div>}
+            : <>
+                <div className="mono-tag">ВСЕ ТРЕКИ ОТЫГРАНЫ</div>
+                <button onClick={() => void finishMelodyRound(gameState, pack)}>
+                  Завершить раунд →</button>
+              </>}
         </div>
       )}
 
@@ -291,7 +317,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
   const leftRef = useRef(spinLeft)
   leftRef.current = spinLeft
   useEffect(() => {
-    if (!spinning || free.length === 0) return
+    if (!spinning || free.length === 0 || spinLeft <= 0) return
     let stop = false
     let timer: number | undefined
     const step = () => {
@@ -325,7 +351,9 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
         const hot = highlighted === key
         return (
           <div key={key} className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}`}
-            style={{ gridColumn: ti + 1, gridRow: i + 2 }}>{done ? '·' : i + 1}</div>
+            data-c={String((ti % 4))} style={{ gridColumn: ti + 1, gridRow: i + 2 }}>
+            <span className="ball">{done ? '·' : i + 1}</span>
+          </div>
         )
       }))}
     </div>

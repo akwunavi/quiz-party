@@ -174,8 +174,14 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
                       const done = played.includes(key)
                       return (
                         <button key={i} disabled={done}
-                          onClick={() => void supabase.from('game_state')
-                            .update({ melody: { ...m, pick: key } }).eq('id', 1)}>
+                          onClick={() => void supabase.from('game_state').update({
+                            // сразу задаём стадию: не зависим от того, активна ли вкладка проектора
+                            melody: {
+                              ...m, key, pick: undefined, stage: 'listen',
+                              deadline: new Date(Date.now() + 3000).toISOString(),
+                              order: undefined, turn: 0, chooser: undefined,
+                            },
+                          }).eq('id', 1)}>
                           {done ? '·' : i + 1}
                         </button>
                       )
