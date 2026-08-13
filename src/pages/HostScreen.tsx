@@ -14,6 +14,8 @@ import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
+import { SprintBoard } from './rounds/SprintRound'
+import { MelodyBoard } from './rounds/MelodyRound'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -161,6 +163,25 @@ function HostInner({ gameState, pack }: {
         </div>
       </div>
     )
+  }
+
+  // ── «120 секунд»: все вопросы на слайде ──
+  if (gameState.phase === 'question' && round.mechanic === 'sprint') {
+    return (
+      <div className="host-screen grid-bg">
+        <SprintBoard pack={pack} round={round} gameState={gameState}
+          timerNode={<Timer startedAt={gameState.timer_started_at}
+            seconds={round.timer_seconds} theme={pack.theme} />} />
+        <div className="host-actions">
+          <button className="ghost dark" onClick={() => void gotoAnswers(0)}>К ответам →</button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── «Угадай мелодию» ──
+  if (gameState.phase === 'question' && round.mechanic === 'melody') {
+    return <MelodyBoard pack={pack} round={round} gameState={gameState} />
   }
 
   // ── Своя игра: сетка плиток ──

@@ -4,7 +4,7 @@ import type { LoadedPack } from './packLoader'
 import { autocheck } from './autocheck'
 import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
-  scoreThematic, type ScoredAnswer,
+  scoreThematic, scoreSprint, scoreMelody, type ScoredAnswer,
 } from './scoring'
 
 export function computeTotals(
@@ -31,6 +31,12 @@ export function computeTotals(
         case 'stakes_free': total += scoreStakesFree(rows); break
         case 'thematic_x2':
           total += scoreThematic(rows, ri === doubledRoundIdx ? !!doubledByTeam[t.id] : false); break
+        case 'sprint':
+          total += scoreSprint(rows,
+            (s.pointsPerQuestion as number | undefined) ?? 2,
+            (s.allCorrectBonus as number | undefined) ?? 5); break
+        case 'melody':
+          total += scoreMelody(rows); break
         default:
           total += scoreStandard(rows, (s.pointsPerQuestion as number | undefined) ?? 1)
       }
@@ -63,6 +69,10 @@ export function computeRoundScores(
         case 'test_stop': v = scoreTestStop(rows); break
         case 'stakes_unique': v = scoreStakesUnique(rows); break
         case 'stakes_free': v = scoreStakesFree(rows); break
+        case 'sprint': v = scoreSprint(rows,
+          (s.pointsPerQuestion as number | undefined) ?? 2,
+          (s.allCorrectBonus as number | undefined) ?? 5); break
+        case 'melody': v = scoreMelody(rows); break
         default: v = scoreStandard(rows, (s.pointsPerQuestion as number | undefined) ?? 1)
       }
       per.push(v)

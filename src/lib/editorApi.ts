@@ -75,11 +75,16 @@ export async function createRound(pack_id: string, position: number, mechanic: M
     : mechanic === 'stakes_free' ? { stakesValues: [0, 2] }
     : mechanic === 'jeopardy' ? { themes: [] }
     : mechanic === 'crossword' ? { grid: null }
+    : mechanic === 'sprint'
+      ? { pointsPerQuestion: 2, allCorrectBonus: 5, startDelaySec: 5, afterTimerSec: 5 }
+    : mechanic === 'melody'
+      ? { themes: [], spinSec: 10, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
     : {}
   const { data, error } = await supabase.from('pack_rounds').insert({
     pack_id, position, mechanic, title_lines: [title.toUpperCase()],
     rules: [], settings: defaults,
-    timer_seconds: 30, answers_reveal: 'after_round',
+    timer_seconds: mechanic === 'sprint' ? 120 : 30,
+    answers_reveal: 'after_round',
   }).select().single()
   if (error) throw error
   void log('round', data.id, 'create', { mechanic })

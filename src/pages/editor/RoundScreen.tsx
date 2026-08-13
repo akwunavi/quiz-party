@@ -211,6 +211,10 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <CrosswordEditor round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'jeopardy' &&
         <JeopardyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
+      {round.mechanic === 'sprint' &&
+        <SprintEditor round={round} locked={locked} onChanged={onChanged} />}
+      {round.mechanic === 'melody' &&
+        <MelodyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {round.mechanic !== 'jeopardy' && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
@@ -420,6 +424,116 @@ function JeopardyEditor({ pack, round, locked, onChanged }: {
             await updateRound(round.id, { settings: { themes } })
             setDirty(false); onChanged()
           }}>Сохранить темы</button>}
+      </>}
+    </div>
+  )
+}
+
+
+// ── «120 секунд»: баллы и паузы ──
+function SprintEditor({ round, locked, onChanged }: {
+  round: LoadedRound; locked: boolean; onChanged: () => void
+}) {
+  const s = round.settings as { pointsPerQuestion?: number; allCorrectBonus?: number
+    startDelaySec?: number; afterTimerSec?: number }
+  const set = (patch: Record<string, number>) =>
+    void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
+  return (
+    <div className="ed-card"><h4>«120 секунд»</h4>
+      <div className="ed-grid2">
+        <div className="ed-field"><label>Баллов за верный ответ</label>
+          <input type="number" min={1} max={10} disabled={locked}
+            value={s.pointsPerQuestion ?? 2} onChange={e => set({ pointsPerQuestion: Number(e.target.value) })} />
+        </div>
+        <div className="ed-field"><label>Бонус за все верные</label>
+          <input type="number" min={0} max={20} disabled={locked}
+            value={s.allCorrectBonus ?? 5} onChange={e => set({ allCorrectBonus: Number(e.target.value) })} />
+        </div>
+        <div className="ed-field"><label>Пауза до старта таймера, сек</label>
+          <input type="number" min={0} max={30} disabled={locked}
+            value={s.startDelaySec ?? 5} onChange={e => set({ startDelaySec: Number(e.target.value) })} />
+          <div className="ed-hint">Слайд показан, команды читают вопросы</div>
+        </div>
+        <div className="ed-field"><label>Пауза до разбора, сек</label>
+          <input type="number" min={0} max={30} disabled={locked}
+            value={s.afterTimerSec ?? 5} onChange={e => set({ afterTimerSec: Number(e.target.value) })} />
+        </div>
+      </div>
+      <div className="ed-hint">Время раунда — поле «Таймер» выше. Вопросы добавляй ниже как обычно;
+        все они показываются на одном слайде, разбор идёт по одному.</div>
+    </div>
+  )
+}
+
+// ── «Угадай мелодию»: темы × треки + тайминги ──
+function MelodyEditor({ pack, round, locked, onChanged }: {
+  pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
+}) {
+  const s = round.settings as { themes?: { name: string; tracks: { audio: string; correct: string }[] }[]
+    spinSec?: number; bidSec?: number; answerSec?: number; passAnswerSec?: number }
+  const [themes, setThemes] = useState(s.themes ?? [])
+  const [dirty, setDirty] = useState(false)
+  const upd = (fn: (t: typeof themes) => typeof themes) => { setThemes(fn); setDirty(true) }
+  const setNum = (patch: Record<string, number>) =>
+    void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
+
+  return (
+    <div className="ed-card"><h4>«Угадай мелодию»</h4>
+      <div className="ed-grid2">
+        <div className="ed-field"><label>Анимация выбора, сек</label>
+          <input type="number" min={2} max={30} disabled={locked} value={s.spinSec ?? 10}
+            onChange={e => setNum({ spinSec: Number(e.target.value) })} /></div>
+        <div className="ed-field"><label>Совещание по ставке, сек</label>
+          <input type="number" min={3} max={60} disabled={locked} value={s.bidSec ?? 10}
+            onChange={e => setNum({ bidSec: Number(e.target.value) })} /></div>
+        <div className="ed-field"><label>На ответ первой команде, сек</label>
+          <input type="number" min={5} max={120} disabled={locked} value={s.answerSec ?? 30}
+            onChange={e => setNum({ answerSec: Number(e.target.value) })} /></div>
+        <div className="ed-field"><label>На ответ второй команде, сек</label>
+          <input type="number" min={5} max={60} disabled={locked} value={s.passAnswerSec ?? 10}
+            onChange={e => setNum({ passAnswerSec: Number(e.target.value) })} /></div>
+      </div>
+      <div className="ed-hint">Баллы: ставка 2–5 сек — 2 балла, 6–10 сек — 1 балл,
+        вторая команда после передачи хода — 0.5. Треки загружай ПОЛНЫМИ (нужны и первая
+        секунда, и проигрывание целиком).</div>
+
+      {themes.map((t, ti) => (
+        <div key={ti} style={{ margin: '10px 0', padding: 10, background: 'var(--panel2)', borderRadius: 8 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input value={t.name} placeholder={`Тема ${ti + 1}`} disabled={locked} style={{ fontWeight: 700 }}
+              onChange={e => upd(ts => ts.map((x, i) => i === ti ? { ...x, name: e.target.value } : x))} />
+            <button className="ico danger" data-tip="Удалить тему" disabled={locked}
+              onClick={() => upd(ts => ts.filter((_, i) => i !== ti))}>🗑</button>
+          </div>
+          {t.tracks.map((tr, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+              <span className="ed-num">{i + 1}</span>
+              <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+                paths={tr.audio ? [tr.audio] : []}
+                onChange={paths => upd(ts => ts.map((x, xi) => xi === ti ? {
+                  ...x, tracks: x.tracks.map((y, yi) => yi === i ? { ...y, audio: paths[0] ?? '' } : y),
+                } : x))} />
+              <input value={tr.correct} placeholder="правильный ответ" disabled={locked} style={{ flex: 1 }}
+                onChange={e => upd(ts => ts.map((x, xi) => xi === ti ? {
+                  ...x, tracks: x.tracks.map((y, yi) => yi === i ? { ...y, correct: e.target.value } : y),
+                } : x))} />
+              <button className="ico danger" data-tip="Удалить трек" disabled={locked}
+                onClick={() => upd(ts => ts.map((x, xi) => xi === ti
+                  ? { ...x, tracks: x.tracks.filter((_, yi) => yi !== i) } : x))}>🗑</button>
+            </div>
+          ))}
+          {!locked && <button style={{ marginTop: 6 }}
+            onClick={() => upd(ts => ts.map((x, i) => i === ti
+              ? { ...x, tracks: [...x.tracks, { audio: '', correct: '' }] } : x))}>+ Трек</button>}
+        </div>
+      ))}
+      {!locked && <>
+        <button onClick={() => upd(ts => [...ts, { name: '', tracks: [{ audio: '', correct: '' }] }])}>
+          + Тема</button>
+        {dirty && <button style={{ marginLeft: 8 }} onClick={async () => {
+          await updateRound(round.id, { settings: { ...round.settings, themes } as never })
+          setDirty(false); onChanged()
+        }}>Сохранить темы</button>}
       </>}
     </div>
   )

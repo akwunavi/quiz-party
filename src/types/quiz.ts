@@ -35,6 +35,8 @@ export type MechanicKey =
   | 'stakes_free'   // Р7: ставка 0|2 (+3 / −2, без ставки 1/0)
   | 'thematic_x2'   // Р6: угадай тему → ×2 (ручная кнопка)
   | 'crossword'     // сетка 6–10 слов
+  | 'sprint'        // «120 секунд»: все вопросы на одном слайде
+  | 'melody'        // «Угадай мелодию»: аукцион секунд
 
 export type AnswersReveal = 'after_question' | 'after_round' | 'never'
 
@@ -77,9 +79,27 @@ export interface JeopardyTheme {
 export interface CrosswordSettings {
   grid: CrosswordGrid | null    // null = ещё не сгенерирована
 }
+export interface SprintSettings {
+  pointsPerQuestion?: number    // по умолчанию 2
+  allCorrectBonus?: number      // по умолчанию 5
+  startDelaySec?: number        // пауза перед стартом таймера (5)
+  afterTimerSec?: number        // пауза перед разбором (5)
+}
+export interface MelodySettings {
+  themes: MelodyTheme[]
+  spinSec?: number              // анимация выбора (10)
+  bidSec?: number               // совещание по ставке (10)
+  answerSec?: number            // на ответ первой команде (30)
+  passAnswerSec?: number        // на ответ второй после полного трека (10)
+}
+export interface MelodyTheme {
+  name: string
+  tracks: { audio: string; correct: string }[]
+}
 export type MechanicSettings =
   | StandardSettings | TestStopSettings | StakesSettings
-  | JeopardySettings | CrosswordSettings | Record<string, never>
+  | JeopardySettings | CrosswordSettings | SprintSettings | MelodySettings
+  | Record<string, never>
 
 // ── Кроссворд ──────────────────────────────────────────
 export interface CrosswordWordPlacement {
@@ -158,8 +178,19 @@ export interface Question {
 }
 
 // ── Игра ───────────────────────────────────────────────
+export interface MelodyState {
+  key?: string                  // 't0-1' — тема-трек
+  stage?: 'idle' | 'spinning' | 'listen' | 'bidding' | 'bids' | 'answering' | 'passed' | 'done'
+  order?: string[]              // очередь команд по ставкам (id)
+  turn?: number                 // индекс текущей команды в order
+  startedAt?: string            // старт текущей стадии
+  played?: string[]             // отыгранные треки
+  chooser?: string              // team_id, кто выбирает следующий трек
+}
+
 export interface GameState {
   id: 1
+  melody?: MelodyState
   game_id: string
   pack_id: string | null
   phase: string

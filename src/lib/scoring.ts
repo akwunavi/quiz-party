@@ -62,3 +62,17 @@ export function scoreJeopardy(tiles: { value: number; isCorrect: boolean | null 
 export function scoreCrossword(answers: ScoredAnswer[]): number {
   return scoreStandard(answers, 1)
 }
+
+/** sprint («120 секунд»): 2 балла за верный + бонус, если верны ВСЕ вопросы. */
+export function scoreSprint(answers: ScoredAnswer[], perQuestion = 2, allBonus = 5): number {
+  const answered = answers.filter(a => a.isCorrect !== null)
+  const correct = answers.filter(a => a.isCorrect === true).length
+  const base = correct * perQuestion
+  const all = answers.length > 0 && correct === answers.length && answered.length === answers.length
+  return base + (all ? allBonus : 0)
+}
+
+/** melody: баллы записаны в stake при выставлении оценки ведущим (2 / 1 / 0.5). */
+export function scoreMelody(answers: ScoredAnswer[]): number {
+  return answers.reduce((s, a) => s + (a.isCorrect ? (a.stake ?? 0) : 0), 0)
+}

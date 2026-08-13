@@ -22,6 +22,8 @@ export const MECHANIC_NAMES: Record<MechanicKey, string> = {
   stakes_free: 'Ставки финальные (0|2)',
   thematic_x2: 'Тематический ×2',
   crossword: 'Кроссворд',
+  sprint: '120 секунд (все вопросы на слайде)',
+  melody: 'Угадай мелодию (аукцион секунд)',
 }
 
 export function EditorApp() {

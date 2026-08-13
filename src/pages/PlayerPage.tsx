@@ -75,6 +75,9 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'show_answers' && round)
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
       label={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'melody')
+    return <MelodyPlayer team={team} gameState={gameState} round={round}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'jeopardy')
     return <JeopardyPlayer team={team} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -121,6 +124,71 @@ function JeopardyPlayer({ team, gameState, roundLabel }: {
   )
 }
 
+/** «Угадай мелодию» у игрока: ставка 2–10 сек, затем ответ (если наш ход). */
+function MelodyPlayer({ team, gameState, round, roundLabel }: {
+  team: Team; roundLabel: string; round: LoadedRound
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const m = gameState.melody ?? {}
+  const [draft, setDraft] = useState('')
+  const [bid, setBid] = useState<number | null>(null)
+  useEffect(() => { setBid(null); setDraft('') }, [m.key])
+
+  const send = (ref: string, text: string) => void enqueueAnswer({
+    team_id: team.id, game_id: gameState.game_id, question_ref: ref,
+    round_number: gameState.round_number, answer_text: text,
+  })
+
+  const myTurn = m.order?.[m.turn ?? 0] === team.id
+  const stage = m.stage ?? 'idle'
+
+  return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        {(stage === 'idle' || stage === 'spinning' || stage === 'done') &&
+          <div className="pl-wait" style={{ padding: 30 }}>ЖДИТЕ НАЧАЛА РАУНДА</div>}
+        {stage === 'listen' && <div className="pl-wait" style={{ padding: 30 }}>СЛУШАЕМ…</div>}
+
+        {stage === 'bidding' && (
+          <div className="pl-card"><div className="pl-qlabel">ЗА СКОЛЬКО СЕКУНД УГАДАЕТЕ?</div>
+            <div className="pl-card-body">
+              <div className="mel-keys">
+                {[2,3,4,5,6,7,8,9,10].map(v => (
+                  <button key={v} className={bid === v ? 'sel' : ''}
+                    onClick={() => { setBid(v); send(`q-mel-${m.key}-bid`, String(v)) }}>{v}</button>
+                ))}
+              </div>
+              {bid && <div className="pl-sent">Ваша ставка: {bid} сек</div>}
+            </div>
+          </div>
+        )}
+
+        {(stage === 'bids' || stage === 'answering' || stage === 'passed') && (
+          myTurn ? (
+            <div className="pl-card"><div className="pl-qlabel">ВАШ ХОД — НАЗОВИТЕ ТРЕК</div>
+              <div className="pl-card-body">
+                <div className="pl-input-col">
+                  <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
+                  <button className="pl-send" disabled={!draft.trim() || stage === 'bids'}
+                    onClick={() => send(`q-mel-${m.key}`, draft.trim())}>Отправить</button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="pl-wait" style={{ padding: 30 }}>ЖДЁМ ДРУГУЮ КОМАНДУ</div>
+          )
+        )}
+
+        {m.chooser === team.id && stage === 'done' && (
+          <div className="pl-notice acc">ВЫ УГАДАЛИ — ВЫБИРАЕТЕ СЛЕДУЮЩИЙ ТРЕК НА ЭКРАНЕ</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ═══ Список вопросов раунда (перенос старой механики) ═══
 interface LocalState { answers: Record<number, string>; stakes: Record<number, number>; edits: Record<number, number> }
 
@@ -137,7 +205,8 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   const isStakes = round.mechanic === 'stakes_unique' || round.mechanic === 'stakes_free'
   const uniqueStakes = round.mechanic === 'stakes_unique'
   const stakeValues = (round.settings as { stakesValues?: number[] }).stakesValues ?? []
-  const collapsible = round.mechanic === 'test_stop' || isStakes || round.mechanic === 'crossword'
+  const collapsible = (round.mechanic === 'test_stop' || isStakes || round.mechanic === 'crossword')
+    && round.mechanic !== 'sprint'
   const isCrossword = round.mechanic === 'crossword'
   const grid = (round.settings as { grid?: CrosswordGrid }).grid ?? null
 
@@ -154,9 +223,14 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   })
   useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(state)) }, [state])
 
-  // вопрос доступен, только если зачитан
+  // вопрос доступен, только если зачитан. В «120 секунд» — все сразу,
+  // но после окончания таймера форма блокируется.
+  const isSprint = round.mechanic === 'sprint'
+  const sprintOver = isSprint && !!gameState.timer_started_at &&
+    Date.now() > new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
   const unlocked = (i: number) =>
-    gameState.phase === 'answer_time' ? true : i <= gameState.question_index
+    isSprint ? !sprintOver
+    : gameState.phase === 'answer_time' ? true : i <= gameState.question_index
   const maxEdits = (round.settings as { maxEdits?: number }).maxEdits ?? 2
   const locked = (i: number) => maxEdits >= 0 && (state.edits[i] ?? 0) > maxEdits
 
