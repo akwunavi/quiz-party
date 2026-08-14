@@ -1086,8 +1086,16 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
   const teams = useTeams(gameId)
   const answers = useAnswers(gameId)
   const totals = computeTotals(pack, teams, answers)
+  const roundScores = computeRoundScores(pack, teams, answers)
   const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
   const top = ranked.slice(0, 3)
+  // поэтапное раскрытие: остальные → 3 место → 2 → 1 → разбивка
+  const [step, setStep] = useState(0)
+  useEffect(() => {
+    if (step >= 5) return
+    const t = setTimeout(() => setStep(s => s + 1), step === 0 ? 1200 : 2200)
+    return () => clearTimeout(t)
+  }, [step])
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
   return (
     <div className="host-screen grid-bg">
@@ -1101,7 +1109,7 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
       <Title theme={pack.theme} lines={['ПОБЕДИТЕЛИ']} />
       <div className="fin-podium">
         {[1, 0, 2].map(pos => top[pos] && (
-          <div key={pos} className={`fin-step p${pos + 1}`}>
+          <div key={pos} className={`fin-step p${pos + 1}${step >= 4 - pos ? '' : ' veiled'}`}>
             <div className="fin-medal">{['🥇', '🥈', '🥉'][pos]}</div>
             <div className="fin-name" style={{ color: top[pos].color }}>{top[pos].name}</div>
             <div className="fin-score">{totals.get(top[pos].id) ?? 0}</div>
@@ -1110,7 +1118,7 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
         ))}
       </div>
       {ranked.length > 3 && (
-        <div className="fin-rest">
+        <div className="fin-rest" style={{ opacity: step >= 1 ? 1 : 0, transition: 'opacity .6s' }}>
           {ranked.slice(3).map((t, i) => (
             <div key={t.id} className="fin-row">
               <span className="num">{i + 4}</span>
@@ -1118,6 +1126,26 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
               <span className="num">{totals.get(t.id) ?? 0}</span>
             </div>
           ))}
+        </div>
+      )}
+      {step >= 5 && (
+        <div className="fin-breakdown">
+          <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
+          <table className="fin-table">
+            <thead><tr><th />{pack.rounds.map((r, i) => !r.off_scoreboard &&
+              <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
+            <tbody>
+              {ranked.map(t => (
+                <tr key={t.id}>
+                  <td style={{ color: t.color }}>{t.name}</td>
+                  {pack.rounds.map((r, i) => !r.off_scoreboard && (
+                    <td key={r.id}>{roundScores.get(t.id)?.[i] ?? 0}</td>
+                  ))}
+                  <td><b>{totals.get(t.id) ?? 0}</b></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
       <div className="host-actions">

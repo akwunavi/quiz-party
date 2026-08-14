@@ -377,7 +377,7 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
   answers: Answer[]; teams: Team[]
 }) {
   const q = round.questions[gameState.question_index]
-  const filled = teams.map(t => ({
+  const filled = [...teams].sort((x, y) => x.name.localeCompare(y.name)).map(t => ({
     team: t,
     done: answers.some(a => a.team_id === t.id && a.question_ref === `q-${q?.id}` && a.answer_text?.trim()),
   }))

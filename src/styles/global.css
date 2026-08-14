@@ -715,8 +715,14 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .ny-wreath .wr-fg { fill: none; stroke: #dff3e6; stroke-width: 5; stroke-linecap: round;
   transform: rotate(-90deg); transform-origin: 55px 55px;
   filter: drop-shadow(0 0 8px rgba(223,243,230,.8)); transition: stroke-dashoffset .3s linear; }
-.ny-wreath .wr-berry { fill: #e63946; filter: drop-shadow(0 0 5px rgba(230,57,70,.8)); }
-.ny-wreath .wr-bow { fill: #e63946; opacity: .9; }
+.ny-wreath .wr-berry { fill: #e63946; filter: drop-shadow(0 0 6px rgba(230,57,70,.9));
+  animation: berryTwinkle 2.4s ease-in-out infinite; }
+.ny-wreath .wr-berry:nth-of-type(2n) { animation-delay: .6s; fill: #ffd24d;
+  filter: drop-shadow(0 0 6px rgba(255,210,77,.9)); }
+.ny-wreath .wr-berry:nth-of-type(3n) { animation-delay: 1.2s; fill: #7cc7ff;
+  filter: drop-shadow(0 0 6px rgba(124,199,255,.9)); }
+@keyframes berryTwinkle { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+.ny-wreath .wr-bow { display: none; }
 .ny-wreath .val { position: relative; font-family: var(--font-digits); font-weight: 900;
   font-size: clamp(34px, 4.2vw, 60px); z-index: 1; }
 .ny-wreath.low .wr-fg { stroke: #ff6b81; filter: drop-shadow(0 0 12px #ff6b81); }
@@ -990,3 +996,15 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .mel-tile .ball::after { top: -12px; height: 12px; width: 24%; }
 /* модалка без hud-уголков */
 .mel-modal { border-radius: 16px; }
+
+/* Финал: поэтапное раскрытие и разбивка */
+.fin-step.veiled { opacity: 0; transform: translateY(26px); }
+.fin-step { transition: opacity .7s ease, transform .7s ease; }
+.fin-breakdown { margin-top: 16px; animation: ruleIn .6s ease both; }
+.fin-table { border-collapse: collapse; font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 1.3vw, 20px); }
+.fin-table th, .fin-table td { padding: 5px 14px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,.12); }
+.fin-table th { color: var(--muted); font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .15em; }
+.fin-table td:first-child { text-align: left; }

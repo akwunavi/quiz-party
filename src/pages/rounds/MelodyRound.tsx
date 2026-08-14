@@ -157,7 +157,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
-    if (m.stage !== 'answering' || !bg || document.hidden) return
+    if ((m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
     const a = playShared(mediaUrl(bg))
     a.loop = true; a.volume = .45
     return () => { a.pause(); a.loop = false; a.volume = 1 }
@@ -252,7 +252,7 @@ export function MelodyBoard({ pack, round, gameState }: {
               <div className="mel-points-hint">2–5 сек → 2 балла · 6–10 сек → 1 балл ·
                 передача хода → 0.5 балла</div>
               <div className="mel-bids">
-                {teams.map(t => {
+                {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => {
                   const b = bids.find(x => x.team_id === t.id)
                   return <div key={t.id} className={`mel-bid-row${b ? ' win' : ''}`}>
                     <span style={{ color: t.color }}>{t.name}</span>
@@ -334,10 +334,13 @@ export function MelodyBoard({ pack, round, gameState }: {
               )}
               <div className="mel-actions">
                 <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
-                <button className="ghost" disabled={!ans} onClick={() => void grade(false)}>✗ Неверно</button>
-                <button className={ans?.is_correct === false ? '' : 'ghost dark'}
-                  onClick={() => void pass()}>
-                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? 'Передать ход →' : 'Закрыть трек'}
+                <button className="ghost" onClick={async () => {
+                  // «не верно» и «дальше» — одно действие: отметить и передать/закрыть
+                  if (ans && ans.is_correct == null)
+                    await supabase.from('answers').update({ is_correct: false, stake: 0 }).eq('id', ans.id)
+                  await pass()
+                }}>
+                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
                 </button>
               </div>
             </>)}
