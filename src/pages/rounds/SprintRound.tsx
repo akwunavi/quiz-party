@@ -49,17 +49,17 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
   const half = Math.ceil(questions.length / 2)
   return (
     <div className="sprint-screen">
+      <div className="host-topbar sprint-topbar">
+        <span className="qnum">{round.title_lines.join(' ')}</span>
+      </div>
       <div className="sprint-col">
         {questions.slice(0, half).map((q, i) => <SprintCard key={q.id} n={i + 1} q={q} />)}
       </div>
       <div className="sprint-center">
-        <div className="mono-tag">{round.title_lines.join(' ')}</div>
         {gameState.timer_started_at
-          ? timerNode
+          ? <div className="sprint-timer">{timerNode}</div>
           : <div className="sprint-pre"><div className="sprint-pre-num">{countdown}</div>
               <div className="mono-tag">ЧИТАЕМ ВОПРОСЫ</div></div>}
-        <div className="mono-tag">{questions.length} ВОПРОСОВ · {(s.pointsPerQuestion ?? 2)} БАЛЛА ЗА КАЖДЫЙ</div>
-        <div className="sprint-bonus">+{s.allCorrectBonus ?? 5} за все верные</div>
       </div>
       <div className="sprint-col">
         {questions.slice(half).map((q, i) => <SprintCard key={q.id} n={half + i + 1} q={q} />)}

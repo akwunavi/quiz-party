@@ -965,3 +965,9 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 
 .mel-tile { display: flex; align-items: center; justify-content: center; min-height: 0; }
 .mel-board { align-items: center; }
+
+/* Спринт: название раунда на обычном месте (слева сверху), таймер крупный */
+.sprint-topbar { position: absolute; top: 0; left: 0; right: 0; }
+.sprint-timer { transform: scale(1.7); transform-origin: center; }
+.sprint-timer .ny-wreath { width: clamp(150px, 15vw, 230px); height: clamp(150px, 15vw, 230px); }
+.sprint-center { min-width: clamp(220px, 24vw, 340px); }

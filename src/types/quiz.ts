@@ -185,6 +185,7 @@ export interface MelodyState {
   order?: string[]              // очередь команд по ставкам (id)
   turn?: number                 // индекс текущей команды в order
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
+  snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
   played?: string[]             // отыгранные треки
   chooser?: string              // team_id, кто выбирает следующий трек
   pick?: string                 // ключ трека, выбранный командой на телефоне

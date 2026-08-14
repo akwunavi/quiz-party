@@ -7,6 +7,7 @@
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
 import { useEffect, useRef, useState } from 'react'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from '../../lib/supabase'
 import { mediaUrl } from '../HostScreen'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -25,6 +26,27 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   } else {
     await supabase.from('game_state').update({ phase: 'finale' }).eq('id', 1)
   }
+}
+
+// Единый аудио-элемент: «разблокируется» первым кликом по проектору и дальше
+// переиспользуется — autoplay-политика браузера больше не блокирует треки,
+// запущенные выбором с телефона (там нет жеста на проекторе).
+let sharedAudio: HTMLAudioElement | null = null
+export function unlockAudio() {
+  if (sharedAudio) return
+  sharedAudio = new Audio()
+  // тихий пинок, чтобы браузер пометил элемент как «разрешённый жестом»
+  sharedAudio.play().catch(() => {})
+  sharedAudio.pause()
+}
+function playShared(src: string): HTMLAudioElement {
+  if (!sharedAudio) sharedAudio = new Audio()
+  sharedAudio.pause()
+  sharedAudio.src = src
+  sharedAudio.loop = false
+  sharedAudio.volume = 1
+  void sharedAudio.play().catch(() => {})
+  return sharedAudio
 }
 
 async function saveMelody(next: MelodyState) {
@@ -55,12 +77,49 @@ export function MelodyBoard({ pack, round, gameState }: {
   const ansRef = `q-mel-${m.key}`
   const bids = answers.filter(a => a.question_ref === bidRef)
 
+  // ставки, дошедшие ПОСЛЕ дедлайна (полинг ~2 сек), пересобирают очередь,
+  // пока трек ещё не запущен кнопкой «Играем N сек»
+  useEffect(() => {
+    if (m.stage !== 'bids') return
+    const bidders = bids
+      .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
+      .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
+      .map(b => b.id)
+    const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
+    if (JSON.stringify(order) !== JSON.stringify(m.order)) {
+      void saveMelody({ ...m, order, turn: 0 })
+    }
+  }, [m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
+
   // выбор трека командой: игрок пишет ключ в melody.pick → сразу слушаем
   useEffect(() => {
     if (!m.pick) return   // обрабатываем всегда: проектор может быть во второй вкладке
     void saveMelody({ ...m, key: m.pick, pick: undefined, stage: 'listen',
       deadline: inSec(3), order: undefined, turn: 0, chooser: undefined })
   }, [m.pick])
+
+  // ── snippet: интервал играет от РЕАЛЬНОГО старта звука ровно bid секунд ──
+  useEffect(() => {
+    if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
+    const sec = m.snippetSec ?? 5
+    const a = playShared(mediaUrl(track.audio))
+    audioRef.current = a
+    let stop: number | undefined
+    let advanced = false
+    const advance = () => {
+      if (advanced) return
+      advanced = true
+      a.pause()
+      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+    }
+    a.addEventListener('playing', () => {
+      // с этого момента и тикает счётчик на экране
+      void saveMelody({ ...m, deadline: inSec(sec) })
+      stop = window.setTimeout(advance, sec * 1000)
+    }, { once: true })
+    const guard = window.setTimeout(advance, (sec + 4) * 1000)
+    return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
+  }, [m.stage, m.key])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
@@ -76,8 +135,6 @@ export function MelodyBoard({ pack, round, gameState }: {
       // ход всё равно есть кому передать
       const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
       void saveMelody({ ...m, stage: 'bids', order, turn: 0, deadline: undefined })
-    } else if (m.stage === 'snippet') {
-      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
     } else if (m.stage === 'answering' || m.stage === 'passed') {
       void saveMelody({ ...m, deadline: undefined })   // время вышло — судит ведущий
     }
@@ -86,49 +143,40 @@ export function MelodyBoard({ pack, round, gameState }: {
   // ── 1 секунда трека на стадии listen ──
   useEffect(() => {
     if (m.stage !== 'listen' || !track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
+    const a = playShared(mediaUrl(track.audio))
     audioRef.current = a
     let stop: number | undefined
-    // отсчёт секунды начинается, когда звук РЕАЛЬНО пошёл (иначе съедается буферизацией)
-    a.addEventListener('playing', () => {
-      stop = window.setTimeout(() => {
-        a.pause()
-        void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
-      }, 1000)
-    }, { once: true })
-    a.play().catch(() => {
+    let advanced = false
+    const advance = () => {
+      if (advanced) return
+      advanced = true
+      a.pause()
       void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
-    })
-    return () => { if (stop) clearTimeout(stop); a.pause() }
+    }
+    // секунда считается от РЕАЛЬНОГО начала звука
+    a.addEventListener('playing', () => { stop = window.setTimeout(advance, 1000) }, { once: true })
+    // страховка: если звук так и не пошёл (нет файла) — не зависаем
+    const guard = window.setTimeout(advance, 4000)
+    return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
   }, [m.stage, m.key])
 
-  // ── выбранный интервал ──
-  useEffect(() => {
-    if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
-    audioRef.current = a
-    a.play().catch(() => {})
-    return () => a.pause()
-  }, [m.stage, m.key])
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
     if (m.stage !== 'answering' || !bg || document.hidden) return
-    const a = new Audio(mediaUrl(bg))
+    const a = playShared(mediaUrl(bg))
     a.loop = true; a.volume = .45
-    a.play().catch(() => {})
-    return () => a.pause()
+    return () => { a.pause(); a.loop = false; a.volume = 1 }
   }, [m.stage])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
     if (m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
-    const a = new Audio(mediaUrl(track.audio))
+    const a = playShared(mediaUrl(track.audio))
     audioRef.current = a
-    a.play().catch(() => {})
     a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
-    return () => a.pause()
+    return () => { a.pause(); a.onended = null }
   }, [m.stage])
 
   if (themes.length === 0) return (
@@ -178,7 +226,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   }
 
   return (
-    <div className="host-screen grid-bg mel-screen">
+    <div className="host-screen grid-bg mel-screen" onPointerDown={unlockAudio}>
       <h1 className="neon-title mel-title">{round.title_lines.join(' ') || 'УГАДАЙ МЕЛОДИЮ'}</h1>
       {pack.theme === 'new_year' && <div className="title-deco">🎄 ♪ 🎁 ♪ 🎄</div>}
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
@@ -248,7 +296,8 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
               <div className="mel-actions">
                 <button disabled={!currentId}
-                  onClick={() => void saveMelody({ ...m, stage: 'snippet', deadline: inSec(bidSec || 5) })}>
+                  onClick={() => void saveMelody({ ...m, stage: 'snippet',
+                    snippetSec: bidSec || 5, deadline: undefined })}>
                   Играем {bidSec || 5} сек →
                 </button>
                 <button className="ghost dark"
