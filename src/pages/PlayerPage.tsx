@@ -143,6 +143,9 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
 
   const stage = m.stage ?? 'idle'
   const myTurn = m.order?.[m.turn ?? 0] === team.id
+  // моя команда уже играла этот трек и провалила ход
+  const myIdx = m.order?.indexOf(team.id) ?? -1
+  const alreadyFailed = myIdx > -1 && myIdx < (m.turn ?? 0)
 
   const Wait = ({ text, sub }: { text: string; sub?: string }) => (
     <div className="mel-wait">
@@ -158,7 +161,9 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
       <div className="pl-list">
         {(<>
           {(stage === 'idle' || stage === 'done') && <Wait text="ЖДИТЕ СЛЕДУЮЩЕГО ТРЕКА" />}
-          {stage === 'reveal' && <Wait text="ТРЕК УГАДАН!" sub="Смотрите на экран" />}
+          {stage === 'reveal' && (m.wonTeam === team.id
+            ? <Wait text={`ВЫ УГАДАЛИ! +${m.wonPts ?? 0}`} sub="Баллы ваши — смотрите на экран" />
+            : <Wait text="ТРЕК УГАДАН" sub="Увы, не вами. Ждите следующего" />)}
           {stage === 'spinning' && <Wait text="ВЫБИРАЕМ ТРЕК" sub="Смотрите на экран" />}
           {stage === 'listen' && <Wait text="СЛУШАЕМ 1 СЕКУНДУ" sub="Приготовьтесь к ставке" />}
 
@@ -179,7 +184,9 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
 
           {stage === 'bids' && (myTurn
             ? <Wait text="ВЫ ИГРАЕТЕ!" sub="Ждите включения музыки" />
-            : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Если не угадают — ход перейдёт к вам, 0.5 балла" />)}
+            : alreadyFailed
+              ? <Wait text="ВЫ НЕ УГАДАЛИ" sub="Ждём другую команду" />
+              : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Если не угадают — ход перейдёт к вам, 0.5 балла" />)}
 
           {(stage === 'snippet' || stage === 'answering' || stage === 'passed') && (myTurn ? (
             <div className="pl-card">
@@ -199,7 +206,9 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
                 {sent && <div className="pl-sent">Отправлено: {sent}</div>}
               </div>
             </div>
-          ) : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ"
+          ) : alreadyFailed
+            ? <Wait text="ВЫ НЕ УГАДАЛИ" sub="Ждём вторую команду" />
+            : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ"
                 sub="Слушайте трек — если не угадают, ход перейдёт к вам (0.5 балла)" />)}
         </>)}
       </div>

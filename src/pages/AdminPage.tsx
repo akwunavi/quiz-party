@@ -47,6 +47,7 @@ export function AdminPage() {
       <div className="adm-status">
         {pack ? `${pack.name} · Р${displayRoundNumber(pack, gameState.round_number)}` : 'пакет не выбран'} · {phase}
         {round && (phase === 'question' || phase === 'show_answers')
+          && round.mechanic !== 'melody' && round.mechanic !== 'jeopardy'
           ? ` · ${gameState.question_index + 1}/${round.questions.length}` : ''}
       </div>
 
@@ -160,6 +161,8 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
       <div className="adm-dim">ВЫБЕРИ РАУНД ДЛЯ СТАРТА</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {pack.rounds.map((r, i) => (
+          pack.settings?.play_mode === 'paper'
+            && (r.mechanic === 'melody' || r.mechanic === 'jeopardy') ? null :
           <button key={r.id} className={`adm-round${current === i ? ' active' : ''}`}
             onClick={() => void gotoRound(i)}>
             Р{displayRoundNumber(pack, i)} {r.title_lines.join(' ')}
@@ -246,6 +249,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           {showRoundSwitch ? 'СКРЫТЬ СПИСОК РАУНДОВ' : 'СМЕНИТЬ РАУНД'}
         </button>
         {showRoundSwitch && <RoundPicker pack={pack} current={gameState.round_number} />}
+
+        {pack.settings?.play_mode === 'paper' &&
+          (phase === 'scoreboard' || phase === 'show_answers' || phase === 'break' || phase === 'answer_time') &&
+          <PaperScores pack={pack} gameState={gameState} teams={teams} />}
 
         <TeamRandomizer />
 
@@ -394,6 +401,38 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
           </span>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ── Бумажный режим: ручные баллы за раунд ──
+function PaperScores({ pack, gameState, teams }: {
+  pack: LoadedPack; teams: Team[]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [vals, setVals] = useState<Record<string, string>>({})
+  const ri = gameState.round_number
+  const save = async (teamId: string) => {
+    const pts = Number(vals[teamId])
+    if (Number.isNaN(pts)) return
+    await supabase.from('answers').upsert({
+      team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
+      round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
+    } as never, { onConflict: 'team_id,game_id,question_ref' } as never)
+  }
+  return (
+    <div className="adm-box">
+      <div className="adm-dim">БАЛЛЫ ЗА РАУНД (БУМАГА) — ВВОДИ И ЖМИ ✓</div>
+      {[...teams].sort((x, y) => x.name.localeCompare(y.name)).map(t => (
+        <div key={t.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ color: t.color, flex: 1 }}>{t.name}</span>
+          <input inputMode="numeric" style={{ width: 80, textAlign: 'center' }}
+            value={vals[t.id] ?? ''} placeholder="0"
+            onChange={e => setVals(v => ({ ...v, [t.id]: e.target.value }))} />
+          <button className="adm-btn ok" style={{ flex: '0 0 auto', padding: '8px 14px' }}
+            onClick={() => void save(t.id)}>✓</button>
+        </div>
+      ))}
     </div>
   )
 }

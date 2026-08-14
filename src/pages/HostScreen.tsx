@@ -731,7 +731,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
             </div>
           )}
         </div>
-        <div className="team-answers">
+        {pack.settings?.play_mode !== 'paper' && <div className="team-answers">
           <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
           {rows.map(a => {
@@ -752,7 +752,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
               </div>
             )
           })}
-        </div>
+        </div>}
       </div>
       <div className="host-actions">
         {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true)}>← Назад</button>}

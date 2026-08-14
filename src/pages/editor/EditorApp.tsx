@@ -224,6 +224,16 @@ function PackScreen({ packId, user, onBack }: {
               }} />
             <div className="ed-hint">Один трек на весь пакет — экономит место. Раунд может переопределить</div>
           </div>
+          <div className="ed-field"><label>Как играем</label>
+            <select value={pack.settings?.play_mode ?? 'phones'}
+              onChange={async ev => { await setPackSettings(pack.id, { ...(pack.settings ?? {}), play_mode: ev.target.value as never }); reload() }}>
+              <option value="phones">на телефонах</option>
+              <option value="paper">на бумаге</option>
+            </select>
+            <div className="ed-hint">Бумага: блок «ответы команд» скрыт, баллы вводит ведущий
+              вручную в админке; раунды «Своя игра» и «Угадай мелодию» в этом режиме
+              пропускаются (им нужны телефоны)</div>
+          </div>
           <div className="ed-field"><label>Показ ответов (по умолчанию)</label>
             <select value={pack.settings?.answers_reveal ?? 'after_round'}
               onChange={async ev => { await setPackSettings(pack.id, { ...(pack.settings ?? {}), answers_reveal: ev.target.value as never }); reload() }}>
@@ -280,8 +290,17 @@ function PackScreen({ packId, user, onBack }: {
               {MECHANIC_NAMES[r.mechanic]}{r.off_scoreboard && ' · разогрев, вне зачёта'}
             </div>
           </div>
-          <span className="ed-count" title="Количество вопросов в раунде">
-            {r.questions.filter(q => !q.hidden).length}
+          <span className="ed-count" title={
+            r.mechanic === 'melody' ? 'Количество треков в раунде'
+            : r.mechanic === 'jeopardy' ? 'Количество плиток в раунде'
+            : 'Количество вопросов в раунде'}>
+            {r.mechanic === 'melody'
+              ? ((r.settings as { themes?: { tracks: unknown[] }[] }).themes ?? [])
+                  .reduce((s, th) => s + th.tracks.length, 0)
+              : r.mechanic === 'jeopardy'
+                ? ((r.settings as { themes?: { tiles: unknown[] }[] }).themes ?? [])
+                    .reduce((s, th) => s + th.tiles.length, 0)
+                : r.questions.filter(q => !q.hidden).length}
           </span>
           <div className="ed-actions">
             <button className="ico" data-tip="Выше" disabled={i === 0 || locked}

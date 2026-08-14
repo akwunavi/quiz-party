@@ -1008,3 +1008,8 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .fin-table th { color: var(--muted); font-family: var(--font-mono); font-size: 11px;
   letter-spacing: .15em; }
 .fin-table td:first-child { text-align: left; }
+
+/* Клавиши ставок: подсветка ТОЛЬКО у выбранной (было: focus от тапа «залипал») */
+.mel-keys button:focus { outline: none; }
+.mel-keys button:focus:not(.sel) { background: rgba(255,255,255,.06);
+  border-color: var(--dim); color: var(--fg); }

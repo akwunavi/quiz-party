@@ -14,6 +14,45 @@ export function QuestionPreview({ pack, round, q, onClose }: {
   const isNY = pack.theme === 'new_year'
   const frameCls = isNY && round.mechanic !== 'rebus' ? 'q-frame' : ''
 
+  // «120 секунд»: предпросмотр показывает ВЕСЬ слайд, как на проекторе
+  if (round.mechanic === 'sprint') {
+    const qs = round.questions.filter(x => !x.hidden)
+    const half = Math.ceil(qs.length / 2)
+    return (
+      <div className="pv-backdrop">
+        <button className="pv-close ico" data-tip="Закрыть" onClick={onClose}>✕</button>
+        <ThemeLayer theme={pack.theme} isProjector>
+          <div className="host-screen grid-bg">
+            <div className="sprint-screen">
+              <div className="host-topbar sprint-topbar">
+                <span className="qnum">{round.title_lines.join(' ')}</span>
+              </div>
+              <div className="sprint-col">
+                {qs.slice(0, half).map((x, i) => (
+                  <div key={x.id} className="sprint-card">
+                    <span className="sprint-num">{i + 1}</span>
+                    <div className="sprint-text">{x.question_text}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="sprint-center">
+                <div className="ny-wreath"><span className="val">{round.timer_seconds}</span></div>
+              </div>
+              <div className="sprint-col">
+                {qs.slice(half).map((x, i) => (
+                  <div key={x.id} className="sprint-card">
+                    <span className="sprint-num">{half + i + 1}</span>
+                    <div className="sprint-text">{x.question_text}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ThemeLayer>
+      </div>
+    )
+  }
+
   return (
     <div className="pv-backdrop">
       <button className="pv-close ico" data-tip="Закрыть" onClick={onClose}>✕</button>

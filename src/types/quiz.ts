@@ -13,6 +13,7 @@ export interface PackSettings {
   timer_seconds?: number     // дефолтный таймер раундов
   max_edits?: number         // дефолт правок ответа
   answers_reveal?: AnswersReveal
+  play_mode?: 'phones' | 'paper'   // бумага: без ответов на экране, баллы вручную
 }
 
 export interface Pack {
