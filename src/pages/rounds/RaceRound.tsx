@@ -116,7 +116,7 @@ export function RaceBoard({ pack, round, gameState }: {
     <div className="host-screen grid-bg race-screen">
       <div className="host-topbar"><span className="qnum">{round.title_lines.join(' ') || 'СКАЧКИ БУЛЬДОГОВ'}</span></div>
 
-      <div className="race-track hud-frame">
+      {(race.stage === 'running' || done) && <div className="race-track hud-frame">
         {/* трибуны и финиш */}
         <div className="race-stands">{Array.from({ length: 26 }, (_, i) =>
           <span key={i} style={{ animationDelay: `${(i % 5) * .3}s` }}>{['🎉','👏','🙌','⭐','🎊'][i % 5]}</span>)}
@@ -137,18 +137,23 @@ export function RaceBoard({ pack, round, gameState }: {
             </div>
           )
         })}
-      </div>
+      </div>}
 
       {(!race.stage || race.stage === 'betting') && (
         <div className="race-panel">
-          <div className="mono-tag">СТАВКИ КОМАНД · выбери бульдога 1–5 на телефоне</div>
-          <div className="mel-bids" style={{ width: 'min(560px, 90vw)' }}>
-            {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(tm => {
-              const b = bets.find(x => x.team_id === tm.id)
-              return <div key={tm.id} className={`mel-bid-row${b ? ' win' : ''}`}>
-                <span style={{ color: tm.color }}>{tm.name}</span>
-                <b>{b ? `№${b.answer_text}` : '…'}</b><span /></div>
-            })}
+          <div className="mono-tag">ВЫБЕРИТЕ СВОЕГО БУЛЬДОГА · СТАВКИ ТАЙНЫЕ</div>
+          <div className="race-lineup">
+            {dogs.map((name, i) => (
+              <div key={i} className="race-candidate">
+                <SittingBulldog color={DOG_COLORS[i]} n={i + 1} />
+                <span className="race-tag"><b>№{i + 1}</b> {name}</span>
+              </div>
+            ))}
+          </div>
+          {/* никто не видит, КТО на кого поставил — только счётчик готовности */}
+          <div className="mono-tag" style={{ color: bets.length === teams.length && teams.length > 0
+            ? 'var(--answer)' : undefined }}>
+            СТАВКИ СДЕЛАЛИ: {bets.length} / {teams.length}
           </div>
           <div className="host-actions">
             {!race.stage && <button onClick={() => void openBets()}>Открыть ставки</button>}
@@ -174,33 +179,94 @@ export function RaceBoard({ pack, round, gameState }: {
   )
 }
 
-/** Стилизованный французский бульдог: SVG, трясущиеся уши и попа на бегу. */
+/** Сидящий французик (фас): для экрана выбора. Уши-локаторы, брыли, грудка. */
+function SittingBulldog({ color, n }: { color: typeof DOG_COLORS[number]; n: number }) {
+  return (
+    <svg viewBox="0 0 120 150" className="bulldog-sit">
+      {/* задние бёдра */}
+      <ellipse cx="34" cy="122" rx="20" ry="16" fill={color.body} />
+      <ellipse cx="86" cy="122" rx="20" ry="16" fill={color.body} />
+      {/* тело-груша */}
+      <path d="M60,58 C90,58 96,96 92,124 C90,136 30,136 28,124 C24,96 30,58 60,58 Z" fill={color.body} />
+      {/* белая грудка */}
+      <path d="M60,72 C72,72 76,100 74,126 C73,132 47,132 46,126 C44,100 48,72 60,72 Z" fill="#fbf7ef" />
+      {/* передние лапки-колонны */}
+      <rect x="43" y="98" width="12" height="38" rx="6" fill={color.body} />
+      <rect x="65" y="98" width="12" height="38" rx="6" fill={color.body} />
+      <ellipse cx="49" cy="137" rx="8" ry="5" fill="#fbf7ef" />
+      <ellipse cx="71" cy="137" rx="8" ry="5" fill="#fbf7ef" />
+      <path d="M46,135 v4 M49,136 v4 M52,135 v4 M68,135 v4 M71,136 v4 M74,135 v4"
+        stroke={color.mask} strokeWidth="1.2" opacity=".55" />
+      {/* уши-локаторы: широкие, скруглённые, розовые внутри */}
+      <path d="M28,44 C18,20 22,6 34,4 C44,3 50,20 48,40 C40,46 32,46 28,44 Z" fill={color.body} />
+      <path d="M92,44 C102,20 98,6 86,4 C76,3 70,20 72,40 C80,46 88,46 92,44 Z" fill={color.body} />
+      <path d="M32,40 C26,22 28,12 35,10 C41,9 45,22 43,38 Z" fill="#eeb6c6" opacity=".8" />
+      <path d="M88,40 C94,22 92,12 85,10 C79,9 75,22 77,38 Z" fill="#eeb6c6" opacity=".8" />
+      {/* голова: широкая, чуть шире плеч */}
+      <ellipse cx="60" cy="48" rx="34" ry="28" fill={color.body} />
+      {/* лобная морщина */}
+      <path d="M48,32 Q60,28 72,32" fill="none" stroke={color.mask} strokeWidth="2" opacity=".5" strokeLinecap="round" />
+      {/* глаза: круглые, широко посаженные, блик */}
+      <circle cx="46" cy="46" r="6.4" fill="#241d22" />
+      <circle cx="74" cy="46" r="6.4" fill="#241d22" />
+      <circle cx="48" cy="44" r="2" fill="#fff" />
+      <circle cx="76" cy="44" r="2" fill="#fff" />
+      {/* морда-маска с брылями */}
+      <path d="M44,54 C44,46 76,46 76,54 C76,68 68,74 60,74 C52,74 44,68 44,54 Z" fill={color.mask} opacity=".92" />
+      <path d="M52,62 C50,70 54,73 60,73 M68,62 C70,70 66,73 60,73"
+        fill="none" stroke="#241d22" strokeWidth="1.6" opacity=".6" />
+      {/* нос широкий + перегородка */}
+      <ellipse cx="60" cy="55" rx="7" ry="5" fill="#241d22" />
+      <path d="M60,58 v7" stroke="#241d22" strokeWidth="1.6" />
+      {/* язычок */}
+      <ellipse cx="60" cy="72" rx="5" ry="4" fill="#ff8da1" />
+      {/* номер на груди */}
+      <circle cx="60" cy="96" r="11" fill={color.mask} />
+      <text x="60" y="101" textAnchor="middle" fontSize="15" fontWeight="700" fill="#fff">{n}</text>
+    </svg>
+  )
+}
+
+/** Бегущий французик (профиль): мощная грудь и голова, компактная попа — как в жизни. */
 function Bulldog({ color, running }: { color: typeof DOG_COLORS[number]; running: boolean }) {
   return (
-    <svg viewBox="0 0 120 80" className={`bulldog${running ? ' run' : ''}`}>
-      {/* хвостик и попа */}
-      <ellipse className="bd-butt" cx="30" cy="52" rx="22" ry="16" fill={color.body} />
-      <circle cx="12" cy="44" r="5" fill={color.body} />
-      {/* тело */}
-      <ellipse cx="55" cy="54" rx="28" ry="15" fill={color.body} />
-      {/* лапы */}
-      <rect className="bd-leg a" x="34" y="60" width="7" height="16" rx="3" fill={color.mask} />
-      <rect className="bd-leg b" x="52" y="62" width="7" height="15" rx="3" fill={color.mask} />
-      <rect className="bd-leg a" x="70" y="60" width="7" height="16" rx="3" fill={color.mask} />
-      {/* голова */}
-      <circle cx="88" cy="38" r="20" fill={color.body} />
+    <svg viewBox="0 0 140 90" className={`bulldog${running ? ' run' : ''}`}>
+      {/* компактная попа: заметно меньше груди, чуть ниже холки */}
+      <ellipse className="bd-butt" cx="40" cy="50" rx="15" ry="12" fill={color.body} />
+      <circle cx="27" cy="42" r="3.6" fill={color.mask} />
+      {/* заднее бедро — мускулистое, но небольшое */}
+      <ellipse cx="42" cy="56" rx="10" ry="9" fill={color.mask} opacity=".28" />
+      {/* тело: клин от узкой талии к МОЩНОЙ груди */}
+      <path d="M40,40 C62,30 88,30 104,42 C110,52 106,64 90,68 C68,72 46,64 40,52 Z" fill={color.body} />
+      {/* глубокая грудина */}
+      <ellipse cx="94" cy="58" rx="16" ry="13" fill={color.body} />
+      <path d="M82,66 C90,72 100,72 106,64 C102,72 86,74 82,66 Z" fill="#fbf7ef" />
+      {/* лапы: короткие, передние мощнее */}
+      <rect className="bd-leg a" x="34" y="58" width="8" height="19" rx="4" fill={color.body} />
+      <rect className="bd-leg b" x="48" y="60" width="8" height="18" rx="4" fill={color.body} />
+      <rect className="bd-leg b" x="82" y="64" width="10" height="17" rx="4.5" fill={color.body} />
+      <rect className="bd-leg a" x="98" y="62" width="10" height="18" rx="4.5" fill={color.body} />
+      {/* складка на холке */}
+      <path d="M88,36 Q96,32 103,38" fill="none" stroke={color.mask} strokeWidth="2.4" opacity=".5" strokeLinecap="round" />
+      {/* голова: крупная, почти как грудь */}
+      <circle cx="114" cy="34" r="24" fill={color.body} />
       {/* уши-локаторы */}
-      <path className="bd-ear l" d="M74,24 L70,2 L84,16 Z" fill={color.body} />
-      <path className="bd-ear r" d="M96,22 L104,0 L108,20 Z" fill={color.body} />
-      <path d="M75,21 L73,9 L81,17 Z" fill="#e8b4c8" opacity=".7" />
-      <path d="M98,19 L102,7 L105,18 Z" fill="#e8b4c8" opacity=".7" />
-      {/* морда-маска */}
-      <ellipse cx="94" cy="44" rx="12" ry="9" fill={color.mask} />
-      <circle cx="97" cy="40" r="3.4" fill="#2b2026" />
-      <circle cx="82" cy="34" r="3" fill="#2b2026" />
-      <circle cx="83" cy="33" r="1" fill="#fff" />
-      {/* высунутый язык */}
-      <ellipse className="bd-tongue" cx="96" cy="52" rx="4" ry="6" fill="#ff8da1" />
+      <path className="bd-ear l" d="M98,18 C92,0 98,-4 106,0 C112,4 110,14 106,20 Z" fill={color.body} />
+      <path className="bd-ear r" d="M120,14 C122,-4 130,-4 134,2 C137,8 132,16 126,20 Z" fill={color.body} />
+      <path d="M100,15 C97,4 101,1 105,4 C108,7 107,12 104,16 Z" fill="#eeb6c6" opacity=".8" />
+      <path d="M123,12 C124,2 129,2 131,6 C133,9 130,14 126,16 Z" fill="#eeb6c6" opacity=".8" />
+      {/* лобная морщина */}
+      <path d="M104,24 Q114,20 124,25" fill="none" stroke={color.mask} strokeWidth="2" opacity=".5" strokeLinecap="round" />
+      {/* глаз */}
+      <circle cx="108" cy="32" r="4.4" fill="#241d22" />
+      <circle cx="109.5" cy="30.5" r="1.4" fill="#fff" />
+      {/* морда-маска, брыль, нос */}
+      <path d="M118,36 C132,34 138,42 134,50 C130,56 120,56 115,50 C112,44 112,38 118,36 Z"
+        fill={color.mask} opacity=".92" />
+      <ellipse cx="133" cy="43" rx="4.6" ry="3.8" fill="#241d22" />
+      <path d="M122,52 Q126,56 131,52" fill="none" stroke="#241d22" strokeWidth="1.6" opacity=".6" />
+      {/* язык на бегу */}
+      <ellipse className="bd-tongue" cx="126" cy="58" rx="4" ry="6.4" fill="#ff8da1" />
     </svg>
   )
 }
