@@ -91,19 +91,6 @@ export function MelodyBoard({ pack, round, gameState }: {
     }
   }, [m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
 
-  // выбор трека командой приходит через answers (как ставки — канал безотказный);
-  // проектор подхватывает его и запускает прослушивание от СВОИХ часов
-  const pickAns = answers.find(a =>
-    a.question_ref === `q-mel-pick-${played.length}` && a.team_id === m.chooser)
-  useEffect(() => {
-    const idleNow = !m.stage || m.stage === 'idle' || m.stage === 'done'
-    if (!idleNow || !m.chooser || !pickAns) return
-    const key = pickAns.answer_text
-    if (!key || played.includes(key)) return
-    void saveMelody({ ...m, key, stage: 'listen', deadline: inSec(3),
-      order: undefined, turn: 0, chooser: undefined })
-  }, [pickAns?.id, pickAns?.answer_text, m.stage, m.chooser])
-
   // ── snippet: интервал играет от РЕАЛЬНОГО старта звука ровно bid секунд ──
   useEffect(() => {
     if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
@@ -195,7 +182,6 @@ export function MelodyBoard({ pack, round, gameState }: {
   const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
   const freeKeys = allKeys.filter(k => !played.includes(k))
   const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
-  const chooserTeam = teams.find(t => t.id === m.chooser)
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
@@ -219,9 +205,11 @@ export function MelodyBoard({ pack, round, gameState }: {
     const isFirst = (m.turn ?? 0) === 0
     const pts = correct ? (isFirst ? (bidSec <= 5 ? 2 : 1) : 0.5) : 0
     await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
-    if (correct) await saveMelody({ ...m, stage: 'done', deadline: undefined,
-      played: [...played, m.key!], chooser: currentId })
-    else await saveMelody({ ...m, deadline: undefined })  // время стоп, ждём передачи хода
+    if (correct) {
+      // не закрываем модалку: показываем результат, закрытие — кнопкой
+      await saveMelody({ ...m, stage: 'reveal', deadline: undefined,
+        played: [...played, m.key!], wonPts: pts, wonTeam: currentId, chooser: undefined })
+    } else await saveMelody({ ...m, deadline: undefined })  // время стоп, ждём передачи хода
   }
   const pass = async () => {
     if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
@@ -236,16 +224,7 @@ export function MelodyBoard({ pack, round, gameState }: {
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
 
-      {idle && freeKeys.length > 0 && m.chooser && (
-        <div className="mel-choosing">
-          <div className="mel-big" style={{ color: chooserTeam?.color }}>
-            {chooserTeam?.name} выбирает следующий трек на телефоне
-          </div>
-          <button className="ghost dark" onClick={() =>
-            void saveMelody({ ...m, chooser: undefined })}>Выбрать рулеткой</button>
-        </div>
-      )}
-      {idle && !m.chooser && (
+      {idle && (
         <div className="host-actions">
           {freeKeys.length > 0
             ? <button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
@@ -316,6 +295,18 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
             )}
 
+            {m.stage === 'reveal' && (<>
+              <div className="answer-reveal" style={{ padding: '18px 28px' }}>
+                <div className="answer-label">ВЕРНО ✓ · +{m.wonPts ?? 0}</div>
+                <div className="answer-main">{track?.correct}</div>
+              </div>
+              <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
+                {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
+              </div>
+              <div className="mel-actions">
+                <button onClick={() => void saveMelody({ ...m, stage: 'done' })}>К доске →</button>
+              </div>
+            </>)}
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
               <div className="mel-big" style={{ color: currentTeam?.color }}>
                 {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}

@@ -7,6 +7,7 @@ import {
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
 import { packMediaSize } from '../../lib/mediaUpload'
+import { supabase } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
 import type { Pack, MechanicKey } from '../../types/quiz'
@@ -105,7 +106,7 @@ function PackList({ packs, user, onOpen, onChanged }: {
         }}>+ Новый пакет</button>
       </div>
       {packs.length === 0 && <p style={{ opacity: .6 }}>Пакетов пока нет — создай первый.</p>}
-      {packs.map(p => (
+      {packs.filter(p => user.role === 'owner' || !p.is_private).map(p => (
         <div key={p.id} style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           border: '1px solid #22314f', borderRadius: 8, padding: 12, marginBottom: 8,
@@ -183,6 +184,21 @@ function PackScreen({ packId, user, onBack }: {
             </div>
             <div className="ed-hint">«Проверить» ищет проблемы в любой момент, даже если пакет готов</div>
           </div>
+          {user.role === 'owner' && (
+            <div className="ed-field"><label>Доступ</label>
+              <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+                <input type="checkbox" checked={!!pack.is_private}
+                  onChange={async ev => {
+                    await supabase.from('packs').update({ is_private: ev.target.checked })
+                      .eq('id', pack.id)
+                    reload()
+                  }} />
+                приватный пакет
+              </label>
+              <div className="ed-hint">Виден только владельцам; редакторы его не увидят в списке
+                и не откроют. Жёсткое серверное ограничение (RLS) добавим вместе со входом хоста</div>
+            </div>
+          )}
           <div className="ed-field"><label>Тема оформления</label>
             <select value={pack.theme} disabled={locked}
               onChange={async e => { await setPackTheme(pack.id, e.target.value); reload() }}>

@@ -985,8 +985,8 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 /* шар живёт внутри своей ячейки: высота от ячейки, колпачок учтён в отступе */
 .mel-board { gap: 14px 10px; }
 .mel-tile { padding-top: 14px; }             /* место под колпачок */
-.mel-tile .ball { height: min(100%, 15vh); width: auto; aspect-ratio: 1;
-  max-width: 100%; }
+.mel-tile .ball { width: clamp(84px, 10vw, 150px); max-width: 92%; max-height: 100%;
+  aspect-ratio: 1; }
 .mel-tile .ball::after { top: -12px; height: 12px; width: 24%; }
 /* модалка без hud-уголков */
 .mel-modal { border-radius: 16px; }

@@ -76,7 +76,7 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
       label={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'melody')
-    return <MelodyPlayer team={team} gameState={gameState} round={round}
+    return <MelodyPlayer team={team} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'jeopardy')
     return <JeopardyPlayer team={team} gameState={gameState}
@@ -125,19 +125,16 @@ function JeopardyPlayer({ team, gameState, roundLabel }: {
 }
 
 /** «Угадай мелодию» у игрока: понятное состояние на каждой стадии. */
-function MelodyPlayer({ team, gameState, round, roundLabel }: {
-  team: Team; roundLabel: string; round: LoadedRound
+function MelodyPlayer({ team, gameState, roundLabel }: {
+  team: Team; roundLabel: string
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const m = gameState.melody ?? {}
-  const s = round.settings as { themes?: { name: string; tracks: unknown[] }[] }
-  const themes = s.themes ?? []
   const [draft, setDraft] = useState('')
   const [bid, setBid] = useState<number | null>(null)
   const [sent, setSent] = useState<string | null>(null)
-  const [picked, setPicked] = useState<string | null>(null)
   // сбрасываем поля только при СМЕНЕ ТРЕКА (иначе ответ стирался при переходе стадии)
-  useEffect(() => { setBid(null); setDraft(''); setSent(null); setPicked(null) }, [m.key])
+  useEffect(() => { setBid(null); setDraft(''); setSent(null) }, [m.key])
 
   const send = (ref: string, text: string) => void enqueueAnswer({
     team_id: team.id, game_id: gameState.game_id, question_ref: ref,
@@ -146,8 +143,6 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
 
   const stage = m.stage ?? 'idle'
   const myTurn = m.order?.[m.turn ?? 0] === team.id
-  const iChoose = m.chooser === team.id && (stage === 'done' || stage === 'idle')
-  const played = m.played ?? []
 
   const Wait = ({ text, sub }: { text: string; sub?: string }) => (
     <div className="mel-wait">
@@ -161,40 +156,9 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
-        {/* выбор следующего трека командой-победителем */}
-        {iChoose ? (
-          <div className="pl-card">
-            <div className="pl-qlabel">
-              {picked ? 'ВЫБОР ОТПРАВЛЕН — СМОТРИТЕ НА ЭКРАН' : 'ВЫ УГАДАЛИ — ВЫБИРАЙТЕ СЛЕДУЮЩИЙ ТРЕК'}
-            </div>
-            <div className="pl-card-body">
-              {themes.map((t, ti) => (
-                <div key={ti} style={{ marginBottom: 10 }}>
-                  <div className="pl-qlabel">{t.name || `Тема ${ti + 1}`}</div>
-                  <div className="mel-keys">
-                    {t.tracks.map((_, i) => {
-                      const key = `${ti}-${i}`
-                      const done = played.includes(key)
-                      return (
-                        <button key={i} disabled={done || picked !== null}
-                          className={picked === key ? 'sel' : ''}
-                          onClick={() => {
-                            // выбор уходит тем же каналом, что и ставки (answers) —
-                            // он единственный, который доставляется безотказно
-                            setPicked(key)
-                            send(`q-mel-pick-${played.length}`, key)
-                          }}>
-                          {done ? '·' : i + 1}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (<>
-          {(stage === 'idle' || stage === 'done') && <Wait text="ЖДИТЕ НАЧАЛА РАУНДА" />}
+        {(<>
+          {(stage === 'idle' || stage === 'done') && <Wait text="ЖДИТЕ СЛЕДУЮЩЕГО ТРЕКА" />}
+          {stage === 'reveal' && <Wait text="ТРЕК УГАДАН!" sub="Смотрите на экран" />}
           {stage === 'spinning' && <Wait text="ВЫБИРАЕМ ТРЕК" sub="Смотрите на экран" />}
           {stage === 'listen' && <Wait text="СЛУШАЕМ 1 СЕКУНДУ" sub="Приготовьтесь к ставке" />}
 

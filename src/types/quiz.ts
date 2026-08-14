@@ -20,6 +20,7 @@ export interface Pack {
   name: string
   status: PackStatus
   theme: ThemeKey
+  is_private?: boolean       // виден только владельцам
   settings?: PackSettings
   created_at: string
   updated_at: string
@@ -181,13 +182,15 @@ export interface Question {
 export interface MelodyState {
   key?: string                  // '0-1' — тема-трек
   stage?: 'idle' | 'spinning' | 'listen' | 'bidding' | 'bids' | 'snippet'
-    | 'answering' | 'passed' | 'done'
+    | 'answering' | 'passed' | 'reveal' | 'done'
   order?: string[]              // очередь команд по ставкам (id)
   turn?: number                 // индекс текущей команды в order
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
   played?: string[]             // отыгранные треки
-  chooser?: string              // team_id, кто выбирает следующий трек
+  chooser?: string              // (не используется: выбор всегда рулеткой)
+  wonPts?: number               // сколько баллов забрали (для экрана результата)
+  wonTeam?: string              // кто забрал
 }
 
 export interface GameState {
