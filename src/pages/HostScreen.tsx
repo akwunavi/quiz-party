@@ -16,6 +16,7 @@ import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { MelodyBoard } from './rounds/MelodyRound'
+import { RaceBoard } from './rounds/RaceRound'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -177,6 +178,11 @@ function HostInner({ gameState, pack }: {
         </div>
       </div>
     )
+  }
+
+  // ── «Скачки бульдогов» ──
+  if (gameState.phase === 'question' && round.mechanic === 'race') {
+    return <RaceBoard pack={pack} round={round} gameState={gameState} />
   }
 
   // ── «Угадай мелодию» ──

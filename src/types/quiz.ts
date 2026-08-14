@@ -39,6 +39,7 @@ export type MechanicKey =
   | 'crossword'     // сетка 6–10 слов
   | 'sprint'        // «120 секунд»: все вопросы на одном слайде
   | 'melody'        // «Угадай мелодию»: аукцион секунд
+  | 'race'          // «Скачки бульдогов»: ставка на номер, баллы по месту
 
 export type AnswersReveal = 'after_question' | 'after_round' | 'never'
 
@@ -94,13 +95,18 @@ export interface MelodySettings {
   answerSec?: number            // на ответ первой команде (30)
   passAnswerSec?: number        // на ответ второй после полного трека (10)
 }
+export interface RaceSettings {
+  dogs?: string[]               // клички 5 бульдогов
+  betSec?: number               // окно ставок (30)
+  raceSec?: number              // длительность забега (18)
+}
 export interface MelodyTheme {
   name: string
   tracks: { audio: string; correct: string }[]
 }
 export type MechanicSettings =
   | StandardSettings | TestStopSettings | StakesSettings
-  | JeopardySettings | CrosswordSettings | SprintSettings | MelodySettings
+  | JeopardySettings | CrosswordSettings | SprintSettings | MelodySettings | RaceSettings
   | Record<string, never>
 
 // ── Кроссворд ──────────────────────────────────────────
@@ -190,6 +196,7 @@ export interface MelodyState {
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
   played?: string[]             // отыгранные треки
   chooser?: string              // (не используется: выбор всегда рулеткой)
+  race?: { seed?: number; stage?: 'betting' | 'running' | 'done'; startedAt?: string }
   wonPts?: number               // сколько баллов забрали (для экрана результата)
   wonTeam?: string              // кто забрал
 }

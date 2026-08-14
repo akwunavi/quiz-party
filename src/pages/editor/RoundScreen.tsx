@@ -37,7 +37,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
   const isJeopardy = round.mechanic === 'jeopardy'
   // в этих механиках контент задаётся не вопросами, а темами/треками
-  const noQuestions = isJeopardy || round.mechanic === 'melody'
+  const noQuestions = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
 
   const patch = async (p: Parameters<typeof updateRound>[1]) => {
     await updateRound(round.id, p); onChanged()
@@ -222,6 +222,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <SprintEditor round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'melody' &&
         <MelodyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
+      {round.mechanic === 'race' &&
+        <RaceEditor round={round} locked={locked} onChanged={onChanged} />}
 
       {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
@@ -544,6 +546,37 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
           }}>Сохранить темы</button>}
         </div>
       )}
+    </div>
+  )
+}
+
+
+// ── «Скачки бульдогов»: клички и длительность ──
+function RaceEditor({ round, locked, onChanged }: {
+  round: LoadedRound; locked: boolean; onChanged: () => void
+}) {
+  const s = round.settings as { dogs?: string[]; raceSec?: number }
+  const dogs = (s.dogs ?? []).length === 5 ? s.dogs!
+    : ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета']
+  const set = (patch: Record<string, unknown>) =>
+    void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
+  return (
+    <div className="ed-card"><h4>«Скачки бульдогов»</h4>
+      <div className="ed-hint">Финал-лотерея: команды ставят на бульдога 1–5, забег решает
+        случайный сид, который создаётся в момент нажатия «Старт!» — победителя не знает
+        никто, включая ведущего. Баллы: 1 место — 5, 2 — 4, 3 — 3, 4 — 2, 5 — 1.</div>
+      <div className="ed-grid2">
+        {dogs.map((name, i) => (
+          <div className="ed-field" key={i}><label>Бульдог №{i + 1}</label>
+            <input value={name} disabled={locked}
+              onChange={e => set({ dogs: dogs.map((x, xi) => xi === i ? e.target.value : x) })} />
+          </div>
+        ))}
+        <div className="ed-field"><label>Длительность забега, сек</label>
+          <input type="number" min={8} max={60} disabled={locked} value={s.raceSec ?? 18}
+            onChange={e => set({ raceSec: Number(e.target.value) || 18 })} />
+        </div>
+      </div>
     </div>
   )
 }

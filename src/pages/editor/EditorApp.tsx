@@ -25,6 +25,7 @@ export const MECHANIC_NAMES: Record<MechanicKey, string> = {
   crossword: 'Кроссворд',
   sprint: '120 секунд (все вопросы на слайде)',
   melody: 'Угадай мелодию (аукцион секунд)',
+  race: 'Скачки бульдогов (финал-лотерея)',
 }
 
 export function EditorApp() {

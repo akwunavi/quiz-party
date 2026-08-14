@@ -1013,3 +1013,41 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .mel-keys button:focus { outline: none; }
 .mel-keys button:focus:not(.sel) { background: rgba(255,255,255,.06);
   border-color: var(--dim); color: var(--fg); }
+
+/* ═══ СКАЧКИ БУЛЬДОГОВ ═══ */
+.race-screen { justify-content: flex-start; gap: 14px; }
+.race-track { position: relative; width: min(96vw, 1600px); flex: 1; min-height: 0;
+  border-radius: 16px; padding: 44px 20px 16px; overflow: hidden;
+  background: linear-gradient(180deg, #0d2a55 0%, #123a24 30%, #1b5230 100%); }
+.race-stands { position: absolute; top: 6px; left: 0; right: 0; display: flex;
+  justify-content: space-around; font-size: clamp(13px, 1.4vw, 22px); opacity: .85; }
+.race-stands span { animation: crowd 1.4s ease-in-out infinite; display: inline-block; }
+@keyframes crowd { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.race-finish { position: absolute; top: 40px; bottom: 8px; right: 7%; width: 10px;
+  background: repeating-conic-gradient(#fff 0 25%, #111 0 50%) 0 0 / 10px 10px; opacity: .9; }
+.race-lane { position: relative; height: calc((100% - 20px) / 5); min-height: 56px;
+  border-bottom: 2px dashed rgba(255,255,255,.18); }
+.race-lane:last-child { border-bottom: none; }
+.race-num { position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-digits); font-size: clamp(16px, 1.8vw, 28px); color: rgba(255,255,255,.5); }
+.race-dog { position: absolute; top: 50%; transform: translateY(-58%);
+  width: clamp(70px, 8vw, 130px); transition: left .12s linear; }
+.race-name { display: block; text-align: center; font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(11px, 1vw, 16px); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6);
+  white-space: nowrap; }
+.race-treat { position: absolute; right: 3.4%; top: 50%; transform: translateY(-50%);
+  font-size: clamp(16px, 1.8vw, 28px); animation: crowd 1s ease-in-out infinite; }
+.race-panel, .race-result { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+/* собака: тряска ушей и попы на бегу */
+.bulldog { width: 100%; height: auto; }
+.bulldog.run .bd-ear { transform-origin: 85px 20px; animation: earFlap .28s ease-in-out infinite; }
+.bulldog.run .bd-butt { transform-origin: 30px 52px; animation: buttWiggle .22s ease-in-out infinite; }
+.bulldog.run .bd-leg.a { transform-origin: center top; animation: legRun .22s ease-in-out infinite; }
+.bulldog.run .bd-leg.b { transform-origin: center top; animation: legRun .22s ease-in-out infinite reverse; }
+.bulldog.run .bd-tongue { animation: crowd .4s ease-in-out infinite; }
+@keyframes earFlap { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
+@keyframes buttWiggle { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes legRun { 0%,100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
+/* новогодняя тема: снег на трибунах */
+.theme-new_year .race-track { background: linear-gradient(180deg, #0d2a55 0%, #10304f 30%, #dfe9f5 100%); }
+.theme-new_year .race-lane { border-color: rgba(255,255,255,.35); }

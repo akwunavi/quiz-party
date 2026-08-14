@@ -76,3 +76,8 @@ export function scoreSprint(answers: ScoredAnswer[], perQuestion = 2, allBonus =
 export function scoreMelody(answers: ScoredAnswer[]): number {
   return answers.reduce((s, a) => s + (a.isCorrect ? (a.stake ?? 0) : 0), 0)
 }
+
+/** race: баллы записаны в stake при финише (5/4/3/2/1 по месту собаки). */
+export function scoreRace(answers: ScoredAnswer[]): number {
+  return answers.reduce((s, a) => s + (a.isCorrect ? (a.stake ?? 0) : 0), 0)
+}

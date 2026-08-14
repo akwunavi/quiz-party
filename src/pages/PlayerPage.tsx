@@ -75,6 +75,9 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'show_answers' && round)
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
       label={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'race')
+    return <RacePlayer team={team} gameState={gameState} round={round}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'melody')
     return <MelodyPlayer team={team} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -211,6 +214,54 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
             : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ"
                 sub="Слушайте трек — если не угадают, ход перейдёт к вам (0.5 балла)" />)}
         </>)}
+      </div>
+    </div>
+  )
+}
+
+/** Скачки: команда жмёт номер бульдога 1–5, пока ставки открыты. */
+function RacePlayer({ team, gameState, round, roundLabel }: {
+  team: Team; roundLabel: string; round: LoadedRound
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const race = gameState.melody?.race ?? {}
+  const s = round.settings as { dogs?: string[] }
+  const dogs = (s.dogs ?? []).length === 5 ? s.dogs! : ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета']
+  const [bet, setBet] = useState<number | null>(null)
+  useEffect(() => { if (!race.stage || race.stage === 'betting') setBet(b => b) }, [race.stage])
+
+  return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        {!race.stage && <div className="pl-wait" style={{ padding: 30 }}>ЖДЁМ ОТКРЫТИЯ СТАВОК</div>}
+        {race.stage === 'betting' && (
+          <div className="pl-card"><div className="pl-qlabel">НА КОГО СТАВИМ?</div>
+            <div className="pl-card-body">
+              <div className="mel-points-hint">1 место — 5 баллов · 2 — 4 · … · 5 — 1</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {dogs.map((name, i) => (
+                  <button key={i} className={`pl-send${bet === i + 1 ? '' : ' ghosted'}`}
+                    style={bet === i + 1 ? {} : { opacity: .65 }}
+                    onClick={() => {
+                      setBet(i + 1)
+                      void enqueueAnswer({
+                        team_id: team.id, game_id: gameState.game_id,
+                        question_ref: `q-race-${gameState.round_number}`,
+                        round_number: gameState.round_number, answer_text: String(i + 1),
+                      })
+                    }}>№{i + 1} · {name}</button>
+                ))}
+              </div>
+              {bet && <div className="pl-sent">Ставка: №{bet} {dogs[bet - 1]} · можно изменить</div>}
+            </div>
+          </div>
+        )}
+        {race.stage === 'running' && <div className="pl-wait" style={{ padding: 30 }}>
+          БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁</div>}
+        {race.stage === 'done' && <div className="pl-wait" style={{ padding: 30 }}>
+          ЗАБЕГ ОКОНЧЕН — БАЛЛЫ НАЧИСЛЕНЫ</div>}
       </div>
     </div>
   )

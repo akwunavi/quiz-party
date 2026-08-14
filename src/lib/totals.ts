@@ -4,7 +4,7 @@ import type { LoadedPack } from './packLoader'
 import { autocheck } from './autocheck'
 import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
-  scoreThematic, scoreSprint, scoreMelody, type ScoredAnswer,
+  scoreThematic, scoreSprint, scoreMelody, scoreRace, type ScoredAnswer,
 } from './scoring'
 
 export function computeTotals(
@@ -26,6 +26,13 @@ export function computeTotals(
             && x.question_ref.startsWith('q-mel-') && !x.question_ref.endsWith('-bid'))
           .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
         total += scoreMelody(rows)
+        return
+      }
+      if (round.mechanic === 'race') {
+        const rows: ScoredAnswer[] = answers
+          .filter(x => x.team_id === t.id && x.question_ref === `q-race-${ri}`)
+          .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
+        total += scoreRace(rows)
         return
       }
       const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
@@ -72,6 +79,13 @@ export function computeRoundScores(
             && x.question_ref.startsWith('q-mel-') && !x.question_ref.endsWith('-bid'))
           .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
         per.push(scoreMelody(rows))
+        return
+      }
+      if (round.mechanic === 'race') {
+        const rows: ScoredAnswer[] = answers
+          .filter(x => x.team_id === t.id && x.question_ref === `q-race-${ri}`)
+          .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
+        per.push(scoreRace(rows))
         return
       }
       const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
