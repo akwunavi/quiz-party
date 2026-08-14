@@ -188,7 +188,6 @@ export interface MelodyState {
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
   played?: string[]             // отыгранные треки
   chooser?: string              // team_id, кто выбирает следующий трек
-  pick?: string                 // ключ трека, выбранный командой на телефоне
 }
 
 export interface GameState {

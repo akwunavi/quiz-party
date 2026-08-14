@@ -135,8 +135,9 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
   const [draft, setDraft] = useState('')
   const [bid, setBid] = useState<number | null>(null)
   const [sent, setSent] = useState<string | null>(null)
+  const [picked, setPicked] = useState<string | null>(null)
   // сбрасываем поля только при СМЕНЕ ТРЕКА (иначе ответ стирался при переходе стадии)
-  useEffect(() => { setBid(null); setDraft(''); setSent(null) }, [m.key])
+  useEffect(() => { setBid(null); setDraft(''); setSent(null); setPicked(null) }, [m.key])
 
   const send = (ref: string, text: string) => void enqueueAnswer({
     team_id: team.id, game_id: gameState.game_id, question_ref: ref,
@@ -163,7 +164,9 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
         {/* выбор следующего трека командой-победителем */}
         {iChoose ? (
           <div className="pl-card">
-            <div className="pl-qlabel">ВЫ УГАДАЛИ — ВЫБИРАЙТЕ СЛЕДУЮЩИЙ ТРЕК</div>
+            <div className="pl-qlabel">
+              {picked ? 'ВЫБОР ОТПРАВЛЕН — СМОТРИТЕ НА ЭКРАН' : 'ВЫ УГАДАЛИ — ВЫБИРАЙТЕ СЛЕДУЮЩИЙ ТРЕК'}
+            </div>
             <div className="pl-card-body">
               {themes.map((t, ti) => (
                 <div key={ti} style={{ marginBottom: 10 }}>
@@ -173,15 +176,14 @@ function MelodyPlayer({ team, gameState, round, roundLabel }: {
                       const key = `${ti}-${i}`
                       const done = played.includes(key)
                       return (
-                        <button key={i} disabled={done}
-                          onClick={() => void supabase.from('game_state').update({
-                            // сразу задаём стадию: не зависим от того, активна ли вкладка проектора
-                            melody: {
-                              ...m, key, pick: undefined, stage: 'listen',
-                              deadline: new Date(Date.now() + 3000).toISOString(),
-                              order: undefined, turn: 0, chooser: undefined,
-                            },
-                          }).eq('id', 1)}>
+                        <button key={i} disabled={done || picked !== null}
+                          className={picked === key ? 'sel' : ''}
+                          onClick={() => {
+                            // выбор уходит тем же каналом, что и ставки (answers) —
+                            // он единственный, который доставляется безотказно
+                            setPicked(key)
+                            send(`q-mel-pick-${played.length}`, key)
+                          }}>
                           {done ? '·' : i + 1}
                         </button>
                       )

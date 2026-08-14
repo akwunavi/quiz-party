@@ -91,12 +91,18 @@ export function MelodyBoard({ pack, round, gameState }: {
     }
   }, [m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
 
-  // выбор трека командой: игрок пишет ключ в melody.pick → сразу слушаем
+  // выбор трека командой приходит через answers (как ставки — канал безотказный);
+  // проектор подхватывает его и запускает прослушивание от СВОИХ часов
+  const pickAns = answers.find(a =>
+    a.question_ref === `q-mel-pick-${played.length}` && a.team_id === m.chooser)
   useEffect(() => {
-    if (!m.pick) return   // обрабатываем всегда: проектор может быть во второй вкладке
-    void saveMelody({ ...m, key: m.pick, pick: undefined, stage: 'listen',
-      deadline: inSec(3), order: undefined, turn: 0, chooser: undefined })
-  }, [m.pick])
+    const idleNow = !m.stage || m.stage === 'idle' || m.stage === 'done'
+    if (!idleNow || !m.chooser || !pickAns) return
+    const key = pickAns.answer_text
+    if (!key || played.includes(key)) return
+    void saveMelody({ ...m, key, stage: 'listen', deadline: inSec(3),
+      order: undefined, turn: 0, chooser: undefined })
+  }, [pickAns?.id, pickAns?.answer_text, m.stage, m.chooser])
 
   // ── snippet: интервал играет от РЕАЛЬНОГО старта звука ровно bid секунд ──
   useEffect(() => {
@@ -227,8 +233,6 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   return (
     <div className="host-screen grid-bg mel-screen" onPointerDown={unlockAudio}>
-      <h1 className="neon-title mel-title">{round.title_lines.join(' ') || 'УГАДАЙ МЕЛОДИЮ'}</h1>
-      {pack.theme === 'new_year' && <div className="title-deco">🎄 ♪ 🎁 ♪ 🎄</div>}
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
 
@@ -256,7 +260,7 @@ export function MelodyBoard({ pack, round, gameState }: {
       {/* модалка появляется только с момента прослушивания, на барабане её нет */}
       {m.stage && !idle && m.stage !== 'spinning' && (
         <div className="mel-overlay">
-          <div className="mel-modal hud-frame">
+          <div className="mel-modal">
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
               {!!deadline && <div className="mel-count">{left}</div>}
