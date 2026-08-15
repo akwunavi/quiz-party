@@ -6,7 +6,9 @@ import { App } from './App'
 const saved = sessionStorage.getItem('qp-redirect')
 if (saved) {
   sessionStorage.removeItem('qp-redirect')
-  history.replaceState(null, '', saved)
+  // HashRouter: путь /quiz-party/admin превращаем в /quiz-party/#/admin
+  const route = saved.replace(/^\/quiz-party/, '')
+  history.replaceState(null, '', '/quiz-party/#' + (route || '/'))
 }
 import './styles/global.css'
 
