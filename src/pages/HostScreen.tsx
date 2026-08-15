@@ -101,7 +101,7 @@ function HostInner({ gameState, pack }: {
               {teams.length === 0
                 ? <span style={{ opacity: .5 }}>ждём команды…</span>
                 : teams.map(t => (
-                  <span key={t.id} className="lobby-team"
+                  <span key={t.id} className="lobby-team team-chip-fx"
                     style={{ color: t.color, opacity: isAlive(t) ? 1 : .4 }}>
                     {t.name}
                   </span>
@@ -596,7 +596,7 @@ function AnswerTime({ pack, round, gameState }: {
   return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
-      <Title theme={pack.theme} lines={['ОТВЕЧАЙТЕ!']} />
+      <div className="answer-pulse"><Title theme={pack.theme} lines={['ОТВЕЧАЙТЕ!']} /></div>
       <div className="meta-line">КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ</div>
       <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
       <div className="answer-time-teams">
@@ -1114,11 +1114,23 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
     // клик в любом месте финала раскрывает всё сразу (не ждать ~10 сек)
     <div className="host-screen grid-bg" onClick={() => setStep(5)}
       style={{ cursor: step < 4 ? 'pointer' : 'default' }}>
-      {Array.from({ length: 14 }, (_, i) => (
-        <span key={i} className="firework" style={{
-          left: `${6 + i * 6.5}%`, background: colors[i % colors.length],
-          animationDelay: `${(i % 7) * 0.23}s`,
-        }} />
+      {/* залповый фейерверк из старого квиза: вспышка + искры по кругу */}
+      {Array.from({ length: 5 }, (_, bi) => (
+        <div key={bi} className="fw-burst" style={{
+          left: `${12 + bi * 19}%`, top: `${18 + (bi % 3) * 14}%`,
+        }}>
+          <span className="fw-flash" style={{
+            background: `radial-gradient(circle, ${colors[bi % colors.length]}55, transparent 70%)`,
+            ['--dur' as string]: `${2.2 + bi * 0.3}s`, ['--delay' as string]: `${bi * 0.45}s`,
+          }} />
+          {Array.from({ length: 10 }, (_, si) => (
+            <span key={si} className="fw-spark" style={{
+              background: colors[(bi + si) % colors.length],
+              ['--a' as string]: `${si * 36}deg`,
+              ['--dur' as string]: `${2.2 + bi * 0.3}s`, ['--delay' as string]: `${bi * 0.45}s`,
+            }} />
+          ))}
+        </div>
       ))}
       <div className="mono-tag">ИТОГИ ИГРЫ</div>
       <Title theme={pack.theme} lines={['ПОБЕДИТЕЛИ']} />

@@ -8,7 +8,12 @@ export function ThemeLayer({ theme, isProjector, children }: {
 }) {
   return (
     <div className={`theme-${theme}`}>
-      {theme === 'new_year' && isProjector && <NewYearScene />}
+      {theme === 'classic' && isProjector && <CyberScene />}
+      {theme === 'new_year' && isProjector && <>
+        <NewYearScene />
+        {/* сани Деда Мороза: редкий пролёт по небу */}
+        <div className="ny-sleigh" aria-hidden>🦌🦌🛷🎅</div>
+      </>}
       {theme === 'potter' && isProjector && <PotterScene />}
       {children}
     </div>
@@ -21,13 +26,18 @@ export function ThemeLayer({ theme, isProjector, children }: {
 function PotterScene() {
   return (
     <div className="pt-scene" aria-hidden>
-      {/* парящие свечи */}
+      {/* парящие свечи: воск + живое пламя, качающееся от «сквозняка» */}
       {Array.from({ length: 9 }, (_, i) => (
         <span key={`c${i}`} className="pt-candle" style={{
-          left: `${6 + i * 11}%`, top: `${4 + (i % 3) * 3}%`,
+          left: `${6 + i * 11}%`, top: `${4 + (i % 3) * 3.4}%`,
           animationDelay: `${(i % 5) * 0.7}s`,
-        }}>🕯️</span>
+          ['--h' as string]: `${34 + (i % 3) * 10}px`,
+        }}>
+          <span className="pt-flame" style={{ animationDelay: `${(i % 4) * 0.35}s` }} />
+        </span>
       ))}
+      {/* сова с письмом: редкий пролёт через экран */}
+      <div className="pt-owl">🦉<span className="pt-owl-letter">✉️</span></div>
       {/* искры из палочки в углах */}
       {Array.from({ length: 14 }, (_, i) => (
         <span key={`s${i}`} className="pt-spark" style={{
@@ -41,6 +51,16 @@ function PotterScene() {
         <span className="pt-ball" />
         <span className="pt-wing r" />
       </div>
+    </div>
+  )
+}
+
+
+/** Киберпанк: дрон-светлячок патрулирует экран, оставляя неоновый след. */
+function CyberScene() {
+  return (
+    <div className="cb-scene" aria-hidden>
+      <div className="cb-drone"><span className="cb-trail" /><span className="cb-dot" /></div>
     </div>
   )
 }
