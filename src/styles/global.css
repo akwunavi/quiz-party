@@ -1155,3 +1155,67 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
   border-bottom: 1px solid var(--ed-line, rgba(255,255,255,.12)); }
 .ed-table th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em;
   color: var(--muted); }
+
+/* ═══ ТЕМА «ВОЛШЕБНАЯ ШКОЛА» ═══ */
+.theme-potter { --accent: #d3a625; --answer: #7cc79b; --bg: #0b0d1a; --bg2: #141126;
+  --panel: #1b1630; --dim: rgba(211,166,37,.35); }
+.theme-potter .grid-bg { background:
+  radial-gradient(ellipse at 50% -10%, rgba(211,166,37,.14), transparent 55%),
+  radial-gradient(ellipse at 85% 110%, rgba(116,0,1,.28), transparent 60%),
+  #0b0d1a; }
+.theme-potter .neon-title, .theme-potter .round-title {
+  color: #e9c766; text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12;
+  letter-spacing: .1em; }
+.theme-potter .hud-frame, .theme-potter .mel-modal, .theme-potter .jp-modal {
+  border-color: rgba(211,166,37,.5); box-shadow: 0 0 34px rgba(211,166,37,.15); }
+.theme-potter button { border-color: rgba(211,166,37,.55); }
+.theme-potter .answer-reveal .answer-main { color: #e9c766; }
+/* сцена */
+.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
+  filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
+  animation: candleFloat 3.6s ease-in-out infinite; }
+@keyframes candleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.pt-spark { position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: #ffe9a8; box-shadow: 0 0 10px #ffd35c, 0 0 20px rgba(255,211,92,.6);
+  animation: sparkTwinkle 2.8s ease-in-out infinite; }
+@keyframes sparkTwinkle { 0%,100% { opacity: 0; transform: scale(.4); }
+  50% { opacity: 1; transform: scale(1); } }
+/* снитч: шарик с крыльями, летает восьмёркой */
+.pt-snitch { position: absolute; top: 18%; left: 8%; width: 64px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  animation: snitchFly 17s ease-in-out infinite; will-change: transform; }
+.pt-ball { width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffe9a8, #d3a625 55%, #7a5c10);
+  box-shadow: 0 0 16px rgba(211,166,37,.9); }
+.pt-wing { width: 22px; height: 12px; border-radius: 50% 100% 0 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.35));
+  transform-origin: right center; animation: wingFlap .18s ease-in-out infinite alternate; }
+.pt-wing.r { transform: scaleX(-1); transform-origin: left center; }
+@keyframes wingFlap { from { transform: rotate(-24deg); } to { transform: rotate(18deg); } }
+.pt-wing.r { animation-name: wingFlapR; }
+@keyframes wingFlapR { from { transform: scaleX(-1) rotate(-24deg); } to { transform: scaleX(-1) rotate(18deg); } }
+@keyframes snitchFly {
+  0%   { transform: translate(0, 0) scale(1); }
+  18%  { transform: translate(62vw, 14vh) scale(.8); }
+  36%  { transform: translate(78vw, 52vh) scale(1.05); }
+  55%  { transform: translate(30vw, 64vh) scale(.7); }
+  74%  { transform: translate(10vw, 34vh) scale(1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+/* таймер: золотое кольцо с крылышками */
+.theme-potter .timer-ring, .theme-potter .ny-wreath { position: relative; }
+.theme-potter .timer-plain { border: 3px solid #d3a625; border-radius: 50%;
+  box-shadow: 0 0 22px rgba(211,166,37,.5), inset 0 0 14px rgba(211,166,37,.25); }
+/* спринт-карточки и плитки в пергаменте */
+.theme-potter .sprint-card { background: rgba(211,166,37,.08);
+  border-color: rgba(211,166,37,.4); }
+.theme-potter .mel-theme { color: #e9c766; }
+.theme-potter .fin-step.p1 { border-color: #d3a625;
+  box-shadow: 0 0 46px rgba(211,166,37,.45); }
+
+/* Спринт: вопрос-«герой» на всю ширину над колонками (нечётное число вопросов) */
+.sprint-screen.with-hero { grid-template-rows: auto 1fr; }
+.sprint-hero { grid-column: 1 / -1; margin-top: 44px; justify-self: center;
+  width: min(92%, 1200px); }
+.sprint-hero .sprint-text { text-align: center; font-size: clamp(17px, 1.8vw, 30px); }

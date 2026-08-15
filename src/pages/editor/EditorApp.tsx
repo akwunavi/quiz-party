@@ -214,6 +214,7 @@ function PackScreen({ packId, user, onBack }: {
               onChange={async e => { await setPackTheme(pack.id, e.target.value); reload() }}>
               <option value="classic">Классика</option>
               <option value="new_year">Новый год</option>
+              <option value="potter">Волшебная школа</option>
             </select>
           </div>
           <div className="ed-field"><label>Финальная музыка (табло/финал)</label>

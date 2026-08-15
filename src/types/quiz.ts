@@ -4,7 +4,7 @@
 
 // ── Пакет ──────────────────────────────────────────────
 export type PackStatus = 'draft' | 'ready' | 'active' | 'played' | 'archived'
-export type ThemeKey = 'classic' | 'new_year'
+export type ThemeKey = 'classic' | 'new_year' | 'potter'
 
 export interface PackSettings {
   bg_music?: string          // общая фоновая музыка вопросов

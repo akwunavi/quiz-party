@@ -46,14 +46,23 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
     return () => clearInterval(t)
   }, [gameState.timer_started_at])
 
-  const half = Math.ceil(questions.length / 2)
+  // нечётное число вопросов: первый — «герой» на всю ширину над таймером
+  const hero = questions.length % 2 === 1 ? questions[0] : null
+  const rest = hero ? questions.slice(1) : questions
+  const half = Math.ceil(rest.length / 2)
   return (
-    <div className="sprint-screen">
+    <div className={`sprint-screen${hero ? ' with-hero' : ''}`}>
+      {hero && (
+        <div className="sprint-hero sprint-card">
+          <span className="sprint-num">1</span>
+          <div className="sprint-text">{hero.question_text}</div>
+        </div>
+      )}
       <div className="host-topbar sprint-topbar">
         <span className="qnum">{round.title_lines.join(' ')}</span>
       </div>
       <div className="sprint-col">
-        {questions.slice(0, half).map((q, i) => <SprintCard key={q.id} n={i + 1} q={q} />)}
+        {rest.slice(0, half).map((q, i) => <SprintCard key={q.id} n={(hero ? 2 : 1) + i} q={q} />)}
       </div>
       <div className="sprint-center">
         {gameState.timer_started_at
@@ -62,7 +71,7 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
               <div className="mono-tag">ЧИТАЕМ ВОПРОСЫ</div></div>}
       </div>
       <div className="sprint-col">
-        {questions.slice(half).map((q, i) => <SprintCard key={q.id} n={half + i + 1} q={q} />)}
+        {rest.slice(half).map((q, i) => <SprintCard key={q.id} n={(hero ? 2 : 1) + half + i} q={q} />)}
       </div>
     </div>
   )

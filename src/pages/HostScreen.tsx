@@ -42,6 +42,7 @@ export function HostScreen() {
 
 function Deco({ theme }: { theme: string }) {
   if (theme === 'new_year') return <div className="title-deco">🎄 ❄ 🎁 ❄ 🎄</div>
+  if (theme === 'potter') return <div className="title-deco">⚡ ✦ 🪄 ✦ ⚡</div>
   return null
 }
 
@@ -160,7 +161,11 @@ function HostInner({ gameState, pack }: {
         </>)}
         <div className="host-actions">
           <button onClick={() => void gotoQuestion(0)}>
-            {round.mechanic === 'jeopardy' ? 'Начать раунд →' : 'Первый вопрос →'}</button>
+            {round.mechanic === 'jeopardy' ? 'Начать раунд →'
+              : round.mechanic === 'race' ? 'К скачкам →'
+              : round.mechanic === 'melody' ? 'К трекам →'
+              : round.mechanic === 'sprint' ? 'Поехали →'
+              : 'Первый вопрос →'}</button>
         </div>
       </div>
     )
@@ -1106,7 +1111,9 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
   }, [step])
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
   return (
-    <div className="host-screen grid-bg">
+    // клик в любом месте финала раскрывает всё сразу (не ждать ~10 сек)
+    <div className="host-screen grid-bg" onClick={() => setStep(5)}
+      style={{ cursor: step < 4 ? 'pointer' : 'default' }}>
       {Array.from({ length: 14 }, (_, i) => (
         <span key={i} className="firework" style={{
           left: `${6 + i * 6.5}%`, background: colors[i % colors.length],
@@ -1136,7 +1143,7 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
           ))}
         </div>
       )}
-      {step >= 5 && (
+      {step >= 4 && (
         <div className="fin-breakdown">
           <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
           <table className="fin-table">
