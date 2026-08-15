@@ -1219,3 +1219,114 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .sprint-hero { grid-column: 1 / -1; margin-top: 44px; justify-self: center;
   width: min(92%, 1200px); }
 .sprint-hero .sprint-text { text-align: center; font-size: clamp(17px, 1.8vw, 30px); }
+
+/* ═══ ПЕРЕНОС ИНТЕРАКТИВА СТАРОГО КВИЗА (эталон quiz-night) ═══ */
+/* Амбиент фона: дрейф сетки, дыхание виньетки, неоновые орбы (classic) */
+@keyframes gridDrift { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+.grid-bg { animation: gridDrift 60s linear infinite; position: relative; overflow: hidden; }
+.grid-bg::before { content: ''; position: absolute; inset: -20%; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle 340px at 18% 30%, rgba(255,47,160,.07), transparent 70%),
+    radial-gradient(circle 300px at 82% 70%, rgba(0,229,255,.05), transparent 70%);
+  animation: orbFloat 24s ease-in-out infinite; }
+@keyframes orbFloat { 0%,100% { transform: translate(0,0); } 33% { transform: translate(4vw,-3vh); }
+  66% { transform: translate(-3vw,2vh); } }
+.grid-bg::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,47,160,.05) 0%, transparent 55%);
+  animation: vignetteBreath 9s ease-in-out infinite; }
+@keyframes vignetteBreath { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
+.grid-bg > * { position: relative; z-index: 1; }
+/* в тематических фонах свой амбиент — орбы и дрейф отключены */
+.theme-new_year .grid-bg, .theme-potter .grid-bg { animation: none; }
+.theme-new_year .grid-bg::before, .theme-new_year .grid-bg::after { display: none; }
+.theme-potter .grid-bg::before { display: none; }
+
+/* Глитч заголовков (редкий, как в старом; в НГ и ГП — отключён, там свои) */
+@keyframes glitchRGB {
+  0%, 86%, 100% { text-shadow: 0 0 30px rgba(255,47,160,.4); transform: none; }
+  87% { text-shadow: -4px 0 #ff2fa0, 4px 0 #00e5ff; transform: translateX(2px); }
+  88% { text-shadow: 4px 0 #ff2fa0, -4px 0 #00e5ff; transform: translateX(-3px) skewX(-2deg); }
+  89% { text-shadow: -6px 0 #ff2fa0, 6px 0 #00e5ff; transform: translateX(1px); }
+  90%, 93% { text-shadow: 0 0 30px rgba(255,47,160,.4); transform: none; }
+  94% { text-shadow: 3px 0 #ff2fa0, -3px 0 #00e5ff; transform: translateY(-2px); }
+  95% { text-shadow: 0 0 30px rgba(255,47,160,.4); transform: none; }
+}
+.neon-title, .round-title { animation: glitchRGB 16s steps(1) infinite; }
+.theme-new_year .neon-title, .theme-new_year .round-title,
+.theme-potter .neon-title, .theme-potter .round-title { animation: none; }
+
+/* Чипы команд в лобби: неоновое мерцание + глитч-дёрганье */
+@keyframes neonFlicker {
+  0%,100% { opacity: 1; box-shadow: 0 0 14px rgba(255,47,160,.5), inset 0 0 8px rgba(255,47,160,.15); }
+  8% { opacity: .6; box-shadow: none; } 10% { opacity: 1; }
+  38% { opacity: 1; box-shadow: 0 0 22px rgba(0,229,255,.6), inset 0 0 10px rgba(0,229,255,.2); }
+  42% { opacity: .75; } 46% { opacity: 1; }
+  71% { opacity: .55; box-shadow: none; }
+  73% { opacity: 1; box-shadow: 0 0 18px rgba(255,47,160,.55); }
+}
+@keyframes glitchShift {
+  0%, 92%, 100% { transform: translate(0,0); clip-path: none; }
+  93% { transform: translate(-3px,1px); }
+  94% { transform: translate(3px,-1px); clip-path: inset(20% 0 40% 0); }
+  95% { transform: translate(-2px,0); clip-path: inset(60% 0 10% 0); }
+  96% { transform: translate(0,0); clip-path: none; }
+}
+.team-chip-fx { animation: neonFlicker 3.2s ease-in-out infinite, glitchShift 4.7s steps(1) infinite; }
+.theme-new_year .team-chip-fx, .theme-potter .team-chip-fx { animation: none; }
+
+/* Ховеры: кнопки как в старом (primary glow / ghost accent2) */
+button.ghost:hover { border-color: var(--accent); color: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent); }
+/* плитки своей игры */
+.jp-tile:not(:disabled):hover { box-shadow: 0 0 18px rgba(255,47,160,.45),
+  inset 0 0 12px rgba(255,47,160,.12); border-color: var(--accent); color: var(--accent);
+  transform: translateY(-2px); transition: all .15s; }
+/* шары мелодии (свободные) */
+.mel-tile:not(.done):hover .ball { transform: scale(1.07);
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+    0 0 26px color-mix(in srgb, var(--accent) 55%, transparent); transition: all .18s; }
+/* карточки спринта */
+.sprint-card { transition: border-color .18s, box-shadow .18s; }
+.sprint-card:hover { border-color: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 30%, transparent); }
+/* строки ответов команд */
+.team-answer { transition: background .15s; }
+.team-answer:hover { background: rgba(255,255,255,.05); }
+
+/* «ОТВЕЧАЙТЕ!»: пульсирующее двойное кольцо + дыхание текста */
+@keyframes answerPulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(87,245,192,.5), 0 0 0 0 rgba(87,245,192,.25); }
+  70% { box-shadow: 0 0 0 18px rgba(87,245,192,0), 0 0 0 36px rgba(87,245,192,0); }
+  100% { box-shadow: 0 0 0 0 rgba(87,245,192,0); }
+}
+.answer-pulse { animation: answerPulseRing 1.8s cubic-bezier(.4,0,.6,1) infinite;
+  border-radius: 12px; padding: 4px 22px; }
+
+/* Финал: залповый фейерверк (вспышка + искры по кругу, ритмичные бахи) */
+.firework { display: none; }
+.fw-burst { position: absolute; width: 0; height: 0; z-index: 0; }
+.fw-spark { position: absolute; left: -2px; top: -8px; width: 4px; height: 16px;
+  border-radius: 2px; transform-origin: 2px 8px;
+  animation: fwSpark var(--dur) ease-out infinite; animation-delay: var(--delay); opacity: 0; }
+@keyframes fwSpark {
+  0% { transform: rotate(var(--a)) translateY(0) scaleY(1); opacity: 0; }
+  5% { opacity: 1; }
+  45% { transform: rotate(var(--a)) translateY(-11vh) scaleY(.5); opacity: .9; }
+  55%, 100% { transform: rotate(var(--a)) translateY(-13vh) scaleY(.2); opacity: 0; }
+}
+.fw-flash { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px;
+  border-radius: 50%; animation: fwFlash var(--dur) ease-out infinite;
+  animation-delay: var(--delay); opacity: 0; }
+@keyframes fwFlash { 0% { transform: scale(0); opacity: .9; }
+  12% { transform: scale(1); opacity: .6; } 25%, 100% { transform: scale(1.4); opacity: 0; } }
+
+/* ГП: свои ховеры (золото вместо неона), мягкое мерцание заголовков как свеча */
+.theme-potter button:hover { box-shadow: 0 0 16px rgba(211,166,37,.55); filter: brightness(1.12); }
+.theme-potter .jp-tile:not(:disabled):hover { box-shadow: 0 0 18px rgba(211,166,37,.5),
+  inset 0 0 12px rgba(211,166,37,.15); border-color: #d3a625; color: #e9c766; }
+.theme-potter .mel-tile:not(.done):hover .ball {
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+    0 0 26px rgba(211,166,37,.7); }
+@keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
+  50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
+.theme-potter .neon-title, .theme-potter .round-title {
+  animation: candleGlowTitle 3.4s ease-in-out infinite; }
