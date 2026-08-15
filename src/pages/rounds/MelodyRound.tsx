@@ -388,7 +388,11 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
     : undefined
 
   return (
-    <div className="mel-board" style={{ gridTemplateColumns: `repeat(${themes.length}, minmax(0,1fr))` }}>
+    <div className="mel-board" style={{
+      gridTemplateColumns: `repeat(${themes.length}, minmax(0,1fr))`,
+      // строки с гарантированной высотой: плитки делят место и НЕ наезжают
+      gridTemplateRows: `auto repeat(${Math.max(...themes.map(t => t.tracks.length), 1)}, minmax(0, 1fr))`,
+    }}>
       {themes.map((t, ti) => (
         <div key={`h${ti}`} className="mel-theme">{t.name || `Тема ${ti + 1}`}</div>
       ))}

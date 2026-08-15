@@ -278,6 +278,13 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             await supabase.from('game_state').update({ melody: {} }).eq('id', 1)
           }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
         )}
+        <button className="adm-link" onClick={async () => {
+          if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
+          await supabase.from('game_state').update({
+            phase: 'lobby', round_number: 0, question_index: 0,
+            timer_started_at: null, reveal: false, melody: {},
+          }).eq('id', 1)
+        }}>⇄ СМЕНИТЬ ПАКЕТ</button>
         <button className="adm-link danger" onClick={() => {
           if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
         }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
