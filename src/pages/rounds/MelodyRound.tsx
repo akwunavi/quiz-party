@@ -399,7 +399,9 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
         return (
           <div key={key} className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}`}
             data-c={String((ti % 4))} style={{ gridColumn: ti + 1, gridRow: i + 2 }}>
-            <span className="ball">{done ? '·' : i + 1}</span>
+            {/* нейтральная «морда» плитки: вид целиком задаёт тема
+                (НГ — ёлочный шар, киберпанк — неон-чип, ГП — письмо с печатью) */}
+            <span className="mel-face">{done ? '' : i + 1}</span>
           </div>
         )
       }))}

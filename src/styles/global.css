@@ -942,32 +942,7 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 
 /* ── Плитки мелодии: ёлочные шары ── */
 .mel-tile { position: relative; background: transparent; border: none; }
-.mel-tile .ball { position: relative; width: min(100%, 108px); aspect-ratio: 1;
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 32% 28%, #7fd4ff 0%, #2a7fd4 45%, #10336b 100%);
-  box-shadow: inset -8px -10px 22px rgba(0,0,0,.45), inset 6px 6px 16px rgba(255,255,255,.35),
-    0 6px 18px rgba(0,0,0,.45);
-  font-family: var(--font-digits); font-size: clamp(18px, 2.2vw, 34px); color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,.5); }
-/* блик */
-.mel-tile .ball::before { content: ''; position: absolute; top: 12%; left: 20%;
-  width: 26%; height: 18%; border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(255,255,255,0)); }
-/* крепление-колпачок и петелька */
-.mel-tile .ball::after { content: ''; position: absolute; top: -13%; left: 50%;
-  transform: translateX(-50%); width: 26%; height: 16%;
-  border-radius: 3px 3px 1px 1px;
-  background: linear-gradient(180deg, #f0d089, #b8892f);
-  box-shadow: 0 -6px 0 -2px transparent, inset 0 -2px 3px rgba(0,0,0,.35); }
-.mel-tile.done .ball { filter: grayscale(.85) brightness(.5); box-shadow: none; }
-.mel-tile.spin .ball { animation: ballSwing .5s ease-in-out infinite;
-  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
-    0 0 34px rgba(140,215,255,.9); }
 @keyframes ballSwing { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-/* цвета шаров по колонкам */
-.mel-tile[data-c="1"] .ball { background: radial-gradient(circle at 32% 28%, #ff9a9a 0%, #d4342a 45%, #6b1010 100%); }
-.mel-tile[data-c="2"] .ball { background: radial-gradient(circle at 32% 28%, #ffe6a1 0%, #e0a92c 45%, #6b4a10 100%); }
-.mel-tile[data-c="3"] .ball { background: radial-gradient(circle at 32% 28%, #b9f5c8 0%, #35a35a 45%, #10401f 100%); }
 
 .mel-tile { display: flex; align-items: center; justify-content: center; min-height: 0; }
 .mel-board { align-items: center; }
@@ -991,9 +966,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 /* шар живёт внутри своей ячейки: высота от ячейки, колпачок учтён в отступе */
 .mel-board { gap: 14px 10px; }
 .mel-tile { padding-top: 14px; }             /* место под колпачок */
-.mel-tile .ball { width: clamp(84px, 10vw, 150px); max-width: 92%; max-height: 100%;
-  aspect-ratio: 1; }
-.mel-tile .ball::after { top: -12px; height: 12px; width: 24%; }
 /* модалка без hud-уголков */
 .mel-modal { border-radius: 16px; }
 
@@ -1203,10 +1175,20 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
   74%  { transform: translate(10vw, 34vh) scale(1); }
   100% { transform: translate(0, 0) scale(1); }
 }
-/* таймер: золотое кольцо с крылышками */
-.theme-potter .timer-ring, .theme-potter .ny-wreath { position: relative; }
-.theme-potter .timer-plain { border: 3px solid #d3a625; border-radius: 50%;
+/* таймер ГП: золотое кольцо-«снитч» с крылышками по бокам */
+.theme-potter .timer-wrap { position: relative; width: 118px; height: 118px;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  border: 3px solid #d3a625;
   box-shadow: 0 0 22px rgba(211,166,37,.5), inset 0 0 14px rgba(211,166,37,.25); }
+.theme-potter .timer-wrap::before, .theme-potter .timer-wrap::after {
+  content: ''; position: absolute; top: 42%; width: 34px; height: 17px;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.3));
+  border-radius: 50% 100% 0 50%; }
+.theme-potter .timer-wrap::before { left: -36px; transform-origin: right center;
+  animation: wingFlap .18s ease-in-out infinite alternate; }
+.theme-potter .timer-wrap::after { right: -36px; transform: scaleX(-1);
+  transform-origin: left center; animation: wingFlapR .18s ease-in-out infinite alternate; }
+.theme-potter .timer-num { color: #e9c766; }
 /* спринт-карточки и плитки в пергаменте */
 .theme-potter .sprint-card { background: rgba(211,166,37,.08);
   border-color: rgba(211,166,37,.4); }
@@ -1281,9 +1263,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
   inset 0 0 12px rgba(255,47,160,.12); border-color: var(--accent); color: var(--accent);
   transform: translateY(-2px); transition: all .15s; }
 /* шары мелодии (свободные) */
-.mel-tile:not(.done):hover .ball { transform: scale(1.07);
-  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
-    0 0 26px color-mix(in srgb, var(--accent) 55%, transparent); transition: all .18s; }
 /* карточки спринта */
 .sprint-card { transition: border-color .18s, box-shadow .18s; }
 .sprint-card:hover { border-color: var(--accent);
@@ -1323,10 +1302,94 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 .theme-potter button:hover { box-shadow: 0 0 16px rgba(211,166,37,.55); filter: brightness(1.12); }
 .theme-potter .jp-tile:not(:disabled):hover { box-shadow: 0 0 18px rgba(211,166,37,.5),
   inset 0 0 12px rgba(211,166,37,.15); border-color: #d3a625; color: #e9c766; }
-.theme-potter .mel-tile:not(.done):hover .ball {
-  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
-    0 0 26px rgba(211,166,37,.7); }
-@keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
+.theme-potter @keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
   50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
 .theme-potter .neon-title, .theme-potter .round-title {
   animation: candleGlowTitle 3.4s ease-in-out infinite; }
+
+/* ═══ ПЛИТКИ МЕЛОДИИ: вид на 100% от темы, разметка нейтральная ═══ */
+.mel-tile .mel-face { display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-digits); font-size: clamp(18px, 2.2vw, 34px); color: #fff;
+  transition: transform .18s, box-shadow .18s, filter .18s; }
+
+/* ── КИБЕРПАНК (база): неоновый гекс-чип, цвет неона по теме-колонке ── */
+.mel-tile { --neon: #ff2fa0; }
+.mel-tile[data-c="1"] { --neon: #00e5ff; }
+.mel-tile[data-c="2"] { --neon: #b6ff3c; }
+.mel-tile[data-c="3"] { --neon: #ff8c42; }
+.mel-tile .mel-face { width: clamp(84px, 10vw, 150px); max-width: 92%; aspect-ratio: 100/88;
+  background: #131a2e;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  box-shadow: inset 0 0 0 2.5px var(--neon),
+    inset 0 0 18px color-mix(in srgb, var(--neon) 30%, transparent); }
+.mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
+  box-shadow: inset 0 0 0 3px var(--neon),
+    inset 0 0 26px color-mix(in srgb, var(--neon) 55%, transparent); }
+.mel-tile.spin .mel-face { animation: chipPulse .4s ease-in-out infinite;
+  color: var(--neon);
+  box-shadow: inset 0 0 0 4px var(--neon),
+    inset 0 0 30px color-mix(in srgb, var(--neon) 70%, transparent); }
+@keyframes chipPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.6); } }
+.mel-tile.done .mel-face { opacity: .22; box-shadow: inset 0 0 0 2px #5a6a8a; }
+
+/* ── НОВЫЙ ГОД: ёлочный шар (как отточили) ── */
+.theme-new_year .mel-tile .mel-face { position: relative; clip-path: none; border-radius: 50%;
+  aspect-ratio: 1; background: radial-gradient(circle at 32% 28%, #7fd4ff 0%, #2a7fd4 45%, #10336b 100%);
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.45), inset 6px 6px 16px rgba(255,255,255,.35),
+    0 6px 18px rgba(0,0,0,.45); text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.theme-new_year .mel-tile .mel-face::before { content: ''; position: absolute; top: 12%; left: 20%;
+  width: 26%; height: 18%; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(255,255,255,0)); }
+.theme-new_year .mel-tile .mel-face::after { content: ''; position: absolute; top: -12px; left: 50%;
+  transform: translateX(-50%); width: 24%; height: 12px; border-radius: 3px 3px 1px 1px;
+  background: linear-gradient(180deg, #f0d089, #b8892f); box-shadow: inset 0 -2px 3px rgba(0,0,0,.35); }
+.theme-new_year .mel-tile[data-c="1"] .mel-face { background: radial-gradient(circle at 32% 28%, #ff9a9a 0%, #d4342a 45%, #6b1010 100%); }
+.theme-new_year .mel-tile[data-c="2"] .mel-face { background: radial-gradient(circle at 32% 28%, #ffe6a1 0%, #e0a92c 45%, #6b4a10 100%); }
+.theme-new_year .mel-tile[data-c="3"] .mel-face { background: radial-gradient(circle at 32% 28%, #b9f5c8 0%, #35a35a 45%, #10401f 100%); }
+.theme-new_year .mel-tile.done .mel-face { filter: grayscale(.85) brightness(.5); box-shadow: none; opacity: 1; }
+.theme-new_year .mel-tile.spin .mel-face { animation: ballSwing .5s ease-in-out infinite;
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+    0 0 34px rgba(140,215,255,.9); filter: none; color: #fff; }
+.theme-new_year .mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
+  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+    0 0 26px rgba(140,215,255,.75); }
+
+/* ── ВОЛШЕБНАЯ ШКОЛА: письмо из Хогвартса с сургучной печатью ── */
+.theme-potter .mel-tile .mel-face { position: relative; clip-path: none; border-radius: 5px;
+  aspect-ratio: 100/70; width: clamp(96px, 11vw, 170px);
+  background: linear-gradient(180deg, #f5ead0, #e9dbb6);
+  border: 2px solid #b39b62; color: #f0d9a8;
+  box-shadow: 0 6px 16px rgba(0,0,0,.5); overflow: visible; }
+/* клапан конверта */
+.theme-potter .mel-tile .mel-face::before { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom right, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top left / 50% 52% no-repeat,
+    linear-gradient(to bottom left, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top right / 50% 52% no-repeat; }
+/* сургучная печать (номер сидит на ней) */
+.theme-potter .mel-tile .mel-face::after { content: ''; position: absolute; left: 50%; top: 52%;
+  transform: translate(-50%, -50%); width: 42%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #a5313a, #8c1d23 60%, #5e1116);
+  box-shadow: 0 2px 6px rgba(0,0,0,.45); }
+.theme-potter .mel-tile .mel-face { z-index: 0; }
+.theme-potter .mel-tile .mel-face::after { z-index: -0; }
+.theme-potter .mel-tile .mel-face > * { position: relative; }
+.theme-potter .mel-tile .mel-face { font-size: clamp(16px, 1.9vw, 28px);
+  text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+/* номер поверх печати */
+.theme-potter .mel-tile .mel-face { flex-direction: column; }
+.theme-potter .mel-tile .mel-face { padding-top: 4%; }
+.theme-potter .mel-tile:not(.done):hover .mel-face { transform: translateY(-5px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.55), 0 0 22px rgba(211,166,37,.55);
+  border-color: #d3a625; }
+.theme-potter .mel-tile.spin .mel-face { animation: letterFlutter .45s ease-in-out infinite;
+  border-color: #d3a625; box-shadow: 0 0 30px rgba(211,166,37,.8); }
+@keyframes letterFlutter { 0%,100% { transform: rotate(-2deg) translateY(-2px); }
+  50% { transform: rotate(2deg) translateY(-6px); } }
+.theme-potter .mel-tile.done .mel-face { opacity: .3; filter: grayscale(.6); box-shadow: none; }
+.theme-potter .mel-tile.done .mel-face::after { display: none; }
+/* модалка ГП: пергамент, открывается как письмо */
+.theme-potter .mel-modal { background: linear-gradient(180deg, #221b38, #171226);
+  border-color: rgba(211,166,37,.6);
+  animation: letterOpen .5s cubic-bezier(.2,.8,.2,1) both;
+  transform-origin: top center; }
+@keyframes letterOpen { from { opacity: 0; transform: perspective(900px) rotateX(-62deg); }
+  to { opacity: 1; transform: perspective(900px) rotateX(0); } }
