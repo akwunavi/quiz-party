@@ -223,7 +223,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
       {round.mechanic === 'melody' &&
         <MelodyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'race' &&
-        <RaceEditor round={round} locked={locked} onChanged={onChanged} />}
+        <RaceEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
@@ -552,8 +552,8 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
 
 
 // ── «Скачки бульдогов»: клички и длительность ──
-function RaceEditor({ round, locked, onChanged }: {
-  round: LoadedRound; locked: boolean; onChanged: () => void
+function RaceEditor({ pack, round, locked, onChanged }: {
+  pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
 }) {
   const s = round.settings as { dogs?: string[]; raceSec?: number }
   const dogs = (s.dogs ?? []).length === 5 ? s.dogs!
@@ -572,6 +572,13 @@ function RaceEditor({ round, locked, onChanged }: {
               onChange={e => set({ dogs: dogs.map((x, xi) => xi === i ? e.target.value : x) })} />
           </div>
         ))}
+        <div className="ed-field"><label>Музыка забега</label>
+          <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+            paths={(round.settings as { race_music?: string }).race_music
+              ? [(round.settings as { race_music?: string }).race_music!] : []}
+            onChange={paths => set({ race_music: paths[0] ?? '' })} />
+          <div className="ed-hint">Играет, пока бегут. Пусто — возьмётся общая фоновая музыка пакета</div>
+        </div>
         <div className="ed-field"><label>Длительность забега, сек</label>
           <input type="number" min={8} max={60} disabled={locked} value={s.raceSec ?? 18}
             onChange={e => set({ raceSec: Number(e.target.value) || 18 })} />

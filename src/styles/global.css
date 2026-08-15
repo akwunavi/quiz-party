@@ -1041,7 +1041,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 /* собака: тряска ушей и попы на бегу */
 .bulldog { width: 100%; height: auto; }
 .bulldog.run .bd-ear { transform-origin: 85px 20px; animation: earFlap .28s ease-in-out infinite; }
-.bulldog.run .bd-butt { transform-origin: 30px 52px; animation: buttWiggle .22s ease-in-out infinite; }
 .bulldog.run .bd-leg.a { transform-origin: center top; animation: legRun .22s ease-in-out infinite; }
 .bulldog.run .bd-leg.b { transform-origin: center top; animation: legRun .22s ease-in-out infinite reverse; }
 .bulldog.run .bd-tongue { animation: crowd .4s ease-in-out infinite; }
@@ -1076,3 +1075,83 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
   background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.28);
   white-space: nowrap; }
 .race-tag b { color: var(--accent); margin-right: 6px; }
+
+/* Скачки: сидящие бульдоги строго по центру экрана */
+.race-panel { flex: 1; min-height: 0; justify-content: center; width: 100%; }
+.race-lineup { flex: 0 1 auto; align-items: center; width: 100%; }
+
+/* ═══ ГАЛОП: скачки корпуса, лапы парами в противофазе, пыль ═══ */
+.bulldog { width: 100%; height: auto; overflow: visible; }
+.bulldog * { transform-box: view-box; }   /* px-origin анимаций от viewBox, не от bbox элемента */
+.bd-dust, .bd-speed { opacity: 0; }
+/* стоя: лапы в нейтрали */
+.bulldog:not(.run) .bd-hind, .bulldog:not(.run) .bd-fore { transform: none; }
+/* бег */
+.bulldog.run .bd-all { animation: gallopBounce .42s ease-in-out infinite; transform-origin: 75px 55px; }
+.bulldog.run .bd-torso { animation: torsoStretch .42s ease-in-out infinite; transform-origin: 75px 50px; }
+.bulldog.run .bd-head { animation: headBob .42s ease-in-out infinite; transform-origin: 118px 58px; }
+.bulldog.run .bd-hind { transform-origin: 54px 70px; animation: hindKick .42s ease-in-out infinite; }
+.bulldog.run .bd-hind.h2 { transform-origin: 67px 73px; animation-delay: .07s; }
+.bulldog.run .bd-fore { transform-origin: 95px 71px; animation: foreReach .42s ease-in-out infinite; }
+.bulldog.run .bd-fore.f2 { transform-origin: 106px 69px; animation-delay: .07s; }
+.bulldog.run .bd-tongue { animation: tongueFlap .42s ease-in-out infinite; }
+.bulldog.run .bd-dust { opacity: 1; animation: dustPuff .42s linear infinite; }
+.bulldog.run .bd-speed { opacity: 1; animation: speedLines .42s linear infinite; }
+/* корпус: взлёт → полёт (вытянут) → приземление (сжат) */
+@keyframes gallopBounce {
+  0%, 100% { transform: translateY(0) rotate(1deg); }
+  35%      { transform: translateY(-6px) rotate(-1.4deg); }
+  70%      { transform: translateY(-1px) rotate(0deg); }
+}
+@keyframes torsoStretch {
+  0%, 100% { transform: scaleX(.96); }   /* сжат при толчке */
+  35%      { transform: scaleX(1.06); }  /* вытянут в полёте */
+}
+@keyframes headBob {
+  0%, 100% { transform: translateY(.6px) rotate(1.2deg); }
+  35%      { transform: translateY(-1.4px) rotate(-1.6deg); }
+}
+/* задние: мощный мах назад → поджим под живот */
+@keyframes hindKick {
+  0%, 100% { transform: rotate(-20deg); }
+  50%      { transform: rotate(16deg); }
+}
+/* передние: вынос вперёд → загребание под грудь (противофаза задним) */
+@keyframes foreReach {
+  0%, 100% { transform: rotate(18deg); }
+  50%      { transform: rotate(-16deg); }
+}
+@keyframes buttWiggle { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+@keyframes tongueFlap { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2.4px); } }
+@keyframes dustPuff {
+  0% { transform: translate(6px, 0) scale(.4); opacity: .9; }
+  100% { transform: translate(-14px, -4px) scale(1.3); opacity: 0; }
+}
+@keyframes speedLines {
+  0% { transform: translateX(8px); opacity: .6; }
+  100% { transform: translateX(-10px); opacity: 0; }
+}
+
+/* Скачки: иконка «отвлечения» над остановившейся собакой */
+.race-pause { position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  font-size: clamp(16px, 1.8vw, 26px); animation: pausePop .5s ease both;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+@keyframes pausePop { 0% { transform: translateX(-50%) scale(.3); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+/* Вход хоста */
+.gate-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); }
+.gate-card { display: flex; flex-direction: column; gap: 12px; width: min(360px, 92vw);
+  padding: 28px; background: var(--panel); border: 1px solid var(--dim); border-radius: 14px; }
+.gate-card input { padding: 12px 14px; border-radius: 8px; border: 1px solid var(--dim);
+  background: rgba(255,255,255,.05); color: var(--fg); font-size: 15px; }
+.gate-hint { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
+.gate-err { color: var(--danger); font-size: 13px; }
+
+/* Таблица редакторов */
+.ed-table { border-collapse: collapse; font-size: 14px; }
+.ed-table th, .ed-table td { text-align: left; padding: 7px 12px;
+  border-bottom: 1px solid var(--ed-line, rgba(255,255,255,.12)); }
+.ed-table th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em;
+  color: var(--muted); }

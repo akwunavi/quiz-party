@@ -996,7 +996,9 @@ function AfterRoundNav({ pack, gameState }: {
   const round = pack.rounds[gameState.round_number]
   const s = round.settings as { show_scoreboard_after?: boolean; break_after_minutes?: number }
   const last = gameState.round_number + 1 >= pack.rounds.length
-  if (s.show_scoreboard_after && gameState.phase !== 'scoreboard' && !last)
+  // табло по настройке показывается ВСЕГДА, включая последний раунд
+  // (раньше на последнем молча пропускалось — предварительные итоги терялись)
+  if (s.show_scoreboard_after && gameState.phase !== 'scoreboard')
     return <button onClick={() => void showScoreboard()}>К табло →</button>
   if (s.break_after_minutes && gameState.phase !== 'break')
     return <button onClick={() => void startBreak()}>Перерыв →</button>

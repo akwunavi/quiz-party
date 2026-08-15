@@ -184,6 +184,15 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const phase = gameState.phase
   const step = gameState.question_index
   const isJeopardy = round.mechanic === 'jeopardy'
+  // интерактивные механики управляются с проектора; стандартный маршрут
+  // «вопрос → время ответов → разбор» для них не существует
+  const isInteractive = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
+  const endRound = () => {
+    const s = round.settings as { show_scoreboard_after?: boolean }
+    if (s.show_scoreboard_after) { void showScoreboard(); return }
+    if (gameState.round_number + 1 < pack.rounds.length) void gotoRound(gameState.round_number + 1)
+    else void finishGame(gameState.pack_id)
+  }
 
   const grade = async (a: Answer, correct: boolean) => {
     await supabase.from('answers').update({ is_correct: correct }).eq('id', a.id)
@@ -226,18 +235,25 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       )}
 
       <div className="adm-footer">
-        {!isJeopardy && phase !== 'show_answers' && (
+        {!isInteractive && phase !== 'show_answers' && (
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             <button className="adm-btn primary" onClick={advance}>ДАЛЬШЕ →</button>
           </div>
         )}
-        {isJeopardy && phase !== 'round_intro' && (
-          <div className="adm-dim">РАУНД УПРАВЛЯЕТСЯ ПЛИТКАМИ НА ПРОЕКТОРЕ</div>
-        )}
-        {isJeopardy && phase === 'round_intro' && (
+        {isInteractive && phase === 'round_intro' && (
           <button className="adm-btn primary" onClick={() => void gotoQuestion(0)}>НАЧАТЬ РАУНД →</button>
         )}
+        {isInteractive && phase !== 'round_intro' && (<>
+          <div className="adm-dim">
+            {round.mechanic === 'race' ? 'ЗАБЕГ УПРАВЛЯЕТСЯ С ПРОЕКТОРА'
+              : round.mechanic === 'melody' ? 'РАУНД УПРАВЛЯЕТСЯ С ПРОЕКТОРА (ШАРЫ/МОДАЛКА)'
+              : 'РАУНД УПРАВЛЯЕТСЯ ПЛИТКАМИ НА ПРОЕКТОРЕ'}
+          </div>
+          <button className="adm-btn primary" onClick={endRound}>
+            ЗАВЕРШИТЬ РАУНД {`${(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after ? '→ ТАБЛО' : '→'}`}
+          </button>
+        </>)}
         {phase !== 'show_answers' && (
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>

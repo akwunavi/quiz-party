@@ -7,7 +7,7 @@ import {
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
 import { packMediaSize } from '../../lib/mediaUpload'
-import { supabase } from '../../lib/supabase'
+import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
 import type { Pack, MechanicKey } from '../../types/quiz'
@@ -97,8 +97,17 @@ function PackList({ packs, user, onOpen, onChanged }: {
   onOpen: (id: string) => void; onChanged: () => void
 }) {
   const [name, setName] = useState('')
+  const [showEditors, setShowEditors] = useState(false)
   return (
     <div>
+      {user.role === 'owner' && (
+        <div style={{ margin: '12px 0' }}>
+          <button className="ghost" onClick={() => setShowEditors(v => !v)}>
+            {showEditors ? '▾ Скрыть редакторов' : '▸ Редакторы (доступы)'}
+          </button>
+          {showEditors && <EditorsPanel me={user} />}
+        </div>
+      )}
       <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
         <input placeholder="Название нового пакета" value={name}
           onChange={e => setName(e.target.value)} style={{ padding: 8, flex: 1 }} />
@@ -365,5 +374,118 @@ export function EditableText({ value, onSave, disabled }: {
       <button onClick={() => { onSave(v); setEditing(false) }}>✓</button>
       <button onClick={() => { setV(value); setEditing(false) }}>✕</button>
     </span>
+  )
+}
+
+
+// ── Управление редакторами (только владелец) ──
+// Добавление без SQL: аккаунт создаётся отдельным клиентом (signupClient),
+// чтобы не подменить сессию владельца, затем строка прав пишется в editor_roles.
+interface RoleRow {
+  user_id: string; role: 'owner' | 'editor'; display_name: string
+  email: string; can_edit_all: boolean
+}
+
+function EditorsPanel({ me }: { me: EditorUser }) {
+  const [rows, setRows] = useState<RoleRow[]>([])
+  const [email, setEmail] = useState('')
+  const [pass, setPass] = useState('')
+  const [dname, setDname] = useState('')
+  const [canAll, setCanAll] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const load = async () => {
+    const { data } = await supabase.from('editor_roles').select('*').order('role')
+    setRows((data ?? []) as RoleRow[])
+  }
+  useEffect(() => { void load() }, [])
+
+  const add = async () => {
+    setBusy(true); setMsg('')
+    try {
+      const { data, error } = await signupClient.auth.signUp({
+        email: email.trim(), password: pass,
+      })
+      if (error) throw error
+      const uid = data.user?.id
+      if (!uid) throw new Error('Аккаунт не создался — проверь настройки Auth')
+      const { error: e2 } = await supabase.from('editor_roles').insert({
+        user_id: uid, role: 'editor', display_name: dname.trim() || email.trim(),
+        email: email.trim(), can_edit_all: canAll,
+      })
+      if (e2) throw e2
+      setMsg(`Готово: ${email.trim()} добавлен. Передай ему пароль лично.`)
+      setEmail(''); setPass(''); setDname(''); setCanAll(false)
+      void load()
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : 'Не получилось')
+    } finally { setBusy(false) }
+  }
+
+  const toggleAll = async (r: RoleRow) => {
+    await supabase.from('editor_roles')
+      .update({ can_edit_all: !r.can_edit_all }).eq('user_id', r.user_id)
+    void load()
+  }
+  const remove = async (r: RoleRow) => {
+    if (!confirm(`Убрать доступ у «${r.display_name}»? Аккаунт останется, но в редактор он не войдёт.`)) return
+    await supabase.from('editor_roles').delete().eq('user_id', r.user_id)
+    void load()
+  }
+
+  return (
+    <div className="ed-card" style={{ marginTop: 10 }}>
+      <h4>Редакторы и права</h4>
+      <table className="ed-table" style={{ width: '100%' }}>
+        <thead><tr><th>Имя</th><th>Email</th><th>Роль</th>
+          <th>Чужие пакеты</th><th /></tr></thead>
+        <tbody>
+          {rows.map(r => (
+            <tr key={r.user_id}>
+              <td>{r.display_name}</td>
+              <td style={{ opacity: .7 }}>{r.email || '—'}</td>
+              <td>{r.role === 'owner' ? 'владелец' : 'редактор'}</td>
+              <td>
+                {r.role === 'owner' ? 'все' : (
+                  <label style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={r.can_edit_all}
+                      onChange={() => void toggleAll(r)} />
+                    {r.can_edit_all ? 'может править' : 'только свои'}
+                  </label>
+                )}
+              </td>
+              <td>{r.role !== 'owner' && r.user_id !== me.id &&
+                <button className="ico danger" data-tip="Убрать доступ"
+                  onClick={() => void remove(r)}>🗑</button>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h4 style={{ marginTop: 16 }}>Добавить редактора</h4>
+      <div className="ed-grid2">
+        <div className="ed-field"><label>Email</label>
+          <input value={email} onChange={ev => setEmail(ev.target.value)} placeholder="name@mail.ru" /></div>
+        <div className="ed-field"><label>Временный пароль</label>
+          <input value={pass} onChange={ev => setPass(ev.target.value)} placeholder="минимум 6 символов" /></div>
+        <div className="ed-field"><label>Имя (видно в списке)</label>
+          <input value={dname} onChange={ev => setDname(ev.target.value)} placeholder="Толян" /></div>
+        <div className="ed-field"><label>Права</label>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            <input type="checkbox" checked={canAll} onChange={ev => setCanAll(ev.target.checked)} />
+            может править чужие пакеты (иначе — только созданные им)
+          </label></div>
+      </div>
+      {msg && <div className="ed-hint" style={{ marginTop: 8 }}>{msg}</div>}
+      <button disabled={busy || !email.trim() || pass.length < 6} onClick={() => void add()}>
+        {busy ? 'Создаём…' : '+ Добавить редактора'}
+      </button>
+      <div className="ed-hint" style={{ marginTop: 8 }}>
+        Приватные пакеты в любом случае видит только владелец. Если в Supabase
+        включено подтверждение почты, новому редактору придёт письмо — до
+        подтверждения он не войдёт (можно выключить: Auth → Email → Confirm email).
+      </div>
+    </div>
   )
 }
