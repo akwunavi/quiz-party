@@ -1513,3 +1513,68 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 /* заголовки/правила читаемость */
 .theme-potter .rule-item, .theme-potter .meta-line, .theme-potter .mono-tag { color: var(--fg); }
 .theme-potter .mono-tag { color: var(--muted); }
+
+/* Игрок: крупное поле ввода (просьба 7.35-3) */
+.pl-card input { font-size: 19px; padding: 15px 16px; min-height: 54px; }
+
+/* Киберпанк: ховеры кнопок КАК В СТАРОМ (btn-primary/btn-ghost as is) */
+.theme-classic button:not(.ghost):hover { background: var(--accent2); color: #061018;
+  box-shadow: var(--glow); filter: none; }
+.theme-classic button.ghost:hover { border-color: var(--accent2); color: var(--accent2);
+  box-shadow: var(--glow2); }
+/* глитч на титуле раунда — чаще (5с), как glitch-title в эталоне */
+.theme-classic .round-intro .neon-title { animation: glitchRGB 5s steps(1) infinite; }
+/* кнопки навигации: неубиваемое позиционирование в правом нижнем углу */
+.host-actions { position: fixed !important; right: 28px !important; bottom: 24px !important;
+  left: auto !important; top: auto !important; }
+
+/* ГП: шрифты во всех углах */
+.theme-potter { --font-digits: 'Cinzel Decorative', serif; }
+.theme-potter .q-text, .theme-potter .rule-item, .theme-potter .sprint-text,
+.theme-potter .mel-big, .theme-potter .team-answer, .theme-potter .pl-card,
+.theme-potter .answer-main, .theme-potter .fin-table, .theme-potter .race-name,
+.theme-potter .mel-bid-row, .theme-potter .jp-modal, .theme-potter .pl-list {
+  font-family: 'Cormorant Garamond', Georgia, serif; }
+.theme-potter .q-text { font-size: clamp(24px, 2.8vw, 46px); font-weight: 600; }
+.theme-potter .mono-tag, .theme-potter .meta-line, .theme-potter .qnum,
+.theme-potter .pack-badge { font-family: 'Cinzel Decorative', serif;
+  letter-spacing: .14em; }
+.theme-potter .timer-num, .theme-potter .mel-count { font-family: 'Cinzel Decorative', serif; }
+
+/* 5: таймер ГП = ПЕСОЧНЫЕ ЧАСЫ (везде: и основной, и в модалке мелодии) */
+.theme-potter .timer-wrap { border: none; box-shadow: none; width: auto; height: auto;
+  display: flex; align-items: center; gap: 14px; }
+.theme-potter .timer-wrap::before, .theme-potter .mel-count::before {
+  content: ''; display: inline-block; width: 34px; height: 56px; flex: 0 0 auto;
+  clip-path: polygon(0 0, 100% 0, 56% 50%, 100% 100%, 0 100%, 44% 50%);
+  background:
+    linear-gradient(180deg, #e9c766 0 14%, rgba(233,199,102,.16) 14% 52%,
+      rgba(233,199,102,.16) 52% 62%, #e9c766 62% 100%);
+  filter: drop-shadow(0 0 6px rgba(211,166,37,.8));
+  animation: hourglassFlip 6s ease-in-out infinite; }
+.theme-potter .timer-wrap::after { display: none; }
+.theme-potter .mel-count { display: flex; align-items: center; gap: 10px; }
+.theme-potter .mel-count::before { width: 24px; height: 40px; }
+@keyframes hourglassFlip { 0%, 88%, 100% { transform: rotate(0); }
+  92% { transform: rotate(180deg); } 96% { transform: rotate(360deg); } }
+
+/* 6: ГП-появление ответа — «проявление чернил» + разлёт искр */
+.theme-potter .answer-reveal { position: relative; }
+.theme-potter .answer-reveal .answer-main { animation: inkReveal 1.1s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes inkReveal {
+  0% { opacity: 0; filter: blur(14px); letter-spacing: .5em; transform: scale(1.06); }
+  55% { opacity: 1; filter: blur(2px); }
+  100% { opacity: 1; filter: blur(0); letter-spacing: normal; transform: none; } }
+.theme-potter .answer-reveal::before, .theme-potter .answer-reveal::after {
+  content: '✦'; position: absolute; top: 50%; color: #ffe9a8; font-size: 20px;
+  animation: sparkFly 1.2s ease-out both; pointer-events: none; }
+.theme-potter .answer-reveal::before { left: 8%; --dx: -70px; }
+.theme-potter .answer-reveal::after { right: 8%; --dx: 70px; animation-delay: .12s; }
+@keyframes sparkFly {
+  0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), -60px) scale(1.2) rotate(160deg); } }
+.theme-potter .answer-reveal { box-shadow: 0 0 0 rgba(211,166,37,0);
+  animation: answerGlowPulse 1.4s ease-out both; }
+@keyframes answerGlowPulse { 30% { box-shadow: 0 0 46px rgba(211,166,37,.55); }
+  100% { box-shadow: 0 0 18px rgba(211,166,37,.25); } }

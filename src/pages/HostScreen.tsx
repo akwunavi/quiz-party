@@ -127,7 +127,7 @@ function HostInner({ gameState, pack }: {
   if (gameState.phase === 'round_intro') {
     const grid = (round.settings as { grid?: CrosswordGrid }).grid
     return (
-      <div className="host-screen grid-bg">
+      <div className="host-screen grid-bg round-intro">
         {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
         {round.mechanic === 'crossword' && grid ? (
           <div className="cw-layout">
