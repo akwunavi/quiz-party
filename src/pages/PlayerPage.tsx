@@ -574,15 +574,13 @@ function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: strin
   const [color, setColor] = useState(COLORS[0])
   const [busy, setBusy] = useState(false)
   return (
-    <div className="pl-center">
-      <h2>Регистрация команды</h2>
+    <div className="pl-register">
+      <h1>Регистрация команды</h1>
       <input value={name} onChange={e => setName(e.target.value)} placeholder="Название команды" />
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div className="colors">
         {COLORS.map(c => (
-          <button key={c} onClick={() => setColor(c)} style={{
-            width: 38, height: 38, borderRadius: 19, background: c, padding: 0,
-            border: color === c ? '3px solid #fff' : '1px solid rgba(255,255,255,.3)',
-          }} />
+          <button key={c} className={`color-dot${color === c ? ' sel' : ''}`}
+            onClick={() => setColor(c)} style={{ background: c, color: c }} />
         ))}
       </div>
       <button disabled={!name.trim() || busy} onClick={async () => {

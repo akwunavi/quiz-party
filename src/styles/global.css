@@ -1321,9 +1321,11 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
   box-shadow: inset 0 0 0 2.5px var(--neon),
     inset 0 0 18px color-mix(in srgb, var(--neon) 30%, transparent); }
-.mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
-  box-shadow: inset 0 0 0 3px var(--neon),
-    inset 0 0 26px color-mix(in srgb, var(--neon) 55%, transparent); }
+@media (hover: hover) {
+  .mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
+    box-shadow: inset 0 0 0 3px var(--neon),
+      inset 0 0 26px color-mix(in srgb, var(--neon) 55%, transparent); }
+}
 .mel-tile.spin .mel-face { animation: chipPulse .4s ease-in-out infinite;
   color: var(--neon);
   box-shadow: inset 0 0 0 4px var(--neon),
@@ -1349,9 +1351,11 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 .theme-new_year .mel-tile.spin .mel-face { animation: ballSwing .5s ease-in-out infinite;
   box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
     0 0 34px rgba(140,215,255,.9); filter: none; color: #fff; }
-.theme-new_year .mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
-  box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
-    0 0 26px rgba(140,215,255,.75); }
+@media (hover: hover) {
+  .theme-new_year .mel-tile:not(.done):hover .mel-face { transform: scale(1.07);
+    box-shadow: inset -8px -10px 22px rgba(0,0,0,.35), inset 6px 6px 16px rgba(255,255,255,.5),
+      0 0 26px rgba(140,215,255,.75); }
+}
 
 /* ── ВОЛШЕБНАЯ ШКОЛА: письмо из Хогвартса с сургучной печатью ── */
 .theme-potter .mel-tile .mel-face { position: relative; clip-path: none; border-radius: 5px;
@@ -1376,9 +1380,11 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 /* номер поверх печати */
 .theme-potter .mel-tile .mel-face { flex-direction: column; }
 .theme-potter .mel-tile .mel-face { padding-top: 4%; }
-.theme-potter .mel-tile:not(.done):hover .mel-face { transform: translateY(-5px);
-  box-shadow: 0 10px 22px rgba(0,0,0,.55), 0 0 22px rgba(211,166,37,.55);
-  border-color: #d3a625; }
+@media (hover: hover) {
+  .theme-potter .mel-tile:not(.done):hover .mel-face { transform: translateY(-5px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.55), 0 0 22px rgba(211,166,37,.55);
+    border-color: #d3a625; }
+}
 .theme-potter .mel-tile.spin .mel-face { animation: letterFlutter .45s ease-in-out infinite;
   border-color: #d3a625; box-shadow: 0 0 30px rgba(211,166,37,.8); }
 @keyframes letterFlutter { 0%,100% { transform: rotate(-2deg) translateY(-2px); }
@@ -1643,3 +1649,27 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 
 /* ЖК-лого: заголовки classic — БЕЛЫЕ с глитчем (акцент — только последняя строка) */
 .theme-classic .neon-title { color: #fff; }
+
+/* Тач: никаких залипающих подсветок */
+.mel-tile, .jp-tile, .pl-send { -webkit-tap-highlight-color: transparent; }
+
+/* Фон темы держит ВЕСЬ вьюпорт (регистрация и любые ранние экраны игрока) */
+.theme-classic, .theme-new_year, .theme-potter { min-height: 100vh;
+  background: var(--bg); color: var(--fg); }
+
+/* Регистрация команды: во всех темах пристойно, в ГП — пергамент */
+.pl-register { min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px; padding: 24px; }
+.pl-register h1 { font-family: var(--font-display); color: var(--fg);
+  font-size: clamp(26px, 7vw, 40px); text-shadow: var(--glow); }
+.pl-register input { width: min(420px, 88vw); font-size: 19px; padding: 15px 16px;
+  border-radius: 10px; border: 1.5px solid var(--dim);
+  background: rgba(255,255,255,.06); color: var(--fg); }
+.pl-register .colors { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.pl-register .color-dot { width: 46px; height: 46px; border-radius: 50%;
+  border: 3px solid transparent; cursor: pointer; transition: transform .15s; }
+.pl-register .color-dot.sel { border-color: #fff; transform: scale(1.15);
+  box-shadow: 0 0 14px currentColor; }
+.theme-potter .pl-register h1 { color: #e9c766; }
+.theme-potter .pl-register input { background: rgba(243,233,207,.08);
+  border-color: rgba(211,166,37,.5); }
