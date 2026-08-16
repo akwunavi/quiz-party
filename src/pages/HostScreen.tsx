@@ -1,3 +1,5 @@
+import { RoomPicker } from './RoomPicker'
+import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
@@ -24,12 +26,13 @@ import { RaceBoard } from './rounds/RaceRound'
 // «ветром» по словам; текст+1-2 картинки — сплит-раскладка; аудио/видео автоплей.
 
 export function HostScreen() {
-  const { gameState } = useGameState()
+  const { gameState, loading: gsLoading, roomId } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
   useEffect(() => {
     if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
     else setPack(null)
   }, [gameState?.pack_id])
+  if (!gsLoading && !roomId) return <RoomPicker route="/" />
   return (
     <ThemeLayer theme={pack?.theme ?? 'classic'} isProjector>
       {pack?.theme === 'new_year' &&
@@ -57,8 +60,8 @@ function HostInner({ gameState, pack }: {
   const teams = useTeams(gameState?.game_id ?? null)
 
   const playerUrl = useMemo(() => {
-    const base = `${location.origin}${location.pathname}#/player`
-    return gameState?.pack_id ? `${base}?pack=${gameState.pack_id}` : base
+    const base = `${location.origin}${location.pathname}#/player?room=${getRoomId() ?? ''}`
+    return gameState?.pack_id ? `${base}&pack=${gameState.pack_id}` : base
   }, [gameState?.pack_id])
 
   if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
@@ -92,20 +95,27 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            <div className="qr-card hud-frame">
-              <div className="mono-tag">ПОДКЛЮЧЕНИЕ ИГРОКОВ</div>
-              <img alt="QR" className="lobby-qr"
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(playerUrl)}`} />
-            </div>
-            <div className="lobby-teams">
-              {teams.length === 0
-                ? <span style={{ opacity: .5 }}>ждём команды…</span>
-                : teams.map(t => (
-                  <span key={t.id} className="lobby-team team-chip-fx"
-                    style={{ color: t.color, opacity: isAlive(t) ? 1 : .4 }}>
-                    {t.name}
-                  </span>
-                ))}
+            {/* раскладка ЖК: QR с подписью слева, команды колонкой справа */}
+            <div className="lobby-row">
+              <div className="qr-card hud-frame" data-pulse={teams.length}>
+                <img alt="QR" className="lobby-qr"
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(playerUrl)}`} />
+                <div className="qr-caption">
+                  <div className="qr-caption-big">ПОДКЛЮЧАЙСЯ<br />К ИГРЕ</div>
+                  <div className="mono-tag">ОТСКАНИРУЙ QR</div>
+                </div>
+              </div>
+              <div className="lobby-teams">
+                {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
+                {teams.length === 0
+                  ? <span style={{ opacity: .5 }}>ждём команды…</span>
+                  : teams.map(t => (
+                    <span key={t.id} className="lobby-team team-chip-fx"
+                      style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
+                      {t.name}
+                    </span>
+                  ))}
+              </div>
             </div>
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {

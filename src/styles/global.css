@@ -1611,3 +1611,28 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 .gate-player-link { text-align: center; font-size: 14px; color: #9aa7bd; }
 .gate-player-link a { color: #22d3ee; text-decoration: none; }
 .gate-player-link a:hover { text-shadow: 0 0 10px rgba(34,211,238,.6); }
+
+/* Админка: сервисные кнопки не липнут к контенту */
+.adm-root .adm-link { display: inline-flex; align-items: center; }
+.adm-footer-links { display: flex; flex-direction: column; align-items: flex-start;
+  gap: 10px; margin-top: 18px; padding-top: 14px;
+  border-top: 1px dashed rgba(255,255,255,.14); }
+
+/* Лобби по эталону ЖК */
+.lobby-row { display: flex; gap: clamp(24px, 5vw, 70px); align-items: center;
+  justify-content: center; flex-wrap: wrap; }
+.qr-card { display: flex; flex-direction: row; align-items: center; gap: 22px;
+  padding: 18px 26px; }
+.qr-card .lobby-qr { background: #fff; padding: 8px; border-radius: 4px;
+  width: clamp(130px, 13vw, 190px); height: auto; transition: box-shadow .3s; }
+.qr-card[data-pulse] .lobby-qr { animation: qrPulse .6s ease; }
+@keyframes qrPulse { 30% { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 60%, transparent); } }
+.qr-caption-big { font-family: var(--font-display); font-size: clamp(18px, 2vw, 27px);
+  line-height: 1.15; margin-bottom: 8px; }
+.lobby-teams { display: flex; flex-direction: column; gap: 12px; min-width: 240px;
+  align-items: stretch; }
+.lobby-team { padding: 13px 26px; font-size: clamp(17px, 1.7vw, 25px);
+  font-family: var(--font-display); color: #fff !important;
+  border: 2px solid var(--tc, var(--accent)); border-left-width: 6px;
+  background: color-mix(in srgb, var(--tc, var(--accent)) 10%, transparent);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }

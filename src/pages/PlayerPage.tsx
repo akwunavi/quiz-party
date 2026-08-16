@@ -1,3 +1,4 @@
+import { RoomPicker } from './RoomPicker'
 import { useEffect, useMemo, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
@@ -17,7 +18,7 @@ import type { AnswerSpec, Team, CrosswordGrid, Question, Answer } from '../types
 const TEAM_LS = 'qp-team'
 
 export function PlayerPage() {
-  const { gameState } = useGameState()
+  const { gameState, loading: gsLoading, roomId } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
   const [team, setTeam] = useState<Team | null>(() => {
     try { return JSON.parse(localStorage.getItem(TEAM_LS) ?? 'null') } catch { return null }
@@ -47,6 +48,8 @@ export function PlayerPage() {
     return () => clearInterval(t)
   }, [team?.id])
 
+
+  if (!gsLoading && !roomId) return <RoomPicker route="/player" forPlayer />
   return (
     <ThemeLayer theme={pack?.theme ?? 'classic'}>
       <PlayerInner gameState={gameState} pack={pack} team={team} setTeam={t => {

@@ -3,6 +3,7 @@
 // До этой секунды исхода не существует нигде — ведущий не знает победителя.
 // Из сида детерминированно считается вся гонка, поэтому любой экран (и даже
 // перезагрузка страницы) разыгрывает одинаковый забег.
+import { getRoomId } from '../../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { gotoRound, finishGame, showScoreboard } from '../../lib/gameActions'
@@ -127,9 +128,9 @@ export function RaceBoard({ pack, round, gameState }: {
         const pts = pos != null ? 5 - pos : 0
         await supabase.from('answers').update({ is_correct: true, stake: pts }).eq('id', b.id)
       }
-      await supabase.from('game_state').update({
+      await supabase.from('game_sessions').update({
         melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
-      }).eq('id', 1)
+      }).eq('id', getRoomId())
     })()
   }, [running, allFinished])
 
@@ -141,14 +142,14 @@ export function RaceBoard({ pack, round, gameState }: {
   const start = async () => {
     // сид рождается ЗДЕСЬ — до этого клика исход не существует
     const seed = (crypto.getRandomValues(new Uint32Array(1))[0]) >>> 0
-    await supabase.from('game_state').update({
+    await supabase.from('game_sessions').update({
       melody: { ...gameState.melody, race: { seed, stage: 'running', startedAt: new Date().toISOString() } },
-    }).eq('id', 1)
+    }).eq('id', getRoomId())
   }
   const openBets = async () => {
-    await supabase.from('game_state').update({
+    await supabase.from('game_sessions').update({
       melody: { ...gameState.melody, race: { stage: 'betting' } },
-    }).eq('id', 1)
+    }).eq('id', getRoomId())
   }
 
   return (

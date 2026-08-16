@@ -1,3 +1,5 @@
+import { getRoomId } from '../lib/room'
+import { RoomPicker } from './RoomPicker'
 import { useEffect, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { useTeams } from '../hooks/useTeams'
@@ -16,7 +18,7 @@ import type { Answer, Pack, Team } from '../types/quiz'
 // нижняя панель управления (назад/дальше, смена раунда, рандомайзер, сброс).
 
 export function AdminPage() {
-  const { gameState } = useGameState()
+  const { gameState, loading: gsLoading, roomId } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
   const teams = useTeams(gameState?.game_id ?? null)
   const answers = useAnswers(gameState?.game_id ?? null, gameState?.round_number)
@@ -26,6 +28,7 @@ export function AdminPage() {
     else setPack(null)
   }, [gameState?.pack_id])
 
+  if (!gsLoading && !roomId) return <RoomPicker route="/admin" />
   if (!gameState) return <div className="cyber adm-center">// ЗАГРУЗКА…</div>
 
   const round = pack?.rounds[gameState.round_number]
@@ -38,7 +41,7 @@ export function AdminPage() {
         <div style={{ display: 'flex', gap: 8 }}>
           <a className="adm-link" href="./" target="_blank" rel="noreferrer">ПРОЕКТОР ↗</a>
           <button className="adm-link" onClick={() => {
-            const url = `${location.origin}${location.pathname}#/player${gameState.pack_id ? `?pack=${gameState.pack_id}` : ''}`
+            const url = `${location.origin}${location.pathname}#/player?room=${getRoomId() ?? ''}`
             void navigator.clipboard?.writeText(url)
           }}>ССЫЛКА ИГРОКАМ</button>
         </div>
@@ -110,8 +113,8 @@ function TeamRandomizer() {
   const publish = async () => {
     if (!preview) return
     setPublishing(true)
-    await supabase.from('game_state')
-      .update({ random_groups: preview } as never).eq('id', 1)
+    await supabase.from('game_sessions')
+      .update({ random_groups: preview } as never).eq('id', getRoomId())
       .then(() => {}, () => {})
     setPublishing(false)
   }
@@ -275,19 +278,21 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         {round.mechanic === 'melody' && (
           <button className="adm-link" onClick={async () => {
             if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
-            await supabase.from('game_state').update({ melody: {} }).eq('id', 1)
+            await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
           }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
         )}
+        <div className="adm-footer-links">
         <button className="adm-link" onClick={async () => {
           if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
-          await supabase.from('game_state').update({
+          await supabase.from('game_sessions').update({
             phase: 'lobby', round_number: 0, question_index: 0,
             timer_started_at: null, reveal: false, melody: {},
-          }).eq('id', 1)
+          }).eq('id', getRoomId())
         }}>⇄ СМЕНИТЬ ПАКЕТ</button>
         <button className="adm-link danger" onClick={() => {
           if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
         }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
+        </div>
       </div>
     </div>
   )

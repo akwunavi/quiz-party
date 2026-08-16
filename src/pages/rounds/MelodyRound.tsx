@@ -6,6 +6,7 @@
 // → bidding (ставки 2–10) → bids (показ, кто играет) → snippet (интервал играет)
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
+import { getRoomId } from '../../lib/room'
 import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,12 +21,12 @@ import type { GameState, MelodySettings, MelodyState, MelodyTheme } from '../../
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   const next = gameState.round_number + 1
   if (next < pack.rounds.length) {
-    await supabase.from('game_state').update({
+    await supabase.from('game_sessions').update({
       phase: 'round_intro', round_number: next, question_index: 0,
       timer_started_at: null, reveal: false, melody: {},
-    }).eq('id', 1)
+    }).eq('id', getRoomId())
   } else {
-    await supabase.from('game_state').update({ phase: 'finale' }).eq('id', 1)
+    await supabase.from('game_sessions').update({ phase: 'finale' }).eq('id', getRoomId())
   }
 }
 
@@ -51,7 +52,7 @@ function playShared(src: string): HTMLAudioElement {
 }
 
 async function saveMelody(next: MelodyState) {
-  await supabase.from('game_state').update({ melody: next }).eq('id', 1)
+  await supabase.from('game_sessions').update({ melody: next }).eq('id', getRoomId())
 }
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
