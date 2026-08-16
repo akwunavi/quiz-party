@@ -2,6 +2,7 @@
 // Игроков это не касается — /player работает без входа.
 import { useState } from 'react'
 import { signIn, useEditorUser } from '../lib/auth'
+import { VERSION } from '../version'
 
 export function HostGate({ children }: { children: React.ReactNode }) {
   const { user, setUser, loading } = useEditorUser()
@@ -16,7 +17,7 @@ export function HostGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="gate-screen">
       <div className="gate-card">
-        <div className="mono-tag">QUIZ PARTY · ВХОД ВЕДУЩЕГО</div>
+        <div className="mono-tag">QUIZ PARTY · ВХОД ВЕДУЩЕГО · v{VERSION}</div>
         <p className="gate-hint">Это экран ведущего: он управляет игрой (переключает
           раунды, запускает музыку и таймеры), поэтому просит вход — иначе любой
           гость со ссылкой мог бы листать твой квиз.</p>

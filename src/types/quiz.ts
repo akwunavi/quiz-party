@@ -202,6 +202,7 @@ export interface MelodyState {
 }
 
 export interface GameState {
+  name?: string                 // имя комнаты (game_sessions)
   id: 1
   melody?: MelodyState
   game_id: string

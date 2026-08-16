@@ -1636,3 +1636,10 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
   border: 2px solid var(--tc, var(--accent)); border-left-width: 6px;
   background: color-mix(in srgb, var(--tc, var(--accent)) 10%, transparent);
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+
+/* Редактор: кнопка добавления темы — отдельной строкой, не липнет к подсказке */
+.ed-addrow { margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,.14); }
+.ed-addrow button { font-size: 15px; padding: 10px 22px; }
+
+/* ЖК-лого: заголовки classic — БЕЛЫЕ с глитчем (акцент — только последняя строка) */
+.theme-classic .neon-title { color: #fff; }

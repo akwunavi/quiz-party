@@ -425,9 +425,9 @@ function JeopardyEditor({ pack, round, locked, onChanged }: {
         </div>
       ))}
       {!locked && <>
-        <button onClick={() => upd(ts => [...ts, {
+        <div className="ed-addrow"><button onClick={() => upd(ts => [...ts, {
           name: '', tiles: VALUES.map(v => ({ value: v, audio: '', correct: '' })),
-        }])}>+ Тема</button>
+        }])}>+ Тема</button></div>
         {dirty && <button style={{ marginLeft: 6 }}
           onClick={async () => {
             await updateRound(round.id, { settings: { themes } })

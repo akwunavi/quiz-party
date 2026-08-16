@@ -70,7 +70,8 @@ function HostInner({ gameState, pack }: {
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <div className="host-screen grid-bg">
-        <Title theme={pack?.theme ?? 'classic'} lines={['QUIZ PARTY']} />
+        <Title theme={pack?.theme ?? 'classic'}
+          lines={(pack?.theme ?? 'classic') === 'classic' ? ['QUIZ', 'PARTY'] : ['QUIZ PARTY']} />
         <Deco theme={pack?.theme ?? 'classic'} />
         {!gameState.pack_id ? (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

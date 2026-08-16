@@ -1,5 +1,6 @@
 import { getRoomId } from '../lib/room'
 import { RoomPicker } from './RoomPicker'
+import { VERSION } from '../version'
 import { useEffect, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { useTeams } from '../hooks/useTeams'
@@ -37,7 +38,7 @@ export function AdminPage() {
   return (
     <div className="cyber adm-root">
       <div className="adm-header">
-        <div className="adm-brand">ВЕДУЩИЙ</div>
+        <div className="adm-brand">ВЕДУЩИЙ <span style={{ opacity: .45, fontSize: 11 }}>v{VERSION}</span></div>
         <div style={{ display: 'flex', gap: 8 }}>
           <a className="adm-link" href="./" target="_blank" rel="noreferrer">ПРОЕКТОР ↗</a>
           <button className="adm-link" onClick={() => {
