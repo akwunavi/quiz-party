@@ -17,8 +17,9 @@ export function HostGate({ children }: { children: React.ReactNode }) {
     <div className="gate-screen">
       <div className="gate-card">
         <div className="mono-tag">QUIZ PARTY · ВХОД ВЕДУЩЕГО</div>
-        <p className="gate-hint">Экран проектора и админка управляют игрой,
-          поэтому требуют входа. Игрокам вход не нужен — их ссылка /player.</p>
+        <p className="gate-hint">Это экран ведущего: он управляет игрой (переключает
+          раунды, запускает музыку и таймеры), поэтому просит вход — иначе любой
+          гость со ссылкой мог бы листать твой квиз.</p>
         <input placeholder="email" value={email} autoComplete="username"
           onChange={e => setEmail(e.target.value)} />
         <input placeholder="пароль" type="password" autoComplete="current-password"
@@ -28,6 +29,9 @@ export function HostGate({ children }: { children: React.ReactNode }) {
         <button disabled={busy || !email || !password} onClick={() => void go()}>
           {busy ? 'Входим…' : 'Войти'}
         </button>
+        <div className="gate-player-link">
+          Ты игрок? Тебе сюда без всяких паролей → <a href="#/player">открыть экран игрока</a>
+        </div>
       </div>
     </div>
   )

@@ -478,7 +478,9 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
     )
   }
   return (
-    <div className="timer-wrap">
+    // --r: доля ОСТАТКА времени — уровень рубинов в часах Хогвартса (тема ГП)
+    <div className={`timer-wrap${low ? ' low' : ''}`}
+      style={{ ['--r' as string]: Math.max(0, Math.min(1, left / Math.max(1, seconds))) }}>
       <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
   )

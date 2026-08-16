@@ -6,6 +6,7 @@
 // → bidding (ставки 2–10) → bids (показ, кто играет) → snippet (интервал играет)
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
+import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from '../../lib/supabase'
@@ -237,7 +238,9 @@ export function MelodyBoard({ pack, round, gameState }: {
       )}
 
       {/* модалка появляется только с момента прослушивания, на барабане её нет */}
-      {m.stage && !idle && m.stage !== 'spinning' && (
+      {/* ПОРТАЛ в document.body: модалка физически не может стать «частью страницы»,
+          какие бы transform/overflow ни появились у предков */}
+      {m.stage && !idle && m.stage !== 'spinning' && createPortal(
         <div className="mel-overlay">
           <div className="mel-modal">
             <div className="mel-modal-head">
@@ -345,7 +348,8 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
             </>)}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
