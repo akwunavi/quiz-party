@@ -9,7 +9,14 @@ const POLL_INTERVAL = 2000 // мс — проверенный интервал; 
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [loading, setLoading] = useState(true)
-  const roomId = getRoomId()
+  // roomId живёт в адресе; клик «выбрать комнату» меняет адрес БЕЗ перезагрузки,
+  // поэтому слушаем hashchange — иначе React не узнаёт о смене комнаты
+  const [roomId, setRoomId] = useState<string | null>(getRoomId())
+  useEffect(() => {
+    const onHash = () => { setLoading(true); setRoomId(getRoomId()) }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
 
   useEffect(() => {
     if (!roomId) { setGameState(null); setLoading(false); return }

@@ -492,6 +492,10 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
     // --r: доля ОСТАТКА времени — уровень рубинов в часах Хогвартса (тема ГП)
     <div className={`timer-wrap${low ? ' low' : ''}`}
       style={{ ['--r' as string]: Math.max(0, Math.min(1, left / Math.max(1, seconds))) }}>
+      {/* песочные часы ГП: две колбы + струйка (скрыто вне темы potter) */}
+      <span className="hg" aria-hidden>
+        <i className="hg-top" /><i className="hg-stream" /><i className="hg-bot" />
+      </span>
       <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
   )

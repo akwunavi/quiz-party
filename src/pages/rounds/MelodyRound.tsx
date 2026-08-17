@@ -242,7 +242,7 @@ export function MelodyBoard({ pack, round, gameState }: {
       {/* ПОРТАЛ в document.body: модалка физически не может стать «частью страницы»,
           какие бы transform/overflow ни появились у предков */}
       {m.stage && !idle && m.stage !== 'spinning' && createPortal(
-        <div className="mel-overlay">
+        <div className={`mel-overlay theme-${pack.theme ?? 'classic'}`}>
           <div className="mel-modal">
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>

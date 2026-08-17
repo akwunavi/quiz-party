@@ -6,6 +6,12 @@ html, body, #root { height: 100%; }
 body { -webkit-font-smoothing: antialiased; font-family: 'Inter', sans-serif; }
 
 :root {
+  /* --mel-portal-fix: модалка-портал живёт в body, ВНЕ слоя темы —
+     поэтому у корня должны быть значения по умолчанию (палитра classic) */
+  --bg: #0a0f1e; --bg2: #101728; --panel: #101728; --fg: #f2f5fa;
+  --muted: #9aa7bd; --dim: rgba(234,88,12,.4); --accent: #ea580c;
+  --accent2: #22d3ee; --answer: #57f5c0; --ok: #57f5c0; --danger: #ef4444;
+  --glow: 0 0 24px rgba(234,88,12,.45); --glow2: 0 0 18px rgba(34,211,238,.4);
   --font-display: 'Russo One', 'Rajdhani', sans-serif;
   --font-digits:  'Orbitron', 'Share Tech Mono', monospace;
   --font-mono:    'Share Tech Mono', monospace;
@@ -1301,7 +1307,7 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 .theme-potter button:hover { box-shadow: 0 0 16px rgba(211,166,37,.55); filter: brightness(1.12); }
 .theme-potter .jp-tile:not(:disabled):hover { box-shadow: 0 0 18px rgba(211,166,37,.5),
   inset 0 0 12px rgba(211,166,37,.15); border-color: #d3a625; color: #e9c766; }
-.theme-potter @keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
+@keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
   50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
 .theme-potter .neon-title, .theme-potter .round-title {
   animation: candleGlowTitle 3.4s ease-in-out infinite; }
@@ -1539,27 +1545,6 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
   letter-spacing: .14em; }
 .theme-potter .timer-num, .theme-potter .mel-count { font-family: 'Cinzel Decorative', serif; }
 
-/* Таймер ГП: ЧАСЫ ХОГВАРТСА — стеклянная колба с рубинами.
-   Уровень камней = остаток времени (--r из JSX): тает к нулю, как очки факультета. */
-.theme-potter .timer-wrap { border: none; box-shadow: none; width: auto; height: auto;
-  display: flex; align-items: center; gap: 16px; }
-.theme-potter .timer-wrap::before { content: ''; width: 38px; height: 86px; flex: 0 0 auto;
-  border: 2.5px solid #d3a625; border-radius: 10px 10px 16px 16px;
-  background:
-    radial-gradient(circle 3.2px at 5px 6px,  #e6323e 62%, #8c1d23 78%, transparent 80%),
-    radial-gradient(circle 3.2px at 12px 11px, #c22833 62%, #7a161c 78%, transparent 80%),
-    radial-gradient(circle 3.2px at 9px 3px,  #ff5560 62%, #a3242c 78%, transparent 80%);
-  background-size: 14px 12px, 16px 14px, 15px 13px;
-  background-color: rgba(211,166,37,.07);
-  /* уровень рубинов: маска снизу на долю остатка */
-  -webkit-mask-image: linear-gradient(to top, #000 calc(var(--r, 1) * 100%), rgba(0,0,0,.08) calc(var(--r, 1) * 100%));
-  mask-image: linear-gradient(to top, #000 calc(var(--r, 1) * 100%), rgba(0,0,0,.08) calc(var(--r, 1) * 100%));
-  box-shadow: inset 0 0 12px rgba(230,50,62,.35), 0 0 18px rgba(211,166,37,.4);
-  animation: gemShimmer 2.6s ease-in-out infinite; }
-@keyframes gemShimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.22); } }
-.theme-potter .timer-wrap.low::before,
-.theme-potter .timer-num.danger ~ ::before { animation-duration: .7s; }
-.theme-potter .timer-wrap::after { display: none; }
 /* мини-версия у отсчёта в модалке мелодии */
 .theme-potter .mel-count { display: flex; align-items: center; gap: 10px; }
 .theme-potter .mel-count::before { content: ''; width: 20px; height: 42px; flex: 0 0 auto;
@@ -1673,3 +1658,43 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 .theme-potter .pl-register h1 { color: #e9c766; }
 .theme-potter .pl-register input { background: rgba(243,233,207,.08);
   border-color: rgba(211,166,37,.5); }
+
+/* ═══ Часы Хогвартса v2 (по референсу Hogwarts Legacy) ═══
+   Верхняя колба ПУСТЕЕТ, нижняя НАПОЛНЯЕТСЯ, между ними течёт струйка.
+   Уровни привязаны к остатку времени (--r) — никакого зацикливания:
+   к нулю таймера рубины полностью внизу. */
+.hg { display: none; }
+.theme-potter .timer-wrap .hg { display: flex; flex-direction: column; align-items: center;
+  width: 46px; height: 96px; position: relative; flex: 0 0 auto;
+  filter: drop-shadow(0 0 10px rgba(211,166,37,.45)); }
+/* общий рубиновый паттерн */
+.theme-potter .hg-top, .theme-potter .hg-bot { width: 100%; height: 44px; position: relative;
+  background:
+    radial-gradient(circle 3px at 5px 6px,  #e6323e 62%, #8c1d23 80%, transparent 82%),
+    radial-gradient(circle 3px at 12px 11px, #c22833 62%, #7a161c 80%, transparent 82%),
+    radial-gradient(circle 3px at 9px 3px,  #ff5560 62%, #a3242c 80%, transparent 82%),
+    rgba(211,166,37,.07);
+  background-size: 13px 11px, 15px 13px, 14px 12px, auto;
+  border: 2.5px solid #d3a625; animation: gemShimmer 2.6s ease-in-out infinite; }
+/* верхняя колба: конус вниз; рубины прижаты К НИЗУ колбы и тают по --r */
+.theme-potter .hg-top { clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%);
+  border-radius: 8px 8px 0 0;
+  -webkit-mask-image: linear-gradient(to top, #000 calc(var(--r, 1) * 100%), rgba(0,0,0,.10) calc(var(--r, 1) * 100%));
+  mask-image: linear-gradient(to top, #000 calc(var(--r, 1) * 100%), rgba(0,0,0,.10) calc(var(--r, 1) * 100%)); }
+/* нижняя колба: конус вверх; горка растёт снизу на (1 - r) */
+.theme-potter .hg-bot { clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  border-radius: 0 0 8px 8px;
+  -webkit-mask-image: linear-gradient(to top, #000 calc((1 - var(--r, 1)) * 100%), rgba(0,0,0,.10) calc((1 - var(--r, 1)) * 100%));
+  mask-image: linear-gradient(to top, #000 calc((1 - var(--r, 1)) * 100%), rgba(0,0,0,.10) calc((1 - var(--r, 1)) * 100%)); }
+/* струйка: рубины падают только пока таймер идёт (0 < r < 1) */
+.theme-potter .hg-stream { position: absolute; left: 50%; top: 42px; width: 4px; height: 14px;
+  transform: translateX(-50%); z-index: 1; opacity: 0;
+  background: repeating-linear-gradient(180deg, #e6323e 0 3px, transparent 3px 6px);
+  animation: rubyFall .5s linear infinite; }
+.theme-potter .timer-wrap:not([style*="--r: 1"]) .hg-stream { opacity: 1; }
+.theme-potter .timer-wrap[style*="--r: 0;"] .hg-stream,
+.theme-potter .timer-wrap[style*="--r: 0 "] .hg-stream { opacity: 0; }
+@keyframes rubyFall { from { background-position: 0 0; } to { background-position: 0 6px; } }
+@keyframes gemShimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.22); } }
+.theme-potter .timer-wrap { display: flex; align-items: center; gap: 16px;
+  border: none; box-shadow: none; width: auto; height: auto; }
