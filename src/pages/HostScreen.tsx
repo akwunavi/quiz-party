@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -233,7 +234,7 @@ function HostInner({ gameState, pack }: {
     return (
       <div className="host-screen grid-bg">
         {round.mechanic !== 'jeopardy' && <>
-          <QuestionAudio q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
+          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
@@ -551,7 +552,9 @@ export function mediaUrl(path: string): string {
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
  *  скрытая вкладка (второй проектор) молчит. */
-function QuestionAudio({ q, round, timerRunning, pack }: {
+function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
+  startedAt?: string | null
+  seconds?: number
   q: LoadedPack['rounds'][number]['questions'][number]
   round: LoadedPack['rounds'][number]
   timerRunning: boolean
@@ -582,7 +585,17 @@ function QuestionAudio({ q, round, timerRunning, pack }: {
     const a = new Audio(mediaUrl(bg))
     a.loop = true; a.volume = 0.6
     a.play().catch(() => {})
-    return () => a.pause()
+    // по истечении таймера музыка играет ЕЩЁ 3 СЕК и мягко глохнет
+    let fade: number | undefined
+    const total = (seconds ?? round.timer_seconds ?? 60) * 1000
+    const msLeft = startedAt ? total - (Date.now() - new Date(startedAt).getTime()) : total
+    const stop = window.setTimeout(() => {
+      fade = window.setInterval(() => {
+        a.volume = Math.max(0, a.volume - 0.1)
+        if (a.volume <= 0.01) { if (fade) clearInterval(fade); a.pause() }
+      }, 80)
+    }, Math.max(0, msLeft) + 3000)
+    return () => { clearTimeout(stop); if (fade) clearInterval(fade); a.pause() }
   }, [timerRunning, q.id])
 
   return null
@@ -728,10 +741,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     const c = (q.answer as { choices: { key: string; text: string }[] })
                       .choices.find(x => x.key === k)
                     return (
-                      <div key={i} className="order-step">
-                        <span className="pos">{i + 1}</span>
-                        <span className="key">{k}</span>
-                        <span className="txt">{c?.text ?? ''}</span>
+                      <div key={i} className="oi">
+                        <b>{i + 1}.</b>{c?.text ?? ''}
                       </div>
                     )
                   })}
@@ -882,7 +893,7 @@ function JeopardyBoard({ pack, round, gameState }: {
         }}>Завершить раунд →</button>
       </div>
       {active && (
-        <TileModal round={round} gameState={gameState}
+        <TileModal packTheme={pack.theme} round={round} gameState={gameState}
           theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
           refKey={`t${themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}`}
           onClose={() => { setOpened(o => [...o, `${active.t}-${active.i}`]); setActive(null) }} />
@@ -893,7 +904,8 @@ function JeopardyBoard({ pack, round, gameState }: {
 
 /** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
  *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
-function TileModal({ round, gameState, theme, tile, refKey, onClose }: {
+function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }: {
+  packTheme?: string
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
   theme: JeopardyTheme
@@ -941,8 +953,8 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose }: {
     await supabase.from('answers').update({ is_correct: correct }).eq('id', id)
   }
 
-  return (
-    <div className="jp-overlay">
+  return createPortal(
+    <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
       <div className="jp-modal hud-frame">
         <div className="jp-modal-head">
           <div>
@@ -986,7 +998,8 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose }: {
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -1000,9 +1013,9 @@ function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][numbe
       {q.answer.left.map((l, i) => {
         const right = pairs.find(p => p.startsWith(l))?.slice(l.length) ?? '—'
         return (
-          <div key={l} className="pair">
+          <div key={l} className="mi">
             {imgs[i] && <img src={mediaUrl(imgs[i])} alt="" />}
-            <span className="lbl">{l} → {right}</span>
+            <div className="mi-label">{l} → {right}</div>
           </div>
         )
       })}

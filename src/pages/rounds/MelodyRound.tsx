@@ -71,6 +71,11 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   const deadline = m.deadline ? new Date(m.deadline).getTime() : 0
   const left = deadline ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0
+  // максимум, который видели в этой фазе → доля остатка для песочных часов
+  const phaseMax = useRef(0)
+  useEffect(() => { phaseMax.current = 0 }, [m.stage, m.key])
+  if (left > phaseMax.current) phaseMax.current = left
+  const total = phaseMax.current
   const expired = !!deadline && now >= deadline
 
   const [ti, i] = (m.key ?? '0-0').split('-').map(Number)
@@ -159,6 +164,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
+    // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
     if ((m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
     const a = playShared(mediaUrl(bg))
     a.loop = true; a.volume = .45
@@ -246,7 +252,17 @@ export function MelodyBoard({ pack, round, gameState }: {
           <div className="mel-modal">
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
-              {!!deadline && <div className="mel-count">{left}</div>}
+              {!!deadline && (
+                // те же часы, что у большого таймера: --r = доля остатка
+                <div className="mel-count" style={{
+                  ['--r' as string]: Math.max(0, Math.min(1, left / Math.max(1, total))),
+                }}>
+                  <span className="hg" aria-hidden>
+                    <i className="hg-top" /><i className="hg-stream" /><i className="hg-bot" />
+                  </span>
+                  {left}
+                </div>
+              )}
             </div>
 
             {m.stage === 'listen' && <div className="mel-big">СЛУШАЕМ 1 СЕКУНДУ…</div>}
