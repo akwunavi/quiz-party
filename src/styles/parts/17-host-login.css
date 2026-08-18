@@ -1,0 +1,82 @@
+/* ═══ Вход ведущего: самодостаточный экран (тема ещё не загружена) ═══ */
+.gate-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle 500px at 20% 20%, rgba(234,88,12,.10), transparent 60%),
+    radial-gradient(circle 420px at 85% 80%, rgba(34,211,238,.08), transparent 60%), #0a0f1e;
+  font-family: 'Rajdhani', system-ui, sans-serif; color: #f2f5fa; }
+.gate-card { display: flex; flex-direction: column; gap: 14px; width: min(400px, 92vw);
+  padding: 34px 30px; background: #101728; border: 1px solid rgba(234,88,12,.5);
+  border-radius: 14px; box-shadow: 0 0 44px rgba(234,88,12,.18); }
+.gate-card .mono-tag { color: #ea580c; opacity: 1; position: static;
+  font-size: 13px; letter-spacing: .22em; }
+.gate-hint { font-size: 15px; color: #9aa7bd; line-height: 1.5; margin: 0; }
+.gate-card input { padding: 14px 16px; border-radius: 10px; border: 1px solid #2c3a55;
+  background: rgba(255,255,255,.06); color: #f2f5fa; font-size: 17px;
+  font-family: inherit; }
+.gate-card input:focus { outline: none; border-color: #ea580c;
+  box-shadow: 0 0 12px rgba(234,88,12,.35); }
+.gate-card button { padding: 13px 18px; border-radius: 10px; border: none;
+  background: #ea580c; color: #fff; font-size: 17px; font-weight: 700;
+  font-family: inherit; letter-spacing: .04em; cursor: pointer; transition: all .15s; }
+.gate-card button:hover:not(:disabled) { background: #22d3ee; color: #06121a;
+  box-shadow: 0 0 18px rgba(34,211,238,.5); }
+.gate-card button:disabled { opacity: .45; cursor: default; }
+.gate-err { color: #ef4444; font-size: 14px; }
+.gate-player-link { text-align: center; font-size: 14px; color: #9aa7bd; }
+.gate-player-link a { color: #22d3ee; text-decoration: none; }
+.gate-player-link a:hover { text-shadow: 0 0 10px rgba(34,211,238,.6); }
+
+/* Админка: сервисные кнопки не липнут к контенту */
+.adm-root .adm-link { display: inline-flex; align-items: center; }
+.adm-footer-links { display: flex; flex-direction: column; align-items: flex-start;
+  gap: 10px; margin-top: 18px; padding-top: 14px;
+  border-top: 1px dashed rgba(255,255,255,.14); }
+
+/* Лобби по эталону ЖК */
+.lobby-row { display: flex; gap: clamp(24px, 5vw, 70px); align-items: center;
+  justify-content: center; flex-wrap: wrap; }
+.qr-card { display: flex; flex-direction: row; align-items: center; gap: 22px;
+  padding: 18px 26px; }
+.qr-card .lobby-qr { background: #fff; padding: 8px; border-radius: 4px;
+  width: clamp(130px, 13vw, 190px); height: auto; transition: box-shadow .3s; }
+.qr-card[data-pulse] .lobby-qr { animation: qrPulse .6s ease; }
+@keyframes qrPulse { 30% { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 60%, transparent); } }
+.qr-caption-big { font-family: var(--font-display); font-size: clamp(18px, 2vw, 27px);
+  line-height: 1.15; margin-bottom: 8px; }
+.lobby-teams { display: flex; flex-direction: column; gap: 12px; min-width: 240px;
+  align-items: stretch; }
+.lobby-team { padding: 13px 26px; font-size: clamp(17px, 1.7vw, 25px);
+  font-family: var(--font-display); color: #fff !important;
+  border: 2px solid var(--tc, var(--accent)); border-left-width: 6px;
+  background: color-mix(in srgb, var(--tc, var(--accent)) 10%, transparent);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+
+/* Редактор: кнопка добавления темы — отдельной строкой, не липнет к подсказке */
+.ed-addrow { margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,.14); }
+.ed-addrow button { font-size: 15px; padding: 10px 22px; }
+
+/* ЖК-лого: заголовки classic — БЕЛЫЕ с глитчем (акцент — только последняя строка) */
+.theme-classic .neon-title { color: #fff; }
+
+/* Тач: никаких залипающих подсветок */
+.mel-tile, .jp-tile, .pl-send { -webkit-tap-highlight-color: transparent; }
+
+/* Фон темы держит ВЕСЬ вьюпорт (регистрация и любые ранние экраны игрока) */
+.theme-classic, .theme-new_year, .theme-potter { min-height: 100vh;
+  background: var(--bg); color: var(--fg); }
+
+/* Регистрация команды: во всех темах пристойно, в ГП — пергамент */
+.pl-register { min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px; padding: 24px; }
+.pl-register h1 { font-family: var(--font-display); color: var(--fg);
+  font-size: clamp(26px, 7vw, 40px); text-shadow: var(--glow); }
+.pl-register input { width: min(420px, 88vw); font-size: 19px; padding: 15px 16px;
+  border-radius: 10px; border: 1.5px solid var(--dim);
+  background: rgba(255,255,255,.06); color: var(--fg); }
+.pl-register .colors { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.pl-register .color-dot { width: 46px; height: 46px; border-radius: 50%;
+  border: 3px solid transparent; cursor: pointer; transition: transform .15s; }
+.pl-register .color-dot.sel { border-color: #fff; transform: scale(1.15);
+  box-shadow: 0 0 14px currentColor; }
+.theme-potter .pl-register h1 { color: #e9c766; }
+.theme-potter .pl-register input { background: rgba(243,233,207,.08);
+  border-color: rgba(211,166,37,.5); }

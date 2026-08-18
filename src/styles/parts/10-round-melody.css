@@ -1,0 +1,82 @@
+/* ═══ УГАДАЙ МЕЛОДИЮ ═══ */
+.mel-screen { justify-content: flex-start; gap: 12px; padding: 20px 34px 92px; }
+.mel-title { flex-shrink: 0; }
+.mel-board { display: grid; gap: 10px; width: 100%; flex: 1; min-height: 0; }
+.mel-theme { display: flex; align-items: center; justify-content: center; text-align: center;
+  font-family: var(--font-display); font-size: clamp(13px, 1.5vw, 22px); color: var(--accent);
+  padding: 8px; border: 1px solid var(--dim); background: rgba(255,255,255,.05); border-radius: 8px; }
+.mel-tile {
+  font-family: var(--font-digits); font-size: clamp(18px, 2.4vw, 36px);
+  background: var(--panel); border: 1px solid var(--dim); border-radius: 10px; }
+.mel-tile.done { opacity: .2; }
+.mel-tile.spin { border-color: var(--accent); box-shadow: 0 0 24px var(--accent);
+  animation: pulse .35s ease-in-out infinite; }
+.mel-overlay { position: fixed !important; inset: 0 !important; z-index: 999 !important;
+  background: rgba(2,6,14,.88);
+  display: flex; align-items: center; justify-content: center; padding: 24px; }
+.mel-modal { padding: 26px; background: var(--bg2);
+  border: 1px solid var(--accent); border-radius: 14px;
+  display: flex; flex-direction: column; gap: 18px; align-items: center; }
+.mel-modal-head { display: flex; justify-content: space-between; align-items: baseline; width: 100%; }
+.mel-modal-theme { font-family: var(--font-display); font-size: clamp(18px, 2.2vw, 30px); color: var(--accent); }
+.mel-count { font-family: var(--font-digits); font-size: clamp(34px, 4.5vw, 62px); }
+.mel-big { font-family: var(--font-display); font-size: clamp(22px, 3vw, 44px); text-align: center; }
+.mel-bids { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.mel-bid { font-family: 'Rajdhani', sans-serif; font-size: 20px; }
+.mel-bid-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center;
+  padding: 10px 16px; border: 1px solid var(--dim); border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif; font-size: clamp(16px, 1.8vw, 24px); }
+.mel-bid-row.win { border-color: var(--answer); background: rgba(87,245,192,.10); }
+.mel-win-tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; color: var(--answer); }
+.mel-answer { font-family: 'Rajdhani', sans-serif; font-size: clamp(18px, 2.2vw, 30px); }
+.mel-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+/* клавиши ставок у игрока */
+.mel-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mel-keys button { padding: 18px 0; font-size: 22px; clip-path: none; border-radius: 10px;
+  background: rgba(255,255,255,.06); border: 1px solid var(--dim); color: var(--fg); }
+.mel-keys button.sel { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Мелодия: состояния игрока и новогодний декор */
+.mel-wait { text-align: center; padding: 40px 20px; display: flex; flex-direction: column; gap: 8px; }
+.mel-choosing { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.mel-wrong { color: var(--danger); font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(16px, 1.8vw, 24px); text-align: center; }
+.theme-new_year .mel-theme { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,.35);
+  background: rgba(255,255,255,.06); border-color: rgba(198,230,255,.35); }
+.theme-new_year .mel-modal { background: linear-gradient(180deg, #0d2a55, #071630);
+  border-color: rgba(198,230,255,.5); box-shadow: 0 0 50px rgba(124,199,255,.25); }
+.theme-new_year .mel-modal::before { content: '❄ ❄ ❄'; position: absolute; top: 8px; left: 0; right: 0;
+  text-align: center; opacity: .35; letter-spacing: 1em; pointer-events: none; }
+.mel-modal { position: relative; }
+/* «120 секунд» в новогодней теме */
+.theme-new_year .sprint-card { background: linear-gradient(180deg, rgba(198,230,255,.12), rgba(124,199,255,.04));
+  border-color: rgba(198,230,255,.4); }
+.theme-new_year .sprint-num::after { content: ' ❅'; opacity: .6; font-size: .7em; }
+.theme-new_year .sprint-bonus { border-color: #ffd700; color: #ffd700; }
+/* Редактор: разносим «+ Трек» и «+ Тема» */
+.mel-add-track { margin-top: 8px; }
+.mel-add-theme { margin-top: 22px; border-top: 1px solid var(--ed-line); padding-top: 16px; }
+
+/* Гирлянда занимает верх — прижимаем контент ниже (мелодия, своя игра, «120 сек») */
+.theme-new_year .mel-screen, .theme-new_year .jp-screen { padding-top: 118px; }
+.theme-new_year .sprint-screen { padding-top: 96px; }
+.mel-title, .jp-title { font-size: clamp(20px, 2.6vw, 40px); margin: 0; line-height: 1.1; }
+.mel-board, .jp-board { max-height: calc(100vh - 250px); }
+
+/* 6: новогодний вид доски мелодии — подарки с лентой и снежные шапки на темах */
+.theme-new_year .mel-theme { position: relative; overflow: visible;
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(124,199,255,.05));
+  border: 1px solid rgba(198,230,255,.45); color: #fff;
+  text-shadow: 0 1px 0 #cfe8ff, 0 0 16px rgba(124,199,255,.5); }
+.theme-new_year .mel-theme::before { content: ''; position: absolute; left: -2px; right: -2px; top: -7px;
+  height: 10px;
+  background: radial-gradient(ellipse 40% 100% at 18% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 44% 120% at 50% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 38% 90%  at 82% 100%, #fff 60%, transparent 62%);
+  filter: drop-shadow(0 2px 2px rgba(90,140,190,.4)); }
+@keyframes giftShake { 0%,100% { transform: rotate(-1.5deg) scale(1.03); }
+  50% { transform: rotate(1.5deg) scale(1.06); } }
+
+/* подсказка по баллам */
+.mel-points-hint { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em;
+  color: var(--answer); text-align: center; }

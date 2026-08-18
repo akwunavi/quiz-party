@@ -1,0 +1,101 @@
+/* ── Цвет правильного ответа: мятно-изумрудный (на синем читается лучше золота) ── */
+:root { --answer: #57f5c0; }
+.answer-reveal { background: linear-gradient(180deg, rgba(87,245,192,.14), rgba(87,245,192,.04));
+  border-color: rgba(87,245,192,.55);
+  box-shadow: 0 0 34px rgba(87,245,192,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+.answer-label { color: var(--answer); }
+.answer-main { color: var(--answer); text-shadow: 0 0 26px rgba(87,245,192,.45); }
+.choice-plate.correct { border-color: var(--answer); border-left-color: var(--answer);
+  background: rgba(87,245,192,.14); box-shadow: 0 0 26px rgba(87,245,192,.4);
+  animation: ruleIn .45s ease forwards, correctPulse 1.6s ease-in-out infinite 1s; }
+@keyframes correctPulse { 50% { box-shadow: 0 0 42px rgba(87,245,192,.75); transform: scale(1.015); } }
+.choice-img.correct { border-color: var(--answer); box-shadow: 0 0 26px rgba(87,245,192,.45);
+  animation: correctPulse 1.6s ease-in-out infinite; }
+.order-step { border-color: rgba(87,245,192,.4); background: rgba(87,245,192,.07); }
+.order-step .pos { color: var(--answer); }
+.rebus-hot { color: var(--answer); text-shadow: 0 0 14px rgba(87,245,192,.6); }
+
+/* ── Картинки-варианты: буква СЛЕВА, ничего не налезает ── */
+.img-answers { display: grid; gap: clamp(10px, 1.6vw, 22px); width: min(94vw, 1500px);
+  flex: 1; min-height: 0; align-content: center; }
+.img-answers.n2, .img-answers.n4 { grid-template-columns: 1fr 1fr; }
+
+.img-answer img {
+  box-shadow: 0 8px 30px rgba(0,0,0,.45); justify-self: start; }
+.img-answers.n2 .img-answer img, .img-answers.n3 .img-answer img { max-height: min(46vh, 420px); }
+.ia-key {
+  border-right: 2px solid rgba(255,255,255,.15); padding-right: 8px; }
+
+/* ── Таймер-венок ── */
+.ny-wreath { position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: clamp(120px, 13vw, 190px); height: clamp(120px, 13vw, 190px); }
+.ny-wreath svg { position: absolute; inset: 0; }
+.ny-wreath .wr-bg { fill: none; stroke: rgba(255,255,255,.10); stroke-width: 6; }
+.ny-wreath .wr-fg { fill: none; stroke: #dff3e6; stroke-width: 5; stroke-linecap: round;
+  transform: rotate(-90deg); transform-origin: 55px 55px;
+  filter: drop-shadow(0 0 8px rgba(223,243,230,.8)); transition: stroke-dashoffset .3s linear; }
+.ny-wreath .wr-berry { fill: #e63946; filter: drop-shadow(0 0 6px rgba(230,57,70,.9));
+  animation: berryTwinkle 2.4s ease-in-out infinite; }
+.ny-wreath .wr-berry:nth-of-type(2n) { animation-delay: .6s; fill: #ffd24d;
+  filter: drop-shadow(0 0 6px rgba(255,210,77,.9)); }
+.ny-wreath .wr-berry:nth-of-type(3n) { animation-delay: 1.2s; fill: #7cc7ff;
+  filter: drop-shadow(0 0 6px rgba(124,199,255,.9)); }
+@keyframes berryTwinkle { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+.ny-wreath .wr-bow { display: none; }
+.ny-wreath .val { position: relative; font-family: var(--font-digits); font-weight: 900;
+  font-size: clamp(34px, 4.2vw, 60px); z-index: 1; }
+.ny-wreath.low .wr-fg { stroke: #ff6b81; filter: drop-shadow(0 0 12px #ff6b81); }
+.ny-wreath.low .val { color: #ff6b81; animation: shiver .5s linear infinite; }
+
+/* ── Финал ── */
+.fin-podium { display: flex; align-items: flex-end; gap: clamp(12px, 2vw, 30px); justify-content: center; }
+.fin-step { display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 18px clamp(14px, 2vw, 30px); border-radius: 14px 14px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.3); min-width: clamp(150px, 16vw, 240px);
+  animation: titleIn .8s both; }
+.fin-step.p1 { padding-bottom: 60px; border-color: rgba(255,215,0,.7);
+  box-shadow: 0 0 40px rgba(255,215,0,.25); }
+.fin-step.p2 { padding-bottom: 36px; }
+.fin-step.p3 { padding-bottom: 22px; }
+.fin-medal { font-size: clamp(34px, 4vw, 58px); }
+.fin-name { font-family: var(--font-display); font-size: clamp(18px, 2vw, 30px); }
+.fin-score { font-family: var(--font-digits); font-size: clamp(26px, 3vw, 46px); }
+.fin-place { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); }
+.fin-rest { display: flex; flex-direction: column; gap: 6px; margin-top: 18px; width: min(60vw, 620px); }
+.fin-row { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif; font-size: 20px; }
+.fin-row .num { font-family: var(--font-digits); color: var(--muted); }
+
+/* ── Своя игра: доска на всю высоту + модалка ── */
+.jp-screen { justify-content: flex-start; gap: 12px; padding: 20px 34px 92px; }
+.jp-title { flex-shrink: 0; }
+.jp-board { display: grid; gap: 10px; width: 100%; flex: 1; min-height: 0; }
+.jp-theme-name { display: flex; align-items: center; justify-content: center; text-align: center;
+  font-family: var(--font-display); font-size: clamp(13px, 1.5vw, 22px);
+  padding: 8px 6px; border: 1px solid var(--dim); background: rgba(255,255,255,.05);
+  color: var(--accent); border-radius: 8px; }
+.jp-tile { width: 100%; height: 100%; font-family: var(--font-digits);
+  font-size: clamp(18px, 2.4vw, 38px); padding: 0; }
+.jp-tile.done { opacity: .22; }
+.jp-overlay { position: fixed; inset: 0; background: rgba(2,6,14,.86); z-index: 60;
+  display: flex; align-items: center; justify-content: center; padding: 24px; }
+.jp-modal { max-height: 90vh; overflow: auto; padding: 24px;
+  background: var(--bg2); border: 1px solid var(--accent); border-radius: 14px;
+  display: flex; flex-direction: column; gap: 16px; }
+.jp-modal-head { display: flex; justify-content: space-between; align-items: baseline; }
+.jp-modal-theme { font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 32px); color: var(--accent); }
+.jp-count { font-family: var(--font-digits); font-size: clamp(30px, 4vw, 54px); color: var(--dim); }
+.jp-count.on { color: var(--accent); animation: pulse 1s ease-in-out infinite; }
+.jp-answers { display: flex; flex-direction: column; gap: 8px; }
+.jp-answer { display: grid; gap: 10px;
+  align-items: center; padding: 10px 12px; background: rgba(255,255,255,.04);
+  border: 1px solid var(--dim); border-radius: 8px; }
+.jp-answer .pos { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.jp-answer .name { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+.jp-answer .txt { font-size: 16px; }
+.jp-grade { padding: 8px 14px; clip-path: none; border-radius: 8px; }
+.jp-grade.ok { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid #22c55e; }
+.jp-grade.no { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid #ef4444; }
+.jp-modal-foot { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }

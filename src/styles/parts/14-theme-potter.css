@@ -1,0 +1,72 @@
+/* ═══ ТЕМА «ВОЛШЕБНАЯ ШКОЛА» ═══ */
+.theme-potter { --accent: #d3a625; --accent2: #a45de2; --answer: #7cc79b;
+  --bg: #0b0d1a; --bg2: #141126; --panel: #1b1630; --panel2: #241d3c;
+  --fg: #f3e9cf; --muted: #b9ab84; --dim: rgba(211,166,37,.35);
+  --ok: #7cc79b; --danger: #d4574e;
+  --glow: 0 0 24px rgba(211,166,37,.45); --glow2: 0 0 18px rgba(164,93,226,.4);
+  --font-display: 'Cinzel Decorative', 'Russo One', serif;   /* шрифт «как у ГП» (легальный аналог) */
+  color: var(--fg); }
+.theme-potter .grid-bg { background:
+  radial-gradient(ellipse at 50% -10%, rgba(211,166,37,.14), transparent 55%),
+  radial-gradient(ellipse at 85% 110%, rgba(116,0,1,.28), transparent 60%),
+  #0b0d1a; }
+.theme-potter .neon-title, .theme-potter .round-title {
+  color: #e9c766; text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12;
+  letter-spacing: .1em; }
+.theme-potter .hud-frame, .theme-potter .mel-modal, .theme-potter .jp-modal {
+  border-color: rgba(211,166,37,.5); box-shadow: 0 0 34px rgba(211,166,37,.15); }
+.theme-potter button { border-color: rgba(211,166,37,.55); }
+.theme-potter .answer-reveal .answer-main { color: #e9c766; }
+/* сцена */
+.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+/* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge),
+.mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
+  z-index: 6; position: relative; }
+.host-topbar, .host-actions, .pack-badge { z-index: 30; }
+.pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
+  filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
+  animation: candleFloat 3.6s ease-in-out infinite; }
+@keyframes candleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.pt-spark { position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: #ffe9a8; box-shadow: 0 0 10px #ffd35c, 0 0 20px rgba(255,211,92,.6);
+  animation: sparkTwinkle 2.8s ease-in-out infinite; }
+@keyframes sparkTwinkle { 0%,100% { opacity: 0; transform: scale(.4); }
+  50% { opacity: 1; transform: scale(1); } }
+/* снитч: шарик с крыльями, летает восьмёркой */
+.pt-snitch { position: absolute; top: 18%; left: 8%; width: 64px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  animation: snitchFly 17s ease-in-out infinite; will-change: transform; }
+.pt-ball { width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffe9a8, #d3a625 55%, #7a5c10);
+  box-shadow: 0 0 16px rgba(211,166,37,.9); }
+.pt-wing { width: 22px; height: 12px; border-radius: 50% 100% 0 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.35));
+  transform-origin: right center; animation: wingFlap .18s ease-in-out infinite alternate; }
+.pt-wing.r { transform: scaleX(-1); transform-origin: left center; }
+@keyframes wingFlap { from { transform: rotate(-24deg); } to { transform: rotate(18deg); } }
+.pt-wing.r { animation-name: wingFlapR; }
+@keyframes wingFlapR { from { transform: scaleX(-1) rotate(-24deg); } to { transform: scaleX(-1) rotate(18deg); } }
+@keyframes snitchFly {
+  0%   { transform: translate(0, 0) scale(1); }
+  18%  { transform: translate(62vw, 14vh) scale(.8); }
+  36%  { transform: translate(78vw, 52vh) scale(1.05); }
+  55%  { transform: translate(30vw, 64vh) scale(.7); }
+  74%  { transform: translate(10vw, 34vh) scale(1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+/* таймер ГП: золотое кольцо-«снитч» с крылышками по бокам */
+.theme-potter .timer-wrap { position: relative; width: 118px; height: 118px;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  border: 3px solid #d3a625;
+  box-shadow: 0 0 22px rgba(211,166,37,.5), inset 0 0 14px rgba(211,166,37,.25); }
+.theme-potter .timer-num { color: #e9c766; }
+/* спринт-карточки и плитки в пергаменте */
+.theme-potter .sprint-card { background: rgba(211,166,37,.08);
+  border-color: rgba(211,166,37,.4); }
+.theme-potter .mel-theme { color: #e9c766; }
+.theme-potter .fin-step.p1 { border-color: #d3a625;
+  box-shadow: 0 0 46px rgba(211,166,37,.45); }
+
+/* Спринт: вопрос-«герой» на всю ширину над колонками (нечётное число вопросов) */
+.sprint-screen.with-hero { grid-template-rows: auto 1fr; }

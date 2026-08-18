@@ -18,6 +18,7 @@ import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
+import { SnakeTimer } from '../components/SnakeTimer'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -232,7 +233,9 @@ function HostInner({ gameState, pack }: {
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
 
     return (
-      <div className="host-screen grid-bg">
+      <div className={`host-screen grid-bg${imgs.length && !q.media.hidden ? ' has-media' : ''}${
+        (choices && !lettered) || (q.answer.mode === 'match'
+          && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
         {round.mechanic !== 'jeopardy' && <>
           <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
           <AutoAdvance round={round} gameState={gameState}
@@ -269,13 +272,15 @@ function HostInner({ gameState, pack }: {
             {!q.media.hidden && imgs.length > 0 && (
               lettered
                 /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
-                ? <div className={`img-answers n${Math.min(imgs.length, 4)}`}>
+                ? <div className={`img-answers n${Math.min(imgs.length, 5)}`}>
                     {imgs.map((m, i) => (
                       <div key={i} className="img-answer">
-                        <span className="ia-key">
-                          {q.answer.mode === 'match' ? i + 1 : (choices?.[i]?.key ?? '')}
+                        <span className="ia-frame">
+                          <span className="ia-key">
+                            {q.answer.mode === 'match' ? i + 1 : (choices?.[i]?.key ?? '')}
+                          </span>
+                          <img src={mediaUrl(m)} alt="" />
                         </span>
-                        <img src={mediaUrl(m)} alt="" />
                         {q.answer.mode === 'choice' && choices?.[i]?.text &&
                           <span className="ia-text">{choices[i].text}</span>}
                       </div>
@@ -404,12 +409,21 @@ function Icicles({ seed, low }: { seed: string; low: boolean }) {
   )
 }
 
+/** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
+export function lenClass(text: string): string {
+  const n = (text ?? '').trim().length
+  if (n <= 70) return ''
+  if (n <= 140) return ' len-m'
+  if (n <= 240) return ' len-l'
+  return ' len-xl'
+}
+
 /** Появление текста «ветром»: по словам с каскадной задержкой. */
 function WindText({ text }: { text: string }) {
   const words = text.split(/(\s+)/)
   let idx = 0
   return (
-    <p className="q-text">
+    <p className={`q-text${lenClass(text)}`}>
       {words.map((w, i) => {
         if (/^\s+$/.test(w)) return w
         const delay = 0.12 * idx++
@@ -489,14 +503,10 @@ function Timer({ startedAt, seconds, theme }: { startedAt: string | null; second
       </div>
     )
   }
+  // ГП: круговой таймер-змея, ползущая к своему хвосту
+  if (theme === 'potter') return <SnakeTimer left={left} seconds={seconds} low={low} />
   return (
-    // --r: доля ОСТАТКА времени — уровень рубинов в часах Хогвартса (тема ГП)
-    <div className={`timer-wrap${low ? ' low' : ''}`}
-      style={{ ['--r' as string]: Math.max(0, Math.min(1, left / Math.max(1, seconds))) }}>
-      {/* песочные часы ГП: две колбы + струйка (скрыто вне темы potter) */}
-      <span className="hg" aria-hidden>
-        <i className="hg-top" /><i className="hg-stream" /><i className="hg-bot" />
-      </span>
+    <div className={`timer-wrap${low ? ' low' : ''}`}>
       <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
   )
@@ -696,45 +706,16 @@ function ShowAnswers({ pack, round, q, gameState }: {
       </div>
       <div className="answers-layout" style={{ marginTop: 60 }}>
         <div style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
-          <p className="q-text" style={{ fontSize: 'clamp(20px, 2.2vw, 32px)' }}>{q.question_text}</p>
+          <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
           {revealed && (
             <div className="answer-reveal hud-frame">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {q.answer.mode === 'match' ? (
                 <MatchAnswer q={q} />
               ) : choices && imgChoices.length === choices.length ? (
-                <div className="choice-imgs">
-                  {choices.map((c, i) => {
-                    const img = imgChoices[i]
-                    const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
-                    const order = shuffleStable(choices.map(x => x.key), q.id).indexOf(c.key)
-                    return (
-                      <div key={c.key} className={`choice-img${ok ? ' correct' : ' dimmed'}`}
-                        style={{ animationDelay: `${order * 0.35}s` }}>
-                        <img src={mediaUrl(img)} alt="" />
-                        <span className="key">{c.key}{c.text ? ` — ${c.text}` : ''}</span>
-                      </div>
-                    )
-                  })}
-                </div>
+                <StagedChoices q={q} choices={choices} imgs={imgChoices} />
               ) : choices ? (
-                <div className="choices-grid" style={{ width: '100%' }}>
-                  {choices.map(c => {
-                    const ok = c.key === (q.answer as { correct_choice?: string }).correct_choice
-                    // сначала два неверных, потом остальные, верный — последним
-                    const wrongs = choices.filter(x =>
-                      x.key !== (q.answer as { correct_choice?: string }).correct_choice)
-                    const seq = [...shuffleStable(wrongs, q.id).map(x => x.key),
-                      (q.answer as { correct_choice?: string }).correct_choice ?? '']
-                    const order = seq.indexOf(c.key)
-                    return (
-                      <div key={c.key} className={`choice-plate${ok ? ' correct' : ' dimmed'}`}
-                        style={{ animationDelay: `${order * 0.75}s` }}>
-                        <span className="key">{c.key}</span>{c.text}
-                      </div>
-                    )
-                  })}
-                </div>
+                <StagedChoices q={q} choices={choices} />
               ) : q.answer.mode === 'order' ? (
                 <div className="order-answer">
                   {q.answer.correct_order.split('').map((k, i) => {
@@ -806,6 +787,62 @@ function ShowAnswers({ pack, round, q, gameState }: {
 }
 
 /** Автопоказ ответа: как только таймер вышел — открываем ответ сам. */
+/** Показ вариантов с интригой (п.5):
+ *  0 сек — на экране два ЗАВЕДОМО НЕВЕРНЫХ варианта;
+ *  3 сек — доезжают оставшиеся (среди них правильный), но ещё без подсветки;
+ *  5.5 сек — подсветка верного и приглушение неверных, плавно.
+ *  Место под все варианты зарезервировано сразу (visibility), поэтому
+ *  раскладка не дёргается и по позиции ничего не угадывается. */
+function StagedChoices({ q, choices, imgs }: {
+  q: LoadedPack['rounds'][number]['questions'][number]
+  choices: { key: string; text: string }[]
+  imgs?: string[]
+}) {
+  const [stage, setStage] = useState(0)
+  useEffect(() => {
+    setStage(0)
+    const t1 = setTimeout(() => setStage(1), 3000)
+    const t2 = setTimeout(() => setStage(2), 5500)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [q.id])
+
+  const correctKey = (q.answer as { correct_choice?: string }).correct_choice ?? ''
+  const wrongs = choices.filter(c => c.key !== correctKey)
+  // первые двое неверных выбираются стабильно — одинаково на всех проекторах
+  const firstWave = new Set(shuffleStable(wrongs.map(c => c.key), q.id).slice(0, 2))
+
+  const cls = (key: string) => {
+    const shown = stage >= 1 || firstWave.has(key)
+    if (!shown) return ' hidden-yet'
+    if (stage < 2) return ''
+    return key === correctKey ? ' correct' : ' dimmed'
+  }
+  const delay = (key: string) => (firstWave.has(key) ? 0 : 0.25 * choices
+    .filter(c => !firstWave.has(c.key)).findIndex(c => c.key === key))
+
+  if (imgs) return (
+    <div className="choice-imgs">
+      {choices.map((c, i) => (
+        <div key={c.key} className={`choice-img${cls(c.key)}`}
+          style={{ animationDelay: `${delay(c.key)}s` }}>
+          <img src={mediaUrl(imgs[i])} alt="" />
+          <span className="key">{c.key}{c.text ? ` — ${c.text}` : ''}</span>
+        </div>
+      ))}
+    </div>
+  )
+  return (
+    <div className="choices-grid" style={{ width: '100%', marginTop: 0, paddingTop: 0 }}>
+      {choices.map(c => (
+        <div key={c.key} className={`choice-plate${cls(c.key)}`}
+          style={{ animationDelay: `${delay(c.key)}s` }}>
+          <span className="key">{c.key}</span>{c.text}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function AutoReveal({ enabled, startedAt, seconds }: {
   enabled: boolean; startedAt: string | null; seconds: number
 }) {

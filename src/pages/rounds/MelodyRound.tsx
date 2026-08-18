@@ -8,6 +8,7 @@
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
 import { createPortal } from 'react-dom'
+import { SnakeTimer } from '../../components/SnakeTimer'
 import { useEffect, useRef, useState } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from '../../lib/supabase'
@@ -254,13 +255,10 @@ export function MelodyBoard({ pack, round, gameState }: {
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
               {!!deadline && (
                 // те же часы, что у большого таймера: --r = доля остатка
-                <div className="mel-count" style={{
-                  ['--r' as string]: Math.max(0, Math.min(1, left / Math.max(1, total))),
-                }}>
-                  <span className="hg" aria-hidden>
-                    <i className="hg-top" /><i className="hg-stream" /><i className="hg-bot" />
-                  </span>
-                  {left}
+                <div className="mel-count">
+                  {pack.theme === 'potter'
+                    ? <SnakeTimer left={left} seconds={total} low={left <= 5} />
+                    : left}
                 </div>
               )}
             </div>

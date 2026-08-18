@@ -1,0 +1,66 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   7.47 — РЕДАКТОР НА ТЕЛЕФОНЕ
+   Один брейкпоинт: до 720px всё выстраивается в одну колонку,
+   строки списков разворачиваются сверху вниз, кнопки уезжают на свою
+   строку и получают тач-размер. Проверено в браузере на 390×844.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  /* ── общая раскладка ── */
+  .ed-page { padding: 14px 12px 88px; max-width: none; }
+  .ed-crumb { flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .ed-h { font-size: 20px; line-height: 1.2; }
+  .ed-card { padding: 14px 12px; border-radius: 10px; margin-bottom: 12px; }
+  .ed-card > h4 { margin-bottom: 10px; font-size: 12px; letter-spacing: .14em; }
+  /* две колонки настроек → одна */
+  .ed-grid2 { grid-template-columns: 1fr; gap: 14px; }
+  .ed-field > label { font-size: 11.5px; }
+  .ed-hint { font-size: 11px; }
+
+  /* поля: 16px обязательны, иначе iOS зумит страницу при фокусе */
+  input, select, textarea,
+  .theme-classic input, .theme-classic select,
+  .theme-new_year input, .theme-new_year select { font-size: 16px; }
+  .ed-field select, .ed-field input, .ed-field textarea { width: 100%; }
+  textarea { min-height: 96px; }
+  /* поля в одной колонке слипались — разводим их по вертикали */
+  .ed-field + .ed-field, .ed-field + .ed-hint { margin-top: 14px; }
+  .qm-body > div > .ed-field + .ed-field { margin-top: 16px; }
+
+  /* ── строки списков: номер и текст сверху, кнопки — своей строкой ── */
+  .ed-row { display: grid; grid-template-columns: auto minmax(0, 1fr);
+    align-items: start; gap: 6px 10px; padding: 12px; }
+  .ed-num { grid-row: 1; min-width: 26px; font-size: 17px; text-align: left; }
+  .ed-row-main { grid-row: 1; }
+  .ed-row-title { font-size: 16px; white-space: normal; overflow: visible; }
+  .ed-row-text { -webkit-line-clamp: 3; font-size: 13px; }
+  .ed-row-meta { font-size: 11.5px; }
+  .ed-count { grid-column: 2; justify-self: start; font-size: 13px; }
+  .ed-answer-chip { max-width: 100%; font-size: 12px; }
+  /* кнопки во всю ширину строки, с отбивкой — больше не слипаются с текстом */
+  .ed-actions { grid-column: 1 / -1; flex-wrap: wrap; gap: 10px;
+    margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--ed-line); }
+
+  /* тач-размер; тултипы на телефоне не показываются (нет ховера) */
+  .ico { width: 44px; height: 44px; font-size: 18px; }
+  .ico[data-tip]::after { display: none; }
+
+  /* кнопки */
+  button, .btn { padding: 12px 18px; font-size: 15px; }
+  .ed-addrow button { width: 100%; }
+
+  /* ── таблицы (редакторы, настройки) — горизонтальный скролл вместо каши ── */
+  .ed-table, .ed-settings { display: block; width: 100%; overflow-x: auto;
+    white-space: nowrap; -webkit-overflow-scrolling: touch; }
+
+  /* ── модалка вопроса: полноэкранная, одна колонка, футер закреплён ── */
+  .qm-backdrop { padding: 0; }
+  .qm-window { width: 100vw; max-width: none; margin: 0; min-height: 100vh;
+    border-radius: 0; border-left: none; border-right: none; }
+  .qm-head { flex-wrap: wrap; gap: 10px; padding: 14px 14px;
+    position: sticky; top: 0; z-index: 3; background: #0b1424; }
+  .qm-body { grid-template-columns: 1fr; gap: 18px; padding: 16px 14px; }
+  .qm-alert { margin: 0 14px; }
+  .qm-foot { position: sticky; bottom: 0; z-index: 3; background: #0b1424;
+    padding: 12px 14px; gap: 10px; }
+  .qm-foot button { flex: 1 1 0; padding: 13px 10px; }
+}

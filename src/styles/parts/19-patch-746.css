@@ -1,0 +1,190 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   7.46 — ТАЙМЕР-ЗМЕЯ, КАРТИНКИ БЕЗ ОБРЕЗКИ, КРУПНЫЙ ТЕКСТ
+   Всё в этом блоке отрисовано и просмотрено в headless-браузере.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1: круговой таймер-змея (ГП) ── */
+.theme-potter .host-screen { padding-top: 150px; }
+.theme-potter .timer-wrap { position: static; width: auto; height: auto;
+  border: none; box-shadow: none; }
+.snake-timer { position: relative; width: clamp(140px, 12.5vw, 200px); aspect-ratio: 1;
+  display: grid; place-items: center; flex: 0 0 auto; }
+.snake-timer svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.snake-num { position: relative; z-index: 2; line-height: 1; font-family: 'Cinzel Decorative', var(--font-digits), serif;
+  font-weight: 700; font-variant-numeric: tabular-nums; color: #e9c766;
+  font-size: clamp(34px, 3.6vw, 58px); text-shadow: 0 0 18px rgba(211,166,37,.55); }
+.snake-num.danger { color: #ff8f7a; text-shadow: 0 0 22px rgba(226,80,58,.7);
+  animation: pulse .85s ease-in-out infinite; }
+/* язык мелькает, как у живой змеи */
+.sn-tongue { transform-origin: 17px 0; animation: snTongue 2.4s ease-in-out infinite; }
+.snake-timer.low .sn-tongue { animation-duration: .9s; }
+@keyframes snTongue {
+  0%, 62%, 100% { opacity: 0; transform: scaleX(.35); }
+  68%, 78%      { opacity: 1; transform: scaleX(1); }
+  84%           { opacity: 1; transform: scaleX(.7); }
+}
+/* в мелодии и спринте — свои размеры */
+.mel-count .snake-timer { width: clamp(84px, 7vw, 112px); }
+.mel-count .snake-num { font-size: clamp(24px, 2.4vw, 38px); }
+.sprint-timer .snake-timer { width: clamp(190px, 19vw, 280px); }
+.sprint-timer:has(.snake-timer) { transform: none; }
+
+/* ── 2+7: КАРТИНКИ НИКОГДА НЕ ОБРЕЗАЮТСЯ ──
+   Фиксированные vh не гарантировали, что блок влезет: при длинном вопросе
+   и вариантах снизу картинки переполняли колонку и наезжали на текст.
+   Теперь сетка забирает ВЕСЬ остаток высоты экрана (flex: 1 1 0), а картинка
+   вписывается в него по max-height:100% — без обрезки и без чёрных полей.
+   Ширина колонок задаётся количеством картинок. */
+.q-media-grid { display: grid; gap: clamp(10px, 1.2vw, 20px); margin-inline: auto;
+  flex: 1 1 0; min-height: 0; align-items: stretch; justify-items: center; }
+.q-media-grid.n1 { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); width: min(1100px, 80vw); }
+.q-media-grid.n2 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(1600px, 94vw); }
+.q-media-grid.n3 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(1680px, 96vw); }
+.q-media-grid.n4 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(4, minmax(0, 1fr)); width: min(1720px, 97vw); }
+/* height НЕ задаём: заданная высота отменяет stretch и ячейка схлопывается */
+.q-img { position: relative; margin: 0; min-width: 0; min-height: 0;
+  display: flex; align-items: center; justify-content: center; width: 100%; }
+.q-img img { width: auto; height: auto; max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 10px; border: 2px solid var(--dim); display: block; }
+.q-img figcaption { position: absolute; top: 8px; left: 8px; z-index: 2;
+  font-family: var(--font-digits); font-size: clamp(20px, 2vw, 32px); color: var(--accent);
+  background: rgba(0,0,0,.68); border-radius: 8px; padding: 2px 12px; }
+
+/* ── 7: СОПОСТАВЛЕНИЕ — все карточки в ОДИН ряд по всей ширине, ответы под ними ── */
+.img-answers { display: grid; margin-inline: auto; gap: clamp(10px, 1.2vw, 22px);
+  flex: 1 1 0; min-height: 0; height: auto; align-content: stretch; align-items: stretch;
+  justify-items: center; grid-template-rows: minmax(0, 1fr); }
+.img-answers.n2 { grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1500px, 92vw); }
+.img-answers.n3 { grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1680px, 96vw); }
+.img-answers.n4 { grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1720px, 97vw); }
+.img-answers.n5 { grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1780px, 98vw); }
+.img-answer { position: relative; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end; gap: 8px;
+  min-width: 0; min-height: 0; width: 100%;
+  grid-template-columns: none; grid-template-rows: none; }
+/* рамка держит номер/букву у самой картинки и отдаёт ей весь остаток высоты */
+.ia-frame { position: relative; flex: 1 1 0; min-height: 0; max-width: 100%;
+  display: flex; align-items: flex-end; justify-content: center; line-height: 0; }
+.img-answer img { width: auto; height: auto; max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 12px; border: 2px solid rgba(255,255,255,.18);
+  display: block; }
+/* бейдж — у НИЖНЕГО края: картинки выровнены по низу, поэтому он всегда
+   прилипает к самой картинке, какой бы она ни была пропорции */
+.ia-key { position: absolute; bottom: 8px; left: 8px; top: auto; z-index: 2; width: auto;
+  font-family: var(--font-display); font-size: clamp(22px, 2.4vw, 40px);
+  color: var(--accent); background: rgba(0,0,0,.68); border-radius: 10px;
+  padding: 0 14px; line-height: 1.35; }
+.ia-text { position: static; grid-column: auto; grid-row: auto; flex: 0 0 auto;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 30px); color: var(--fg); text-align: center;
+  white-space: normal; overflow: visible; text-overflow: clip; }
+.img-answer:has(.ia-text) { grid-template-rows: none; }
+/* текст вопроса и варианты высоту не отбирают — они по содержимому */
+.host-screen > .q-text, .host-screen > .choices-grid { flex: 0 0 auto; }
+
+/* экран ответа сопоставления — тоже в один ряд и без обрезки */
+.match-answer { display: grid; gap: clamp(10px, 1.2vw, 22px);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  width: min(1680px, 96vw); margin-inline: auto; }
+.match-answer .mi img { width: 100%; height: auto; max-height: 34vh; object-fit: contain;
+  border-radius: 10px; border: 2px solid var(--accent); background: rgba(0,0,0,.25); }
+
+/* ── 6: ТЕКСТ ВОПРОСА — ОЧЕНЬ КРУПНЫЙ, с адаптацией под длину ── */
+.q-text { font-size: clamp(38px, 5vw, 104px); line-height: 1.12; max-width: 94vw;
+  font-weight: 700; }
+.q-text.len-m { font-size: clamp(34px, 4.2vw, 84px); }
+.q-text.len-l { font-size: clamp(28px, 3.4vw, 64px); }
+.q-text.len-xl { font-size: clamp(24px, 2.7vw, 50px); line-height: 1.18; }
+/* если рядом картинки — текст чуть спокойнее, но всё равно крупный */
+.q-split .q-text { font-size: clamp(30px, 3.4vw, 68px); }
+.q-split .q-text.len-l { font-size: clamp(26px, 2.8vw, 54px); }
+.q-split .q-text.len-xl { font-size: clamp(22px, 2.3vw, 42px); }
+.has-media .q-text { font-size: clamp(30px, 3.6vw, 72px); }
+.has-media .q-text.len-l { font-size: clamp(26px, 2.9vw, 56px); }
+.has-media .q-text.len-xl { font-size: clamp(22px, 2.4vw, 44px); }
+/* тема ГП задавала свой размер (.theme-potter .q-text) — повторяем всю шкалу,
+   иначе более специфичное старое правило душит крупный кегль */
+.theme-potter .q-text { font-size: clamp(38px, 5vw, 104px); line-height: 1.12; }
+.theme-potter .q-text.len-m { font-size: clamp(34px, 4.2vw, 84px); }
+.theme-potter .q-text.len-l { font-size: clamp(28px, 3.4vw, 64px); }
+.theme-potter .q-text.len-xl { font-size: clamp(24px, 2.7vw, 50px); line-height: 1.18; }
+.theme-potter .q-split .q-text { font-size: clamp(30px, 3.4vw, 68px); }
+.theme-potter .has-media .q-text { font-size: clamp(30px, 3.6vw, 72px); }
+.theme-potter .has-media .q-text.len-l { font-size: clamp(26px, 2.9vw, 56px); }
+.theme-potter .has-media .q-text.len-xl { font-size: clamp(22px, 2.4vw, 44px); }
+.theme-potter .answers-layout .q-text { font-size: clamp(26px, 2.8vw, 50px); }
+.theme-potter .answers-layout .q-text.len-l { font-size: clamp(22px, 2.3vw, 40px); }
+.theme-potter .answers-layout .q-text.len-xl { font-size: clamp(19px, 1.9vw, 32px); }
+
+/* текст без картинок висел под шапкой, оставляя дыру: центрируем его
+   в свободном пространстве над вариантами */
+.host-screen:not(.has-media) > .q-text,
+.host-screen:not(.has-media) > *:not(.host-topbar):not(.host-actions) > .q-text { margin-block: auto; }
+
+/* на экране разбора вопрос тоже читаемый */
+.answers-layout .q-text { font-size: clamp(26px, 2.8vw, 50px); }
+.answers-layout .q-text.len-l { font-size: clamp(22px, 2.3vw, 40px); }
+.answers-layout .q-text.len-xl { font-size: clamp(19px, 1.9vw, 32px); }
+
+/* ── 4: ВАРИАНТЫ ОТВЕТА — ниже и заметно крупнее (правило для всех механик) ── */
+.choices-grid { display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.4vw, 24px); width: min(1600px, 95vw); margin-inline: auto;
+  flex-shrink: 0; margin-top: auto; padding-top: clamp(20px, 5vh, 72px); }
+.choice-plate { display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
+  padding: clamp(16px, 2vh, 30px) clamp(20px, 2vw, 38px);
+  font-size: clamp(26px, 2.9vw, 52px); font-weight: 700; line-height: 1.15;
+  border-radius: 12px; }
+.choice-plate .key { font-size: 1.15em; flex: 0 0 auto; }
+/* три и более коротких варианта — в одну строку, если влезают */
+.choices-grid:has(.choice-plate:nth-child(5)) { grid-template-columns: 1fr 1fr 1fr; }
+
+/* ── 5: ИНТРИГА ПРИ ПОКАЗЕ ОТВЕТА ──
+   плитки выезжают партиями, «правильный/неправильный» подсвечивается позже,
+   и подсветка появляется плавно, без дёрганья раскладки. */
+.choice-plate.pending { opacity: 1; }
+.choice-plate.hidden-yet { visibility: hidden; animation: none; opacity: 0; }
+.choice-plate.correct, .choice-plate.dimmed,
+.choice-img.correct, .choice-img.dimmed { transition: opacity .5s ease, filter .5s ease,
+  border-color .5s ease, box-shadow .5s ease, background-color .5s ease; }
+.choice-img.hidden-yet { visibility: hidden; animation: none; opacity: 0; }
+.choice-imgs { display: grid; gap: clamp(10px, 1.2vw, 22px);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  width: min(1600px, 95vw); margin-inline: auto; }
+.choice-img img { width: 100%; height: auto; max-height: 34vh; object-fit: contain;
+  border-radius: 8px; background: rgba(0,0,0,.25); }
+.choice-img .key { font-size: clamp(18px, 1.8vw, 30px); font-weight: 700; }
+
+/* ── 3: «120 СЕКУНД» — вопрос-герой вплотную над таймером ── */
+.sprint-screen.with-hero { grid-template-rows: minmax(0, auto) minmax(0, 1fr); }
+.sprint-hero { grid-column: 1 / -1; justify-self: center; align-self: end;
+  margin-top: 0; width: min(94%, 1500px); }
+.sprint-hero .sprint-text { text-align: center;
+  font-size: clamp(24px, 3vw, 56px); line-height: 1.15; }
+.sprint-hero.len-l .sprint-text { font-size: clamp(20px, 2.4vw, 42px); }
+.sprint-hero.len-xl .sprint-text { font-size: clamp(18px, 2vw, 34px); }
+/* таймер прижимается к верху своей строки — прямо под вопросом.
+   align-self обязателен: у .sprint-screen align-items:center центрировал
+   ячейку целиком, и justify-content внутри ничего не решал. */
+.sprint-screen.with-hero > .sprint-center { align-self: start; justify-content: flex-start;
+  padding-top: clamp(4px, 1vh, 14px); }
+.sprint-screen.with-hero > .sprint-col { align-self: start; }
+.sprint-screen.with-hero { padding-top: clamp(38px, 5.5vh, 62px); }
+.sprint-center { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; }
+/* карточки спринта — крупнее, адаптивно к количеству */
+.sprint-text { font-size: clamp(17px, 1.85vw, 32px); line-height: 1.25; }
+.sprint-screen.many .sprint-text { font-size: clamp(15px, 1.5vw, 25px); }
+.sprint-img { max-height: 18vh; width: auto; object-fit: contain; }
+
+/* сплит «текст слева, картинка справа»: колонка тянется на всю высоту,
+   иначе grid-ячейка схлопывается и картинка становится нулевой */
+.q-split { align-items: stretch; }
+.q-split .q-media-grid { height: 100%; min-height: 0; }
+/* медиа на экране ответа высоту не захватывает */
+.answer-media { flex: 0 1 auto; grid-template-rows: auto; }
+.answer-media img { max-height: 34vh; width: auto; height: auto;
+  max-width: 100%; object-fit: contain; }

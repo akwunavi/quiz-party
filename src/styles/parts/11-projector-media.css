@@ -1,0 +1,43 @@
+/* ═══ Картинки-варианты и сопоставление: строгая сетка, ноль наездов ═══ */
+.host-screen { padding-top: 92px; padding-bottom: 96px; }   /* под шапку и кнопки */
+.theme-new_year .host-screen { padding-top: 128px; }        /* + гирлянда */
+.img-answers { display: grid; width: min(92vw, 1400px);
+  flex: 1 1 auto; min-height: 0; height: 100%;
+  gap: clamp(8px, 1.2vw, 20px); align-content: stretch; }
+
+.ia-key { font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 40px);
+  color: var(--accent); width: 1.5em; text-align: center; align-self: center; }
+
+/* ── 2: колонка ответов команд уже, вопрос шире, всё адаптивно ── */
+.answers-layout { display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 22vw, 340px);
+  gap: clamp(16px, 2vw, 34px); flex: 1; min-height: 0; width: 100%; }
+.team-answers { min-height: 0; overflow-y: auto; }
+.team-answer { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; padding: 10px 12px; }
+.team-answer .name { min-width: 0; font-size: clamp(14px, 1.2vw, 19px); overflow: hidden;
+  text-overflow: ellipsis; }
+.team-answer .text { font-size: clamp(15px, 1.4vw, 22px); }
+
+/* ── 3: модалка своей игры — больше, без скроллов ── */
+.jp-modal { width: min(1600px, 96vw); max-height: 92vh; overflow: hidden;
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 14px; }
+.jp-answers { min-height: 0; overflow-y: auto; }
+.jp-answer { grid-template-columns: 40px minmax(90px, 160px) 1fr auto auto; }
+
+/* Финал: фейерверк крупнее, подиум с ледяными ступенями */
+.firework { width: 10px; height: 10px; box-shadow: 0 0 22px currentColor; }
+.fin-podium { display: flex; align-items: flex-end; gap: clamp(14px, 2.2vw, 34px);
+  justify-content: center; margin-top: 10px; }
+.theme-new_year .fin-step { background: linear-gradient(180deg, rgba(223,241,255,.24), rgba(124,199,255,.10));
+  border: 1px solid rgba(223,241,255,.55);
+  box-shadow: inset 0 2px 14px rgba(255,255,255,.35), 0 0 30px rgba(124,199,255,.25); }
+.theme-new_year .fin-step.p1 { border-color: #ffd700;
+  box-shadow: inset 0 2px 16px rgba(255,255,255,.4), 0 0 46px rgba(255,215,0,.4); }
+.fin-step.p1 .fin-medal { animation: pulse 1.8s ease-in-out infinite; }
+/* снежные шапки на ступенях */
+.theme-new_year .fin-step { position: relative; }
+.theme-new_year .fin-step::before { content: ''; position: absolute; left: -3px; right: -3px; top: -8px;
+  height: 12px;
+  background: radial-gradient(ellipse 40% 100% at 20% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 44% 120% at 52% 100%, #fff 60%, transparent 62%),
+              radial-gradient(ellipse 38% 90%  at 84% 100%, #fff 60%, transparent 62%);
+  filter: drop-shadow(0 2px 3px rgba(90,140,190,.45)); }

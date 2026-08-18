@@ -1,0 +1,25 @@
+/* ═══ КИБЕРПАНК: админка + редактор (без изменений против 5.5) ═══ */
+.cyber {
+  --bg: #070b12; --panel: #0d1420; --panel2: #131c2e; --fg: #d4e3ff; --muted: #5d708f;
+  --neon: #00e5ff; --magenta: #ff2fa0; --lime: #b6ff3c; --amber: #ffb020; --danger: #ff3b5c;
+  background: var(--bg); color: var(--fg); min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.cyber h2, .cyber h3, .cyber h4 { letter-spacing: .04em;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--neon) 40%, transparent); }
+.cyber button { background: var(--panel2); color: var(--fg);
+  border: 1px solid color-mix(in srgb, var(--neon) 55%, transparent);
+  border-radius: 8px; padding: 7px 13px; cursor: pointer; font-size: 14px;
+  font-family: inherit; text-transform: none; letter-spacing: 0; clip-path: none;
+  transition: box-shadow .15s, filter .15s; }
+.cyber button:hover { box-shadow: 0 0 10px color-mix(in srgb, var(--neon) 60%, transparent); filter: brightness(1.15); }
+.cyber button:disabled { opacity: .35; box-shadow: none; cursor: default; }
+.cyber input, .cyber textarea, .cyber select { background: var(--panel); color: var(--fg);
+  border: 1px solid var(--muted); border-radius: 8px; padding: 8px; font-family: inherit; }
+.cyber input:focus, .cyber textarea:focus, .cyber select:focus { outline: none;
+  border-color: var(--neon); box-shadow: 0 0 8px color-mix(in srgb, var(--neon) 50%, transparent); }
+.cyber table { border-collapse: collapse; }
+.cyber td { padding: 4px 6px; }
+.cyber a { color: var(--neon); }
+.cyber ::placeholder { color: var(--muted); }
+.cyber .num, .cyber code { font-family: 'Share Tech Mono', monospace; }

@@ -2,7 +2,7 @@
 // Поток: слайд → пауза startDelaySec → таймер + фоновая музыка →
 // таймер вышел → пауза afterTimerSec → фаза разбора (по одному вопросу).
 import { useEffect, useState } from 'react'
-import { mediaUrl } from '../HostScreen'
+import { mediaUrl, lenClass } from '../HostScreen'
 import { startTimer, gotoAnswers } from '../../lib/gameActions'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'
@@ -51,9 +51,10 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
   const rest = hero ? questions.slice(1) : questions
   const half = Math.ceil(rest.length / 2)
   return (
-    <div className={`sprint-screen${hero ? ' with-hero' : ''}`}>
+    <div className={`sprint-screen${hero ? ' with-hero' : ''}${questions.length > 7 ? ' many' : ''}`}>
       {hero && (
-        <div className="sprint-hero sprint-card">
+        <div className={`sprint-hero sprint-card${lenClass(hero.question_text).trim()
+          ? lenClass(hero.question_text) : ''}`}>
           <span className="sprint-num">1</span>
           <div className="sprint-text">{hero.question_text}</div>
         </div>

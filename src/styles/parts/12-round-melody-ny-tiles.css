@@ -1,0 +1,45 @@
+/* ── Плитки мелодии: ёлочные шары ── */
+.mel-tile { position: relative; background: transparent; border: none; }
+@keyframes ballSwing { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+.mel-tile { display: flex; align-items: center; justify-content: center; }
+.mel-board { align-items: center; }
+
+/* Спринт: название раунда на обычном месте (слева сверху), таймер крупный */
+.sprint-topbar { position: absolute; top: 0; left: 0; right: 0; }
+.sprint-timer { transform: scale(1.7); transform-origin: center; }
+.sprint-timer .ny-wreath { width: clamp(150px, 15vw, 230px); height: clamp(150px, 15vw, 230px); }
+.sprint-center { min-width: clamp(220px, 24vw, 340px); }
+
+/* Мелодия: доска без заголовка раунда, темы дышат, шары не наезжают */
+.mel-screen { padding-top: 84px; }
+.theme-new_year .mel-screen { padding-top: 96px; }
+.mel-theme { animation: themeGlow 3.2s ease-in-out infinite; }
+.mel-theme:nth-child(2) { animation-delay: .8s; }
+.mel-theme:nth-child(3) { animation-delay: 1.6s; }
+@keyframes themeGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(124,199,255,0); }
+  50% { box-shadow: 0 0 22px rgba(124,199,255,.35); }
+}
+/* шар живёт внутри своей ячейки: высота от ячейки, колпачок учтён в отступе */
+.mel-board { gap: 14px 10px; }
+.mel-tile { padding-top: 14px; }             /* место под колпачок */
+/* модалка без hud-уголков */
+.mel-modal { border-radius: 16px; }
+
+/* Финал: поэтапное раскрытие и разбивка */
+.fin-step.veiled { opacity: 0; transform: translateY(26px); }
+.fin-step { transition: opacity .7s ease, transform .7s ease; }
+.fin-breakdown { margin-top: 16px; animation: ruleIn .6s ease both; }
+.fin-table { border-collapse: collapse; font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 1.3vw, 20px); }
+.fin-table th, .fin-table td { padding: 5px 14px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,.12); }
+.fin-table th { color: var(--muted); font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .15em; }
+.fin-table td:first-child { text-align: left; }
+
+/* Клавиши ставок: подсветка ТОЛЬКО у выбранной (было: focus от тапа «залипал») */
+.mel-keys button:focus { outline: none; }
+.mel-keys button:focus:not(.sel) { background: rgba(255,255,255,.06);
+  border-color: var(--dim); color: var(--fg); }

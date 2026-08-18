@@ -1,0 +1,65 @@
+/* ═══ Часы Хогвартса (песочные) удалены в 7.46 — заменены таймером-змеёй ═══ */
+
+/* ═══ 7.45: КРУПНЫЙ ТЕКСТ И АДАПТАЦИЯ (проверено в браузере) ═══ */
+/* вопрос и варианты — заметно крупнее, с автоподгонкой под длину */
+.q-text { font-size: clamp(26px, 3.2vw, 58px); line-height: 1.18; }
+.q-text.long { font-size: clamp(22px, 2.4vw, 42px); }
+.opt-row { font-size: clamp(19px, 2vw, 34px); padding: 16px 22px; }
+.opt-row .opt-letter { font-size: 1.05em; }
+.jp-modal, .mel-modal { width: min(1100px, 94vw); }
+.jp-modal-question, .jp-answer { font-size: clamp(22px, 2.6vw, 44px); }
+/* ответы команд и разбор */
+.team-answer { font-size: clamp(15px, 1.4vw, 24px); }
+.answer-main { font-size: clamp(30px, 3.6vw, 64px); }
+
+/* 7+8: СОПОСТАВЛЕНИЕ — крупные картинки, поочерёдное появление ответа */
+.q-media-grid { display: grid; gap: clamp(10px, 1.4vw, 22px);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  width: min(1200px, 92vw); margin-inline: auto; }
+.q-img { position: relative; margin: 0; }
+
+/* экран ответа: крупная сетка сопоставления, карточки появляются по очереди */
+.match-answer { display: grid; gap: clamp(12px, 1.6vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  width: min(1200px, 92vw); margin-inline: auto; }
+.match-answer .mi { animation: matchPop .5s cubic-bezier(.2,.8,.3,1) both; }
+.match-answer .mi:nth-child(1) { animation-delay: .1s; }
+.match-answer .mi:nth-child(2) { animation-delay: .7s; }
+.match-answer .mi:nth-child(3) { animation-delay: 1.3s; }
+.match-answer .mi:nth-child(4) { animation-delay: 1.9s; }
+.match-answer .mi:nth-child(5) { animation-delay: 2.5s; }
+.match-answer .mi:nth-child(6) { animation-delay: 3.1s; }
+@keyframes matchPop { from { opacity: 0; transform: translateY(26px) scale(.9); }
+  to { opacity: 1; transform: none; } }
+.match-answer .mi-label { font-family: var(--font-digits);
+  font-size: clamp(20px, 2.2vw, 36px); color: var(--accent); margin-top: 8px; }
+/* 9: порядок — тоже крупно и по очереди */
+.order-answer { display: flex; flex-direction: column; gap: 12px;
+  width: min(1000px, 90vw); margin-inline: auto; }
+.order-answer .oi { font-size: clamp(20px, 2.2vw, 38px); padding: 14px 24px;
+  border: 2px solid var(--dim); border-radius: 10px; text-align: left;
+  animation: matchPop .5s cubic-bezier(.2,.8,.3,1) both; }
+.order-answer .oi:nth-child(1) { animation-delay: .1s; }
+.order-answer .oi:nth-child(2) { animation-delay: .7s; }
+.order-answer .oi:nth-child(3) { animation-delay: 1.3s; }
+.order-answer .oi:nth-child(4) { animation-delay: 1.9s; }
+.order-answer .oi:nth-child(5) { animation-delay: 2.5s; }
+.order-answer .oi:nth-child(6) { animation-delay: 3.1s; }
+.order-answer .oi b { color: var(--accent); margin-right: 14px; }
+
+/* 10: ГП — «ОТВЕЧАЙТЕ!» без кибер-кольца, вместо него волшебное сияние */
+.theme-potter .answer-pulse { animation: none; }
+.theme-potter .answer-pulse .neon-title {
+  animation: spellGlow 2.4s ease-in-out infinite; }
+@keyframes spellGlow {
+  0%, 100% { text-shadow: 0 0 16px rgba(211,166,37,.5), 0 0 34px rgba(164,93,226,.25);
+    filter: brightness(1); }
+  50% { text-shadow: 0 0 30px rgba(233,199,102,.9), 0 0 60px rgba(164,93,226,.55);
+    filter: brightness(1.15); }
+}
+.theme-potter .answer-pulse::before, .theme-potter .answer-pulse::after {
+  content: '✦'; position: absolute; color: #ffe9a8; font-size: 22px;
+  animation: sparkTwinkle 2s ease-in-out infinite; }
+.theme-potter .answer-pulse { position: relative; }
+.theme-potter .answer-pulse::before { left: -34px; top: 10%; }
+.theme-potter .answer-pulse::after { right: -34px; bottom: 10%; animation-delay: 1s; }
