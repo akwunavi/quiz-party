@@ -79,76 +79,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             В этом раунде контент задаётся темами и треками ниже — блок вопросов и
             общий таймер не используются, тайминги стадий настраиваются отдельно.
           </div>}
-        <table style={{ display: 'none' }}><tbody>
-          <tr><td>Заголовок (проектор):</td><td>
-            <EditableText value={round.title_lines.join(' / ')} disabled={locked}
-              onSave={v => void patch({ title_lines: v.split('/').map(s => s.trim()).filter(Boolean) })} />
-            <span style={{ opacity: .5 }}> (строки через /)</span>
-          </td></tr>
-          {!noQuestions && <tr><td>Таймер:</td><td>
-            <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
-              onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
-            <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
-          </td></tr>}
-          {!noQuestions && <tr><td>Показ ответов:</td><td>
-            <select value={round.answers_reveal} disabled={locked}
-              onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
-              <option value="after_question">сразу после вопроса</option>
-              <option value="after_round">в конце раунда</option>
-              <option value="never">не показывать</option>
-            </select>
-          </td></tr>}
-          {!noQuestions && <tr><td>Правок ответа:</td><td>
-            <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
-              onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
-              <option value={0}>без правок</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={-1}>без ограничений</option>
-            </select>
-            <span style={{ opacity: .5 }}> (стереть ответ можно всегда)</span>
-          </td></tr>}
-          <tr><td>metaLine:</td><td>
-            <EditableText value={round.meta_line_override ?? metaLine(round)} disabled={locked}
-              onSave={v => void patch({ meta_line_override: v.trim() === metaLine(round) ? null : (v.trim() || null) })} />
-            <span style={{ opacity: .5 }}> (правишь текущий текст; сотри всё = автогенерация)</span>
-          </td></tr>
-          <tr><td style={{ verticalAlign: 'top' }}>Правила:</td><td>
-            <RulesEditor rules={round.rules} disabled={locked}
-              onSave={rules => void patch({ rules })} />
-          </td></tr>
-          {!noQuestions && <tr><td>Музыка/озвучка правил:</td><td>
-            <MediaSlot label="" packId={pack.id} accept="audio/*"
-              paths={round.rules_audio ? [round.rules_audio] : []} max={1}
-              onChange={paths => void patch({ rules_audio: paths[0] ?? null })} />
-          </td></tr>}
-          <tr><td>Фоновая музыка вопросов:</td><td>
-            <MediaSlot label="" packId={pack.id} accept="audio/*"
-              paths={(round.settings as { bg_music?: string }).bg_music ? [(round.settings as { bg_music: string }).bg_music] : []} max={1}
-              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
-            <span style={{ opacity: .5 }}>играет во время таймера, если у вопроса нет своего аудио/видео</span>
-          </td></tr>
-          <tr><td>После раунда:</td><td>
-            <label><input type="checkbox"
-              checked={!!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after}
-              disabled={locked}
-              onChange={e => void patch({ settings: { ...round.settings, show_scoreboard_after: e.target.checked } as never })} />
-              {' '}показать табло</label>
-            {'  '}
-            <label style={{ marginLeft: 16 }}>перерыв, мин:{' '}
-              <input type="number" min={0} max={60} style={{ width: 64 }}
-                value={(round.settings as { break_after_minutes?: number }).break_after_minutes ?? 0}
-                disabled={locked}
-                onChange={e => void patch({ settings: { ...round.settings, break_after_minutes: Number(e.target.value) || undefined } as never })} />
-              {' '}(0 = без перерыва)</label>
-          </td></tr>
-          {!noQuestions && <tr><td>Вне зачёта:</td><td>
-            <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
-              onChange={e => void patch({ off_scoreboard: e.target.checked })} />
-            <span style={{ opacity: .5 }}> (разогрев: баллы не идут в табло)</span>
-          </td></tr>}
-        </tbody></table>
+        {/* старая таблица настроек удалена в 7.54: она была скрыта
+            display:none и три поля из неё не имели видимой замены */}
 
         <div className="ed-field"><label>Заголовок на проекторе</label>
           <EditableText value={round.title_lines.join(' / ')} disabled={locked}
@@ -157,7 +89,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         </div>
 
         <div className="ed-field"><label>Разогрев</label>
-          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" checked={round.off_scoreboard} disabled={locked}
               onChange={e => void patch({ off_scoreboard: e.target.checked })} />
             баллы не идут в общий зачёт
@@ -170,8 +102,36 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
             <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </div>
+          <div className="ed-field"><label>Показ ответов</label>
+            <select value={round.answers_reveal} disabled={locked}
+              onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
+              <option value="after_question">сразу после вопроса</option>
+              <option value="after_round">в конце раунда</option>
+              <option value="never">не показывать</option>
+            </select>
+            <div className="ed-hint">Переопределяет настройку пакета для этого раунда</div>
+          </div>
+          <div className="ed-field"><label>Правок ответа</label>
+            <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
+              onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
+              <option value={0}>без правок</option>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={-1}>без ограничений</option>
+            </select>
+            <div className="ed-hint">Сколько раз команда может переписать ответ. Стереть ответ можно всегда</div>
+          </div>
+          <div className="ed-field"><label>Фоновая музыка вопросов</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={(round.settings as { bg_music?: string }).bg_music
+                ? [(round.settings as { bg_music: string }).bg_music] : []}
+              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
+            <div className="ed-hint">Играет во время таймера, если у вопроса нет своего аудио или видео.
+              Пусто — возьмётся общая музыка пакета</div>
+          </div>
           <div className="ed-field"><label>Автопролистывание</label>
-            <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
               через
               <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
                 value={(round.settings as { autoAdvanceSec?: number }).autoAdvanceSec ?? 0}
@@ -195,13 +155,13 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         </div>
 
         <div className="ed-field"><label>После раунда</label>
-          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
               checked={!!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after}
               onChange={e => void patch({ settings: { ...round.settings, show_scoreboard_after: e.target.checked } as never })} />
             показать табло
           </label>
-          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             перерыв, мин:
             <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
               value={(round.settings as { break_after_minutes?: number }).break_after_minutes ?? 0}

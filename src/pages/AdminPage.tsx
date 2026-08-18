@@ -9,6 +9,7 @@ import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart,
+  setFinaleStep, setFinaleMode,
 } from '../lib/gameActions'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
@@ -64,7 +65,8 @@ export function AdminPage() {
         </div>
       )}
 
-      {phase === 'finale' && <FinalePanel pack={pack} gameId={gameState.game_id} teams={teams} />}
+      {phase === 'finale' && <FinalePanel pack={pack} gameId={gameState.game_id}
+        teams={teams} gameState={gameState} />}
 
       {gameState.pack_id && phase !== 'lobby' && phase !== 'finale' && pack && round && (
         <RoundView pack={pack} round={round} gameState={gameState} teams={teams} answers={answers} />
@@ -270,8 +272,9 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         </button>
         {showRoundSwitch && <RoundPicker pack={pack} current={gameState.round_number} />}
 
-        {pack.settings?.play_mode === 'paper' &&
-          (phase === 'scoreboard' || phase === 'show_answers' || phase === 'break' || phase === 'answer_time') &&
+        {/* на бумаге баллы вносят когда угодно: во время раунда, на табло,
+            в перерыве и после — раньше блок жил только в четырёх фазах */}
+        {pack.settings?.play_mode === 'paper' && phase !== 'lobby' &&
           <PaperScores pack={pack} gameState={gameState} teams={teams} />}
 
         <TeamRandomizer />
@@ -313,6 +316,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
   const q = questions[step]
   const rows = answers.filter(a => a.question_ref === `q-${q?.id}`)
   const last = gameState.round_number + 1 >= pack.rounds.length
+  const showSb = !!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after
 
   return (
     <div className="adm-answers">
@@ -348,10 +352,14 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
         <button className="adm-btn" disabled={step === 0}
           onClick={() => void gotoAnswers(step - 1, true)}>← НАЗАД</button>
         <button className="adm-btn primary" onClick={() => {
-          if (step < total - 1) void gotoAnswers(step + 1)
-          else if (last) void finishGame(gameState.pack_id)
-          else void showScoreboard()
-        }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →' : last ? 'ФИНАЛ →' : 'К ТАБЛО →'}</button>
+          if (step < total - 1) { void gotoAnswers(step + 1); return }
+          // настройка раунда «показать табло» раньше игнорировалась здесь:
+          // после разбора сразу уходили в финал или в табло независимо от неё
+          if (showSb) { void showScoreboard(); return }
+          if (last) void finishGame(gameState.pack_id)
+          else void gotoRound(gameState.round_number + 1)
+        }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'
+          : showSb ? 'К ТАБЛО →' : last ? 'ФИНАЛ →' : 'СЛЕД. РАУНД →'}</button>
       </div>
     </div>
   )
@@ -439,41 +447,116 @@ function PaperScores({ pack, gameState, teams }: {
   pack: LoadedPack; teams: Team[]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
+  const answers = useAnswers(gameState.game_id)
+  // раунд, который правим: по умолчанию текущий, но можно вернуться к прошлым —
+  // на бумаге ошибки в подсчёте всплывают уже после того, как раунд закрыт
+  const [ri, setRi] = useState(gameState.round_number)
+  useEffect(() => { setRi(gameState.round_number) }, [gameState.round_number])
   const [vals, setVals] = useState<Record<string, string>>({})
-  const ri = gameState.round_number
+  const [saved, setSaved] = useState<Record<string, boolean>>({})
+
+  // подтягиваем уже сохранённые баллы, иначе ведущий правит вслепую
+  const stored = new Map<string, number>()
+  for (const a of answers) {
+    if (a.question_ref === `q-paper-${ri}`) stored.set(a.team_id, Number(a.stake ?? 0))
+  }
+  useEffect(() => { setVals({}); setSaved({}) }, [ri])
+
   const save = async (teamId: string) => {
-    const pts = Number(vals[teamId])
+    const raw = vals[teamId]
+    const pts = Number(raw === undefined || raw === '' ? stored.get(teamId) ?? 0 : raw)
     if (Number.isNaN(pts)) return
     await supabase.from('answers').upsert({
       team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
       round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
     } as never, { onConflict: 'team_id,game_id,question_ref' } as never)
+    setSaved(v => ({ ...v, [teamId]: true }))
+    setTimeout(() => setSaved(v => ({ ...v, [teamId]: false })), 1500)
   }
+
+  const scored = pack.rounds.map((r, i) => ({ r, i })).filter(x => !x.r.off_scoreboard)
+  const sum = teams.reduce((acc, t) => acc + (Number(vals[t.id] ?? stored.get(t.id) ?? 0) || 0), 0)
+
   return (
     <div className="adm-box">
-      <div className="adm-dim">БАЛЛЫ ЗА РАУНД (БУМАГА) — ВВОДИ И ЖМИ ✓</div>
-      {[...teams].sort((x, y) => x.name.localeCompare(y.name)).map(t => (
-        <div key={t.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ color: t.color, flex: 1 }}>{t.name}</span>
-          <input inputMode="numeric" style={{ width: 80, textAlign: 'center' }}
-            value={vals[t.id] ?? ''} placeholder="0"
-            onChange={e => setVals(v => ({ ...v, [t.id]: e.target.value }))} />
-          <button className="adm-btn ok" style={{ flex: '0 0 auto', padding: '8px 14px' }}
-            onClick={() => void save(t.id)}>✓</button>
-        </div>
-      ))}
+      <div className="adm-dim">БАЛЛЫ ЗА РАУНД (БУМАГА)</div>
+      {/* выбор раунда: правки задним числом — обязательный сценарий на бумаге */}
+      <div className="paper-rounds">
+        {scored.map(({ r, i }) => (
+          <button key={r.id} className={`adm-round${i === ri ? ' active' : ''}`}
+            onClick={() => setRi(i)}>Р{displayRoundNumber(pack, i)}</button>
+        ))}
+      </div>
+      {ri !== gameState.round_number &&
+        <div className="adm-warn">правишь ПРОШЛЫЙ раунд Р{displayRoundNumber(pack, ri)}</div>}
+      {[...teams].sort((x, y) => x.name.localeCompare(y.name)).map(t => {
+        const has = stored.has(t.id)
+        return (
+          <div key={t.id} className="paper-row">
+            <span style={{ color: t.color, flex: 1 }}>{t.name}</span>
+            <input inputMode="numeric" className={has ? 'has' : ''}
+              style={{ width: 80, textAlign: 'center' }}
+              value={vals[t.id] ?? (has ? String(stored.get(t.id)) : '')}
+              placeholder="—"
+              onChange={e => setVals(v => ({ ...v, [t.id]: e.target.value }))} />
+            <button className={`adm-btn ok${saved[t.id] ? ' flash' : ''}`}
+              style={{ flex: '0 0 auto', padding: '8px 14px' }}
+              onClick={() => void save(t.id)}>{saved[t.id] ? '✔' : '✓'}</button>
+          </div>
+        )
+      })}
+      <div className="adm-dim">введено за раунд: {sum} · без оценки: {
+        teams.filter(t => !stored.has(t.id) && !vals[t.id]).length}</div>
     </div>
   )
 }
 
 // ── Финал ──
-function FinalePanel({ pack, gameId, teams }: { pack: LoadedPack | null; gameId: string; teams: Team[] }) {
+function FinalePanel({ pack, gameId, teams, gameState }: {
+  pack: LoadedPack | null; gameId: string; teams: Team[]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']> | null
+}) {
   const answers = useAnswers(gameId)
+  const bar = !!gameState?.reveal
+  const step = gameState?.question_index ?? 0
+  const scoredRounds = pack ? pack.rounds.filter(r => !r.off_scoreboard).length : 0
+  const barLabels = ['ПОКАЗАТЬ 3 МЕСТО', 'ПОКАЗАТЬ 2 МЕСТО', 'ПОКАЗАТЬ ПОБЕДИТЕЛЯ', 'ПОКАЗАТЬ ТАБЛИЦУ']
   return (
     <div className="adm-pad">
       <div className="adm-h1">ФИНАЛ</div>
       <div className="adm-dim">Команд: {teams.length} · ответов: {answers.length}</div>
       {pack && <div className="adm-dim">Пакет: {pack.name}</div>}
+
+      <div className="adm-box">
+        <div className="adm-dim">СЦЕНАРИЙ</div>
+        <div className="adm-two">
+          <button className={`adm-btn${!bar ? ' primary' : ''}`}
+            onClick={() => void setFinaleMode('show')}>ШОУ (АВТО)</button>
+          <button className={`adm-btn${bar ? ' primary' : ''}`}
+            onClick={() => void setFinaleMode('bar')}>НАГРАЖДЕНИЕ (БАР)</button>
+        </div>
+        <div className="adm-dim">
+          {bar
+            ? 'Ручной режим: 3 → 2 → 1 место, каждый шаг по твоей команде. Успеваешь вручить и сфотографировать.'
+            : `Авто: ${scoredRounds} слайдов по раундам (15 сек) → победитель (10 сек) → общая таблица.`}
+        </div>
+      </div>
+
+      <div className="adm-box">
+        <div className="adm-dim">
+          {bar ? `ШАГ ${Math.min(step + 1, 4)} ИЗ 4` : 'МОЖНО ПРОМОТАТЬ ВРУЧНУЮ'}
+        </div>
+        <div className="adm-two">
+          <button className="adm-btn" disabled={step <= 0}
+            onClick={() => void setFinaleStep(Math.max(0, step - 1))}>← НАЗАД</button>
+          <button className="adm-btn primary"
+            disabled={bar && step >= 3}
+            onClick={() => void setFinaleStep(step + 1)}>
+            {bar ? (barLabels[step] ?? 'ДАЛЬШЕ →') : 'ДАЛЬШЕ →'}
+          </button>
+        </div>
+      </div>
+
       <button className="adm-link danger" onClick={() => {
         if (confirm('Начать новую игру?')) void resetGame()
       }}>⟲ НОВАЯ ИГРА</button>

@@ -86,12 +86,28 @@
 /* текст вопроса и варианты высоту не отбирают — они по содержимому */
 .host-screen > .q-text, .host-screen > .choices-grid { flex: 0 0 auto; }
 
-/* экран ответа сопоставления — тоже в один ряд и без обрезки */
-.match-answer { display: grid; gap: clamp(10px, 1.2vw, 22px);
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  width: min(1680px, 96vw); margin-inline: auto; }
-.match-answer .mi img { width: 100%; height: auto; max-height: 34vh; object-fit: contain;
-  border-radius: 10px; border: 2px solid var(--accent); background: rgba(0,0,0,.25); }
+/* Экран ответа сопоставления. ВАЖНО: блок живёт в ЛЕВОЙ колонке рядом с
+   колонкой ответов команд, поэтому ширину берём от родителя (100%), а не от
+   экрана — иначе последняя плитка уезжала под соседнюю колонку и обрезалась.
+   Раскладка — по 2 в ряд; высота картинки зависит от числа рядов. */
+.match-answer { display: grid; gap: clamp(10px, 1.2vw, 20px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%; max-width: 100%; margin-inline: 0; }
+.match-answer .mi { display: grid; grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center; gap: 6px; min-width: 0; min-height: 0; }
+.match-answer .mi img { width: auto; height: auto; max-width: 100%;
+  max-height: 100%; align-self: center; object-fit: contain; border-radius: 10px;
+  border: 2px solid var(--accent); background: rgba(0,0,0,.25); display: block; }
+/* Блок забирает остаток высоты колонки, ряды делят его поровну — плитки не
+   съезжают за нижний край при любом числе картинок. Растягиваем ТОЛЬКО рамку
+   с сопоставлением (:has), чтобы не менять вид остальных экранов ответа.
+   flex: 1 1 auto, а не 1 1 0 — при basis 0 контейнер схлопывается в ноль. */
+.answers-layout .answer-reveal:has(.match-answer) { display: flex;
+  flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.answer-reveal:has(.match-answer) .match-answer { flex: 1 1 auto; min-height: 0; }
+.match-answer.n1, .match-answer.n2 { grid-template-rows: minmax(0, 1fr); }
+.match-answer.n3, .match-answer.n4 { grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.match-answer.n5, .match-answer.n6 { grid-template-rows: repeat(3, minmax(0, 1fr)); }
 
 /* ── 6: ТЕКСТ ВОПРОСА — ОЧЕНЬ КРУПНЫЙ, с адаптацией под длину ── */
 .q-text { font-size: clamp(38px, 5vw, 104px); line-height: 1.12; max-width: 94vw;

@@ -83,7 +83,9 @@ export async function markRoundCompleted(completed: number[]) {
 }
 
 export async function finishGame(packId: string | null) {
-  await supabase.from('game_sessions').update({ phase: 'finale' }).eq('id', getRoomId())
+  // финал всегда начинается с нулевого шага, иначе подхватится индекс вопроса
+  await supabase.from('game_sessions')
+    .update({ phase: 'finale', question_index: 0, reveal: false }).eq('id', getRoomId())
   if (packId) await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
 }
 
@@ -109,5 +111,20 @@ export async function resetGame() {
     round_number: 0, question_index: 0,
     timer_started_at: null, reveal: false, completed_rounds: [], melody: {},
   }).eq('id', getRoomId())
+  if (error) throw error
+}
+
+/** Шаг финала. Хранится в question_index сессии — так им можно рулить
+ *  и с проектора, и с телефона ведущего (важно для награждения в баре). */
+export async function setFinaleStep(step: number) {
+  const { error } = await supabase.from('game_sessions')
+    .update({ question_index: step }).eq('id', getRoomId())
+  if (error) throw error
+}
+
+/** Сценарий финала: 'show' — нарезка раундов, 'bar' — ручное награждение. */
+export async function setFinaleMode(mode: 'show' | 'bar') {
+  const { error } = await supabase.from('game_sessions')
+    .update({ reveal: mode === 'bar', question_index: 0 }).eq('id', getRoomId())
   if (error) throw error
 }

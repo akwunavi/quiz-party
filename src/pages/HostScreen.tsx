@@ -6,7 +6,7 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
-  startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime,
+  startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime, setFinaleStep,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { SnowCurtain } from '../components/NewYearScene'
@@ -19,6 +19,7 @@ import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
+import { rankTeams } from '../lib/ranking'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -69,6 +70,7 @@ function HostInner({ gameState, pack }: {
   if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
 
   // ── Лобби / выбор пакета ──
+  const paperMode = pack?.settings?.play_mode === 'paper'
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <div className="host-screen grid-bg">
@@ -98,16 +100,17 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            {/* раскладка ЖК: QR с подписью слева, команды колонкой справа */}
-            <div className="lobby-row">
-              <div className="qr-card hud-frame" data-pulse={teams.length}>
+            {/* раскладка ЖК: QR с подписью слева, команды колонкой справа.
+                На бумаге телефоны не нужны — QR только путал бы гостей. */}
+            <div className={`lobby-row${paperMode ? ' no-qr' : ''}`}>
+              {!paperMode && <div className="qr-card hud-frame" data-pulse={teams.length}>
                 <img alt="QR" className="lobby-qr"
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(playerUrl)}`} />
                 <div className="qr-caption">
                   <div className="qr-caption-big">ПОДКЛЮЧАЙСЯ<br />К ИГРЕ</div>
                   <div className="mono-tag">ОТСКАНИРУЙ QR</div>
                 </div>
-              </div>
+              </div>}
               <div className="lobby-teams">
                 {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
                 {teams.length === 0
@@ -362,7 +365,7 @@ function HostInner({ gameState, pack }: {
   }
 
   if (gameState.phase === 'finale') {
-    return <Finale pack={pack} gameId={gameState.game_id} />
+    return <Finale pack={pack} gameId={gameState.game_id} gameState={gameState} />
   }
 
   return <div className="host-screen grid-bg">
@@ -619,6 +622,7 @@ function AnswerTime({ pack, round, gameState }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const seconds = (round.settings as { answerTimeSeconds?: number }).answerTimeSeconds ?? 60
+  const paper = pack.settings?.play_mode === 'paper'
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const totalQ = round.questions.filter(q => !q.hidden).length
@@ -636,8 +640,11 @@ function AnswerTime({ pack, round, gameState }: {
   return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
-      <div className="answer-pulse"><Title theme={pack.theme} lines={['ОТВЕЧАЙТЕ!']} /></div>
-      <div className="meta-line">КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ</div>
+      <div className="answer-pulse"><Title theme={pack.theme}
+        lines={[paper ? 'СДАВАЙТЕ БЛАНКИ' : 'ОТВЕЧАЙТЕ!']} /></div>
+      <div className="meta-line">{paper
+        ? 'ПЕРЕДАЙТЕ БЛАНКИ ВЕДУЩЕМУ'
+        : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>
       <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
       <div className="answer-time-teams">
         {teams.map(t => {
@@ -1046,7 +1053,7 @@ function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][numbe
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const pairs = q.answer.correct_pairs
   return (
-    <div className="match-answer">
+    <div className={`match-answer n${Math.min(q.answer.left.length, 6)}`}>
       {q.answer.left.map((l, i) => {
         const right = pairs.find(p => p.startsWith(l))?.slice(l.length) ?? '—'
         return (
@@ -1089,7 +1096,8 @@ function ScoreboardScreen({ pack, gameState }: {
   const totals = computeTotals(pack, teams, answers)
   const perRound = computeRoundScores(pack, teams, answers)
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
-  const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
+  const rows = rankTeams(teams, totals, answers)
+  const ranked = rows.map(r => r.team)
   // раскрытие интригой: с последнего места, по одной строке каждые 2.2 сек
   const [revealed, setRevealed] = useState(0)
   useEffect(() => {
@@ -1101,9 +1109,10 @@ function ScoreboardScreen({ pack, gameState }: {
   const visible = ranked.slice(Math.max(0, ranked.length - revealed))
   const medals = ['🥇', '🥈', '🥉']
   return (
-    <div className="host-screen grid-bg">
+    <div className="host-screen grid-bg sb-screen">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
-      <Title theme={pack.theme} lines={['ТАБЛО']} />
+      {/* заголовок намеренно НЕ через Title: он был крупнее самой таблицы */}
+      <h2 className="sb-title">ПРОМЕЖУТОЧНЫЕ РЕЗУЛЬТАТЫ</h2>
       <table className="score-table">
         <thead>
           <tr>
@@ -1114,10 +1123,12 @@ function ScoreboardScreen({ pack, gameState }: {
         </thead>
         <tbody>
           {visible.map(t => {
-            const pos = ranked.indexOf(t)
+            const row = rows.find(r => r.team.id === t.id)
+            const place = row?.place ?? 1
             return (
-            <tr key={t.id} className={`sb-row${pos === 0 ? ' leader' : ''}`}>
-              <td>{medals[pos] ?? pos + 1}</td>
+            <tr key={t.id} className={`sb-row${place === 1 ? ' leader' : ''}`}>
+              {/* при равных очках место общее: 1, 2, 2, 4 */}
+              <td>{medals[place - 1] ?? place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>{t.name}</td>
               {(perRound.get(t.id) ?? scored.map(() => 0)).map((v, i) => <td key={i}>{v}</td>)}
               <td className="total">{totals.get(t.id) ?? 0}</td>
@@ -1162,26 +1173,45 @@ function BreakScreen({ pack, round, gameState }: {
   )
 }
 
-function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
+function Finale({ pack, gameId, gameState }: {
+  pack: LoadedPack; gameId: string
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
   const teams = useTeams(gameId)
   const answers = useAnswers(gameId)
   const totals = computeTotals(pack, teams, answers)
   const roundScores = computeRoundScores(pack, teams, answers)
-  const ranked = [...teams].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0))
-  const top = ranked.slice(0, 3)
-  // поэтапное раскрытие: остальные → 3 место → 2 → 1 → разбивка
-  const [step, setStep] = useState(0)
+  const rows = rankTeams(teams, totals, answers)
+
+  // Шаг и сценарий живут в сессии: ведущий может вести финал с телефона,
+  // стоя у сцены, — для награждения в баре это обязательно.
+  const bar = !!gameState.reveal
+  const step = gameState.question_index ?? 0
+
+  // раунды, идущие в зачёт, и победитель каждого из них
+  const scored = pack.rounds.map((r, i) => ({ r, i })).filter(x => !x.r.off_scoreboard)
+  const roundWinners = scored.map(({ r, i }) => {
+    let best: (typeof teams)[number] | null = null, bestVal = -Infinity
+    for (const t of teams) {
+      const v = roundScores.get(t.id)?.[i] ?? 0
+      if (v > bestVal) { bestVal = v; best = t }
+    }
+    return { round: r, idx: i, team: best, score: bestVal }
+  })
+
+  // ── СЦЕНАРИЙ «ШОУ»: нарезка раундов по 15 сек → победитель (10 сек) → таблица
+  const SLIDE = 15_000, WINNER = 10_000
+  const winnerStep = roundWinners.length
   useEffect(() => {
-    if (step >= 5) return
-    const t = setTimeout(() => setStep(s => s + 1), step === 0 ? 1200 : 2200)
+    if (bar || step > winnerStep) return
+    const ms = step === winnerStep ? WINNER : SLIDE
+    const t = setTimeout(() => void setFinaleStep(step + 1), ms)
     return () => clearTimeout(t)
-  }, [step])
+  }, [bar, step, winnerStep])
+
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
-  return (
-    // клик в любом месте финала раскрывает всё сразу (не ждать ~10 сек)
-    <div className="host-screen grid-bg" onClick={() => setStep(5)}
-      style={{ cursor: step < 4 ? 'pointer' : 'default' }}>
-      {/* залповый фейерверк из старого квиза: вспышка + искры по кругу */}
+  const fireworks = (
+    <>
       {Array.from({ length: 5 }, (_, bi) => (
         <div key={bi} className="fw-burst" style={{
           left: `${12 + bi * 19}%`, top: `${18 + (bi % 3) * 14}%`,
@@ -1199,49 +1229,126 @@ function Finale({ pack, gameId }: { pack: LoadedPack; gameId: string }) {
           ))}
         </div>
       ))}
-      <div className="mono-tag">ИТОГИ ИГРЫ</div>
-      <Title theme={pack.theme} lines={['ПОБЕДИТЕЛИ']} />
-      <div className="fin-podium">
-        {[1, 0, 2].map(pos => top[pos] && (
-          <div key={pos} className={`fin-step p${pos + 1}${step >= 4 - pos ? '' : ' veiled'}`}>
-            <div className="fin-medal">{['🥇', '🥈', '🥉'][pos]}</div>
-            <div className="fin-name" style={{ color: top[pos].color }}>{top[pos].name}</div>
-            <div className="fin-score">{totals.get(top[pos].id) ?? 0}</div>
-            <div className="fin-place">{pos + 1} место</div>
-          </div>
-        ))}
-      </div>
-      {ranked.length > 3 && (
-        <div className="fin-rest" style={{ opacity: step >= 1 ? 1 : 0, transition: 'opacity .6s' }}>
-          {ranked.slice(3).map((t, i) => (
-            <div key={t.id} className="fin-row">
-              <span className="num">{i + 4}</span>
-              <span style={{ color: t.color }}>{t.name}</span>
-              <span className="num">{totals.get(t.id) ?? 0}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {step >= 4 && (
-        <div className="fin-breakdown">
-          <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
-          <table className="fin-table">
-            <thead><tr><th />{pack.rounds.map((r, i) => !r.off_scoreboard &&
-              <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
-            <tbody>
-              {ranked.map(t => (
-                <tr key={t.id}>
-                  <td style={{ color: t.color }}>{t.name}</td>
-                  {pack.rounds.map((r, i) => !r.off_scoreboard && (
-                    <td key={r.id}>{roundScores.get(t.id)?.[i] ?? 0}</td>
-                  ))}
-                  <td><b>{totals.get(t.id) ?? 0}</b></td>
-                </tr>
+    </>
+  )
+
+  const fullTable = (
+    <div className="fin-breakdown">
+      <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
+      <table className="fin-table">
+        <thead><tr><th />{pack.rounds.map((r, i) => !r.off_scoreboard &&
+          <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
+        <tbody>
+          {rows.map(({ team: t, place, shared }) => (
+            <tr key={t.id} className={place <= 3 ? 'top3' : ''}>
+              <td className="fin-pos">{place}{shared && <span className="sb-eq">=</span>}</td>
+              <td style={{ color: t.color }}>{t.name}</td>
+              {pack.rounds.map((r, ri) => !r.off_scoreboard && (
+                <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}
-            </tbody>
-          </table>
+              <td><b>{totals.get(t.id) ?? 0}</b></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+
+  // ── СЦЕНАРИЙ «БАР»: 3 место → 2 → 1 → таблица, каждый шаг по команде ведущего
+  if (bar) {
+    // Идём по МЕСТАМ (3 → 2 → 1), а не по позициям в списке: при ничьей
+    // одно место могут занимать несколько команд, и все они выходят вместе.
+    const places = [3, 2, 1]
+    if (step >= places.length) return (
+      <div className="host-screen grid-bg fin-screen">
+        {fireworks}
+        <div className="mono-tag">ИТОГИ ИГРЫ</div>
+        <Title theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+        {fullTable}
+        <div className="host-actions">
+          <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
         </div>
-      )}
+      </div>
+    )
+    const place = places[step]
+    const winners = rows.filter(r => r.place === place)
+    return (
+      <div className="host-screen grid-bg fin-screen" onClick={() => void setFinaleStep(step + 1)}>
+        {place === 1 && fireworks}
+        <div className="mono-tag">НАГРАЖДЕНИЕ</div>
+        <div className={`fin-award p${place}`}>
+          <div className="fin-award-place">{place} МЕСТО</div>
+          <div className="fin-award-medal">{['🥇', '🥈', '🥉'][place - 1]}</div>
+          {winners.length > 0
+            ? <>
+                {winners.map(r => (
+                  <div key={r.team.id} className="fin-award-name"
+                    style={{ color: r.team.color }}>{r.team.name}</div>
+                ))}
+                <div className="fin-award-score">{winners[0].total}</div>
+              </>
+            : <div className="fin-award-name">—</div>}
+        </div>
+        <div className="fin-hint">дальше — по команде ведущего</div>
+      </div>
+    )
+  }
+
+  // ── СЦЕНАРИЙ «ШОУ» ──
+  if (step < winnerStep) {
+    const w = roundWinners[step]
+    return (
+      <div className="host-screen grid-bg fin-screen" onClick={() => void setFinaleStep(step + 1)}>
+        <div className="mono-tag">ВСПОМИНАЕМ ИГРУ</div>
+        <div className="fin-slide">
+          <div className="fin-slide-round">
+            Раунд {displayRoundNumber(pack, w.idx)} · {w.round.title_lines.join(' ')}
+          </div>
+          <div className="fin-slide-label">лучший результат</div>
+          <div className="fin-slide-team" style={{ color: w.team?.color }}>
+            {w.team?.name ?? '—'}
+          </div>
+          <div className="fin-slide-score">{Math.max(0, w.score)}</div>
+        </div>
+        {/* полоска времени: видно, сколько осталось до следующего слайда */}
+        <div className="fin-progress" key={step}><i style={{ animationDuration: '15s' }} /></div>
+        <div className="fin-dots">
+          {roundWinners.map((_, i) => <span key={i} className={i === step ? 'on' : ''} />)}
+        </div>
+      </div>
+    )
+  }
+
+  if (step === winnerStep) {
+    // победителей может быть несколько — ничья на первом месте
+    const champs = rows.filter(r => r.place === 1)
+    return (
+      <div className="host-screen grid-bg fin-screen" onClick={() => void setFinaleStep(step + 1)}>
+        {fireworks}
+        <div className="mono-tag">
+          {champs.length > 1 ? 'ПОБЕДИТЕЛИ ИГРЫ' : 'ПОБЕДИТЕЛЬ ИГРЫ'}
+        </div>
+        <div className="fin-award p1">
+          <div className="fin-award-medal">🥇</div>
+          {champs.length > 0
+            ? champs.map(r => (
+                <div key={r.team.id} className="fin-award-name"
+                  style={{ color: r.team.color }}>{r.team.name}</div>
+              ))
+            : <div className="fin-award-name">—</div>}
+          <div className="fin-award-score">{champs[0]?.total ?? 0}</div>
+        </div>
+        <div className="fin-progress" key="w"><i style={{ animationDuration: '10s' }} /></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="host-screen grid-bg fin-screen">
+      {fireworks}
+      <div className="mono-tag">ИТОГИ ИГРЫ</div>
+      <Title theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+      {fullTable}
       <div className="host-actions">
         <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
       </div>

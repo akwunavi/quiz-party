@@ -196,7 +196,7 @@ function PackScreen({ packId, user, onBack }: {
           </div>
           {user.role === 'owner' && (
             <div className="ed-field"><label>Доступ</label>
-              <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+              <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
                 <input type="checkbox" checked={!!pack.is_private}
                   onChange={async ev => {
                     await supabase.from('packs').update({ is_private: ev.target.checked })
@@ -345,7 +345,7 @@ function AddRound({ packId, nextPos, onDone }: {
   const [mechanic, setMechanic] = useState<MechanicKey>('standard')
   const [title, setTitle] = useState('')
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+    <div className="ed-addround" style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
       <select value={mechanic} onChange={e => setMechanic(e.target.value as MechanicKey)}>
         {(Object.keys(MECHANIC_NAMES) as MechanicKey[]).map(k =>
           <option key={k} value={k}>{MECHANIC_NAMES[k]}</option>)}
@@ -473,7 +473,7 @@ function EditorsPanel({ me }: { me: EditorUser }) {
         <div className="ed-field"><label>Имя (видно в списке)</label>
           <input value={dname} onChange={ev => setDname(ev.target.value)} placeholder="Толян" /></div>
         <div className="ed-field"><label>Права</label>
-          <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" checked={canAll} onChange={ev => setCanAll(ev.target.checked)} />
             может править чужие пакеты (иначе — только созданные им)
           </label></div>

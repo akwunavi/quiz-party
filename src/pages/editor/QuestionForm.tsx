@@ -82,7 +82,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             paths={media.question ?? []} max={4}
             onChange={paths => save({ media: { ...media, question: paths } })} />
           {(media.question ?? []).some(m => /\.(mp4|webm|mp3|wav)$/i.test(m)) && (
-            <label style={{ display: 'block', margin: '4px 0' }}>
+            <label className="ed-check" style={{ display: 'block', margin: '4px 0' }}>
               <input type="checkbox" checked={!!media.hidden}
                 onChange={e => save({ media: { ...media, hidden: e.target.checked } })} />
               {' '}не показывать видео/обложку на экране — только звук
@@ -102,7 +102,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
 
           {round.mechanic === 'rebus' && <RebusService q={q} onSave={save} />}
           {round.mechanic === 'thematic_x2' && (
-            <label style={{ display: 'block', marginTop: 8 }}>
+            <label className="ed-check" style={{ display: 'block', marginTop: 8 }}>
               <input type="checkbox" checked={q.is_final_question}
                 onChange={e => save({ is_final_question: e.target.checked })} />
               {' '}это финальный вопрос-тема (×2)
@@ -331,15 +331,16 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   return (
-    <div style={{ margin: '8px 0' }}>
+    <div className="media-slot" style={{ margin: '8px 0' }}>
       <label><b>{label}</b></label>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="media-slot-row" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         {paths.map((p, i) => (
-          <span key={i} style={{ fontSize: 12, background: 'var(--panel2)', padding: '2px 6px', borderRadius: 6 }}>
+          <span key={i} className="media-chip" style={{ fontSize: 12, background: 'var(--panel2)', padding: '2px 6px', borderRadius: 6 }}>
             {/\.(mp3|wav)$/i.test(p) ? '🎵' : /\.(mp4|webm)$/i.test(p) ? '🎬'
               : <img src={mediaUrl(p)} alt="" style={{ height: 36, verticalAlign: 'middle' }} />}
-            {' '}{p.split('/').pop()}
-            <button onClick={() => onChange(paths.filter((_, j) => j !== i))}>✕</button>
+            {' '}<span className="media-name">{p.split('/').pop()}</span>
+            <button className="media-del"
+              onClick={() => onChange(paths.filter((_, j) => j !== i))}>✕</button>
           </span>
         ))}
         {paths.length < max && (

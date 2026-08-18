@@ -48,9 +48,14 @@
   button, .btn { padding: 12px 18px; font-size: 15px; }
   .ed-addrow button { width: 100%; }
 
-  /* ── таблицы (редакторы, настройки) — горизонтальный скролл вместо каши ── */
-  .ed-table, .ed-settings { display: block; width: 100%; overflow-x: auto;
-    white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  /* ── таблицы (редакторы, настройки) ──
+     display:block делает таблицу скроллящимся контейнером, но thead/tbody
+     остаются table и держат свою ширину — иначе они распирали всю страницу. */
+  .ed-table, .ed-settings { display: block; width: 100%; max-width: 100%;
+    overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .ed-table thead, .ed-table tbody, .ed-settings thead, .ed-settings tbody {
+    display: table; min-width: 100%; }
+  .ed-table th, .ed-table td { padding: 8px 10px; }
 
   /* ── модалка вопроса: полноэкранная, одна колонка, футер закреплён ── */
   .qm-backdrop { padding: 0; }
@@ -64,3 +69,134 @@
     padding: 12px 14px; gap: 10px; }
   .qm-foot button { flex: 1 1 0; padding: 13px 10px; }
 }
+
+/* ═══ 7.50: строки, собранные инлайн-стилями в TSX ═══
+   Раньше эти блоки не имели классов, поэтому мобильный брейкпоинт их не
+   доставал — они и уезжали за правый край, создавая горизонтальный скролл. */
+
+/* Стрелка у выпадающих списков: на телефоне нативная почти не видна,
+   и поле не читается как дропдаун. Рисуем свою на всех размерах. */
+/* .cyber ... select задаёт background шорткатом и стирал бы картинку —
+   поэтому селектор такой же специфичный и стоит ниже по каскаду */
+select, .cyber select, .cyber input[type="select"] {
+  appearance: none; -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 17px center, right 11px center;
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+/* Строка «чекбокс + подпись»: не наследует стиль заголовка поля
+   (он был ЗАГЛАВНЫМИ и разгонял строку), подпись переносится. */
+/* .ed-field > label (0,1,1) бил бы .ed-check (0,1,0) — уточняем селектор,
+   иначе подпись у чекбокса остаётся ЗАГЛАВНЫМИ и разгоняет строку */
+.ed-field > label.ed-check, .ed-check { text-transform: none; letter-spacing: normal; font-weight: 500;
+  color: var(--fg); justify-content: flex-start; flex-wrap: wrap;
+  gap: 8px; line-height: 1.35; cursor: pointer; }
+.ed-check input[type="checkbox"] { flex: 0 0 auto; width: 20px; height: 20px; margin: 0; }
+
+/* Медиа-поле: имя файла может быть любой длины — переносим и не даём
+   растянуть колонку. */
+.media-slot { min-width: 0; }
+.media-slot-row { min-width: 0; max-width: 100%; }
+.media-chip { display: inline-flex; align-items: center; gap: 6px;
+  max-width: 100%; min-width: 0; }
+.media-name { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.media-slot input[type="file"] { max-width: 100%; min-width: 0; }
+
+/* Форма добавления раунда — селект, поле и две кнопки в одну строку
+   не влезали никогда, даже на 360px. */
+.ed-addround { flex-wrap: wrap; }
+.ed-addround input { min-width: 0; flex: 1 1 180px; }
+/* в колонке flex-basis становится ВЫСОТОЙ — поле раздувалось на пол-экрана */
+.ed-addround { align-items: center; }
+
+@media (max-width: 720px) {
+  /* всё, что живёт в колонках, не должно распирать их шире экрана */
+  .ed-grid2 > *, .ed-field, .ed-card, .ed-row-main, .qm-body > * { min-width: 0; }
+  .ed-hint { overflow-wrap: anywhere; }
+
+  /* медиа-поле в столбик: сначала выбор файла, ПОД ним имена — как просил Иван */
+  .media-slot-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .media-chip { width: 100%; justify-content: space-between;
+    padding: 8px 10px !important; font-size: 13px !important; }
+  .media-del { flex: 0 0 auto; min-width: 40px; }
+  .media-slot input[type="file"] { width: 100%; font-size: 14px; }
+
+  /* добавление раунда — всё друг под другом на всю ширину */
+  .ed-addround { flex-direction: column; align-items: stretch; gap: 10px; }
+  .ed-addround select, .ed-addround input, .ed-addround button {
+    width: 100%; flex: 0 0 auto; }
+}
+
+/* ═══ 7.51: промежуточные результаты и финал ═══ */
+
+/* Заголовок табло был крупнее самой таблицы — теперь скромный подзаголовок */
+.sb-title { font-family: var(--font-display); font-size: clamp(20px, 2.2vw, 38px);
+  letter-spacing: .08em; margin: 4px 0 clamp(10px, 2vh, 22px); opacity: .85;
+  text-transform: uppercase; }
+.sb-screen .score-table { font-size: clamp(17px, 1.8vw, 30px); }
+.sb-screen .score-table td, .sb-screen .score-table th { padding: clamp(6px, 1vh, 14px) clamp(8px, 1vw, 18px); }
+
+/* ── ФИНАЛ ── */
+.fin-screen { justify-content: center; gap: clamp(10px, 2vh, 28px); }
+
+/* слайд раунда: кто взял раунд */
+.fin-slide { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(6px, 1.4vh, 18px); text-align: center; }
+.fin-slide-round { font-family: var(--font-display); letter-spacing: .06em;
+  font-size: clamp(20px, 2.2vw, 40px); opacity: .8; }
+.fin-slide-label { font-size: clamp(13px, 1.2vw, 20px); letter-spacing: .22em;
+  text-transform: uppercase; opacity: .5; }
+.fin-slide-team { font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(38px, 5.4vw, 104px); line-height: 1.05; max-width: 92vw; }
+.fin-slide-score { font-family: var(--font-digits); font-size: clamp(30px, 3.4vw, 62px);
+  color: var(--accent); }
+
+/* полоска времени слайда */
+.fin-progress { width: min(620px, 60vw); height: 4px; border-radius: 3px;
+  background: rgba(255,255,255,.12); overflow: hidden; }
+.fin-progress i { display: block; height: 100%; width: 100%; background: var(--accent);
+  transform-origin: left center; animation: finBar linear forwards; }
+@keyframes finBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.fin-dots { display: flex; gap: 8px; }
+.fin-dots span { width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.22); }
+.fin-dots span.on { background: var(--accent); }
+
+/* карточка награждения */
+.fin-award { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(4px, 1vh, 14px); text-align: center; }
+.fin-award-place { font-family: var(--font-display); letter-spacing: .2em;
+  font-size: clamp(18px, 2vw, 34px); opacity: .7; }
+.fin-award-medal { font-size: clamp(56px, 7vw, 130px); line-height: 1; }
+.fin-award-name { font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(40px, 6vw, 120px); line-height: 1.04; max-width: 94vw; }
+.fin-award-score { font-family: var(--font-digits); font-size: clamp(34px, 4vw, 80px);
+  color: var(--accent); }
+.fin-award.p1 .fin-award-name { text-shadow: 0 0 40px rgba(255,215,0,.45); }
+.fin-hint { font-size: clamp(12px, 1.1vw, 18px); letter-spacing: .18em;
+  text-transform: uppercase; opacity: .35; }
+
+/* итоговая таблица: тройка выделена */
+.fin-table .fin-pos { font-family: var(--font-digits); opacity: .6;
+  padding-right: 10px; text-align: right; }
+.fin-table tr.top3 td { background: rgba(255,255,255,.05); }
+.fin-table tr.top3 .fin-pos { color: var(--accent); opacity: 1; }
+
+/* ── админка: бумажный режим и финал ── */
+.paper-rounds { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.paper-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.paper-row input.has { border-color: var(--ok); }
+.adm-warn { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+  color: #ffb020; margin-bottom: 8px; }
+.adm-btn.flash { background: var(--ok); color: #04120a; }
+.adm-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+
+/* знак «место разделено» рядом с номером */
+.sb-eq { font-size: .6em; opacity: .55; margin-left: .15em; vertical-align: super; }
+/* в лобби без телефонов QR нет — команды занимают всю ширину */
+.lobby-row.no-qr { justify-content: center; }
+.lobby-row.no-qr .lobby-teams { align-items: center; text-align: center; }
