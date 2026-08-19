@@ -9,7 +9,7 @@ import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart,
-  setFinaleStep, setFinaleMode,
+  setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam,
 } from '../lib/gameActions'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
@@ -272,10 +272,13 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         </button>
         {showRoundSwitch && <RoundPicker pack={pack} current={gameState.round_number} />}
 
-        {/* на бумаге баллы вносят когда угодно: во время раунда, на табло,
-            в перерыве и после — раньше блок жил только в четырёх фазах */}
-        {pack.settings?.play_mode === 'paper' && phase !== 'lobby' &&
-          <PaperScores pack={pack} gameState={gameState} teams={teams} />}
+        {/* на бумаге: сначала заводим команды, потом ставим им баллы.
+            Блоки доступны всегда — команда может прийти в середине игры */}
+        {pack.settings?.play_mode === 'paper' && <>
+          <TeamsPanel gameId={gameState.game_id} teams={teams} />
+          {phase !== 'lobby' &&
+            <PaperScores pack={pack} gameState={gameState} teams={teams} />}
+        </>}
 
         <TeamRandomizer />
 
@@ -443,6 +446,50 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
 }
 
 // ── Бумажный режим: ручные баллы за раунд ──
+/** Команды в админке. На бумаге это ЕДИНСТВЕННЫЙ способ их завести:
+ *  QR никто не сканирует, значит регистрации с телефонов не будет. */
+function TeamsPanel({ gameId, teams }: { gameId: string; teams: Team[] }) {
+  const PALETTE = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42',
+    '#9d7bff', '#ff5c5c', '#40e0d0', '#f7a1c4', '#7cf5a0']
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const add = async () => {
+    const n = name.trim()
+    if (!n || busy) return
+    setBusy(true)
+    try {
+      await registerTeam(n, PALETTE[teams.length % PALETTE.length], gameId)
+      setName('')
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="adm-box">
+      <div className="adm-dim">КОМАНДЫ ({teams.length})</div>
+      {teams.length === 0 && <div className="adm-dim">Ни одной команды. Добавь их здесь —
+        на бумаге сами они не подключатся.</div>}
+      {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => (
+        <div key={t.id} className="paper-row">
+          <span className="team-dot" style={{ background: t.color }} />
+          <input defaultValue={t.name} style={{ flex: 1, minWidth: 0 }}
+            onBlur={e => { const v = e.target.value.trim()
+              if (v && v !== t.name) void renameTeam(t.id, v) }} />
+          <button className="adm-btn danger" style={{ flex: '0 0 auto', padding: '8px 12px' }}
+            onClick={() => { if (confirm(`Удалить «${t.name}» вместе с её баллами?`)) void deleteTeam(t.id) }}>✕</button>
+        </div>
+      ))}
+      <div className="paper-row">
+        <input placeholder="Название команды" value={name} style={{ flex: 1, minWidth: 0 }}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') void add() }} />
+        <button className="adm-btn primary" style={{ flex: '0 0 auto' }}
+          disabled={!name.trim() || busy} onClick={() => void add()}>+ ДОБАВИТЬ</button>
+      </div>
+    </div>
+  )
+}
+
 function PaperScores({ pack, gameState, teams }: {
   pack: LoadedPack; teams: Team[]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>

@@ -128,3 +128,16 @@ export async function setFinaleMode(mode: 'show' | 'bar') {
     .update({ reveal: mode === 'bar', question_index: 0 }).eq('id', getRoomId())
   if (error) throw error
 }
+
+/** Удалить команду вместе с её ответами (ведущий ошибся при вводе). */
+export async function deleteTeam(teamId: string) {
+  await supabase.from('answers').delete().eq('team_id', teamId)
+  const { error } = await supabase.from('teams').delete().eq('id', teamId)
+  if (error) throw error
+}
+
+/** Переименовать команду — на бумаге название часто уточняют по ходу. */
+export async function renameTeam(teamId: string, name: string) {
+  const { error } = await supabase.from('teams').update({ name }).eq('id', teamId)
+  if (error) throw error
+}

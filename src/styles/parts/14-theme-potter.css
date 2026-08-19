@@ -20,10 +20,10 @@
 /* сцена */
 .pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
-.host-topbar, .host-actions, .pack-badge { z-index: 30; }
+.host-topbar, .host-actions, .pack-badge, .round-badge { z-index: 30; }
 .pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
   filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
   animation: candleFloat 3.6s ease-in-out infinite; }

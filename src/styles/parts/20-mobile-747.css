@@ -200,3 +200,57 @@ select, .cyber select, .cyber input[type="select"] {
 /* в лобби без телефонов QR нет — команды занимают всю ширину */
 .lobby-row.no-qr { justify-content: center; }
 .lobby-row.no-qr .lobby-teams { align-items: center; text-align: center; }
+
+/* ═══ 7.55: барная игра «на листках» + разбор ответов ═══ */
+
+/* ── п.3: логотип в лобби крупнее: QR нет, место освободилось ── */
+.paper-lobby .title-line { font-size: calc(clamp(46px, 7vw, 132px) * 1.3); }
+.paper-lobby .lobby-teams { font-size: 1.15em; }
+
+/* ── п.4: номер раунда крупно в левом верхнем углу ── */
+/* .grid-bg > * принудительно ставит детям position: relative —
+   бейдж вынесен в исключения там же, плюс дублируем здесь для надёжности */
+.host-screen .round-badge, .round-badge { position: absolute; left: clamp(28px, 3vw, 64px); top: clamp(22px, 3vh, 54px);
+  display: flex; flex-direction: column; align-items: flex-start; line-height: .92; z-index: 3; }
+.rb-word { font-family: var(--font-digits), monospace; letter-spacing: .34em;
+  font-size: clamp(13px, 1.1vw, 20px); color: var(--dim); }
+.rb-num { font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(64px, 8vw, 168px); color: var(--accent);
+  text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 45%, transparent); }
+.round-intro { position: relative; }
+
+/* ── п.8: длинный вопрос налезал на «ВОПРОС 2/2» в углу ──
+   шапка абсолютная, поэтому текст обязан держать под неё отступ */
+.host-topbar { z-index: 4; }
+.q-text { padding-inline: clamp(12px, 2vw, 40px); }
+.answers-layout { padding-top: clamp(8px, 1.6vh, 24px); }
+.host-screen > .q-text:first-of-type { margin-top: clamp(6px, 1.2vh, 18px); }
+
+/* ── п.5: на бумаге колонки «ответы команд» нет — контент на всю ширину ── */
+.paper-answers .answers-layout { width: 96vw; max-width: none; gap: clamp(16px, 2vw, 34px); }
+.paper-answers .answers-main { flex: 1 1 auto; width: 100%; }
+.paper-answers .answer-reveal { width: 100%; }
+/* ── п.7: варианты-картинки в разборе уезжали за правый край ──
+   ширину берём от колонки, а не от экрана */
+.answers-layout .choice-imgs, .answers-layout .img-answers,
+.answers-layout .choices-grid, .answers-layout .q-media-grid {
+  width: 100%; max-width: 100%; margin-inline: 0; }
+.answers-layout .choice-imgs { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+.answers-layout .choice-img img { max-height: 30vh; }
+
+/* ── п.9: одиночная картинка ответа уходит вправо, ответ и разбор под ней ── */
+.answers-layout.with-side { align-items: stretch; }
+.answer-side { flex: 0 0 clamp(280px, 26vw, 460px); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: clamp(8px, 1.4vh, 18px);
+  min-width: 0; padding: clamp(10px, 1.4vw, 22px);
+  border-left: 2px solid var(--dim); }
+.answer-side img { width: auto; max-width: 100%; max-height: 46vh; height: auto;
+  object-fit: contain; border-radius: 12px; border: 2px solid var(--accent); }
+.answer-side-main { font-family: var(--font-display); font-weight: 700; text-align: center;
+  font-size: clamp(26px, 2.6vw, 52px); color: var(--ok); line-height: 1.1; }
+.answer-side-note { font-size: clamp(15px, 1.4vw, 24px); opacity: .75;
+  text-align: center; line-height: 1.3; }
+
+/* ── админка: команды ── */
+.team-dot { width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto; }
+.adm-btn.danger { border-color: var(--danger); color: var(--danger); }

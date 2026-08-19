@@ -73,7 +73,7 @@ function HostInner({ gameState, pack }: {
   const paperMode = pack?.settings?.play_mode === 'paper'
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
-      <div className="host-screen grid-bg">
+      <div className={`host-screen grid-bg${paperMode ? ' paper-lobby' : ''}`}>
         <Title theme={pack?.theme ?? 'classic'}
           lines={(pack?.theme ?? 'classic') === 'classic' ? ['QUIZ', 'PARTY'] : ['QUIZ PARTY']} />
         <Deco theme={pack?.theme ?? 'classic'} />
@@ -114,7 +114,7 @@ function HostInner({ gameState, pack }: {
               <div className="lobby-teams">
                 {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
                 {teams.length === 0
-                  ? <span style={{ opacity: .5 }}>ждём команды…</span>
+                  ? (paperMode ? null : <span style={{ opacity: .5 }}>ждём команды…</span>)
                   : teams.map(t => (
                     <span key={t.id} className="lobby-team team-chip-fx"
                       style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
@@ -163,7 +163,11 @@ function HostInner({ gameState, pack }: {
             </div>
           </div>
         ) : (<>
-          <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
+          {/* номер раунда — крупно в левом верхнем углу, читается с дальних столов */}
+          <div className="round-badge">
+            <span className="rb-word">РАУНД</span>
+            <span className="rb-num">{displayRoundNumber(pack, gameState.round_number)}</span>
+          </div>
           <Title theme={pack.theme} lines={round.title_lines} />
           <Deco theme={pack.theme} />
           <div className="meta-line">{metaLine(round)}</div>
@@ -250,7 +254,8 @@ function HostInner({ gameState, pack }: {
           <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
             <b>{gameState.question_index + 1}</b> / {round.questions.length}</span>
           {round.mechanic !== 'jeopardy' &&
-            <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds} theme={pack.theme} />}
+            <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
+              theme={pack.theme} />}
         </div>
 
         {split ? (
@@ -461,18 +466,48 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   )
 }
 
-function Timer({ startedAt, seconds, theme }: { startedAt: string | null; seconds: number; theme?: string }) {
+/** Сигнал окончания таймера. Синтезируем на месте: не нужен файл, не зависит
+ *  от сети и не ломается, если медиа пакета не докачались. */
+function playChime() {
+  try {
+    const Ctx = (window.AudioContext
+      ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)
+    const ctx = new Ctx()
+    const now = ctx.currentTime
+    // три нисходящих удара — узнаётся как «время вышло», не пугает гостей
+    ;[880, 660, 440].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain()
+      o.type = 'triangle'
+      o.frequency.setValueAtTime(f, now + i * 0.18)
+      g.gain.setValueAtTime(0.0001, now + i * 0.18)
+      g.gain.exponentialRampToValueAtTime(0.35, now + i * 0.18 + 0.02)
+      g.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.4)
+      o.connect(g); g.connect(ctx.destination)
+      o.start(now + i * 0.18); o.stop(now + i * 0.18 + 0.45)
+    })
+    setTimeout(() => void ctx.close(), 1500)
+  } catch { /* звук не критичен: игра идёт дальше */ }
+}
+
+function Timer({ startedAt, seconds, theme, chime = true }: {
+  startedAt: string | null; seconds: number; theme?: string; chime?: boolean
+}) {
   const [left, setLeft] = useState(seconds)
+  const rang = useRef(false)
   useEffect(() => {
-    if (!startedAt) { setLeft(seconds); return }
+    if (!startedAt) { setLeft(seconds); rang.current = false; return }
     const tick = () => {
       const elapsed = (Date.now() - new Date(startedAt).getTime()) / 1000
-      setLeft(Math.max(0, Math.ceil(seconds - elapsed)))
+      const l = Math.max(0, Math.ceil(seconds - elapsed))
+      setLeft(l)
+      // гонг ровно один раз на запуск таймера; в музыкальных раундах выключен,
+      // чтобы не наложиться на трек
+      if (l === 0 && chime && !rang.current) { rang.current = true; playChime() }
     }
     tick()
     const t = setInterval(tick, 250)
     return () => clearInterval(t)
-  }, [startedAt, seconds])
+  }, [startedAt, seconds, chime])
   const low = left <= 10
   if (theme === 'new_year') {
     const R = 44, C = 2 * Math.PI * R
@@ -673,6 +708,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
   q: LoadedPack['rounds'][number]['questions'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
+  const paper = pack.settings?.play_mode === 'paper'
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const revealed = gameState.reveal
   const teams = useTeams(gameState.game_id)
@@ -704,17 +740,24 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
+  const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  // одиночная картинка ответа уезжает в правую колонку: по центру она душила текст
+  const sideImg = paper && answerImgs.length === 1 ? answerImgs[0] : null
 
   return (
-    <div className="host-screen grid-bg" style={{ justifyContent: 'flex-start' }}>
+    <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
+      style={{ justifyContent: 'flex-start' }}>
       <div className="host-topbar">
         <span className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОТВЕТЫ</span>
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
-      <div className="answers-layout" style={{ marginTop: 60 }}>
-        <div style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
+      <div className={`answers-layout${sideImg ? ' with-side' : ''}`} style={{ marginTop: 60 }}>
+        <div className="answers-main" style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
           <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
-          {revealed && (
+          {/* если картинка ответа уехала вправо, весь разбор живёт там —
+              иначе ответ дублировался в двух местах экрана */}
+          {revealed && !sideImg && (
             <div className="answer-reveal hud-frame">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {q.answer.mode === 'match' ? (
@@ -752,13 +795,23 @@ function ShowAnswers({ pack, round, q, gameState }: {
               {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
               {q.answer.mode === 'choice' && !(q.answer as { correct_choice?: string }).correct_choice &&
                 <div style={{ color: '#ff8fa3' }}>⚠ в редакторе не отмечен верный вариант</div>}
-              <div className="q-media-grid answer-media">
-                {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
-              </div>
+              {!sideImg && (
+                <div className="q-media-grid answer-media">
+                  {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
+                </div>
+              )}
             </div>
           )}
         </div>
-        {pack.settings?.play_mode !== 'paper' && <div className="team-answers">
+        {sideImg && revealed && (
+          <div className="answer-side hud-frame">
+            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+            <img src={mediaUrl(sideImg)} alt="" />
+            <div className="answer-side-main">{displayAnswer(q)}</div>
+            {q.answer_note && <div className="answer-side-note">{q.answer_note}</div>}
+          </div>
+        )}
+        {!paper && <div className="team-answers">
           <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
           {rows.map(a => {
