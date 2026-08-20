@@ -59,7 +59,7 @@ export function BankPicker({ targetRoundId, onClose, onAdded }: {
   const total = (bank?.rounds ?? []).reduce((n, r) => n + r.questions.filter(x => !x.hidden).length, 0)
 
   return createPortal(
-    <div className="qm-backdrop" onClick={onClose}>
+    <div className="cyber qm-backdrop" onClick={onClose}>
       <div className="qm-window" onClick={e => e.stopPropagation()}>
         <div className="qm-head">
           <div>
@@ -148,7 +148,7 @@ export function BankSend({ questionId, canDelete, onClose, onDone }: {
   }
 
   return createPortal(
-    <div className="qm-backdrop" onClick={onClose}>
+    <div className="cyber qm-backdrop" onClick={onClose}>
       <div className="qm-window bank-send" onClick={e => e.stopPropagation()}>
         <div className="qm-head">
           <div>

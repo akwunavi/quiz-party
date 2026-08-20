@@ -35,7 +35,11 @@
   .ed-row-text { -webkit-line-clamp: 3; font-size: 13px; }
   .ed-row-meta { font-size: 11.5px; }
   .ed-count { grid-column: 2; justify-self: start; font-size: 13px; }
+  /* ответ и счётчик медиа встают друг под другом: в одну строку на 390px
+     они не помещались, и длинный ответ выпихивал счётчик за экран */
+  .ed-row-tags { flex-direction: column; align-items: flex-start; gap: 6px; }
   .ed-answer-chip { max-width: 100%; font-size: 12px; }
+  .ed-answer-chip span { white-space: normal; overflow-wrap: anywhere; }
   /* кнопки во всю ширину строки, с отбивкой — больше не слипаются с текстом */
   .ed-actions { grid-column: 1 / -1; flex-wrap: wrap; gap: 10px;
     margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--ed-line); }
@@ -265,6 +269,9 @@ select, .cyber select, .cyber input[type="select"] {
 .pt-candle, .pt-flame { z-index: 1; }
 .theme-potter .host-topbar, .theme-potter .round-badge { z-index: 30; }
 
+.ed-row-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  min-width: 0; max-width: 100%; }
+
 /* ═══ 7.57: список пакетов, имена файлов, отбраковка типа ═══ */
 
 /* строка пакета: название, состояние, кнопки — тремя ярусами */
@@ -318,7 +325,11 @@ select, .cyber select, .cyber input[type="select"] {
 .bank-item.on { border-color: var(--ok); background: rgba(45,212,160,.07); }
 .bank-item input { flex: 0 0 auto; width: 20px; height: 20px; margin: 2px 0 0; }
 .bank-item-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.bank-item-text { line-height: 1.35; overflow-wrap: anywhere; }
+/* окно рисуется порталом в body — вне .cyber, поэтому цвет задаём явно,
+   иначе текст наследует тёмный по умолчанию и не читается */
+.qm-window, .qm-window .bank-item-text, .qm-window .ed-hint { color: var(--fg); }
+.bank-item-text { line-height: 1.35; overflow-wrap: anywhere; color: var(--fg); }
+.bank-search { color: var(--fg); }
 .pack-status.st-bank { background: #2a2340; }
 
 @media (max-width: 720px) {

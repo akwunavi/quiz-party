@@ -126,7 +126,9 @@ function calibration(examples: { text: string; accepted: boolean }[] = []) {
   return out
 }
 
-async function ask(system: string, user: string) {
+/** Один запрос к провайдеру. jsonMode=false — запасной заход: некоторые
+ *  модели молча игнорируют response_format и возвращают пустой content. */
+async function askOnce(system: string, user: string, jsonMode: boolean) {
   const key = Deno.env.get('DEEPSEEK_API_KEY')
   if (!key) throw new Error('DEEPSEEK_API_KEY не задан в секретах Supabase')
 
@@ -141,7 +143,11 @@ async function ask(system: string, user: string) {
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
         temperature: 0.3,             // разбор должен быть стабильным, не творческим
         max_tokens: 1600,
-        response_format: { type: 'json_object' },
+        ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
+        // У моделей V4 режим размышления включён по умолчанию: тогда ответ
+        // уезжает в reasoning_content, а content приходит ПУСТЫМ — отсюда и
+        // «ИИ вернул не JSON». Нам рассуждения не нужны, нужен готовый разбор.
+        thinking: { type: 'disabled' },
       }),
     })
     if (res.ok) break
@@ -162,11 +168,53 @@ async function ask(system: string, user: string) {
   if (!res || !res.ok) throw new Error(`ИИ вернул ошибку ${lastErr}`)
 
   const data = await res.json()
-  const text: string = data?.choices?.[0]?.message?.content ?? ''
-  // на всякий случай снимаем ограждение ```json, если модель его добавила
-  const clean = text.replace(/```json|```/g, '').trim()
-  try { return JSON.parse(clean) }
-  catch { throw new Error('ИИ вернул не JSON: ' + clean.slice(0, 200)) }
+  const msg = data?.choices?.[0]?.message ?? {}
+  // content основной; если модель всё же ушла в размышление — берём его текст
+  const raw: string = (msg.content && String(msg.content).trim())
+    || (msg.reasoning_content ? String(msg.reasoning_content) : '')
+
+  const parsed = extractJson(raw)
+  if (parsed) return parsed
+
+  // диагностика вместо глухого «не JSON»: видно, что именно пришло
+  throw new Error(
+    'ИИ вернул не JSON. '
+    + `Длина ответа: ${raw.length}. `
+    + (raw.length === 0
+      ? 'Ответ ПУСТОЙ — модель, вероятно, ушла в режим размышления. '
+        + `finish_reason: ${data?.choices?.[0]?.finish_reason ?? '?'}.`
+      : 'Начало: ' + raw.slice(0, 200)))
+}
+
+/** Два захода: сначала со строгим json-режимом, затем без него, но с прямым
+ *  требованием в тексте. Так разбор не встаёт колом, если модель не умеет
+ *  response_format. */
+async function ask(system: string, user: string) {
+  try { return await askOnce(system, user, true) }
+  catch (e) {
+    const hint = '\n\nВАЖНО: ответь ТОЛЬКО валидным JSON-объектом. '
+      + 'Без markdown, без ```-ограждения, без единого слова до или после.'
+    try { return await askOnce(system + hint, user, false) }
+    catch (e2) {
+      throw new Error(
+        (e2 instanceof Error ? e2.message : String(e2))
+        + ' | первая попытка: ' + (e instanceof Error ? e.message : String(e)))
+    }
+  }
+}
+
+/** Достаёт JSON из ответа модели. Модели любят обрамлять его текстом или
+ *  ```-ограждением, поэтому недостаточно просто JSON.parse. */
+function extractJson(text: string): unknown | null {
+  if (!text) return null
+  const clean = text.replace(/```json/gi, '').replace(/```/g, '').trim()
+  try { return JSON.parse(clean) } catch { /* пробуем вырезать объект */ }
+  // берём от первой { до последней } — отсекает вступления вроде «Вот разбор:»
+  const a = clean.indexOf('{'), b = clean.lastIndexOf('}')
+  if (a >= 0 && b > a) {
+    try { return JSON.parse(clean.slice(a, b + 1)) } catch { /* не вышло */ }
+  }
+  return null
 }
 
 Deno.serve(async (req: Request) => {

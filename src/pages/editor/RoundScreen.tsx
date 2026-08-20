@@ -205,7 +205,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               <div className="ed-row-text">
                 {q.question_text || <i style={{ opacity: .5 }}>(текст не задан — только медиа)</i>}
               </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div className="ed-row-tags">
                 {answerSnippet(q)
                   ? <span className="ed-answer-chip">✓ <span>{answerSnippet(q)}</span></span>
                   : <span className="ed-answer-chip empty">ответ не задан</span>}
