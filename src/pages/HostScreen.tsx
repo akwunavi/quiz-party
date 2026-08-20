@@ -20,6 +20,7 @@ import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
+import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -466,26 +467,39 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   )
 }
 
-/** Сигнал окончания таймера. Синтезируем на месте: не нужен файл, не зависит
- *  от сети и не ломается, если медиа пакета не докачались. */
+/** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
+ *  как на кухонном/спортивном таймере. Синтезируем на месте: не нужен файл,
+ *  не зависит от сети и не ломается, если медиа пакета не докачались.
+ *  Прямоугольная волна выбрана намеренно — она резкая и пробивает шум бара. */
 function playChime() {
   try {
     const Ctx = (window.AudioContext
       ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)
     const ctx = new Ctx()
-    const now = ctx.currentTime
-    // три нисходящих удара — узнаётся как «время вышло», не пугает гостей
-    ;[880, 660, 440].forEach((f, i) => {
+    const t0 = ctx.currentTime
+    const master = ctx.createGain()
+    master.gain.value = 0.5
+    master.connect(ctx.destination)
+
+    const beep = (freq: number, at: number, len: number, type: OscillatorType, vol: number) => {
       const o = ctx.createOscillator(), g = ctx.createGain()
-      o.type = 'triangle'
-      o.frequency.setValueAtTime(f, now + i * 0.18)
-      g.gain.setValueAtTime(0.0001, now + i * 0.18)
-      g.gain.exponentialRampToValueAtTime(0.35, now + i * 0.18 + 0.02)
-      g.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.4)
-      o.connect(g); g.connect(ctx.destination)
-      o.start(now + i * 0.18); o.stop(now + i * 0.18 + 0.45)
-    })
-    setTimeout(() => void ctx.close(), 1500)
+      o.type = type
+      o.frequency.setValueAtTime(freq, t0 + at)
+      g.gain.setValueAtTime(0.0001, t0 + at)
+      g.gain.linearRampToValueAtTime(vol, t0 + at + 0.008)
+      g.gain.setValueAtTime(vol, t0 + at + len - 0.05)
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + len)
+      o.connect(g); g.connect(master)
+      o.start(t0 + at); o.stop(t0 + at + len + 0.02)
+    }
+
+    // пять пиков «пи-пи-пи-пи-пи»
+    for (let i = 0; i < 5; i++) beep(1046.5, i * 0.22, 0.11, 'square', 0.30)
+    // длинный финальный тон: два голоса, чтобы звучал плотнее
+    beep(784, 1.20, 1.25, 'square', 0.26)
+    beep(392, 1.20, 1.25, 'sine', 0.30)
+
+    setTimeout(() => void ctx.close(), 3000)
   } catch { /* звук не критичен: игра идёт дальше */ }
 }
 
@@ -1125,18 +1139,18 @@ function AfterRoundNav({ pack, gameState }: {
   pack: LoadedPack
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
-  const round = pack.rounds[gameState.round_number]
-  const s = round.settings as { show_scoreboard_after?: boolean; break_after_minutes?: number }
-  const last = gameState.round_number + 1 >= pack.rounds.length
-  // табло по настройке показывается ВСЕГДА, включая последний раунд
-  // (раньше на последнем молча пропускалось — предварительные итоги терялись)
-  if (s.show_scoreboard_after && gameState.phase !== 'scoreboard')
-    return <button onClick={() => void showScoreboard()}>К табло →</button>
-  if (s.break_after_minutes && gameState.phase !== 'break')
-    return <button onClick={() => void startBreak()}>Перерыв →</button>
-  return last
-    ? <button onClick={() => void finishGame(gameState.pack_id)}>Финальные итоги →</button>
-    : <button onClick={() => void gotoRound(gameState.round_number + 1)}>Следующий раунд →</button>
+  // маршрут считает общий модуль — проектор и админка не могут разойтись
+  const step = afterRoundStep(pack, gameState.round_number, gameState.phase)
+  const label = step.label.replace(' →', '').toLowerCase()
+  const run = () => {
+    if (step.kind === 'scoreboard') return void showScoreboard()
+    if (step.kind === 'break') return void startBreak()
+    if (step.kind === 'finale') return void finishGame(gameState.pack_id)
+    return void gotoRound(gameState.round_number + 1)
+  }
+  return <button onClick={run}>
+    {label.charAt(0).toUpperCase() + label.slice(1)} →
+  </button>
 }
 
 /** Табло с разбивкой по раундам (перенос идеи старого Scoreboard, новогодний визуал). */

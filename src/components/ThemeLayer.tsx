@@ -26,16 +26,22 @@ export function ThemeLayer({ theme, isProjector, children }: {
 function PotterScene() {
   return (
     <div className="pt-scene" aria-hidden>
-      {/* парящие свечи: воск + живое пламя, качающееся от «сквозняка» */}
-      {Array.from({ length: 9 }, (_, i) => (
+      {/* Парящие свечи: воск + живое пламя, качающееся от «сквозняка».
+          В углах экрана живут номер раунда и счётчик вопросов, поэтому
+          крайние свечи опускаем ниже — иначе пламя загораживало цифры. */}
+      {Array.from({ length: 9 }, (_, i) => {
+        const left = 6 + i * 11
+        const nearCorner = left < 26 || left > 74
+        const top = nearCorner ? 17 + (i % 2) * 3 : 4 + (i % 3) * 3.4
+        return (
         <span key={`c${i}`} className="pt-candle" style={{
-          left: `${6 + i * 11}%`, top: `${4 + (i % 3) * 3.4}%`,
+          left: `${left}%`, top: `${top}%`,
           animationDelay: `${(i % 5) * 0.7}s`,
           ['--h' as string]: `${34 + (i % 3) * 10}px`,
         }}>
           <span className="pt-flame" style={{ animationDelay: `${(i % 4) * 0.35}s` }} />
         </span>
-      ))}
+      )})}
       {/* сова с письмом: редкий пролёт через экран */}
       <div className="pt-owl">🦉<span className="pt-owl-letter">✉️</span></div>
       {/* искры из палочки в углах */}

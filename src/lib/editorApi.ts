@@ -156,3 +156,56 @@ export async function hideQuestion(id: string, hidden: boolean) {
   if (error) throw error
   void log('question', id, hidden ? 'hide' : 'restore')
 }
+
+// ═══ БАНК ВОПРОСОВ ═══
+// Банк — пакет со статусом 'bank'. Его раунды работают как рубрики
+// («кино», «музыка», «про город»), а вопросы копируются в рабочие пакеты.
+// Копируются, а НЕ переносятся: вопрос должен остаться в банке для будущих игр.
+
+/** Найти банк или создать, если его ещё нет. Банк один на всех. */
+export async function getOrCreateBank(): Promise<Pack> {
+  const { data } = await supabase.from('packs').select('*')
+    .eq('status', 'bank').limit(1).maybeSingle()
+  if (data) return data as Pack
+  const { data: created, error } = await supabase.from('packs')
+    .insert({ name: 'Банк вопросов', status: 'bank' }).select().single()
+  if (error) throw error
+  return created as Pack
+}
+
+/** Скопировать вопрос в конец указанного раунда (в любую сторону: банк ⇄ пакет). */
+export async function copyQuestionTo(questionId: string, targetRoundId: string) {
+  const { data: q, error: e1 } = await supabase.from('pack_questions')
+    .select('*').eq('id', questionId).single()
+  if (e1) throw e1
+  const { data: maxRow } = await supabase.from('pack_questions')
+    .select('position').eq('round_id', targetRoundId)
+    .order('position', { ascending: false }).limit(1).maybeSingle()
+  const src = q as Question & { service?: unknown; is_final_question?: boolean }
+  const { data, error } = await supabase.from('pack_questions').insert({
+    round_id: targetRoundId,
+    position: (maxRow?.position ?? -1) + 1,
+    question_text: src.question_text,
+    // media копируем ССЫЛКАМИ: файл остаётся в хранилище исходного пакета,
+    // повторной загрузки не требуется
+    media: src.media,
+    answer: src.answer,
+    answer_note: src.answer_note,
+    service: src.service ?? {},
+    is_final_question: src.is_final_question ?? false,
+  }).select().single()
+  if (error) throw error
+  void log('question', data.id, 'duplicate', { from: questionId })
+  return data as Question
+}
+
+/** ПЕРЕНЕСТИ вопрос в банк: копия в рубрику + удаление из раунда.
+ *  Порядок важен: сначала успешная копия, только потом удаление —
+ *  иначе при обрыве связи вопрос пропал бы совсем. */
+export async function moveQuestionToBank(
+  questionId: string, bankRoundId: string, canDelete: boolean,
+) {
+  await copyQuestionTo(questionId, bankRoundId)
+  if (canDelete) await deleteQuestion(questionId)
+  else await hideQuestion(questionId, true)   // у редактора нет прав на удаление
+}

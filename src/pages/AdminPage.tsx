@@ -8,9 +8,10 @@ import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
-  gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart,
+  gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam,
 } from '../lib/gameActions'
+import { afterRoundStep } from '../lib/flow'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
 import type { Answer, Pack, Team } from '../types/quiz'
@@ -193,12 +194,16 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   // интерактивные механики управляются с проектора; стандартный маршрут
   // «вопрос → время ответов → разбор» для них не существует
   const isInteractive = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
-  const endRound = () => {
-    const s = round.settings as { show_scoreboard_after?: boolean }
-    if (s.show_scoreboard_after) { void showScoreboard(); return }
-    if (gameState.round_number + 1 < pack.rounds.length) void gotoRound(gameState.round_number + 1)
-    else void finishGame(gameState.pack_id)
+  // шаг после раунда берём из общего модуля: раньше здесь была своя копия
+  // логики, которая игнорировала перерыв и расходилась с проектором
+  const runAfterRound = () => {
+    const st = afterRoundStep(pack, gameState.round_number, gameState.phase)
+    if (st.kind === 'scoreboard') return void showScoreboard()
+    if (st.kind === 'break') return void startBreak()
+    if (st.kind === 'finale') return void finishGame(gameState.pack_id)
+    return void gotoRound(gameState.round_number + 1)
   }
+  const endRound = runAfterRound
 
   const grade = async (a: Answer, correct: boolean) => {
     await supabase.from('answers').update({ is_correct: correct }).eq('id', a.id)
@@ -213,10 +218,9 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       return
     }
     if (phase === 'answer_time') { void gotoAnswers(0); return }
-    if (phase === 'scoreboard' || phase === 'break') {
-      if (gameState.round_number + 1 < pack.rounds.length) void gotoRound(gameState.round_number + 1)
-      else void finishGame(gameState.pack_id)
-    }
+    // с табло и из перерыва идём по общему маршруту: с табло может быть
+    // ещё перерыв, а вот из перерыва — только вперёд
+    if (phase === 'scoreboard' || phase === 'break') runAfterRound()
   }
   const goBack = () => {
     if (phase === 'question' && step > 0) void gotoQuestion(step - 1)
@@ -394,8 +398,14 @@ function QuestionTextOnly({ round, gameState }: {
   if (phase === 'answer_time') return (
     <div className="adm-centered"><div className="adm-h1 ok">ВРЕМЯ ОТВЕТОВ</div></div>
   )
-  if (phase === 'scoreboard') return <div className="adm-centered"><div className="adm-h1">ТАБЛО</div></div>
-  if (phase === 'break') return <div className="adm-centered"><div className="adm-h1">ПЕРЕРЫВ</div></div>
+  if (phase === 'scoreboard') return (
+    <div className="adm-centered"><div className="adm-h1">ТАБЛО</div>
+      <div className="adm-dim">команды смотрят промежуточные результаты</div></div>
+  )
+  if (phase === 'break') return (
+    <div className="adm-centered"><div className="adm-h1">ПЕРЕРЫВ</div>
+      <div className="adm-dim">по кнопке ниже игра пойдёт дальше</div></div>
+  )
   if (phase === 'question') {
     const q = round.questions[step]
     return (

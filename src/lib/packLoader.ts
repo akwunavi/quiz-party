@@ -62,6 +62,7 @@ export async function listPacks(): Promise<Pack[]> {
   const { data, error } = await supabase
     .from('packs').select('*')
     .neq('status', 'archived')
+    .neq('status', 'bank')          // банк — хранилище, а не игровой пакет
     .order('updated_at', { ascending: false })
   if (error) throw error
   return (data ?? []) as Pack[]

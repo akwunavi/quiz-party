@@ -3,7 +3,8 @@
 // Опечатка в поле = красное подчёркивание здесь, а не баг на вечеринке.
 
 // ── Пакет ──────────────────────────────────────────────
-export type PackStatus = 'draft' | 'ready' | 'active' | 'played' | 'archived'
+// 'bank' — хранилище вопросов, в выбор пакета на игре не попадает (см. 0002)
+export type PackStatus = 'draft' | 'ready' | 'active' | 'played' | 'archived' | 'bank'
 export type ThemeKey = 'classic' | 'new_year' | 'potter'
 
 export interface PackSettings {

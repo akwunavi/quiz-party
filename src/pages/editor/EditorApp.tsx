@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useEditorUser, signIn, signOut, type EditorUser } from '../../lib/auth'
 import { listPacks, loadPack, type LoadedPack } from '../../lib/packLoader'
+import { estimateRoundMinutes } from '../../lib/duration'
 import {
   createPack, renamePack, setPackStatus, setPackTheme, setPackSettings, duplicatePack,
   createRound, swapRounds, deleteRound,
+  getOrCreateBank,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
 import { packMediaSize } from '../../lib/mediaUpload'
@@ -90,6 +92,7 @@ function EditorMain({ user, onLogout }: { user: EditorUser; onLogout: () => void
 // ── Список пакетов ──
 const STATUS_RU: Record<string, string> = {
   draft: 'черновик', ready: 'готов', active: 'ИДЁТ ИГРА', played: 'сыгран', archived: 'архив',
+  bank: 'БАНК ВОПРОСОВ',
 }
 
 function PackList({ packs, user, onOpen, onChanged }: {
@@ -114,26 +117,30 @@ function PackList({ packs, user, onOpen, onChanged }: {
         <button disabled={!name.trim()} onClick={async () => {
           const p = await createPack(name.trim()); setName(''); onChanged(); onOpen(p.id)
         }}>+ Новый пакет</button>
+        {/* банк один на всех: кнопка либо создаст его, либо просто откроет */}
+        <button onClick={async () => { const b = await getOrCreateBank(); onChanged(); onOpen(b.id) }}
+          title="Хранилище вопросов для будущих игр">📚 Банк</button>
       </div>
       {packs.length === 0 && <p style={{ opacity: .6 }}>Пакетов пока нет — создай первый.</p>}
+      {/* строка пакета: название во всю ширину, под ним состояние,
+          под ними кнопки — иначе на 390px кнопки вылезали за экран */}
       {packs.filter(p => user.role === 'owner' || !p.is_private).map(p => (
-        <div key={p.id} style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          border: '1px solid #22314f', borderRadius: 8, padding: 12, marginBottom: 8,
-        }}>
-          <div>
-            <b>{p.name}</b>{' '}
-            <span style={{
-              padding: '2px 8px', borderRadius: 10, fontSize: 12,
-              background: p.status === 'ready' ? '#0f3d2e' : p.status === 'active' ? '#4a1220' : '#1a2440', border: '1px solid #22314f',
-            }}>{STATUS_RU[p.status]}</span>
-            {' '}<span style={{ opacity: .5, fontSize: 12 }}>тема: {p.theme}</span>
+        <div key={p.id} className={`pack-row${p.status === 'archived' ? ' archived' : ''}`}>
+          <div className="pack-name">{p.name}</div>
+          <div className="pack-meta">
+            <span className={`pack-status st-${p.status}`}>{STATUS_RU[p.status]}</span>
+            <span className="pack-theme">тема: {p.theme}</span>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="pack-acts">
             <button onClick={() => onOpen(p.id)}>Открыть</button>
             <button onClick={async () => { await duplicatePack(p.id); onChanged() }}>Дублировать</button>
-            {user.role === 'owner' && p.status !== 'archived' &&
-              <button onClick={async () => { await setPackStatus(p.id, 'archived'); onChanged() }}>Архив</button>}
+            {user.role === 'owner' && (p.status === 'archived'
+              ? <button onClick={async () => { await setPackStatus(p.id, 'draft'); onChanged() }}>
+                  Вернуть из архива</button>
+              : <button onClick={async () => {
+                  if (!confirm(`Убрать «${p.name}» в архив?\n\nПакет НЕ удаляется: он просто пропадает из выбора на игре. Вернуть можно в любой момент.`)) return
+                  await setPackStatus(p.id, 'archived'); onChanged()
+                }}>В архив</button>)}
           </div>
         </div>
       ))}
@@ -291,7 +298,16 @@ function PackScreen({ packId, user, onBack }: {
         </div>
       )}
 
-      <div className="ed-card"><h4>Раунды</h4>
+      <div className="ed-card"><h4>Раунды
+        {(() => {
+          const total = pack.rounds.reduce((n, r) => n + estimateRoundMinutes(r), 0)
+          return total > 0
+            ? <span className="round-time" title="Сумма по раундам, без перерывов и финала">
+                вся игра ≈ {total} мин
+              </span>
+            : null
+        })()}
+      </h4>
       {pack.rounds.map((r, i) => (
         <div key={r.id} className="ed-row">
           <div className="ed-num">{i + 1}</div>
@@ -299,6 +315,7 @@ function PackScreen({ packId, user, onBack }: {
             <div className="ed-row-title">{r.title_lines.join(' ') || '(без названия)'}</div>
             <div className="ed-row-meta">
               {MECHANIC_NAMES[r.mechanic]}{r.off_scoreboard && ' · разогрев, вне зачёта'}
+              {estimateRoundMinutes(r) > 0 && ` · ≈ ${estimateRoundMinutes(r)} мин`}
             </div>
           </div>
           <span className="ed-count" title={

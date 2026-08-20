@@ -5,6 +5,7 @@ import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
 import { mediaUrl } from '../HostScreen'
 import type { AnswerSpec, ChoiceOption, Question } from '../../types/quiz'
+import { AiQuestionReview } from './AiReview'
 
 // ═══ Форма вопроса: контент · ответ · превью ═══
 // Автосохранение при каждом изменении (с дебаунсом через кнопку «Сохранить» + on-blur).
@@ -127,6 +128,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
 
         </div>
       </div>
+      <AiQuestionReview q={q} timerSeconds={round.timer_seconds} />
       <div className="qm-foot">
         <button onClick={onBack}>Закрыть без сохранения</button>
         <button className="save" disabled={saving} onClick={() => void persistAll(true)}>Сохранить</button>
@@ -328,6 +330,14 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
   label: string; packId: string; paths: string[]; max: number
   accept?: string; onChange: (paths: string[]) => void
 }) {
+  // Телефонный «проводник» игнорирует accept и даёт выбрать что угодно.
+  // Поэтому проверяем расширение сами: молча принять видео вместо аудио —
+  // значит получить тишину на игре и разбираться уже при гостях.
+  const KIND: Record<string, { ext: RegExp; what: string }> = {
+    'audio/*': { ext: /\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i, what: 'аудио' },
+    'image/*': { ext: /\.(png|jpe?g|webp|gif|avif)$/i, what: 'картинка' },
+  }
+  const [badFile, setBadFile] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   return (
@@ -338,7 +348,7 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
           <span key={i} className="media-chip" style={{ fontSize: 12, background: 'var(--panel2)', padding: '2px 6px', borderRadius: 6 }}>
             {/\.(mp3|wav)$/i.test(p) ? '🎵' : /\.(mp4|webm)$/i.test(p) ? '🎬'
               : <img src={mediaUrl(p)} alt="" style={{ height: 36, verticalAlign: 'middle' }} />}
-            {' '}<span className="media-name">{p.split('/').pop()}</span>
+            {' '}<span className="media-name" title={p.split('/').pop()}>{p.split('/').pop()}</span>
             <button className="media-del"
               onClick={() => onChange(paths.filter((_, j) => j !== i))}>✕</button>
           </span>
@@ -346,8 +356,16 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
         {paths.length < max && (
           <input type="file" accept={accept} disabled={busy} multiple={max > 1}
             onChange={async e => {
-              const files = Array.from(e.target.files ?? []).slice(0, max - paths.length)
-              if (files.length === 0) return
+              const picked = Array.from(e.target.files ?? []).slice(0, max - paths.length)
+              if (picked.length === 0) return
+              // отсеиваем файлы не того типа: аудио-слот не должен принять видео
+              const rule = KIND[accept ?? '']
+              const files = rule ? picked.filter(f => rule.ext.test(f.name)) : picked
+              const rejected = picked.filter(f => !files.includes(f))
+              setBadFile(rejected.length
+                ? `Не подходит: ${rejected.map(f => f.name).join(', ')} — нужен ${rule.what}`
+                : null)
+              if (files.length === 0) { e.target.value = ''; return }
               setBusy(true); setErr('')
               try {
                 const uploaded: string[] = []
@@ -361,6 +379,7 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
         {busy && 'загружаю…'}
       </div>
       {err && <div style={{ color: '#f43f5e', fontSize: 12 }}>{err}</div>}
+      {badFile && <div className="media-bad">{badFile}</div>}
     </div>
   )
 }

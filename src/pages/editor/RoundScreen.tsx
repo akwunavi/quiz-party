@@ -9,10 +9,13 @@ import { EditableText, MECHANIC_NAMES } from './EditorApp'
 import type { EditorUser } from '../../lib/auth'
 import { MediaSlot } from './QuestionForm'
 import type { CrosswordGrid, JeopardyTheme } from '../../types/quiz'
+import { BankPicker, BankSend } from './BankPicker'
+import { AiRoundReview } from './AiReview'
+import { estimateRoundMinutes } from '../../lib/duration'
 
 // ═══ Экран раунда: настройки механики + вопросы ═══
 
-function answerSnippet(q: { answer: { mode: string } }): string {
+export function answerSnippet(q: { answer: { mode: string } }): string {
   const a = q.answer as Record<string, unknown>
   switch (a.mode) {
     case 'free_text': return String(a.correct ?? '').split('/')[0].trim()
@@ -31,6 +34,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   const round = pack.rounds[roundIdx]
   const [openQIdx, setOpenQIdx] = useState<number | null>(null)
   const [previewIdx, setPreviewIdx] = useState<number | null>(null)
+  const [bankOpen, setBankOpen] = useState(false)
+  const [sendIdx, setSendIdx] = useState<number | null>(null)
+  const isBank = pack.status === 'bank'
   const backdropDown = useRef(false)
   const locked = pack.status === 'active' && user.role !== 'owner'
 
@@ -186,7 +192,12 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <RaceEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {!noQuestions && <>
-        <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}</h4>
+        <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}
+          {estimateRoundMinutes(round) > 0 &&
+            <span className="round-time" title="Оценка: вступление + таймеры + разбор ответов">
+              ≈ {estimateRoundMinutes(round)} мин
+            </span>}
+        </h4>
         {round.questions.map((q, i) => (
           <div key={q.id} className={`ed-row${q.hidden ? ' hidden-row' : ''}`}>
             <div className="ed-num">{i + 1}</div>
@@ -212,6 +223,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
                     onClick={async () => { await hideQuestion(q.id, false); onChanged() }}>👁</button>
                 : <button className="ico" data-tip="Скрыть из игры"
                     onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>🚫</button>)}
+              {!locked && !isBank && <button className="ico" data-tip="Перенести в банк"
+                onClick={() => setSendIdx(i)}>📥</button>}
               {user.role === 'owner' && <button className="ico danger" data-tip="Удалить"
                 onClick={async () => {
                   if (confirm('Удалить вопрос безвозвратно?')) { await deleteQuestion(q.id); onChanged() }
@@ -219,11 +232,23 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             </div>
           </div>
         ))}
-        {!locked && <button style={{ marginTop: 6 }} onClick={async () => {
-          await createQuestion(round.id, defaultModeFor(round.mechanic))
-          onChanged()
-          setOpenQIdx(round.questions.length)
-        }}>+ Добавить вопрос</button>}
+        {round.questions.filter(q => !q.hidden).length > 0 && <AiRoundReview round={round} />}
+        {!locked && (
+          <div className="ed-addrow ed-qadd">
+            <button onClick={async () => {
+              await createQuestion(round.id, defaultModeFor(round.mechanic))
+              onChanged()
+              setOpenQIdx(round.questions.length)
+            }}>+ Добавить вопрос</button>
+            <button onClick={() => setBankOpen(true)}>📚 Взять из банка</button>
+          </div>
+        )}
+        {bankOpen && <BankPicker targetRoundId={round.id}
+          onClose={() => setBankOpen(false)} onAdded={onChanged} />}
+        {sendIdx !== null && round.questions[sendIdx] &&
+          <BankSend questionId={round.questions[sendIdx].id}
+            canDelete={user.role === 'owner'}
+            onClose={() => setSendIdx(null)} onDone={onChanged} />}
         </div>
       </>}
     </div>
