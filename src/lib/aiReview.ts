@@ -57,7 +57,22 @@ async function call(mode: 'question' | 'round', payload: string) {
   const { data, error } = await supabase.functions.invoke('review-question', {
     body: { mode, payload, examples },
   })
-  if (error) throw new Error(error.message)
+  if (error) {
+    // supabase-js на любой не-2xx отдаёт общее «Edge Function returned a non-2xx
+    // status code» и прячет тело ответа. Настоящая причина — внутри context,
+    // и без неё чинить нечего: достаём её и показываем как есть.
+    const ctx = (error as unknown as { context?: Response }).context
+    if (ctx && typeof ctx.text === 'function') {
+      try {
+        const raw = await ctx.text()
+        const parsed = raw.trim().startsWith('{') ? JSON.parse(raw) : null
+        throw new Error(parsed?.error ?? raw.slice(0, 400) ?? error.message)
+      } catch (e) {
+        if (e instanceof Error && e.message !== error.message) throw e
+      }
+    }
+    throw new Error(error.message)
+  }
   if (data?.error) throw new Error(data.error)
   return data
 }
@@ -108,4 +123,20 @@ export async function loadReview(kind: 'question' | 'round', id: string) {
   const { data } = await supabase.from('ai_reviews')
     .select('result, created_at').eq('target_kind', kind).eq('target_id', id).maybeSingle()
   return data ?? null
+}
+
+/** Проверка связи: есть ли ключ и отвечает ли провайдер. Токены не тратит. */
+export async function pingAi() {
+  const { data, error } = await supabase.functions.invoke('review-question', {
+    body: { mode: 'ping' },
+  })
+  if (error) {
+    const ctx = (error as unknown as { context?: Response }).context
+    if (ctx?.text) {
+      const raw = await ctx.text()
+      throw new Error(raw.slice(0, 400))
+    }
+    throw new Error(error.message)
+  }
+  return data as { ok: boolean; status: number; key_tail: string; body: string }
 }

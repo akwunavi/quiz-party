@@ -12,7 +12,8 @@
 // плюс имя секрета; формат запроса у DeepSeek совместим с OpenAI.
 
 const BASE = 'https://api.deepseek.com/chat/completions'
-const MODEL = 'deepseek-v4-flash'
+// основная и запасная модели: если основной ID отключат, разбор не встанет колом
+const MODELS = ['deepseek-v4-flash', 'deepseek-chat']
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -129,18 +130,36 @@ async function ask(system: string, user: string) {
   const key = Deno.env.get('DEEPSEEK_API_KEY')
   if (!key) throw new Error('DEEPSEEK_API_KEY не задан в секретах Supabase')
 
-  const res = await fetch(BASE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-      temperature: 0.3,               // разбор должен быть стабильным, не творческим
-      max_tokens: 1600,
-      response_format: { type: 'json_object' },
-    }),
-  })
-  if (!res.ok) throw new Error(`ИИ вернул ${res.status}: ${(await res.text()).slice(0, 300)}`)
+  let res: Response | null = null
+  let lastErr = ''
+  for (const model of MODELS) {
+    res = await fetch(BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+        temperature: 0.3,             // разбор должен быть стабильным, не творческим
+        max_tokens: 1600,
+        response_format: { type: 'json_object' },
+      }),
+    })
+    if (res.ok) break
+    const body = (await res.text()).slice(0, 400)
+    // расшифровываем типовые коды: иначе на экране просто «non-2xx»
+    if (res.status === 401) throw new Error(
+      'Ключ DeepSeek не принят (401). Проверь, что в секрет DEEPSEEK_API_KEY '
+      + 'вставлен полный ключ вида sk-… без пробелов и кавычек.')
+    if (res.status === 402) throw new Error(
+      'На счёте DeepSeek нет средств (402). Стартовые токены израсходованы '
+      + 'или не начислены — пополни баланс в кабинете.')
+    if (res.status === 429) throw new Error(
+      'Слишком много запросов к DeepSeek (429). Подожди минуту и повтори.')
+    lastErr = `${res.status}: ${body}`
+    // 400 обычно значит «нет такой модели» — пробуем запасную
+    if (res.status !== 400 && res.status !== 404) break
+  }
+  if (!res || !res.ok) throw new Error(`ИИ вернул ошибку ${lastErr}`)
 
   const data = await res.json()
   const text: string = data?.choices?.[0]?.message?.content ?? ''
@@ -150,10 +169,28 @@ async function ask(system: string, user: string) {
   catch { throw new Error('ИИ вернул не JSON: ' + clean.slice(0, 200)) }
 }
 
-Deno.serve(async req => {
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   try {
     const body = await req.json()
+
+    // Режим проверки связи: не тратит токены на разбор, только проверяет,
+    // что ключ на месте и провайдер отвечает. Нужен, чтобы отличить
+    // «сломался ИИ» от «сломалась функция».
+    if (body.mode === 'ping') {
+      const key = Deno.env.get('DEEPSEEK_API_KEY')
+      if (!key) throw new Error('DEEPSEEK_API_KEY не задан в секретах Supabase')
+      const r = await fetch('https://api.deepseek.com/models', {
+        headers: { Authorization: `Bearer ${key}` },
+      })
+      const txt = (await r.text()).slice(0, 300)
+      return new Response(JSON.stringify({
+        ok: r.ok, status: r.status,
+        key_tail: '…' + key.slice(-4),
+        body: txt,
+      }), { headers: { ...CORS, 'Content-Type': 'application/json' } })
+    }
+
     const cal = calibration(body.examples)
     const result = body.mode === 'round'
       ? await ask(ROUND_SYSTEM + cal, body.payload)

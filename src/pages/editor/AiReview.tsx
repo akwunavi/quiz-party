@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react'
 import {
   reviewQuestion, reviewRound, rateIssue, loadReview,
-  type QuestionReview, type RoundReview, type Issue,
+  pingAi, type QuestionReview, type RoundReview, type Issue,
 } from '../../lib/aiReview'
 import type { LoadedPack } from '../../lib/packLoader'
 
@@ -74,7 +74,17 @@ export function AiQuestionReview({ q, timerSeconds }: {
           {busy ? 'думаю…' : data ? 'Проверить заново' : 'Проверить вопрос'}
         </button>
       </div>
-      {err && <div className="ai-err">{err}</div>}
+      {err && <>
+        <div className="ai-err">{err}</div>
+        <button className="ghost" onClick={async () => {
+          try {
+            const p = await pingAi()
+            alert(p.ok
+              ? `Связь есть. Ключ …${p.key_tail.slice(-4)} принят провайдером.`
+              : `Провайдер ответил ${p.status}. Ключ …${p.key_tail.slice(-4)}.\n\n${p.body}`)
+          } catch (e) { alert(e instanceof Error ? e.message : 'нет связи с функцией') }
+        }}>Проверить связь и ключ</button>
+      </>}
       {stale && data && <div className="ed-hint">разбор сохранён с прошлого раза</div>}
 
       {data && (
