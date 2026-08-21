@@ -58,6 +58,18 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
   const setAnswer = (answer: AnswerSpec) => save({ answer })
   const media = q.media
 
+  // ── Какие поля показывать для этой механики ──
+  // Правило: если поле в механике не работает, его не должно быть на экране.
+  // Иначе редактор заполняет его и удивляется, что на игре ничего не изменилось.
+  const mech = round.mechanic
+  const fixedMode = mech === 'crossword' || mech === 'melody'   // тип ответа задан
+  const noQuestionMedia = mech === 'crossword'                  // сетка рисуется сама
+  const noVoice = mech === 'melody' || mech === 'crossword'      // озвучка не играет
+  const mediaLabel = mech === 'melody' ? 'Трек (mp3)'
+    : mech === 'rebus' ? 'Две картинки ребуса' : 'Медиа вопроса (до 4)'
+  const mediaMax = mech === 'melody' ? 1 : mech === 'rebus' ? 2 : 4
+  const mediaAccept = mech === 'melody' ? 'audio/*' : undefined
+
   return (
     <div>
       <div className="qm-head">
@@ -75,13 +87,17 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
       <div className="qm-body">
         {/* ── Контент ── */}
         <div>
+          {/* Что показывать — зависит от механики. Поля, которые в ней
+              не работают, скрыты: они путают и создают иллюзию настройки. */}
           <div className="ed-field"><label>Текст вопроса</label>
           <textarea value={q.question_text} rows={5} style={{ width: '100%', padding: 8 }}
             onChange={e => save({ question_text: e.target.value })} /></div>
 
-          <MediaSlot label="Медиа вопроса (до 4)" packId={pack.id}
-            paths={media.question ?? []} max={4}
-            onChange={paths => save({ media: { ...media, question: paths } })} />
+          {!noQuestionMedia && (
+            <MediaSlot label={mediaLabel} packId={pack.id}
+              paths={media.question ?? []} max={mediaMax} accept={mediaAccept}
+              onChange={paths => save({ media: { ...media, question: paths } })} />
+          )}
           {(media.question ?? []).some(m => /\.(mp4|webm|mp3|wav)$/i.test(m)) && (
             <label className="ed-check" style={{ display: 'block', margin: '4px 0' }}>
               <input type="checkbox" checked={!!media.hidden}
@@ -89,9 +105,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
               {' '}не показывать видео/обложку на экране — только звук
             </label>
           )}
-          <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
+          {!noVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"
-            onChange={paths => save({ media: { ...media, voice: paths[0] ?? null } })} />
+            onChange={paths => save({ media: { ...media, voice: paths[0] ?? null } })} />}
           <MediaSlot label="Медиа ответа" packId={pack.id}
             paths={media.answer ?? []} max={4}
             onChange={paths => save({ media: { ...media, answer: paths } })} />
@@ -113,7 +129,8 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
 
         {/* ── Ответ ── */}
         <div>
-          <div className="ed-field" style={{ marginBottom: 18 }}>
+          {/* у кроссворда и мелодии тип ответа задан механикой — выбор убран */}
+          <div className="ed-field" style={{ marginBottom: 18, display: fixedMode ? 'none' : undefined }}>
             <label>Тип вопроса</label>
             <select value={q.answer.mode}
               onChange={e => setAnswer(defaultAnswer(e.target.value as AnswerSpec['mode']))}>
@@ -349,8 +366,14 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
             {/\.(mp3|wav)$/i.test(p) ? '🎵' : /\.(mp4|webm)$/i.test(p) ? '🎬'
               : <img src={mediaUrl(p)} alt="" style={{ height: 36, verticalAlign: 'middle' }} />}
             {' '}<span className="media-name" title={p.split('/').pop()}>{p.split('/').pop()}</span>
-            <button className="media-del"
-              onClick={() => onChange(paths.filter((_, j) => j !== i))}>✕</button>
+            <button className="media-del" title="Убрать из вопроса"
+              onClick={() => {
+                onChange(paths.filter((_, j) => j !== i))
+                // Файл остаётся в хранилище: Supabase не отслеживает ссылки.
+                // Предупреждаем сразу, иначе место утекает незаметно.
+                setBadFile('Файл убран из вопроса, но остался в хранилище. '
+                  + 'Освободить место: «Проверить мусор» в шапке пакета.')
+              }}>✕</button>
           </span>
         ))}
         {paths.length < max && (

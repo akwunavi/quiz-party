@@ -5,10 +5,10 @@ import { estimateRoundMinutes } from '../../lib/duration'
 import {
   createPack, renamePack, setPackStatus, setPackTheme, setPackSettings, duplicatePack,
   createRound, swapRounds, deleteRound,
-  getOrCreateBank,
+  getOrCreateBank, exportPackJson, exportPackCsv,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
-import { packMediaSize, findOrphans, deleteOrphans, type Orphan } from '../../lib/mediaUpload'
+import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, type Orphan } from '../../lib/mediaUpload'
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
@@ -56,6 +56,43 @@ function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }
             </button>}
       {err && <span className="ed-row-meta" style={{ color: 'var(--danger)' }}>{err}</span>}
     </span>
+  )
+}
+
+
+/** Выгрузка пакета: JSON со всеми вопросами + список медиа со ссылками.
+ *  Нужна как страховка перед удалением медиа или раунда: место в хранилище
+ *  кончается незаметно, а вопросы должны пережить чистку. */
+function PackExport({ pack }: { pack: LoadedPack }) {
+  const [busy, setBusy] = useState(false)
+
+  const download = (name: string, text: string, type = 'application/json') => {
+    const url = URL.createObjectURL(new Blob([text], { type }))
+    const a = document.createElement('a')
+    a.href = url; a.download = name; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const exportAll = async () => {
+    setBusy(true)
+    try {
+      const stamp = new Date().toISOString().slice(0, 10)
+      const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
+      const links = await mediaLinks(pack)
+      const map = new Map(links.map(l => [l.path, l.url]))
+      // основной формат — таблица: открывается в Excel двойным кликом,
+      // ссылки на медиа лежат прямо в ячейках, качать можно по клику
+      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map), 'text/csv;charset=utf-8')
+      // резервный слепок: из него можно восстановить структуру целиком
+      download(`${safe}_${stamp}_резерв.json`, exportPackJson(pack))
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <button className="ghost" disabled={busy} onClick={() => void exportAll()}
+      title="Таблица CSV для Excel: все вопросы, ответы и ссылки на медиа">
+      {busy ? 'готовлю…' : '⬇ Выгрузить в Excel'}
+    </button>
   )
 }
 
@@ -231,7 +268,7 @@ function PackScreen({ packId, user, onBack }: {
         </div>
       </div>
       <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}
-        <MediaCleanup pack={pack} onDone={reload} />
+        <span className="pack-tools"><PackExport pack={pack} /><MediaCleanup pack={pack} onDone={reload} /></span>
       </h4>
         <div className="ed-grid2">
           <div className="ed-field"><label>Статус</label>

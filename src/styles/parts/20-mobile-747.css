@@ -396,6 +396,20 @@ select, .cyber select, .cyber input[type="select"] {
   .ai-issue-acts button { flex: 1 1 0; }
 }
 
+/* ═══ 7.66: редактор — уборка, числовые поля ═══ */
+
+/* заголовок карточки пакета: название слева, уборка мусора справа */
+.ed-card > h4 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.media-clean { margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+  text-transform: none; letter-spacing: normal; }
+.media-clean button { padding: 6px 14px; font-size: 12.5px; }
+.media-clean button.danger { border-color: var(--danger); color: var(--danger); }
+
+/* числовое поле: сохраняем по потере фокуса, а не на каждый символ */
+.num-field { display: inline-flex; align-items: center; gap: 8px; }
+.num-field input { text-align: center; }
+.num-suffix { font-size: 12.5px; opacity: .6; }
+
 /* ═══ 7.65: экран разбора — крупнее, ответ внизу, пояснение отдельно ═══ */
 
 /* ── п.1: сам ответ заметно крупнее ── */
@@ -435,3 +449,59 @@ select, .cyber select, .cyber input[type="select"] {
   background: none; border: none; text-decoration: underline; cursor: pointer;
   color: var(--fg); }
 .mel-escape:hover { opacity: 1; color: var(--danger); }
+
+/* инструменты пакета в правом углу заголовка */
+.pack-tools { margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; text-transform: none; letter-spacing: normal; }
+.pack-tools button { padding: 6px 14px; font-size: 12.5px; }
+.media-clean { margin-left: 0; }
+@media (max-width: 720px) {
+  .pack-tools { margin-left: 0; width: 100%; }
+  .pack-tools button { flex: 1 1 auto; }
+}
+
+/* ═══ 7.67: сплит «текст + одна картинка» ═══
+   Было две беды сразу:
+   1) .q-media-grid.n1 имел width: min(1100px, 80vw) — фиксированная ширина
+      ломала пропорции колонок: тексту оставалось 470px из 1600.
+   2) размер шрифта считался от ШИРИНЫ ЭКРАНА (vw), хотя текст живёт в узкой
+      колонке. При 57px в колонке 473px строка вмещала 7 знаков, и текст
+      вырастал на 1290px — далеко за пределы экрана.
+   Решение: колонки делят ширину поровну, а шрифт считается от ШИРИНЫ БЛОКА
+   (единицы cqw), то есть подстраивается под свой контейнер. */
+.q-split { container-type: inline-size; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: clamp(16px, 2.5vw, 48px); width: min(1720px, 96vw); }
+.q-split .q-media-grid, .q-split .q-media-grid.n1 { width: 100%; min-width: 0; }
+.q-split .q-img img { max-height: 68vh; }
+
+/* размер по ширине КОНТЕЙНЕРА и по длине текста */
+.q-split .q-text,
+.theme-potter .q-split .q-text { font-size: clamp(20px, 2.8cqw, 54px); line-height: 1.15; }
+.q-split .q-text.len-m,
+.theme-potter .q-split .q-text.len-m { font-size: clamp(19px, 2.4cqw, 46px); }
+.q-split .q-text.len-l,
+.theme-potter .q-split .q-text.len-l { font-size: clamp(17px, 2.0cqw, 38px); }
+.q-split .q-text.len-xl,
+.theme-potter .q-split .q-text.len-xl { font-size: clamp(15px, 1.7cqw, 30px); line-height: 1.25; }
+
+/* на узком экране сплит перестаёт быть сплитом */
+@media (max-width: 900px) {
+  .q-split { grid-template-columns: 1fr; }
+}
+
+/* подсказка под названием темы «Своей игры» */
+.jp-theme-hint { display: block; font-family: 'Rajdhani', sans-serif;
+  font-weight: 500; font-size: clamp(11px, .95vw, 17px); opacity: .6;
+  letter-spacing: .02em; margin-top: 2px; line-height: 1.2; }
+
+/* ═══ 7.67: кнопки админки не слипаются ═══
+   Раньше ряды кнопок собирались инлайн-стилями с фиксированным gap и без
+   переноса — на 390px они налезали друг на друга. */
+.adm-footer { display: flex; flex-direction: column; gap: 10px; }
+.adm-footer > div { display: flex; gap: 10px; flex-wrap: wrap; }
+.adm-row-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.adm-footer .adm-btn { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+@media (max-width: 720px) {
+  .adm-footer .adm-btn { flex: 1 1 46%; padding: 12px 10px; font-size: 13.5px; }
+  .adm-footer .adm-btn.primary { flex: 1 1 100%; }
+}

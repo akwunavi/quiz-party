@@ -992,6 +992,7 @@ function JeopardyBoard({ pack, round, gameState }: {
         {themes.map((t, ti) => (
           <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
             {t.name || `Тема ${ti + 1}`}
+            {t.hint && <span className="jp-theme-hint">{t.hint}</span>}
           </div>
         ))}
         {themes.map((t, ti) => t.tiles.map((tile, i) => {

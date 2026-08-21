@@ -1,6 +1,6 @@
 // ═══ Полноэкранный предпросмотр вопроса: ровно как увидят на проекторе ═══
 import { ThemeLayer } from '../../components/ThemeLayer'
-import { mediaUrl } from '../HostScreen'
+import { mediaUrl, lenClass } from '../HostScreen'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
 
@@ -57,7 +57,9 @@ export function QuestionPreview({ pack, round, q, onClose }: {
     <div className="pv-backdrop">
       <button className="pv-close ico" data-tip="Закрыть" onClick={onClose}>✕</button>
       <ThemeLayer theme={pack.theme} isProjector>
-        <div className="host-screen grid-bg">
+        {/* классы те же, что на проекторе: has-media/has-choices управляют
+            вертикальной раскладкой, без них текст улетал вверх */}
+        <div className={`host-screen grid-bg${imgs.length && !q.media.hidden ? ' has-media' : ''}${choices ? ' has-choices' : ''}`}>
           <div className="host-topbar">
             <span className="qnum">ПРЕДПРОСМОТР · ВОПРОС <b>1</b></span>
             <span className="timer-num timer-ico">{round.timer_seconds}</span>
@@ -65,7 +67,7 @@ export function QuestionPreview({ pack, round, q, onClose }: {
           {split ? (
             <div className={frameCls}>
               <div className="q-split">
-                <p className="q-text">{q.question_text}</p>
+                <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
                 <div className="q-media-grid n1">
                   {imgs.map((m, i) => (
                     <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
@@ -76,7 +78,9 @@ export function QuestionPreview({ pack, round, q, onClose }: {
             </div>
           ) : (
             <>
-              <div className={frameCls}><p className="q-text">{q.question_text}</p></div>
+              <div className={frameCls}>
+                <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+              </div>
               {!q.media.hidden && imgs.length > 0 && (
                 <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}${choices ? ' with-choices' : ''}`}>
                   {imgs.map((m, i) => (

@@ -9,6 +9,8 @@ import { EditableText, MECHANIC_NAMES } from './EditorApp'
 import type { EditorUser } from '../../lib/auth'
 import { MediaSlot } from './QuestionForm'
 import type { CrosswordGrid, JeopardyTheme } from '../../types/quiz'
+import { swapQuestions } from '../../lib/editorApi'
+import { NumField } from './NumField'
 import { BankPicker, BankSend } from './BankPicker'
 import { AiRoundReview } from './AiReview'
 import { estimateRoundMinutes } from '../../lib/duration'
@@ -104,8 +106,13 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
         {!noQuestions && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
-            <input type="number" min={5} max={600} value={round.timer_seconds} disabled={locked}
-              onChange={e => void patch({ timer_seconds: Number(e.target.value) || 30 })} />
+            <NumField
+              value={round.timer_seconds}
+              min={5}
+              max={600}
+              disabled={locked}
+              onCommit={v => void patch({ timer_seconds: v || 30 })}
+              />
             <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </div>
           <div className="ed-field"><label>Показ ответов</label>
@@ -139,9 +146,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <div className="ed-field"><label>Автопролистывание</label>
             <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
               через
-              <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
+              <NumField min={0} max={60} width={70} disabled={locked}
                 value={(round.settings as { autoAdvanceSec?: number }).autoAdvanceSec ?? 0}
-                onChange={e => void patch({ settings: { ...round.settings, autoAdvanceSec: Number(e.target.value) || undefined } as never })} />
+                onCommit={v => void patch({ settings: { ...round.settings, autoAdvanceSec: v || undefined } as never })} />
               сек после таймера
             </label>
             <div className="ed-hint">0 — листает ведущий вручную</div>
@@ -169,9 +176,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             перерыв, мин:
-            <input type="number" min={0} max={60} style={{ width: 70 }} disabled={locked}
+            <NumField min={0} max={60} width={70} disabled={locked}
               value={(round.settings as { break_after_minutes?: number }).break_after_minutes ?? 0}
-              onChange={e => void patch({ settings: { ...round.settings, break_after_minutes: Number(e.target.value) || undefined } as never })} />
+              onCommit={v => void patch({ settings: { ...round.settings, break_after_minutes: v || undefined } as never })} />
           </label>
         </div>
 
@@ -215,6 +222,16 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               </div>
             </div>
             <div className="ed-actions">
+              {!locked && <>
+                <button className="ico" data-tip="Выше" disabled={i === 0}
+                  onClick={async () => {
+                    await swapQuestions(q, round.questions[i - 1]); onChanged()
+                  }}>↑</button>
+                <button className="ico" data-tip="Ниже" disabled={i === round.questions.length - 1}
+                  onClick={async () => {
+                    await swapQuestions(q, round.questions[i + 1]); onChanged()
+                  }}>↓</button>
+              </>}
               <button className="ico" data-tip="Предпросмотр" onClick={() => setPreviewIdx(i)}>👁‍🗨</button>
               {!q.hidden && <button className="ico" data-tip="Редактировать"
                 onClick={() => setOpenQIdx(i)}>✏️</button>}
@@ -388,6 +405,13 @@ function JeopardyEditor({ pack, round, locked, onChanged }: {
             onChange={e => upd(ts => ts.map((x, i) => i === ti ? { ...x, name: e.target.value } : x))}
             style={{ padding: 4, fontWeight: 700 }} />
           <button disabled={locked} onClick={() => upd(ts => ts.filter((_, i) => i !== ti))}>✕ тему</button>
+          <div className="ed-field" style={{ marginTop: 6 }}>
+            <input value={t.hint ?? ''} placeholder="Подсказка к теме (на проекторе)" disabled={locked}
+              style={{ width: '100%', padding: 4 }}
+              onChange={e => upd(ts => ts.map((x, i) =>
+                i === ti ? { ...x, hint: e.target.value || undefined } : x))} />
+            <div className="ed-hint">Строка под названием темы: поясняет, о чём она</div>
+          </div>
           <table style={{ marginTop: 4, fontSize: 13 }}>
             <tbody>
               {t.tiles.map((tile, i) => (
@@ -436,21 +460,41 @@ function SprintEditor({ round, locked, onChanged }: {
     <div className="ed-card"><h4>«120 секунд»</h4>
       <div className="ed-grid2">
         <div className="ed-field"><label>Баллов за верный ответ</label>
-          <input type="number" min={1} max={10} disabled={locked}
-            value={s.pointsPerQuestion ?? 2} onChange={e => set({ pointsPerQuestion: Number(e.target.value) })} />
+          <NumField
+              value={s.pointsPerQuestion ?? 2}
+              min={1}
+              max={10}
+              disabled={locked}
+              onCommit={v => set({ pointsPerQuestion: v })}
+              />
         </div>
         <div className="ed-field"><label>Бонус за все верные</label>
-          <input type="number" min={0} max={20} disabled={locked}
-            value={s.allCorrectBonus ?? 5} onChange={e => set({ allCorrectBonus: Number(e.target.value) })} />
+          <NumField
+              value={s.allCorrectBonus ?? 5}
+              min={0}
+              max={20}
+              disabled={locked}
+              onCommit={v => set({ allCorrectBonus: v })}
+              />
         </div>
         <div className="ed-field"><label>Пауза до старта таймера, сек</label>
-          <input type="number" min={0} max={30} disabled={locked}
-            value={s.startDelaySec ?? 5} onChange={e => set({ startDelaySec: Number(e.target.value) })} />
+          <NumField
+              value={s.startDelaySec ?? 5}
+              min={0}
+              max={30}
+              disabled={locked}
+              onCommit={v => set({ startDelaySec: v })}
+              />
           <div className="ed-hint">Слайд показан, команды читают вопросы</div>
         </div>
         <div className="ed-field"><label>Пауза до разбора, сек</label>
-          <input type="number" min={0} max={30} disabled={locked}
-            value={s.afterTimerSec ?? 5} onChange={e => set({ afterTimerSec: Number(e.target.value) })} />
+          <NumField
+              value={s.afterTimerSec ?? 5}
+              min={0}
+              max={30}
+              disabled={locked}
+              onCommit={v => set({ afterTimerSec: v })}
+              />
         </div>
       </div>
       <div className="ed-hint">Время раунда — поле «Таймер» выше. Вопросы добавляй ниже как обычно;
@@ -475,17 +519,37 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
     <div className="ed-card"><h4>«Угадай мелодию»</h4>
       <div className="ed-grid2">
         <div className="ed-field"><label>Анимация выбора, сек</label>
-          <input type="number" min={2} max={30} disabled={locked} value={s.spinSec ?? 10}
-            onChange={e => setNum({ spinSec: Number(e.target.value) })} /></div>
+          <NumField
+              value={s.spinSec ?? 10}
+              min={2}
+              max={30}
+              disabled={locked}
+              onCommit={v => setNum({ spinSec: v })}
+              /></div>
         <div className="ed-field"><label>Совещание по ставке, сек</label>
-          <input type="number" min={3} max={60} disabled={locked} value={s.bidSec ?? 10}
-            onChange={e => setNum({ bidSec: Number(e.target.value) })} /></div>
+          <NumField
+              value={s.bidSec ?? 10}
+              min={3}
+              max={60}
+              disabled={locked}
+              onCommit={v => setNum({ bidSec: v })}
+              /></div>
         <div className="ed-field"><label>На ответ первой команде, сек</label>
-          <input type="number" min={5} max={120} disabled={locked} value={s.answerSec ?? 30}
-            onChange={e => setNum({ answerSec: Number(e.target.value) })} /></div>
+          <NumField
+              value={s.answerSec ?? 30}
+              min={5}
+              max={120}
+              disabled={locked}
+              onCommit={v => setNum({ answerSec: v })}
+              /></div>
         <div className="ed-field"><label>На ответ второй команде, сек</label>
-          <input type="number" min={5} max={60} disabled={locked} value={s.passAnswerSec ?? 10}
-            onChange={e => setNum({ passAnswerSec: Number(e.target.value) })} /></div>
+          <NumField
+              value={s.passAnswerSec ?? 10}
+              min={5}
+              max={60}
+              disabled={locked}
+              onCommit={v => setNum({ passAnswerSec: v })}
+              /></div>
       </div>
       <div className="ed-hint">Баллы: ставка 2–5 сек — 2 балла, 6–10 сек — 1 балл,
         вторая команда после передачи хода — 0.5. Треки загружай ПОЛНЫМИ (нужны и первая
@@ -565,8 +629,13 @@ function RaceEditor({ pack, round, locked, onChanged }: {
           <div className="ed-hint">Играет, пока бегут. Пусто — возьмётся общая фоновая музыка пакета</div>
         </div>
         <div className="ed-field"><label>Длительность забега, сек</label>
-          <input type="number" min={8} max={60} disabled={locked} value={s.raceSec ?? 18}
-            onChange={e => set({ raceSec: Number(e.target.value) || 18 })} />
+          <NumField
+              value={s.raceSec ?? 18}
+              min={8}
+              max={60}
+              disabled={locked}
+              onCommit={v => set({ raceSec: v || 18 })}
+              />
         </div>
       </div>
     </div>

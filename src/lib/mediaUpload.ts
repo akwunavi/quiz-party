@@ -103,3 +103,13 @@ export async function deleteOrphans(orphans: Orphan[]) {
     .remove(orphans.map(o => o.path))
   if (error) throw error
 }
+
+/** Публичные ссылки на все медиа пакета — для выгрузки перед чисткой. */
+export async function mediaLinks(pack: PackLike) {
+  const { data } = await supabase.storage.from('quiz-media')
+    .list(`pack-${pack.id}`, { limit: 1000 })
+  return (data ?? []).map(f => {
+    const path = `pack-${pack.id}/${f.name}`
+    return { path, url: supabase.storage.from('quiz-media').getPublicUrl(path).data.publicUrl }
+  })
+}

@@ -9,7 +9,7 @@ import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
-  setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam,
+  setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { supabase } from '../lib/supabase'
@@ -265,7 +265,13 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </button>
         </>)}
         {phase !== 'show_answers' && (
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="adm-row-btns">
+            {/* повтор вопроса: перезапускает таймер, не сбивая номер вопроса.
+                Нужен, когда команды не расслышали или зависла музыка */}
+            {(phase === 'question' || phase === 'answer_time') && (
+              <button className="adm-btn" onClick={() => void startTimer()}
+                title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
+            )}
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
             <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>

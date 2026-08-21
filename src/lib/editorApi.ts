@@ -1,6 +1,7 @@
 // ═══ CRUD редактора + журнал правок ═══
 import { supabase } from './supabase'
 import type { Pack, RoundBase, Question, MechanicKey } from '../types/quiz'
+import type { LoadedPack } from './packLoader'
 
 async function log(entity: string, entity_id: string, action: string, diff?: unknown) {
   const { data } = await supabase.auth.getUser()
@@ -208,4 +209,75 @@ export async function moveQuestionToBank(
   await copyQuestionTo(questionId, bankRoundId)
   if (canDelete) await deleteQuestion(questionId)
   else await hideQuestion(questionId, true)   // у редактора нет прав на удаление
+}
+
+/** Поменять два вопроса местами. Как и у раундов, через временную позицию:
+ *  на паре (round_id, position) висит unique, прямой обмен упрётся в него. */
+export async function swapQuestions(
+  a: { id: string; position: number }, b: { id: string; position: number },
+) {
+  await updateQuestion(a.id, { position: -1 } as never)
+  await updateQuestion(b.id, { position: a.position } as never)
+  await updateQuestion(a.id, { position: b.position } as never)
+}
+
+/** Выгрузка пакета в CSV для Excel.
+ *  Excel не понимает JSON без плясок, поэтому основной формат — таблица.
+ *  BOM в начале обязателен: без него Excel открывает кириллицу кракозябрами. */
+export function exportPackCsv(pack: LoadedPack, mediaUrls: Map<string, string>): string {
+  const esc = (v: unknown) => {
+    const t = String(v ?? '').replace(/"/g, '""')
+    return `"${t}"`
+  }
+  const answerText = (q: LoadedPack['rounds'][number]['questions'][number]) => {
+    const a = q.answer as unknown as Record<string, unknown>
+    if (a.mode === 'choice') {
+      const ch = (a.choices ?? []) as { key: string; text: string }[]
+      return ch.map(c => `${c.key}) ${c.text}`).join(' | ')
+        + ` → верный: ${String(a.correct_choice ?? '')}`
+    }
+    if (a.mode === 'match') {
+      const l = (a.left ?? []) as string[], r = (a.right_labels ?? []) as string[]
+      return l.map((x, i) => `${i + 1}. ${x} → ${r[i] ?? ''}`).join(' | ')
+    }
+    if (a.mode === 'free') return String(a.correct ?? '')
+    if (a.mode === 'crossword_word') return String(a.word ?? '')
+    return JSON.stringify(a)
+  }
+
+  const rows: string[][] = [[
+    'Раунд', '№ раунда', 'Механика', 'Таймер, сек',
+    '№ вопроса', 'Текст вопроса', 'Ответ', 'Пояснение',
+    'Медиа вопроса', 'Медиа ответа', 'Скрыт',
+  ]]
+  pack.rounds.forEach((r, ri) => {
+    r.questions.forEach((q, qi) => {
+      const link = (paths: string[] | undefined) =>
+        (paths ?? []).map(p => mediaUrls.get(p) ?? p).join('\n')
+      rows.push([
+        r.title_lines.join(' '), String(ri + 1), r.mechanic, String(r.timer_seconds),
+        String(qi + 1), q.question_text, answerText(q), q.answer_note ?? '',
+        link(q.media.question), link(q.media.answer), q.hidden ? 'да' : '',
+      ])
+    })
+  })
+  // разделитель «;» — Excel с русской локалью ждёт именно его
+  return '\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n')
+}
+
+/** Выгрузка пакета в JSON — страховка перед удалением медиа или раунда. */
+export function exportPackJson(pack: LoadedPack) {
+  return JSON.stringify({
+    exported_at: new Date().toISOString(),
+    pack: { name: pack.name, theme: pack.theme, settings: pack.settings },
+    rounds: pack.rounds.map(r => ({
+      title: r.title_lines.join(' '), mechanic: r.mechanic,
+      timer_seconds: r.timer_seconds, off_scoreboard: r.off_scoreboard,
+      rules: r.rules, settings: r.settings,
+      questions: r.questions.map(q => ({
+        position: q.position, text: q.question_text, answer: q.answer,
+        note: q.answer_note, media: q.media, hidden: q.hidden,
+      })),
+    })),
+  }, null, 2)
 }

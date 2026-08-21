@@ -78,6 +78,7 @@ export interface JeopardySettings {
 }
 export interface JeopardyTheme {
   name: string
+  hint?: string        // подсказка к теме: строка под названием на проекторе
   tiles: { value: number; audio: string; correct: string }[]
 }
 export interface CrosswordSettings {
