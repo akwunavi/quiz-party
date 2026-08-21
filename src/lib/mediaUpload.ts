@@ -45,3 +45,61 @@ export async function packMediaSize(packId: string): Promise<number> {
     s + Number((f.metadata as { size?: number } | null)?.size ?? 0), 0)
   return Math.round(bytes / 1048576 * 10) / 10
 }
+
+// ═══ УБОРКА ОСИРОТЕВШИХ ФАЙЛОВ ═══
+// Удаление вопроса стирает строку в базе, но ФАЙЛ в хранилище остаётся:
+// Supabase не знает, что на него больше никто не ссылается. За несколько
+// пакетов так набегают десятки мегабайт мусора, а место в хранилище конечно.
+
+/** Все пути к медиа, на которые ссылается пакет (вопросы, раунды, сам пакет). */
+type PackLike = {
+  id: string
+  settings?: unknown
+  rounds: { settings?: unknown; rules_audio?: string | null; questions: { media?: unknown }[] }[]
+}
+
+function usedPaths(pack: PackLike): Set<string> {
+  const used = new Set<string>()
+  const add = (v: unknown) => {
+    if (typeof v === 'string' && v) used.add(v)
+    else if (Array.isArray(v)) v.forEach(add)
+  }
+  const rec = (v: unknown) => (v ?? {}) as Record<string, unknown>
+  add(rec(pack.settings).bg_music)
+  add(rec(pack.settings).finale_music)
+  for (const r of pack.rounds) {
+    add(r.rules_audio)
+    add(rec(r.settings).bg_music)
+    for (const q of r.questions) {
+      const m = rec(q.media)
+      add(m.question); add(m.answer); add(m.voice)
+    }
+  }
+  return used
+}
+
+export type Orphan = { path: string; size: number }
+
+/** Найти файлы пакета, на которые никто не ссылается. Ничего не удаляет. */
+export async function findOrphans(pack: PackLike) {
+  const { data, error } = await supabase.storage.from('quiz-media')
+    .list(`pack-${pack.id}`, { limit: 1000 })
+  if (error) throw error
+  const used = usedPaths(pack)
+  const orphans: Orphan[] = []
+  for (const f of data ?? []) {
+    const full = `pack-${pack.id}/${f.name}`
+    if (!used.has(full)) {
+      orphans.push({ path: full, size: (f.metadata?.size as number) ?? 0 })
+    }
+  }
+  return orphans
+}
+
+/** Удалить найденные файлы. Действие необратимо. */
+export async function deleteOrphans(orphans: Orphan[]) {
+  if (orphans.length === 0) return
+  const { error } = await supabase.storage.from('quiz-media')
+    .remove(orphans.map(o => o.path))
+  if (error) throw error
+}

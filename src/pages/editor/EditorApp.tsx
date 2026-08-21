@@ -8,11 +8,56 @@ import {
   getOrCreateBank,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
-import { packMediaSize } from '../../lib/mediaUpload'
+import { packMediaSize, findOrphans, deleteOrphans, type Orphan } from '../../lib/mediaUpload'
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
 import type { Pack, MechanicKey } from '../../types/quiz'
+
+
+/** Уборка осиротевших файлов.
+ *  Удаление вопроса стирает строку в базе, но файл в хранилище остаётся —
+ *  Supabase не отслеживает ссылки. Эта кнопка находит такие файлы и удаляет. */
+function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }) {
+  const [found, setFound] = useState<Orphan[] | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+
+  const scan = async () => {
+    setBusy(true); setErr('')
+    try { setFound(await findOrphans(pack)) }
+    catch (e) { setErr(e instanceof Error ? e.message : 'не удалось проверить') }
+    finally { setBusy(false) }
+  }
+  const wipe = async () => {
+    if (!found?.length) return
+    const mb = (found.reduce((n, o) => n + o.size, 0) / 1048576).toFixed(1)
+    if (!confirm(`Удалить ${found.length} файл(ов) на ${mb} МБ?\n\n`
+      + 'Это файлы, на которые не ссылается ни один вопрос пакета. '
+      + 'Действие необратимо.')) return
+    setBusy(true)
+    try { await deleteOrphans(found); setFound([]); onDone() }
+    catch (e) { setErr(e instanceof Error ? e.message : 'не удалось удалить') }
+    finally { setBusy(false) }
+  }
+
+  return (
+    <span className="media-clean">
+      {found === null
+        ? <button onClick={() => void scan()} disabled={busy}
+            title="Файлы удалённых вопросов остаются в хранилище — здесь их можно найти">
+            {busy ? 'ищу…' : 'Проверить мусор'}
+          </button>
+        : found.length === 0
+          ? <span className="ed-row-meta">мусора нет</span>
+          : <button className="danger" onClick={() => void wipe()} disabled={busy}>
+              Удалить {found.length} лишних ·{' '}
+              {(found.reduce((n, o) => n + o.size, 0) / 1048576).toFixed(1)} МБ
+            </button>}
+      {err && <span className="ed-row-meta" style={{ color: 'var(--danger)' }}>{err}</span>}
+    </span>
+  )
+}
 
 // ═══ Редактор: вход → пакеты → пакет → раунд → вопрос ═══
 
@@ -168,6 +213,8 @@ function PackScreen({ packId, user, onBack }: {
 
   if (!pack) return <div>Загрузка пакета…</div>
   const locked = pack.status === 'active' && user.role !== 'owner'
+  // банк — хранилище, а не игра: игровые настройки в нём бессмысленны
+  const isBank = pack.status === 'bank'
 
   if (openRoundIdx !== null && pack.rounds[openRoundIdx]) {
     return <RoundScreen pack={pack} roundIdx={openRoundIdx} user={user}
@@ -183,7 +230,9 @@ function PackScreen({ packId, user, onBack }: {
             onSave={async v => { await renamePack(pack.id, v); reload() }} />
         </div>
       </div>
-      <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}</h4>
+      <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}
+        <MediaCleanup pack={pack} onDone={reload} />
+      </h4>
         <div className="ed-grid2">
           <div className="ed-field"><label>Статус</label>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -298,7 +347,7 @@ function PackScreen({ packId, user, onBack }: {
         </div>
       )}
 
-      <div className="ed-card"><h4>Раунды
+      <div className="ed-card"><h4>{isBank ? 'Рубрики' : 'Раунды'}
         {(() => {
           const total = pack.rounds.reduce((n, r) => n + estimateRoundMinutes(r), 0)
           return total > 0

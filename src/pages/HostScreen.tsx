@@ -418,6 +418,16 @@ function Icicles({ seed, low }: { seed: string; low: boolean }) {
   )
 }
 
+/** Размер пояснения к ответу — по его длине: короткое читается крупно,
+ *  длинное ужимается, чтобы влезть в блок под ответом. */
+export function noteClass(text: string): string {
+  const n = (text ?? '').trim().length
+  if (n <= 90) return ''
+  if (n <= 200) return ' n-m'
+  if (n <= 360) return ' n-l'
+  return ' n-xl'
+}
+
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
 export function lenClass(text: string): string {
   const n = (text ?? '').trim().length
@@ -806,7 +816,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     ))}
                 </div>
               )}
-              {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
+              {/* пояснение вынесено ПОД рамку: внутри оно тонуло мелким текстом */}
               {q.answer.mode === 'choice' && !(q.answer as { correct_choice?: string }).correct_choice &&
                 <div style={{ color: '#ff8fa3' }}>⚠ в редакторе не отмечен верный вариант</div>}
               {!sideImg && (
@@ -816,6 +826,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
               )}
             </div>
           )}
+          {revealed && !sideImg && q.answer_note &&
+            <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
         </div>
         {sideImg && revealed && (
           <div className="answer-side hud-frame">

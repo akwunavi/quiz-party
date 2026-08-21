@@ -395,3 +395,43 @@ select, .cyber select, .cyber input[type="select"] {
   .ai-head button { width: 100%; }
   .ai-issue-acts button { flex: 1 1 0; }
 }
+
+/* ═══ 7.65: экран разбора — крупнее, ответ внизу, пояснение отдельно ═══ */
+
+/* ── п.1: сам ответ заметно крупнее ── */
+.answers-layout .answer-main { font-size: clamp(34px, 4.2vw, 84px); line-height: 1.08; }
+.answers-layout .answer-label { font-size: clamp(13px, 1.2vw, 20px); letter-spacing: .28em; }
+.theme-potter .answers-layout .answer-main { font-size: clamp(34px, 4.2vw, 84px); }
+/* варианты и сопоставление в разборе — тоже крупнее */
+.answers-layout .choice-plate { font-size: clamp(22px, 2.3vw, 40px); padding: 14px 20px; }
+.answers-layout .order-answer .oi { font-size: clamp(20px, 2vw, 34px); }
+
+/* ── п.2: блок ответа прижат к низу и компактнее по высоте ── */
+.answers-main { justify-content: flex-start !important; }
+.answers-main > .q-text { margin-bottom: auto; }
+.answers-layout .answer-reveal { flex: 0 0 auto; padding: clamp(10px, 1.4vh, 20px) clamp(16px, 2vw, 30px); }
+
+/* пояснение — отдельным блоком под рамкой, размер по длине текста */
+.answer-note { flex: 0 0 auto; text-align: center; line-height: 1.35;
+  color: var(--fg); opacity: .88; max-width: 96%; margin: 0 auto;
+  padding: clamp(6px, 1vh, 12px) clamp(14px, 1.6vw, 26px);
+  border-left: 3px solid var(--ok); background: rgba(255,255,255,.04);
+  font-size: clamp(22px, 2.4vw, 42px); }
+.answer-note.n-m { font-size: clamp(19px, 2vw, 34px); }
+.answer-note.n-l { font-size: clamp(17px, 1.7vw, 28px); }
+.answer-note.n-xl { font-size: clamp(15px, 1.45vw, 23px); line-height: 1.4; }
+/* пояснение сбоку (бумага, картинка справа) — тоже крупнее */
+.answer-side-note { font-size: clamp(16px, 1.6vw, 26px); }
+
+/* ── п.3: «РАУНД» в теме ГП не читался — тонкая золотая надпись на тёмном ── */
+.theme-potter .rb-word { color: #f3e9cf; opacity: .95; font-weight: 700;
+  font-size: clamp(15px, 1.3vw, 24px); letter-spacing: .3em;
+  text-shadow: 0 2px 10px rgba(0,0,0,.85); }
+.theme-potter .rb-num { text-shadow: 0 0 44px rgba(211,166,37,.6), 0 3px 12px rgba(0,0,0,.8); }
+
+/* аварийный выход в «Угадай мелодию» */
+.mel-escape { align-self: center; margin-top: 6px; font-size: 12px;
+  letter-spacing: .1em; text-transform: uppercase; opacity: .5;
+  background: none; border: none; text-decoration: underline; cursor: pointer;
+  color: var(--fg); }
+.mel-escape:hover { opacity: 1; color: var(--danger); }

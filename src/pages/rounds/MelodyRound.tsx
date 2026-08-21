@@ -100,6 +100,18 @@ export function MelodyBoard({ pack, round, gameState }: {
   }, [m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
 
   // ── snippet: интервал играет от РЕАЛЬНОГО старта звука ровно bid секунд ──
+  // Сторож стадии snippet. Переход был завязан ТОЛЬКО на событие окончания
+  // звука: если аудио не загрузилось, вкладка была скрыта или браузер не дал
+  // автовоспроизведение — экран замирал навсегда, и выйти было нельзя.
+  useEffect(() => {
+    if (m.stage !== 'snippet') return
+    const sec = m.snippetSec ?? 5
+    const t = window.setTimeout(() => {
+      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+    }, (sec + 10) * 1000)          // фрагмент + 10 сек запаса
+    return () => clearTimeout(t)
+  }, [m.stage, m.key, m.snippetSec])
+
   useEffect(() => {
     if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
     const sec = m.snippetSec ?? 5
@@ -307,11 +319,16 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
             </>)}
 
-            {m.stage === 'snippet' && (
+            {m.stage === 'snippet' && (<>
               <div className="mel-big" style={{ color: currentTeam?.color }}>
                 {currentTeam?.name} · играет {bidSec} сек
               </div>
-            )}
+              {/* если звук не пошёл — ведущий переводит стадию руками */}
+              <div className="mel-actions">
+                <button onClick={() => void saveMelody({ ...m, stage: 'answering',
+                  deadline: inSec(s.answerSec ?? 30) })}>Принимаем ответ →</button>
+              </div>
+            </>)}
 
             {m.stage === 'reveal' && (<>
               <div className="answer-reveal" style={{ padding: '18px 28px' }}>
@@ -325,6 +342,18 @@ export function MelodyBoard({ pack, round, gameState }: {
                 <button onClick={() => void saveMelody({ ...m, stage: 'done' })}>К доске →</button>
               </div>
             </>)}
+            {/* Аварийный выход. Доступен на любой стадии: интернет у команд
+                отваливается, ответы не долетают, и ведущему нужен способ
+                двигаться дальше, не перезапуская игру. */}
+            {m.stage !== 'reveal' && m.stage !== 'done' && (
+              <button className="mel-escape" onClick={async () => {
+                if (!confirm('Закрыть трек и вернуться к доске?\n\n'
+                  + 'Баллы за него никто не получит.')) return
+                await saveMelody({ ...m, stage: 'done', deadline: undefined,
+                  played: [...played, m.key!] })
+              }}>аварийно закрыть трек</button>
+            )}
+
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
               <div className="mel-big" style={{ color: currentTeam?.color }}>
                 {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
