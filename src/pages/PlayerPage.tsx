@@ -8,7 +8,8 @@ import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
-import type { AnswerSpec, Team, CrosswordGrid, Question, Answer } from '../types/quiz'
+import type { AnswerSpec, Team, CrosswordGrid, Question, Answer, JeopardyTheme } from '../types/quiz'
+import { spendsEdit } from '../lib/edits'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -85,7 +86,7 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
     return <MelodyPlayer team={team} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'jeopardy')
-    return <JeopardyPlayer team={team} gameState={gameState}
+    return <JeopardyPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if ((phase === 'question' || phase === 'answer_time') && round)
     return <AnswerForm team={team} round={round} gameState={gameState}
@@ -95,12 +96,43 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
 
 /** Своя игра у игрока: ведущий открывает плитку — команда пишет ответ.
  *  Ответ уходит с меткой плитки, которую ведущий видит в модалке по скорости. */
-function JeopardyPlayer({ team, gameState, roundLabel }: {
+function JeopardyPlayer({ team, gameState, roundLabel, round }: {
   team: Team; roundLabel: string
+  round?: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const [draft, setDraft] = useState('')
   const [sent, setSent] = useState<string | null>(null)
+  // плитка считается открытой, когда ведущий её запустил (пошёл таймер).
+  // Раньше поле ответа висело всегда — команда набирала ответ заранее,
+  // ещё не услышав трек.
+  const open = !!gameState.timer_started_at
+  // стоимость открытой плитки: по сквозному номеру находим её в темах
+  const themes = (round?.settings as { themes?: JeopardyTheme[] })?.themes ?? []
+  let flat = gameState.question_index
+  let value: number | null = null
+  for (const t of themes) {
+    if (flat < t.tiles.length) { value = t.tiles[flat]?.value ?? null; break }
+    flat -= t.tiles.length
+  }
+  // при смене плитки очищаем поле, иначе уедет прошлый ответ
+  useEffect(() => { setDraft(''); setSent(null) }, [gameState.question_index])
+
+  if (!open) return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        <div className="pl-notice acc">СВОЯ ИГРА</div>
+        <div className="pl-card">
+          <div className="pl-card-body" style={{ textAlign: 'center' }}>
+            <div className="pl-wait">Ждём, пока ведущий откроет плитку</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="pl-root">
       <PlayerHeader team={team} round={roundLabel} />
@@ -108,7 +140,9 @@ function JeopardyPlayer({ team, gameState, roundLabel }: {
       <div className="pl-list">
         <div className="pl-notice acc">СВОЯ ИГРА · СЛУШАЙ ТРЕК НА ЭКРАНЕ</div>
         <div className="pl-card">
-          <div className="pl-qlabel">ОТВЕТ НА ОТКРЫТУЮ ПЛИТКУ</div>
+          <div className="pl-qlabel">
+            ОТВЕТ НА ПЛИТКУ{value != null && <b className="pl-tile-value">{value}</b>}
+          </div>
           <div className="pl-card-body">
             <div className="pl-input-col">
               <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ответ" />
@@ -302,7 +336,16 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       return { answers: {}, stakes: {}, edits: {} }
     }
   })
-  useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(state)) }, [state])
+  useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(state)) }, [state, storageKey])
+  // При смене раунда состояние ОБЯЗАНО перечитаться под новый ключ: без этого
+  // на экране оставались ответы прошлого раунда, потому что useState с
+  // инициализатором срабатывает только при первом монтировании.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey)
+      setState(saved ? JSON.parse(saved) : { answers: {}, stakes: {}, edits: {} })
+    } catch { setState({ answers: {}, stakes: {}, edits: {} }) }
+  }, [storageKey])
 
   // вопрос доступен, только если зачитан. В «120 секунд» — все сразу,
   // но после окончания таймера форма блокируется.
@@ -313,7 +356,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
     isSprint ? !sprintOver
     : gameState.phase === 'answer_time' ? true : i <= gameState.question_index
   const maxEdits = (round.settings as { maxEdits?: number }).maxEdits ?? 2
-  const locked = (i: number) => maxEdits >= 0 && (state.edits[i] ?? 0) > maxEdits
+  const locked = (i: number) => maxEdits >= 0 && (state.edits[i] ?? 0) >= maxEdits
 
   const push = (qIdx: number, text: string, stake?: number | null) => {
     const q = questions[qIdx]
@@ -324,7 +367,16 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
     })
   }
   const setAnswer = (i: number, text: string) => {
-    setState(s => ({ ...s, answers: { ...s.answers, [i]: text }, edits: { ...s.edits, [i]: (s.edits[i] ?? 0) + 1 } }))
+    const spec = questions[i].answer
+    setState(s => {
+      // логика вынесена в lib/edits.ts и покрыта тестами
+      const spend = spendsEdit(spec, s.answers[i] ?? '', text)
+      return {
+        ...s,
+        answers: { ...s.answers, [i]: text },
+        edits: spend ? { ...s.edits, [i]: (s.edits[i] ?? 0) + 1 } : s.edits,
+      }
+    })
     push(i, text)
   }
   // Стереть ответ можно ВСЕГДА, независимо от лимита правок (как в старом проекте)
@@ -406,7 +458,10 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                   {q.question_text
                     ? <div className="pl-qtext">{q.question_text}</div>
                     : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
-                  {isStakes && (
+                  {isStakes && (<>
+                    <div className="pl-stakes-label">
+                      Ставка: сколько баллов ставишь на этот вопрос
+                    </div>
                     <div className="pl-stakes">
                       {stakeValues.map(v => (
                         <button key={v} className={state.stakes[i] === v ? 'sel' : ''}
@@ -414,7 +469,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                           onClick={() => setStake(i, v)}>{v}</button>
                       ))}
                     </div>
-                  )}
+                  </>)}
                   <Picker spec={q.answer} value={state.answers[i] ?? ''} locked={isLocked}
                     onChange={text => setAnswer(i, text)} />
                   <div className="pl-row-bottom">
@@ -424,7 +479,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                     )}
                     {maxEdits >= 0 && (
                       <span className="pl-sent">
-                        правок: {Math.max(0, (state.edits[i] ?? 0) - 1)}/{maxEdits}
+                        правок: {state.edits[i] ?? 0}/{maxEdits}
                       </span>
                     )}
                   </div>

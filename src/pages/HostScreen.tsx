@@ -172,13 +172,17 @@ function HostInner({ gameState, pack }: {
           <Title theme={pack.theme} lines={round.title_lines} />
           <Deco theme={pack.theme} />
           <div className="meta-line">{metaLine(round)}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: '72vw' }}>
-            {round.rules.map((r, i) => (
-              <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
-                <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
-              </div>
-            ))}
-          </div>
+          {/* правила в рамке: у каждой темы своё оформление, см. rules-frame */}
+          {round.rules.length > 0 && (
+            <div className="rules-frame">
+              <div className="rules-frame-label">правила раунда</div>
+              {round.rules.map((r, i) => (
+                <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
+                  <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
+                </div>
+              ))}
+            </div>
+          )}
         </>)}
         <div className="host-actions">
           <button onClick={() => void gotoQuestion(0)}>
@@ -656,6 +660,9 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   const hasOwnAV = (q.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
   const voiceRef = useRef<HTMLAudioElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  // отмечает, что старт уже запрошен: по нему страховка понимает,
+  // ждём мы озвучку или запрос просто потерялся
+  const requested = useRef(false)
 
   // ── ЗВУК ВОПРОСА И СТАРТ ТАЙМЕРА ──
   // Правило: озвучка ВСЕГДА идёт первой и блокирует старт. Всё остальное —
@@ -673,9 +680,12 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
     const ownAudio = (q.media.question ?? [])
       .find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
 
+    requested.current = false
+
     /** Запускает вопрос: собственное аудио и таймер вместе. */
     const runQuestion = () => {
       if (cancelled) return
+      requested.current = true
       if (ownAudio) {
         const a = new Audio(mediaUrl(ownAudio))
         audioRef.current = a
@@ -700,11 +710,15 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
     }
   }, [q.id])
 
-  // Страховка: если звук по любой причине не пошёл, таймер всё равно
-  // стартует — экран не должен замирать навсегда.
+  // ── Страховка: таймер обязан пойти ──
+  // Запрос на старт мог не дойти (у команд и проектора связь рвётся), а
+  // повторить его было некому: эффект выше срабатывает один раз на вопрос.
+  // Здесь проверяем результат и повторяем попытку, пока таймер не пошёл.
   useEffect(() => {
     if (timerRunning || document.hidden) return
-    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, 45_000)
+    // ждём, пока доиграет озвучка: во время неё таймер и не должен идти
+    if (q.media.voice && !requested.current) return
+    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, 2500)
     return () => clearTimeout(t)
   }, [q.id, timerRunning])
 
@@ -812,16 +826,26 @@ function ShowAnswers({ pack, round, q, gameState }: {
     return () => clearTimeout(t)
   }, [revealed, step])
 
-  // автопроверка при раскрытии (только видимый проектор), финальное слово админа — поверх
+  // Автопроверка идёт ВМЕСТЕ с показом ответа. Раньше она срабатывала
+  // сразу по флагу reveal, а сам ответ выезжает с анимацией — на экране
+  // успевали загореться галочки, когда ответа ещё не было.
+  const [checked, setChecked] = useState(false)
   useEffect(() => {
-    if (!revealed || document.hidden) return
+    setChecked(false)
+    if (!revealed) return
+    const t = setTimeout(() => setChecked(true), 700)   // столько едет рамка ответа
+    return () => clearTimeout(t)
+  }, [revealed, step])
+
+  useEffect(() => {
+    if (!checked || document.hidden) return
     rows.forEach(a => {
       if (a.is_correct != null) return
       const ok = autocheck(q.answer, a.answer_text)
       if (ok === null) return
       void supabase.from('answers').update({ is_correct: ok }).eq('id', a.id).then(() => {})
     })
-  }, [revealed, step, rows.length, rows.map(r => r.answer_text).join('|')])
+  }, [checked, step, rows.length, rows.map(r => r.answer_text).join('|')])
 
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
@@ -871,7 +895,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
                       .choices.find(x => x.key === k)
                     return (
                       <div key={i} className="oi">
-                        <b>{i + 1}.</b>{c?.text ?? ''}
+                        {/* буква варианта, как её вводила команда;
+                            номер позиции показываем мельче рядом */}
+                        <b>{k}</b>
+                        <span className="oi-pos">{i + 1}</span>
+                        <span className="oi-text">{c?.text ?? ''}</span>
                       </div>
                     )
                   })}
@@ -909,7 +937,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {rows.map(a => {
             const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
             // приоритет: ручная оценка админа → автопроверка на лету
-            const shown = a.is_correct ?? (revealed ? autocheck(q.answer, a.answer_text) : null)
+            const shown = a.is_correct ?? (checked ? autocheck(q.answer, a.answer_text) : null)
             return (
               <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
@@ -953,8 +981,10 @@ function StagedChoices({ q, choices, imgs }: {
   const [stage, setStage] = useState(0)
   useEffect(() => {
     setStage(0)
-    const t1 = setTimeout(() => setStage(1), 3000)
-    const t2 = setTimeout(() => setStage(2), 5500)
+    // Вторая пара и подсветка идут почти встык: как только оставшиеся два
+    // варианта на экране, ответ и так очевиден — тянуть паузу незачем.
+    const t1 = setTimeout(() => setStage(1), 2200)
+    const t2 = setTimeout(() => setStage(2), 3300)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [q.id])
 
@@ -1162,7 +1192,9 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
         )}
 
         <div className="jp-answers">
-          <div className="mono-tag">ОТВЕТЫ (ПО СКОРОСТИ)</div>
+          <div className="mono-tag">
+            {showAnswer ? 'ОТВЕТЫ (ПО СКОРОСТИ)' : `ОТВЕТИЛИ: ${rows.length}`}
+          </div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>ждём ответы…</div>}
           {rows.map((a, pos) => {
             const team = teams.find(t => t.id === a.team_id)
@@ -1172,11 +1204,15 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
               }}>
                 <span className="pos">#{pos + 1}</span>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
-                <span className="txt">{a.answer_text || '—'}</span>
-                <button className="jp-grade ok" disabled={a.is_correct != null}
-                  onClick={() => void grade(a.id, true)}>✓</button>
-                <button className="jp-grade no" disabled={a.is_correct != null}
-                  onClick={() => void grade(a.id, false)}>✗</button>
+                {/* до нажатия «Показать ответ» видно только ФАКТ ответа:
+                    иначе зал читает чужие ответы и интрига пропадает */}
+                <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>
+                {showAnswer && <>
+                  <button className="jp-grade ok" disabled={a.is_correct != null}
+                    onClick={() => void grade(a.id, true)}>✓</button>
+                  <button className="jp-grade no" disabled={a.is_correct != null}
+                    onClick={() => void grade(a.id, false)}>✗</button>
+                </>}
               </div>
             )
           })}
@@ -1307,8 +1343,8 @@ function BreakScreen({ pack, round, gameState }: {
   const mm = String(Math.floor(left / 60)).padStart(2, '0')
   const ss = String(left % 60).padStart(2, '0')
   return (
-    <div className="host-screen grid-bg">
-      <div className="mono-tag">АНТРАКТ</div>
+    <div className="host-screen grid-bg break-screen">
+      <div className="mono-tag accent">АНТРАКТ</div>
       <Title theme={pack.theme} lines={['ПЕРЕРЫВ']} />
       <Deco theme={pack.theme} />
       <div className="break-timer">{mm}:{ss}</div>

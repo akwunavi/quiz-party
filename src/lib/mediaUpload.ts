@@ -52,31 +52,14 @@ export async function packMediaSize(packId: string): Promise<number> {
 // пакетов так набегают десятки мегабайт мусора, а место в хранилище конечно.
 
 /** Все пути к медиа, на которые ссылается пакет (вопросы, раунды, сам пакет). */
-type PackLike = {
-  id: string
-  settings?: unknown
-  rounds: { settings?: unknown; rules_audio?: string | null; questions: { media?: unknown }[] }[]
-}
-
-function usedPaths(pack: PackLike): Set<string> {
-  const used = new Set<string>()
-  const add = (v: unknown) => {
-    if (typeof v === 'string' && v) used.add(v)
-    else if (Array.isArray(v)) v.forEach(add)
-  }
-  const rec = (v: unknown) => (v ?? {}) as Record<string, unknown>
-  add(rec(pack.settings).bg_music)
-  add(rec(pack.settings).finale_music)
-  for (const r of pack.rounds) {
-    add(r.rules_audio)
-    add(rec(r.settings).bg_music)
-    for (const q of r.questions) {
-      const m = rec(q.media)
-      add(m.question); add(m.answer); add(m.voice)
-    }
-  }
-  return used
-}
+/** Все пути к медиа, на которые ссылается пакет.
+ *
+ *  ВАЖНО: обходим структуру ЦЕЛИКОМ, а не по списку известных полей.
+ *  Прежняя версия перечисляла поля вручную (bg_music, media.question…) и
+ *  не знала про треки «Своей игры», которые лежат в
+ *  settings.themes[].tiles[].audio — из-за чего уборка считала их мусором
+ *  и удаляла. Рекурсивный обход не сломается при добавлении новых полей. */
+import { collectUsedPaths, type PackLike } from './usedPaths'
 
 export type Orphan = { path: string; size: number }
 
@@ -85,7 +68,7 @@ export async function findOrphans(pack: PackLike) {
   const { data, error } = await supabase.storage.from('quiz-media')
     .list(`pack-${pack.id}`, { limit: 1000 })
   if (error) throw error
-  const used = usedPaths(pack)
+  const used = collectUsedPaths(pack)
   const orphans: Orphan[] = []
   for (const f of data ?? []) {
     const full = `pack-${pack.id}/${f.name}`
