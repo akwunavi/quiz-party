@@ -304,11 +304,12 @@ function HostInner({ gameState, pack }: {
           </>
         )}
 
+        {/* Медиа вопроса ждёт озвучку: пока её читают, видео молчит.
+            Запуск привязан к таймеру — они стартуют одновременно. */}
         {avs.map((m, i) => /\.(mp4|webm)$/i.test(m)
-          ? (q.media.hidden
-            ? <video key={i} autoPlay src={mediaUrl(m)} style={{ width: 1, height: 1, opacity: 0 }} />
-            : <video key={i} autoPlay controls src={mediaUrl(m)} style={{ maxHeight: '46vh', borderRadius: 14 }} />)
-          : <audio key={i} autoPlay src={mediaUrl(m)} />)}
+          ? <QuestionVideo key={i} src={mediaUrl(m)} hidden={!!q.media.hidden}
+              waitFor={!!q.media.voice} go={!!gameState.timer_started_at} />
+          : null)}
 
         {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && (
           <div className="choices-grid">
@@ -621,6 +622,26 @@ export function mediaUrl(path: string): string {
   return `${base}/storage/v1/object/public/quiz-media/${path.replace(/^\//, '')}`
 }
 
+/** Видео вопроса. Если у вопроса есть озвучка — ждём её окончания
+ *  (признак: пошёл таймер), иначе играем сразу. Аудио вопроса здесь НЕ
+ *  рендерим: им управляет QuestionAudio, иначе трек играл бы дважды. */
+function QuestionVideo({ src, hidden, waitFor, go }: {
+  src: string; hidden: boolean; waitFor: boolean; go: boolean
+}) {
+  const ref = useRef<HTMLVideoElement | null>(null)
+  useEffect(() => {
+    if (waitFor && !go) return
+    ref.current?.play().catch(() => {})
+  }, [waitFor, go])
+  return (
+    <video ref={ref} src={src} controls={!hidden}
+      autoPlay={!waitFor}
+      style={hidden
+        ? { width: 1, height: 1, opacity: 0 }
+        : { maxHeight: '46vh', borderRadius: 14 }} />
+  )
+}
+
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
  *  скрытая вкладка (второй проектор) молчит. */
@@ -633,22 +654,59 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   pack?: LoadedPack
 }) {
   const hasOwnAV = (q.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
+  const voiceRef = useRef<HTMLAudioElement | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // озвучка → startTimer
+  // ── ЗВУК ВОПРОСА И СТАРТ ТАЙМЕРА ──
+  // Правило: озвучка ВСЕГДА идёт первой и блокирует старт. Всё остальное —
+  // аудио вопроса, видео, таймер, фоновая музыка — стартует ОДНОВРЕМЕННО
+  // после неё. Команда должна слушать трек, пока тикает таймер, а не после.
+  //
+  //   только озвучка        → озвучка, затем таймер + фоновая музыка
+  //   аудио без озвучки     → сразу аудио + таймер
+  //   аудио + озвучка       → озвучка, затем аудио + таймер
+  //   видео без озвучки     → сразу видео + таймер
+  //   видео + озвучка       → озвучка, затем видео + таймер
   useEffect(() => {
     if (timerRunning || document.hidden) return
     let cancelled = false
-    if (q.media.voice) {
-      const a = new Audio(mediaUrl(q.media.voice))
-      const done = () => { if (!cancelled) void startTimer() }
-      a.onended = done; a.onerror = done
-      a.play().catch(done)
-      return () => { cancelled = true; a.pause() }
+    const ownAudio = (q.media.question ?? [])
+      .find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
+
+    /** Запускает вопрос: собственное аудио и таймер вместе. */
+    const runQuestion = () => {
+      if (cancelled) return
+      if (ownAudio) {
+        const a = new Audio(mediaUrl(ownAudio))
+        audioRef.current = a
+        a.play().catch(() => {})        // не смогли — таймер всё равно идёт
+      }
+      void startTimer()
     }
-    if (!hasOwnAV) void startTimer()
-    // вопросы со своим аудио/видео: таймер стартует кнопкой «Дальше» не нужен —
-    // ведущий может запустить руками через админку; авто не трогаем (как в старом)
+
+    if (!q.media.voice) { runQuestion(); return }
+
+    // озвучка блокирует старт: пока читают вопрос, время не тикает
+    const v = new Audio(mediaUrl(q.media.voice))
+    voiceRef.current = v
+    v.onended = runQuestion
+    v.onerror = runQuestion            // нет файла — не зависаем
+    v.play().catch(runQuestion)        // запрет автозапуска — тоже
+
+    return () => {
+      cancelled = true
+      voiceRef.current?.pause()
+      audioRef.current?.pause()
+    }
   }, [q.id])
+
+  // Страховка: если звук по любой причине не пошёл, таймер всё равно
+  // стартует — экран не должен замирать навсегда.
+  useEffect(() => {
+    if (timerRunning || document.hidden) return
+    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, 45_000)
+    return () => clearTimeout(t)
+  }, [q.id, timerRunning])
 
   // фоновая музыка раунда, пока тикает таймер
   useEffect(() => {
@@ -686,9 +744,12 @@ function AnswerTime({ pack, round, gameState }: {
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const totalQ = round.questions.filter(q => !q.hidden).length
 
-  // фоновая музыка на время раздумий — как в старом
+  // Фоновая музыка на время раздумий. Раньше бралась ТОЛЬКО из настроек
+  // раунда, поэтому при музыке, заданной на уровне пакета, экран молчал —
+  // хотя во время вопросов она играла. Теперь запасной вариант тот же.
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music
+      ?? pack.settings?.bg_music
     if (!bg || document.hidden) return
     const a = new Audio(mediaUrl(bg))
     a.loop = true; a.volume = 0.6
@@ -766,8 +827,10 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
   const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  // одиночная картинка ответа уезжает в правую колонку: по центру она душила текст
-  const sideImg = paper && answerImgs.length === 1 ? answerImgs[0] : null
+  // Одиночная картинка ответа уходит в ЛЕВУЮ колонку на всю высоту, под ней —
+  // сам ответ. Текст вопроса при этом прячем: на экране разбора он уже
+  // прозвучал, а место нужнее картинке.
+  const sideImg = answerImgs.length === 1 ? answerImgs[0] : null
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -777,8 +840,19 @@ function ShowAnswers({ pack, round, q, gameState }: {
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
       <div className={`answers-layout${sideImg ? ' with-side' : ''}`} style={{ marginTop: 60 }}>
+        {/* картинка ответа — слева, во всю высоту, ответ сразу под ней */}
+        {sideImg && revealed && (
+          <div className="answer-side hud-frame">
+            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+            <img src={mediaUrl(sideImg)} alt="" />
+            <div className="answer-side-main">{displayAnswer(q)}</div>
+            {q.answer_note &&
+              <div className={`answer-side-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
+          </div>
+        )}
         <div className="answers-main" style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
-          <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+          {!(sideImg && revealed) &&
+            <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>}
           {/* если картинка ответа уехала вправо, весь разбор живёт там —
               иначе ответ дублировался в двух местах экрана */}
           {revealed && !sideImg && (
@@ -829,14 +903,6 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && !sideImg && q.answer_note &&
             <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
         </div>
-        {sideImg && revealed && (
-          <div className="answer-side hud-frame">
-            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <img src={mediaUrl(sideImg)} alt="" />
-            <div className="answer-side-main">{displayAnswer(q)}</div>
-            {q.answer_note && <div className="answer-side-note">{q.answer_note}</div>}
-          </div>
-        )}
         {!paper && <div className="team-answers">
           <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}

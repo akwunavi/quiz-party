@@ -505,3 +505,52 @@ select, .cyber select, .cyber input[type="select"] {
   .adm-footer .adm-btn { flex: 1 1 46%; padding: 12px 10px; font-size: 13.5px; }
   .adm-footer .adm-btn.primary { flex: 1 1 100%; }
 }
+
+/* ═══ 7.68: картинка ответа слева во всю высоту ═══ */
+.answers-layout.with-side { align-items: stretch; }
+.answers-layout.with-side .answer-side {
+  order: -1;                                  /* слева от текста */
+  flex: 0 0 clamp(320px, 34vw, 620px);
+  border-left: none; border-right: 2px solid var(--dim);
+  justify-content: flex-start; gap: clamp(8px, 1.2vh, 16px);
+}
+/* flex: 1 1 auto + height:100% раздували картинку и она выпирала за экран.
+   Нужен flex-basis 0 и min-height 0: тогда блок берёт ОСТАТОК высоты,
+   а картинка вписывается в него по meньшей стороне. */
+.answers-layout.with-side .answer-side img {
+  flex: 1 1 0; min-height: 0; height: auto; max-height: 100%;
+  width: auto; max-width: 100%; object-fit: contain; align-self: center;
+}
+.answer-side-main { font-size: clamp(28px, 3vw, 60px); }
+.answer-side-note { flex: 0 0 auto; }
+.answer-side-note.n-m { font-size: clamp(15px, 1.4vw, 23px); }
+.answer-side-note.n-l { font-size: clamp(14px, 1.25vw, 20px); }
+.answer-side-note.n-xl { font-size: clamp(13px, 1.1vw, 18px); }
+
+/* ═══ 7.69: вопрос по центру в ЛЮБОМ раунде ═══
+   Правило 7.46 центрировало текст только когда у вопроса нет картинок
+   (:not(.has-media)), и только у прямого потомка экрана. В механиках, где
+   текст лежит глубже или рядом есть медиа, он оставался прижат к шапке.
+   Здесь центрируем текст в свободном месте НАД вариантами во всех случаях —
+   кроме сплита, где текст выравнивается по картинке. */
+.host-screen > .q-text,
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.q-split) > .q-text {
+  margin-block: auto;
+}
+/* в сплите центрируем по вертикали относительно картинки */
+.q-split > .q-text { margin-block: 0; align-self: center; }
+/* На экранах с картинками текст был прижат к шапке: сетка медиа забирала
+   ВСЮ остаточную высоту (flex: 1 1 0). Теперь картинки берут столько,
+   сколько нужно (до 60% высоты), а пара «вопрос + картинки» центрируется
+   как единый блок. */
+.host-screen.has-media { justify-content: center; }
+.host-screen.has-media > .q-text { margin-block: 0 clamp(10px, 2vh, 28px); }
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers { flex: 0 1 auto; margin-top: 0;
+  max-height: 60vh; min-height: 0; }
+.host-screen.has-media.has-choices > .q-media-grid,
+.host-screen.has-media.has-choices > .img-answers { max-height: 44vh; }
+/* когда снизу есть варианты, они прижаты к низу, а вопрос центрируется
+   в оставшемся месте — а не делит его пополам с ними */
+.host-screen.has-choices > .q-text { margin-block: auto 0; }
+.host-screen.has-choices > .choices-grid { margin-top: auto; }
