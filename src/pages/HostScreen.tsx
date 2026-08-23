@@ -20,6 +20,7 @@ import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
+import { teamColor } from '../lib/teamColors'
 import { AudioGate } from '../components/AudioGate'
 import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -106,39 +107,37 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            {/* Лобби: QR маленький в левом нижнем углу без подписей, в основной
-                зоне — составы команд от рандомайзера и подключившиеся.
-                Скролла нет нигде: блоки ужимаются шрифтом, потому что на
-                проекторе прокрутить страницу некому. */}
-            <div className={`lobby-grid${groups.length ? ' with-groups' : ''}`}>
-              {groups.length > 0 && (
-                <div className="lobby-groups" data-count={groups.length}>
-                  <div className="mono-tag">СОСТАВЫ КОМАНД</div>
-                  <div className="lg-list">
-                    {groups.map((g, i) => (
-                      <div key={i} className="lg-team">
-                        <div className="lg-name"
-                          style={{ color: LOBBY_COLORS[i % LOBBY_COLORS.length] }}>
-                          Команда {i + 1}
-                        </div>
-                        <div className="lg-players">{g.join(' · ')}</div>
+            {/* Лобби как было: список подключившихся команд по центру.
+                Составы от рандомайзера появляются НАД ним и только если их
+                опубликовали — без них экран выглядит ровно как раньше. */}
+            {groups.length > 0 && (
+              <div className="lobby-groups" data-count={groups.length}>
+                <div className="mono-tag">СОСТАВЫ КОМАНД</div>
+                <div className="lg-list">
+                  {groups.map((g, i) => (
+                    <div key={i} className="lg-team">
+                      <div className="lg-name"
+                        style={{ color: teamColor(i) }}>
+                        Команда {i + 1}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="lobby-teams">
-                {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
-                {teams.length === 0
-                  ? (paperMode ? null : <span style={{ opacity: .5 }}>ждём команды…</span>)
-                  : teams.map(t => (
-                    <span key={t.id} className="lobby-team team-chip-fx"
-                      style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
-                      {t.name}
-                    </span>
+                      <div className="lg-players">{g.join(' · ')}</div>
+                    </div>
                   ))}
+                </div>
               </div>
+            )}
+            <div className="lobby-teams">
+              {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
+              {teams.length === 0
+                ? (paperMode ? null : <span style={{ opacity: .5 }}>ждём команды…</span>)
+                : teams.map(t => (
+                  <span key={t.id} className="lobby-team team-chip-fx"
+                    style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
+                    {t.name}
+                  </span>
+                ))}
             </div>
+            {/* QR — всегда маленький в левом нижнем углу, нигде по центру */}
             {!paperMode && (
               <img alt="QR" className="lobby-qr-corner"
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=1&data=${encodeURIComponent(playerUrl)}`} />
@@ -454,8 +453,6 @@ export function noteClass(text: string): string {
 }
 
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
-const LOBBY_COLORS = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42',
-  '#9d7bff', '#ff5c5c', '#40e0d0']
 
 export function lenClass(text: string): string {
   const n = (text ?? '').trim().length
@@ -503,6 +500,17 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
       ))}
     </h1>
   )
+}
+
+/** Останавливает ВСЁ звучащее на странице.
+ *  Пауз через ссылки на конкретные плееры недостаточно: элементы создаются
+ *  и React-разметкой, и вручную, и в модалках раундов. Проще один раз пройти
+ *  по всем и остановить. Вызывается при СМЕНЕ вопроса и по концу таймера. */
+export function stopAllMedia() {
+  document.querySelectorAll('audio, video').forEach(el => {
+    const m = el as HTMLMediaElement
+    try { m.pause(); m.currentTime = 0 } catch { /* элемент уже мёртв */ }
+  })
 }
 
 /** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
@@ -701,6 +709,10 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
     // document.hidden из условия УБРАН намеренно: если вкладку свернули на
     // секунду (или ОС решила, что окно неактивно), таймер не запускался
     // вообще, и вопрос замирал до перезагрузки страницы.
+    // Новый вопрос — старый звук обязан замолчать НЕМЕДЛЕННО. Раньше пауза
+    // была только в очистке эффекта и не покрывала плееры, созданные вне
+    // этого компонента: при переходе аудио продолжало играть поверх.
+    stopAllMedia()
     if (timerRunning) return
     let cancelled = false
     const ownAudio = (q.media.question ?? [])

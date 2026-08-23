@@ -27,7 +27,18 @@ export async function gotoRound(round_number: number) {
   if (error) throw error
 }
 
+/** Останавливает звук на ЭТОЙ вкладке. На проекторе то же делает
+ *  stopAllMedia в HostScreen — здесь для админки и телефонов. */
+function hushLocal() {
+  if (typeof document === 'undefined') return
+  document.querySelectorAll('audio, video').forEach(el => {
+    const m = el as HTMLMediaElement
+    try { m.pause() } catch { /* уже недоступен */ }
+  })
+}
+
 export async function gotoQuestion(question_index: number) {
+  hushLocal()
   // Таймер НЕ стартует здесь: хост запустит его после окончания озвучки
   const { error } = await supabase.from('game_sessions').update({
     phase: 'question', question_index,

@@ -10,7 +10,7 @@ import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Question, Answer, JeopardyTheme } from '../types/quiz'
 import { spendsEdit } from '../lib/edits'
-import { mediaUrl } from './HostScreen'
+import { TEAM_PALETTE } from '../lib/teamColors'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -31,16 +31,32 @@ export function PlayerPage() {
     else setPack(null)
   }, [gameState?.pack_id])
 
-  // если игра перезапущена — перепривязываем команду к новому game_id
+  // Команда, сохранённая в телефоне, действительна только пока она ЕСТЬ в базе.
+  // Раньше при новой игре телефон просто перепривязывал старую команду к новому
+  // game_id — поэтому после полной очистки на экране снова всплывало старое
+  // название, и помогал только сброс кеша браузера.
   useEffect(() => {
     if (!team || !gameState) return
-    if (team.game_id === gameState.game_id) return
-    void supabase.from('teams')
-      .update({ game_id: gameState.game_id, last_seen_at: new Date().toISOString() })
-      .eq('id', team.id).then(() => {
+    let alive = true
+    void (async () => {
+      const { data } = await supabase.from('teams')
+        .select('id, game_id').eq('id', team.id).maybeSingle()
+      if (!alive) return
+      if (!data) {
+        // команду удалили вместе с игрой — забываем её и просим зайти заново
+        localStorage.removeItem(TEAM_LS)
+        setTeam(null)
+        return
+      }
+      if (data.game_id !== gameState.game_id) {
+        await supabase.from('teams')
+          .update({ game_id: gameState.game_id, last_seen_at: new Date().toISOString() })
+          .eq('id', team.id)
         const t = { ...team, game_id: gameState.game_id }
         localStorage.setItem(TEAM_LS, JSON.stringify(t)); setTeam(t)
-      })
+      }
+    })()
+    return () => { alive = false }
   }, [team?.id, gameState?.game_id])
 
   useEffect(() => {
@@ -462,18 +478,8 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                   {q.question_text
                     ? <div className="pl-qtext">{q.question_text}</div>
                     : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
-                  {/* картинки вопроса у игрока: их не показывали вообще,
-                      хотя половина вопросов без них не читается */}
-                  {(() => {
-                    const imgs = (q.media?.question ?? [])
-                      .filter(m => !/\.(mp3|mp4|webm|wav|m4a|ogg)$/i.test(m))
-                    if (!imgs.length || q.media?.hidden) return null
-                    return (
-                      <div className={`pl-media n${Math.min(imgs.length, 4)}`}>
-                        {imgs.map((m, k) => <img key={k} src={mediaUrl(m)} alt="" />)}
-                      </div>
-                    )
-                  })()}
+                  {/* картинки у игрока НЕ показываем: они на проекторе,
+                      а на телефоне только съедали экран под формой ответа */}
                   {isStakes && (uniqueStakes ? (<>
                     <div className="pl-stakes-label">
                       Ставка: сколько баллов ставишь на этот вопрос
@@ -647,7 +653,8 @@ function PlayerHeader({ team, round }: { team: Team; round: string }) {
   )
 }
 
-const COLORS = ['#14b8a6', '#f43f5e', '#eab308', '#8b5cf6', '#3b82f6', '#f97316']
+// палитра общая для всего проекта, см. lib/teamColors.ts
+const COLORS = TEAM_PALETTE
 
 function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: string }) {
   const [name, setName] = useState('')

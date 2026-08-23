@@ -12,6 +12,7 @@ import {
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
+import { teamColor, nextFreeColor } from '../lib/teamColors'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
 import type { Answer, Pack, Team } from '../types/quiz'
@@ -95,7 +96,7 @@ function PackPicker() {
 }
 
 // ── Рандомайзер команд (перенос as is) ──
-const TEAM_COLORS = ['#ea580c', '#3b82f6', '#22c55e', '#a855f7', '#ec4899', '#eab308']
+// палитра общая для всего проекта, см. lib/teamColors.ts
 
 function TeamRandomizer() {
   const [namesText, setNamesText] = useState('')
@@ -151,10 +152,10 @@ function TeamRandomizer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {preview.map((group, i) => (
               <div key={i} className="adm-group" style={{
-                borderColor: TEAM_COLORS[i % TEAM_COLORS.length],
-                borderLeft: `3px solid ${TEAM_COLORS[i % TEAM_COLORS.length]}`,
+                borderColor: teamColor(i),
+                borderLeft: `3px solid ${teamColor(i)}`,
               }}>
-                <div style={{ color: TEAM_COLORS[i % TEAM_COLORS.length], fontSize: 13 }}>КОМАНДА {i + 1}</div>
+                <div style={{ color: teamColor(i), fontSize: 13 }}>КОМАНДА {i + 1}</div>
                 <div style={{ fontSize: 14, opacity: .85 }}>{group.join(', ') || '—'}</div>
               </div>
             ))}
@@ -474,8 +475,7 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
 /** Команды в админке. На бумаге это ЕДИНСТВЕННЫЙ способ их завести:
  *  QR никто не сканирует, значит регистрации с телефонов не будет. */
 function TeamsPanel({ gameId, teams }: { gameId: string; teams: Team[] }) {
-  const PALETTE = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42',
-    '#9d7bff', '#ff5c5c', '#40e0d0', '#f7a1c4', '#7cf5a0']
+
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -484,7 +484,7 @@ function TeamsPanel({ gameId, teams }: { gameId: string; teams: Team[] }) {
     if (!n || busy) return
     setBusy(true)
     try {
-      await registerTeam(n, PALETTE[teams.length % PALETTE.length], gameId)
+      await registerTeam(n, nextFreeColor(teams.map(t => t.color)), gameId)
       setName('')
     } finally { setBusy(false) }
   }
@@ -629,17 +629,13 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
         </div>
       </div>
 
+      {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
+          перед игрой. Здесь был её дубль с тем же действием: две кнопки
+          с одинаковым смыслом только путали. */}
       <button className="adm-link danger" onClick={() => {
-        if (confirm('Начать новую игру?\n\nКоманды и ответы этой игры сохранятся в базе.')) void resetGame()
+        if (confirm('Начать новую игру?\n\nКоманды и ответы сохранятся в базе. '
+          + 'Полная очистка — кнопкой в лобби.')) void resetGame()
       }}>⟲ НОВАЯ ИГРА</button>
-      <button className="adm-link danger" onClick={() => {
-        if (!confirm('ПОЛНАЯ ОЧИСТКА.\n\nБудут УДАЛЕНЫ все команды и все ответы этой игры. '
-          + 'Восстановить нельзя. Продолжить?')) return
-        if (!confirm('Точно удалить? Второе подтверждение.')) return
-        void resetGameHard()
-          .then(() => alert('Готово: команды и ответы удалены.'))
-          .catch(e => alert(e instanceof Error ? e.message : 'не удалось очистить'))
-      }}>🗑 НОВАЯ ИГРА С ОЧИСТКОЙ</button>
     </div>
   )
 }
