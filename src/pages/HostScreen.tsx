@@ -73,6 +73,10 @@ function HostInner({ gameState, pack }: {
 
   // ── Лобби / выбор пакета ──
   const paperMode = pack?.settings?.play_mode === 'paper'
+  // Разбивка игроков по командам, опубликованная из админки.
+  const groups: string[][] =
+    ((gameState as unknown as { random_groups?: string[][] }).random_groups ?? [])
+      .filter(g => Array.isArray(g) && g.length > 0)
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <div className={`host-screen grid-bg${paperMode ? ' paper-lobby' : ''}`}>
@@ -102,17 +106,27 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            {/* раскладка ЖК: QR с подписью слева, команды колонкой справа.
-                На бумаге телефоны не нужны — QR только путал бы гостей. */}
-            <div className={`lobby-row${paperMode ? ' no-qr' : ''}`}>
-              {!paperMode && <div className="qr-card hud-frame" data-pulse={teams.length}>
-                <img alt="QR" className="lobby-qr"
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(playerUrl)}`} />
-                <div className="qr-caption">
-                  <div className="qr-caption-big">ПОДКЛЮЧАЙСЯ<br />К ИГРЕ</div>
-                  <div className="mono-tag">ОТСКАНИРУЙ QR</div>
+            {/* Лобби: QR маленький в левом нижнем углу без подписей, в основной
+                зоне — составы команд от рандомайзера и подключившиеся.
+                Скролла нет нигде: блоки ужимаются шрифтом, потому что на
+                проекторе прокрутить страницу некому. */}
+            <div className={`lobby-grid${groups.length ? ' with-groups' : ''}`}>
+              {groups.length > 0 && (
+                <div className="lobby-groups" data-count={groups.length}>
+                  <div className="mono-tag">СОСТАВЫ КОМАНД</div>
+                  <div className="lg-list">
+                    {groups.map((g, i) => (
+                      <div key={i} className="lg-team">
+                        <div className="lg-name"
+                          style={{ color: LOBBY_COLORS[i % LOBBY_COLORS.length] }}>
+                          Команда {i + 1}
+                        </div>
+                        <div className="lg-players">{g.join(' · ')}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>}
+              )}
               <div className="lobby-teams">
                 {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
                 {teams.length === 0
@@ -125,6 +139,10 @@ function HostInner({ gameState, pack }: {
                   ))}
               </div>
             </div>
+            {!paperMode && (
+              <img alt="QR" className="lobby-qr-corner"
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=1&data=${encodeURIComponent(playerUrl)}`} />
+            )}
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
@@ -436,6 +454,9 @@ export function noteClass(text: string): string {
 }
 
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
+const LOBBY_COLORS = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42',
+  '#9d7bff', '#ff5c5c', '#40e0d0']
+
 export function lenClass(text: string): string {
   const n = (text ?? '').trim().length
   if (n <= 70) return ''
@@ -721,11 +742,16 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   // Здесь проверяем результат и повторяем попытку, пока таймер не пошёл.
   useEffect(() => {
     if (timerRunning) return
-    // ждём, пока доиграет озвучка: во время неё таймер и не должен идти,
-    // но не дольше 12 секунд — иначе одна залипшая озвучка вешает вопрос
-    const wait = q.media.voice && !requested.current ? 12_000 : 2500
-    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, wait)
-    return () => clearTimeout(t)
+    // Пока озвучка РЕАЛЬНО играет — не вмешиваемся, сколько бы она ни длилась.
+    // Фиксированный лимит был ошибкой: озвучки длиннее его обрывались таймером.
+    const t = setInterval(() => {
+      if (timerRunning) return
+      const v = voiceRef.current
+      const voicePlaying = !!v && !v.paused && !v.ended
+      if (voicePlaying) return          // ждём дальше, время не идёт
+      void startTimer()
+    }, 2000)
+    return () => clearInterval(t)
   }, [q.id, timerRunning])
 
   // фоновая музыка раунда, пока тикает таймер
@@ -839,7 +865,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
   useEffect(() => {
     setChecked(false)
     if (!revealed) return
-    const t = setTimeout(() => setChecked(true), 700)   // столько едет рамка ответа
+    const t = setTimeout(() => setChecked(true), 1600)  // рамка ответа + пауза на прочтение
     return () => clearTimeout(t)
   }, [revealed, step])
 
@@ -875,7 +901,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
         <span className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОТВЕТЫ</span>
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
-      <div className="answers-layout" style={{ marginTop: 60 }}>
+      <div className={`answers-layout${revealed ? ' revealed' : ''}`} style={{ marginTop: 60 }}>
         <div className={`answers-main${sideImg && revealed ? ' with-pic' : ''}`}
           style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Текст вопроса скрываем, когда показана картинка ответа: он уже
@@ -936,9 +962,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
               {/* пояснение вынесено ПОД рамку: внутри оно тонуло мелким текстом */}
               {q.answer.mode === 'choice' && !(q.answer as { correct_choice?: string }).correct_choice &&
                 <div style={{ color: '#ff8fa3' }}>⚠ в редакторе не отмечен верный вариант</div>}
-              {!sideImg && (
-                <div className="q-media-grid answer-media">
-                  {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
+              {!sideImg && revealImgs.length > 0 && (
+                <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}`}>
+                  {revealImgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
                 </div>
               )}
             </div>
@@ -1247,16 +1273,22 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
 /** Сопоставление на экране ответа: картинка №N с правильной буквой (перенос MatchAnswerGrid). */
 function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][number] }) {
   if (q.answer.mode !== 'match') return null
+  const spec = q.answer
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const pairs = q.answer.correct_pairs
+  const pairs = spec.correct_pairs
   return (
-    <div className={`match-answer n${Math.min(q.answer.left.length, 6)}`}>
-      {q.answer.left.map((l, i) => {
+    <div className={`match-answer n${Math.min(spec.left.length, 6)}`}>
+      {spec.left.map((l, i) => {
         const right = pairs.find(p => p.startsWith(l))?.slice(l.length) ?? '—'
+        // рядом с буквой показываем САМ вариант: одну букву зал не соотнесёт
+        const label = (spec.right_labels ?? [])[(spec.right ?? []).indexOf(right)] || right
         return (
           <div key={l} className="mi">
             {imgs[i] && <img src={mediaUrl(imgs[i])} alt="" />}
-            <div className="mi-label">{l} → {right}</div>
+            <div className="mi-label">
+              <b>{l} → {right}</b>
+              {label && label !== right && <span className="mi-text">{label}</span>}
+            </div>
           </div>
         )
       })}
@@ -1433,7 +1465,9 @@ function Finale({ pack, gameId, gameState }: {
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
       <table className="fin-table">
-        <thead><tr><th />{pack.rounds.map((r, i) => !r.off_scoreboard &&
+        {/* ДВЕ пустые колонки: место и название команды. Была одна —
+            заголовки раундов съезжали влево на целый столбец. */}
+        <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
           <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
         <tbody>
           {rows.map(({ team: t, place, shared }) => (

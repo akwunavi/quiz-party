@@ -137,6 +137,15 @@ function TeamRandomizer() {
           <input inputMode="numeric" value={teamCount} placeholder="2-8" style={{ width: 64, textAlign: 'center' }}
             onChange={e => { setTeamCount(e.target.value.replace(/[^0-9]/g, '')); setPreview(null) }} />
           <button className="adm-btn primary" onClick={shuffle}>🎲 ПЕРЕМЕШАТЬ</button>
+          {/* очистка нужна ИМЕННО здесь: перед игрой, а не после финала */}
+          <button className="adm-btn danger" onClick={() => {
+            if (!confirm('ПОЛНАЯ ОЧИСТКА.\n\nБудут удалены все команды и ответы '
+              + 'этой и прошлых игр. Восстановить нельзя. Продолжить?')) return
+            if (!confirm('Точно удалить? Второе подтверждение.')) return
+            void resetGameHard()
+              .then(() => alert('Готово: команды и ответы удалены.'))
+              .catch(e => alert(e instanceof Error ? e.message : 'не удалось очистить'))
+          }}>🗑 ОЧИСТИТЬ КОМАНДЫ И ОТВЕТЫ</button>
         </div>
         {preview && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

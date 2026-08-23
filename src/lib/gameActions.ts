@@ -170,5 +170,18 @@ export async function resetGameHard() {
         + 'в SQL-редакторе Supabase и повтори.')
     }
   }
+  // Чистим и ОСИРОТЕВШИЕ данные прошлых игр: обычный сброс лишь выдавал
+  // новый game_id, а строки со старыми id оставались в базе навсегда.
+  await purgeOldGames()
   await resetGame()
+}
+
+/** Удалить ответы и команды игр, которых больше нет ни в одной комнате. */
+export async function purgeOldGames() {
+  const { data: sessions } = await supabase.from('game_sessions').select('game_id')
+  const live = (sessions ?? []).map(r => r.game_id).filter(Boolean) as string[]
+  if (live.length === 0) return
+  const list = `(${live.map(id => `"${id}"`).join(',')})`
+  await supabase.from('answers').delete().not('game_id', 'in', list)
+  await supabase.from('teams').delete().not('game_id', 'in', list)
 }
