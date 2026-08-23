@@ -8,7 +8,7 @@ import {
   getOrCreateBank, exportPackJson, exportPackCsv,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
-import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, type Orphan } from '../../lib/mediaUpload'
+import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, findMissing, type Orphan } from '../../lib/mediaUpload'
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
@@ -23,9 +23,16 @@ function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
+  const [missing, setMissing] = useState<string[] | null>(null)
+
   const scan = async () => {
     setBusy(true); setErr('')
-    try { setFound(await findOrphans(pack)) }
+    try {
+      setFound(await findOrphans(pack))
+      // заодно проверяем обратное: ссылки, для которых файла УЖЕ НЕТ.
+      // Это и есть «звук пропал»: путь в базе остался, файла нет.
+      setMissing(await findMissing(pack))
+    }
     catch (e) { setErr(e instanceof Error ? e.message : 'не удалось проверить') }
     finally { setBusy(false) }
   }
@@ -55,6 +62,13 @@ function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }
               {(found.reduce((n, o) => n + o.size, 0) / 1048576).toFixed(1)} МБ
             </button>}
       {err && <span className="ed-row-meta" style={{ color: 'var(--danger)' }}>{err}</span>}
+      {missing && missing.length > 0 && (
+        <span className="media-missing" title={missing.join('\n')}>
+          ⚠ файлов нет в хранилище: {missing.length} — перезалей их
+        </span>
+      )}
+      {missing && missing.length === 0 && found !== null &&
+        <span className="ed-row-meta">все файлы на месте</span>}
     </span>
   )
 }

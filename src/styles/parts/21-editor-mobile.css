@@ -287,3 +287,7 @@ select, .cyber select, .cyber input[type="select"] {
 .ed-row-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
   min-width: 0; max-width: 100%; }
 .media-clean { margin-left: 0; }
+
+/* предупреждение о потерянных файлах пакета */
+.media-missing { color: #ffb020; font-size: 12.5px; text-transform: none;
+  letter-spacing: normal; cursor: help; }

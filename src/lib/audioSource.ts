@@ -16,7 +16,15 @@ async function toBlobUrl(url: string): Promise<string> {
   const hit = cache.get(url)
   if (hit) return hit
   const res = await fetch(url, { mode: 'cors', credentials: 'omit' })
-  if (!res.ok) throw new Error(`сервер ответил ${res.status}`)
+  if (!res.ok) {
+    // Supabase на отсутствующий объект отвечает коротким JSON — отличаем
+    // «файла нет» от «сеть заблокировала», это разные починки
+    const body = await res.text().catch(() => '')
+    if (/not_found|Object not found/i.test(body) || res.status === 404 || res.status === 400) {
+      throw new Error('ФАЙЛА НЕТ В ХРАНИЛИЩЕ')
+    }
+    throw new Error(`сервер ответил ${res.status}`)
+  }
   const blobUrl = URL.createObjectURL(await res.blob())
   cache.set(url, blobUrl)
   return blobUrl
@@ -46,9 +54,11 @@ export async function playAudio(el: HTMLAudioElement, url: string): Promise<Play
   } catch (e) {
     return {
       ok: false,
-      reason: e instanceof Error && /Failed to fetch|NetworkError/i.test(e.message)
-        ? 'файл не скачивается: запрос блокирует браузер, VPN или расширение'
-        : `не удалось воспроизвести: ${e instanceof Error ? e.message : 'ошибка'}`,
+      reason: e instanceof Error && /ФАЙЛА НЕТ/.test(e.message)
+        ? 'файла нет в хранилище — трек нужно загрузить заново в редакторе'
+        : e instanceof Error && /Failed to fetch|NetworkError/i.test(e.message)
+          ? 'файл не скачивается: запрос блокирует браузер, VPN или расширение'
+          : `не удалось воспроизвести: ${e instanceof Error ? e.message : 'ошибка'}`,
     }
   }
 }

@@ -96,3 +96,17 @@ export async function mediaLinks(pack: PackLike) {
     return { path, url: supabase.storage.from('quiz-media').getPublicUrl(path).data.publicUrl }
   })
 }
+
+/** Ссылки пакета, для которых В ХРАНИЛИЩЕ НЕТ ФАЙЛА.
+ *  Обратная задача к поиску мусора: там ищем файлы без ссылок, здесь —
+ *  ссылки без файлов. Именно так выглядит «звук пропал»: путь в базе есть,
+ *  плеер по нему стучится, а Supabase отвечает «объект не найден». */
+export async function findMissing(pack: PackLike) {
+  const { data } = await supabase.storage.from('quiz-media')
+    .list(`pack-${pack.id}`, { limit: 1000 })
+  const present = new Set((data ?? []).map(f => `pack-${pack.id}/${f.name}`))
+  const used = [...collectUsedPaths(pack)]
+  // чужие пакеты (например, вопрос взят из банка) не проверяем: их файлы
+  // лежат в другой папке и здесь их видно не будет
+  return used.filter(p => p.startsWith(`pack-${pack.id}/`) && !present.has(p))
+}
