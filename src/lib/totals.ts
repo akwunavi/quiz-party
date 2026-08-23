@@ -1,6 +1,7 @@
 // ═══ Подсчёт итогов по пакету (общий для админки и финала) ═══
 import type { Answer, Team } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
+import { finalQuestionOf, scoringQuestionsOf } from './thematic'
 import { autocheck } from './autocheck'
 import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
@@ -39,7 +40,7 @@ export function computeTotals(
       // решает, удваивать ли раунд. Раньше он и сам приносил баллы, и потом
       // всё удваивалось — отсюда 18 очков там, где максимум 10.
       const scoringQuestions = round.mechanic === 'thematic_x2'
-        ? round.questions.filter(q => !q.is_final_question)
+        ? scoringQuestionsOf(round.questions)
         : round.questions
 
       const rows: ScoredAnswer[] = scoringQuestions.map((q, qi) => {
@@ -58,7 +59,7 @@ export function computeTotals(
         case 'thematic_x2': {
           // удвоение решает ответ команды на финальный вопрос раунда:
           // отдельного «ручного удвоения» в игре нет, флаг никто не передавал
-          const fin = round.questions.find(q => q.is_final_question)
+          const fin = finalQuestionOf(round.questions)
           const finAns = fin
             ? answers.find(x => x.team_id === t.id && x.question_ref === `q-${fin.id}`)
             : undefined
@@ -110,7 +111,7 @@ export function computeRoundScores(
       // решает, удваивать ли раунд. Раньше он и сам приносил баллы, и потом
       // всё удваивалось — отсюда 18 очков там, где максимум 10.
       const scoringQuestions = round.mechanic === 'thematic_x2'
-        ? round.questions.filter(q => !q.is_final_question)
+        ? scoringQuestionsOf(round.questions)
         : round.questions
 
       const rows: ScoredAnswer[] = scoringQuestions.map((q, qi) => {

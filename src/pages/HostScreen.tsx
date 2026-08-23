@@ -877,7 +877,10 @@ function ShowAnswers({ pack, round, q, gameState }: {
   useEffect(() => {
     setChecked(false)
     if (!revealed) return
-    const t = setTimeout(() => setChecked(true), 1600)  // рамка ответа + пауза на прочтение
+    // сопоставление и порядок выезжают по элементам — ждём, пока покажут всё
+    const slow = q.answer.mode === 'match' || q.answer.mode === 'order'
+      || (q.answer.mode === 'choice')
+    const t = setTimeout(() => setChecked(true), slow ? 4200 : 1600)
     return () => clearTimeout(t)
   }, [revealed, step])
 
@@ -927,7 +930,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
           {/* ── ПОСЛЕ ПОКАЗА: старые картинки убираем, показываем ответ ── */}
           {revealed && (
-            <div className="answer-block">
+            <div className="answer-block reveal-in">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
 
               {round.mechanic === 'rebus' ? (
@@ -977,13 +980,19 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 )}
               </>)}
 
-              {q.answer_note &&
+              {/* подсказка выходит ВМЕСТЕ с автопроверкой — когда ответ
+                  показан целиком, включая сопоставление и порядок */}
+              {checked && q.answer_note &&
                 <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
             </div>
           )}
         </div>
         {!paper && <div className="team-answers">
-          <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
+          {/* Пока ответ не показан — видно только СКОЛЬКО команд ответило.
+              Иначе зал читает чужие ответы и интрига пропадает. */}
+          <div className="mono-tag">
+            {revealed ? 'ОТВЕТЫ КОМАНД' : `ОТВЕТИЛИ: ${rows.length}`}
+          </div>
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
           {rows.map(a => {
             const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
@@ -994,7 +1003,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
-                <span className="text">{a.answer_text || '—'}
+                <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
                   {a.stake != null && a.stake !== 0 &&
                     <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
                 {shown != null &&
@@ -1080,7 +1089,7 @@ function AutoReveal({ enabled, startedAt, seconds }: {
   enabled: boolean; startedAt: string | null; seconds: number
 }) {
   useEffect(() => {
-    if (!enabled || !startedAt || document.hidden) return
+    if (!enabled || !startedAt) return
     const ms = new Date(startedAt).getTime() + seconds * 1000 - Date.now()
     const t = setTimeout(() => { void revealAnswer() }, Math.max(0, ms))
     return () => clearTimeout(t)
@@ -1096,11 +1105,14 @@ function AutoAdvance({ round, gameState, isLast }: {
 }) {
   const sec = (round.settings as { autoAdvanceSec?: number }).autoAdvanceSec ?? 0
   useEffect(() => {
-    if (!sec || !gameState.timer_started_at || isLast || document.hidden) return
+    // document.hidden убран: стоило окну на миг потерять фокус — и
+    // автопролистывание не включалось до конца раунда.
+    if (!sec || !gameState.timer_started_at || isLast) return
     const started = new Date(gameState.timer_started_at).getTime()
     const fireAt = started + (round.timer_seconds + sec) * 1000
-    const ms = fireAt - Date.now()
-    if (ms <= 0) return
+    // если время уже вышло (вернулись на вопрос), листаем почти сразу,
+    // а не молчим — раньше при ms <= 0 эффект просто выходил
+    const ms = Math.max(500, fireAt - Date.now())
     const t = setTimeout(() => { void gotoQuestion(gameState.question_index + 1) }, ms)
     return () => clearTimeout(t)
   }, [gameState.timer_started_at, gameState.question_index, sec])
@@ -1116,7 +1128,20 @@ function JeopardyBoard({ pack, round, gameState }: {
 }) {
   const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
   const [active, setActive] = useState<{ t: number; i: number } | null>(null)
-  const [opened, setOpened] = useState<string[]>([])
+  // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
+  // перезагрузки страницы они снова становились доступны, и вопрос можно
+  // было сыграть дважды.
+  const doneList = ((gameState as unknown as { completed_rounds?: unknown[] })
+    .completed_rounds ?? []) as unknown[]
+  const opened: string[] = doneList
+    .filter((x): x is string => typeof x === 'string' && x.startsWith('jp:'))
+    .map(x => x.slice(3))
+  const setOpened = (next: string[]) => {
+    const others = doneList.filter(x => !(typeof x === 'string' && x.startsWith('jp:')))
+    void supabase.from('game_sessions')
+      .update({ completed_rounds: [...others, ...next.map(k => `jp:${k}`)] } as never)
+      .eq('id', getRoomId())
+  }
 
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
@@ -1170,7 +1195,7 @@ function JeopardyBoard({ pack, round, gameState }: {
         <TileModal packTheme={pack.theme} round={round} gameState={gameState}
           theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
           refKey={`t${themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}`}
-          onClose={() => { setOpened(o => [...o, `${active.t}-${active.i}`]); setActive(null) }} />
+          onClose={() => { setOpened([...opened, `${active.t}-${active.i}`]); setActive(null) }} />
       )}
     </div>
   )
@@ -1262,9 +1287,11 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
                     иначе зал читает чужие ответы и интрига пропадает */}
                 <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>
                 {showAnswer && <>
-                  <button className="jp-grade ok" disabled={a.is_correct != null}
+                  <button className={`jp-grade ok${a.is_correct === true ? ' chosen' : ''}`}
+                    disabled={a.is_correct != null}
                     onClick={() => void grade(a.id, true)}>✓</button>
-                  <button className="jp-grade no" disabled={a.is_correct != null}
+                  <button className={`jp-grade no${a.is_correct === false ? ' chosen' : ''}`}
+                    disabled={a.is_correct != null}
                     onClick={() => void grade(a.id, false)}>✗</button>
                 </>}
               </div>

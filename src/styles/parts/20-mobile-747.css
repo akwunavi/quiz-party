@@ -810,16 +810,45 @@ select, .cyber select, .cyber input[type="select"] {
 .answers-screen .answers-main > .q-media-grid { flex: 1 1 0; min-height: 0;
   max-height: 52vh; }
 
+/* Блок ответа: содержимое ОБЯЗАНО помещаться в отведённую высоту.
+   Раньше картинки внутри считали высоту от себя и вылезали на 1433px при
+   экране 900, а подсказка налезала на картинку (отрицательный зазор −80). */
 .answer-block { display: flex; flex-direction: column; align-items: center;
-  gap: clamp(8px, 1.4vh, 18px); width: 100%; min-height: 0; flex: 1 1 auto;
-  justify-content: center; }
+  gap: clamp(10px, 1.6vh, 22px); width: 100%; flex: 1 1 0;
+  min-height: 0; overflow: hidden; justify-content: center; }
+.answer-block > * { flex: 0 0 auto; max-width: 100%; }
+/* сетки картинок забирают остаток и вписываются в него */
+.answer-block > .q-media-grid,
+.answer-block > .match-answer,
+.answer-block > .rebus-answer { flex: 1 1 0; min-height: 0; align-content: center; }
+.answer-block .mi, .answer-block .q-img { min-height: 0; }
+/* Селекторы нарочно длинные: правила вида `.q-media-grid.n1 .q-img img`
+   задают высоту в vh и перебивают короткое «вписаться в контейнер».
+   Картинка обязана считать высоту от блока ответа, а не от экрана. */
+.answer-block .q-media-grid .q-img img,
+.answer-block .match-answer .mi img,
+.answer-block .rebus-answer .q-img img,
+.answer-block .mi img, .answer-block .q-img img {
+  max-height: 100%; height: auto; width: auto; max-width: 100%;
+  object-fit: contain; }
+.answer-block .q-img, .answer-block .mi { overflow: hidden; }
 .answer-block .answer-main { font-size: clamp(32px, 4vw, 76px); line-height: 1.06; }
-.answer-block .q-media-grid { flex: 0 1 auto; min-height: 0; max-height: 42vh;
-  width: 100%; }
-.answer-block .q-img img { max-height: 42vh; }
+.answer-block .q-media-grid { width: 100%; }
 .answer-block .rebus-answer { display: grid; grid-template-columns: 1fr 1fr;
-  gap: clamp(10px, 1.4vw, 24px); width: 100%; min-height: 0; }
-.answer-block .rebus-answer .q-img img { max-height: 34vh; }
+  gap: clamp(10px, 1.4vw, 24px); width: 100%; align-items: end; }
+/* подпись слога — часть фигуры, поэтому картинке оставляем место под неё,
+   иначе подсказка снизу налезала на изображение */
+.answer-block .rebus-answer .q-img { display: grid;
+  grid-template-rows: minmax(0, 1fr) auto; gap: 8px; height: 100%; }
+.answer-block .rebus-answer .q-img img { align-self: end; }
+.answer-block .rebus-answer figcaption { align-self: start; }
+/* сопоставление на разборе: карточки в один ряд, высота от остатка */
+.answer-block .match-answer { display: grid; width: 100%;
+  gap: clamp(8px, 1vw, 18px); grid-template-rows: minmax(0, 1fr); }
+.answer-block .match-answer .mi { display: grid;
+  grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 6px; }
+.answer-block .match-answer .mi-label b { font-size: clamp(15px, 1.5vw, 26px); }
+.answer-block .match-answer .mi-text { font-size: clamp(12px, 1.15vw, 19px); }
 .answer-block .answer-note { margin-top: 0; }
 
 /* запас снизу под кнопки — они больше ни на что не налезают */
@@ -831,8 +860,38 @@ select, .cyber select, .cyber input[type="select"] {
 .rules-frame .rule-item { font-size: clamp(18px, 2vw, 36px); line-height: 1.3; }
 .rules-frame .rule-item .idx { font-size: .7em; }
 
-/* подписи слогов ребуса — над своей картинкой, а не поверх соседней */
-.answer-block .rebus-answer .q-img { position: relative; display: flex;
-  flex-direction: column-reverse; align-items: center; gap: 8px; }
+/* подпись слога — ПОД своей картинкой, отдельной строкой грида */
 .answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
-  font-size: clamp(20px, 2.2vw, 40px); }
+  font-size: clamp(18px, 2vw, 34px); text-align: center; }
+
+/* ═══ 7.78: появление ответа, «Своя игра», правила ═══ */
+
+/* п.8: «волшебное появление» блока ответа — вернулось, и для всех тем */
+.answer-block.reveal-in { animation: ansIn .55s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes ansIn {
+  from { opacity: 0; transform: translateY(24px) scale(.97); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+.theme-potter .answer-block.reveal-in { animation-duration: .8s; }
+.theme-new_year .answer-block.reveal-in { animation-name: ansInSnow; }
+@keyframes ansInSnow {
+  from { opacity: 0; transform: translateY(-26px) rotate(-1.5deg); filter: blur(7px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+/* п.2: в модалке плитки имя команды не режется, ответ прижат вправо */
+.jp-answer { display: flex; align-items: baseline; gap: 10px; }
+.jp-answer .name { flex: 0 1 auto; max-width: none; white-space: normal;
+  overflow-wrap: anywhere; font-size: clamp(13px, 1.15vw, 19px); }
+.jp-answer .txt { flex: 1 1 auto; text-align: right; min-width: 0; }
+
+/* п.4: нажатая оценка остаётся подсвеченной */
+.jp-grade:disabled { opacity: .28; }
+.jp-grade.chosen, .jp-grade.chosen:disabled { opacity: 1;
+  box-shadow: 0 0 0 2px currentColor inset; }
+
+/* п.5: правила помещаются в рамку при любом их количестве */
+.rules-frame { max-height: 58vh; overflow: hidden; }
+.rules-frame:has(.rule-item:nth-child(5)) .rule-item { font-size: clamp(16px, 1.7vw, 30px); }
+.rules-frame:has(.rule-item:nth-child(7)) .rule-item { font-size: clamp(14px, 1.4vw, 24px); }
+.rules-frame:has(.rule-item:nth-child(9)) .rule-item { font-size: clamp(13px, 1.2vw, 20px); }
