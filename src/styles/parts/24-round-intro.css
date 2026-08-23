@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ЗАСТАВКА РАУНДА: НОМЕР, ЗАГОЛОВОК, ПРАВИЛА
+   Правки этой части интерфейса складываем СЮДА, а не в конец сборки.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══ п.9: правила раунда в рамке, своя для каждой темы ═══
+   Подпись «правила раунда» не влезала в верхнюю кромку рамки, а сама рамка
+   по центру отжимала кнопки. Решение как в кроссворде: заголовок раунда по
+   центру, правила — колонкой рядом, подпись короткая и ВНУТРИ рамки. */
+/* Ширина панели идёт ОТ СОДЕРЖИМОГО: при коротких правилах она узкая, при
+   длинных расширяется до половины экрана. Раньше жёсткие 42vw давали
+   «узкую колонку с простынёй текста» на раундах с длинными формулировками. */
+.rules-frame { position: relative; display: flex; flex-direction: column;
+  gap: clamp(6px, 1vh, 14px); width: max-content;
+  max-width: min(880px, 50vw); min-width: min(320px, 34vw);
+  padding: clamp(14px, 2vh, 26px) clamp(16px, 2vw, 30px);
+  border: 2px solid var(--dim); border-radius: 14px;
+  background: rgba(255,255,255,.03); }
+.rules-frame-label { position: static; align-self: center; margin-bottom: 4px;
+  padding: 2px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  font-family: var(--font-mono); font-size: clamp(10px, .85vw, 14px);
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+  white-space: nowrap; }
+
+/* киберпанк: неоновый контур с угловыми засечками */
+.cyber .rules-frame, .theme-classic .rules-frame {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 18%, transparent),
+              inset 0 0 30px rgba(0,0,0,.35); }
+.theme-classic .rules-frame::before, .theme-classic .rules-frame::after {
+  content: ''; position: absolute; width: 18px; height: 18px;
+  border: 2px solid var(--accent); }
+.theme-classic .rules-frame::before { left: -2px; top: -2px; border-right: none; border-bottom: none; }
+.theme-classic .rules-frame::after { right: -2px; bottom: -2px; border-left: none; border-top: none; }
+
+/* волшебная школа: пергамент с золотым кантом */
+.theme-potter .rules-frame { border-color: rgba(211,166,37,.55); border-radius: 6px;
+  background: linear-gradient(180deg, rgba(243,233,207,.07), rgba(243,233,207,.02));
+  box-shadow: 0 0 40px rgba(211,166,37,.16), inset 0 0 40px rgba(0,0,0,.4); }
+.theme-potter .rules-frame-label { color: #e9c766; font-family: 'Cinzel Decorative', serif;
+  letter-spacing: .18em; }
+
+/* новый год: заснеженная рамка */
+.theme-new_year .rules-frame { border-color: rgba(150,200,255,.5); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(180,220,255,.08), rgba(180,220,255,.02));
+  box-shadow: 0 0 34px rgba(150,200,255,.2), inset 0 0 30px rgba(10,30,60,.4); }
+.theme-new_year .rules-frame-label::after { content: ' ❅'; }
+
+@media (max-width: 900px) { .rules-frame { max-width: 92vw; } }
+
+/* п.6: порядок на экране ответа — буква крупно, позиция мелко */
+.order-answer .oi { display: flex; align-items: baseline; gap: 12px; }
+.order-answer .oi b { font-family: var(--font-display); color: var(--accent);
+  font-size: 1.15em; min-width: 1.4em; }
+.oi-pos { font-family: var(--font-mono); font-size: .62em; opacity: .5; }
+.oi-text { flex: 1 1 auto; min-width: 0; }
+
+/* п.3: подпись к ряду ставок */
+.pl-stakes-label { font-size: 12.5px; opacity: .7; margin: 8px 0 4px; line-height: 1.35; }
+
+/* п.2: текст вопроса на разборе — адаптивно от ширины СВОЕЙ колонки,
+   а не от экрана: колонка узкая из-за ответов команд справа */
+.answers-main { container-type: inline-size; }
+.answers-layout .q-text,
+.theme-potter .answers-layout .q-text { font-size: clamp(20px, 4.4cqw, 56px); line-height: 1.16; }
+.answers-layout .q-text.len-m,
+.theme-potter .answers-layout .q-text.len-m { font-size: clamp(19px, 3.8cqw, 46px); }
+.answers-layout .q-text.len-l,
+.theme-potter .answers-layout .q-text.len-l { font-size: clamp(17px, 3.2cqw, 38px); }
+.answers-layout .q-text.len-xl,
+.theme-potter .answers-layout .q-text.len-xl { font-size: clamp(16px, 2.7cqw, 31px); line-height: 1.25; }
+
+/* п.3: переключатель ставки ×2 */
+.pl-x2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 14px; margin: 8px 0; border: 1px solid var(--pl-line, #2a3550);
+  border-radius: 10px; cursor: pointer; }
+.pl-x2 input { width: 22px; height: 22px; flex: 0 0 auto; margin: 0; }
+.pl-x2 span { font-weight: 700; }
+.pl-x2 i { font-style: normal; font-size: 12px; opacity: .6; flex: 1 1 100%; }
+
+/* ═══ п.3: правила раунда крупнее и не под кнопками ═══ */
+.round-intro { padding-bottom: clamp(96px, 13vh, 150px) !important; }
+.rules-frame { max-height: 62vh; overflow: hidden; }
+/* Размер правил ужимается ступенями по количеству (ниже), а каждое правило
+   не длиннее ТРЁХ строк: длинная формулировка сокращается многоточием,
+   иначе панель превращается в простыню текста. */
+.rules-frame .rule-item { font-size: clamp(15px, 1.5vw, 26px); line-height: 1.28;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  overflow: hidden; }
+.rules-frame .rule-item .idx { font-size: .7em; flex: 0 0 auto; }
+
+/* подпись слога — ПОД своей картинкой, отдельной строкой грида */
+.answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
+  font-size: clamp(18px, 2vw, 34px); text-align: center; }

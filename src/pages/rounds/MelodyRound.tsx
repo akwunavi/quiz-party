@@ -7,6 +7,7 @@
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
+import { playAudio } from '../../lib/audioSource'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
@@ -50,10 +51,11 @@ export function unlockAudio() {
 function playShared(src: string): HTMLAudioElement {
   if (!sharedAudio) sharedAudio = new Audio()
   sharedAudio.pause()
-  sharedAudio.src = src
   sharedAudio.loop = false
   sharedAudio.volume = 1
-  void sharedAudio.play().catch(() => {})
+  // тот же запасной путь, что и в «Своей игре»: при блокировке прямого
+  // запроса файл скачивается и играется из памяти
+  void playAudio(sharedAudio, src)
   return sharedAudio
 }
 

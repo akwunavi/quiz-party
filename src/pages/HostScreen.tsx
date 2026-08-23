@@ -21,6 +21,7 @@ import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
+import { playAudio, probeMedia } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
 import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -1233,21 +1234,13 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
     if (timerRef.current) clearInterval(timerRef.current)
     if (!tile.audio) { setPlaying(false); setAudioErr('у плитки не задан трек'); return }
     setAudioErr(null)
-    const audio = new Audio(mediaUrl(tile.audio))
+    const audio = new Audio()
     audioRef.current = audio
     setRemaining(clipSeconds); setPlaying(true)
-    // Молчание без объяснения — худшее, что может случиться на игре.
-    // Показываем причину прямо на экране, а не только в консоли браузера.
-    audio.onerror = () => {
-      setPlaying(false)
-      setAudioErr('файл не загрузился — браузер заблокировал запрос '
-        + '(чаще всего мешает VPN или расширение)')
-    }
-    audio.play().catch(e => {
-      setPlaying(false)
-      setAudioErr(e instanceof Error && e.name === 'NotAllowedError'
-        ? 'браузер не разрешил звук — кликните по экрану и нажмите «Переслушать»'
-        : 'не удалось воспроизвести трек')
+    // playAudio сам попробует запасной путь (скачать и играть из памяти),
+    // если браузер заблокировал прямой запрос медиа-элемента
+    void playAudio(audio, mediaUrl(tile.audio)).then(r => {
+      if (!r.ok) { setPlaying(false); setAudioErr(r.reason) }
     })
     timerRef.current = window.setInterval(() => {
       setRemaining(prev => {
@@ -1322,7 +1315,12 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
         <div className="jp-modal-foot">
           {!showAnswer && <button onClick={() => setShowAnswer(true)}>Показать ответ</button>}
           <button className="ghost" onClick={play}>↻ Переслушать</button>
-          {audioErr && <div className="jp-audio-err">🔇 {audioErr}</div>}
+          {audioErr && <div className="jp-audio-err">🔇 {audioErr}
+            <button className="ghost" style={{ marginLeft: 10 }}
+              onClick={() => void probeMedia(mediaUrl(tile.audio)).then(t => alert(t))}>
+              что с файлом?
+            </button>
+          </div>}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
       </div>

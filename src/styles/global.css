@@ -7,8 +7,9 @@
    совпадает с прежним (проверено 33 скриншотами).
 
    КУДА ПРАВИТЬ: в тематический модуль, а не в конец списка.
-   Файлы 18–20 (patch-*) — исторические слои правок; их надо постепенно
-   растаскивать по темам, а не наращивать.
+   Файлы 18–19 (patch-*) — исторические слои; их надо растаскивать по темам.
+   Файлы 21–27 разложены ПО СМЫСЛУ: редактор, вопрос, ответы, заставка,
+   итоги, админка, лобби. Новые правки кладём в подходящий по смыслу файл.
    ═══════════════════════════════════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap');
 
@@ -31,4 +32,10 @@
 @import './parts/17-host-login.css';
 @import './parts/18-patch-745.css';
 @import './parts/19-patch-746.css';
-@import './parts/20-mobile-747.css';
+@import './parts/21-editor-mobile.css';
+@import './parts/22-question.css';
+@import './parts/23-answers.css';
+@import './parts/24-round-intro.css';
+@import './parts/25-results.css';
+@import './parts/26-admin.css';
+@import './parts/27-lobby.css';

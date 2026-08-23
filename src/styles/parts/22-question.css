@@ -1,0 +1,87 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ЭКРАН ВОПРОСА: СПЛИТ, ЦЕНТРОВКА ТЕКСТА
+   Правки этой части интерфейса складываем СЮДА, а не в конец сборки.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══ 7.67: сплит «текст + одна картинка» ═══
+   Было две беды сразу:
+   1) .q-media-grid.n1 имел width: min(1100px, 80vw) — фиксированная ширина
+      ломала пропорции колонок: тексту оставалось 470px из 1600.
+   2) размер шрифта считался от ШИРИНЫ ЭКРАНА (vw), хотя текст живёт в узкой
+      колонке. При 57px в колонке 473px строка вмещала 7 знаков, и текст
+      вырастал на 1290px — далеко за пределы экрана.
+   Решение: колонки делят ширину поровну, а шрифт считается от ШИРИНЫ БЛОКА
+   (единицы cqw), то есть подстраивается под свой контейнер. */
+.q-split { container-type: inline-size; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: clamp(16px, 2.5vw, 48px); width: min(1720px, 96vw); }
+.q-split .q-media-grid, .q-split .q-media-grid.n1 { width: 100%; min-width: 0; }
+.q-split .q-img img { max-height: 68vh; }
+
+/* размер по ширине КОНТЕЙНЕРА и по длине текста */
+.q-split .q-text,
+.theme-potter .q-split .q-text { font-size: clamp(20px, 2.8cqw, 54px); line-height: 1.15; }
+.q-split .q-text.len-m,
+.theme-potter .q-split .q-text.len-m { font-size: clamp(19px, 2.4cqw, 46px); }
+.q-split .q-text.len-l,
+.theme-potter .q-split .q-text.len-l { font-size: clamp(17px, 2.0cqw, 38px); }
+.q-split .q-text.len-xl,
+.theme-potter .q-split .q-text.len-xl { font-size: clamp(15px, 1.7cqw, 30px); line-height: 1.25; }
+
+/* на узком экране сплит перестаёт быть сплитом */
+@media (max-width: 900px) {
+  .q-split { grid-template-columns: 1fr; }
+}
+
+/* подсказка под названием темы «Своей игры» */
+.jp-theme-hint { display: block; font-family: 'Rajdhani', sans-serif;
+  font-weight: 500; font-size: clamp(11px, .95vw, 17px); opacity: .6;
+  letter-spacing: .02em; margin-top: 2px; line-height: 1.2; }
+
+/* ═══ 7.69: вопрос по центру в ЛЮБОМ раунде ═══
+   Правило 7.46 центрировало текст только когда у вопроса нет картинок
+   (:not(.has-media)), и только у прямого потомка экрана. В механиках, где
+   текст лежит глубже или рядом есть медиа, он оставался прижат к шапке.
+   Здесь центрируем текст в свободном месте НАД вариантами во всех случаях —
+   кроме сплита, где текст выравнивается по картинке. */
+.host-screen > .q-text,
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.q-split) > .q-text {
+  margin-block: auto;
+}
+/* в сплите центрируем по вертикали относительно картинки */
+.q-split > .q-text { margin-block: 0; align-self: center; }
+/* На экранах с картинками текст был прижат к шапке: сетка медиа забирала
+   ВСЮ остаточную высоту (flex: 1 1 0). Теперь картинки берут столько,
+   сколько нужно (до 60% высоты), а пара «вопрос + картинки» центрируется
+   как единый блок. */
+.host-screen.has-media { justify-content: center; }
+.host-screen.has-media > .q-text { margin-block: 0 clamp(10px, 2vh, 28px); }
+/* ВАЖНО про flex-basis. Картинки внутри ограничены max-height: 100% —
+   это работает, только если у контейнера ОПРЕДЕЛЁННАЯ высота. При
+   flex: 0 1 auto высота считается от содержимого, содержимое — от высоты,
+   и вся сетка схлопывалась в ноль (проверено: сопоставление давало 0px).
+   Поэтому контейнер снова берёт остаток (flex: 1 1 0), а «не отбирать
+   центр у текста» решаем ограничением max-height. */
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers { flex: 1 1 0; margin-top: 0;
+  max-height: 60vh; min-height: 0; }
+.host-screen.has-media.has-choices > .q-media-grid,
+.host-screen.has-media.has-choices > .img-answers { max-height: 42vh; }
+/* когда снизу есть варианты, они прижаты к низу, а вопрос центрируется
+   в оставшемся месте — а не делит его пополам с ними */
+.host-screen.has-choices > .q-text { margin-block: auto 0; }
+.host-screen.has-choices > .choices-grid { margin-top: auto; }
+
+/* ═══ 7.74: вопрос по центру — окончательно ═══
+   Прошлые попытки давали тексту margin-block: auto, но варианты снизу тоже
+   имели margin-top: auto — два «auto» делили свободное место пополам, и
+   текст вставал не по центру своей зоны, а в её верхней трети.
+   Теперь свободное место забирает ТОЛЬКО текст, а варианты и медиа
+   стоят по содержимому. */
+.host-screen.has-choices > .q-text { margin: auto 0 !important; }
+.host-screen.has-choices > .choices-grid { margin-top: 0 !important; flex: 0 0 auto; }
+.host-screen:not(.has-media):not(.has-choices) > .q-text { margin: auto 0 !important; }
+
+/* кольцо таймера выше шапки — контенту нужен запас, иначе текст налипает
+   на номер вопроса (раунд со ставками) */
+.theme-classic .host-screen, .cyber .host-screen { padding-top: 168px; }
+.theme-classic .host-screen.round-intro { padding-top: 92px; }

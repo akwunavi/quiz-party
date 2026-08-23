@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   РЕДАКТОР НА ТЕЛЕФОНЕ: ПОЛЯ, СПИСКИ, БАНК, РАЗБОР ИИ
+   Правки этой части интерфейса складываем СЮДА, а не в конец сборки.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7.47 — РЕДАКТОР НА ТЕЛЕФОНЕ
+   Один брейкпоинт: до 720px всё выстраивается в одну колонку,
+   строки списков разворачиваются сверху вниз, кнопки уезжают на свою
+   строку и получают тач-размер. Проверено в браузере на 390×844.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  /* ── общая раскладка ── */
+  .ed-page { padding: 14px 12px 88px; max-width: none; }
+  .ed-crumb { flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .ed-h { font-size: 20px; line-height: 1.2; }
+  .ed-card { padding: 14px 12px; border-radius: 10px; margin-bottom: 12px; }
+  .ed-card > h4 { margin-bottom: 10px; font-size: 12px; letter-spacing: .14em; }
+  /* две колонки настроек → одна */
+  .ed-grid2 { grid-template-columns: 1fr; gap: 14px; }
+  .ed-field > label { font-size: 11.5px; }
+  .ed-hint { font-size: 11px; }
+
+  /* поля: 16px обязательны, иначе iOS зумит страницу при фокусе */
+  input, select, textarea,
+  .theme-classic input, .theme-classic select,
+  .theme-new_year input, .theme-new_year select { font-size: 16px; }
+  .ed-field select, .ed-field input, .ed-field textarea { width: 100%; }
+  textarea { min-height: 96px; }
+  /* поля в одной колонке слипались — разводим их по вертикали */
+  .ed-field + .ed-field, .ed-field + .ed-hint { margin-top: 14px; }
+  .qm-body > div > .ed-field + .ed-field { margin-top: 16px; }
+
+  /* ── строки списков: номер и текст сверху, кнопки — своей строкой ── */
+  .ed-row { display: grid; grid-template-columns: auto minmax(0, 1fr);
+    align-items: start; gap: 6px 10px; padding: 12px; }
+  .ed-num { grid-row: 1; min-width: 26px; font-size: 17px; text-align: left; }
+  .ed-row-main { grid-row: 1; }
+  .ed-row-title { font-size: 16px; white-space: normal; overflow: visible; }
+  .ed-row-text { -webkit-line-clamp: 3; font-size: 13px; }
+  .ed-row-meta { font-size: 11.5px; }
+  .ed-count { grid-column: 2; justify-self: start; font-size: 13px; }
+  /* ответ и счётчик медиа встают друг под другом: в одну строку на 390px
+     они не помещались, и длинный ответ выпихивал счётчик за экран */
+  .ed-row-tags { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .ed-answer-chip { max-width: 100%; font-size: 12px; }
+  .ed-answer-chip span { white-space: normal; overflow-wrap: anywhere; }
+  /* кнопки во всю ширину строки, с отбивкой — больше не слипаются с текстом */
+  .ed-actions { grid-column: 1 / -1; flex-wrap: wrap; gap: 10px;
+    margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--ed-line); }
+
+  /* тач-размер; тултипы на телефоне не показываются (нет ховера) */
+  .ico { width: 44px; height: 44px; font-size: 18px; }
+  .ico[data-tip]::after { display: none; }
+
+  /* кнопки */
+  button, .btn { padding: 12px 18px; font-size: 15px; }
+  .ed-addrow button { width: 100%; }
+
+  /* ── таблицы (редакторы, настройки) ──
+     display:block делает таблицу скроллящимся контейнером, но thead/tbody
+     остаются table и держат свою ширину — иначе они распирали всю страницу. */
+  .ed-table, .ed-settings { display: block; width: 100%; max-width: 100%;
+    overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  /* Таблицу НЕ разбираем на block: thead и tbody тогда считают колонки
+     независимо и шапка съезжает относительно строк. Вместо этого делаем
+     прокручиваемой саму карточку, а таблица остаётся цельной. */
+  .ed-card:has(> .ed-table), .ed-card:has(> .ed-settings) {
+    overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ed-table, .ed-settings { display: table; width: max-content; min-width: 100%;
+    white-space: nowrap; }
+  .ed-table th, .ed-table td, .ed-settings th, .ed-settings td { padding: 8px 10px; }
+
+  /* ── модалка вопроса: полноэкранная, одна колонка, футер закреплён ── */
+  .qm-backdrop { padding: 0; }
+  .qm-window { width: 100vw; max-width: none; margin: 0; min-height: 100vh;
+    border-radius: 0; border-left: none; border-right: none; }
+  .qm-head { flex-wrap: wrap; gap: 10px; padding: 14px 14px;
+    position: sticky; top: 0; z-index: 3; background: #0b1424; }
+  .qm-body { grid-template-columns: 1fr; gap: 18px; padding: 16px 14px; }
+  .qm-alert { margin: 0 14px; }
+  .qm-foot { position: sticky; bottom: 0; z-index: 3; background: #0b1424;
+    padding: 12px 14px; gap: 10px; }
+  .qm-foot button { flex: 1 1 0; padding: 13px 10px; }
+}
+
+/* ═══ 7.50: строки, собранные инлайн-стилями в TSX ═══
+   Раньше эти блоки не имели классов, поэтому мобильный брейкпоинт их не
+   доставал — они и уезжали за правый край, создавая горизонтальный скролл. */
+
+/* Стрелка у выпадающих списков: на телефоне нативная почти не видна,
+   и поле не читается как дропдаун. Рисуем свою на всех размерах. */
+/* .cyber ... select задаёт background шорткатом и стирал бы картинку —
+   поэтому селектор такой же специфичный и стоит ниже по каскаду */
+select, .cyber select, .cyber input[type="select"] {
+  appearance: none; -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 17px center, right 11px center;
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+/* Строка «чекбокс + подпись»: не наследует стиль заголовка поля
+   (он был ЗАГЛАВНЫМИ и разгонял строку), подпись переносится. */
+/* .ed-field > label (0,1,1) бил бы .ed-check (0,1,0) — уточняем селектор,
+   иначе подпись у чекбокса остаётся ЗАГЛАВНЫМИ и разгоняет строку */
+.ed-field > label.ed-check, .ed-check { text-transform: none; letter-spacing: normal; font-weight: 500;
+  color: var(--fg); justify-content: flex-start; flex-wrap: wrap;
+  gap: 8px; line-height: 1.35; cursor: pointer; }
+.ed-check input[type="checkbox"] { flex: 0 0 auto; width: 20px; height: 20px; margin: 0; }
+
+/* Медиа-поле: имя файла может быть любой длины — переносим и не даём
+   растянуть колонку. */
+.media-slot { min-width: 0; }
+.media-slot-row { min-width: 0; max-width: 100%; }
+.media-chip { display: inline-flex; align-items: center; gap: 6px;
+  max-width: 100%; min-width: 0; }
+.media-name { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.media-slot input[type="file"] { max-width: 100%; min-width: 0; }
+
+/* Форма добавления раунда — селект, поле и две кнопки в одну строку
+   не влезали никогда, даже на 360px. */
+.ed-addround { flex-wrap: wrap; }
+.ed-addround input { min-width: 0; flex: 1 1 180px; }
+/* в колонке flex-basis становится ВЫСОТОЙ — поле раздувалось на пол-экрана */
+.ed-addround { align-items: center; }
+
+@media (max-width: 720px) {
+  /* всё, что живёт в колонках, не должно распирать их шире экрана */
+  .ed-grid2 > *, .ed-field, .ed-card, .ed-row-main, .qm-body > * { min-width: 0; }
+  .ed-hint { overflow-wrap: anywhere; }
+
+  /* медиа-поле в столбик: сначала выбор файла, ПОД ним имена — как просил Иван */
+  .media-slot-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .media-chip { width: 100%; justify-content: space-between;
+    padding: 8px 10px !important; font-size: 13px !important; }
+  .media-del { flex: 0 0 auto; min-width: 40px; }
+  .media-slot input[type="file"] { width: 100%; font-size: 14px; }
+
+  /* добавление раунда — всё друг под другом на всю ширину */
+  .ed-addround { flex-direction: column; align-items: stretch; gap: 10px; }
+  .ed-addround select, .ed-addround input, .ed-addround button {
+    width: 100%; flex: 0 0 auto; }
+}
+
+/* ═══ 7.57: список пакетов, имена файлов, отбраковка типа ═══ */
+
+/* строка пакета: название, состояние, кнопки — тремя ярусами */
+.pack-row { border: 1px solid var(--ed-line); border-radius: 10px;
+  padding: 14px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+.pack-row.archived { opacity: .55; }
+.pack-name { font-weight: 700; font-size: 17px; line-height: 1.25;
+  overflow-wrap: anywhere; }
+.pack-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pack-status { padding: 2px 10px; border-radius: 10px; font-size: 12px;
+  border: 1px solid var(--ed-line); background: #1a2440; }
+.pack-status.st-ready { background: #0f3d2e; }
+.pack-status.st-active { background: #4a1220; }
+.pack-status.st-archived { background: #241a2e; }
+.pack-theme { opacity: .5; font-size: 12px; }
+.pack-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.pack-acts button { flex: 1 1 auto; min-width: 0; }
+
+/* отбракованный файл */
+.media-bad { color: #ffb020; font-size: 12px; margin-top: 6px; line-height: 1.35; }
+
+/* Имена файлов: одна строка с многоточием, а не простыня на пол-экрана.
+   Полное имя остаётся в подсказке (title). */
+.media-name { display: block; min-width: 0; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  overflow-wrap: normal; word-break: normal; }
+
+@media (max-width: 720px) {
+  .pack-acts button { flex: 1 1 46%; }
+  /* чипы файлов компактные: у «Своей игры» их много, и колонка растягивалась */
+  .media-slot-row { gap: 6px; }
+  .media-chip { padding: 6px 8px !important; font-size: 12.5px !important;
+    min-height: 38px; }
+  .media-del { min-width: 34px; }
+}
+
+/* ═══ 7.58: банк вопросов и оценка времени ═══ */
+.round-time { margin-left: 12px; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .1em; color: var(--accent); opacity: .85; text-transform: none; }
+.ed-qadd { display: flex; gap: 8px; flex-wrap: wrap; }
+.ed-qadd button { flex: 1 1 auto; }
+
+.bank-body { padding: 16px 20px; overflow-y: auto; max-height: 62vh;
+  display: flex; flex-direction: column; gap: 14px; }
+.bank-search { width: 100%; }
+.bank-rubric-name { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.bank-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px;
+  border: 1px solid var(--ed-line); border-radius: 8px; margin-bottom: 6px;
+  cursor: pointer; }
+.bank-item.on { border-color: var(--ok); background: rgba(45,212,160,.07); }
+.bank-item input { flex: 0 0 auto; width: 20px; height: 20px; margin: 2px 0 0; }
+.bank-item-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+/* окно рисуется порталом в body — вне .cyber, поэтому цвет задаём явно,
+   иначе текст наследует тёмный по умолчанию и не читается */
+.qm-window, .qm-window .bank-item-text, .qm-window .ed-hint { color: var(--fg); }
+.bank-item-text { line-height: 1.35; overflow-wrap: anywhere; color: var(--fg); }
+.bank-search { color: var(--fg); }
+.pack-status.st-bank { background: #2a2340; }
+
+@media (max-width: 720px) {
+  .bank-body { max-height: none; padding: 14px; }
+  .ed-qadd button { flex: 1 1 100%; }
+}
+
+/* выбор рубрики при переносе в банк */
+.bank-rubric-btn { display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 8px; }
+.bank-send .bank-body { max-height: 52vh; }
+
+/* ═══ 7.60: разбор ИИ ═══ */
+.ai-panel { border: 1px solid var(--ed-line); border-radius: 10px;
+  padding: 14px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;
+  background: rgba(120,140,255,.04); }
+.ai-head { display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; }
+.ai-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--accent); }
+.ai-err { color: var(--danger); font-size: 13px; }
+.ai-metrics { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ai-verdict { padding: 3px 12px; border-radius: 10px; font-size: 12.5px;
+  border: 1px solid var(--ed-line); }
+.ai-verdict.v-ok { background: #0f3d2e; }
+.ai-verdict.v-warn { background: #3d3410; }
+.ai-verdict.v-bad { background: #4a1220; }
+.ai-metric { font-size: 12.5px; opacity: .75; }
+.ai-metric.over { color: #ffb020; opacity: 1; }
+.ai-warn { border-left: 3px solid #ffb020; padding: 8px 12px; font-size: 13.5px;
+  background: rgba(255,176,32,.08); line-height: 1.4; }
+.ai-note { font-size: 13.5px; opacity: .8; line-height: 1.45; }
+.ai-note.big { opacity: 1; font-size: 15px; }
+.ai-ok { font-size: 13.5px; color: var(--ok); }
+
+.ai-issue { border: 1px solid var(--ed-line); border-radius: 8px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px; }
+.ai-issue.accepted { border-color: var(--ok); }
+.ai-issue.rejected { opacity: .45; }
+.ai-issue-head { display: flex; gap: 10px; align-items: center; }
+.ai-kind { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); }
+.ai-qnum { font-size: 11.5px; opacity: .6; }
+.ai-issue-text { font-size: 14px; line-height: 1.45; }
+.ai-issue-acts { display: flex; gap: 8px; }
+.ai-issue-acts button { padding: 6px 14px; font-size: 13px; }
+.ai-issue-done { font-size: 12px; opacity: .7; }
+
+.ai-suggest { border-left: 3px solid var(--accent); padding: 8px 12px;
+  font-size: 14px; line-height: 1.45; display: flex; flex-direction: column; gap: 6px; }
+.ai-recs { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+
+/* полоса времени раскрутки по вопросам */
+.ai-times { display: flex; flex-wrap: wrap; gap: 6px; }
+.ai-time { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+  border-radius: 8px; font-size: 12.5px; border: 1px solid var(--ed-line); }
+.ai-time i { font-style: normal; opacity: .65; font-size: 11px; }
+.ai-time.v-fits { background: rgba(45,212,160,.10); }
+.ai-time.v-tight { background: rgba(255,176,32,.12); }
+.ai-time.v-over { background: rgba(244,63,94,.14); border-color: var(--danger); }
+
+@media (max-width: 720px) {
+  .ai-head button { width: 100%; }
+  .ai-issue-acts button { flex: 1 1 0; }
+}
+
+/* ═══ 7.66: редактор — уборка, числовые поля ═══ */
+
+/* заголовок карточки пакета: название слева, уборка мусора справа */
+.ed-card > h4 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.media-clean { margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+  text-transform: none; letter-spacing: normal; }
+.media-clean button { padding: 6px 14px; font-size: 12.5px; }
+.media-clean button.danger { border-color: var(--danger); color: var(--danger); }
+
+/* числовое поле: сохраняем по потере фокуса, а не на каждый символ */
+.num-field { display: inline-flex; align-items: center; gap: 8px; }
+.num-field input { text-align: center; }
+.num-suffix { font-size: 12.5px; opacity: .6; }
+
+/* строка тегов вопроса (ответ + счётчик медиа) */
+.ed-row-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  min-width: 0; max-width: 100%; }
+.media-clean { margin-left: 0; }

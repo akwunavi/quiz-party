@@ -1,0 +1,268 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ЭКРАН РАЗБОРА ОТВЕТОВ: БЛОК ОТВЕТА, КАРТИНКИ, ПОРЯДОК ПОКАЗА
+   Правки этой части интерфейса складываем СЮДА, а не в конец сборки.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══ 7.55: барная игра «на листках» + разбор ответов ═══ */
+
+/* ── п.3: логотип в лобби крупнее: QR нет, место освободилось ── */
+.paper-lobby .title-line { font-size: calc(clamp(46px, 7vw, 132px) * 1.3); }
+.paper-lobby .lobby-teams { font-size: 1.15em; }
+
+/* ── п.4: номер раунда крупно в левом верхнем углу ── */
+/* .grid-bg > * принудительно ставит детям position: relative —
+   бейдж вынесен в исключения там же, плюс дублируем здесь для надёжности */
+.host-screen .round-badge, .round-badge { position: absolute; left: clamp(28px, 3vw, 64px); top: clamp(22px, 3vh, 54px);
+  display: flex; flex-direction: column; align-items: flex-start; line-height: .92; z-index: 3; }
+.rb-word { font-family: var(--font-digits), monospace; letter-spacing: .34em;
+  font-size: clamp(13px, 1.1vw, 20px); color: var(--dim); }
+.rb-num { font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(64px, 8vw, 168px); color: var(--accent);
+  text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 45%, transparent); }
+.round-intro { position: relative; }
+
+/* ── п.8: длинный вопрос налезал на «ВОПРОС 2/2» в углу ──
+   шапка абсолютная, поэтому текст обязан держать под неё отступ */
+.host-topbar { z-index: 4; }
+.q-text { padding-inline: clamp(12px, 2vw, 40px); }
+.answers-layout { padding-top: clamp(8px, 1.6vh, 24px); }
+.host-screen > .q-text:first-of-type { margin-top: clamp(6px, 1.2vh, 18px); }
+
+/* ── п.5: на бумаге колонки «ответы команд» нет — контент на всю ширину ── */
+.paper-answers .answers-layout { width: 96vw; max-width: none; gap: clamp(16px, 2vw, 34px); }
+.paper-answers .answers-main { flex: 1 1 auto; width: 100%; }
+.paper-answers .answer-reveal { width: 100%; }
+/* ── п.7: варианты-картинки в разборе уезжали за правый край ──
+   ширину берём от колонки, а не от экрана */
+.answers-layout .choice-imgs, .answers-layout .img-answers,
+.answers-layout .choices-grid, .answers-layout .q-media-grid {
+  width: 100%; max-width: 100%; margin-inline: 0; }
+.answers-layout .choice-imgs { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+.answers-layout .choice-img img { max-height: 30vh; }
+
+/* ── п.9: одиночная картинка ответа уходит вправо, ответ и разбор под ней ── */
+.answers-layout.with-side { align-items: stretch; }
+.answer-side { flex: 0 0 clamp(280px, 26vw, 460px); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: clamp(8px, 1.4vh, 18px);
+  min-width: 0; padding: clamp(10px, 1.4vw, 22px);
+  border-left: 2px solid var(--dim); }
+.answer-side img { width: auto; max-width: 100%; max-height: 46vh; height: auto;
+  object-fit: contain; border-radius: 12px; border: 2px solid var(--accent); }
+.answer-side-main { font-family: var(--font-display); font-weight: 700; text-align: center;
+  font-size: clamp(26px, 2.6vw, 52px); color: var(--ok); line-height: 1.1; }
+.answer-side-note { font-size: clamp(15px, 1.4vw, 24px); opacity: .75;
+  text-align: center; line-height: 1.3; }
+
+/* ── админка: команды ── */
+.team-dot { width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto; }
+.adm-btn.danger { border-color: var(--danger); color: var(--danger); }
+
+/* свечи ГП — декор, они не должны перекрывать цифры в углах */
+.pt-scene { pointer-events: none; }
+.pt-candle, .pt-flame { z-index: 1; }
+.theme-potter .host-topbar, .theme-potter .round-badge { z-index: 30; }
+
+
+/* ═══ 7.65: экран разбора — крупнее, ответ внизу, пояснение отдельно ═══ */
+
+/* ── п.1: сам ответ заметно крупнее ── */
+.answers-layout .answer-main { font-size: clamp(34px, 4.2vw, 84px); line-height: 1.08; }
+.answers-layout .answer-label { font-size: clamp(13px, 1.2vw, 20px); letter-spacing: .28em; }
+.theme-potter .answers-layout .answer-main { font-size: clamp(34px, 4.2vw, 84px); }
+/* варианты и сопоставление в разборе — тоже крупнее */
+.answers-layout .choice-plate { font-size: clamp(22px, 2.3vw, 40px); padding: 14px 20px; }
+.answers-layout .order-answer .oi { font-size: clamp(20px, 2vw, 34px); }
+
+/* ── п.2: блок ответа прижат к низу и компактнее по высоте ── */
+.answers-main { justify-content: flex-start !important; }
+.answers-main > .q-text { margin-bottom: auto; }
+.answers-layout .answer-reveal { flex: 0 0 auto; padding: clamp(10px, 1.4vh, 20px) clamp(16px, 2vw, 30px); }
+
+/* пояснение — отдельным блоком под рамкой, размер по длине текста */
+.answer-note { flex: 0 0 auto; text-align: center; line-height: 1.35;
+  color: var(--fg); opacity: .88; max-width: 96%; margin: 0 auto;
+  padding: clamp(6px, 1vh, 12px) clamp(14px, 1.6vw, 26px);
+  border-left: 3px solid var(--ok); background: rgba(255,255,255,.04);
+  font-size: clamp(22px, 2.4vw, 42px); }
+.answer-note.n-m { font-size: clamp(19px, 2vw, 34px); }
+.answer-note.n-l { font-size: clamp(17px, 1.7vw, 28px); }
+.answer-note.n-xl { font-size: clamp(15px, 1.45vw, 23px); line-height: 1.4; }
+/* пояснение сбоку (бумага, картинка справа) — тоже крупнее */
+.answer-side-note { font-size: clamp(16px, 1.6vw, 26px); }
+
+/* ── п.3: «РАУНД» в теме ГП не читался — тонкая золотая надпись на тёмном ── */
+.theme-potter .rb-word { color: #f3e9cf; opacity: .95; font-weight: 700;
+  font-size: clamp(15px, 1.3vw, 24px); letter-spacing: .3em;
+  text-shadow: 0 2px 10px rgba(0,0,0,.85); }
+.theme-potter .rb-num { text-shadow: 0 0 44px rgba(211,166,37,.6), 0 3px 12px rgba(0,0,0,.8); }
+
+/* аварийный выход в «Угадай мелодию» */
+.mel-escape { align-self: center; margin-top: 6px; font-size: 12px;
+  letter-spacing: .1em; text-transform: uppercase; opacity: .5;
+  background: none; border: none; text-decoration: underline; cursor: pointer;
+  color: var(--fg); }
+.mel-escape:hover { opacity: 1; color: var(--danger); }
+
+/* инструменты пакета в правом углу заголовка */
+.pack-tools { margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; text-transform: none; letter-spacing: normal; }
+.pack-tools button { padding: 6px 14px; font-size: 12.5px; }
+@media (max-width: 720px) {
+  .pack-tools { margin-left: 0; width: 100%; }
+  .pack-tools button { flex: 1 1 auto; }
+}
+
+/* ═══ 7.72: картинка на экране ответа ═══
+   Прошлый вариант (боковая колонка) был ошибкой: картинка получалась мелкой,
+   а ответы команд пропадали. Теперь картинка занимает ОСНОВНУЮ колонку во всю
+   доступную высоту, под ней — ответ и пояснение, а ответы команд остаются
+   на своём обычном месте справа. Текст вопроса на разборе скрыт. */
+.answers-main.with-pic { justify-content: flex-start !important; min-height: 0; }
+.answer-pic { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(8px, 1.4vh, 18px); flex: 1 1 0; min-height: 0; width: 100%; }
+.answer-pic img { flex: 1 1 0; min-height: 0; height: auto; max-height: 100%;
+  width: auto; max-width: 100%; object-fit: contain;
+  border-radius: 14px; border: 2px solid var(--accent); }
+.answer-pic-main { flex: 0 0 auto; font-family: var(--font-display); font-weight: 700;
+  text-align: center; line-height: 1.05; color: var(--ok);
+  font-size: clamp(36px, 4.4vw, 88px);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--ok) 35%, transparent); }
+.answer-pic-note { flex: 0 0 auto; text-align: center; line-height: 1.35; opacity: .85;
+  max-width: 94%; font-size: clamp(20px, 2.1vw, 36px); }
+.answer-pic-note.n-m { font-size: clamp(18px, 1.8vw, 30px); }
+.answer-pic-note.n-l { font-size: clamp(16px, 1.55vw, 25px); }
+.answer-pic-note.n-xl { font-size: clamp(15px, 1.35vw, 21px); }
+
+/* ═══ п.7: вопрос ДО показа ответа — крупно ═══
+   Пока ответа нет, тексту принадлежит вся колонка: нет смысла жать его
+   до размера, рассчитанного на соседство с рамкой ответа. */
+.answers-layout:not(.revealed) .answers-main { justify-content: center !important; }
+.answers-layout:not(.revealed) .q-text,
+.theme-potter .answers-layout:not(.revealed) .q-text { font-size: clamp(26px, 6.4cqw, 78px); }
+.answers-layout:not(.revealed) .q-text.len-m,
+.theme-potter .answers-layout:not(.revealed) .q-text.len-m { font-size: clamp(24px, 5.4cqw, 64px); }
+.answers-layout:not(.revealed) .q-text.len-l,
+.theme-potter .answers-layout:not(.revealed) .q-text.len-l { font-size: clamp(21px, 4.4cqw, 50px); }
+.answers-layout:not(.revealed) .q-text.len-xl,
+.theme-potter .answers-layout:not(.revealed) .q-text.len-xl { font-size: clamp(18px, 3.6cqw, 40px); }
+
+/* п.5: подпись варианта под буквой в сопоставлении */
+.mi-label { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.mi-label b { font-family: var(--font-display); font-size: clamp(18px, 1.9vw, 32px); }
+.mi-text { font-size: clamp(14px, 1.35vw, 22px); opacity: .8; line-height: 1.2;
+  text-align: center; overflow-wrap: anywhere; }
+
+/* ═══ 7.77: экран ответов собран заново ═══
+   Логика теперь одна и понятная:
+   ДО показа ответа — вопрос и его картинки, как на экране вопроса;
+   ПОСЛЕ — они убираются, на их месте блок с ответом.
+   Никаких дублей картинок и наездов на кнопки. */
+.answers-screen .answers-main { min-height: 0; justify-content: center; }
+.answers-screen .answers-main > .q-media-grid { flex: 1 1 0; min-height: 0;
+  max-height: 52vh; }
+
+/* Блок ответа: содержимое ОБЯЗАНО помещаться в отведённую высоту.
+   Раньше картинки внутри считали высоту от себя и вылезали на 1433px при
+   экране 900, а подсказка налезала на картинку (отрицательный зазор −80). */
+.answer-block { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(10px, 1.6vh, 22px); width: 100%; flex: 1 1 0;
+  min-height: 0; overflow: hidden; justify-content: center; }
+.answer-block > * { flex: 0 0 auto; max-width: 100%; }
+/* сетки картинок забирают остаток и вписываются в него */
+.answer-block > .q-media-grid,
+.answer-block > .match-answer,
+.answer-block > .rebus-answer { flex: 1 1 0; min-height: 0; align-content: center; }
+.answer-block .mi, .answer-block .q-img { min-height: 0; }
+/* Селекторы нарочно длинные: правила вида `.q-media-grid.n1 .q-img img`
+   задают высоту в vh и перебивают короткое «вписаться в контейнер».
+   Картинка обязана считать высоту от блока ответа, а не от экрана. */
+.answer-block .q-media-grid .q-img img,
+.answer-block .match-answer .mi img,
+.answer-block .rebus-answer .q-img img,
+.answer-block .mi img, .answer-block .q-img img {
+  max-height: 100%; height: auto; width: auto; max-width: 100%;
+  object-fit: contain; }
+.answer-block .q-img, .answer-block .mi { overflow: hidden; }
+.answer-block .answer-main { font-size: clamp(32px, 4vw, 76px); line-height: 1.06; }
+.answer-block .q-media-grid { width: 100%; }
+.answer-block .rebus-answer { display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 1.4vw, 24px); width: 100%; align-items: end; }
+/* подпись слога — часть фигуры, поэтому картинке оставляем место под неё,
+   иначе подсказка снизу налезала на изображение */
+.answer-block .rebus-answer .q-img { display: grid;
+  grid-template-rows: minmax(0, 1fr) auto; gap: 8px; height: 100%; }
+.answer-block .rebus-answer .q-img img { align-self: end; }
+.answer-block .rebus-answer figcaption { align-self: start; }
+/* сопоставление на разборе: карточки в один ряд, высота от остатка */
+.answer-block .match-answer { display: grid; width: 100%;
+  gap: clamp(8px, 1vw, 18px); grid-template-rows: minmax(0, 1fr); }
+.answer-block .match-answer .mi { display: grid;
+  grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 6px; }
+.answer-block .match-answer .mi-label b { font-size: clamp(15px, 1.5vw, 26px); }
+.answer-block .match-answer .mi-text { font-size: clamp(12px, 1.15vw, 19px); }
+.answer-block .answer-note { margin-top: 0; }
+
+/* запас снизу под кнопки — они больше ни на что не налезают */
+.answers-screen .answers-layout { padding-bottom: clamp(72px, 10vh, 116px); }
+
+/* ═══ 7.78: появление ответа, «Своя игра», правила ═══ */
+
+/* п.8: «волшебное появление» блока ответа — вернулось, и для всех тем */
+.answer-block.reveal-in { animation: ansIn .55s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes ansIn {
+  from { opacity: 0; transform: translateY(24px) scale(.97); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+.theme-potter .answer-block.reveal-in { animation-duration: .8s; }
+.theme-new_year .answer-block.reveal-in { animation-name: ansInSnow; }
+@keyframes ansInSnow {
+  from { opacity: 0; transform: translateY(-26px) rotate(-1.5deg); filter: blur(7px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+
+/* п.4: нажатая оценка остаётся подсвеченной */
+.jp-grade:disabled { opacity: .28; }
+.jp-grade.chosen, .jp-grade.chosen:disabled { opacity: 1;
+  box-shadow: 0 0 0 2px currentColor inset; }
+
+/* Заставка раунда: номер слева, заголовок по центру, правила справа.
+   Ничто ни на что не налезает, кнопки внизу свободны. */
+.round-intro { display: grid; align-content: center; justify-items: center;
+  grid-template-columns: minmax(0, 1fr) auto; gap: clamp(16px, 3vw, 56px);
+  padding-inline: clamp(24px, 5vw, 90px);
+  /* номер раунда стоит в левом верхнем углу — заголовку нужен отступ,
+     иначе на длинных названиях он заезжает под цифру */
+  padding-top: clamp(120px, 16vh, 190px); }
+.round-intro > .title-block, .round-intro > .meta-line,
+.round-intro > .mono-tag { grid-column: 1; justify-self: center; }
+.round-intro > .rules-frame { grid-column: 2; grid-row: 1 / span 4;
+  align-self: center; max-height: 66vh; overflow: hidden; }
+.round-intro .title-line { font-size: clamp(30px, 4.4vw, 82px); }
+
+/* размер правил ужимается ступенями по их количеству */
+.rules-frame[data-count="4"] .rule-item,
+.rules-frame[data-count="5"] .rule-item { font-size: clamp(14px, 1.3vw, 22px); }
+.rules-frame[data-count="6"] .rule-item,
+.rules-frame[data-count="7"] .rule-item { font-size: clamp(13px, 1.15vw, 19px); }
+.rules-frame[data-count="8"] .rule-item,
+.rules-frame[data-count="9"] .rule-item { font-size: clamp(12px, 1vw, 17px); }
+
+@media (max-width: 900px) {
+  .round-intro { grid-template-columns: 1fr; }
+  .round-intro > .rules-frame { grid-column: 1; grid-row: auto; max-width: 92vw; }
+}
+
+/* сообщение о проблеме со звуком плитки — на экране, а не только в консоли */
+.jp-audio-err { flex: 1 1 100%; margin-top: 8px; padding: 8px 12px;
+  border-left: 3px solid #ffb020; background: rgba(255,176,32,.1);
+  color: #ffb020; font-size: clamp(13px, 1.2vw, 18px); line-height: 1.35; }
+
+/* Правила не должны исчезать, если анимация не отработала.
+   Базовый стиль ставит opacity: 0 и полагается на анимацию — при
+   prefers-reduced-motion, ошибке или повторном рендере текст оставался
+   невидимым навсегда. Держим единицу, а появление задаём кадрами. */
+.rule-item { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .rule-item, .answer-block.reveal-in { animation: none !important; opacity: 1 !important; }
+}
