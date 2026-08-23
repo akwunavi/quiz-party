@@ -93,3 +93,21 @@
 /* подпись слога — ПОД своей картинкой, отдельной строкой грида */
 .answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
   font-size: clamp(18px, 2vw, 34px); text-align: center; }
+
+/* ═══ ЗАГОЛОВОК РАУНДА: РАЗМЕР ПО ДЛИНЕ САМОГО ДЛИННОГО СЛОВА ═══
+   Длинное неразрывное слово («ЭЛЕКТРОЭНЦЕФАЛОГРАФИЯ») переносить некуда:
+   оно выезжало за край колонки и наползало на правила. Поэтому кегль
+   уменьшается ступенями, а само слово при крайней нужде рвётся. */
+.round-intro > .neon-title {
+  width: 100%; min-width: 0; max-width: 100%;
+  overflow-wrap: anywhere; word-break: break-word;
+  font-size: clamp(24px, 4.2vw, 78px) !important; line-height: 1.05; }
+.round-intro > .neon-title[data-longest="12"],
+.round-intro > .neon-title[data-longest="13"],
+.round-intro > .neon-title[data-longest="14"] { font-size: clamp(22px, 3.4vw, 58px) !important; }
+.round-intro > .neon-title[data-longest="15"],
+.round-intro > .neon-title[data-longest="16"],
+.round-intro > .neon-title[data-longest="17"] { font-size: clamp(20px, 2.8vw, 48px) !important; }
+.round-intro > .neon-title[data-longest="18"],
+.round-intro > .neon-title[data-longest="19"],
+.round-intro > .neon-title[data-longest="20"] { font-size: clamp(18px, 2.3vw, 40px) !important; }

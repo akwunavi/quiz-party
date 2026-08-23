@@ -7,7 +7,7 @@
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
-import { playAudio } from '../../lib/audioSource'
+import { playAudio, createAudio } from '../../lib/audioSource'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
@@ -43,13 +43,13 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
 let sharedAudio: HTMLAudioElement | null = null
 export function unlockAudio() {
   if (sharedAudio) return
-  sharedAudio = new Audio()
+  sharedAudio = createAudio()
   // тихий пинок, чтобы браузер пометил элемент как «разрешённый жестом»
   sharedAudio.play().catch(() => {})
   sharedAudio.pause()
 }
 function playShared(src: string): HTMLAudioElement {
-  if (!sharedAudio) sharedAudio = new Audio()
+  if (!sharedAudio) sharedAudio = createAudio()
   sharedAudio.pause()
   sharedAudio.loop = false
   sharedAudio.volume = 1

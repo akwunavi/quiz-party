@@ -12,6 +12,7 @@ import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, RaceSettings } from '../../types/quiz'
+import { createAudio } from '../../lib/audioSource'
 
 const DOG_COLORS = [
   { body: '#f2e3c9', mask: '#b99a7d', name: 'кремовый' },   // Френк — как на фото
@@ -99,7 +100,7 @@ export function RaceBoard({ pack, round, gameState }: {
     const src = (round.settings as { race_music?: string }).race_music
       ?? pack.settings?.bg_music
     if (race.stage !== 'running' || !src || document.hidden) return
-    const a = new Audio(mediaUrl(src))
+    const a = createAudio(); a.src = mediaUrl(src)
     a.loop = true; a.volume = .55
     a.play().catch(() => {})
     return () => a.pause()

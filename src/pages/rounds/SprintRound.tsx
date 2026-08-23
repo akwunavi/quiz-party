@@ -6,6 +6,7 @@ import { mediaUrl, lenClass } from '../HostScreen'
 import { startTimer, gotoAnswers } from '../../lib/gameActions'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'
+import { createAudio } from '../../lib/audioSource'
 
 export function SprintBoard({ pack, round, gameState, timerNode }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -25,7 +26,7 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
 
   useEffect(() => {
     if (!gameState.timer_started_at || !bgMusic || document.hidden) return
-    const a = new Audio(mediaUrl(bgMusic))
+    const a = createAudio(); a.src = mediaUrl(bgMusic)
     a.loop = true; a.volume = .6
     a.play().catch(() => {})
     return () => a.pause()

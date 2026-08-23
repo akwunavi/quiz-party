@@ -21,7 +21,7 @@ import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
-import { playAudio, probeMedia } from '../lib/audioSource'
+import { playAudio, probeMedia, createAudio, stopAllAudio } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
 import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -480,10 +480,19 @@ function WindText({ text }: { text: string }) {
 }
 
 /** Заголовок: в НГ-теме буквы выпадают снегом и обрастают сугробом. */
+/** Длина самого длинного слова заголовка. Переносить длинное слово некуда,
+ *  поэтому по этой длине CSS выбирает кегль — иначе «ЭЛЕКТРОЭНЦЕФАЛОГРАФИЯ»
+ *  уезжает за край колонки и наползает на правила раунда. */
+function longestWord(lines: string[]): number {
+  const words = lines.join(' ').split(/\s+/).filter(Boolean)
+  return Math.min(20, words.reduce((m, w) => Math.max(m, w.length), 0))
+}
+
 function Title({ theme, lines }: { theme: string; lines: string[] }) {
+  const longest = longestWord(lines)
   if (theme !== 'new_year') {
     return (
-      <h1 className="neon-title title-anim">
+      <h1 className="neon-title title-anim" data-longest={longest}>
         {lines.map((l, i) => (
           <span key={i} style={i === lines.length - 1 && lines.length > 1 ? { color: 'var(--accent)' } : {}}>{l}<br /></span>
         ))}
@@ -492,7 +501,7 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   }
   let n = 0
   return (
-    <h1 className="neon-title">
+    <h1 className="neon-title" data-longest={longest}>
       {lines.map((line, li) => (
         <span key={li} style={{ display: 'block' }}>
           {[...line].map((ch, i) => ch === ' '
@@ -509,10 +518,10 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
  *  и React-разметкой, и вручную, и в модалках раундов. Проще один раз пройти
  *  по всем и остановить. Вызывается при СМЕНЕ вопроса и по концу таймера. */
 export function stopAllMedia() {
-  document.querySelectorAll('audio, video').forEach(el => {
-    const m = el as HTMLMediaElement
-    try { m.pause(); m.currentTime = 0 } catch { /* элемент уже мёртв */ }
-  })
+  // вся работа — в реестре плееров: он видит и объекты Audio, созданные
+  // кодом, и элементы из разметки
+  stopAllAudio()
+
 }
 
 /** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
@@ -732,7 +741,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
       if (cancelled) return
       requested.current = true
       if (ownAudio) {
-        const a = new Audio(mediaUrl(ownAudio))
+        const a = createAudio(); a.src = mediaUrl(ownAudio)
         audioRef.current = a
         a.play().catch(() => {})        // не смогли — таймер всё равно идёт
       }
@@ -742,7 +751,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
     if (!q.media.voice) { runQuestion(); return }
 
     // озвучка блокирует старт: пока читают вопрос, время не тикает
-    const v = new Audio(mediaUrl(q.media.voice))
+    const v = createAudio(); v.src = mediaUrl(q.media.voice)
     voiceRef.current = v
     v.onended = runQuestion
     v.onerror = runQuestion            // нет файла — не зависаем
@@ -777,7 +786,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack?.settings?.bg_music
     if (!timerRunning || !bg || hasOwnAV) return
-    const a = new Audio(mediaUrl(bg))
+    const a = createAudio(); a.src = mediaUrl(bg)
     a.loop = true; a.volume = 0.6
     a.play().catch(() => {})
     // по истечении таймера музыка играет ЕЩЁ 3 СЕК и мягко глохнет
@@ -816,7 +825,7 @@ function AnswerTime({ pack, round, gameState }: {
     const bg = (round.settings as { bg_music?: string }).bg_music
       ?? pack.settings?.bg_music
     if (!bg) return
-    const a = new Audio(mediaUrl(bg))
+    const a = createAudio(); a.src = mediaUrl(bg)
     a.loop = true; a.volume = 0.6
     a.play().catch(() => {})
     return () => a.pause()
@@ -1234,7 +1243,7 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
     if (timerRef.current) clearInterval(timerRef.current)
     if (!tile.audio) { setPlaying(false); setAudioErr('у плитки не задан трек'); return }
     setAudioErr(null)
-    const audio = new Audio()
+    const audio = createAudio()
     audioRef.current = audio
     setRemaining(clipSeconds); setPlaying(true)
     // playAudio сам попробует запасной путь (скачать и играть из памяти),

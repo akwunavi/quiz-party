@@ -63,9 +63,12 @@ function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }
             </button>}
       {err && <span className="ed-row-meta" style={{ color: 'var(--danger)' }}>{err}</span>}
       {missing && missing.length > 0 && (
-        <span className="media-missing" title={missing.join('\n')}>
-          ⚠ файлов нет в хранилище: {missing.length} — перезалей их
-        </span>
+        <button className="media-missing"
+          onClick={() => alert('НЕТ В ХРАНИЛИЩЕ (' + missing.length + '):\n\n'
+            + missing.map(m => m.split('/').pop()).join('\n')
+            + '\n\nЭти файлы надо загрузить заново в соответствующие вопросы и плитки.')}>
+          ⚠ файлов нет в хранилище: {missing.length} — показать список
+        </button>
       )}
       {missing && missing.length === 0 && found !== null &&
         <span className="ed-row-meta">все файлы на месте</span>}

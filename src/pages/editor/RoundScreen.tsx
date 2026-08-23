@@ -393,6 +393,14 @@ function JeopardyEditor({ pack, round, locked, onChanged }: {
   const upd = (fn: (t: JeopardyTheme[]) => JeopardyTheme[]) => {
     setThemes(fn); setDirty(true)
   }
+  /** Изменить И СРАЗУ сохранить. Нужно для медиа: файл уже уехал в хранилище,
+   *  и если ссылку не записать немедленно, он останется «ничей». */
+  const saveThemes = async (fn: (t: JeopardyTheme[]) => JeopardyTheme[]) => {
+    const next = fn(themes)
+    setThemes(next)
+    await updateRound(round.id, { settings: { themes: next } })
+    onChanged()
+  }
 
   return (
     <div style={{ margin: '12px 0', padding: 10, border: '1px dashed #3a4a6b', borderRadius: 8 }}>
@@ -417,9 +425,14 @@ function JeopardyEditor({ pack, round, locked, onChanged }: {
               {t.tiles.map((tile, i) => (
                 <tr key={i}>
                   <td><b>{tile.value}</b></td>
+                  {/* Файл уходит в хранилище СРАЗУ, а ссылка на него раньше
+                      сохранялась только по кнопке «Сохранить темы». Если её
+                      не нажать, файл остаётся в хранилище «ничей», а плитка
+                      продолжает ссылаться на старый (уже удалённый) путь.
+                      Поэтому медиа сохраняем немедленно. */}
                   <td><MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
                     paths={tile.audio ? [tile.audio] : []}
-                    onChange={paths => upd(ts => ts.map((x, xi) => xi === ti ? {
+                    onChange={paths => void saveThemes(ts => ts.map((x, xi) => xi === ti ? {
                       ...x, tiles: x.tiles.map((tl, tli) => tli === i ? { ...tl, audio: paths[0] ?? '' } : tl),
                     } : x))} /></td>
                   <td><input value={tile.correct} placeholder="ответ" disabled={locked}
@@ -512,6 +525,13 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
   const [themes, setThemes] = useState(s.themes ?? [])
   const [dirty, setDirty] = useState(false)
   const upd = (fn: (t: typeof themes) => typeof themes) => { setThemes(fn); setDirty(true) }
+  /** То же, что upd, но с немедленной записью — для медиа (см. «Свою игру»). */
+  const saveTracks = async (fn: (t: typeof themes) => typeof themes) => {
+    const next = fn(themes)
+    setThemes(next)
+    await updateRound(round.id, { settings: { ...round.settings, themes: next } as never })
+    onChanged()
+  }
   const setNum = (patch: Record<string, number>) =>
     void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
 
@@ -566,9 +586,10 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
           {t.tracks.map((tr, i) => (
             <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
               <span className="ed-num">{i + 1}</span>
+              {/* медиа сохраняется сразу: файл уже в хранилище */}
               <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
                 paths={tr.audio ? [tr.audio] : []}
-                onChange={paths => upd(ts => ts.map((x, xi) => xi === ti ? {
+                onChange={paths => void saveTracks(ts => ts.map((x, xi) => xi === ti ? {
                   ...x, tracks: x.tracks.map((y, yi) => yi === i ? { ...y, audio: paths[0] ?? '' } : y),
                 } : x))} />
               <input value={tr.correct} placeholder="правильный ответ" disabled={locked} style={{ flex: 1 }}

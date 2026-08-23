@@ -266,3 +266,17 @@
 @media (prefers-reduced-motion: reduce) {
   .rule-item, .answer-block.reveal-in { animation: none !important; opacity: 1 !important; }
 }
+
+
+/* п.5: текст вопроса налезал на картинку. Причина не в отступах: длинный
+   текст съедал всю высоту (352 из 481), картинкам оставалось 91px, и они
+   вылезали из своей зоны вверх. Делим высоту принудительно: тексту не
+   больше 46%, картинкам не меньше 42%, всё лишнее прячется. */
+.answers-screen .answers-main { gap: clamp(12px, 2vh, 26px) !important; }
+.answers-screen .answers-main > .q-text { flex: 0 1 auto; max-height: 46%;
+  overflow: hidden; margin-bottom: 0; position: relative; z-index: 2; }
+.answers-screen .answers-main > .q-media-grid { flex: 1 1 auto;
+  min-height: 42%; margin-top: 0; overflow: hidden; }
+.answers-screen .answers-main > .q-media-grid .q-img { overflow: hidden; min-height: 0; }
+.answers-screen .answers-main > .q-media-grid .q-img img {
+  max-height: 100%; max-width: 100%; width: auto; height: auto; object-fit: contain; }

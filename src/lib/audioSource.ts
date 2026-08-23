@@ -11,6 +11,32 @@
 
 const cache = new Map<string, string>()
 
+// ═══ РЕЕСТР ЖИВЫХ ПЛЕЕРОВ ═══
+// Объекты `new Audio()` НЕ находятся в документе, поэтому
+// document.querySelectorAll('audio') их не видит. Из-за этого все прошлые
+// попытки «заглушить всё» не трогали ни озвучку, ни трек вопроса, ни
+// плитки: звук продолжал играть на следующем слайде.
+const live = new Set<HTMLAudioElement>()
+
+/** Создать плеер, о котором система будет знать. */
+export function createAudio(): HTMLAudioElement {
+  const a = new Audio()
+  live.add(a)
+  return a
+}
+
+/** Остановить ВЕСЬ звук: и созданный кодом, и вставленный в разметку. */
+export function stopAllAudio() {
+  live.forEach(a => {
+    try { a.pause(); a.currentTime = 0; a.src = '' } catch { /* уже мёртв */ }
+  })
+  live.clear()
+  document.querySelectorAll('audio, video').forEach(el => {
+    const m = el as HTMLMediaElement
+    try { m.pause(); m.currentTime = 0 } catch { /* уже мёртв */ }
+  })
+}
+
 /** Скачать файл и вернуть локальную ссылку на него. */
 async function toBlobUrl(url: string): Promise<string> {
   const hit = cache.get(url)
@@ -34,6 +60,7 @@ export type PlayResult = { ok: true } | { ok: false; reason: string }
 
 /** Воспроизвести звук, при необходимости через запасной путь. */
 export async function playAudio(el: HTMLAudioElement, url: string): Promise<PlayResult> {
+  live.add(el)                       // чтобы его точно можно было заглушить
   // 1) как есть
   try {
     el.src = url

@@ -13,10 +13,13 @@
   animation: vignetteBreath 9s ease-in-out infinite; }
 @keyframes vignetteBreath { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
 /* контент поверх орбов, НО не ломая fixed-элементы (topbar/кнопки/бейджи) */
-.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge) {
+/* ВНИМАНИЕ: это правило перебивает position у ЛЮБОГО прямого потомка экрана.
+   На нём уже трижды спотыкались (шапка, номер раунда, QR). Любой элемент,
+   которому нужен собственный position, ОБЯЗАН быть в этом списке. */
+.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.audio-gate) {
   position: relative; z-index: 1; }
 .grid-bg > .host-topbar, .grid-bg > .host-actions, .grid-bg > .pack-badge,
-.grid-bg > .round-badge { z-index: 20; }
+.grid-bg > .round-badge, .grid-bg > .lobby-qr-corner { z-index: 20; }
 /* в тематических фонах свой амбиент — орбы и дрейф отключены */
 .theme-new_year .grid-bg, .theme-potter .grid-bg { animation: none; }
 .theme-new_year .grid-bg::before, .theme-new_year .grid-bg::after { display: none; }
