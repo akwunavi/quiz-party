@@ -667,3 +667,52 @@ select, .cyber select, .cyber input[type="select"] {
 .pl-x2 input { width: 22px; height: 22px; flex: 0 0 auto; margin: 0; }
 .pl-x2 span { font-weight: 700; }
 .pl-x2 i { font-style: normal; font-size: 12px; opacity: .6; flex: 1 1 100%; }
+
+/* ═══ 7.73: звук, таймер киберпанка, разбор ═══ */
+
+/* подсказка, пока браузер держит звук заблокированным */
+.audio-gate { position: fixed; left: 50%; top: 12px; transform: translateX(-50%);
+  z-index: 60; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: 10px 20px; border-radius: 999px;
+  background: rgba(255,176,32,.14); border: 1px solid #ffb020;
+  color: #ffb020; font-size: 15px; letter-spacing: .04em;
+  animation: pulse 1.8s ease-in-out infinite; pointer-events: none; }
+.audio-gate b { color: #fff; font-weight: 700; }
+
+/* п.3: таймер киберпанка — кольцо, как в других темах */
+.theme-classic .timer-wrap, .cyber .timer-wrap {
+  position: relative; width: clamp(118px, 10vw, 168px); aspect-ratio: 1;
+  display: grid; place-items: center; border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: radial-gradient(circle at 50% 45%,
+    color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 28%, transparent),
+              inset 0 0 24px rgba(0,0,0,.5); }
+.theme-classic .timer-wrap::before {
+  content: ''; position: absolute; inset: -7px; border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--accent) 40%, transparent);
+  animation: spin 14s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.theme-classic .timer-wrap.low, .cyber .timer-wrap.low {
+  border-color: var(--danger);
+  box-shadow: 0 0 34px color-mix(in srgb, var(--danger) 45%, transparent),
+              inset 0 0 24px rgba(0,0,0,.5); }
+.theme-classic .timer-num { font-size: clamp(38px, 3.6vw, 62px); }
+
+/* п.4: картинки вопроса на телефоне игрока */
+.pl-media { display: grid; gap: 8px; margin: 10px 0; }
+.pl-media.n1 { grid-template-columns: 1fr; }
+.pl-media.n2, .pl-media.n4 { grid-template-columns: 1fr 1fr; }
+.pl-media.n3 { grid-template-columns: repeat(3, 1fr); }
+.pl-media img { width: 100%; height: auto; max-height: 46vh; object-fit: contain;
+  border-radius: 10px; border: 1px solid var(--pl-line, #2a3550); background: #0b1120; }
+
+/* п.7: кнопки проектора не наезжают на контент и совпадают по ширине
+   с колонкой ответов команд */
+.host-actions { z-index: 40; display: flex; gap: 10px; align-items: center;
+  justify-content: flex-end; flex-wrap: wrap;
+  width: clamp(260px, 22vw, 420px); }
+.host-actions button { flex: 1 1 auto; white-space: nowrap; }
+.answers-layout { padding-right: clamp(0px, 1vw, 16px); }
+/* на разборе оставляем место под кнопки, чтобы они ни на что не ложились */
+.host-screen .answers-layout { padding-bottom: clamp(64px, 9vh, 104px); }

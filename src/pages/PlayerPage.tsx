@@ -10,6 +10,7 @@ import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Question, Answer, JeopardyTheme } from '../types/quiz'
 import { spendsEdit } from '../lib/edits'
+import { mediaUrl } from './HostScreen'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -461,6 +462,18 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                   {q.question_text
                     ? <div className="pl-qtext">{q.question_text}</div>
                     : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
+                  {/* картинки вопроса у игрока: их не показывали вообще,
+                      хотя половина вопросов без них не читается */}
+                  {(() => {
+                    const imgs = (q.media?.question ?? [])
+                      .filter(m => !/\.(mp3|mp4|webm|wav|m4a|ogg)$/i.test(m))
+                    if (!imgs.length || q.media?.hidden) return null
+                    return (
+                      <div className={`pl-media n${Math.min(imgs.length, 4)}`}>
+                        {imgs.map((m, k) => <img key={k} src={mediaUrl(m)} alt="" />)}
+                      </div>
+                    )
+                  })()}
                   {isStakes && (uniqueStakes ? (<>
                     <div className="pl-stakes-label">
                       Ставка: сколько баллов ставишь на этот вопрос

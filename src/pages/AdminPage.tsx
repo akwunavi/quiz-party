@@ -628,6 +628,8 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
           + 'Восстановить нельзя. Продолжить?')) return
         if (!confirm('Точно удалить? Второе подтверждение.')) return
         void resetGameHard()
+          .then(() => alert('Готово: команды и ответы удалены.'))
+          .catch(e => alert(e instanceof Error ? e.message : 'не удалось очистить'))
       }}>🗑 НОВАЯ ИГРА С ОЧИСТКОЙ</button>
     </div>
   )

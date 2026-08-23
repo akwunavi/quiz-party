@@ -20,6 +20,7 @@ import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
+import { AudioGate } from '../components/AudioGate'
 import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
@@ -248,6 +249,7 @@ function HostInner({ gameState, pack }: {
       <div className={`host-screen grid-bg${imgs.length && !q.media.hidden ? ' has-media' : ''}${
         (choices && !lettered) || (q.answer.mode === 'match'
           && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
+        <AudioGate />
         {round.mechanic !== 'jeopardy' && <>
           <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
           <AutoAdvance round={round} gameState={gameState}
@@ -675,7 +677,10 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   //   видео без озвучки     → сразу видео + таймер
   //   видео + озвучка       → озвучка, затем видео + таймер
   useEffect(() => {
-    if (timerRunning || document.hidden) return
+    // document.hidden из условия УБРАН намеренно: если вкладку свернули на
+    // секунду (или ОС решила, что окно неактивно), таймер не запускался
+    // вообще, и вопрос замирал до перезагрузки страницы.
+    if (timerRunning) return
     let cancelled = false
     const ownAudio = (q.media.question ?? [])
       .find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
@@ -715,17 +720,18 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   // повторить его было некому: эффект выше срабатывает один раз на вопрос.
   // Здесь проверяем результат и повторяем попытку, пока таймер не пошёл.
   useEffect(() => {
-    if (timerRunning || document.hidden) return
-    // ждём, пока доиграет озвучка: во время неё таймер и не должен идти
-    if (q.media.voice && !requested.current) return
-    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, 2500)
+    if (timerRunning) return
+    // ждём, пока доиграет озвучка: во время неё таймер и не должен идти,
+    // но не дольше 12 секунд — иначе одна залипшая озвучка вешает вопрос
+    const wait = q.media.voice && !requested.current ? 12_000 : 2500
+    const t = setTimeout(() => { if (!timerRunning) void startTimer() }, wait)
     return () => clearTimeout(t)
   }, [q.id, timerRunning])
 
   // фоновая музыка раунда, пока тикает таймер
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack?.settings?.bg_music
-    if (!timerRunning || !bg || hasOwnAV || document.hidden) return
+    if (!timerRunning || !bg || hasOwnAV) return
     const a = new Audio(mediaUrl(bg))
     a.loop = true; a.volume = 0.6
     a.play().catch(() => {})
@@ -764,7 +770,7 @@ function AnswerTime({ pack, round, gameState }: {
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music
       ?? pack.settings?.bg_music
-    if (!bg || document.hidden) return
+    if (!bg) return
     const a = new Audio(mediaUrl(bg))
     a.loop = true; a.volume = 0.6
     a.play().catch(() => {})
@@ -853,6 +859,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // Нет своей картинки у ответа — берём картинку вопроса: на разборе она
   // нужнее текста вопроса, который уже прозвучал.
+  // Картинки вопроса показываем на разборе и тогда, когда во время вопроса
+  // они были скрыты (media.hidden): на ответе прятать их уже незачем.
   const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const revealImgs = answerImgs.length ? answerImgs : questionImgs
   // Одиночная картинка ответа уходит в ЛЕВУЮ колонку на всю высоту, под ней —

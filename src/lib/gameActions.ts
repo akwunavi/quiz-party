@@ -152,9 +152,23 @@ export async function resetGameHard() {
     .select('game_id').eq('id', room).maybeSingle()
   const gameId = s?.game_id
   if (gameId) {
-    // ответы удаляем ПЕРВЫМИ: на них ссылается ai_feedback и оценки
+    // ответы удаляем ПЕРВЫМИ: на них ссылаются оценки
     await supabase.from('answers').delete().eq('game_id', gameId)
     await supabase.from('teams').delete().eq('game_id', gameId)
+
+    // ПРОВЕРЯЕМ результат. При запрещающей политике RLS Postgres не отдаёт
+    // ошибку — он просто не видит строк, и удаление «проходит», ничего не
+    // удалив. Без этой проверки кнопка врала бы об успехе.
+    const [{ count: aLeft }, { count: tLeft }] = await Promise.all([
+      supabase.from('answers').select('id', { count: 'exact', head: true }).eq('game_id', gameId),
+      supabase.from('teams').select('id', { count: 'exact', head: true }).eq('game_id', gameId),
+    ])
+    if ((aLeft ?? 0) > 0 || (tLeft ?? 0) > 0) {
+      throw new Error(
+        `Очистка не сработала: осталось ответов ${aLeft ?? '?'}, команд ${tLeft ?? '?'}. `
+        + 'База запрещает удаление. Выполни миграцию supabase/migrations/0004_hard_reset.sql '
+        + 'в SQL-редакторе Supabase и повтори.')
+    }
   }
   await resetGame()
 }
