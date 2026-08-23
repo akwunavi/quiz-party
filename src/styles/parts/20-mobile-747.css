@@ -601,16 +601,21 @@ select, .cyber select, .cyber input[type="select"] {
   background: var(--accent); color: #08121f; font-family: var(--font-digits); }
 .pl-wait { padding: 18px 6px; opacity: .7; line-height: 1.4; }
 
-/* ═══ п.9: правила раунда в рамке, своя для каждой темы ═══ */
+/* ═══ п.9: правила раунда в рамке, своя для каждой темы ═══
+   Подпись «правила раунда» не влезала в верхнюю кромку рамки, а сама рамка
+   по центру отжимала кнопки. Решение как в кроссворде: заголовок раунда по
+   центру, правила — колонкой рядом, подпись короткая и ВНУТРИ рамки. */
 .rules-frame { position: relative; display: flex; flex-direction: column;
-  gap: clamp(8px, 1.2vh, 16px); max-width: min(1100px, 78vw);
-  padding: clamp(18px, 2.6vh, 34px) clamp(22px, 3vw, 48px);
+  gap: clamp(6px, 1vh, 14px); max-width: min(720px, 42vw);
+  padding: clamp(14px, 2vh, 26px) clamp(16px, 2vw, 30px);
   border: 2px solid var(--dim); border-radius: 14px;
   background: rgba(255,255,255,.03); }
-.rules-frame-label { position: absolute; top: -.75em; left: clamp(18px, 2.4vw, 36px);
-  padding: 0 12px; background: var(--bg);
-  font-family: var(--font-mono); font-size: clamp(11px, 1vw, 16px);
-  letter-spacing: .24em; text-transform: uppercase; color: var(--accent); }
+.rules-frame-label { position: static; align-self: center; margin-bottom: 4px;
+  padding: 2px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  font-family: var(--font-mono); font-size: clamp(10px, .85vw, 14px);
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+  white-space: nowrap; }
 
 /* киберпанк: неоновый контур с угловыми засечками */
 .cyber .rules-frame, .theme-classic .rules-frame {
@@ -890,8 +895,41 @@ select, .cyber select, .cyber input[type="select"] {
 .jp-grade.chosen, .jp-grade.chosen:disabled { opacity: 1;
   box-shadow: 0 0 0 2px currentColor inset; }
 
-/* п.5: правила помещаются в рамку при любом их количестве */
-.rules-frame { max-height: 58vh; overflow: hidden; }
-.rules-frame:has(.rule-item:nth-child(5)) .rule-item { font-size: clamp(16px, 1.7vw, 30px); }
-.rules-frame:has(.rule-item:nth-child(7)) .rule-item { font-size: clamp(14px, 1.4vw, 24px); }
-.rules-frame:has(.rule-item:nth-child(9)) .rule-item { font-size: clamp(13px, 1.2vw, 20px); }
+/* Заставка раунда: номер слева, заголовок по центру, правила справа.
+   Ничто ни на что не налезает, кнопки внизу свободны. */
+.round-intro { display: grid; align-content: center; justify-items: center;
+  grid-template-columns: 1fr auto; gap: clamp(16px, 3vw, 60px);
+  padding-inline: clamp(24px, 5vw, 90px); }
+.round-intro > .title-block, .round-intro > .meta-line,
+.round-intro > .mono-tag { grid-column: 1; justify-self: center; }
+.round-intro > .rules-frame { grid-column: 2; grid-row: 1 / span 4;
+  align-self: center; max-height: 66vh; overflow: hidden; }
+.round-intro .title-line { font-size: clamp(30px, 4.4vw, 82px); }
+
+/* размер правил ужимается ступенями по их количеству */
+.rules-frame .rule-item { font-size: clamp(15px, 1.5vw, 26px); line-height: 1.28; }
+.rules-frame[data-count="4"] .rule-item,
+.rules-frame[data-count="5"] .rule-item { font-size: clamp(14px, 1.3vw, 22px); }
+.rules-frame[data-count="6"] .rule-item,
+.rules-frame[data-count="7"] .rule-item { font-size: clamp(13px, 1.15vw, 19px); }
+.rules-frame[data-count="8"] .rule-item,
+.rules-frame[data-count="9"] .rule-item { font-size: clamp(12px, 1vw, 17px); }
+
+@media (max-width: 900px) {
+  .round-intro { grid-template-columns: 1fr; }
+  .round-intro > .rules-frame { grid-column: 1; grid-row: auto; max-width: 92vw; }
+}
+
+/* сообщение о проблеме со звуком плитки — на экране, а не только в консоли */
+.jp-audio-err { flex: 1 1 100%; margin-top: 8px; padding: 8px 12px;
+  border-left: 3px solid #ffb020; background: rgba(255,176,32,.1);
+  color: #ffb020; font-size: clamp(13px, 1.2vw, 18px); line-height: 1.35; }
+
+/* Правила не должны исчезать, если анимация не отработала.
+   Базовый стиль ставит opacity: 0 и полагается на анимацию — при
+   prefers-reduced-motion, ошибке или повторном рендере текст оставался
+   невидимым навсегда. Держим единицу, а появление задаём кадрами. */
+.rule-item { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .rule-item, .answer-block.reveal-in { animation: none !important; opacity: 1 !important; }
+}

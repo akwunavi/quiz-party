@@ -240,7 +240,8 @@ export function exportPackCsv(pack: LoadedPack, mediaUrls: Map<string, string>):
       const l = (a.left ?? []) as string[], r = (a.right_labels ?? []) as string[]
       return l.map((x, i) => `${i + 1}. ${x} → ${r[i] ?? ''}`).join(' | ')
     }
-    if (a.mode === 'free') return String(a.correct ?? '')
+    // режим называется free_text; из-за 'free' ответ выгружался пустым
+    if (a.mode === 'free_text') return String(a.correct ?? '')
     if (a.mode === 'crossword_word') return String(a.word ?? '')
     return JSON.stringify(a)
   }

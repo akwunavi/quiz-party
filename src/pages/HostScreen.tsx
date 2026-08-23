@@ -190,10 +190,11 @@ function HostInner({ gameState, pack }: {
           <Title theme={pack.theme} lines={round.title_lines} />
           <Deco theme={pack.theme} />
           <div className="meta-line">{metaLine(round)}</div>
-          {/* правила в рамке: у каждой темы своё оформление, см. rules-frame */}
+          {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
+              а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
-            <div className="rules-frame">
-              <div className="rules-frame-label">правила раунда</div>
+            <div className="rules-frame" data-count={round.rules.length}>
+              <div className="rules-frame-label">ПРАВИЛА</div>
               {round.rules.map((r, i) => (
                 <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
@@ -654,7 +655,12 @@ function displayAnswer(q: Question): string {
 export function mediaUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path
   const base = import.meta.env.VITE_SUPABASE_URL
-  return `${base}/storage/v1/object/public/quiz-media/${path.replace(/^\//, '')}`
+  // Путь ОБЯЗАН быть закодирован. В именах файлов встречаются пробелы
+  // («song r7 9 1 .mp3»), а ссылка с пробелами невалидна: браузер её
+  // «чинит» по-своему, и запрос падает с невнятной ошибкой безопасности.
+  // Кодируем каждый сегмент отдельно, чтобы не съесть разделители «/».
+  const safe = path.replace(/^\//, '').split('/').map(encodeURIComponent).join('/')
+  return `${base}/storage/v1/object/public/quiz-media/${safe}`
 }
 
 /** Видео вопроса. Если у вопроса есть озвучка — ждём её окончания
@@ -1220,15 +1226,29 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
   const [showAnswer, setShowAnswer] = useState(false)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
+  const [audioErr, setAudioErr] = useState<string | null>(null)
 
   const play = () => {
     audioRef.current?.pause()
     if (timerRef.current) clearInterval(timerRef.current)
-    if (!tile.audio) { setPlaying(false); return }
+    if (!tile.audio) { setPlaying(false); setAudioErr('у плитки не задан трек'); return }
+    setAudioErr(null)
     const audio = new Audio(mediaUrl(tile.audio))
     audioRef.current = audio
     setRemaining(clipSeconds); setPlaying(true)
-    audio.play().catch(() => setPlaying(false))
+    // Молчание без объяснения — худшее, что может случиться на игре.
+    // Показываем причину прямо на экране, а не только в консоли браузера.
+    audio.onerror = () => {
+      setPlaying(false)
+      setAudioErr('файл не загрузился — браузер заблокировал запрос '
+        + '(чаще всего мешает VPN или расширение)')
+    }
+    audio.play().catch(e => {
+      setPlaying(false)
+      setAudioErr(e instanceof Error && e.name === 'NotAllowedError'
+        ? 'браузер не разрешил звук — кликните по экрану и нажмите «Переслушать»'
+        : 'не удалось воспроизвести трек')
+    })
     timerRef.current = window.setInterval(() => {
       setRemaining(prev => {
         if (prev <= 1) {
@@ -1302,6 +1322,7 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
         <div className="jp-modal-foot">
           {!showAnswer && <button onClick={() => setShowAnswer(true)}>Показать ответ</button>}
           <button className="ghost" onClick={play}>↻ Переслушать</button>
+          {audioErr && <div className="jp-audio-err">🔇 {audioErr}</div>}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
       </div>

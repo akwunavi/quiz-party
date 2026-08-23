@@ -7,7 +7,7 @@ const match = { mode: 'match', left: ['1', '2', '3', '4'], right: ['А', 'Б', '
 const order = { mode: 'order',
   choices: [{ key: 'А', text: '' }, { key: 'Б', text: '' }, { key: 'В', text: '' }],
   correct_order: 'АБВ' } as unknown as AnswerSpec
-const free = { mode: 'free', correct: 'х' } as unknown as AnswerSpec
+const free = { mode: 'free_text', correct: 'х' } as unknown as AnswerSpec
 
 describe('учёт правок', () => {
   it('СОПОСТАВЛЕНИЕ: набор ответа по частям НЕ тратит правки', () => {

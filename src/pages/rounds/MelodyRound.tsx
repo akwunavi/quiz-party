@@ -7,6 +7,8 @@
 // → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
+import { afterRoundStep } from '../../lib/flow'
+import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { SnakeTimer } from '../../components/SnakeTimer'
 import { useEffect, useRef, useState } from 'react'
@@ -20,15 +22,18 @@ import type { GameState, MelodySettings, MelodyState, MelodyTheme } from '../../
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
-  const next = gameState.round_number + 1
-  if (next < pack.rounds.length) {
-    await supabase.from('game_sessions').update({
-      phase: 'round_intro', round_number: next, question_index: 0,
-      timer_started_at: null, reveal: false, melody: {},
-    }).eq('id', getRoomId())
-  } else {
-    await supabase.from('game_sessions').update({ phase: 'finale' }).eq('id', getRoomId())
-  }
+  // Раньше отсюда прыгали СРАЗУ в следующий раунд, минуя общий маршрут:
+  // настройки «показать табло» и «перерыв» у музыкального раунда просто
+  // игнорировались. Теперь шаг считает тот же модуль, что и везде.
+  await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
+  const step = afterRoundStep(pack, gameState.round_number, 'show_answers')
+  if (step.kind === 'scoreboard') return void showScoreboard()
+  if (step.kind === 'break') return void startBreak()
+  if (step.kind === 'finale') return void finishGame(gameState.pack_id)
+  await supabase.from('game_sessions').update({
+    phase: 'round_intro', round_number: gameState.round_number + 1,
+    question_index: 0, timer_started_at: null, reveal: false, melody: {},
+  }).eq('id', getRoomId())
 }
 
 // Единый аудио-элемент: «разблокируется» первым кликом по проектору и дальше

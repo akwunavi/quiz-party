@@ -41,7 +41,8 @@ function answerText(q: Q): string {
     const r = (a.right_labels ?? []) as string[]
     return `сопоставление: ${l.join(', ')} → ${r.join(', ')}`
   }
-  if (a.mode === 'free') return `ответ: ${String(a.correct ?? '')}`
+  // режим называется free_text; из-за 'free' ИИ получал JSON вместо ответа
+  if (a.mode === 'free_text') return `ответ: ${String(a.correct ?? '')}`
   return `режим ${String(a.mode)}: ${JSON.stringify(a).slice(0, 300)}`
 }
 
