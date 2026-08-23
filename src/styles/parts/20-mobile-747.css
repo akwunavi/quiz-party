@@ -800,3 +800,39 @@ select, .cyber select, .cyber input[type="select"] {
 .lobby-grid .lobby-teams > .mono-tag { flex: 1 1 100%; text-align: center; }
 /* составы не должны сжиматься под чипами */
 .lobby-groups { flex: 0 1 auto; }
+
+/* ═══ 7.77: экран ответов собран заново ═══
+   Логика теперь одна и понятная:
+   ДО показа ответа — вопрос и его картинки, как на экране вопроса;
+   ПОСЛЕ — они убираются, на их месте блок с ответом.
+   Никаких дублей картинок и наездов на кнопки. */
+.answers-screen .answers-main { min-height: 0; justify-content: center; }
+.answers-screen .answers-main > .q-media-grid { flex: 1 1 0; min-height: 0;
+  max-height: 52vh; }
+
+.answer-block { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(8px, 1.4vh, 18px); width: 100%; min-height: 0; flex: 1 1 auto;
+  justify-content: center; }
+.answer-block .answer-main { font-size: clamp(32px, 4vw, 76px); line-height: 1.06; }
+.answer-block .q-media-grid { flex: 0 1 auto; min-height: 0; max-height: 42vh;
+  width: 100%; }
+.answer-block .q-img img { max-height: 42vh; }
+.answer-block .rebus-answer { display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 1.4vw, 24px); width: 100%; min-height: 0; }
+.answer-block .rebus-answer .q-img img { max-height: 34vh; }
+.answer-block .answer-note { margin-top: 0; }
+
+/* запас снизу под кнопки — они больше ни на что не налезают */
+.answers-screen .answers-layout { padding-bottom: clamp(72px, 10vh, 116px); }
+
+/* ═══ п.3: правила раунда крупнее и не под кнопками ═══ */
+.round-intro { padding-bottom: clamp(96px, 13vh, 150px) !important; }
+.rules-frame { max-height: 62vh; overflow: hidden; }
+.rules-frame .rule-item { font-size: clamp(18px, 2vw, 36px); line-height: 1.3; }
+.rules-frame .rule-item .idx { font-size: .7em; }
+
+/* подписи слогов ребуса — над своей картинкой, а не поверх соседней */
+.answer-block .rebus-answer .q-img { position: relative; display: flex;
+  flex-direction: column-reverse; align-items: center; gap: 8px; }
+.answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
+  font-size: clamp(20px, 2.2vw, 40px); }

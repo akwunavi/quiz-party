@@ -35,13 +35,28 @@ function firstMistakeAt(teamId: string, answers: Answer[]): number {
 
 export function rankTeams(
   teams: Team[], totals: Map<string, number>, answers: Answer[],
+  roundScores: Map<string, number[]> = new Map(),
 ): RankRow[] {
   const sorted = [...teams].sort((a, b) => {
     const d = (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0)
     if (d !== 0) return d
+
+    // ── Ничья по сумме ──
+    // Сравниваем раунды ПО ПОРЯДКУ: у кого раньше оказался лучший результат,
+    // тот выше. Пример Ивана: 6-8-6 против 7-5-8 при равной сумме 20 —
+    // выше вторая, потому что уже в первом раунде взяла больше.
+    const ra = roundScores.get(a.id) ?? []
+    const rb = roundScores.get(b.id) ?? []
+    const n = Math.max(ra.length, rb.length)
+    for (let i = 0; i < n; i++) {
+      const diff = (rb[i] ?? 0) - (ra[i] ?? 0)
+      if (diff !== 0) return diff
+    }
+
+    // раунды совпали до последнего — смотрим, кто раньше ошибся
     const ma = firstMistakeAt(a.id, answers)
     const mb = firstMistakeAt(b.id, answers)
-    if (ma !== mb) return ma - mb          // ошибся раньше — выше
+    if (ma !== mb) return ma - mb
     return a.name.localeCompare(b.name)     // иначе стабильный порядок
   })
 

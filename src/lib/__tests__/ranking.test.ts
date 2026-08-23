@@ -52,3 +52,33 @@ describe('rankTeams', () => {
     expect(r[1].total).toBe(0)
   })
 })
+
+describe('ничья: сравнение по раундам', () => {
+  const t = (id: string, name: string) =>
+    ({ id, name, color: '#fff', game_id: 'g', last_seen_at: null } as unknown as Team)
+
+  it('пример Ивана: 6-8-6 против 7-5-8 — выше вторая', () => {
+    const teams = [t('a', 'Первая'), t('b', 'Вторая')]
+    const totals = new Map([['a', 20], ['b', 20]])
+    const rounds = new Map([['a', [6, 8, 6]], ['b', [7, 5, 8]]])
+    const r = rankTeams(teams, totals, [], rounds)
+    expect(r[0].team.id).toBe('b')     // 7 > 6 уже в первом раунде
+    expect(r.map(x => x.place)).toEqual([1, 1])   // место общее
+  })
+
+  it('различие в последнем раунде тоже учитывается', () => {
+    const teams = [t('a', 'A'), t('b', 'B')]
+    const totals = new Map([['a', 15], ['b', 15]])
+    const rounds = new Map([['a', [5, 5, 5]], ['b', [5, 5, 5]]])
+    expect(rankTeams(teams, totals, [], rounds).length).toBe(2)
+  })
+
+  it('раунды одинаковые — порядок стабильный, не случайный', () => {
+    const teams = [t('b', 'Бета'), t('a', 'Альфа')]
+    const totals = new Map([['a', 10], ['b', 10]])
+    const rounds = new Map([['a', [5, 5]], ['b', [5, 5]]])
+    const first = rankTeams(teams, totals, [], rounds).map(x => x.team.id)
+    const second = rankTeams(teams, totals, [], rounds).map(x => x.team.id)
+    expect(first).toEqual(second)
+  })
+})

@@ -901,10 +901,6 @@ function ShowAnswers({ pack, round, q, gameState }: {
   // они были скрыты (media.hidden): на ответе прятать их уже незачем.
   const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const revealImgs = answerImgs.length ? answerImgs : questionImgs
-  // Одиночная картинка ответа уходит в ЛЕВУЮ колонку на всю высоту, под ней —
-  // сам ответ. Текст вопроса при этом прячем: на экране разбора он уже
-  // прозвучал, а место нужнее картинке.
-  const sideImg = revealImgs.length === 1 ? revealImgs[0] : null
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -914,28 +910,42 @@ function ShowAnswers({ pack, round, q, gameState }: {
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
       <div className={`answers-layout${revealed ? ' revealed' : ''}`} style={{ marginTop: 60 }}>
-        <div className={`answers-main${sideImg && revealed ? ' with-pic' : ''}`}
+        <div className={`answers-main${revealed ? ' revealed' : ''}`}
           style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Текст вопроса скрываем, когда показана картинка ответа: он уже
-              прозвучал, а место нужно картинке. Ответы команд при этом
-              остаются на своём обычном месте — в правой колонке. */}
-          {!(sideImg && revealed) &&
-            <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>}
-          {sideImg && revealed && (
-            <div className="answer-pic">
+
+          {/* ── ДО ПОКАЗА ОТВЕТА: экран вопроса как он был ── */}
+          {!revealed && <>
+            <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+            {questionImgs.length > 0 && !q.media.hidden && (
+              <div className={`q-media-grid n${Math.min(questionImgs.length, 4)}`}>
+                {questionImgs.map((m, i) => (
+                  <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
+                ))}
+              </div>
+            )}
+          </>}
+
+          {/* ── ПОСЛЕ ПОКАЗА: старые картинки убираем, показываем ответ ── */}
+          {revealed && (
+            <div className="answer-block">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              <img src={mediaUrl(sideImg)} alt="" />
-              <div className="answer-pic-main">{displayAnswer(q)}</div>
-              {q.answer_note &&
-                <div className={`answer-pic-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
-            </div>
-          )}
-          {/* если картинка ответа уехала вправо, весь разбор живёт там —
-              иначе ответ дублировался в двух местах экрана */}
-          {revealed && !sideImg && (
-            <div className="answer-reveal hud-frame">
-              <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              {q.answer.mode === 'match' ? (
+
+              {round.mechanic === 'rebus' ? (
+                // у ребуса свой разбор: две картинки с подсветкой слогов
+                <>
+                  <div className="answer-main">{displayAnswer(q)}</div>
+                  <div className="rebus-answer">
+                    {questionImgs.slice(0, 2).map((m, i) => (
+                      <figure key={i} className="q-img">
+                        <img src={mediaUrl(m)} alt="" />
+                        <figcaption>
+                          {rebusCaption(i === 0 ? q.service.word1 : q.service.word2, i === 0)}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                </>
+              ) : q.answer.mode === 'match' ? (
                 <MatchAnswer q={q} />
               ) : choices && imgChoices.length === choices.length ? (
                 <StagedChoices q={q} choices={choices} imgs={imgChoices} />
@@ -948,8 +958,6 @@ function ShowAnswers({ pack, round, q, gameState }: {
                       .choices.find(x => x.key === k)
                     return (
                       <div key={i} className="oi">
-                        {/* буква варианта, как её вводила команда;
-                            номер позиции показываем мельче рядом */}
                         <b>{k}</b>
                         <span className="oi-pos">{i + 1}</span>
                         <span className="oi-text">{c?.text ?? ''}</span>
@@ -957,32 +965,22 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     )
                   })}
                 </div>
-              ) : (
+              ) : (<>
                 <div className="answer-main">{displayAnswer(q)}</div>
-              )}
-              {round.mechanic === 'rebus' && (
-                <div className="rebus-answer">
-                  {(q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-                    .map((m, i) => (
-                      <figure key={i} className="q-img">
-                        <img src={mediaUrl(m)} alt="" />
-                        <figcaption>{rebusCaption(i === 0 ? q.service.word1 : q.service.word2, i === 0)}</figcaption>
-                      </figure>
+                {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
+                {revealImgs.length > 0 && (
+                  <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}`}>
+                    {revealImgs.map((m, i) => (
+                      <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
                     ))}
-                </div>
-              )}
-              {/* пояснение вынесено ПОД рамку: внутри оно тонуло мелким текстом */}
-              {q.answer.mode === 'choice' && !(q.answer as { correct_choice?: string }).correct_choice &&
-                <div style={{ color: '#ff8fa3' }}>⚠ в редакторе не отмечен верный вариант</div>}
-              {!sideImg && revealImgs.length > 0 && (
-                <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}`}>
-                  {revealImgs.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
-                </div>
-              )}
+                  </div>
+                )}
+              </>)}
+
+              {q.answer_note &&
+                <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
             </div>
           )}
-          {revealed && !sideImg && q.answer_note &&
-            <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
         </div>
         {!paper && <div className="team-answers">
           <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
@@ -1153,7 +1151,10 @@ function JeopardyBoard({ pack, round, gameState }: {
                 // синхронизируем номер открытой плитки с игроками:
                 // они шлют ответ по question_index, модалка читает по нему же
                 const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
-                void gotoQuestion(flat)
+                // gotoQuestion обнуляет timer_started_at, а телефоны именно по
+                // нему понимают, что плитка открыта — без старта они вечно
+                // показывали «ждём, пока ведущий откроет плитку».
+                void gotoQuestion(flat).then(() => startTimer())
                 setActive({ t: ti, i })
               }}>{done ? '·' : tile.value}</button>
           )
@@ -1198,7 +1199,7 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
   const play = () => {
     audioRef.current?.pause()
     if (timerRef.current) clearInterval(timerRef.current)
-    if (document.hidden || !tile.audio) { setPlaying(false); return }
+    if (!tile.audio) { setPlaying(false); return }
     const audio = new Audio(mediaUrl(tile.audio))
     audioRef.current = audio
     setRemaining(clipSeconds); setPlaying(true)
@@ -1337,7 +1338,7 @@ function ScoreboardScreen({ pack, gameState }: {
   const totals = computeTotals(pack, teams, answers)
   const perRound = computeRoundScores(pack, teams, answers)
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
-  const rows = rankTeams(teams, totals, answers)
+  const rows = rankTeams(teams, totals, answers, perRound)
   const ranked = rows.map(r => r.team)
   // раскрытие интригой: с последнего места, по одной строке каждые 2.2 сек
   const [revealed, setRevealed] = useState(0)
@@ -1422,7 +1423,7 @@ function Finale({ pack, gameId, gameState }: {
   const answers = useAnswers(gameId)
   const totals = computeTotals(pack, teams, answers)
   const roundScores = computeRoundScores(pack, teams, answers)
-  const rows = rankTeams(teams, totals, answers)
+  const rows = rankTeams(teams, totals, answers, roundScores)
 
   // Шаг и сценарий живут в сессии: ведущий может вести финал с телефона,
   // стоя у сцены, — для награждения в баре это обязательно.
