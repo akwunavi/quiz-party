@@ -506,26 +506,26 @@ select, .cyber select, .cyber input[type="select"] {
   .adm-footer .adm-btn.primary { flex: 1 1 100%; }
 }
 
-/* ═══ 7.68: картинка ответа слева во всю высоту ═══ */
-.answers-layout.with-side { align-items: stretch; }
-.answers-layout.with-side .answer-side {
-  order: -1;                                  /* слева от текста */
-  flex: 0 0 clamp(320px, 34vw, 620px);
-  border-left: none; border-right: 2px solid var(--dim);
-  justify-content: flex-start; gap: clamp(8px, 1.2vh, 16px);
-}
-/* flex: 1 1 auto + height:100% раздували картинку и она выпирала за экран.
-   Нужен flex-basis 0 и min-height 0: тогда блок берёт ОСТАТОК высоты,
-   а картинка вписывается в него по meньшей стороне. */
-.answers-layout.with-side .answer-side img {
-  flex: 1 1 0; min-height: 0; height: auto; max-height: 100%;
-  width: auto; max-width: 100%; object-fit: contain; align-self: center;
-}
-.answer-side-main { font-size: clamp(28px, 3vw, 60px); }
-.answer-side-note { flex: 0 0 auto; }
-.answer-side-note.n-m { font-size: clamp(15px, 1.4vw, 23px); }
-.answer-side-note.n-l { font-size: clamp(14px, 1.25vw, 20px); }
-.answer-side-note.n-xl { font-size: clamp(13px, 1.1vw, 18px); }
+/* ═══ 7.72: картинка на экране ответа ═══
+   Прошлый вариант (боковая колонка) был ошибкой: картинка получалась мелкой,
+   а ответы команд пропадали. Теперь картинка занимает ОСНОВНУЮ колонку во всю
+   доступную высоту, под ней — ответ и пояснение, а ответы команд остаются
+   на своём обычном месте справа. Текст вопроса на разборе скрыт. */
+.answers-main.with-pic { justify-content: flex-start !important; min-height: 0; }
+.answer-pic { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(8px, 1.4vh, 18px); flex: 1 1 0; min-height: 0; width: 100%; }
+.answer-pic img { flex: 1 1 0; min-height: 0; height: auto; max-height: 100%;
+  width: auto; max-width: 100%; object-fit: contain;
+  border-radius: 14px; border: 2px solid var(--accent); }
+.answer-pic-main { flex: 0 0 auto; font-family: var(--font-display); font-weight: 700;
+  text-align: center; line-height: 1.05; color: var(--ok);
+  font-size: clamp(36px, 4.4vw, 88px);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--ok) 35%, transparent); }
+.answer-pic-note { flex: 0 0 auto; text-align: center; line-height: 1.35; opacity: .85;
+  max-width: 94%; font-size: clamp(20px, 2.1vw, 36px); }
+.answer-pic-note.n-m { font-size: clamp(18px, 1.8vw, 30px); }
+.answer-pic-note.n-l { font-size: clamp(16px, 1.55vw, 25px); }
+.answer-pic-note.n-xl { font-size: clamp(15px, 1.35vw, 21px); }
 
 /* ═══ 7.69: вопрос по центру в ЛЮБОМ раунде ═══
    Правило 7.46 центрировало текст только когда у вопроса нет картинок
@@ -647,3 +647,23 @@ select, .cyber select, .cyber input[type="select"] {
 
 /* п.3: подпись к ряду ставок */
 .pl-stakes-label { font-size: 12.5px; opacity: .7; margin: 8px 0 4px; line-height: 1.35; }
+
+/* п.2: текст вопроса на разборе — адаптивно от ширины СВОЕЙ колонки,
+   а не от экрана: колонка узкая из-за ответов команд справа */
+.answers-main { container-type: inline-size; }
+.answers-layout .q-text,
+.theme-potter .answers-layout .q-text { font-size: clamp(20px, 4.4cqw, 56px); line-height: 1.16; }
+.answers-layout .q-text.len-m,
+.theme-potter .answers-layout .q-text.len-m { font-size: clamp(19px, 3.8cqw, 46px); }
+.answers-layout .q-text.len-l,
+.theme-potter .answers-layout .q-text.len-l { font-size: clamp(17px, 3.2cqw, 38px); }
+.answers-layout .q-text.len-xl,
+.theme-potter .answers-layout .q-text.len-xl { font-size: clamp(16px, 2.7cqw, 31px); line-height: 1.25; }
+
+/* п.3: переключатель ставки ×2 */
+.pl-x2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 14px; margin: 8px 0; border: 1px solid var(--pl-line, #2a3550);
+  border-radius: 10px; cursor: pointer; }
+.pl-x2 input { width: 22px; height: 22px; flex: 0 0 auto; margin: 0; }
+.pl-x2 span { font-weight: 700; }
+.pl-x2 i { font-style: normal; font-size: 12px; opacity: .6; flex: 1 1 100%; }

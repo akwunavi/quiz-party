@@ -35,7 +35,14 @@ export function computeTotals(
         total += scoreRace(rows)
         return
       }
-      const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
+      // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь
+      // решает, удваивать ли раунд. Раньше он и сам приносил баллы, и потом
+      // всё удваивалось — отсюда 18 очков там, где максимум 10.
+      const scoringQuestions = round.mechanic === 'thematic_x2'
+        ? round.questions.filter(q => !q.is_final_question)
+        : round.questions
+
+      const rows: ScoredAnswer[] = scoringQuestions.map((q, qi) => {
         const a = answers.find(x => x.team_id === t.id && x.question_ref === `q-${q.id}`)
         return {
           questionIndex: qi,
@@ -48,8 +55,19 @@ export function computeTotals(
         case 'test_stop': total += scoreTestStop(rows); break
         case 'stakes_unique': total += scoreStakesUnique(rows); break
         case 'stakes_free': total += scoreStakesFree(rows); break
-        case 'thematic_x2':
-          total += scoreThematic(rows, ri === doubledRoundIdx ? !!doubledByTeam[t.id] : false); break
+        case 'thematic_x2': {
+          // удвоение решает ответ команды на финальный вопрос раунда:
+          // отдельного «ручного удвоения» в игре нет, флаг никто не передавал
+          const fin = round.questions.find(q => q.is_final_question)
+          const finAns = fin
+            ? answers.find(x => x.team_id === t.id && x.question_ref === `q-${fin.id}`)
+            : undefined
+          const doubled = fin
+            ? (finAns ? (finAns.is_correct ?? autocheck(fin.answer, finAns.answer_text)) === true : false)
+            : (ri === doubledRoundIdx ? !!doubledByTeam[t.id] : false)
+          total += scoreThematic(rows, doubled)
+          break
+        }
         case 'sprint':
           total += scoreSprint(rows,
             (s.pointsPerQuestion as number | undefined) ?? 2,
@@ -88,7 +106,14 @@ export function computeRoundScores(
         per.push(scoreRace(rows))
         return
       }
-      const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
+      // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь
+      // решает, удваивать ли раунд. Раньше он и сам приносил баллы, и потом
+      // всё удваивалось — отсюда 18 очков там, где максимум 10.
+      const scoringQuestions = round.mechanic === 'thematic_x2'
+        ? round.questions.filter(q => !q.is_final_question)
+        : round.questions
+
+      const rows: ScoredAnswer[] = scoringQuestions.map((q, qi) => {
         const a = answers.find(x => x.team_id === t.id && x.question_ref === `q-${q.id}`)
         return {
           questionIndex: qi,

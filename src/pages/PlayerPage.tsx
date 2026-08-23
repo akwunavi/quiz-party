@@ -389,7 +389,10 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   }
   const setStake = (i: number, v: number) => {
     setState(s => ({ ...s, stakes: { ...s.stakes, [i]: v } }))
-    if (state.answers[i]) push(i, state.answers[i], v)
+    // Ставка уходит на сервер СРАЗУ, даже если ответа ещё нет. Раньше
+    // отправка была только при уже введённом ответе: команда сначала
+    // ставила ставку, потом отвечала — и ставка терялась, раунд давал 0.
+    push(i, state.answers[i] ?? '', v)
   }
   const usedStakes = Object.entries(state.stakes)
     .filter(([k]) => Number(k) !== openIdx).map(([, v]) => v)
@@ -458,18 +461,27 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                   {q.question_text
                     ? <div className="pl-qtext">{q.question_text}</div>
                     : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
-                  {isStakes && (<>
+                  {isStakes && (uniqueStakes ? (<>
                     <div className="pl-stakes-label">
                       Ставка: сколько баллов ставишь на этот вопрос
                     </div>
                     <div className="pl-stakes">
                       {stakeValues.map(v => (
                         <button key={v} className={state.stakes[i] === v ? 'sel' : ''}
-                          disabled={uniqueStakes && usedStakes.includes(v)}
+                          disabled={usedStakes.includes(v)}
                           onClick={() => setStake(i, v)}>{v}</button>
                       ))}
                     </div>
-                  </>)}
+                  </>) : (
+                    // свободные ставки бинарны: либо ×2, либо ничего.
+                    // Ряд кнопок здесь только путал — оставили один переключатель.
+                    <label className="pl-x2">
+                      <input type="checkbox" checked={(state.stakes[i] ?? 0) > 0}
+                        onChange={e => setStake(i, e.target.checked ? 2 : 0)} />
+                      <span>Ставка ×2</span>
+                      <i>верно — плюс 3, неверно — минус 2</i>
+                    </label>
+                  ))}
                   <Picker spec={q.answer} value={state.answers[i] ?? ''} locked={isLocked}
                     onChange={text => setAnswer(i, text)} />
                   <div className="pl-row-bottom">

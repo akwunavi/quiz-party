@@ -851,10 +851,14 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
   const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  // Нет своей картинки у ответа — берём картинку вопроса: на разборе она
+  // нужнее текста вопроса, который уже прозвучал.
+  const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  const revealImgs = answerImgs.length ? answerImgs : questionImgs
   // Одиночная картинка ответа уходит в ЛЕВУЮ колонку на всю высоту, под ней —
   // сам ответ. Текст вопроса при этом прячем: на экране разбора он уже
   // прозвучал, а место нужнее картинке.
-  const sideImg = answerImgs.length === 1 ? answerImgs[0] : null
+  const sideImg = revealImgs.length === 1 ? revealImgs[0] : null
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -863,20 +867,23 @@ function ShowAnswers({ pack, round, q, gameState }: {
         <span className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОТВЕТЫ</span>
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
-      <div className={`answers-layout${sideImg ? ' with-side' : ''}`} style={{ marginTop: 60 }}>
-        {/* картинка ответа — слева, во всю высоту, ответ сразу под ней */}
-        {sideImg && revealed && (
-          <div className="answer-side hud-frame">
-            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <img src={mediaUrl(sideImg)} alt="" />
-            <div className="answer-side-main">{displayAnswer(q)}</div>
-            {q.answer_note &&
-              <div className={`answer-side-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
-          </div>
-        )}
-        <div className="answers-main" style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
+      <div className="answers-layout" style={{ marginTop: 60 }}>
+        <div className={`answers-main${sideImg && revealed ? ' with-pic' : ''}`}
+          style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Текст вопроса скрываем, когда показана картинка ответа: он уже
+              прозвучал, а место нужно картинке. Ответы команд при этом
+              остаются на своём обычном месте — в правой колонке. */}
           {!(sideImg && revealed) &&
             <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>}
+          {sideImg && revealed && (
+            <div className="answer-pic">
+              <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+              <img src={mediaUrl(sideImg)} alt="" />
+              <div className="answer-pic-main">{displayAnswer(q)}</div>
+              {q.answer_note &&
+                <div className={`answer-pic-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
+            </div>
+          )}
           {/* если картинка ответа уехала вправо, весь разбор живёт там —
               иначе ответ дублировался в двух местах экрана */}
           {revealed && !sideImg && (
@@ -1382,7 +1389,7 @@ function Finale({ pack, gameId, gameState }: {
   })
 
   // ── СЦЕНАРИЙ «ШОУ»: нарезка раундов по 15 сек → победитель (10 сек) → таблица
-  const SLIDE = 15_000, WINNER = 10_000
+  const SLIDE = 3_000, WINNER = 10_000
   const winnerStep = roundWinners.length
   useEffect(() => {
     if (bar || step > winnerStep) return
@@ -1493,7 +1500,7 @@ function Finale({ pack, gameId, gameState }: {
           <div className="fin-slide-score">{Math.max(0, w.score)}</div>
         </div>
         {/* полоска времени: видно, сколько осталось до следующего слайда */}
-        <div className="fin-progress" key={step}><i style={{ animationDuration: '15s' }} /></div>
+        <div className="fin-progress" key={step}><i style={{ animationDuration: '3s' }} /></div>
         <div className="fin-dots">
           {roundWinners.map((_, i) => <span key={i} className={i === step ? 'on' : ''} />)}
         </div>

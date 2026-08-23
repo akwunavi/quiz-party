@@ -141,3 +141,20 @@ export async function renameTeam(teamId: string, name: string) {
   const { error } = await supabase.from('teams').update({ name }).eq('id', teamId)
   if (error) throw error
 }
+
+/** Новая игра С ПОЛНОЙ ОЧИСТКОЙ.
+ *  Обычный resetGame просто выдаёт новый game_id — старые ответы и команды
+ *  остаются в базе навсегда и копятся от игры к игре. Здесь они удаляются.
+ *  Действие необратимо: истории прошлых игр не останется. */
+export async function resetGameHard() {
+  const room = getRoomId()
+  const { data: s } = await supabase.from('game_sessions')
+    .select('game_id').eq('id', room).maybeSingle()
+  const gameId = s?.game_id
+  if (gameId) {
+    // ответы удаляем ПЕРВЫМИ: на них ссылается ai_feedback и оценки
+    await supabase.from('answers').delete().eq('game_id', gameId)
+    await supabase.from('teams').delete().eq('game_id', gameId)
+  }
+  await resetGame()
+}

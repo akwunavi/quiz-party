@@ -9,7 +9,7 @@ import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/
 import {
   gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
-  setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer,
+  setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { supabase } from '../lib/supabase'
@@ -621,8 +621,14 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
       </div>
 
       <button className="adm-link danger" onClick={() => {
-        if (confirm('Начать новую игру?')) void resetGame()
+        if (confirm('Начать новую игру?\n\nКоманды и ответы этой игры сохранятся в базе.')) void resetGame()
       }}>⟲ НОВАЯ ИГРА</button>
+      <button className="adm-link danger" onClick={() => {
+        if (!confirm('ПОЛНАЯ ОЧИСТКА.\n\nБудут УДАЛЕНЫ все команды и все ответы этой игры. '
+          + 'Восстановить нельзя. Продолжить?')) return
+        if (!confirm('Точно удалить? Второе подтверждение.')) return
+        void resetGameHard()
+      }}>🗑 НОВАЯ ИГРА С ОЧИСТКОЙ</button>
     </div>
   )
 }
