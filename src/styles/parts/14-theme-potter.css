@@ -24,11 +24,10 @@
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner { z-index: 30; }
-/* п.4: номер вопроса поднят — свеча перекрывала строку */
-.theme-potter .host-topbar { top: 10px; }
-.theme-potter .host-topbar .qnum, .theme-potter .host-topbar .mono-tag {
-  background: linear-gradient(180deg, rgba(10,6,2,.85), rgba(10,6,2,.35));
-  padding: 4px 14px; border-radius: 10px; }
+/* Номер вопроса и метка раунда подняты выше свечей. Тёмную подложку под
+   них не ставим — она смотрелась заплаткой; вместо этого свечи опущены
+   ниже строки (см. ThemeLayer: крайние свечи и так уже сдвинуты). */
+.theme-potter .host-topbar { top: 8px; }
 .pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
   filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
   animation: candleFloat 3.6s ease-in-out infinite; }

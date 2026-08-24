@@ -1147,16 +1147,14 @@ function JeopardyBoard({ pack, round, gameState }: {
   // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
   // перезагрузки страницы они снова становились доступны, и вопрос можно
   // было сыграть дважды.
-  const doneList = ((gameState as unknown as { completed_rounds?: unknown[] })
-    .completed_rounds ?? []) as unknown[]
-  const opened: string[] = doneList
-    .filter((x): x is string => typeof x === 'string' && x.startsWith('jp:'))
-    .map(x => x.slice(3))
+  // Отдельное поле сессии. Раньше плитки лежали в completed_rounds — там же,
+  // где номера сыгранных раундов. Оно перезаписывается целиком при переходе
+  // между раундами, поэтому отметки стирались и плитки снова открывались.
+  const opened = ((gameState as unknown as { jeopardy_opened?: unknown[] })
+    .jeopardy_opened ?? []).filter((x): x is string => typeof x === 'string')
   const setOpened = (next: string[]) => {
-    const others = doneList.filter(x => !(typeof x === 'string' && x.startsWith('jp:')))
     void supabase.from('game_sessions')
-      .update({ completed_rounds: [...others, ...next.map(k => `jp:${k}`)] } as never)
-      .eq('id', getRoomId())
+      .update({ jeopardy_opened: next } as never).eq('id', getRoomId())
   }
 
   if (themes.length === 0) return (

@@ -31,8 +31,11 @@ function PotterScene() {
           крайние свечи опускаем ниже — иначе пламя загораживало цифры. */}
       {Array.from({ length: 9 }, (_, i) => {
         const left = 6 + i * 11
-        const nearCorner = left < 26 || left > 74
-        const top = nearCorner ? 17 + (i % 2) * 3 : 4 + (i % 3) * 3.4
+        // Верхняя полоса экрана занята шапкой (номер раунда слева, номер
+        // вопроса справа) — свечи туда не ставим вовсе, иначе пламя
+        // перекрывает цифры. Середина висит ниже шапки, края — ещё ниже.
+        const nearCorner = left < 30 || left > 70
+        const top = nearCorner ? 19 + (i % 2) * 3 : 13 + (i % 3) * 3.4
         return (
         <span key={`c${i}`} className="pt-candle" style={{
           left: `${left}%`, top: `${top}%`,

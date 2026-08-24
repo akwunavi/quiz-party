@@ -8,6 +8,8 @@ export async function selectPackAndStart(packId: string) {
     game_id, pack_id: packId, phase: 'lobby',
     round_number: 0, question_index: 0,
     timer_started_at: null, reveal: false, completed_rounds: [],
+    // разбивка команд показывается ОДИН раз: на следующей игре она не нужна
+    random_groups: [], jeopardy_opened: [],
   }).eq('id', getRoomId())
   if (error) throw error
   await supabase.from('packs').update({ status: 'active' }).eq('id', packId)
@@ -120,7 +122,9 @@ export async function resetGame() {
   const { error } = await supabase.from('game_sessions').update({
     game_id: crypto.randomUUID(), pack_id: null, phase: 'lobby',
     round_number: 0, question_index: 0,
-    timer_started_at: null, reveal: false, completed_rounds: [], melody: {},
+    timer_started_at: null, reveal: false, completed_rounds: [],
+    // разбивка команд показывается ОДИН раз: на следующей игре она не нужна
+    random_groups: [], jeopardy_opened: [], melody: {},
   }).eq('id', getRoomId())
   if (error) throw error
 }
