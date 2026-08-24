@@ -21,7 +21,8 @@ import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
-import { playAudio, probeMedia, createAudio, stopAllAudio } from '../lib/audioSource'
+import { probeMedia, createAudio, stopAllAudio, playSynced,
+  type SyncedHandle } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
 import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -1244,8 +1245,8 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
   onClose: () => void
 }) {
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const timerRef = useRef<number | null>(null)
+  // одна ручка на текущий трек: она глушит и звук, и отсчёт
+  const handleRef = useRef<SyncedHandle | null>(null)
   const [remaining, setRemaining] = useState(clipSeconds)
   const [playing, setPlaying] = useState(false)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -1254,31 +1255,23 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
   const [audioErr, setAudioErr] = useState<string | null>(null)
 
   const play = () => {
-    audioRef.current?.pause()
-    if (timerRef.current) clearInterval(timerRef.current)
+    handleRef.current?.stop()
     if (!tile.audio) { setPlaying(false); setAudioErr('у плитки не задан трек'); return }
     setAudioErr(null)
-    const audio = createAudio()
-    audioRef.current = audio
-    setRemaining(clipSeconds); setPlaying(true)
-    // playAudio сам попробует запасной путь (скачать и играть из памяти),
-    // если браузер заблокировал прямой запрос медиа-элемента
-    void playAudio(audio, mediaUrl(tile.audio)).then(r => {
-      if (!r.ok) { setPlaying(false); setAudioErr(r.reason) }
+    setRemaining(clipSeconds)
+    // Отсчёт запускается ПО ФАКТУ начала звука, а не по нажатию: файл может
+    // грузиться несколько секунд, и раньше таймер уходил вперёд.
+    // «Переслушать» глушит прошлый трек — наложения быть не может.
+    handleRef.current = playSynced(mediaUrl(tile.audio), clipSeconds, {
+      onStart: () => setPlaying(true),
+      onTick: left => setRemaining(left),
+      onEnd: () => setPlaying(false),
+      onError: reason => { setPlaying(false); setAudioErr(reason) },
     })
-    timerRef.current = window.setInterval(() => {
-      setRemaining(prev => {
-        if (prev <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current)
-          audio.pause(); setPlaying(false); return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
   }
   useEffect(() => {
     play()
-    return () => { audioRef.current?.pause(); if (timerRef.current) clearInterval(timerRef.current) }
+    return () => { handleRef.current?.stop() }
   }, [refKey])
 
   const rows = answers
@@ -1323,12 +1316,12 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
                 {/* до нажатия «Показать ответ» видно только ФАКТ ответа:
                     иначе зал читает чужие ответы и интрига пропадает */}
                 <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>
+                {/* оценку можно переставить: раньше кнопки блокировались
+                    навсегда, и промах мышью стоил команде баллов */}
                 {showAnswer && <>
                   <button className={`jp-grade ok${a.is_correct === true ? ' chosen' : ''}`}
-                    disabled={a.is_correct != null}
                     onClick={() => void grade(a.id, true)}>✓</button>
                   <button className={`jp-grade no${a.is_correct === false ? ' chosen' : ''}`}
-                    disabled={a.is_correct != null}
                     onClick={() => void grade(a.id, false)}>✗</button>
                 </>}
               </div>
@@ -1345,6 +1338,12 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
               что с файлом?
             </button>
           </div>}
+          {/* неоценённый ответ даёт 0 баллов — предупреждаем ДО закрытия плитки */}
+          {rows.some(a => a.is_correct == null) && (
+            <div className="jp-ungraded">
+              ⚠ не оценено: {rows.filter(a => a.is_correct == null).length}
+            </div>
+          )}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
       </div>
@@ -1442,7 +1441,13 @@ function ScoreboardScreen({ pack, gameState }: {
               {/* при равных очках место общее: 1, 2, 2, 4 */}
               <td>{medals[place - 1] ?? place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>{t.name}</td>
-              {(perRound.get(t.id) ?? scored.map(() => 0)).map((v, i) => <td key={i}>{v}</td>)}
+              {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
+                  сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
+                  все баллы на колонку влево */}
+              {scored.map(r => {
+                const all = perRound.get(t.id) ?? []
+                return <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>
+              })}
               <td className="total">{totals.get(t.id) ?? 0}</td>
             </tr>
           )})}

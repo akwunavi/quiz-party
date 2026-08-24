@@ -103,3 +103,59 @@ export async function probeMedia(url: string) {
   }
   return out.join('\n')
 }
+
+// ═══ ЗАПУСК ТРЕКА СИНХРОННО С ОТСЧЁТОМ ═══
+// Две беды, которые это решает:
+//   1) Отсчёт запускали сразу, а звук начинался через 3–5 секунд (загрузка
+//      файла) — таймер и музыка расходились.
+//   2) «Переслушать» создавал новый плеер, а старый мог ожить: его play()
+//      был ещё «в полёте» и срабатывал уже после паузы — два трека разом.
+//
+// Решение: отсчёт стартует по событию `playing`, а каждый запуск получает
+// номер поколения. Всё, что осталось от прошлых поколений, глушится и
+// игнорируется.
+
+let generation = 0
+
+export type SyncedHandle = { stop: () => void }
+
+export function playSynced(url: string, seconds: number, cb: {
+  onStart?: () => void
+  onTick?: (left: number) => void
+  onEnd?: () => void
+  onError?: (reason: string) => void
+}): SyncedHandle {
+  const my = ++generation
+  stopAllAudio()                      // прошлые треки замолкают ДО старта нового
+
+  const el = createAudio()
+  let timer: ReturnType<typeof setInterval> | undefined
+  const stale = () => my !== generation
+
+  const stop = () => {
+    if (timer) clearInterval(timer)
+    try { el.pause() } catch { /* уже мёртв */ }
+  }
+
+  // отсчёт начинается ровно тогда, когда звук ПОШЁЛ
+  el.addEventListener('playing', () => {
+    if (stale()) { stop(); return }
+    cb.onStart?.()
+    let left = seconds
+    cb.onTick?.(left)
+    // setInterval без window: код должен работать и вне браузера (тесты)
+    timer = setInterval(() => {
+      if (stale()) { stop(); return }
+      left -= 1
+      cb.onTick?.(Math.max(0, left))
+      if (left <= 0) { stop(); cb.onEnd?.() }
+    }, 1000)
+  }, { once: true })
+
+  void playAudio(el, url).then(r => {
+    if (stale()) { stop(); return }      // пока грузились, нажали «переслушать»
+    if (!r.ok) { stop(); cb.onError?.(r.reason) }
+  })
+
+  return { stop: () => { if (my === generation) generation++; stop() } }
+}

@@ -480,6 +480,10 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                     : <div className="pl-qtext" style={{ opacity: .6 }}>Смотрите вопрос на экране</div>}
                   {/* картинки у игрока НЕ показываем: они на проекторе,
                       а на телефоне только съедали экран под формой ответа */}
+                  <Picker spec={q.answer} value={state.answers[i] ?? ''} locked={isLocked}
+                    onChange={text => setAnswer(i, text)} />
+                  {/* Ставка идёт ПОСЛЕ поля ответа: сначала решаешь, ЧТО
+                      ответить, и только потом — сколько на это поставить. */}
                   {isStakes && (uniqueStakes ? (<>
                     <div className="pl-stakes-label">
                       Ставка: сколько баллов ставишь на этот вопрос
@@ -501,8 +505,6 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                       <i>верно — плюс 3, неверно — минус 2</i>
                     </label>
                   ))}
-                  <Picker spec={q.answer} value={state.answers[i] ?? ''} locked={isLocked}
-                    onChange={text => setAnswer(i, text)} />
                   <div className="pl-row-bottom">
                     {state.answers[i] && <span className="pl-sent">Отправлено: {state.answers[i]}</span>}
                     {state.answers[i] && (
@@ -550,7 +552,6 @@ function Picker({ spec, value, locked, onChange }: {
         <div className="pl-slot">{seq.length ? seq.join(' → ') : 'Тапай по порядку'}</div>
         <div className="pl-choices">
           {left.map(k => <button key={k} disabled={locked} onClick={() => onChange(value + k)}>{k}</button>)}
-          {value && <button className="ghost" onClick={() => onChange('')}>сброс</button>}
         </div>
         {spec.choices.map(c => <div key={c.key} className="pl-legend"><b>{c.key}</b> {c.text}</div>)}
       </div>

@@ -63,3 +63,10 @@
 .answers-layout { padding-right: clamp(0px, 1vw, 16px); }
 /* на разборе оставляем место под кнопки, чтобы они ни на что не ложились */
 .host-screen .answers-layout { padding-bottom: clamp(64px, 9vh, 104px); }
+
+/* разбор баллов в финале: видно, где ответы остались неоценёнными */
+.adm-why { margin: 12px 0; border: 1px solid var(--ed-line); border-radius: 10px;
+  padding: 10px 12px; }
+.adm-why summary { cursor: pointer; font-size: 13px; letter-spacing: .06em; }
+.adm-why-row { display: flex; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--ed-line); }

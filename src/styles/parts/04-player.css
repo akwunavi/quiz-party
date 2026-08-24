@@ -97,3 +97,12 @@
 .pl-row-bottom { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .pl-erase { padding: 6px 12px; font-size: 12px; clip-path: none; border-radius: 6px;
   background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+
+/* подсказка и подписи колонок в сопоставлении: без них команды не понимали,
+   что тапать надо парами «номер → вариант» */
+.pl-match-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pl-match-cap { font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  opacity: .55; text-align: center; }
+.pl-howto { margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.05); font-size: 13px; line-height: 1.4; }
+.pl-howto b { display: block; margin-top: 4px; opacity: .8; }

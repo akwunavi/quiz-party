@@ -193,9 +193,14 @@
   grid-template-rows: minmax(0, 1fr) auto; gap: 8px; height: 100%; }
 .answer-block .rebus-answer .q-img img { align-self: end; }
 .answer-block .rebus-answer figcaption { align-self: start; }
-/* сопоставление на разборе: карточки в один ряд, высота от остатка */
+/* Сопоставление на разборе.
+   ОСТОРОЖНО: здесь была моя ошибка — `grid-template-rows: minmax(0,1fr)`
+   задавал РОВНО ОДНУ строку. При четырёх карточках (2 колонки × 2 строки)
+   вторая строка обрезалась `overflow: hidden`, и две картинки исчезали.
+   Число строк должен считать сам грид. */
 .answer-block .match-answer { display: grid; width: 100%;
-  gap: clamp(8px, 1vw, 18px); grid-template-rows: minmax(0, 1fr); }
+  gap: clamp(8px, 1vw, 18px);
+  grid-auto-rows: minmax(0, 1fr); align-content: center; }
 .answer-block .match-answer .mi { display: grid;
   grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 6px; }
 .answer-block .match-answer .mi-label b { font-size: clamp(15px, 1.5vw, 26px); }
@@ -257,6 +262,11 @@
 .jp-audio-err { flex: 1 1 100%; margin-top: 8px; padding: 8px 12px;
   border-left: 3px solid #ffb020; background: rgba(255,176,32,.1);
   color: #ffb020; font-size: clamp(13px, 1.2vw, 18px); line-height: 1.35; }
+
+/* напоминание ведущему: неоценённый ответ = 0 баллов за плитку */
+.jp-ungraded { flex: 1 1 100%; margin-top: 8px; padding: 6px 12px;
+  border-left: 3px solid var(--dim); color: var(--dim);
+  font-family: var(--font-mono, monospace); font-size: clamp(12px, 1.1vw, 16px); }
 
 /* Правила не должны исчезать, если анимация не отработала.
    Базовый стиль ставит opacity: 0 и полагается на анимацию — при

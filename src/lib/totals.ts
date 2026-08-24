@@ -1,5 +1,5 @@
 // ═══ Подсчёт итогов по пакету (общий для админки и финала) ═══
-import type { Answer, Team } from '../types/quiz'
+import type { Answer, Team, JeopardyTheme } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
 import { finalQuestionOf, scoringQuestionsOf } from './thematic'
 import { autocheck } from './autocheck'
@@ -7,6 +7,38 @@ import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
   scoreThematic, scoreSprint, scoreMelody, scoreRace, type ScoredAnswer,
 } from './scoring'
+
+// ── «Своя игра» (jeopardy) ───────────────────────────────────────────────
+// ПРАВИЛО ОДНО: балл = ЦЕНА ПЛИТКИ. Ни скорость ответа, ни ставки, ни
+// секунды заявки на него не влияют — порядок ответов в модалке нужен только
+// ведущему, чтобы понимать, кто успел раньше, и в баллы он не попадает.
+//
+// Ответы лежат по ключу `q-t<сквозной номер плитки>`: нумерация идёт по темам
+// слева направо, внутри темы — сверху вниз (тот же расчёт, что в проекторе и
+// на телефоне игрока). Раунд отбирается по round_number.
+//
+// Засчитывается только явная оценка ведущего is_correct === true. Не
+// проверенный ответ (null) даёт 0 — ровно как во всех остальных раундах,
+// автопроверку тут никто не включал.
+function scoreJeopardyRound(
+  round: LoadedPack['rounds'][number], ri: number, teamId: string, answers: Answer[],
+): number {
+  const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
+  // сквозной номер → цена плитки
+  const values: number[] = []
+  for (const t of themes) for (const tile of t.tiles ?? []) values.push(Number(tile.value) || 0)
+
+  let total = 0
+  for (const a of answers) {
+    if (a.team_id !== teamId) continue
+    if (a.round_number !== ri) continue
+    if (a.is_correct !== true) continue
+    const m = /^q-t(\d+)$/.exec(a.question_ref)
+    if (!m) continue
+    total += values[Number(m[1])] ?? 0
+  }
+  return total
+}
 
 export function computeTotals(
   pack: LoadedPack, teams: Team[], answers: Answer[],
@@ -25,8 +57,21 @@ export function computeTotals(
         const rows: ScoredAnswer[] = answers
           .filter(x => x.team_id === t.id && x.round_number === ri
             && x.question_ref.startsWith('q-mel-') && !x.question_ref.endsWith('-bid'))
-          .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
+          .map((a, qi) => {
+            // секунды заявки лежат в парной записи «…-bid»: они спасают балл,
+            // если ответ отметили верным, а ставку не проставили
+            const bidRow = answers.find(x => x.team_id === t.id
+              && x.question_ref === `${a.question_ref}-bid`)
+            const bidSeconds = bidRow ? Number(bidRow.answer_text) || null : null
+            return { questionIndex: qi, isCorrect: a.is_correct,
+                     stake: a.stake ?? null, bidSeconds }
+          })
         total += scoreMelody(rows)
+        return
+      }
+      // своя игра: балл = цена плитки, см. scoreJeopardyRound
+      if (round.mechanic === 'jeopardy') {
+        total += scoreJeopardyRound(round, ri, t.id, answers)
         return
       }
       if (round.mechanic === 'race') {
@@ -96,8 +141,21 @@ export function computeRoundScores(
         const rows: ScoredAnswer[] = answers
           .filter(x => x.team_id === t.id && x.round_number === ri
             && x.question_ref.startsWith('q-mel-') && !x.question_ref.endsWith('-bid'))
-          .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
+          .map((a, qi) => {
+            // секунды заявки лежат в парной записи «…-bid»: они спасают балл,
+            // если ответ отметили верным, а ставку не проставили
+            const bidRow = answers.find(x => x.team_id === t.id
+              && x.question_ref === `${a.question_ref}-bid`)
+            const bidSeconds = bidRow ? Number(bidRow.answer_text) || null : null
+            return { questionIndex: qi, isCorrect: a.is_correct,
+                     stake: a.stake ?? null, bidSeconds }
+          })
         per.push(scoreMelody(rows))
+        return
+      }
+      // своя игра: балл = цена плитки, см. scoreJeopardyRound
+      if (round.mechanic === 'jeopardy') {
+        per.push(scoreJeopardyRound(round, ri, t.id, answers))
         return
       }
       if (round.mechanic === 'race') {
@@ -128,6 +186,20 @@ export function computeRoundScores(
         case 'test_stop': v = scoreTestStop(rows); break
         case 'stakes_unique': v = scoreStakesUnique(rows); break
         case 'stakes_free': v = scoreStakesFree(rows); break
+        case 'thematic_x2': {
+          // раньше колонка раунда показывала базу БЕЗ удвоения, а в Σ удвоение
+          // уже входило — строка не сходилась сама с собой. Логика та же, что
+          // в computeTotals: удваивает ответ на финальный вопрос раунда.
+          const fin = finalQuestionOf(round.questions)
+          const finAns = fin
+            ? answers.find(x => x.team_id === t.id && x.question_ref === `q-${fin.id}`)
+            : undefined
+          const doubled = fin && finAns
+            ? (finAns.is_correct ?? autocheck(fin.answer, finAns.answer_text)) === true
+            : false
+          v = scoreThematic(rows, doubled)
+          break
+        }
         case 'sprint': v = scoreSprint(rows,
           (s.pointsPerQuestion as number | undefined) ?? 2,
           (s.allCorrectBonus as number | undefined) ?? 5); break

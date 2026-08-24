@@ -632,6 +632,28 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
       {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
           перед игрой. Здесь был её дубль с тем же действием: две кнопки
           с одинаковым смыслом только путали. */}
+      {/* Почему у команды столько баллов — видно здесь, а не «на глаз».
+          Главная причина нулей: ответ есть, но ведущий не нажал верно/неверно. */}
+      <details className="adm-why">
+        <summary>Почему такие баллы?</summary>
+        {teams.map(t => {
+          const mine = answers.filter(a => a.team_id === t.id)
+          const graded = mine.filter(a => a.is_correct !== null).length
+          const pending = mine.filter(a => a.is_correct === null
+            && !a.question_ref.endsWith('-bid')).length
+          return (
+            <div key={t.id} className="adm-why-row">
+              <span style={{ color: t.color }}>{t.name}</span>
+              <span className="adm-dim">
+                ответов {mine.length} · оценено {graded}
+                {pending > 0 && ` · НЕ ОЦЕНЕНО ${pending}`}
+              </span>
+            </div>
+          )
+        })}
+        <div className="adm-dim">Неоценённые ответы баллов не приносят.</div>
+      </details>
+
       <button className="adm-link danger" onClick={() => {
         if (confirm('Начать новую игру?\n\nКоманды и ответы сохранятся в базе. '
           + 'Полная очистка — кнопкой в лобби.')) void resetGame()
