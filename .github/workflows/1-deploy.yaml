@@ -1,0 +1,71 @@
+# ═══ Деплой по кнопке: собирает на серверах GitHub и кладёт в docs/ ═══
+# Полный аналог локального deploy.sh, только без Codespaces и без ноутбука.
+# Запуск: вкладка Actions → «deploy» → кнопка «Run workflow».
+#
+# Проверки те же, что в CI: типы + тесты + сборка. Красный шаг = деплоя нет,
+# docs/ остаётся нетронутым и прод продолжает работать на старой версии.
+name: deploy
+
+on:
+  workflow_dispatch:        # только вручную: пуш в src ничего не публикует
+
+# два одновременных деплоя переписали бы docs/ друг другу
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write           # нужно, чтобы закоммитить docs/ обратно в main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+
+      - run: npm ci
+
+      # ── Те же ворота, что в CI: не пускаем сломанное на прод ──
+      - name: Типы
+        run: npx tsc --noEmit
+      - name: Тесты
+        run: npx vitest run
+
+      # ── Сборка. Ключи Supabase вшиваются в бандл на этом шаге ──
+      - name: Сборка
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::error::Нет секретов VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY."
+            echo "::error::Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
+          fi
+          npx vite build
+
+      # ── Страховка из deploy.sh: собрано именно то дерево ──
+      - name: Проверка версии в сборке
+        run: |
+          VER=$(grep -o "VERSION = '[0-9.]*'" src/version.ts | grep -o "[0-9.]*")
+          grep -rqo "$VER" dist/assets/*.js \
+            || { echo "::error::В сборке нет версии $VER — собран не тот код"; exit 1; }
+          echo "📦 Версия v$VER" >> $GITHUB_STEP_SUMMARY
+
+      - name: Публикация в docs/
+        run: |
+          rm -rf docs && cp -r dist docs && touch docs/.nojekyll
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A docs
+          # если бандл не изменился, коммитить нечего — это не ошибка
+          if git diff --cached --quiet; then
+            echo "🔸 docs/ не изменился, деплой не нужен" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "deploy $(date +%Y-%m-%d_%H:%M) [actions]"
+          git push
+          echo "✅ https://akwunavi.github.io/quiz-party/" >> $GITHUB_STEP_SUMMARY

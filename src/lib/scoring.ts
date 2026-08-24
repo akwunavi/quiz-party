@@ -6,6 +6,9 @@ export interface ScoredAnswer {
   questionIndex: number
   isCorrect: boolean | null     // null = не проверен/пусто
   stake?: number | null
+  /** секунды заявки в «Угадай мелодию»: по ним считается балл,
+   *  если ставка (stake) осталась пустой */
+  bidSeconds?: number | null
 }
 
 /** standard: 1 балл (или pointsPerQuestion) за верный */
@@ -73,8 +76,25 @@ export function scoreSprint(answers: ScoredAnswer[], perQuestion = 2, allBonus =
 }
 
 /** melody: баллы записаны в stake при выставлении оценки ведущим (2 / 1 / 0.5). */
+/** Балл за трек по величине ставки — те же правила, что в самом раунде:
+ *  ставка 2–5 секунд даёт 2 балла, 6–10 секунд — 1 балл. */
+export function melodyPointsFor(bidSeconds: number | null): number {
+  if (bidSeconds == null || bidSeconds <= 0) return 1
+  return bidSeconds <= 5 ? 2 : 1
+}
+
+/** melody: балл записан в stake при оценке ведущим.
+ *
+ *  ВАЖНО. Ответ можно отметить верным и НЕ из модалки трека (например,
+ *  кнопкой в общем разборе ответов) — тогда is_correct = true, а stake
+ *  остаётся пустым, и трек молча давал НОЛЬ. Поэтому при пустой ставке
+ *  считаем балл по секундам заявки — по тем же правилам раунда. */
 export function scoreMelody(answers: ScoredAnswer[]): number {
-  return answers.reduce((s, a) => s + (a.isCorrect ? (a.stake ?? 0) : 0), 0)
+  return answers.reduce((sum, a) => {
+    if (!a.isCorrect) return sum
+    if (a.stake != null) return sum + a.stake
+    return sum + melodyPointsFor(a.bidSeconds ?? null)
+  }, 0)
 }
 
 /** race: баллы записаны в stake при финише (5/4/3/2/1 по месту собаки). */

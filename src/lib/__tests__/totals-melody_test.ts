@@ -40,3 +40,24 @@ describe('подсчёт в музыкальном раунде', () => {
     expect(computeTotals(pack, [team], [mel('0-2', true, 0.5)]).get('t1')).toBe(0.5)
   })
 })
+
+describe('балл спасается ставкой, если stake не проставлен', () => {
+  it('ВЕРНО без stake и с заявкой 4 сек — 2 балла, а не ноль', () => {
+    // случай Ивана: в базе is_correct = true, но stake пустой
+    const answers = [bid('0-0', 4), mel('0-0', true, null)]
+    expect(computeTotals(pack, [team], answers).get('t1')).toBe(2)
+  })
+
+  it('ВЕРНО без stake и с заявкой 8 сек — 1 балл', () => {
+    expect(computeTotals(pack, [team], [bid('0-1', 8), mel('0-1', true, null)]).get('t1')).toBe(1)
+  })
+
+  it('ВЕРНО без stake и без заявки — 1 балл (минимум за верный ответ)', () => {
+    expect(computeTotals(pack, [team], [mel('0-2', true, null)]).get('t1')).toBe(1)
+  })
+
+  it('проставленный stake ВСЕГДА важнее расчёта по заявке', () => {
+    // перехват дал 0.5 — эту оценку ведущего трогать нельзя
+    expect(computeTotals(pack, [team], [bid('0-3', 3), mel('0-3', true, 0.5)]).get('t1')).toBe(0.5)
+  })
+})
