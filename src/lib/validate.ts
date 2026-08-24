@@ -26,7 +26,10 @@ export function validatePack(pack: LoadedPack): Problem[] {
   pack.rounds.forEach((rawRound, ri) => {
     // скрытые вопросы в игре не участвуют — валидатор их полностью игнорирует
     const round = { ...rawRound, questions: rawRound.questions.filter(q => !q.hidden) }
-    const noQuestions = round.mechanic === 'jeopardy' || round.mechanic === 'melody'
+    // В этих механиках контент задаётся НЕ вопросами, а темами/треками/сеткой,
+  // поэтому «нет вопросов» для них не ошибка.
+  const noQuestions = round.mechanic === 'jeopardy' || round.mechanic === 'melody'
+    || round.mechanic === 'crossword' || round.mechanic === 'race'
     if (!noQuestions && round.questions.length === 0)
       problems.push({ roundIdx: ri, text: 'Нет вопросов' })
     if (round.mechanic === 'melody') validateMelody(round, ri, problems)
@@ -62,20 +65,18 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
   if (!text.trim() && !hasMedia) push('Пустой вопрос (нет ни текста, ни медиа)')
 
   // ── опечатки и типовые огрехи ──
-  if (text !== text.trim()) push('Лишние пробелы в начале/конце текста вопроса')
-  if (/ {2,}/.test(text)) push('Двойные пробелы в тексте вопроса')
+  // Лишние и двойные пробелы НЕ проверяем: на игру они не влияют,
+  // автопроверка ответов их всё равно срезает, а в списке проблем они
+  // тонули среди настоящих ошибок.
   if (/\s+[,.!?]/.test(text)) push('Пробел перед знаком препинания')
   if (/\b([а-яa-z]{3,})\s+\1\b/i.test(text)) push('Похоже, слово повторяется дважды')
 
   const answerText = a.mode === 'free_text' ? a.correct
     : a.mode === 'crossword_word' ? a.word : ''
   if (answerText) {
-    if (answerText !== answerText.trim()) push('Лишние пробелы в правильном ответе')
     if (answerText.length > 60) push('Правильный ответ подозрительно длинный (>60 символов)')
-    if (/ {2,}/.test(answerText)) push('Двойные пробелы в правильном ответе')
   }
-  if (q.answer_note && q.answer_note !== q.answer_note.trim())
-    push('Лишние пробелы в пояснении к ответу')
+    // пробелы в пояснении тоже не мешают
 
   switch (a.mode) {
     case 'free_text':

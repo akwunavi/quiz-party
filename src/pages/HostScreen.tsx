@@ -1150,11 +1150,27 @@ function JeopardyBoard({ pack, round, gameState }: {
   // Отдельное поле сессии. Раньше плитки лежали в completed_rounds — там же,
   // где номера сыгранных раундов. Оно перезаписывается целиком при переходе
   // между раундами, поэтому отметки стирались и плитки снова открывались.
-  const opened = ((gameState as unknown as { jeopardy_opened?: unknown[] })
+  const fromServer = ((gameState as unknown as { jeopardy_opened?: unknown[] })
     .jeopardy_opened ?? []).filter((x): x is string => typeof x === 'string')
-  const setOpened = (next: string[]) => {
-    void supabase.from('game_sessions')
+  // Локальная копия — страховка: если запись в базу не прошла (например,
+  // миграция не применена), плитки всё равно гаснут до конца игры, а не
+  // делают вид, что ничего не произошло.
+  const [openedLocal, setOpenedLocal] = useState<string[]>([])
+  const [saveErr, setSaveErr] = useState<string | null>(null)
+  const opened = [...new Set([...fromServer, ...openedLocal])]
+
+  const setOpened = async (next: string[]) => {
+    setOpenedLocal(next)
+    const { error } = await supabase.from('game_sessions')
       .update({ jeopardy_opened: next } as never).eq('id', getRoomId())
+    if (error) {
+      setSaveErr('Плитки не сохраняются: ' + error.message
+        + '. Выполни миграцию 0006_jeopardy_opened.sql.')
+    } else setSaveErr(null)
+    // Плитка закрыта — у команд должна пропасть форма ответа. Она видна,
+    // пока идёт таймер, поэтому его надо снять, иначе форма висит вечно.
+    await supabase.from('game_sessions')
+      .update({ timer_started_at: null, reveal: false }).eq('id', getRoomId())
   }
 
   if (themes.length === 0) return (
@@ -1175,7 +1191,8 @@ function JeopardyBoard({ pack, round, gameState }: {
         gridTemplateColumns: `repeat(${themes.length}, minmax(0, 1fr))`,
         gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
       }}>
-        {themes.map((t, ti) => (
+        {saveErr && <div className="jp-save-err">⚠ {saveErr}</div>}
+      {themes.map((t, ti) => (
           <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
             {t.name || `Тема ${ti + 1}`}
             {t.hint && <span className="jp-theme-hint">{t.hint}</span>}
@@ -1209,7 +1226,7 @@ function JeopardyBoard({ pack, round, gameState }: {
         <TileModal packTheme={pack.theme} round={round} gameState={gameState}
           theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
           refKey={`t${themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}`}
-          onClose={() => { setOpened([...opened, `${active.t}-${active.i}`]); setActive(null) }} />
+          onClose={() => { void setOpened([...opened, `${active.t}-${active.i}`]); setActive(null) }} />
       )}
     </div>
   )

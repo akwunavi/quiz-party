@@ -108,3 +108,10 @@
   font-size: clamp(18px, 1.9vw, 32px); font-weight: 700; color: var(--fg);
   overflow-wrap: anywhere; }
 .jp-answer .pos { font-family: var(--font-digits); opacity: .5; flex: 0 0 auto; }
+
+/* сообщение, если отметки о плитках не сохраняются (нет миграции) */
+.jp-save-err { grid-column: 1 / -1; margin-bottom: 10px; padding: 8px 14px;
+  border-left: 3px solid #ffb020; background: rgba(255,176,32,.1);
+  color: #ffb020; font-size: clamp(13px, 1.2vw, 18px); }
+/* отыгранная плитка гаснет заметнее: 0.22 на проекторе читалось как «активна» */
+.jp-tile.done { opacity: .18; filter: grayscale(1); pointer-events: none; }
