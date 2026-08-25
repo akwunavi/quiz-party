@@ -152,7 +152,7 @@ export async function mockQuizBackend(page: Page, options?: {
   await page.route('**/rest/v1/packs*', route => json(route, isSingle(route) ? { ...pack, theme } : [{ ...pack, theme }]))
   await page.route('**/rest/v1/pack_rounds*', route => json(route, isSingle(route) ? round : [round]))
   await page.route('**/rest/v1/pack_questions*', route => json(route, isSingle(route) ? question : [question]))
-  await page.route('**/rest/v1/teams*', route => json(route, [team]))
+  await page.route('**/rest/v1/teams*', route => json(route, isSingle(route) ? team : [team]))
   await page.route('**/rest/v1/answers*', route => json(route, []))
 
   await page.route('**/storage/v1/object/public/quiz-media/qa/landscape.svg', route =>
