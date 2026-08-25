@@ -294,3 +294,128 @@
 .answers-screen .answers-main > .q-media-grid .q-img { overflow: hidden; min-height: 0; }
 .answers-screen .answers-main > .q-media-grid .q-img img {
   max-height: 100%; max-width: 100%; width: auto; height: auto; object-fit: contain; }
+
+
+/* ═══════ 7.92–7.95: картинка на разборе, ответ, появление ═══════ */
+
+/* ═══ 1. КАРТИНКА НА РАЗБОРЕ ДО ПОКАЗА ОТВЕТА НАЛЕЗАЛА НА ТЕКСТ ═══
+   Контейнер сетки честно ужимался (185px), а вот сам <img> держал
+   max-height: 52vh (468px) и вылезал ВВЕРХ из своей ячейки — прямо на
+   текст вопроса. Правило «вписаться в контейнер» существовало только
+   под .answer-block и под .answers-screen (класс, которого в разметке
+   нет вообще). Здесь оно распространяется на весь экран разбора. */
+.answers-layout .q-media-grid { min-height: 0; }
+.answers-layout .q-media-grid .q-img { min-height: 0; overflow: hidden; }
+.answers-layout .q-media-grid .q-img img,
+.answers-layout .q-media-grid img {
+  max-height: 100%; height: auto; width: auto; max-width: 100%;
+  object-fit: contain; }
+/* до показа ответа картинка забирает остаток колонки, но не больше него */
+.answers-layout:not(.revealed) .answers-main > .q-media-grid {
+  flex: 1 1 0; min-height: 0; }
+.answers-layout:not(.revealed) .answers-main > .q-text { flex: 0 0 auto; }
+
+/* на разборе те же ступени, но от своей колонки */
+.answers-layout .choices-grid.c-l .choice-plate { font-size: clamp(16px, 1.6vw, 26px); }
+.answers-layout .choices-grid.c-xl .choice-plate { font-size: clamp(14px, 1.35vw, 22px); }
+
+/* экран разбора до показа ответа */
+.answers-layout:not(.revealed) .answers-main > .q-media-grid {
+  max-height: calc(100% * min(1, var(--ms, 1))); }
+
+/* ═══ 3. ОТВЕТ С КАРТИНКОЙ: КАРТИНКА СЛЕВА И КРУПНЕЕ, ОТВЕТ СПРАВА ═══
+   Было: подпись, ответ, под ними мелкая картинка, под ней подсказка —
+   колонкой, картинка терялась. Стало: две колонки, картинка во всю высоту
+   блока слева, справа по центру подпись + ответ + подсказка (её текст и
+   стиль не трогаем, меняется только место).
+   Применяется ТОЛЬКО к одиночной картинке: с двумя и более прежняя
+   раскладка колонкой честнее. */
+.answer-block:has(> .answer-media.n1) {
+  display: grid; justify-content: stretch;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: center; align-items: center;
+  column-gap: clamp(18px, 2.4vw, 46px); row-gap: clamp(4px, .8vh, 12px); }
+.answer-block:has(> .answer-media.n1) > .answer-media {
+  grid-column: 1; grid-row: 1 / -1; height: 100%; min-height: 0;
+  align-self: stretch; }
+.answer-block:has(> .answer-media.n1) > .answer-media .q-img {
+  height: 100%; min-height: 0; }
+.answer-block:has(> .answer-media.n1) > .answer-media .q-img img {
+  max-height: 100%; max-width: 100%; width: auto; height: auto;
+  object-fit: contain; border-radius: 14px;
+  border: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 10px 44px rgba(0,0,0,.55); }
+.answer-block:has(> .answer-media.n1) > .answer-label {
+  grid-column: 2; grid-row: 1; align-self: end; }
+.answer-block:has(> .answer-media.n1) > .answer-main {
+  grid-column: 2; grid-row: 2; }
+.answer-block:has(> .answer-media.n1) > .answer-note {
+  grid-column: 2; grid-row: 3; align-self: start; max-width: 100%; }
+/* колонка ответа узкая — кегль считаем от неё, а не от экрана */
+.answer-block:has(> .answer-media.n1) > .answer-main {
+  font-size: clamp(28px, 3.2vw, 62px); }
+/* Подсказки нет — центрируем подпись и ответ по картинке.
+   Строка под подсказку остаётся пустой и тянет пару «подпись + ответ»
+   вверх, из-за чего они висели выше середины фото. Селектор :has()
+   отличает случай «подсказка есть» от «подсказки нет». */
+.answer-block:has(> .answer-media.n1):not(:has(> .answer-note)) {
+  grid-template-rows: auto auto; }
+.answer-block:has(> .answer-media.n1):not(:has(> .answer-note)) > .answer-label {
+  align-self: end; }
+.answer-block:has(> .answer-media.n1):not(:has(> .answer-note)) > .answer-main {
+  align-self: start; }
+
+@media (max-width: 900px) {
+  .answer-block:has(> .answer-media.n1) { grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto; }
+  .answer-block:has(> .answer-media.n1) > .answer-media { grid-column: 1; grid-row: 1; }
+  .answer-block:has(> .answer-media.n1) > .answer-label { grid-column: 1; grid-row: 2; }
+  .answer-block:has(> .answer-media.n1) > .answer-main { grid-column: 1; grid-row: 3; }
+  .answer-block:has(> .answer-media.n1) > .answer-note { grid-column: 1; grid-row: 4; }
+}
+
+/* ═══ 6. ПОЯВЛЕНИЕ ВЕРНОГО ОТВЕТА ═══
+   Блок и раньше выезжал (ansIn), но САМ ответ возникал резко — просто
+   оказывался на месте. В ГП красивое проявление чернилами было только в
+   рамке .answer-reveal (модалка «Своей игры»), а на экране разбора — нет.
+   Время и все состояния прежние: анимация запускается тем же классом
+   .reveal-in, ничего не задерживает и ничего не блокирует. */
+.answer-block.reveal-in .answer-main,
+.answer-reveal .answer-main { animation: ansDecode .9s cubic-bezier(.2,.75,.25,1) .18s both; }
+@keyframes ansDecode {
+  0%   { opacity: 0; letter-spacing: .42em; filter: blur(12px); transform: scale(1.04); }
+  45%  { opacity: 1; letter-spacing: .16em; filter: blur(3px); }
+  100% { opacity: 1; letter-spacing: normal; filter: blur(0); transform: none; }
+}
+/* киберпанк: поверх проявления — вспышка подсветки, как у включённой вывески */
+.theme-classic .answer-block.reveal-in .answer-main,
+.cyber .answer-block.reveal-in .answer-main,
+.theme-classic .answer-reveal .answer-main, .cyber .answer-reveal .answer-main {
+  animation: ansDecode .9s cubic-bezier(.2,.75,.25,1) .18s both,
+             ansNeon 1.5s ease-out .18s both; }
+@keyframes ansNeon {
+  0%   { text-shadow: none; }
+  18%  { text-shadow: 0 0 34px var(--ok), 0 0 70px color-mix(in srgb, var(--ok) 55%, transparent); }
+  32%  { text-shadow: 0 0 6px color-mix(in srgb, var(--ok) 30%, transparent); }
+  44%  { text-shadow: 0 0 34px var(--ok), 0 0 70px color-mix(in srgb, var(--ok) 45%, transparent); }
+  100% { text-shadow: 0 0 26px color-mix(in srgb, var(--ok) 45%, transparent); }
+}
+/* ГП: то же проявление чернилами, что было в модалке — теперь и на разборе */
+.theme-potter .answer-block.reveal-in .answer-main {
+  animation: inkReveal 1.1s cubic-bezier(.2,.7,.3,1) .15s both; }
+/* подпись «ПРАВИЛЬНЫЙ ОТВЕТ» проступает чуть раньше самого ответа */
+.answer-block.reveal-in .answer-label { animation: ansLabel .5s ease both; }
+@keyframes ansLabel { from { opacity: 0; letter-spacing: .6em; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .timer-wrap::after, .cyber .timer-wrap::after,
+  .theme-classic .timer-num, .cyber .timer-num,
+  .theme-classic .timer-wrap.low, .cyber .timer-wrap.low,
+  .cyber-frame > .cf-scan,
+  .answer-block.reveal-in .answer-main, .answer-reveal .answer-main,
+  .answer-block.reveal-in .answer-label { animation: none !important; }
+  .answer-block.reveal-in .answer-main, .answer-reveal .answer-main,
+  .answer-block.reveal-in .answer-label { opacity: 1 !important; filter: none !important;
+    letter-spacing: normal !important; }
+}

@@ -85,3 +85,101 @@
    на номер вопроса (раунд со ставками) */
 .theme-classic .host-screen, .cyber .host-screen { padding-top: 168px; }
 .theme-classic .host-screen.round-intro { padding-top: 92px; }
+
+
+/* ═══════ 7.92–7.95: медиа, варианты, масштаб картинок ═══════ */
+
+/* ТА ЖЕ БОЛЕЗНЬ НА ЭКРАНЕ ВОПРОСА.
+   Контейнер сетки ужимался до 42vh (когда снизу варианты), а <img> держал
+   свои 52vh из правила `.q-media-grid.n1 .q-img img` и вылезал вверх — прямо
+   на текст вопроса. Высота контейнера тут определённая (flex: 1 1 0 +
+   max-height), поэтому max-height: 100% у картинки корректно разрешается.
+   Правило намеренно узкое: только сетки, лежащие ПРЯМО в экране с медиа. */
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers { min-height: 0; }
+.host-screen.has-media > .q-media-grid .q-img,
+.host-screen.has-media > .img-answers .img-answer { min-height: 0; }
+.host-screen.has-media > .q-media-grid .q-img img,
+.host-screen.has-media > .img-answers img {
+  max-height: 100%; height: auto; width: auto; max-width: 100%;
+  object-fit: contain; }
+/* ...но «вписаться» не значит «схлопнуться». Когда сверху длинный вопрос,
+   а снизу варианты, остаток высоты уходил в ноль и две картинки
+   превращались в марки 70px. Поэтому у сетки есть ПОЛ по высоте, а
+   уступает место текст вопроса — он читается и мельче. */
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers { min-height: min(26vh, 260px); }
+.host-screen.has-media.has-choices > .q-media-grid,
+.host-screen.has-media.has-choices > .img-answers { min-height: min(22vh, 220px); }
+/* текст вопроса рядом с картинками И вариантами — на ступень мельче */
+.host-screen.has-media.has-choices .q-text { font-size: clamp(19px, 2.3vw, 40px); }
+.host-screen.has-media.has-choices .q-text.len-m { font-size: clamp(18px, 2vw, 34px); }
+.host-screen.has-media.has-choices .q-text.len-l { font-size: clamp(17px, 1.75vw, 29px); }
+.host-screen.has-media.has-choices .q-text.len-xl { font-size: clamp(15px, 1.5vw, 24px); }
+
+/* ═══ 2. ДЛИННЫЕ ВАРИАНТЫ ОТВЕТА НАЕЗЖАЛИ НА КНОПКИ ═══
+   Кегль плитки был фиксированным независимо от длины текста, поэтому
+   четыре развёрнутых варианта не помещались по высоте и уезжали под
+   кнопки «Назад / Показать ответ».
+   Класс ставится в JSX по длине САМОГО ДЛИННОГО варианта. */
+.choices-grid.c-m .choice-plate { font-size: clamp(20px, 2.2vw, 38px);
+  padding: clamp(12px, 1.5vh, 22px) clamp(16px, 1.6vw, 30px); }
+.choices-grid.c-l .choice-plate { font-size: clamp(17px, 1.75vw, 30px);
+  padding: clamp(10px, 1.2vh, 18px) clamp(14px, 1.4vw, 26px); line-height: 1.22; }
+.choices-grid.c-xl .choice-plate { font-size: clamp(15px, 1.45vw, 25px);
+  padding: clamp(8px, 1vh, 15px) clamp(12px, 1.2vw, 22px); line-height: 1.25; }
+/* Жёсткий предел: варианты не имеют права занять больше половины экрана.
+   Даже если ведущий напишет в вариант целый абзац, кнопки останутся видны. */
+.host-screen > .choices-grid { max-height: 46vh; overflow: hidden; }
+.host-screen > .choices-grid .choice-plate { min-width: 0; overflow: hidden; }
+.host-screen > .choices-grid .choice-plate > *:not(.key) { min-width: 0; }
+/* запас под кнопки в правом нижнем углу */
+.host-screen.has-choices { padding-bottom: clamp(84px, 11vh, 132px); }
+
+/* ═══ РАЗМЕР КАРТИНКИ НА ЭКРАНЕ (media.scale из редактора) ═══
+   Переменная --ms приходит из вопроса (0.5…1.3). Меняем ПОТОЛОК КОНТЕЙНЕРА,
+   а не саму картинку: картинка и так вписана в контейнер (max-height: 100%),
+   поэтому она честно следует за ним и не может из него вылезти.
+   Внешние границы min()/max() — те же, что проверены на наложения:
+   ниже пола картинка нечитаема, выше потолка начинает жать текст. */
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers {
+  max-height: min(70vh, calc(60vh * var(--ms, 1)));
+  /* Пол тоже двигается: рост упирался именно в него, а не в потолок —
+     сетка делит остаток высоты по flex и без поднятого пола не росла.
+     Внешний min() держит абсолютную границу, чтобы не съесть текст. */
+  min-height: min(58vh, calc(26vh * var(--ms, 1))); }
+.host-screen.has-media.has-choices > .q-media-grid,
+.host-screen.has-media.has-choices > .img-answers {
+  max-height: min(52vh, calc(42vh * var(--ms, 1)));
+  min-height: min(42vh, calc(22vh * var(--ms, 1))); }
+/* сплит «текст + одна картинка»: там высоту задаёт сама картинка */
+.q-split .q-img img { max-height: min(74vh, calc(68vh * var(--ms, 1))); }
+
+/* ═══ РЯД КАРТИНОК, ВЫРАВНЕННЫЙ ПО ВЫСОТЕ (.eq-row) ═══
+   Раньше сетка раскладывала картинки по РАВНЫМ ПО ШИРИНЕ колонкам, и при
+   разных пропорциях высоты получались разными: горизонтальная выходила
+   низкой, квадратная — высокой, ряд смотрелся рваным.
+   Здесь наоборот: высота у всех общая (ряд флексбокса растянут), а ширину
+   каждой ячейке задаёт её собственная пропорция через flex-grow из JSX.
+   Ничего не обрезается — только перераспределяется ширина.
+   Правило перекрывает `display: grid` из ранних частей, поэтому идёт
+   последним и повторяет селектор с тем же весом. */
+.q-media-grid.eq-row, .q-media-grid.eq-row.n2,
+.q-media-grid.eq-row.n3, .q-media-grid.eq-row.n4 {
+  display: flex; flex-direction: row; align-items: stretch;
+  justify-content: center; flex-wrap: nowrap;
+  gap: clamp(10px, 1.2vw, 22px); }
+.q-media-grid.eq-row .q-img {
+  min-width: 0; min-height: 0; display: flex; align-items: center;
+  justify-content: center; overflow: hidden; }
+/* картинка заполняет ячейку целиком: ширина ячейки уже подобрана под
+   её пропорцию, поэтому contain даёт ровно общую высоту ряда */
+.q-media-grid.eq-row .q-img img {
+  width: 100%; height: 100%; max-width: 100%; max-height: 100%;
+  object-fit: contain; }
+/* на узком экране ряд из четырёх нечитаем — разрешаем перенос */
+@media (max-width: 900px) {
+  .q-media-grid.eq-row { flex-wrap: wrap; }
+  .q-media-grid.eq-row .q-img { flex-basis: 40% !important; }
+}

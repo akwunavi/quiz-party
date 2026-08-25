@@ -105,6 +105,10 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
               {' '}не показывать видео/обложку на экране — только звук
             </label>
           )}
+          {(media.question ?? []).some(m => !/\.(mp4|webm|mp3|wav)$/i.test(m)) && (
+            <MediaScale value={media.scale}
+              onChange={scale => save({ media: { ...media, scale } })} />
+          )}
           {!noVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"
             onChange={paths => save({ media: { ...media, voice: paths[0] ?? null } })} />}
@@ -429,4 +433,35 @@ function questionErrors(q: Question): string[] {
     case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
   }
   return errs
+}
+
+/** Размер картинки НА ЭКРАНЕ. Осознанно НЕ трогает файл: пережатие
+ *  необратимо и портит качество, а тут задача — как крупно картинка
+ *  выводится проектором. Значение живёт в media.scale (проценты) и в любой
+ *  момент возвращается к 100. Диапазон ограничен 50…130: за этими краями
+ *  картинка либо нечитаема, либо начинает наезжать на текст и кнопки. */
+function MediaScale({ value, onChange }: {
+  value: number | undefined; onChange: (v: number | undefined) => void
+}) {
+  const on = value != null && value !== 100
+  return (
+    <div className="ed-field">
+      <label className="ed-check" style={{ display: 'block', margin: '4px 0' }}>
+        <input type="checkbox" checked={on}
+          onChange={e => onChange(e.target.checked ? 80 : undefined)} />
+        {' '}задать размер картинки на экране
+      </label>
+      {on && (
+        <div className="ed-scale">
+          <input type="range" min={50} max={100} step={5} value={value ?? 100}
+            onChange={e => onChange(Number(e.target.value))} />
+          <b>{value}%</b>
+          <button type="button" className="ghost" onClick={() => onChange(undefined)}>сброс</button>
+        </div>
+      )}
+      <div className="ed-hint">
+        Меняется только вывод на проекторе. Файл остаётся как есть — качество не теряется.
+      </div>
+    </div>
+  )
 }

@@ -128,3 +128,11 @@
 .theme-new_year .jp-tile::after { content: '🎁'; display: block; font-size: .5em; opacity: .8; }
 .theme-new_year .jp-tile.done { background: rgba(255,255,255,.06); }
 .theme-new_year .jp-theme-name { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,.4); }
+
+
+/* ═══ 7.94: ползунок «размер картинки на экране» ═══ */
+/* ползунок размера в редакторе */
+.ed-scale { display: flex; align-items: center; gap: 10px; margin: 4px 0 2px; }
+.ed-scale input[type="range"] { flex: 1 1 auto; min-width: 0; }
+.ed-scale b { font-variant-numeric: tabular-nums; min-width: 46px; text-align: right; }
+.ed-scale button { padding: 4px 10px; font-size: 12px; }

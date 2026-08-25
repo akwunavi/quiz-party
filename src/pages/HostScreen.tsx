@@ -318,7 +318,7 @@ function HostInner({ gameState, pack }: {
             {isCyber && <span className="cf-scan" aria-hidden="true" />}
             <div className="q-split">
             <WindText key={q.id} text={q.question_text} />
-            <div className="q-media-grid n1">
+            <div className="q-media-grid n1" style={mediaScaleVar(q)}>
               {imgs.map((m, i) => (
                 <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
                   {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
@@ -350,10 +350,10 @@ function HostInner({ gameState, pack }: {
                       </div>
                     ))}
                   </div>
-                : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}`}>
-                    {imgs.map((m, i) => (
-                      <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
-                    ))}
+                : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
+                      round.mechanic === 'rebus' ? ' rebus' : ''}${imgs.length > 1 ? ' eq-row' : ''}`}
+                    style={mediaScaleVar(q)}>
+                    {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
             )}
           </>
@@ -659,8 +659,13 @@ function Timer({ startedAt, seconds, theme, chime = true }: {
   }
   // ГП: круговой таймер-змея, ползущая к своему хвосту
   if (theme === 'potter') return <SnakeTimer left={left} seconds={seconds} low={low} />
+  // Киберпанк: искра бежит по кольцу. Замирает, когда таймер не идёт —
+  // либо ещё не запущен, либо уже дотикал до нуля. Это единственный
+  // элемент, по которому с дальнего конца зала видно, идёт время или нет.
+  const running = !!startedAt && left > 0
   return (
-    <div className={`timer-wrap${low ? ' low' : ''}`}>
+    <div className={`timer-wrap${low ? ' low' : ''}${running ? '' : ' paused'}`}>
+      <span className="tm-orbit" aria-hidden="true"><i className="tm-spark" /></span>
       <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
   )
@@ -691,6 +696,44 @@ function shuffleStable<T>(arr: T[], seedStr: string): T[] {
   return a
 }
 
+
+/** Масштаб картинок на экране из настройки вопроса (media.scale, проценты).
+ *  Отдаём CSS-переменной, а не жёстким размером: дальше её подхватывают
+ *  правила высоты, у которых есть свои потолки — так картинка не сможет
+ *  наехать на текст или кнопки даже на максимуме. */
+function mediaScaleVar(q: Question): CSSProperties | undefined {
+  const s = q.media.scale
+  if (s == null || s === 100) return undefined
+  return { '--ms': Math.min(100, Math.max(50, s)) / 100 } as CSSProperties
+}
+
+/** Картинка в ряду, выравненном ПО ВЫСОТЕ.
+ *
+ *  Проблема: когда картинок несколько и пропорции у них разные (одна
+ *  горизонтальная, другая почти квадратная), каждая вписывается в свою
+ *  ячейку по-своему и ряд получается рваным по высоте. Раньше это
+ *  приходилось лечить вручную во внешнем редакторе, подгоняя файлы.
+ *
+ *  Решение — приём «выключной ряд»: ширина ячейки задаётся ПРОПОРЦИЕЙ
+ *  картинки (flex-grow = ширина/высота). Тогда при одинаковой высоте ряда
+ *  каждая занимает ровно свою ширину, высоты совпадают сами собой, и
+ *  ничего не обрезается. Пропорцию узнаём у самого файла при загрузке,
+ *  поэтому в редакторе ничего указывать не нужно.
+ *
+ *  До загрузки берём 1.5 — типичная горизонтальная картинка; после onLoad
+ *  значение уточняется, скачка не видно. */
+function FitImg({ src, children }: { src: string; children?: React.ReactNode }) {
+  const [ar, setAr] = useState(1.5)
+  return (
+    <figure className="q-img" style={{ flexGrow: ar, flexBasis: 0 } as CSSProperties}>
+      <img src={src} alt="" onLoad={e => {
+        const el = e.currentTarget
+        if (el.naturalWidth && el.naturalHeight) setAr(el.naturalWidth / el.naturalHeight)
+      }} />
+      {children}
+    </figure>
+  )
+}
 
 function displayAnswer(q: Question): string {
   const empty = '⚠ ответ не заполнен в редакторе'
@@ -981,10 +1024,10 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {!revealed && <>
             <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
             {questionImgs.length > 0 && !q.media.hidden && (
-              <div className={`q-media-grid n${Math.min(questionImgs.length, 4)}`}>
-                {questionImgs.map((m, i) => (
-                  <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
-                ))}
+              <div className={`q-media-grid n${Math.min(questionImgs.length, 4)}${
+                  questionImgs.length > 1 ? ' eq-row' : ''}`}
+                style={mediaScaleVar(q)}>
+                {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
               </div>
             )}
           </>}
@@ -1033,10 +1076,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 <div className="answer-main">{displayAnswer(q)}</div>
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
-                  <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}`}>
-                    {revealImgs.map((m, i) => (
-                      <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" /></figure>
-                    ))}
+                  <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${
+                      revealImgs.length > 1 ? ' eq-row' : ''}`}>
+                    {revealImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
                 )}
               </>)}

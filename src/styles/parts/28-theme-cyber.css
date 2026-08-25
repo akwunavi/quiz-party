@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ТЕМА «КИБЕРПАНК»: ТАЙМЕР И РАМКА ВОПРОСА
+   Идёт ПОСЛЕ 26-admin.css намеренно: там лежит базовое кольцо таймера
+   (.theme-classic .timer-wrap), и эти правила его дополняют.
+   Правки оформления киберпанка складываем СЮДА.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══ 4. ТАЙМЕР КИБЕРПАНКА ═══
+   Дуга-развёртка, которая тут была, читалась только вплотную к экрану.
+   Заменена на ИСКРУ: яркая точка с хвостом бежит по кольцу и замирает,
+   когда таймер стоит (не запущен или дотикал). Видно с дальнего ряда,
+   и сразу понятно, идёт время или нет. */
+.theme-classic .timer-wrap, .cyber .timer-wrap { overflow: visible; }
+.theme-classic .tm-orbit, .cyber .tm-orbit {
+  position: absolute; inset: -6px; border-radius: 50%; pointer-events: none;
+  animation: tmOrbit 2.6s linear infinite; }
+/* хвост искры — короткая дуга, догоняющая точку */
+.theme-classic .tm-orbit::before, .cyber .tm-orbit::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 268deg,
+    color-mix(in srgb, var(--accent2) 78%, transparent) 0deg,
+    color-mix(in srgb, var(--accent2) 30%, transparent) 34deg,
+    transparent 70deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px)); }
+/* сама искра */
+.theme-classic .tm-spark, .cyber .tm-spark {
+  position: absolute; top: -8px; left: 50%; width: 16px; height: 16px;
+  margin-left: -8px; border-radius: 50%; background: #fff;
+  box-shadow: 0 0 10px 3px var(--accent2),
+              0 0 26px 8px color-mix(in srgb, var(--accent2) 70%, transparent),
+              0 0 46px 16px color-mix(in srgb, var(--accent) 45%, transparent); }
+@keyframes tmOrbit { to { transform: rotate(360deg); } }
+/* таймер стоит — искра замирает там, где её застали */
+.theme-classic .timer-wrap.paused .tm-orbit,
+.cyber .timer-wrap.paused .tm-orbit { animation-play-state: paused; }
+.theme-classic .timer-wrap.paused .tm-spark,
+.cyber .timer-wrap.paused .tm-spark { background: var(--dim);
+  box-shadow: 0 0 8px 2px color-mix(in srgb, var(--dim) 60%, transparent); }
+/* цифра дышит в такт секундам */
+.theme-classic .timer-num, .cyber .timer-num {
+  position: relative; z-index: 1;
+  animation: tmBeat 1s ease-in-out infinite;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 65%, transparent); }
+.theme-classic .timer-wrap.paused .timer-num,
+.cyber .timer-wrap.paused .timer-num { animation: none; }
+@keyframes tmBeat { 0%, 100% { transform: scale(1); opacity: .95; }
+  12% { transform: scale(1.07); opacity: 1; } 26% { transform: scale(1); } }
+/* последние 10 секунд: искра разгоняется и краснеет, кольцо тревожно мигает */
+.theme-classic .timer-wrap.low .tm-orbit, .cyber .timer-wrap.low .tm-orbit {
+  animation-duration: .9s; }
+.theme-classic .timer-wrap.low .tm-orbit::before, .cyber .timer-wrap.low .tm-orbit::before {
+  background: conic-gradient(from 268deg, var(--danger) 0deg,
+    color-mix(in srgb, var(--danger) 35%, transparent) 40deg, transparent 80deg, transparent 360deg); }
+.theme-classic .timer-wrap.low .tm-spark, .cyber .timer-wrap.low .tm-spark {
+  box-shadow: 0 0 10px 3px var(--danger),
+              0 0 30px 10px color-mix(in srgb, var(--danger) 70%, transparent); }
+.theme-classic .timer-wrap.low, .cyber .timer-wrap.low { animation: tmAlarm 1s steps(1) infinite; }
+@keyframes tmAlarm { 0%, 100% { box-shadow: 0 0 34px color-mix(in srgb, var(--danger) 45%, transparent), inset 0 0 24px rgba(0,0,0,.5); }
+  50% { box-shadow: 0 0 12px color-mix(in srgb, var(--danger) 20%, transparent), inset 0 0 24px rgba(0,0,0,.5); } }
+
+/* ═══ 5. КИБЕРПАНК: РАМКА ВОКРУГ ВОПРОСА ═══
+   В НГ вопрос обёрнут в .q-frame с сосульками, в ГП — своё оформление,
+   у классики обёртка была пустым div без единого стиля.
+   Рамка НЕ добавляет отступов снаружи и ограничена шириной колонки,
+   поэтому раскладку вопроса не меняет — только оформляет. */
+.theme-classic .cyber-frame, .cyber .cyber-frame {
+  position: relative; width: 100%; min-width: 0;
+  padding: clamp(14px, 2.2vh, 30px) clamp(18px, 2.4vw, 46px);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-right: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%); }
+/* угловые засечки сверху и снизу */
+.theme-classic .cyber-frame::before, .cyber .cyber-frame::before,
+.theme-classic .cyber-frame::after, .cyber .cyber-frame::after {
+  content: ''; position: absolute; left: -2px; right: -2px; height: 14px;
+  pointer-events: none;
+  border-left: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+.theme-classic .cyber-frame::before, .cyber .cyber-frame::before {
+  top: -2px; border-top: 2px solid var(--accent); }
+.theme-classic .cyber-frame::after, .cyber .cyber-frame::after {
+  bottom: -2px; border-bottom: 2px solid var(--accent); }
+/* тонкая бегущая линия по верхней кромке — «идёт передача» */
+.theme-classic .cyber-frame > .cf-scan, .cyber .cyber-frame > .cf-scan {
+  position: absolute; left: 0; top: -1px; height: 2px; width: 34%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  animation: cfScan 5.5s ease-in-out infinite; }
+@keyframes cfScan { 0%, 100% { transform: translateX(-20%); opacity: .2; }
+  50% { transform: translateX(220%); opacity: 1; } }
+
+/* Кольцо таймера висит фиксированно и заходит до y=180. Рамка вопроса —
+   первый элемент потока, поэтому ей нужен запас чуть больше, иначе её
+   правый верхний угол оказывается ПОД таймером.
+   Правило нарочно сужено через :has(> .cyber-frame): общий padding-top в
+   168px делят с этим экраном табло, мелодия, скачки и «Своя игра» — им
+   лишние 20px не нужны и сдвинули бы вёрстку без причины. */
+.theme-classic .host-screen:has(> .cyber-frame),
+.cyber .host-screen:has(> .cyber-frame) { padding-top: 188px; }
+/* с вариантами снизу места мало: рамка и отбивка вариантов ужимаются,
+   иначе связка «рамка + плитки» не влезает и выезжает вверх на шапку */
+.host-screen.has-choices > .cyber-frame {
+  padding-block: clamp(8px, 1.2vh, 18px); min-height: 0; }
+.host-screen.has-choices > .choices-grid { padding-top: clamp(10px, 2vh, 28px); }
