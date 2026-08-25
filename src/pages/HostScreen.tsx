@@ -279,7 +279,12 @@ function HostInner({ gameState, pack }: {
     const isNY = pack.theme === 'new_year'
     const timeLow = !!gameState.timer_started_at &&
       (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
-    const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}` : ''
+    // Обёртка вопроса была пустым div только в киберпанке: в НГ там сосульки,
+    // в ГП своё оформление. Даём классике рамку — разметка не меняется,
+    // добавляется только класс на уже существующий контейнер.
+    const isCyber = pack.theme === 'classic'
+    const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
+      : isCyber ? 'cyber-frame' : ''
     // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
     const lettered = !q.media.hidden && imgs.length > 1 && (
       (q.answer.mode === 'choice' && q.answer.choices.length === imgs.length) ||
@@ -310,6 +315,7 @@ function HostInner({ gameState, pack }: {
         {split ? (
           <div className={frameCls}>
             {isNY && <Icicles seed={q.id} low={timeLow} />}
+            {isCyber && <span className="cf-scan" aria-hidden="true" />}
             <div className="q-split">
             <WindText key={q.id} text={q.question_text} />
             <div className="q-media-grid n1">
@@ -324,6 +330,7 @@ function HostInner({ gameState, pack }: {
           <>
             <div className={frameCls}>
               {isNY && <Icicles seed={q.id} low={timeLow} />}
+              {isCyber && <span className="cf-scan" aria-hidden="true" />}
               <WindText key={q.id} text={q.question_text} />
             </div>
             {!q.media.hidden && imgs.length > 0 && (
@@ -360,7 +367,8 @@ function HostInner({ gameState, pack }: {
           : null)}
 
         {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && (
-          <div className="choices-grid">
+          <div className={`choices-grid${
+            choicesLenClass((q.answer.right_labels ?? []) as string[])}`}>
             {q.answer.right.map((r, i) => (
               <div key={r} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
                 <span className="key">{r}</span>{(q.answer as { right_labels?: string[] }).right_labels?.[i] ?? ''}
@@ -369,7 +377,7 @@ function HostInner({ gameState, pack }: {
           </div>
         )}
         {choices && !lettered && (
-          <div className="choices-grid">
+          <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}>
             {choices.map((c, i) => (
               <div key={c.key} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
                 <span className="key">{c.key}</span>{c.text}
@@ -485,6 +493,18 @@ export function lenClass(text: string): string {
   if (n <= 140) return ' len-m'
   if (n <= 240) return ' len-l'
   return ' len-xl'
+}
+
+/** Ступень кегля для плиток вариантов — по САМОМУ ДЛИННОМУ варианту.
+ *  Раньше кегль был фиксированным: четыре развёрнутые формулировки не
+ *  влезали по высоте и уезжали под кнопки «Назад / Показать ответ».
+ *  Считаем по одному, самому длинному, чтобы плитки остались одного размера. */
+export function choicesLenClass(texts: (string | undefined)[]): string {
+  const n = Math.max(0, ...texts.map(t => (t ?? '').trim().length))
+  if (n <= 28) return ''
+  if (n <= 55) return ' c-m'
+  if (n <= 95) return ' c-l'
+  return ' c-xl'
 }
 
 /** Появление текста «ветром»: по словам с каскадной задержкой. */
@@ -1115,7 +1135,8 @@ function StagedChoices({ q, choices, imgs }: {
     </div>
   )
   return (
-    <div className="choices-grid" style={{ width: '100%', marginTop: 0, paddingTop: 0 }}>
+    <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}
+      style={{ width: '100%', marginTop: 0, paddingTop: 0 }}>
       {choices.map(c => (
         <div key={c.key} className={`choice-plate${cls(c.key)}`}
           style={{ animationDelay: `${delay(c.key)}s` }}>
