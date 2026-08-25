@@ -94,20 +94,87 @@
 .answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
   font-size: clamp(18px, 2vw, 34px); text-align: center; }
 
-/* ═══ ЗАГОЛОВОК РАУНДА: РАЗМЕР ПО ДЛИНЕ САМОГО ДЛИННОГО СЛОВА ═══
+/* ═══ ЗАГОЛОВОК РАУНДА: РАЗМЕР ПО ШИРИНЕ СВОЕЙ КОЛОНКИ ═══
    Длинное неразрывное слово («ЭЛЕКТРОЭНЦЕФАЛОГРАФИЯ») переносить некуда:
    оно выезжало за край колонки и наползало на правила. Поэтому кегль
-   уменьшается ступенями, а само слово при крайней нужде рвётся. */
-.round-intro > .neon-title {
+   уменьшается ступенями, а само слово при крайней нужде рвётся.
+
+   ВАЖНО: единицы cqw, а не vw. Колонка заголовка узкая, когда рядом стоят
+   правила, и во всю ширину, когда правил нет. На vw кегль был одинаковым в
+   обоих случаях — приходилось равняться на худший, и на пустом экране
+   заголовок выглядел крошечным. Контейнер — .ri-main. */
+.round-intro > .ri-main {
+  grid-column: 1; justify-self: center;
+  container-type: inline-size;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(10px, 1.8vh, 24px);
+  width: 100%; min-width: 0; }
+
+/* Кегль считается ФОРМУЛОЙ, а не ступенями по длине слова. Ступени были
+   грубыми: «МУЗЫКАЛЬНАЯ» на своей ступени всё равно не влезала и рвалась
+   посередине. Здесь ширина самого длинного слова ≈ длина × кегль × --k,
+   и мы просто решаем это уравнение относительно кегля.
+   --k = 0.73 — замеренная средняя ширина заглавной буквы шрифта заставки
+   (по промерам 0.63–0.71, взят запас). --longest и --lines приходят из JSX. */
+.ri-main > .neon-title {
+  --k: .73;
   width: 100%; min-width: 0; max-width: 100%;
   overflow-wrap: anywhere; word-break: break-word;
-  font-size: clamp(24px, 4.2vw, 78px) !important; line-height: 1.05; }
-.round-intro > .neon-title[data-longest="12"],
-.round-intro > .neon-title[data-longest="13"],
-.round-intro > .neon-title[data-longest="14"] { font-size: clamp(22px, 3.4vw, 58px) !important; }
-.round-intro > .neon-title[data-longest="15"],
-.round-intro > .neon-title[data-longest="16"],
-.round-intro > .neon-title[data-longest="17"] { font-size: clamp(20px, 2.8vw, 48px) !important; }
-.round-intro > .neon-title[data-longest="18"],
-.round-intro > .neon-title[data-longest="19"],
-.round-intro > .neon-title[data-longest="20"] { font-size: clamp(18px, 2.3vw, 40px) !important; }
+  line-height: 1.04; margin: 0;
+  font-size: max(26px, min(
+    190px,                                              /* потолок */
+    calc(100cqw / (var(--longest, 8) * var(--k))),      /* влезть по ширине */
+    calc(46vh / var(--lines, 1))                        /* влезть по высоте */
+  )) !important; }
+
+/* ═══ КИБЕРПАНК: ЖИЗНЬ НА ЗАСТАВКЕ РАУНДА ═══
+   У НГ и ГП декор был (ёлки, молнии), у классики — пусто. Всё ниже живёт
+   ВНУТРИ колонки заголовка и растягивается по ней, поэтому на правила
+   налезть не может: ширину задаёт родитель. */
+
+/* полоса-«дешифратор» под заголовком */
+.cyber-deco { display: flex; align-items: center; justify-content: center;
+  gap: clamp(10px, 1.4vw, 22px); width: min(100%, 620px); }
+.cyber-deco .cd-line { flex: 1 1 auto; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent,
+    color-mix(in srgb, var(--accent) 70%, transparent), transparent);
+  background-size: 220% 100%; animation: cdSweep 4.5s ease-in-out infinite; }
+.cyber-deco .cd-line:last-child { animation-direction: reverse; }
+.cyber-deco .cd-chip { color: var(--accent2); font-size: clamp(11px, 1vw, 16px);
+  animation: cdPulse 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent2) 60%, transparent)); }
+@keyframes cdSweep { 0%, 100% { background-position: 140% 0; } 50% { background-position: -40% 0; } }
+@keyframes cdPulse { 0%, 100% { opacity: .45; transform: scale(.9); }
+  50% { opacity: 1; transform: scale(1.15); } }
+
+/* угловые засечки вокруг блока заголовка — как рамка прицела в HUD */
+.theme-classic .round-intro > .ri-main::before,
+.theme-classic .round-intro > .ri-main::after {
+  content: ''; position: absolute; width: clamp(20px, 2.2vw, 40px);
+  height: clamp(20px, 2.2vw, 40px); pointer-events: none;
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: hudBreath 5s ease-in-out infinite; }
+.theme-classic .round-intro > .ri-main::before {
+  left: 0; top: calc(-1 * clamp(14px, 2vh, 28px));
+  border-right: none; border-bottom: none; }
+.theme-classic .round-intro > .ri-main::after {
+  right: 0; bottom: calc(-1 * clamp(14px, 2vh, 28px));
+  border-left: none; border-top: none; }
+@keyframes hudBreath { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
+
+/* редкий горизонтальный «скан» по всему экрану заставки */
+.theme-classic .round-intro::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 140px;
+  pointer-events: none; z-index: 0;
+  background: linear-gradient(180deg, transparent,
+    color-mix(in srgb, var(--accent) 7%, transparent), transparent);
+  animation: introScan 11s linear infinite; }
+@keyframes introScan { 0% { top: -160px; } 100% { top: 100%; } }
+
+/* уважаем системную настройку «меньше движения» */
+@media (prefers-reduced-motion: reduce) {
+  .cyber-deco .cd-line, .cyber-deco .cd-chip,
+  .theme-classic .round-intro > .ri-main::before,
+  .theme-classic .round-intro > .ri-main::after,
+  .theme-classic .round-intro::after { animation: none; }
+}

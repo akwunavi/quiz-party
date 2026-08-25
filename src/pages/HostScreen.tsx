@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
 import { getRoomId } from '../lib/room'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
@@ -55,6 +55,21 @@ function Deco({ theme }: { theme: string }) {
   if (theme === 'new_year') return <div className="title-deco">🎄 ❄ 🎁 ❄ 🎄</div>
   if (theme === 'potter') return <div className="title-deco">⚡ ✦ 🪄 ✦ ⚡</div>
   return null
+}
+
+/** Декор титула в киберпанке: полоса-«дешифратор» под заголовком.
+ *  У НГ и ГП свой декор (ёлки/молнии), у классики его не было вообще —
+ *  экран заставки выглядел пустым. Элемент строчный, в потоке колонки:
+ *  наехать на правила он не может, ширина ограничена родителем. */
+function CyberDeco({ theme }: { theme: string }) {
+  if (theme !== 'classic') return null
+  return (
+    <div className="cyber-deco" aria-hidden="true">
+      <span className="cd-line" />
+      <span className="cd-chip">◆</span>
+      <span className="cd-line" />
+    </div>
+  )
 }
 
 function HostInner({ gameState, pack }: {
@@ -189,9 +204,16 @@ function HostInner({ gameState, pack }: {
             <span className="rb-word">РАУНД</span>
             <span className="rb-num">{displayRoundNumber(pack, gameState.round_number)}</span>
           </div>
-          <Title theme={pack.theme} lines={round.title_lines} />
-          <Deco theme={pack.theme} />
-          <div className="meta-line">{metaLine(round)}</div>
+          {/* Обёртка нужна ДЛЯ РАЗМЕРА ЗАГОЛОВКА: кегль считается от ширины
+              этой колонки (cqw), а не от ширины экрана (vw). Раньше заголовок
+              мельчал одинаково и там, где правила съедали полэкрана, и там,
+              где их нет вовсе — на пустом экране он выглядел крошечным. */}
+          <div className="ri-main">
+            <Title theme={pack.theme} lines={round.title_lines} />
+            <Deco theme={pack.theme} />
+            <CyberDeco theme={pack.theme} />
+            <div className="meta-line">{metaLine(round)}</div>
+          </div>
           {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
               а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
@@ -493,7 +515,8 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   const longest = longestWord(lines)
   if (theme !== 'new_year') {
     return (
-      <h1 className="neon-title title-anim" data-longest={longest}>
+      <h1 className="neon-title title-anim" data-longest={longest}
+        style={{ '--longest': longest, '--lines': lines.length } as CSSProperties}>
         {lines.map((l, i) => (
           <span key={i} style={i === lines.length - 1 && lines.length > 1 ? { color: 'var(--accent)' } : {}}>{l}<br /></span>
         ))}
@@ -502,7 +525,8 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   }
   let n = 0
   return (
-    <h1 className="neon-title" data-longest={longest}>
+    <h1 className="neon-title" data-longest={longest}
+      style={{ '--longest': longest, '--lines': lines.length } as CSSProperties}>
       {lines.map((line, li) => (
         <span key={li} style={{ display: 'block' }}>
           {[...line].map((ch, i) => ch === ' '

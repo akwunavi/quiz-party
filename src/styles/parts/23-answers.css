@@ -241,7 +241,11 @@
   padding-top: clamp(120px, 16vh, 190px); }
 .round-intro > .title-block, .round-intro > .meta-line,
 .round-intro > .mono-tag { grid-column: 1; justify-self: center; }
-.round-intro > .rules-frame { grid-column: 2; grid-row: 1 / span 4;
+/* Раньше правила растягивались на 4 строки грида — по числу отдельных
+   элементов в левой колонке (титул, декор, мета…). Теперь слева ОДИН блок
+   .ri-main, строка ровно одна, и span 4 добавлял пустые строки: контент
+   прижимался кверху, а низ экрана оставался мёртвым. */
+.round-intro > .rules-frame { grid-column: 2; grid-row: 1;
   align-self: center; max-height: 66vh; overflow: hidden; }
 .round-intro .title-line { font-size: clamp(30px, 4.4vw, 82px); }
 
