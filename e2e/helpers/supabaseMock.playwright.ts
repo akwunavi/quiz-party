@@ -164,9 +164,27 @@ export async function mockQuizBackend(page: Page, options?: {
   await page.route('**/storage/v1/object/public/quiz-media/qa/wide.svg', route =>
     route.fulfill({ status: 200, contentType: 'image/svg+xml', body: svg(2000, 800, 'WIDE') }))
 
-  await page.addInitScript(({ teamValue }) => {
+  await page.addInitScript(({ teamValue, authStorageKey }) => {
     localStorage.setItem('qp-team', JSON.stringify(teamValue))
-  }, { teamValue: team })
+    localStorage.setItem(authStorageKey, JSON.stringify({
+      access_token: 'qa-access-token',
+      refresh_token: 'qa-refresh-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      user: {
+        id: 'qa-user-001',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'qa@example.com',
+        app_metadata: {},
+        user_metadata: {},
+      },
+    }))
+  }, {
+    teamValue: team,
+    authStorageKey: `sb-${new URL(process.env.VITE_SUPABASE_URL ?? 'https://qa.invalid').hostname.split('.')[0]}-auth-token`,
+  })
 }
 
 export const QA_ROOM_URL = `#/player?room=${GAME_ID}`
