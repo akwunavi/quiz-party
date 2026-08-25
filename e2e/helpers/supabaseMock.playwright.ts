@@ -136,6 +136,15 @@ export async function mockQuizBackend(page: Page, options?: {
     user_metadata: {},
   }))
 
+  await page.route('**/rest/v1/**', async route => {
+    const method = route.request().method()
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      await route.abort('blockedbyclient')
+      return
+    }
+    await route.fallback()
+  })
+
   await page.route('**/rest/v1/editor_roles*', route => json(route, isSingle(route)
     ? { user_id: 'qa-user-001', role: 'owner', display_name: 'QA' }
     : [{ user_id: 'qa-user-001', role: 'owner', display_name: 'QA' }]))
@@ -158,15 +167,6 @@ export async function mockQuizBackend(page: Page, options?: {
   await page.addInitScript(({ teamValue }) => {
     localStorage.setItem('qp-team', JSON.stringify(teamValue))
   }, { teamValue: team })
-
-  await page.route('**/rest/v1/**', async route => {
-    const method = route.request().method()
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-      await route.abort('blockedbyclient')
-      return
-    }
-    await route.continue()
-  })
 }
 
 export const QA_ROOM_URL = `#/player?room=${GAME_ID}`
