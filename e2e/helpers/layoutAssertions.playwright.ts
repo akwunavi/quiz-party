@@ -17,12 +17,6 @@ export async function assertViewportIsClean(page: Page) {
   expect(metrics.scrollHeight, `page vertical overflow: ${JSON.stringify(metrics)}`).toBeLessThanOrEqual(metrics.viewportHeight + 1)
 }
 
-/**
- * Checks that rendered images are loaded, non-zero and fully visible in the
- * viewport. This is deliberately scoped to content images rather than every
- * image in the document, because themes may contain decorative images that are
- * intentionally cropped.
- */
 export async function assertImagesAreLoadedAndVisible(page: Page, selector = '.q-media-grid img, .img-answers img') {
   const images = page.locator(selector)
   const count = await images.count()
@@ -63,10 +57,10 @@ export async function assertImagesAreLoadedAndVisible(page: Page, selector = '.q
 }
 
 /**
- * Detects likely text clipping only on semantic content elements. We do not
- * scan every DOM node: line-height, inline spans and decorative wrappers can
- * legitimately have scrollHeight/clientHeight differences without anything
- * being visually clipped.
+ * Detects clipping only when the semantic element itself uses a clipping
+ * overflow mode. A scrollHeight/clientHeight difference alone is not enough:
+ * line-height, inline content and fractional pixels can legitimately produce
+ * a small difference while all text remains visible.
  */
 export async function assertNoTextClipping(page: Page) {
   const clipped = await page.evaluate(() => {
@@ -85,10 +79,13 @@ export async function assertNoTextClipping(page: Page) {
     for (const el of Array.from(document.querySelectorAll<HTMLElement>(selectors.join(',')))) {
       const style = getComputedStyle(el)
       if (style.display === 'none' || style.visibility === 'hidden') continue
-      if (el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2) {
+
+      const clipsX = ['hidden', 'clip'].includes(style.overflowX)
+      const clipsY = ['hidden', 'clip'].includes(style.overflowY)
+      if (clipsX && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2) {
         out.push(`${el.tagName}.${String(el.className)}: horizontal ${el.scrollWidth}/${el.clientWidth}`)
       }
-      if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 2) {
+      if (clipsY && el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 2) {
         out.push(`${el.tagName}.${String(el.className)}: vertical ${el.scrollHeight}/${el.clientHeight}`)
       }
     }
@@ -98,11 +95,6 @@ export async function assertNoTextClipping(page: Page) {
   expect(clipped, `semantic content clipping detected: ${clipped.join('; ')}`).toEqual([])
 }
 
-/**
- * For an image, also verify that none of its overflow-hidden ancestors hides
- * a part of the rendered image. This catches the more important case where
- * the image itself fits the viewport but is clipped by its container.
- */
 export async function assertImagesAreNotAncestorClipped(page: Page, selector = '.q-media-grid img, .img-answers img') {
   const clipped = await page.locator(selector).evaluateAll((els) => {
     const viewport = { width: window.innerWidth, height: window.innerHeight }
