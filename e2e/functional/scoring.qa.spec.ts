@@ -31,7 +31,7 @@ describe('QA: scoring regression', () => {
     expect(scoreStandard([ok(0), wrong(1), blank(2), ok(3)], 2)).toBe(4)
   })
 
-  it('test_stop: stops after the first wrong answer but ignores skipped questions', () => {
+  it('test_stop: stops after the first wrong answer and ignores skipped questions', () => {
     expect(scoreTestStop([ok(2), wrong(3), ok(0), ok(4)])).toBe(1)
     expect(scoreTestStop([ok(0), blank(1), ok(2), wrong(3), ok(4)])).toBe(2)
   })
