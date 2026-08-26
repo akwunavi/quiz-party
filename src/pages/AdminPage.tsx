@@ -12,6 +12,10 @@ import {
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
+import {
+  isDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
+  type CheckRow,
+} from '../lib/devSeed'
 import { teamColor, nextFreeColor } from '../lib/teamColors'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
@@ -295,6 +299,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
+
+        <DevSeedPanel pack={pack} gameState={gameState} />
 
         <button className="adm-link" onClick={() => setShowRoundSwitch(s => !s)}>
           {showRoundSwitch ? 'СКРЫТЬ СПИСОК РАУНДОВ' : 'СМЕНИТЬ РАУНД'}
@@ -667,6 +673,71 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
         if (confirm('Начать новую игру?\n\nКоманды и ответы сохранятся в базе. '
           + 'Полная очистка — кнопкой в лобби.')) void resetGame()
       }}>⟲ НОВАЯ ИГРА</button>
+    </div>
+  )
+}
+
+/** Панель репетиции: видна ТОЛЬКО при ?dev=1 в адресе.
+ *  На боевой игре её не существует — случайно нажать нечего. */
+function DevSeedPanel({ pack, gameState }: {
+  pack: LoadedPack
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [busy, setBusy] = useState('')
+  const [msg, setMsg] = useState('')
+  const [check, setCheck] = useState<CheckRow[] | null>(null)
+  if (!isDevMode()) return null
+
+  const run = async (label: string, fn: () => Promise<string>) => {
+    setBusy(label); setMsg(''); setCheck(null)
+    try { setMsg(await fn()) } catch (e) { setMsg('Ошибка: ' + (e as Error).message) }
+    finally { setBusy('') }
+  }
+
+  return (
+    <div className="adm-dev">
+      <div className="adm-dim">РЕПЕТИЦИЯ · ?dev=1</div>
+      <div className="adm-dev-row">
+        <button className="adm-btn" disabled={!!busy}
+          onClick={() => void run('teams', async () => {
+            const n = await seedTeams(gameState.game_id)
+            return n ? `Создано команд: ${n}` : 'Демо-команды уже есть'
+          })}>+ ДЕМО-КОМАНДЫ</button>
+        <button className="adm-btn" disabled={!!busy}
+          onClick={() => void run('answers', async () => {
+            const r = await seedRoundAnswers(pack, gameState.round_number, gameState.game_id)
+            return r.teams
+              ? `Ответов: ${r.rows} за ${r.teams} команд`
+              : 'Сначала создай демо-команды'
+          })}>ЗАПОЛНИТЬ РАУНД</button>
+      </div>
+      <div className="adm-dev-row">
+        <button className="adm-btn primary" disabled={!!busy}
+          onClick={() => void run('check', async () => {
+            const rows = await checkRoundScoring(pack, gameState.round_number, gameState.game_id)
+            setCheck(rows)
+            const bad = rows.filter(r => r.diff !== 0).length
+            return bad ? `РАСХОЖДЕНИЙ: ${bad}` : 'Начисления сходятся'
+          })}>СВЕРИТЬ БАЛЛЫ</button>
+        <button className="adm-btn" disabled={!!busy}
+          onClick={() => void run('clear', async () => {
+            const n = await clearSeed(gameState.game_id)
+            return n ? `Удалено команд: ${n}` : 'Демо-данных нет'
+          })}>УДАЛИТЬ ДЕМО</button>
+      </div>
+      {msg && <div className="adm-dev-msg">{msg}</div>}
+      {check && check.length > 0 && (
+        <table className="adm-dev-table">
+          <thead><tr><th>команда</th><th>ждали</th><th>вышло</th><th>Δ</th></tr></thead>
+          <tbody>
+            {check.map(r => (
+              <tr key={r.team} className={r.diff === 0 ? '' : 'bad'}>
+                <td>{r.team}</td><td>{r.expected}</td><td>{r.actual}</td><td>{r.diff}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }

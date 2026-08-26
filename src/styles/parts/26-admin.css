@@ -64,3 +64,19 @@
 .adm-why summary { cursor: pointer; font-size: 13px; letter-spacing: .06em; }
 .adm-why-row { display: flex; justify-content: space-between; gap: 12px;
   flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--ed-line); }
+
+/* ═══ ПАНЕЛЬ РЕПЕТИЦИИ (?dev=1) ═══
+   Видна только в dev-режиме. Намеренно отличается по цвету от боевых
+   кнопок: если она вдруг оказалась на экране во время игры, это видно
+   сразу, а не после нажатия. */
+.adm-dev { margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+  border: 1px dashed #a855f7; background: rgba(168, 85, 247, .08); }
+.adm-dev .adm-dim { color: #c084fc; letter-spacing: .18em; margin-bottom: 8px; }
+.adm-dev-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.adm-dev-row .adm-btn { flex: 1 1 0; min-width: 0; font-size: 12px; }
+.adm-dev-msg { font-size: 13px; color: #e9d5ff; margin: 4px 0 8px; }
+.adm-dev-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.adm-dev-table th { text-align: left; color: #c084fc; font-weight: 600;
+  padding: 4px 6px; border-bottom: 1px solid rgba(168, 85, 247, .3); }
+.adm-dev-table td { padding: 4px 6px; font-variant-numeric: tabular-nums; }
+.adm-dev-table tr.bad td { color: #f87171; font-weight: 700; }
