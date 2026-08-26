@@ -264,3 +264,53 @@
   .img-answers.eq-row { flex-wrap: wrap; }
   .img-answers.eq-row .img-answer { flex-basis: 40% !important; }
 }
+
+/* Ребус: равные половины. Выключный ряд сюда не применяется (см. HostScreen),
+   но после того как пустой контейнер вопроса убрали, картинкам достался весь
+   экран — и пара «широкая + вертикальная» расползалась. Равные колонки плюс
+   общий потолок по высоте держат половины сопоставимыми. */
+.q-media-grid.rebus { display: grid; align-items: center; justify-items: center; }
+.q-media-grid.rebus.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.q-media-grid.rebus .q-img { width: 100%; height: 100%; min-height: 0;
+  display: flex; align-items: center; justify-content: center; }
+.q-media-grid.rebus .q-img img { max-width: 100%; max-height: 100%;
+  width: auto; height: auto; object-fit: contain; }
+/* ВОТ ОНА, ПРИЧИНА РЕГРЕССИИ. У ребуса всегда был свой потолок высоты —
+   `.q-media-grid.rebus .q-img img { max-height: 46vh }` из 01-base.css. Мой
+   общий приём «вписаться в контейнер» (`max-height: 100%`) оказался
+   специфичнее и этот потолок перебил. Пока пустая рамка вопроса занимала
+   верх экрана, разницы почти не было. Как только рамку убрали, картинкам
+   достался весь экран — и вертикальная выросла до 630px против 299px у
+   горизонтальной. Возвращаем потолок, не ломая вписывание. */
+.host-screen.has-media > .q-media-grid.rebus .q-img img,
+.host-screen.no-qtext.has-media > .q-media-grid.rebus .q-img img {
+  max-height: min(46vh, 100%); }
+
+/* ═══ ПОВТОР ВОПРОСОВ СЛАЙДАМИ (фаза recap) ═══
+   Экран показывается перед временем на ответы, если галочка включена.
+   Раскладка та же, что у вопроса, плюс полоска прогресса по слайдам. */
+.recap-screen .recap-body { flex: 1 1 0; min-height: 0; width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: clamp(12px, 2vh, 28px);
+  animation: recapIn .45s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes recapIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; } }
+.recap-screen .recap-body > .q-media-grid { flex: 1 1 0; min-height: 0;
+  max-height: min(58vh, calc(58vh * var(--ms, 1))); }
+/* картинка обязана вписаться в свою ячейку: тело слайда — flex-колонка,
+   и без этого снимок вылезал вверх на текст вопроса */
+.recap-screen .recap-body > .q-media-grid .q-img { min-height: 0; overflow: hidden; }
+.recap-screen .recap-body > .q-media-grid .q-img img {
+  max-height: 100%; max-width: 100%; width: auto; height: auto;
+  object-fit: contain; }
+.recap-screen .recap-body > .q-text { flex: 0 0 auto; max-width: 100%; }
+/* точки-слайды: пройденные приглушены, текущая горит */
+.recap-dots { display: flex; gap: 8px; justify-content: center;
+  margin-bottom: clamp(10px, 2vh, 24px); }
+.recap-dots i { width: 10px; height: 10px; border-radius: 50%;
+  background: color-mix(in srgb, var(--dim) 45%, transparent); transition: .3s; }
+.recap-dots i.done { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.recap-dots i.on { background: var(--accent); transform: scale(1.4);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  .recap-screen .recap-body { animation: none; }
+}

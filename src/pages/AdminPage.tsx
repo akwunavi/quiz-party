@@ -204,6 +204,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   // интерактивные механики управляются с проектора; стандартный маршрут
   // «вопрос → время ответов → разбор» для них не существует
   const isInteractive = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
+  const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
   // шаг после раунда берём из общего модуля: раньше здесь была своя копия
   // логики, которая игнорировала перерыв и расходилась с проектором
   const runAfterRound = () => {
@@ -222,11 +223,15 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const advance = () => {
     if (phase === 'round_intro') { void gotoQuestion(0); return }
     if (phase === 'question') {
-      if (step + 1 < round.questions.length) void gotoQuestion(step + 1)
-      else if (round.answers_reveal === 'after_round') void startAnswerTime()
+      if (step + 1 < round.questions.length) { void gotoQuestion(step + 1); return }
+      // Повтор вопросов слайдами — если включён в редакторе. Идёт ПЕРЕД
+      // временем на ответы: зал ещё раз видит все вопросы, потом отвечает.
+      if (recapOn && round.answers_reveal === 'after_round') { void setPhase('recap'); return }
+      if (round.answers_reveal === 'after_round') void startAnswerTime()
       else void gotoAnswers(0)
       return
     }
+    if (phase === 'recap') { void startAnswerTime(); return }
     if (phase === 'answer_time') { void gotoAnswers(0); return }
     // с табло и из перерыва идём по общему маршруту: с табло может быть
     // ещё перерыв, а вот из перерыва — только вперёд
@@ -235,7 +240,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const goBack = () => {
     if (phase === 'question' && step > 0) void gotoQuestion(step - 1)
     else if (phase === 'question') void setPhase('round_intro')
-    else if (phase === 'answer_time') void gotoQuestion(round.questions.length - 1)
+    else if (phase === 'recap') void gotoQuestion(round.questions.length - 1)
+    else if (phase === 'answer_time') {
+      if (recapOn) void setPhase('recap')
+      else void gotoQuestion(round.questions.length - 1)
+    }
   }
 
   return (
@@ -248,7 +257,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       {phase !== 'show_answers' && (
         <div className="adm-mid">
           <QuestionTextOnly round={round} gameState={gameState} />
-          {(phase === 'question' || phase === 'answer_time') && (
+          {(phase === 'question' || phase === 'recap' || phase === 'answer_time') && (
             <AnsweredIndicator round={round} gameState={gameState} answers={answers} teams={teams} />
           )}
         </div>

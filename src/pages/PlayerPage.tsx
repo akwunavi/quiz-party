@@ -19,6 +19,20 @@ import { TEAM_PALETTE } from '../lib/teamColors'
 
 const TEAM_LS = 'qp-team'
 
+/** Полная очистка следов прошлой игры в телефоне.
+ *  Удалять одну лишь команду мало: рядом лежат неотправленная очередь
+ *  ответов и черновики по каждому раунду (`qp-answers-<игра>-<раунд>`).
+ *  Без них на новой игре всплывали старые ответы. */
+function forgetPlayerData() {
+  try {
+    localStorage.removeItem(TEAM_LS)
+    localStorage.removeItem('qp-answer-queue')
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith('qp-answers-')) localStorage.removeItem(k)
+    }
+  } catch { /* приватный режим — не критично */ }
+}
+
 export function PlayerPage() {
   const { gameState, loading: gsLoading, roomId } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
@@ -44,16 +58,19 @@ export function PlayerPage() {
       if (!alive) return
       if (!data) {
         // команду удалили вместе с игрой — забываем её и просим зайти заново
-        localStorage.removeItem(TEAM_LS)
+        forgetPlayerData()
         setTeam(null)
         return
       }
       if (data.game_id !== gameState.game_id) {
-        await supabase.from('teams')
-          .update({ game_id: gameState.game_id, last_seen_at: new Date().toISOString() })
-          .eq('id', team.id)
-        const t = { ...team, game_id: gameState.game_id }
-        localStorage.setItem(TEAM_LS, JSON.stringify(t)); setTeam(t)
+        // Идёт ДРУГАЯ игра. Раньше телефон молча перепривязывал старую
+        // команду к новому game_id — поэтому после новой игры на экране
+        // всплывала команда с прошлого раза, вместе с её ответами, и
+        // помогал только сброс кеша браузера.
+        // Теперь сохранённая команда действительна только для своей игры:
+        // забываем её и просим зарегистрироваться заново.
+        forgetPlayerData()
+        setTeam(null)
       }
     })()
     return () => { alive = false }

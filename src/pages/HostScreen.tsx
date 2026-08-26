@@ -381,7 +381,15 @@ function HostInner({ gameState, pack }: {
                     ))}
                   </div>
                 : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
-                      round.mechanic === 'rebus' ? ' rebus' : ''}${imgs.length > 1 ? ' eq-row' : ''}`}
+                      round.mechanic === 'rebus' ? ' rebus' : ''}${
+                      // Ребус — исключение. Это две половины одного слова, и
+                      // читается он как равные половины. Выключный ряд даёт
+                      // равные ВЫСОТЫ, но ширину пропорционально снимку: на
+                      // паре «горизонтальная + вертикальная» первая выходила
+                      // в 4.5 раза шире. С тремя и более картинками ширина
+                      // делится на всех и разброс не бросается в глаза,
+                      // поэтому там ряд остаётся.
+                      imgs.length > 1 && round.mechanic !== 'rebus' ? ' eq-row' : ''}`}
                     style={mediaScaleVar(q)}>
                     {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
@@ -439,6 +447,10 @@ function HostInner({ gameState, pack }: {
         </div>
       </div>
     )
+  }
+
+  if (gameState.phase === 'recap') {
+    return <RecapSlides pack={pack} round={round} gameState={gameState} />
   }
 
   if (gameState.phase === 'answer_time') {
@@ -774,6 +786,8 @@ function FitImg({ src, children }: { src: string; children?: React.ReactNode }) 
    порядок при большом числе элементов.
    Теперь длительность считается ИЗ ТЕХ ЖЕ ЧИСЕЛ, что и анимация. Меняешь
    тайминг показа — правь константу здесь, и проверка сдвинется сама. */
+/** Сколько держится один слайд повтора, если озвучки нет или она короче. */
+const RECAP_SLIDE_MS = 5000
 const CH_STAGE2_MS = 3300        // когда подсвечивается верный вариант
 const CH_STAGGER_MS = 500        // каскад по невыпавшим вариантам
 const CH_HIGHLIGHT_MS = 900      // сама подсветка
@@ -896,6 +910,88 @@ function FitAnswer({ src, badge, children }: {
         }} />
       </span>
       {children}
+    </div>
+  )
+}
+
+
+/** Повтор всех вопросов раунда слайдами, перед временем на ответы.
+ *
+ *  Включается галочкой в редакторе (settings.recap_before_answers).
+ *  По умолчанию выключено: раунды, где вопросы читают вслух по одному,
+ *  в повторе не нуждаются.
+ *
+ *  Слайд держится 5 секунд ИЛИ пока играет озвучка вопроса — что дольше.
+ *  Смысл в том, что озвучка бывает и длиннее пяти секунд, и обрывать её
+ *  на полуслове нельзя. Если озвучки нет, работает простой отсчёт.
+ *  Ведущий может пролистнуть вручную или пропустить повтор целиком. */
+function RecapSlides({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const questions = useMemo(() => round.questions.filter(q => !q.hidden), [round.questions])
+  const [i, setI] = useState(0)
+  const q = questions[i]
+  const last = i + 1 >= questions.length
+  const toAnswers = () => void startAnswerTime()
+  const next = () => { if (last) toAnswers(); else setI(n => n + 1) }
+
+  // Слайд живёт максимум из двух: 5 секунд и длительность озвучки.
+  useEffect(() => {
+    if (!q) { toAnswers(); return }
+    let alive = true
+    const go = () => { if (alive) next() }
+    const timer = setTimeout(go, RECAP_SLIDE_MS)
+    const voice = q.media.voice
+    if (!voice) return () => { alive = false; clearTimeout(timer) }
+    // озвучка длиннее слайда — ждём её конца, а не таймер
+    const a = createAudio()
+    a.src = mediaUrl(voice)
+    a.play().catch(() => {})
+    const onEnd = () => { clearTimeout(timer); go() }
+    a.addEventListener('ended', onEnd)
+    return () => {
+      alive = false; clearTimeout(timer)
+      a.removeEventListener('ended', onEnd)
+      try { a.pause() } catch { /* уже остановлено */ }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i, q?.id])
+
+  if (!q) return null
+  const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|wav|mp4|webm)$/i.test(m))
+  const hasText = !!q.question_text.trim()
+  // Классы те же, что на экране вопроса: без них правила вписывания
+  // картинок сюда не достают, и снимок наползал на текст — ровно тот же
+  // дефект, который уже чинили на разборе и на вопросе.
+  return (
+    <div className={`host-screen grid-bg recap-screen${
+      imgs.length ? ' has-media' : ''}${hasText ? '' : ' no-qtext'}`}>
+      <div className="host-topbar">
+        <span className="mono-tag">ПОВТОР ВОПРОСОВ</span>
+        <span className="qnum">{i + 1} / {questions.length}</span>
+      </div>
+      <div className="recap-body" key={q.id}>
+        {hasText && (
+          <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+        )}
+        {imgs.length > 0 && (
+          <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
+            imgs.length > 1 ? ' eq-row' : ''}`} style={mediaScaleVar(q)}>
+            {imgs.map((m, k) => <FitImg key={k} src={mediaUrl(m)} />)}
+          </div>
+        )}
+      </div>
+      <div className="recap-dots" aria-hidden="true">
+        {questions.map((_, k) => (
+          <i key={k} className={k === i ? 'on' : k < i ? 'done' : ''} />
+        ))}
+      </div>
+      <div className="host-actions">
+        <button className="ghost" onClick={toAnswers}>Пропустить повтор</button>
+        <button onClick={next}>{last ? 'К ответам →' : 'Следующий →'}</button>
+      </div>
     </div>
   )
 }
@@ -1477,10 +1573,12 @@ function JeopardyBoard({ pack, round, gameState }: {
         }))}
       </div>
       <div className="host-actions">
-        <button onClick={() => {
-          if (gameState.round_number + 1 < pack.rounds.length) void gotoRound(gameState.round_number + 1)
-          else void finishGame(gameState.pack_id)
-        }}>Завершить раунд →</button>
+        {/* Кнопка прыгала в следующий раунд НАПРЯМУЮ и обходила общий
+            маршрут: табло и перерыв, настроенные для раунда, молча
+            пропускались. Именно поэтому после «Своей игры» и мелодии не
+            показывалось табло, хотя галочка в редакторе стояла.
+            Теперь маршрут считает тот же модуль, что и в админке. */}
+        <AfterRoundNav pack={pack} gameState={gameState} />
       </div>
       {active && (
         <TileModal packTheme={pack.theme} round={round} gameState={gameState}

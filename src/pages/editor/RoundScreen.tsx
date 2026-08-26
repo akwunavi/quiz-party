@@ -167,6 +167,21 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <div className="ed-hint">Строка под заголовком раунда. Сотри всё — вернётся автотекст</div>
         </div>
 
+        <div className="ed-field"><label>Перед ответами</label>
+          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+            <input type="checkbox" disabled={locked}
+              checked={!!(round.settings as { recap_before_answers?: boolean }).recap_before_answers}
+              onChange={e => void patch({ settings: { ...round.settings, recap_before_answers: e.target.checked } as never })} />
+            повторить вопросы слайдами
+          </label>
+          <div className="ed-hint">
+            После последнего вопроса зал ещё раз увидит все вопросы: по 5 секунд
+            на слайд, а если у вопроса есть озвучка — пока она не доиграет.
+            Затем обычное время на ответы. Работает только когда ответы
+            собираются в конце раунда.
+          </div>
+        </div>
+
         <div className="ed-field"><label>После раунда</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
