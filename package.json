@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
+    "test:qa": "vitest run --config vitest.qa.config.ts",
     "deploy:prep": "npm run build && rm -rf docs && cp -r dist docs"
   },
   "dependencies": {
