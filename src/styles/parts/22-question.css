@@ -218,3 +218,49 @@
 .host-screen.has-media > .img-answers { min-height: min(58vh, calc(32vh * var(--ms, 1))); }
 .host-screen.has-media.has-choices > .q-media-grid,
 .host-screen.has-media.has-choices > .img-answers { min-height: min(42vh, calc(27vh * var(--ms, 1))); }
+
+/* ═══════ 8.01: ширина сеток считается от КОНТЕЙНЕРА, а не от экрана ═══════
+   Баг, найденный QA: при 1366px правый край четвёртой картинки-варианта
+   оказывался на 1369.016px — за пределами экрана, и `overflow-x: hidden`
+   срезал эти пиксели.
+
+   Причина в единицах. Ширина сеток задавалась в `vw` — это доля ВСЕГО ОКНА.
+   Но сетка лежит внутри `.host-screen`, у которого есть боковые отступы по
+   44px. Про них `vw` ничего не знает. При `.img-answers.n4 { width:
+   min(1720px, 97vw) }` на 1366px получалось 1325px внутри контейнера
+   шириной 1278px — вылет 47px, и `margin-inline: auto` разбрасывал его на
+   обе стороны.
+
+   Замеры вылета до правки (1366px): n2 −11px (влезала), n3 +33, n4 +47,
+   n5 +61. То есть чем больше картинок, тем хуже — ровно как в отчёте.
+
+   Лечим единицами: `100%` — это доля РОДИТЕЛЯ, отступы уже вычтены.
+   Потолок в пикселях оставляем: он ограничивает ширину на больших экранах.
+   На реальной машине с полосой прокрутки было ещё хуже: `vw` считает и её. */
+.host-screen > .img-answers,
+.host-screen > .img-answers.n2,
+.host-screen > .img-answers.n3,
+.host-screen > .img-answers.n4,
+.host-screen > .img-answers.n5 { max-width: 100%; }
+.host-screen > .q-media-grid,
+.host-screen > .q-media-grid.n1,
+.host-screen > .q-media-grid.n2,
+.host-screen > .q-media-grid.n3,
+.host-screen > .q-media-grid.n4 { max-width: 100%; }
+/* сетка вариантов и текст вопроса — та же арифметика */
+.host-screen > .choices-grid, .host-screen > .q-text,
+.host-screen > .cyber-frame, .host-screen > .q-frame { max-width: 100%; }
+
+/* Картинки-варианты тоже выравниваем по высоте (см. .eq-row выше).
+   Раньше это было сделано только для сеток вопроса — недосмотр. */
+.img-answers.eq-row { display: flex; flex-direction: row; align-items: stretch;
+  justify-content: center; flex-wrap: nowrap; }
+.img-answers.eq-row .img-answer { min-width: 0; min-height: 0; }
+.img-answers.eq-row .ia-frame { display: flex; height: 100%; min-height: 0;
+  align-items: center; justify-content: center; overflow: hidden; }
+.img-answers.eq-row .ia-frame img { width: 100%; height: 100%;
+  max-width: 100%; max-height: 100%; object-fit: contain; }
+@media (max-width: 900px) {
+  .img-answers.eq-row { flex-wrap: wrap; }
+  .img-answers.eq-row .img-answer { flex-basis: 40% !important; }
+}

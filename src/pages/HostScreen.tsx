@@ -87,18 +87,23 @@ function HostInner({ gameState, pack }: {
     return gameState?.pack_id ? `${base}&pack=${gameState.pack_id}` : base
   }, [gameState?.pack_id])
 
-  if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
-
-  // ── Лобби / выбор пакета ──
-  const paperMode = pack?.settings?.play_mode === 'paper'
   // Разбивка игроков по командам, опубликованная из админки.
+  // ВНИМАНИЕ: и вычисление, и оба хука ниже обязаны стоять ДО любого
+  // раннего return. React сверяет число хуков между рендерами: пока
+  // gameState был null, ветка с ними не выполнялась, и на первом же
+  // успешном рендере количество хуков менялось — падал React #310.
   const groups: string[][] =
-    ((gameState as unknown as { random_groups?: string[][] }).random_groups ?? [])
+    ((gameState as unknown as { random_groups?: string[][] } | null)?.random_groups ?? [])
       .filter(g => Array.isArray(g) && g.length > 0)
   // Ключ по содержимому составов: перегенерировали — модалка открылась снова.
   const groupsKey = groups.map(g => g.join(',')).join('|')
   const [groupsOpen, setGroupsOpen] = useState(true)
   useEffect(() => { setGroupsOpen(true) }, [groupsKey])
+
+  if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
+
+  // ── Лобби / выбор пакета ──
+  const paperMode = pack?.settings?.play_mode === 'paper'
 
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
@@ -365,18 +370,14 @@ function HostInner({ gameState, pack }: {
             {!q.media.hidden && imgs.length > 0 && (
               lettered
                 /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
-                ? <div className={`img-answers n${Math.min(imgs.length, 5)}`}>
+                ? <div className={`img-answers n${Math.min(imgs.length, 5)}${
+                      imgs.length > 1 ? ' eq-row' : ''}`}>
                     {imgs.map((m, i) => (
-                      <div key={i} className="img-answer">
-                        <span className="ia-frame">
-                          <span className="ia-key">
-                            {q.answer.mode === 'match' ? i + 1 : (choices?.[i]?.key ?? '')}
-                          </span>
-                          <img src={mediaUrl(m)} alt="" />
-                        </span>
+                      <FitAnswer key={i} src={mediaUrl(m)}
+                        badge={q.answer.mode === 'match' ? String(i + 1) : (choices?.[i]?.key ?? '')}>
                         {q.answer.mode === 'choice' && choices?.[i]?.text &&
                           <span className="ia-text">{choices[i].text}</span>}
-                      </div>
+                      </FitAnswer>
                     ))}
                   </div>
                 : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
@@ -872,6 +873,29 @@ function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => v
           ))}
         </div>
       </div>
+    </div>
+  )
+}
+
+/** Картинка-вариант в ряду, выравненном по высоте.
+ *  Та же механика, что у FitImg: ширину карточки задаёт пропорция снимка,
+ *  поэтому при общей высоте ряда все варианты выглядят одинаково крупными.
+ *  Раньше выравнивание было сделано только для сеток вопроса, а варианты
+ *  с картинками остались рваными — недосмотр, а не решение. */
+function FitAnswer({ src, badge, children }: {
+  src: string; badge: string; children?: React.ReactNode
+}) {
+  const [ar, setAr] = useState(1.5)
+  return (
+    <div className="img-answer" style={{ flexGrow: ar, flexBasis: 0 } as CSSProperties}>
+      <span className="ia-frame">
+        <span className="ia-key">{badge}</span>
+        <img src={src} alt="" onLoad={e => {
+          const el = e.currentTarget
+          if (el.naturalWidth && el.naturalHeight) setAr(el.naturalWidth / el.naturalHeight)
+        }} />
+      </span>
+      {children}
     </div>
   )
 }
