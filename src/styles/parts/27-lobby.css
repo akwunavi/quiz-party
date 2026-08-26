@@ -6,10 +6,6 @@
 /* ═══ 7.75: лобби без скролла ═══
    Проектором никто не прокручивает — значит всё обязано влезать. Блоки
    ужимаются шрифтом через clamp и количество колонок, а не скроллом. */
-.host-screen:has(.lobby-grid) { overflow: hidden; }
-.lobby-grid { display: flex; flex-direction: column; align-items: center;
-  gap: clamp(10px, 2vh, 26px); width: min(1500px, 92vw);
-  flex: 1 1 auto; min-height: 0; justify-content: center; }
 
 .lobby-groups { width: 100%; display: flex; flex-direction: column;
   align-items: center; gap: clamp(6px, 1vh, 14px); min-height: 0; }
@@ -44,12 +40,6 @@
 /* Подключившиеся команды: старое правило растягивало их в колонку на всю
    ширину (min-width 240 + align stretch) — плашки наезжали на составы.
    Здесь чипы в ряд по содержимому. */
-.lobby-grid .lobby-teams { display: flex; flex-direction: row; flex-wrap: wrap;
-  justify-content: center; align-items: center; gap: clamp(6px, .8vw, 14px);
-  width: 100%; min-width: 0; flex: 0 0 auto; }
-.lobby-grid .lobby-team { padding: 8px 18px; font-size: clamp(14px, 1.4vw, 24px);
-  flex: 0 0 auto; }
-.lobby-grid .lobby-teams > .mono-tag { flex: 1 1 100%; text-align: center; }
 /* составы не должны сжиматься под чипами */
 .lobby-groups { flex: 0 1 auto; }
 

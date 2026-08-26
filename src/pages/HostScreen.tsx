@@ -100,6 +100,10 @@ function HostInner({ gameState, pack }: {
   const [groupsOpen, setGroupsOpen] = useState(true)
   useEffect(() => { setGroupsOpen(true) }, [groupsKey])
 
+  // Предзагрузка следующего вопроса. Хук стоит ЗДЕСЬ, до всех ранних
+  // return: вызов внутри условия однажды уже дал падение React #310.
+  usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
+
   if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
 
   // ── Лобби / выбор пакета ──
@@ -113,6 +117,7 @@ function HostInner({ gameState, pack }: {
             а игроки смотрят на него дольше, чем на любой другой экран.
             Панели стоят СЛЕВА и СПРАВА от логотипа отдельными колонками,
             поэтому налезть на него не могут: ширину делит флекс-строка. */}
+        <LobbyMusic pack={pack} />
         {(pack?.theme ?? 'classic') === 'classic' ? (
           <div className="cyber-lobby-head">
             <CyberPanel side="left" />
@@ -994,6 +999,86 @@ function RecapSlides({ pack, round, gameState }: {
       </div>
     </div>
   )
+}
+
+/** Фоновая музыка на экране ожидания.
+ *
+ *  Лобби висит дольше любого другого экрана, и до сих пор оно молчало.
+ *  По умолчанию берём ту же фоновую музыку, что задана для пакета
+ *  (`settings.bg_music`); если для лобби задана своя — `settings.lobby_music`
+ *  перебивает её.
+ *
+ *  Про автозапуск: браузер не даёт играть звуку, пока по странице не
+ *  кликнули. Поэтому при отказе мы не молчим, а ждём первого клика по
+ *  экрану и стартуем тогда — ведущий всё равно нажимает кнопки.
+ *  Громкость ниже, чем у музыки вопросов: под лобби разговаривают. */
+function LobbyMusic({ pack }: { pack: LoadedPack | null }) {
+  useEffect(() => {
+    const src = pack?.settings?.lobby_music ?? pack?.settings?.bg_music
+    if (!src) return
+    const a = createAudio()
+    a.src = mediaUrl(src)
+    a.loop = true
+    a.volume = 0.45
+    let unlocked = false
+    const start = () => {
+      if (unlocked) return
+      unlocked = true
+      a.play().catch(() => {})
+      window.removeEventListener('pointerdown', start)
+      window.removeEventListener('keydown', start)
+    }
+    a.play().then(() => { unlocked = true }).catch(() => {
+      // автозапуск заблокирован — ждём первого касания
+      window.addEventListener('pointerdown', start)
+      window.addEventListener('keydown', start)
+    })
+    return () => {
+      window.removeEventListener('pointerdown', start)
+      window.removeEventListener('keydown', start)
+      try { a.pause() } catch { /* уже остановлено */ }
+    }
+  }, [pack?.settings?.lobby_music, pack?.settings?.bg_music])
+  return null
+}
+
+/** Предзагрузка медиа СЛЕДУЮЩЕГО вопроса.
+ *
+ *  Раньше картинка начинала грузиться в момент показа: на слабом вайфае зал
+ *  видел чёрный кадр посреди игры. Здесь мы, пока идёт текущий вопрос, тихо
+ *  тянем медиа следующего — браузер кладёт их в кеш, и показ становится
+ *  мгновенным.
+ *
+ *  Грузим ровно на один вопрос вперёд: тянуть весь пак разом значит забить
+ *  канал ровно тогда, когда он нужен для текущего вопроса. Аудио и видео
+ *  берём с `preload="auto"`, но не проигрываем. Ошибки игнорируются —
+ *  предзагрузка не должна ронять игру. */
+function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: number) {
+  useEffect(() => {
+    if (!round) return
+    const questions = round.questions.filter(q => !q.hidden)
+    const next = questions[index + 1]
+    if (!next) return
+    const paths = [
+      ...(next.media.question ?? []),
+      ...(next.media.answer ?? []),
+      ...(next.media.voice ? [next.media.voice] : []),
+    ]
+    const nodes: HTMLElement[] = []
+    for (const p of paths) {
+      const url = mediaUrl(p)
+      if (/\.(mp3|wav|m4a|aac|ogg|opus|flac|mp4|webm)$/i.test(p)) {
+        const el = document.createElement(/\.(mp4|webm)$/i.test(p) ? 'video' : 'audio')
+        el.preload = 'auto'; el.src = url
+        nodes.push(el)
+      } else {
+        const img = new Image()
+        img.src = url
+        nodes.push(img)
+      }
+    }
+    return () => { for (const n of nodes) { try { (n as HTMLMediaElement).src = '' } catch { /* ok */ } } }
+  }, [round, index])
 }
 
 function displayAnswer(q: Question): string {

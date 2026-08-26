@@ -345,6 +345,18 @@ function PackScreen({ packId, user, onBack }: {
               }} />
             <div className="ed-hint">Один трек на весь пакет — экономит место. Раунд может переопределить</div>
           </div>
+          <div className="ed-field"><label>Музыка в лобби</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={pack.settings?.lobby_music ? [pack.settings.lobby_music] : []}
+              onChange={async paths => {
+                await setPackSettings(pack.id, { ...(pack.settings ?? {}), lobby_music: paths[0] })
+                reload()
+              }} />
+            <div className="ed-hint">
+              Играет на экране ожидания, пока собираются команды.
+              Если пусто — играет общая фоновая музыка выше
+            </div>
+          </div>
           <div className="ed-field"><label>Как играем</label>
             <select value={pack.settings?.play_mode ?? 'phones'}
               onChange={async ev => { await setPackSettings(pack.id, { ...(pack.settings ?? {}), play_mode: ev.target.value as never }); reload() }}>

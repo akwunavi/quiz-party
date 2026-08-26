@@ -70,8 +70,6 @@
 /* знак «место разделено» рядом с номером */
 .sb-eq { font-size: .6em; opacity: .55; margin-left: .15em; vertical-align: super; }
 /* в лобби без телефонов QR нет — команды занимают всю ширину */
-.lobby-row.no-qr { justify-content: center; }
-.lobby-row.no-qr .lobby-teams { align-items: center; text-align: center; }
 
 /* ═══ 7.70: перерыв, «О счастливчик», Своя игра ═══ */
 

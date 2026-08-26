@@ -11,8 +11,6 @@
 @keyframes correctPulse { 50% { box-shadow: 0 0 42px rgba(87,245,192,.75); transform: scale(1.015); } }
 .choice-img.correct { border-color: var(--answer); box-shadow: 0 0 26px rgba(87,245,192,.45);
   animation: correctPulse 1.6s ease-in-out infinite; }
-.order-step { border-color: rgba(87,245,192,.4); background: rgba(87,245,192,.07); }
-.order-step .pos { color: var(--answer); }
 .rebus-hot { color: var(--answer); text-shadow: 0 0 14px rgba(87,245,192,.6); }
 
 /* ── Картинки-варианты: буква СЛЕВА, ничего не налезает ── */
@@ -48,25 +46,6 @@
 .ny-wreath.low .val { color: #ff6b81; animation: shiver .5s linear infinite; }
 
 /* ── Финал ── */
-.fin-podium { display: flex; align-items: flex-end; gap: clamp(12px, 2vw, 30px); justify-content: center; }
-.fin-step { display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 18px clamp(14px, 2vw, 30px); border-radius: 14px 14px 0 0;
-  background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.3); min-width: clamp(150px, 16vw, 240px);
-  animation: titleIn .8s both; }
-.fin-step.p1 { padding-bottom: 60px; border-color: rgba(255,215,0,.7);
-  box-shadow: 0 0 40px rgba(255,215,0,.25); }
-.fin-step.p2 { padding-bottom: 36px; }
-.fin-step.p3 { padding-bottom: 22px; }
-.fin-medal { font-size: clamp(34px, 4vw, 58px); }
-.fin-name { font-family: var(--font-display); font-size: clamp(18px, 2vw, 30px); }
-.fin-score { font-family: var(--font-digits); font-size: clamp(26px, 3vw, 46px); }
-.fin-place { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); }
-.fin-rest { display: flex; flex-direction: column; gap: 6px; margin-top: 18px; width: min(60vw, 620px); }
-.fin-row { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; padding: 8px 16px;
-  border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
-  font-family: 'Rajdhani', sans-serif; font-size: 20px; }
-.fin-row .num { font-family: var(--font-digits); color: var(--muted); }
 
 /* ── Своя игра: доска на всю высоту + модалка ── */
 .jp-screen { justify-content: flex-start; gap: 12px; padding: 20px 34px 92px; }

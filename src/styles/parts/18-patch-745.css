@@ -4,8 +4,6 @@
 /* вопрос и варианты — заметно крупнее, с автоподгонкой под длину */
 .q-text { font-size: clamp(26px, 3.2vw, 58px); line-height: 1.18; }
 .q-text.long { font-size: clamp(22px, 2.4vw, 42px); }
-.opt-row { font-size: clamp(19px, 2vw, 34px); padding: 16px 22px; }
-.opt-row .opt-letter { font-size: 1.05em; }
 .jp-modal, .mel-modal { width: min(1100px, 94vw); }
 .jp-modal-question, .jp-answer { font-size: clamp(22px, 2.6vw, 44px); }
 /* ответы команд и разбор */

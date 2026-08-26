@@ -28,8 +28,6 @@
 .mel-modal { border-radius: 16px; }
 
 /* Финал: поэтапное раскрытие и разбивка */
-.fin-step.veiled { opacity: 0; transform: translateY(26px); }
-.fin-step { transition: opacity .7s ease, transform .7s ease; }
 .fin-breakdown { margin-top: 16px; animation: ruleIn .6s ease both; }
 .fin-table { border-collapse: collapse; font-family: 'Rajdhani', sans-serif;
   font-size: clamp(14px, 1.3vw, 20px); }

@@ -115,11 +115,6 @@
 /* Правильный порядок: расшифровка по шагам */
 .order-answer { display: flex; flex-direction: column; gap: 8px; align-items: stretch;
   width: min(80vw, 900px); }
-.order-step { display: flex; align-items: center; gap: 14px; padding: 8px 16px;
-  border: 1px solid rgba(255,215,0,.4); border-radius: 10px; }
-.order-step .pos { font-family: var(--font-digits); min-width: 28px; }
-.order-step .key { font-family: var(--font-display); color: var(--accent); min-width: 26px; }
-.order-step .txt { font-family: 'Rajdhani', sans-serif; font-size: clamp(18px, 2vw, 28px); }
 
 /* Своя игра в новогодней теме: плитки-подарки */
 .theme-new_year .jp-tile { background: linear-gradient(180deg, #12467f, #0d2a55);

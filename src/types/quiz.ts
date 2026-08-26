@@ -9,6 +9,8 @@ export type ThemeKey = 'classic' | 'new_year' | 'potter'
 
 export interface PackSettings {
   bg_music?: string          // общая фоновая музыка вопросов
+  // Музыка на экране ожидания. Не задана — играет bg_music.
+  lobby_music?: string
   title_music?: string       // музыка титульного экрана
   finale_music?: string      // музыка табло/финала
   timer_seconds?: number     // дефолтный таймер раундов

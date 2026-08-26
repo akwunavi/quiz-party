@@ -69,8 +69,6 @@
 .theme-potter .sprint-card { background: rgba(211,166,37,.08);
   border-color: rgba(211,166,37,.4); }
 .theme-potter .mel-theme { color: #e9c766; }
-.theme-potter .fin-step.p1 { border-color: #d3a625;
-  box-shadow: 0 0 46px rgba(211,166,37,.45); }
 
 /* Спринт: вопрос-«герой» на всю ширину над колонками (нечётное число вопросов) */
 .sprint-screen.with-hero { grid-template-rows: auto 1fr; }

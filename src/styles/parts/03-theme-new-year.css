@@ -58,10 +58,6 @@
 .ny-timer { position: relative; display: inline-flex; align-items: center; justify-content: center;
   width: clamp(120px, 13vw, 190px); height: clamp(120px, 13vw, 190px); }
 .ny-timer svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.ny-timer .ring-bg { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 7; }
-.ny-timer .ring-fg { fill: none; stroke: #bfe3ff; stroke-width: 7; stroke-linecap: round;
-  filter: drop-shadow(0 0 8px #7cc7ff); transition: stroke-dashoffset .3s linear; }
-.ny-timer.low .ring-fg { stroke: #ff6b81; filter: drop-shadow(0 0 12px #ff6b81); }
 .ny-timer .val { font-family: var(--font-digits); font-weight: 900;
   font-size: clamp(36px, 4.4vw, 64px); font-variant-numeric: tabular-nums; z-index: 1; }
 .ny-timer.low .val { color: #ff6b81; animation: shiver .5s linear infinite; }

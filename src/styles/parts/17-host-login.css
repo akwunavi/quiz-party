@@ -32,8 +32,6 @@
   border-top: 1px dashed rgba(255,255,255,.14); }
 
 /* Лобби по эталону ЖК */
-.lobby-row { display: flex; gap: clamp(24px, 5vw, 70px); align-items: center;
-  justify-content: center; flex-wrap: wrap; }
 .qr-card { display: flex; flex-direction: row; align-items: center; gap: 22px;
   padding: 18px 26px; }
 .qr-card .lobby-qr { background: #fff; padding: 8px; border-radius: 4px;
