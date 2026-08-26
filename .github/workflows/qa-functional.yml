@@ -2,8 +2,9 @@ name: qa-functional
 
 on:
   push:
-    branches: [main]
+    branches: [main, qa/phase-0-smoke]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   functional:
