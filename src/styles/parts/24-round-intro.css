@@ -119,7 +119,16 @@
 .ri-main > .neon-title {
   --k: .73;
   width: 100%; min-width: 0; max-width: 100%;
-  overflow-wrap: anywhere; word-break: break-word;
+  /* ПЕРЕНОСЫ. `overflow-wrap: anywhere` рвал слово в любом месте, и на
+     вторую строку могла уехать одна буква — «МУЗЫКАЛЬНА/Я». Теперь порядок
+     такой: сначала пробуем перенести слово целиком, если не влезает —
+     переносим по слогам с дефисом (hyphens: auto + lang="ru" на <html>),
+     и только в безвыходной ситуации рвём. До разрыва обычно не доходит:
+     кегль ниже подбирается формулой так, чтобы слово влезало в строку. */
+  overflow-wrap: break-word; word-break: normal;
+  hyphens: auto; -webkit-hyphens: auto;
+  /* не оставлять на строке огрызок короче 3 букв */
+  hyphenate-limit-chars: 6 3 3;
   line-height: 1.04; margin: 0;
   font-size: max(26px, min(
     190px,                                              /* потолок */

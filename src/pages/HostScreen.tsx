@@ -95,12 +95,34 @@ function HostInner({ gameState, pack }: {
   const groups: string[][] =
     ((gameState as unknown as { random_groups?: string[][] }).random_groups ?? [])
       .filter(g => Array.isArray(g) && g.length > 0)
+  // Ключ по содержимому составов: перегенерировали — модалка открылась снова.
+  const groupsKey = groups.map(g => g.join(',')).join('|')
+  const [groupsOpen, setGroupsOpen] = useState(true)
+  useEffect(() => { setGroupsOpen(true) }, [groupsKey])
+
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <div className={`host-screen grid-bg${paperMode ? ' paper-lobby' : ''}`}>
-        <Title theme={pack?.theme ?? 'classic'}
-          lines={(pack?.theme ?? 'classic') === 'classic' ? ['QUIZ', 'PARTY'] : ['QUIZ PARTY']} />
-        <Deco theme={pack?.theme ?? 'classic'} />
+        {/* Киберпанк-обвязка логотипа. У НГ и ГП экран лобби живой сам по
+            себе (снег, свечи), у классики он висел статичной картинкой —
+            а игроки смотрят на него дольше, чем на любой другой экран.
+            Панели стоят СЛЕВА и СПРАВА от логотипа отдельными колонками,
+            поэтому налезть на него не могут: ширину делит флекс-строка. */}
+        {(pack?.theme ?? 'classic') === 'classic' ? (
+          <div className="cyber-lobby-head">
+            <CyberPanel side="left" />
+            <div className="clh-title">
+              <Title theme="classic" lines={['QUIZ', 'PARTY']} />
+              <CyberDeco theme="classic" />
+            </div>
+            <CyberPanel side="right" />
+          </div>
+        ) : (
+          <>
+            <Title theme={pack?.theme ?? 'classic'} lines={['QUIZ PARTY']} />
+            <Deco theme={pack?.theme ?? 'classic'} />
+          </>
+        )}
         {!gameState.pack_id ? (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <select value={selectedId} onChange={e => setSelectedId(e.target.value)}
@@ -127,21 +149,18 @@ function HostInner({ gameState, pack }: {
             {/* Лобби как было: список подключившихся команд по центру.
                 Составы от рандомайзера появляются НАД ним и только если их
                 опубликовали — без них экран выглядит ровно как раньше. */}
-            {groups.length > 0 && (
-              <div className="lobby-groups" data-count={groups.length}>
-                <div className="mono-tag">СОСТАВЫ КОМАНД</div>
-                <div className="lg-list">
-                  {groups.map((g, i) => (
-                    <div key={i} className="lg-team">
-                      <div className="lg-name"
-                        style={{ color: teamColor(i) }}>
-                        Команда {i + 1}
-                      </div>
-                      <div className="lg-players">{g.join(' · ')}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* Составы от рандомайзера — модалкой поверх лобби.
+                В потоке они выдавливали список подключившихся вниз, а при
+                восьми командах экран переставал помещаться. Модалка
+                открывается сама, когда составы опубликовали, закрывается
+                ведущим и возвращается кнопкой. Размер считает сетка внутри:
+                колонок тем больше, чем больше команд. */}
+            {groups.length > 0 && groupsOpen && (
+              <GroupsModal groups={groups} onClose={() => setGroupsOpen(false)} />
+            )}
+            {groups.length > 0 && !groupsOpen && (
+              <button className="ghost dark lobby-groups-btn"
+                onClick={() => setGroupsOpen(true)}>СОСТАВЫ КОМАНД</button>
             )}
             <div className="lobby-teams">
               {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
@@ -283,6 +302,9 @@ function HostInner({ gameState, pack }: {
     // в ГП своё оформление. Даём классике рамку — разметка не меняется,
     // добавляется только класс на уже существующий контейнер.
     const isCyber = pack.theme === 'classic'
+    // Есть ли вообще текст вопроса: у ребусов его не бывает, и в обычных
+    // вопросах поле могут оставить пустым, когда всё говорит картинка.
+    const hasText = !!q.question_text.trim()
     const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
       : isCyber ? 'cyber-frame' : ''
     // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
@@ -293,7 +315,8 @@ function HostInner({ gameState, pack }: {
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
 
     return (
-      <div className={`host-screen grid-bg${imgs.length && !q.media.hidden ? ' has-media' : ''}${
+      <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
+        imgs.length && !q.media.hidden ? ' has-media' : ''}${
         (choices && !lettered) || (q.answer.mode === 'match'
           && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
         <AudioGate />
@@ -328,11 +351,17 @@ function HostInner({ gameState, pack }: {
           </div>
         ) : (
           <>
-            <div className={frameCls}>
-              {isNY && <Icicles seed={q.id} low={timeLow} />}
-              {isCyber && <span className="cf-scan" aria-hidden="true" />}
-              <WindText key={q.id} text={q.question_text} />
-            </div>
+            {/* Пустой текст — пустая рамка. У ребусов текста нет никогда, но
+                так же бывает и в обычных вопросах, где всё сказано картинкой.
+                Раньше на экране висел пустой контейнер и съедал высоту,
+                которая нужна изображениям. */}
+            {hasText && (
+              <div className={frameCls}>
+                {isNY && <Icicles seed={q.id} low={timeLow} />}
+                {isCyber && <span className="cf-scan" aria-hidden="true" />}
+                <WindText key={q.id} text={q.question_text} />
+              </div>
+            )}
             {!q.media.hidden && imgs.length > 0 && (
               lettered
                 /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
@@ -735,6 +764,118 @@ function FitImg({ src, children }: { src: string; children?: React.ReactNode }) 
   )
 }
 
+/* ── Сколько длится показ верного ответа ──────────────────────────────────
+   Раньше автопроверка стояла на СВОЁМ таймере в 4200 мс, никак не связанном
+   с анимацией. Для вариантов подсветка верного заканчивается позже: 3300 мс
+   до стадии 2, плюс до 500 мс каскада, плюс сама подсветка. Автопроверка
+   успевала записать is_correct раньше — и на телефонах игроков галочка
+   загоралась до того, как зал увидел ответ. То же ждало сопоставление и
+   порядок при большом числе элементов.
+   Теперь длительность считается ИЗ ТЕХ ЖЕ ЧИСЕЛ, что и анимация. Меняешь
+   тайминг показа — правь константу здесь, и проверка сдвинется сама. */
+const CH_STAGE2_MS = 3300        // когда подсвечивается верный вариант
+const CH_STAGGER_MS = 500        // каскад по невыпавшим вариантам
+const CH_HIGHLIGHT_MS = 900      // сама подсветка
+const ITEM_FIRST_MS = 100        // первый элемент match/order
+const ITEM_STEP_MS = 600         // шаг между элементами (см. 18-patch-745.css)
+const ITEM_ANIM_MS = 500         // длительность появления элемента
+/** Через сколько мс после reveal ответ ПОЛНОСТЬЮ на экране. */
+function revealDoneMs(q: Question): number {
+  const a = q.answer
+  if (a.mode === 'choice') return CH_STAGE2_MS + CH_STAGGER_MS + CH_HIGHLIGHT_MS
+  if (a.mode === 'match')
+    return ITEM_FIRST_MS + ITEM_STEP_MS * Math.max(0, Math.min(a.left.length, 6) - 1) + ITEM_ANIM_MS
+  if (a.mode === 'order')
+    return ITEM_FIRST_MS + ITEM_STEP_MS * Math.max(0, a.correct_order.length - 1) + ITEM_ANIM_MS
+  return 1200
+}
+
+/** Скрытое видео на показе ответа.
+ *
+ *  Во время вопроса видео с media.hidden играет «как аудио»: картинки нет,
+ *  зал слышит только звук. На разборе прятать его уже незачем — наоборот,
+ *  зал должен увидеть, что там было. Раньше на экране разбора видео не
+ *  показывалось вообще: фильтр медиа выкидывал mp4/webm вместе с аудио.
+ *
+ *  Показываем ровно 10 СЕКУНД, независимо от длины ролика: длинное видео
+ *  затянуло бы разбор, короткое доиграет и остановится само. Отсчёт идёт от
+ *  момента показа ответа, поэтому видео и ответ появляются одновременно. */
+function RevealVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement | null>(null)
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    v.currentTime = 0
+    v.play().catch(() => {})
+    const t = setTimeout(() => { try { v.pause() } catch { /* ничего */ } }, 10_000)
+    return () => { clearTimeout(t); try { v.pause() } catch { /* ничего */ } }
+  }, [src])
+  return (
+    <div className="reveal-video">
+      <video ref={ref} src={src} playsInline muted={false} />
+    </div>
+  )
+}
+
+/** Боковая панель лобби в киберпанке.
+ *
+ *  Три элемента, все — чистый CSS, без картинок и без данных:
+ *  бегущий столбец «телеметрии», вертикальная шкала и штрих-код.
+ *  Содержимое декоративное и намеренно не несёт смысла: это фон, на который
+ *  игроки смотрят долго, а не информация, которую надо читать.
+ *  Панели скрываются на узких экранах, чтобы не жать логотип. */
+function CyberPanel({ side }: { side: 'left' | 'right' }) {
+  const rows = side === 'left'
+    ? ['SYS::READY', 'NET 100%', 'NODE 07', 'SYNC OK', 'BUF 4096', 'CH 02']
+    : ['LINK UP', 'PING 12ms', 'QUEUE 0', 'AUTH OK', 'TEMP 41C', 'RUN']
+  return (
+    <div className={`cyber-panel cp-${side}`} aria-hidden="true">
+      <span className="cp-bar" />
+      <div className="cp-rows">
+        {rows.map((r, i) => (
+          <span key={r} className="cp-row" style={{ animationDelay: `${i * 0.4}s` }}>{r}</span>
+        ))}
+      </div>
+      <div className="cp-code">
+        {Array.from({ length: 14 }, (_, i) => (
+          <i key={i} style={{ width: `${2 + ((i * 7) % 5)}px` }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Модалка составов команд от рандомайзера.
+ *  Закрывается крестиком, кликом по фону и Esc — ведущему может понадобиться
+ *  показать что-то под ней, не перезапуская экран. */
+function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+  const players = groups.reduce((n, g) => n + g.length, 0)
+  return (
+    <div className="groups-overlay" onClick={onClose}>
+      <div className="groups-modal" data-count={groups.length}
+        onClick={e => e.stopPropagation()}>
+        <div className="gm-head">
+          <span className="mono-tag">СОСТАВЫ КОМАНД · {groups.length} · {players} чел.</span>
+          <button className="gm-close" onClick={onClose} aria-label="Закрыть">✕</button>
+        </div>
+        <div className="lg-list">
+          {groups.map((g, i) => (
+            <div key={i} className="lg-team">
+              <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>
+              <div className="lg-players">{g.join(' · ')}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function displayAnswer(q: Question): string {
   const empty = '⚠ ответ не заполнен в редакторе'
   const a = q.answer as unknown as Record<string, unknown>
@@ -981,10 +1122,10 @@ function ShowAnswers({ pack, round, q, gameState }: {
   useEffect(() => {
     setChecked(false)
     if (!revealed) return
-    // сопоставление и порядок выезжают по элементам — ждём, пока покажут всё
-    const slow = q.answer.mode === 'match' || q.answer.mode === 'order'
-      || (q.answer.mode === 'choice')
-    const t = setTimeout(() => setChecked(true), slow ? 4200 : 1600)
+    // Ждём, пока ответ ПОЛНОСТЬЮ окажется на экране, и только потом пишем
+    // is_correct — иначе на телефонах игроков результат загорается раньше зала.
+    // +600 мс запаса на неровность таймеров браузера.
+    const t = setTimeout(() => setChecked(true), revealDoneMs(q) + 600)
     return () => clearTimeout(t)
   }, [revealed, step])
 
@@ -1008,6 +1149,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
   // они были скрыты (media.hidden): на ответе прятать их уже незачем.
   const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const revealImgs = answerImgs.length ? answerImgs : questionImgs
+  // Видео, которое во время вопроса играло «как аудио» (media.hidden).
+  // На разборе показываем его вместе с ответом — 10 секунд, см. RevealVideo.
+  const hiddenVideo = q.media.hidden
+    ? (q.media.question ?? []).find(m => /\.(mp4|webm)$/i.test(m))
+    : undefined
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -1036,6 +1182,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && (
             <div className="answer-block reveal-in">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+              {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
+              {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
 
               {round.mechanic === 'rebus' ? (
                 // у ребуса свой разбор: две картинки с подсветкой слогов
@@ -1147,7 +1295,7 @@ function StagedChoices({ q, choices, imgs }: {
     // Вторая пара и подсветка идут почти встык: как только оставшиеся два
     // варианта на экране, ответ и так очевиден — тянуть паузу незачем.
     const t1 = setTimeout(() => setStage(1), 2200)
-    const t2 = setTimeout(() => setStage(2), 3300)
+    const t2 = setTimeout(() => setStage(2), CH_STAGE2_MS)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [q.id])
 

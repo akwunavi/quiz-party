@@ -183,3 +183,38 @@
   .q-media-grid.eq-row { flex-wrap: wrap; }
   .q-media-grid.eq-row .q-img { flex-basis: 40% !important; }
 }
+
+/* ═══════ 7.97: пустой вопрос, баланс «текст ↔ картинки» ═══════ */
+
+/* ── Вопрос без текста (ребусы и любые «всё сказано картинкой») ──
+   Рамка вопроса в разметке больше не рендерится, но экрану нужно отдать
+   освободившуюся высоту изображениям, иначе они остаются прежнего размера
+   и сверху висит пустая полоса. */
+.host-screen.no-qtext.has-media > .q-media-grid,
+.host-screen.no-qtext.has-media > .img-answers {
+  max-height: min(78vh, calc(70vh * var(--ms, 1)));
+  min-height: min(66vh, calc(40vh * var(--ms, 1))); }
+.host-screen.no-qtext.has-media.has-choices > .q-media-grid,
+.host-screen.no-qtext.has-media.has-choices > .img-answers {
+  max-height: min(60vh, calc(52vh * var(--ms, 1)));
+  min-height: min(50vh, calc(32vh * var(--ms, 1))); }
+
+/* ── Баланс текста и картинок ──
+   Текст вопроса рядом с изображениями был крупнее, чем нужно: он съедал
+   высоту, которой не хватало картинкам. Опускаем на ступень и отдаём
+   освободившееся место медиа. Там, где картинок нет, кегль прежний. */
+.host-screen.has-media .q-text { font-size: clamp(19px, 2.5vw, 44px); }
+.host-screen.has-media .q-text.len-m { font-size: clamp(18px, 2.2vw, 38px); }
+.host-screen.has-media .q-text.len-l { font-size: clamp(17px, 1.9vw, 32px); }
+.host-screen.has-media .q-text.len-xl { font-size: clamp(15px, 1.6vw, 26px); }
+.host-screen.has-media.has-choices .q-text { font-size: clamp(18px, 2.05vw, 35px); }
+.host-screen.has-media.has-choices .q-text.len-m { font-size: clamp(17px, 1.8vw, 30px); }
+.host-screen.has-media.has-choices .q-text.len-l { font-size: clamp(16px, 1.6vw, 26px); }
+.host-screen.has-media.has-choices .q-text.len-xl { font-size: clamp(14px, 1.4vw, 22px); }
+/* рамка вопроса рядом с картинками тоже ужимается по вертикали */
+.host-screen.has-media > .cyber-frame { padding-block: clamp(8px, 1.2vh, 18px); }
+/* картинкам достаётся освободившееся: поднимаем пол */
+.host-screen.has-media > .q-media-grid,
+.host-screen.has-media > .img-answers { min-height: min(58vh, calc(32vh * var(--ms, 1))); }
+.host-screen.has-media.has-choices > .q-media-grid,
+.host-screen.has-media.has-choices > .img-answers { min-height: min(42vh, calc(27vh * var(--ms, 1))); }

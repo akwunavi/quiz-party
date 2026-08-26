@@ -419,3 +419,16 @@
   .answer-block.reveal-in .answer-label { opacity: 1 !important; filter: none !important;
     letter-spacing: normal !important; }
 }
+
+/* ═══════ 7.97: скрытое видео на показе ответа ═══════ */
+/* Появляется вместе с ответом и играет 10 секунд (см. RevealVideo).
+   Размер держим скромным: это дополнение к ответу, а не главный герой. */
+.reveal-video { display: flex; justify-content: center; width: 100%;
+  min-height: 0; margin: 4px 0 2px; }
+.reveal-video video {
+  max-height: min(46vh, 420px); max-width: min(100%, 760px);
+  width: auto; height: auto; border-radius: 14px;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 10px 44px rgba(0,0,0,.55); }
+/* если рядом ещё и картинка ответа — видео уступает ей место */
+.answer-block:has(> .answer-media) .reveal-video video { max-height: min(34vh, 300px); }

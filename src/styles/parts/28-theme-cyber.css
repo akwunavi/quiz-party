@@ -103,3 +103,77 @@
 .host-screen.has-choices > .cyber-frame {
   padding-block: clamp(8px, 1.2vh, 18px); min-height: 0; }
 .host-screen.has-choices > .choices-grid { padding-top: clamp(10px, 2vh, 28px); }
+
+/* ═══ ЛОББИ: ОБВЯЗКА ЛОГОТИПА ═══
+   Экран лобби игроки видят дольше любого другого, а в классике он висел
+   статичной картинкой. Панели стоят ОТДЕЛЬНЫМИ КОЛОНКАМИ слева и справа,
+   логотип — в средней: наехать друг на друга они не могут, ширину делит
+   флекс-строка, а не абсолютное позиционирование. */
+.cyber-lobby-head { display: flex; align-items: center; justify-content: center;
+  gap: clamp(18px, 3vw, 64px); width: min(1600px, 94vw); }
+.cyber-lobby-head > .clh-title { flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(8px, 1.4vh, 20px); container-type: inline-size; }
+/* Логотип считаем ТОЙ ЖЕ формулой, что и заголовки раундов: ширина слова
+   умножается на кегль, поэтому «QUIZ PARTY» заполняет колонку между
+   панелями, а не висит узкой полосой с пустотой по бокам.
+   font-weight задан явно: по умолчанию у <h1> это 700, и на крупном кегле
+   те же 700 читаются тоньше, чем на мелком — чисто оптический эффект.
+   Возвращаем плотность, которая была при прежнем размере. */
+.cyber-lobby-head .neon-title {
+  font-weight: 900;
+  letter-spacing: -.012em;
+  font-size: max(48px, min(
+    calc(100cqw / (var(--longest, 5) * .72)),   /* влезть по ширине колонки */
+    calc(52vh / var(--lines, 1)),               /* влезть по высоте экрана */
+    260px                                        /* потолок */
+  )) !important; }
+
+.cyber-panel { flex: 0 0 auto; width: clamp(120px, 12vw, 210px);
+  display: flex; align-items: center; gap: clamp(8px, .8vw, 16px);
+  opacity: .85; pointer-events: none; }
+.cyber-panel.cp-right { flex-direction: row-reverse; }
+
+/* вертикальная шкала с бегущим бликом */
+.cyber-panel .cp-bar { flex: 0 0 3px; align-self: stretch; min-height: 140px;
+  border-radius: 3px; background: linear-gradient(180deg,
+    transparent, color-mix(in srgb, var(--accent) 75%, transparent), transparent);
+  background-size: 100% 220%; animation: cpBar 4.2s ease-in-out infinite; }
+.cyber-panel.cp-right .cp-bar { animation-direction: reverse; }
+@keyframes cpBar { 0%, 100% { background-position: 0 -60%; }
+  50% { background-position: 0 160%; } }
+
+/* столбец телеметрии: строки проступают по очереди и гаснут */
+.cyber-panel .cp-rows { display: flex; flex-direction: column;
+  gap: clamp(3px, .5vh, 7px); min-width: 0; }
+.cyber-panel.cp-right .cp-rows { align-items: flex-end; }
+.cyber-panel .cp-row { font-family: var(--font-mono, monospace);
+  font-size: clamp(9px, .78vw, 14px); letter-spacing: .12em;
+  color: color-mix(in srgb, var(--accent2) 80%, transparent);
+  white-space: nowrap; animation: cpRow 3.6s ease-in-out infinite; }
+@keyframes cpRow { 0%, 100% { opacity: .18; } 45% { opacity: 1; } }
+
+/* штрих-код: тонкие штрихи разной ширины, слегка мерцают */
+.cyber-panel .cp-code { display: flex; align-items: flex-end;
+  gap: 2px; height: clamp(26px, 3vh, 44px); }
+.cyber-panel .cp-code i { display: block; height: 100%; border-radius: 1px;
+  background: color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cpCode 2.8s steps(1) infinite; }
+.cyber-panel .cp-code i:nth-child(3n) { animation-delay: .9s; }
+.cyber-panel .cp-code i:nth-child(3n+1) { animation-delay: 1.8s; }
+@keyframes cpCode { 0%, 100% { opacity: .35; } 50% { opacity: .95; } }
+
+/* узкий экран: панели уходят, логотипу нужна вся ширина */
+@media (max-width: 1100px) { .cyber-panel { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .cyber-panel .cp-bar, .cyber-panel .cp-row, .cyber-panel .cp-code i {
+    animation: none; opacity: .7; }
+}
+
+/* Режим «без телефонов» (paper-lobby) задаёт размер СТРОКАМ логотипа
+   отдельным правилом — оно писалось, когда заголовок был мелким, и делало
+   его крупнее. Теперь кегль считает формула на самом <h1>, а правило строк
+   перебивало её: буквы рендерились в 145px, а межстрочный интервал брался
+   от 234px — между QUIZ и PARTY зияла дыра, и логотип не заполнял колонку.
+   Строки наследуют размер заголовка, поэтому оба режима выглядят одинаково. */
+.cyber-lobby-head .neon-title .title-line { font-size: inherit; }

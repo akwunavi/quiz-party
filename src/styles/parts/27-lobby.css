@@ -52,3 +52,64 @@
 .lobby-grid .lobby-teams > .mono-tag { flex: 1 1 100%; text-align: center; }
 /* составы не должны сжиматься под чипами */
 .lobby-groups { flex: 0 1 auto; }
+
+/* ═══════ 7.98: фишки команд в ряд, составы — модалкой ═══════ */
+
+/* ── Команды выстраивались СТОЛБИКОМ ──
+   Правило «в ряд» было написано под `.lobby-grid .lobby-teams`, но класса
+   `.lobby-grid` в разметке нет — селектор не срабатывал никогда, и побеждал
+   `flex-direction: column` из 17-host-login.css. При четырёх и более
+   командах экран превращался в вертикальный список.
+   Здесь селектор привязан к реальной разметке: список — прямой ребёнок
+   экрана. На итогах (`.lobby-row .lobby-teams`) вёрстка своя, её не трогаем. */
+.host-screen > .lobby-teams {
+  display: flex; flex-direction: row; flex-wrap: wrap;
+  align-items: center; justify-content: center;
+  gap: clamp(8px, 1vw, 18px); width: min(1400px, 92vw); max-width: none; }
+.host-screen > .lobby-teams > .mono-tag { flex: 1 1 100%; text-align: center; }
+.host-screen > .lobby-teams > .lobby-team { flex: 0 0 auto; }
+/* много команд — фишки мельче, чтобы ряд не расползался на пол-экрана */
+.host-screen > .lobby-teams:has(> .lobby-team:nth-child(7)) > .lobby-team {
+  font-size: clamp(15px, 1.4vw, 21px); padding: 10px 20px; }
+.host-screen > .lobby-teams:has(> .lobby-team:nth-child(11)) > .lobby-team {
+  font-size: clamp(13px, 1.15vw, 18px); padding: 8px 16px; }
+
+/* ── Составы команд: модалка поверх лобби ──
+   В потоке они выдавливали список подключившихся вниз и при восьми командах
+   экран переставал помещаться. Размер модалки задаёт содержимое: ширина
+   растёт до предела, число колонок — по количеству команд. */
+.groups-overlay { position: fixed; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(16px, 3vh, 40px);
+  background: rgba(4, 8, 14, .72); backdrop-filter: blur(6px);
+  animation: gmFade .25s ease both; }
+@keyframes gmFade { from { opacity: 0; } to { opacity: 1; } }
+
+.groups-modal { display: flex; flex-direction: column;
+  gap: clamp(10px, 1.6vh, 22px); min-width: 0; min-height: 0;
+  width: min(1500px, 94vw); max-height: 92vh; overflow: auto;
+  padding: clamp(18px, 2.4vh, 34px) clamp(20px, 2.4vw, 44px);
+  border-radius: 18px; border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--bg, #0b1017) 94%, transparent);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, .7);
+  animation: gmIn .3s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes gmIn { from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to { opacity: 1; transform: none; } }
+/* мало команд — модалка не растягивается на весь экран впустую */
+.groups-modal[data-count="1"], .groups-modal[data-count="2"] { width: min(760px, 92vw); }
+.groups-modal[data-count="3"], .groups-modal[data-count="4"] { width: min(1100px, 93vw); }
+
+.gm-head { display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; }
+.gm-close { flex: 0 0 auto; width: 40px; height: 40px; padding: 0;
+  border-radius: 10px; font-size: 18px; line-height: 1;
+  background: transparent; color: var(--dim);
+  border: 1px solid color-mix(in srgb, var(--dim) 60%, transparent); }
+.gm-close:hover { color: var(--accent); border-color: var(--accent); }
+
+/* кнопка возврата, когда модалку закрыли */
+.lobby-groups-btn { margin-top: clamp(6px, 1vh, 14px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .groups-overlay, .groups-modal { animation: none; }
+}
