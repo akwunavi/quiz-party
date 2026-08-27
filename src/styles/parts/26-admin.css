@@ -80,3 +80,8 @@
   padding: 4px 6px; border-bottom: 1px solid rgba(168, 85, 247, .3); }
 .adm-dev-table td { padding: 4px 6px; font-variant-numeric: tabular-nums; }
 .adm-dev-table tr.bad td { color: #f87171; font-weight: 700; }
+
+/* кнопки показа слайдов-брифингов */
+.adm-slides { margin-top: 10px; }
+.adm-slide-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.adm-slide-list .adm-btn { text-align: left; font-size: 13px; }

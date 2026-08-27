@@ -395,3 +395,60 @@
   box-shadow: 0 10px 44px rgba(0,0,0,.55); }
 /* если рядом ещё и картинка ответа — видео уступает ей место */
 .answer-block:has(> .answer-media) .reveal-video video { max-height: min(34vh, 300px); }
+
+/* ═══════ 8.07 ═══════ */
+
+/* П.4: текст ответа обрезался, когда рядом играло видео.
+   Блок ответа с `overflow: hidden` делил высоту с роликом, и строка
+   ответа ужималась до нуля. Видео уступает: ответ важнее. */
+.answer-block .reveal-video { flex: 0 1 auto; min-height: 0; }
+.answer-block > .answer-label,
+.answer-block > .answer-main { flex: 0 0 auto; }
+.answer-block:has(> .reveal-video) > .answer-main {
+  overflow: visible; white-space: normal; }
+.answer-block:has(> .reveal-video) .reveal-video video {
+  max-height: min(38vh, 340px); }
+
+/* П.9: итоговая таблица была мелковата для проектора. */
+.scoreboard-screen table, .finale-screen table { font-size: clamp(16px, 1.7vw, 30px); }
+.scoreboard-screen th, .finale-screen th { font-size: clamp(12px, 1.1vw, 19px); }
+.scoreboard-screen td, .scoreboard-screen th,
+.finale-screen td, .finale-screen th { padding: clamp(7px, 1.1vh, 15px) clamp(8px, .9vw, 18px); }
+.scoreboard-screen .team-name, .finale-screen .team-name { font-weight: 700; }
+
+/* Базовая раскладка колонки — переехала из инлайнового стиля JSX. */
+.answers-layout .answers-main { display: flex; flex-direction: column; gap: 14px; }
+
+/* П.5: одна картинка на разборе ДО показа ответа.
+   Раньше она стояла колонкой под текстом и смотрелась сиротливо. Теперь
+   раскладка та же, что при показе ответа: текст слева, картинка справа.
+   Только для ОДНОЙ картинки — с двумя и более ряд честнее. */
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: center; align-content: center;
+  column-gap: clamp(16px, 2.2vw, 40px); }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-text {
+  grid-column: 1; margin: 0; max-width: 100%; min-width: 0;
+  /* Колонка вдвое уже прежней полосы — кегль обязан следовать за ней,
+     иначе длинный вопрос уезжает за нижний край экрана. */
+  font-size: clamp(15px, 1.85vw, 32px); line-height: 1.25;
+  max-height: 100%; overflow: hidden; }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-text.len-m {
+  font-size: clamp(14px, 1.6vw, 28px); }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-text.len-l {
+  font-size: clamp(13px, 1.4vw, 24px); }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-text.len-xl {
+  font-size: clamp(12px, 1.2vw, 20px); }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-media-grid {
+  grid-column: 2; height: 100%; min-height: 0; }
+.answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-media-grid .q-img img {
+  max-height: 100%; max-width: 100%; width: auto; height: auto;
+  object-fit: contain; border-radius: 14px;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+@media (max-width: 900px) {
+  .answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) {
+    grid-template-columns: 1fr; }
+  .answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-text,
+  .answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-media-grid {
+    grid-column: 1; }
+}

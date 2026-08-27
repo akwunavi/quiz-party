@@ -117,7 +117,11 @@
    --k = 0.73 — замеренная средняя ширина заглавной буквы шрифта заставки
    (по промерам 0.63–0.71, взят запас). --longest и --lines приходят из JSX. */
 .ri-main > .neon-title {
-  --k: .73;
+  /* Было .73 — ровно средняя ширина буквы. На пограничных случаях слово
+     не влезало на считанные пиксели, срабатывал аварийный разрыв, и на
+     отдельную строку уезжала одна буква («МУЗЫК-А» в «КИНО И МУЗЫКА»).
+     .79 даёт запас ~8%: кегль чуть меньше, зато разрыва не случается. */
+  --k: .79;
   width: 100%; min-width: 0; max-width: 100%;
   /* ПЕРЕНОСЫ. `overflow-wrap: anywhere` рвал слово в любом месте, и на
      вторую строку могла уехать одна буква — «МУЗЫКАЛЬНА/Я». Теперь порядок
@@ -125,7 +129,10 @@
      переносим по слогам с дефисом (hyphens: auto + lang="ru" на <html>),
      и только в безвыходной ситуации рвём. До разрыва обычно не доходит:
      кегль ниже подбирается формулой так, чтобы слово влезало в строку. */
-  overflow-wrap: break-word; word-break: normal;
+  /* Разрыв слова запрещён совсем: кегль подбирается формулой так, чтобы
+     слово влезало, а висящая буква выглядит хуже любого уменьшения.
+     Перенос по слогам с дефисом остаётся — он читается нормально. */
+  overflow-wrap: normal; word-break: normal;
   hyphens: auto; -webkit-hyphens: auto;
   /* не оставлять на строке огрызок короче 3 букв */
   hyphenate-limit-chars: 6 3 3;
@@ -186,4 +193,48 @@
   .theme-classic .round-intro > .ri-main::before,
   .theme-classic .round-intro > .ri-main::after,
   .theme-classic .round-intro::after { animation: none; }
+}
+
+/* ═══ СЛАЙД-БРИФИНГ (фаза info) ═══
+   Универсальный экран: правила, туториал, реклама. Показывается кнопкой из
+   админки в любой момент. Раскладка — две колонки, если есть картинки,
+   одна широкая, если их нет. */
+.info-screen .info-body { flex: 1 1 0; min-height: 0; width: min(1500px, 94%);
+  margin: 0 auto; display: flex; align-items: center;
+  gap: clamp(20px, 3vw, 56px); }
+.info-screen.has-media .info-body > .info-col { flex: 1 1 0; min-width: 0; }
+.info-screen .info-body > .info-col { flex: 1 1 auto; min-width: 0; text-align: left;
+  display: flex; flex-direction: column; gap: clamp(14px, 2.4vh, 30px); }
+.info-screen .info-media { flex: 1 1 0; min-width: 0; min-height: 0;
+  max-height: 74vh; }
+
+.info-list { list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: clamp(10px, 1.8vh, 22px); }
+/* Список правил читают, а не любуются им: выравнивание по левому краю
+   обязательно, по центру строки «скачут» и глаз теряет начало. */
+.info-list li { position: relative; padding-left: 1.6em; text-align: left;
+  font-size: clamp(18px, 2.1vw, 40px); line-height: 1.3;
+  animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
+.info-list li::before { content: '▸'; position: absolute; left: 0;
+  color: var(--accent); }
+@keyframes infoIn { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; } }
+
+/* сводка по раундам — собирается из пакета, руками не дублируется */
+.info-rounds { display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px);
+  padding-top: clamp(8px, 1.4vh, 18px);
+  border-top: 1px solid color-mix(in srgb, var(--dim) 50%, transparent); }
+.info-round { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 16px);
+  text-align: left;
+  font-size: clamp(14px, 1.5vw, 26px); }
+.info-round .ir-num { flex: 0 0 auto; min-width: 1.6em;
+  font-family: var(--font-digits); color: var(--accent); font-weight: 700; }
+.info-round .ir-name { flex: 1 1 auto; min-width: 0; }
+.info-round .ir-count { flex: 0 0 auto; color: var(--dim);
+  font-family: var(--font-mono, monospace); font-size: .82em; }
+
+@media (max-width: 900px) {
+  .info-screen .info-body { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .info-list li { animation: none; }
 }

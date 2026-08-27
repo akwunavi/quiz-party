@@ -82,3 +82,59 @@ describe('сверка начислений: ожидание сходится �
     expect(expectedSprint(answers, 1)).toBe(0)
   })
 })
+
+// ── Механики, добавленные в сверку последними ──────────────────────────
+// Финальный вопрос помечается флагом в редакторе и САМ баллов не даёт —
+// он решает, удваивать ли раунд. «Последний по счёту» здесь не работает.
+function expectedThematic(answers: Answer[], finalRef: string): number {
+  const base = answers.filter(a => a.is_correct === true && a.question_ref !== finalRef).length
+  const finOk = answers.some(a => a.question_ref === finalRef && a.is_correct === true)
+  return finOk ? base * 2 : base
+}
+
+describe('сверка: кроссворд и тематический с удвоением', () => {
+  const mkPack = (mechanic: string, ids: string[]) => ({
+    rounds: [{
+      id: 'r', mechanic, off_scoreboard: false, settings: {},
+      questions: ids.map(id => ({
+        id, hidden: false, media: {}, question_text: '?',
+        is_final_question: id === 'fin',
+        answer: { mode: 'free_text', correct: 'да', display: 'да' },
+      })),
+    }],
+  } as unknown as LoadedPack)
+
+  it('кроссворд: балл за каждое верное слово', () => {
+    const pack = mkPack('crossword', ['a', 'b', 'c'])
+    const answers = [
+      ans({ question_ref: 'q-a', is_correct: true }),
+      ans({ question_ref: 'q-b', is_correct: true }),
+      ans({ question_ref: 'q-c', is_correct: false }),
+    ]
+    expect(computeTotals(pack, [team('t1')], answers).get('t1')).toBe(2)
+  })
+
+  it('тематический: верный финальный вопрос удваивает раунд', () => {
+    const pack = mkPack('thematic_x2', ['a', 'b', 'fin'])
+    const answers = [
+      ans({ question_ref: 'q-a', is_correct: true }),
+      ans({ question_ref: 'q-b', is_correct: true }),
+      ans({ question_ref: 'q-fin', is_correct: true }),
+    ]
+    const actual = computeTotals(pack, [team('t1')], answers).get('t1')
+    expect(actual).toBe(expectedThematic(answers, 'q-fin'))
+    expect(actual).toBe(4)   // 2 базовых × 2
+  })
+
+  it('тематический: финальный неверен — удвоения нет', () => {
+    const pack = mkPack('thematic_x2', ['a', 'b', 'fin'])
+    const answers = [
+      ans({ question_ref: 'q-a', is_correct: true }),
+      ans({ question_ref: 'q-b', is_correct: true }),
+      ans({ question_ref: 'q-fin', is_correct: false }),
+    ]
+    const actual = computeTotals(pack, [team('t1')], answers).get('t1')
+    expect(actual).toBe(expectedThematic(answers, 'q-fin'))
+    expect(actual).toBe(2)
+  })
+})

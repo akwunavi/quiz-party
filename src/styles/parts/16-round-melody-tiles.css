@@ -253,3 +253,33 @@
   animation: answerGlowPulse 1.4s ease-out both; }
 @keyframes answerGlowPulse { 30% { box-shadow: 0 0 46px rgba(211,166,37,.55); }
   100% { box-shadow: 0 0 18px rgba(211,166,37,.25); } }
+
+/* ═══ «СВОЯ ИГРА»: ТОТ ЖЕ НЕОНОВЫЙ ГЕКС-ЧИП, ЧТО У МЕЛОДИИ ═══
+   Плитки двух раундов выглядели по-разному: у мелодии шестиугольный чип с
+   неоном, у «Своей игры» — обычный прямоугольник. Приводим к одному виду,
+   цвет неона берётся по номеру темы, как там по колонке.
+   Разметка не менялась — только класс и data-c. */
+.theme-classic .jp-tile, .cyber .jp-tile {
+  --neon: var(--accent);
+  /* Пропорция и центрирование — как у мелодии. Без них ячейка сетки
+     растягивала шестиугольник в плоскую ленту. */
+  width: auto; height: min(100%, 15vh); aspect-ratio: 100/88;
+  justify-self: center; align-self: center; max-width: 94%;
+  background: #131a2e; border: none; border-radius: 0; padding: 0;
+  color: #fff; font-family: var(--font-digits);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  box-shadow: inset 0 0 0 2.5px var(--neon),
+    inset 0 0 18px color-mix(in srgb, var(--neon) 30%, transparent);
+  transition: transform .18s, box-shadow .18s, filter .18s; }
+.theme-classic .jp-tile[data-c="1"], .cyber .jp-tile[data-c="1"] { --neon: var(--accent2); }
+.theme-classic .jp-tile[data-c="2"], .cyber .jp-tile[data-c="2"] { --neon: var(--ok); }
+.theme-classic .jp-tile[data-c="3"], .cyber .jp-tile[data-c="3"] { --neon: #eab308; }
+@media (hover: hover) {
+  .theme-classic .jp-tile:not(.done):not(:disabled):hover,
+  .cyber .jp-tile:not(.done):not(:disabled):hover {
+    transform: scale(1.07);
+    box-shadow: inset 0 0 0 3px var(--neon),
+      inset 0 0 26px color-mix(in srgb, var(--neon) 55%, transparent); }
+}
+.theme-classic .jp-tile.done, .cyber .jp-tile.done {
+  opacity: .22; box-shadow: inset 0 0 0 2px #5a6a8a; }

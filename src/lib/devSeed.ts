@@ -216,6 +216,20 @@ function expectedForRound(
     case 'melody':
       // балл записан в stake при оценке ведущим
       return right.reduce((acc, a) => acc + Number(a.stake ?? 0), 0)
+    case 'crossword':
+      // по баллу за каждое верно угаданное слово
+      return right.length
+    case 'thematic_x2': {
+      // Финальный вопрос помечен флагом is_final_question в редакторе —
+      // «последний по счёту» тут НЕ подходит. Своих баллов он не приносит,
+      // он только решает, удваивать ли весь раунд.
+      const fin = round.questions.find(q => q.is_final_question)
+      const base = right.filter(a => !fin || a.question_ref !== `q-${fin.id}`).length
+      const finOk = fin
+        ? mine.some(a => a.question_ref === `q-${fin.id}` && a.is_correct === true)
+        : false
+      return finOk ? base * 2 : base
+    }
     default:
       return right.length
   }

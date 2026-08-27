@@ -300,6 +300,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </div>
         )}
 
+        <InfoSlidesButtons pack={pack} gameState={gameState} />
+
         <DevSeedPanel pack={pack} gameState={gameState} />
 
         <button className="adm-link" onClick={() => setShowRoundSwitch(s => !s)}>
@@ -737,6 +739,42 @@ function DevSeedPanel({ pack, gameState }: {
             ))}
           </tbody>
         </table>
+      )}
+    </div>
+  )
+}
+
+
+/** Показ слайдов-брифингов из админки. Работает в ЛЮБОЙ фазе: слайд не
+ *  привязан к раунду, и вернуться можно туда же, откуда ушёл. */
+function InfoSlidesButtons({ pack, gameState }: {
+  pack: LoadedPack
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const slides = pack.settings?.info_slides ?? []
+  const [open, setOpen] = useState(false)
+  if (slides.length === 0) return null
+  const active = gameState.phase === 'info'
+  return (
+    <div className="adm-slides">
+      <button className="adm-link" onClick={() => setOpen(o => !o)}>
+        {active ? '▣ СЛАЙД НА ЭКРАНЕ' : '▢ ПОКАЗАТЬ СЛАЙД'}
+      </button>
+      {open && (
+        <div className="adm-slide-list">
+          {slides.map((sl, i) => (
+            <button key={sl.id} className="adm-btn"
+              onClick={() => { void setFinaleStep(i); void setPhase('info'); setOpen(false) }}>
+              {i + 1}. {sl.title || 'без названия'}
+            </button>
+          ))}
+          {active && (
+            <button className="adm-btn primary"
+              onClick={() => { void setPhase('round_intro'); setOpen(false) }}>
+              ← ВЕРНУТЬСЯ К РАУНДУ
+            </button>
+          )}
+        </div>
       )}
     </div>
   )

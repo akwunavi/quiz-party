@@ -17,6 +17,19 @@ export interface PackSettings {
   max_edits?: number         // дефолт правок ответа
   answers_reveal?: AnswersReveal
   play_mode?: 'phones' | 'paper'   // бумага: без ответов на экране, баллы вручную
+  /** Слайды-брифинги: правила, туториал, реклама. Показываются В ЛЮБОЙ
+   *  момент игры кнопкой из админки, к раундам не привязаны. */
+  info_slides?: InfoSlide[]
+}
+
+export interface InfoSlide {
+  id: string
+  title: string
+  /** Текст: каждая строка — отдельный пункт на экране. */
+  body: string
+  images: string[]
+  /** Показать сводку по раундам: номер, название, число вопросов. */
+  show_rounds?: boolean
 }
 
 export interface Pack {

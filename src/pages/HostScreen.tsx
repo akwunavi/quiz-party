@@ -16,7 +16,7 @@ import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid, JeopardyTheme } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
@@ -99,6 +99,7 @@ function HostInner({ gameState, pack }: {
   const groupsKey = groups.map(g => g.join(',')).join('|')
   const [groupsOpen, setGroupsOpen] = useState(true)
   useEffect(() => { setGroupsOpen(true) }, [groupsKey])
+  const groupsShown = groups.length > 0 && groupsOpen
 
   // Предзагрузка следующего вопроса. Хук стоит ЗДЕСЬ, до всех ранних
   // return: вызов внутри условия однажды уже дал падение React #310.
@@ -165,7 +166,7 @@ function HostInner({ gameState, pack }: {
                 открывается сама, когда составы опубликовали, закрывается
                 ведущим и возвращается кнопкой. Размер считает сетка внутри:
                 колонок тем больше, чем больше команд. */}
-            {groups.length > 0 && groupsOpen && (
+            {groupsShown && (
               <GroupsModal groups={groups} onClose={() => setGroupsOpen(false)} />
             )}
             {groups.length > 0 && !groupsOpen && (
@@ -183,10 +184,17 @@ function HostInner({ gameState, pack }: {
                   </span>
                 ))}
             </div>
-            {/* QR — всегда маленький в левом нижнем углу, нигде по центру */}
+            {/* QR — всегда маленький в левом нижнем углу, нигде по центру.
+                Когда открыты составы, экран затемняется, а QR поднимается
+                НАД затемнением и подсвечивается: опоздавшие должны видеть,
+                куда подключаться, даже во время показа команд. */}
             {!paperMode && (
-              <img alt="QR" className="lobby-qr-corner"
+              <img alt="QR"
+                className={`lobby-qr-corner${groupsShown ? ' lobby-qr-lit' : ''}`}
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=1&data=${encodeURIComponent(playerUrl)}`} />
+            )}
+            {!paperMode && groupsShown && (
+              <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {
@@ -452,6 +460,12 @@ function HostInner({ gameState, pack }: {
         </div>
       </div>
     )
+  }
+
+  if (gameState.phase === 'info') {
+    const slides = pack?.settings?.info_slides ?? []
+    const slide = slides[gameState.question_index] ?? slides[0]
+    if (slide) return <InfoScreen pack={pack} slide={slide} />
   }
 
   if (gameState.phase === 'recap') {
@@ -1081,6 +1095,78 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
   }, [round, index])
 }
 
+/** Слайд-брифинг: правила, туториал, что угодно между раундами.
+ *
+ *  Содержимое целиком задаёт ведущий в редакторе — текст правится от игры к
+ *  игре, поэтому зашивать его в код нельзя. Сводку по раундам собираем из
+ *  самого пакета: номер, название и число вопросов всегда актуальны и
+ *  дублировать их руками не нужно.
+ *
+ *  К раундам слайд не привязан: показывается кнопкой из админки в любой
+ *  момент, поэтому и живёт в настройках ПАКЕТА, а не раунда. */
+function InfoScreen({ pack, slide }: { pack: LoadedPack; slide: InfoSlide }) {
+  const lines = slide.body.split('\n').map(l => l.trim()).filter(Boolean)
+  const imgs = slide.images ?? []
+  const rounds = slide.show_rounds ? pack.rounds.filter(r => !r.off_scoreboard) : []
+  return (
+    <div className={`host-screen grid-bg info-screen${imgs.length ? ' has-media' : ''}`}>
+      <div className="host-topbar">
+        <span className="mono-tag">{slide.title || 'ПРАВИЛА'}</span>
+      </div>
+      <div className="info-body">
+        <div className="info-col">
+          {lines.length > 0 && (
+            <ul className="info-list">
+              {lines.map((l, i) => (
+                <li key={i} style={{ animationDelay: `${0.12 * i}s` }}>{l}</li>
+              ))}
+            </ul>
+          )}
+          {rounds.length > 0 && (
+            <div className="info-rounds">
+              {rounds.map((r, i) => (
+                <div key={r.id} className="info-round">
+                  <span className="ir-num">{i + 1}</span>
+                  <span className="ir-name">{(r.title_lines ?? []).join(' ') || '—'}</span>
+                  <span className="ir-count">{r.questions.filter(q => !q.hidden).length} вопр.</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {imgs.length > 0 && (
+          <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
+            imgs.length > 1 ? ' eq-row' : ''} info-media`}>
+            {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+          </div>
+        )}
+      </div>
+      <div className="host-actions">
+        <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)} />
+      </div>
+    </div>
+  )
+}
+
+function indexOfSlide(pack: LoadedPack, slide: InfoSlide): number {
+  return (pack.settings?.info_slides ?? []).findIndex(s => s.id === slide.id)
+}
+
+/** Кнопки перехода: между слайдами и обратно в игру. */
+function InfoNav({ slides, index }: { slides: InfoSlide[]; index: number }) {
+  return (
+    <>
+      {index > 0 && (
+        <button className="ghost" onClick={() => void setFinaleStep(index - 1)}>← Назад</button>
+      )}
+      {index + 1 < slides.length && (
+        <button className="ghost" onClick={() => void setFinaleStep(index + 1)}>Дальше →</button>
+      )}
+      <button onClick={() => void setPhase('round_intro')}>К раунду →</button>
+    </>
+  )
+}
+
 function displayAnswer(q: Question): string {
   const empty = '⚠ ответ не заполнен в редакторе'
   const a = q.answer as unknown as Record<string, unknown>
@@ -1332,7 +1418,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
     // +600 мс запаса на неровность таймеров браузера.
     const t = setTimeout(() => setChecked(true), revealDoneMs(q) + 600)
     return () => clearTimeout(t)
-  }, [revealed, step])
+    // ВАЖНО: в зависимостях НЕ должно быть step. Он меняется по ходу самой
+    // анимации показа, и таймер перезапускался на каждой стадии.
+  }, [revealed, q.id])
 
   useEffect(() => {
     if (!checked || document.hidden) return
@@ -1368,8 +1456,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
         <span className="qnum">ВОПРОС <b>{step + 1}</b> / {total}</span>
       </div>
       <div className={`answers-layout${revealed ? ' revealed' : ''}`} style={{ marginTop: 60 }}>
+        {/* Раскладка вынесена в CSS: инлайновый `display: flex` бил любые
+            правила, и переключить колонку на две при одной картинке было
+            невозможно. Числовые пропорции остались здесь. */}
         <div className={`answers-main${revealed ? ' revealed' : ''}`}
-          style={{ flex: 1.4, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          style={{ flex: 1.4, minHeight: 0 }}>
 
           {/* ── ДО ПОКАЗА ОТВЕТА: экран вопроса как он был ── */}
           {!revealed && <>
@@ -1453,7 +1544,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {rows.map(a => {
             const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
             // приоритет: ручная оценка админа → автопроверка на лету
-            const shown = a.is_correct ?? (checked ? autocheck(q.answer, a.answer_text) : null)
+            // Пока показ ответа не закончился — вердикта нет НИ У КОГО.
+            // Раньше готовая оценка из базы показывалась мгновенно, в обход
+            // ожидания: при повторном прогоне раунда is_correct уже лежал в
+            // строке с прошлого раза, и галочки загорались до ответа.
+            const shown = checked
+              ? (a.is_correct ?? autocheck(q.answer, a.answer_text))
+              : null
             return (
               <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
@@ -1642,7 +1739,10 @@ function JeopardyBoard({ pack, round, gameState }: {
         {themes.map((t, ti) => t.tiles.map((tile, i) => {
           const done = opened.includes(`${ti}-${i}`)
           return (
+            // data-c — номер темы для раскраски: у плиток мелодии цвет неона
+            // берётся так же, и «Своя игра» теперь выглядит с ней одинаково
             <button key={`${ti}-${i}`} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
+              data-c={ti % 4}
               style={{ gridColumn: ti + 1, gridRow: i + 2 }}
               onClick={() => {
                 // синхронизируем номер открытой плитки с игроками:

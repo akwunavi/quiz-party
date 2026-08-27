@@ -103,3 +103,26 @@
 @media (prefers-reduced-motion: reduce) {
   .groups-overlay, .groups-modal { animation: none; }
 }
+
+/* ═══════ 8.08: рандомайзер поверх затемнённого экрана, QR остаётся видимым ═══════
+   Пока открыты составы, зал должен видеть только их и QR — чтобы
+   опоздавшие всё ещё могли подключиться. Затемнение делает overlay,
+   а QR поднимаем НАД ним и подсвечиваем. */
+/* z-index базового правила стоит ПОЗЖЕ в файле и перебивал этот класс —
+   поэтому !important: поднять QR над затемнением можно только так,
+   не переписывая базовое правило. */
+.lobby-qr-corner.lobby-qr-lit { z-index: 41 !important; }
+.lobby-qr-lit::after { content: ''; position: absolute; inset: -10px;
+  border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 3px var(--accent), 0 0 44px color-mix(in srgb, var(--accent) 65%, transparent);
+  animation: qrPulse 2.4s ease-in-out infinite; }
+@keyframes qrPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+/* подпись под QR — видна только когда экран затемнён */
+.lobby-qr-hint { position: fixed; z-index: 41;
+  left: clamp(18px, 2vw, 34px); bottom: clamp(8px, 1vh, 14px);
+  font-family: var(--font-mono, monospace); font-size: clamp(11px, 1vw, 15px);
+  letter-spacing: .14em; color: var(--accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  .lobby-qr-lit::after { animation: none; opacity: .9; }
+}

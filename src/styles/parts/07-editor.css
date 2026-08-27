@@ -131,3 +131,13 @@
 .ed-scale input[type="range"] { flex: 1 1 auto; min-width: 0; }
 .ed-scale b { font-variant-numeric: tabular-nums; min-width: 46px; text-align: right; }
 .ed-scale button { padding: 4px 10px; font-size: 12px; }
+
+/* ═══ РЕДАКТОР СЛАЙДОВ-БРИФИНГОВ ═══ */
+.ed-slides { display: flex; flex-direction: column; gap: 10px; }
+.ed-slide { padding: 10px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03);
+  display: flex; flex-direction: column; gap: 8px; }
+.ed-slide-head { display: flex; gap: 6px; align-items: center; }
+.ed-slide-head input { flex: 1 1 auto; min-width: 0; }
+.ed-slide-head button { flex: 0 0 auto; padding: 4px 10px; }
+.ed-slide textarea { width: 100%; resize: vertical; font: inherit; }
