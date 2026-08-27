@@ -1,0 +1,74 @@
+# Manual QA runner. This file lives on main so GitHub exposes the Run workflow button.
+# It checks out the selected QA branch; it does not modify the application or Supabase.
+name: qa-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to test'
+        required: true
+        default: 'qa/phase-0-smoke'
+        type: string
+      suite:
+        description: 'QA suite'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - functional
+          - smoke
+
+permissions:
+  contents: read
+
+jobs:
+  functional:
+    if: ${{ inputs.suite == 'all' || inputs.suite == 'functional' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout selected QA ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run Functional QA
+        run: npm run test:qa
+
+  smoke:
+    if: ${{ inputs.suite == 'all' || inputs.suite == 'smoke' }}
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || secrets.SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - name: Checkout selected QA ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright for QA only
+        run: npm install --no-save @playwright/test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run smoke tests
+        run: npx playwright test e2e/smoke/app.playwright.ts
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
