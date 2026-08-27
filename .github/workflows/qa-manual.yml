@@ -18,6 +18,7 @@ on:
         options:
           - all
           - functional
+          - visual
           - smoke
 
 permissions:
@@ -39,6 +40,39 @@ jobs:
       - run: npm ci
       - name: Run Functional QA
         run: npm run test:qa
+
+  visual:
+    if: ${{ inputs.suite == 'all' || inputs.suite == 'visual' }}
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || secrets.SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - name: Checkout selected QA ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright for QA only
+        run: npm install --no-save @playwright/test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run projector visual QA
+        run: npx playwright test e2e/visual/projector.visual.playwright.ts
+      - name: Upload visual artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-visual-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
   smoke:
     if: ${{ inputs.suite == 'all' || inputs.suite == 'smoke' }}
