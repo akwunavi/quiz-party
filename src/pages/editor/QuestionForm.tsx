@@ -405,8 +405,41 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
         )}
         {busy && 'загружаю…'}
       </div>
+      {paths.length < max && <MediaLink onAdd={u => onChange([...paths, u])} />}
       {err && <div style={{ color: '#f43f5e', fontSize: 12 }}>{err}</div>}
       {badFile && <div className="media-bad">{badFile}</div>}
+    </div>
+  )
+}
+
+/** Вставка ГОТОВОЙ ссылки вместо загрузки файла.
+ *
+ *  Нужна для медиа, которое лежит не в Supabase, а в самом репозитории:
+ *  файлы из папки public/ раздаются GitHub Pages по обычному адресу и
+ *  места в хранилище не занимают. Раньше вписать такой адрес было некуда —
+ *  в слоте была только кнопка выбора файла с компьютера.
+ *
+ *  mediaUrl пропускает абсолютные ссылки без изменений, поэтому дальше по
+ *  коду ничего менять не пришлось. */
+function MediaLink({ onAdd }: { onAdd: (url: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [val, setVal] = useState('')
+  const ok = /^https?:\/\/\S+$/.test(val.trim())
+  if (!open) {
+    return (
+      <button className="ghost media-link-toggle" style={{ fontSize: 12, padding: '2px 8px' }}
+        onClick={() => setOpen(true)}>+ вставить ссылку</button>
+    )
+  }
+  return (
+    <div className="media-link" style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+      <input value={val} placeholder="https://akwunavi.github.io/quiz-party/main.mp3"
+        style={{ flex: '1 1 auto', minWidth: 0, fontSize: 12 }}
+        onChange={e => setVal(e.target.value)} />
+      <button disabled={!ok} onClick={() => { onAdd(val.trim()); setVal(''); setOpen(false) }}>
+        Добавить
+      </button>
+      <button className="ghost" onClick={() => { setVal(''); setOpen(false) }}>✕</button>
     </div>
   )
 }
