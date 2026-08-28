@@ -238,3 +238,14 @@
 @media (prefers-reduced-motion: reduce) {
   .info-list li { animation: none; }
 }
+
+/* ── Раскладки слайда-брифинга (выбор в редакторе) ── */
+/* Порядок в потоке задаёт JSX, здесь только ширины и выравнивание. */
+.info-screen.lay-full .info-body { flex-direction: column; align-items: stretch; }
+.info-screen.lay-full .info-media { max-height: 46vh; width: 100%; }
+.info-screen.lay-right .info-body > .info-col { text-align: left; }
+/* дополнительный текст внизу — сноска, не конкурирует с пунктами */
+.info-note { flex: 0 0 auto; width: min(1500px, 94%); margin: 0 auto;
+  padding: clamp(8px, 1.4vh, 18px) 0 clamp(14px, 2vh, 26px);
+  text-align: center; color: var(--dim);
+  font-size: clamp(13px, 1.3vw, 24px); line-height: 1.35; }

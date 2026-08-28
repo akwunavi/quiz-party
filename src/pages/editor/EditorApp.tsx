@@ -12,7 +12,8 @@ import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, findMissing, typ
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
-import type { InfoSlide, Pack, MechanicKey } from '../../types/quiz'
+import type { Pack, MechanicKey } from '../../types/quiz'
+import { InfoSlidesModal } from './InfoSlidesModal'
 
 
 /** Уборка осиротевших файлов.
@@ -255,6 +256,7 @@ function PackScreen({ packId, user, onBack }: {
   const [openRoundIdx, setOpenRoundIdx] = useState<number | null>(null)
   const [problems, setProblems] = useState<Problem[] | null>(null)
   const [adding, setAdding] = useState(false)
+  const [slidesOpen, setSlidesOpen] = useState(false)
 
   const reload = () => void loadPack(packId, true, true).then(setPack).catch(() => {})
   useEffect(reload, [packId])
@@ -345,8 +347,14 @@ function PackScreen({ packId, user, onBack }: {
               }} />
             <div className="ed-hint">Один трек на весь пакет — экономит место. Раунд может переопределить</div>
           </div>
+          {slidesOpen && (
+            <InfoSlidesModal pack={pack} loaded={pack} reload={reload}
+              onClose={() => setSlidesOpen(false)} />
+          )}
           <div className="ed-field"><label>Слайды-брифинги</label>
-            <InfoSlidesEditor pack={pack} reload={reload} />
+            <button className="ghost" onClick={() => setSlidesOpen(true)}>
+              Открыть редактор ({(pack.settings?.info_slides ?? []).length})
+            </button>
             <div className="ed-hint">
               Правила, туториал, реклама. Показываются кнопкой из админки
               в любой момент игры — к раундам не привязаны
@@ -630,55 +638,3 @@ function EditorsPanel({ me }: { me: EditorUser }) {
   )
 }
 
-/** Редактор слайдов-брифингов. Живут в настройках пакета, потому что
- *  показываются в любой момент игры и к конкретному раунду не относятся. */
-function InfoSlidesEditor({ pack, reload }: { pack: Pack; reload: () => void }) {
-  const slides = pack.settings?.info_slides ?? []
-  const save = async (next: InfoSlide[]) => {
-    await setPackSettings(pack.id, { ...(pack.settings ?? {}), info_slides: next })
-    reload()
-  }
-  const patch = (i: number, part: Partial<InfoSlide>) =>
-    void save(slides.map((s, k) => (k === i ? { ...s, ...part } : s)))
-  const move = (i: number, d: number) => {
-    const next = [...slides]
-    const j = i + d
-    if (j < 0 || j >= next.length) return
-    ;[next[i], next[j]] = [next[j], next[i]]
-    void save(next)
-  }
-
-  return (
-    <div className="ed-slides">
-      {slides.map((sl, i) => (
-        <div key={sl.id} className="ed-slide">
-          <div className="ed-slide-head">
-            <input value={sl.title} placeholder="Заголовок слайда"
-              onChange={e => patch(i, { title: e.target.value })} />
-            <button className="ghost" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
-            <button className="ghost" onClick={() => move(i, 1)}
-              disabled={i === slides.length - 1}>↓</button>
-            <button className="ghost" onClick={() => {
-              if (confirm(`Удалить слайд «${sl.title || 'без названия'}»?`)) {
-                void save(slides.filter((_, k) => k !== i))
-              }
-            }}>✕</button>
-          </div>
-          <textarea rows={4} value={sl.body}
-            placeholder={'Каждая строка — отдельный пункт на экране.\nНапример:\nОтвечаем с телефона\nОдин ответ от команды'}
-            onChange={e => patch(i, { body: e.target.value })} />
-          <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13 }}>
-            <input type="checkbox" checked={!!sl.show_rounds}
-              onChange={e => patch(i, { show_rounds: e.target.checked })} />
-            показать список раундов с числом вопросов
-          </label>
-          <MediaSlot label="Картинки слайда" packId={pack.id} max={4} accept="image/*"
-            paths={sl.images ?? []} onChange={paths => patch(i, { images: paths })} />
-        </div>
-      ))}
-      <button className="ghost" onClick={() => void save([...slides, {
-        id: crypto.randomUUID(), title: '', body: '', images: [],
-      }])}>+ слайд</button>
-    </div>
-  )
-}

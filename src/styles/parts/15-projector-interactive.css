@@ -16,7 +16,7 @@
 /* ВНИМАНИЕ: это правило перебивает position у ЛЮБОГО прямого потомка экрана.
    На нём уже трижды спотыкались (шапка, номер раунда, QR). Любой элемент,
    которому нужен собственный position, ОБЯЗАН быть в этом списке. */
-.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.audio-gate) {
+.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.audio-gate):not(.groups-overlay) {
   position: relative; z-index: 1; }
 .grid-bg > .host-topbar, .grid-bg > .host-actions, .grid-bg > .pack-badge,
 .grid-bg > .round-badge, .grid-bg > .lobby-qr-corner { z-index: 20; }
@@ -107,3 +107,7 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
   50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
 .theme-potter .neon-title, .theme-potter .round-title {
   animation: candleGlowTitle 3.4s ease-in-out infinite; }
+
+/* Модалка составов накрывает ВЕСЬ экран, поэтому position задаёт она сама.
+   На этом правиле уже спотыкались шапка, номер раунда, QR и audio-gate. */
+.grid-bg > .groups-overlay { z-index: 40; }

@@ -30,6 +30,10 @@ export interface InfoSlide {
   images: string[]
   /** Показать сводку по раундам: номер, название, число вопросов. */
   show_rounds?: boolean
+  /** Где текст относительно картинок: слева, справа или во всю ширину. */
+  layout?: 'left' | 'right' | 'full'
+  /** Дополнительная строка внизу: сноска, условие акции, что угодно. */
+  note?: string
 }
 
 export interface Pack {

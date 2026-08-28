@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
+import { InfoSlideView } from '../components/InfoSlideView'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
@@ -1105,46 +1106,20 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
  *  К раундам слайд не привязан: показывается кнопкой из админки в любой
  *  момент, поэтому и живёт в настройках ПАКЕТА, а не раунда. */
 function InfoScreen({ pack, slide }: { pack: LoadedPack; slide: InfoSlide }) {
-  const lines = slide.body.split('\n').map(l => l.trim()).filter(Boolean)
-  const imgs = slide.images ?? []
-  const rounds = slide.show_rounds ? pack.rounds.filter(r => !r.off_scoreboard) : []
+  // Внешний вид живёт в общем компоненте: им же рисуется превью в
+  // редакторе, поэтому «на экране» и «в редакторе» совпадают всегда.
+  const rounds = pack.rounds.filter(r => !r.off_scoreboard).map(r => ({
+    id: r.id,
+    name: (r.title_lines ?? []).join(' ') || '—',
+    count: r.questions.filter(q => !q.hidden).length,
+  }))
   return (
-    <div className={`host-screen grid-bg info-screen${imgs.length ? ' has-media' : ''}`}>
-      <div className="host-topbar">
-        <span className="mono-tag">{slide.title || 'ПРАВИЛА'}</span>
-      </div>
-      <div className="info-body">
-        <div className="info-col">
-          {lines.length > 0 && (
-            <ul className="info-list">
-              {lines.map((l, i) => (
-                <li key={i} style={{ animationDelay: `${0.12 * i}s` }}>{l}</li>
-              ))}
-            </ul>
-          )}
-          {rounds.length > 0 && (
-            <div className="info-rounds">
-              {rounds.map((r, i) => (
-                <div key={r.id} className="info-round">
-                  <span className="ir-num">{i + 1}</span>
-                  <span className="ir-name">{(r.title_lines ?? []).join(' ') || '—'}</span>
-                  <span className="ir-count">{r.questions.filter(q => !q.hidden).length} вопр.</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {imgs.length > 0 && (
-          <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
-            imgs.length > 1 ? ' eq-row' : ''} info-media`}>
-            {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
-          </div>
-        )}
-      </div>
+    <>
+      <InfoSlideView slide={slide} rounds={rounds} mediaUrl={mediaUrl} />
       <div className="host-actions">
         <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)} />
       </div>
-    </div>
+    </>
   )
 }
 

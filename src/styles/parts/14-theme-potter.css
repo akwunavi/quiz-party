@@ -20,7 +20,7 @@
 /* сцена */
 .pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner { z-index: 30; }
