@@ -176,13 +176,11 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
   font-size: clamp(90px, 16vw, 240px); text-shadow: var(--glow); font-variant-numeric: tabular-nums; }
 
 /* снег/фейерверк/пьедестал/кроссворд */
-.snow-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .firework { position: fixed; width: 6px; height: 6px; border-radius: 50%;
   animation: fw 1.6s ease-out infinite; pointer-events: none; }
 @keyframes fw { 0% { transform: translateY(40vh) scale(.4); opacity: 1; }
   60% { transform: translateY(-12vh) scale(1); opacity: 1; }
   100% { transform: translateY(-18vh) scale(2.6); opacity: 0; } }
-.pedestal { display: flex; align-items: flex-end; gap: 14px; justify-content: center; margin-top: 20px; }
 .pedestal .step { background: var(--bg2); border: 1px solid var(--accent);
   border-radius: 10px 10px 0 0; padding: 12px; min-width: 140px; text-align: center; }
 .cw-grid { display: grid; gap: 2px; width: fit-content; margin: 0 auto; }

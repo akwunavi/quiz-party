@@ -21,20 +21,38 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
   onClose: () => void
   reload: () => void
 }) {
-  const slides = pack.settings?.info_slides ?? []
+  // ── ЧЕРНОВИК В ПАМЯТИ ──
+  // Раньше каждое нажатие клавиши уходило запросом в базу: набирать текст
+  // было мучительно, а на слабой связи буквы ещё и терялись, потому что
+  // ответы приходили не в том порядке, в каком уходили.
+  // Теперь правки копятся локально, а в базу уезжают по кнопке «Сохранить»
+  // или сами — при переключении слайда и закрытии окна.
+  const saved = pack.settings?.info_slides ?? []
+  const [slides, setSlides] = useState<InfoSlide[]>(saved)
   const [sel, setSel] = useState(0)
   const [saving, setSaving] = useState(false)
+  const [dirty, setDirty] = useState(false)
   const slide: InfoSlide | undefined = slides[sel]
 
-  const save = async (next: InfoSlide[]) => {
+  const save = async (next: InfoSlide[] = slides) => {
     setSaving(true)
     try {
       await setPackSettings(pack.id, { ...(pack.settings ?? {}), info_slides: next })
+      setDirty(false)
       reload()
     } finally { setSaving(false) }
   }
+  /** Правка только в памяти — запроса нет. */
+  const edit = (next: InfoSlide[]) => { setSlides(next); setDirty(true) }
   const patch = (part: Partial<InfoSlide>) =>
-    void save(slides.map((s, k) => (k === sel ? { ...s, ...part } : s)))
+    edit(slides.map((s, k) => (k === sel ? { ...s, ...part } : s)))
+
+  /** Уходя со слайда, сохраняем накопленное: так правки не теряются, даже
+   *  если про кнопку забыли. */
+  const flushThen = async (fn: () => void) => {
+    if (dirty) await save()
+    fn()
+  }
   const move = (d: number) => {
     const j = sel + d
     if (j < 0 || j >= slides.length) return
@@ -42,6 +60,7 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
     ;[next[sel], next[j]] = [next[j], next[sel]]
     setSel(j); void save(next)
   }
+  const close = () => void flushThen(onClose)
 
   const rounds = (loaded?.rounds ?? [])
     .filter(r => !r.off_scoreboard)
@@ -52,12 +71,17 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
     }))
 
   return (
-    <div className="slides-overlay" onClick={onClose}>
+    <div className="slides-overlay" onClick={close}>
       <div className="slides-modal" onClick={e => e.stopPropagation()}>
         <div className="sm-head">
           <b>Слайды-брифинги</b>
-          <span className="sm-dim">{saving ? 'сохраняю…' : 'сохраняется само'}</span>
-          <button className="ghost" onClick={onClose}>Закрыть</button>
+          <span className="sm-dim">
+            {saving ? 'сохраняю…' : dirty ? 'есть несохранённые правки' : 'всё сохранено'}
+          </span>
+          <button disabled={!dirty || saving} onClick={() => void save()}>
+            Сохранить
+          </button>
+          <button className="ghost" onClick={close}>Закрыть</button>
         </div>
 
         <div className="sm-body">
@@ -65,16 +89,18 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
           <div className="sm-list">
             {slides.map((s, i) => (
               <button key={s.id} className={`sm-item${i === sel ? ' on' : ''}`}
-                onClick={() => setSel(i)}>
+                onClick={() => void flushThen(() => setSel(i))}>
                 <span className="sm-num">{i + 1}</span>
                 {s.title || 'без названия'}
               </button>
             ))}
             <button className="ghost" onClick={() => {
-              void save([...slides, {
-                id: crypto.randomUUID(), title: '', body: '', images: [], layout: 'left',
-              }])
+              const next = [...slides, {
+                id: crypto.randomUUID(), title: '', body: '', images: [], layout: 'left' as const,
+              }]
               setSel(slides.length)
+              void save(next)
+              setSlides(next)
             }}>+ слайд</button>
           </div>
 
@@ -107,7 +133,12 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
               </label>
 
               <MediaSlot label="Картинки (до 4)" packId={pack.id} max={4} accept="image/*"
-                paths={slide.images ?? []} onChange={images => patch({ images })} />
+                paths={slide.images ?? []}
+                onChange={images => {
+                  // загрузка файла и так идёт в сеть — копить нечего
+                  const next = slides.map((s2, k) => (k === sel ? { ...s2, images } : s2))
+                  setSlides(next); void save(next)
+                }} />
 
               <label>Дополнительный текст внизу</label>
               <input value={slide.note ?? ''} placeholder="сноска, условие акции, что угодно"
@@ -119,8 +150,9 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
                   disabled={sel >= slides.length - 1}>↓ ниже</button>
                 <button className="ghost sm-del" onClick={() => {
                   if (!confirm(`Удалить слайд «${slide.title || 'без названия'}»?`)) return
-                  void save(slides.filter((_, k) => k !== sel))
+                  const next = slides.filter((_, k) => k !== sel)
                   setSel(Math.max(0, sel - 1))
+                  setSlides(next); void save(next)
                 }}>Удалить слайд</button>
               </div>
             </>}

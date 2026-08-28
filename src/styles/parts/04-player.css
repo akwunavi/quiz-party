@@ -20,8 +20,6 @@
 .pl-preview .acc { color: var(--accent); } .pl-preview .chev { color: var(--dim); font-size: 11px; }
 .pl-card-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 .pl-qtext { font-size: 14px; line-height: 1.5; color: var(--muted); }
-.pl-input-row { display: flex; gap: 8px; }
-.pl-input-row input { font-size: 16px; }
 .pl-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .pl-choices button { padding: 14px 0; font-size: 20px; clip-path: none; border-radius: 8px;
   background: rgba(255,255,255,.06); border: 1px solid var(--dim); color: var(--fg); }
@@ -86,13 +84,7 @@
 @keyframes sbIn { from { opacity: 0; transform: translateY(26px) scale(.97); } to { opacity: 1; transform: none; } }
 
 /* Игрок: кнопки не вылезают */
-.pl-input-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
-.pl-input-row input { flex: 1 1 160px; min-width: 0; }
-.pl-input-row button { flex: 0 1 auto; white-space: nowrap; padding: 10px 16px; font-size: 14px;
-  clip-path: none; border-radius: 8px; max-width: 100%; }
 @media (max-width: 420px) {
-  .pl-input-row { flex-direction: column; }
-  .pl-input-row button { width: 100%; }
 }
 .pl-row-bottom { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .pl-erase { padding: 6px 12px; font-size: 12px; clip-path: none; border-radius: 6px;
@@ -100,9 +92,36 @@
 
 /* подсказка и подписи колонок в сопоставлении: без них команды не понимали,
    что тапать надо парами «номер → вариант» */
-.pl-match-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.pl-match-cap { font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-  opacity: .55; text-align: center; }
-.pl-howto { margin-top: 10px; padding: 10px 12px; border-radius: 8px;
-  background: rgba(255,255,255,.05); font-size: 13px; line-height: 1.4; }
-.pl-howto b { display: block; margin-top: 4px; opacity: .8; }
+
+/* ═══ ОЦЕНКИ ВОПРОСОВ И КОММЕНТАРИЙ (телефон игрока) ═══
+   Блок свёрнут по умолчанию: он не должен мешать отвечать. Кнопки шкалы
+   крупные — палец на телефоне, а не курсор. */
+.pl-fb-open { width: 100%; margin-top: 12px; padding: 12px;
+  border-radius: 12px; font-size: 15px;
+  border: 1px dashed rgba(255,255,255,.25); background: transparent;
+  color: var(--accent); }
+.pl-feedback { margin-top: 12px; padding: 12px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
+  display: flex; flex-direction: column; gap: 12px; }
+.pl-fb-head { display: flex; align-items: center; justify-content: space-between; }
+.pl-fb-hide { background: none; border: none; color: var(--dim); font-size: 13px; }
+.pl-fb-q { display: flex; flex-direction: column; gap: 6px; }
+.pl-fb-qtext { font-size: 13px; color: var(--dim); line-height: 1.3;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; }
+.pl-fb-scale { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.pl-fb-dot { padding: 10px 0; border-radius: 8px; font-size: 13px;
+  border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.05);
+  color: inherit; }
+.pl-fb-dot.on { background: var(--accent); border-color: var(--accent);
+  color: #0b0f18; font-weight: 700; }
+.pl-fb-comment { display: flex; flex-direction: column; gap: 8px; }
+.pl-fb-comment textarea { width: 100%; resize: vertical; font: inherit;
+  padding: 10px; border-radius: 10px; }
+/* Десять кнопок в один ряд не помещаются на обычном телефоне: на 390px
+   «10» уезжала за край. Порог 380px не срабатывал — экран шире на 10px.
+   Ниже 480px раскладываем шкалу в два ряда по пять. */
+@media (max-width: 480px) {
+  .pl-fb-scale { grid-template-columns: repeat(5, 1fr); }
+  .pl-fb-dot { padding: 12px 0; font-size: 15px; }
+}

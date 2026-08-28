@@ -14,6 +14,3 @@
 .sprint-pre { text-align: center; }
 .sprint-pre-num { font-family: var(--font-digits); font-size: clamp(50px, 7vw, 110px);
   color: var(--accent); animation: pulse 1s ease-in-out infinite; }
-.sprint-bonus { font-family: 'Rajdhani', sans-serif; font-size: clamp(15px, 1.6vw, 22px);
-  color: var(--answer); border: 1px solid var(--answer); border-radius: 999px;
-  padding: 5px 16px; }

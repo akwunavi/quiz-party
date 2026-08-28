@@ -8,6 +8,7 @@ import {
   getOrCreateBank, exportPackJson, exportPackCsv,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
+import { ratingsByQuestion } from '../../lib/ratings'
 import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, findMissing, type Orphan } from '../../lib/mediaUpload'
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
@@ -100,7 +101,10 @@ function PackExport({ pack }: { pack: LoadedPack }) {
       const map = new Map(links.map(l => [l.path, l.url]))
       // основной формат — таблица: открывается в Excel двойным кликом,
       // ссылки на медиа лежат прямо в ячейках, качать можно по клику
-      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map), 'text/csv;charset=utf-8')
+      // Оценки собираем по ВСЕМ играм этого пакета: интересна не одна
+      // вечеринка, а то, какие вопросы стабильно проседают.
+      const rated = await ratingsByQuestion()
+      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map, rated), 'text/csv;charset=utf-8')
       // резервный слепок: из него можно восстановить структуру целиком
       download(`${safe}_${stamp}_резерв.json`, exportPackJson(pack))
     } finally { setBusy(false) }

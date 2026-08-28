@@ -58,5 +58,3 @@
 .icicles { left: 2px; right: 2px; }
 
 /* Редактор: плотная раскладка настроек */
-.ed-settings td:first-child { white-space: nowrap; color: var(--muted); font-size: 13px; }
-.ed-settings { width: 100%; }

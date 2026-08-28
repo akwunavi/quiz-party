@@ -409,12 +409,20 @@
 .answer-block:has(> .reveal-video) .reveal-video video {
   max-height: min(38vh, 340px); }
 
-/* П.9: итоговая таблица была мелковата для проектора. */
-.scoreboard-screen table, .finale-screen table { font-size: clamp(16px, 1.7vw, 30px); }
-.scoreboard-screen th, .finale-screen th { font-size: clamp(12px, 1.1vw, 19px); }
-.scoreboard-screen td, .scoreboard-screen th,
-.finale-screen td, .finale-screen th { padding: clamp(7px, 1.1vh, 15px) clamp(8px, .9vw, 18px); }
-.scoreboard-screen .team-name, .finale-screen .team-name { font-weight: 700; }
+/* П.9: итоговая таблица была мелковата для проектора.
+   ВНИМАНИЕ: первая версия этих правил была написана под классы
+   .scoreboard-screen / .finale-screen / .team-name, которых В РАЗМЕТКЕ НЕТ.
+   Правила выглядели рабочими и не делали ничего — таблица так и осталась
+   мелкой. Настоящие классы: .sb-screen и .score-table. */
+.sb-screen .score-table { font-size: clamp(16px, 1.7vw, 30px); }
+.sb-screen .score-table th { font-size: clamp(12px, 1.15vw, 20px); }
+.sb-screen .score-table td, .sb-screen .score-table th {
+  padding: clamp(7px, 1.1vh, 15px) clamp(8px, .9vw, 18px); }
+.sb-screen .sb-title { font-size: clamp(20px, 2.2vw, 40px); }
+/* финальные итоги — свои классы, тоже крупнее */
+.fin-screen .fin-table { font-size: clamp(16px, 1.7vw, 30px); }
+.fin-screen .fin-table td, .fin-screen .fin-table th {
+  padding: clamp(7px, 1.1vh, 15px) clamp(8px, .9vw, 18px); }
 
 /* Базовая раскладка колонки — переехала из инлайнового стиля JSX. */
 .answers-layout .answers-main { display: flex; flex-direction: column; gap: 14px; }

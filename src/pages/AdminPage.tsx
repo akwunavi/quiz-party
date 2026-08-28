@@ -12,6 +12,7 @@ import {
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
+import { loadRatings, summarize, type RatingRow } from '../lib/ratings'
 import {
   isDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
   type CheckRow,
@@ -299,6 +300,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
+
+        <RatingsPanel pack={pack} gameState={gameState} />
 
         <InfoSlidesButtons pack={pack} gameState={gameState} />
 
@@ -774,6 +777,76 @@ function InfoSlidesButtons({ pack, gameState }: {
               ← ВЕРНУТЬСЯ К РАУНДУ
             </button>
           )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+/** Оценки команд: средняя по раундам, худшие вопросы, комментарии.
+ *  Грузится по кнопке, а не сама: во время игры лишний опрос базы не нужен,
+ *  а смотреть эти цифры ведущий будет в перерыве или после. */
+function RatingsPanel({ pack, gameState }: {
+  pack: LoadedPack
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [open, setOpen] = useState(false)
+  const [rows, setRows] = useState<RatingRow[] | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  const load = async () => {
+    setBusy(true)
+    try { setRows(await loadRatings(gameState.game_id)) }
+    catch { setRows([]) }
+    finally { setBusy(false) }
+  }
+
+  const sum = rows ? summarize(rows) : null
+  const qText = new Map<string, string>()
+  pack.rounds.forEach(r => r.questions.forEach((q, i) =>
+    qText.set(`q-${q.id}`, `${i + 1}. ${q.question_text.slice(0, 60)}`)))
+
+  return (
+    <div className="adm-ratings">
+      <button className="adm-link" onClick={() => {
+        setOpen(o => !o); if (!rows) void load()
+      }}>★ ОЦЕНКИ КОМАНД</button>
+      {open && (
+        <div className="adm-rt">
+          <button className="adm-btn" disabled={busy} onClick={() => void load()}>
+            {busy ? 'загружаю…' : 'обновить'}
+          </button>
+          {sum && sum.size === 0 && <div className="adm-dim">оценок пока нет</div>}
+          {sum && [...sum.values()].sort((a, b) => a.roundNumber - b.roundNumber).map(s => {
+            const round = pack.rounds[s.roundNumber]
+            const worst = [...s.byQuestion.entries()]
+              .sort((a, b) => a[1].avg - b[1].avg).slice(0, 3)
+            return (
+              <div key={s.roundNumber} className="adm-rt-round">
+                <div className="adm-rt-head">
+                  <b>Р{s.roundNumber + 1} {(round?.title_lines ?? []).join(' ')}</b>
+                  <span className={`adm-rt-avg${(s.avg ?? 0) < 6 ? ' low' : ''}`}>
+                    {s.avg == null ? '—' : s.avg.toFixed(1)}
+                  </span>
+                  <span className="adm-dim">{s.votes} голосов</span>
+                </div>
+                {worst.length > 0 && (
+                  <div className="adm-rt-worst">
+                    слабее всего:
+                    {worst.map(([ref, v]) => (
+                      <div key={ref}>
+                        <b>{v.avg.toFixed(1)}</b> {qText.get(ref) ?? ref}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {s.comments.map((c, i) => (
+                  <div key={i} className="adm-rt-comment">«{c}»</div>
+                ))}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

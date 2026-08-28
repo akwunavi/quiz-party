@@ -85,3 +85,18 @@
 .adm-slides { margin-top: 10px; }
 .adm-slide-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .adm-slide-list .adm-btn { text-align: left; font-size: 13px; }
+
+/* ═══ ПАНЕЛЬ ОЦЕНОК КОМАНД ═══ */
+.adm-ratings { margin-top: 10px; }
+.adm-rt { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.adm-rt-round { padding: 8px 10px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); }
+.adm-rt-head { display: flex; align-items: baseline; gap: 8px; }
+.adm-rt-head > b { flex: 1 1 auto; min-width: 0; font-size: 13px; }
+/* низкая средняя подсвечивается: ради этого всё и затевалось */
+.adm-rt-avg { font-size: 18px; font-weight: 700; color: var(--ok); }
+.adm-rt-avg.low { color: #f43f5e; }
+.adm-rt-worst { margin-top: 6px; font-size: 12px; color: var(--dim); line-height: 1.5; }
+.adm-rt-worst b { color: #fbbf24; }
+.adm-rt-comment { margin-top: 6px; padding: 6px 8px; border-radius: 6px;
+  background: rgba(255,255,255,.04); font-size: 12px; font-style: italic; }

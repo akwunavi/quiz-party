@@ -55,12 +55,6 @@
   to { opacity: 1; transform: none; filter: none; } }
 
 /* — таймер: венок, обмерзающий по мере истечения — */
-.ny-timer { position: relative; display: inline-flex; align-items: center; justify-content: center;
-  width: clamp(120px, 13vw, 190px); height: clamp(120px, 13vw, 190px); }
-.ny-timer svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.ny-timer .val { font-family: var(--font-digits); font-weight: 900;
-  font-size: clamp(36px, 4.4vw, 64px); font-variant-numeric: tabular-nums; z-index: 1; }
-.ny-timer.low .val { color: #ff6b81; animation: shiver .5s linear infinite; }
 @keyframes shiver { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-2px) rotate(-1deg) }
   75% { transform: translateX(2px) rotate(1deg) } }
 /* сосульки под кольцом на последних секундах */
@@ -83,10 +77,6 @@
   text-shadow: 0 0 10px #7cc7ff, 0 0 34px #7cc7ff, 0 4px 0 #a8d3f5; }
 
 /* QR-карточка в лобби */
-.qr-card { display: flex; flex-direction: column; align-items: center; gap: 10px;
-  padding: 16px 18px; background: rgba(8,26,52,.72); box-shadow: 0 8px 30px rgba(0,0,0,.45);
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 12px;
-  backdrop-filter: blur(4px); }
 
 /* 13: мягкий переход между экранами вместо резкой шторы */
 .ny-curtain { animation: curtainSoft 1.05s cubic-bezier(.45,0,.25,1) forwards;
