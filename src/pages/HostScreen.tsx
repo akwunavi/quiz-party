@@ -119,7 +119,11 @@ function HostInner({ gameState, pack }: {
             а игроки смотрят на него дольше, чем на любой другой экран.
             Панели стоят СЛЕВА и СПРАВА от логотипа отдельными колонками,
             поэтому налезть на него не могут: ширину делит флекс-строка. */}
-        <LobbyMusic pack={pack} />
+        {/* Музыка звучит, только когда пакет ВЫБРАН и мы уже ждём команды.
+            Эта ветка включает и экран выбора пакета — там трек заводился
+            до начала игры, пока ведущий ещё листает список. */}
+        {gameState.phase === 'lobby' && !!gameState.pack_id && pack &&
+          <LobbyMusic pack={pack} />}
         {(pack?.theme ?? 'classic') === 'classic' ? (
           <div className="cyber-lobby-head">
             <CyberPanel side="left" />

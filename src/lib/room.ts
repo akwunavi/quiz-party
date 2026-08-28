@@ -8,7 +8,11 @@ export function getRoomId(): string | null {
 }
 
 export function roomUrl(route: string, roomId: string): string {
-  return `#${route}?room=${roomId}`
+  // Переход в комнату собирает адрес заново и терял прочие параметры —
+  // в том числе dev=1. Флаг переносим явно; сам режим при этом ещё и
+  // запоминается в localStorage (см. devSeed.isDevMode).
+  const dev = window.location.href.includes('dev=1') ? '&dev=1' : ''
+  return `#${route}?room=${roomId}${dev}`
 }
 
 export function rememberRoom(id: string) { localStorage.setItem('qp-room', id) }

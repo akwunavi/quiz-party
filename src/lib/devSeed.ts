@@ -27,8 +27,29 @@ const DEMO_NAMES = ['Тест-1', 'Тест-2', 'Тест-3']
 const DEMO_COLORS = ['#14b8a6', '#f43f5e', '#eab308']
 const BATCH = 50
 
-export const isDevMode = () =>
-  typeof window !== 'undefined' && window.location.href.includes('dev=1')
+// Режим репетиции ЛИПКИЙ и не зависит от адреса.
+// Раньше он читался только из строки запроса, а при выборе комнаты адрес
+// пересобирается (`#/admin?room=<uuid>`) — флаг терялся, и панель исчезала
+// ровно в тот момент, когда становилась нужна.
+// Хранение в localStorage, а не в sessionStorage: комнату часто открывают
+// в новой вкладке, а sessionStorage у каждой вкладки свой.
+const DEV_KEY = 'qp-dev'
+export function isDevMode(): boolean {
+  if (typeof window === 'undefined') return false
+  const href = window.location.href
+  try {
+    if (href.includes('dev=0')) { localStorage.removeItem(DEV_KEY); return false }
+    if (href.includes('dev=1')) { localStorage.setItem(DEV_KEY, '1'); return true }
+    return localStorage.getItem(DEV_KEY) === '1'
+  } catch {
+    return href.includes('dev=1')
+  }
+}
+
+/** Выключить режим кнопкой — править адрес руками неудобно. */
+export function disableDevMode() {
+  try { localStorage.removeItem(DEV_KEY) } catch { /* приватный режим */ }
+}
 
 export const isDemoTeam = (t: { name: string }) => DEMO_NAMES.includes(t.name)
 

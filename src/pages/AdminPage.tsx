@@ -14,7 +14,7 @@ import {
 import { afterRoundStep } from '../lib/flow'
 import { loadRatings, summarize, type RatingRow } from '../lib/ratings'
 import {
-  isDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
+  isDevMode, disableDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
   type CheckRow,
 } from '../lib/devSeed'
 import { teamColor, nextFreeColor } from '../lib/teamColors'
@@ -717,6 +717,10 @@ function DevSeedPanel({ pack, gameState }: {
           })}>ЗАПОЛНИТЬ РАУНД</button>
       </div>
       <div className="adm-dev-row">
+        <button className="adm-btn" disabled={!!busy}
+          onClick={() => { disableDevMode(); location.reload() }}>ВЫКЛЮЧИТЬ РЕЖИМ</button>
+      </div>
+      <div className="adm-dev-row">
         <button className="adm-btn primary" disabled={!!busy}
           onClick={() => void run('check', async () => {
             const rows = await checkRoundScoring(pack, gameState.round_number, gameState.game_id)
@@ -729,6 +733,13 @@ function DevSeedPanel({ pack, gameState }: {
             const n = await clearSeed(gameState.game_id)
             return n ? `Удалено команд: ${n}` : 'Демо-данных нет'
           })}>УДАЛИТЬ ДЕМО</button>
+      </div>
+      <div className="adm-dev-row">
+        {/* Выключение кнопкой: править адрес руками неудобно, а при переходе
+            в комнату он всё равно пересобирается. */}
+        <button className="adm-btn" onClick={() => { disableDevMode(); location.reload() }}>
+          ВЫКЛЮЧИТЬ РЕЖИМ РЕПЕТИЦИИ
+        </button>
       </div>
       {msg && <div className="adm-dev-msg">{msg}</div>}
       {check && check.length > 0 && (

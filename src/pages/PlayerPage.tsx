@@ -534,14 +534,17 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                       </span>
                     )}
                   </div>
+                  {/* Оценка ЭТОГО вопроса — прямо под полем ответа.
+                      Раньше все оценки лежали общим списком внизу, и на
+                      экране дублировались все вопросы раунда. */}
+                  <QuestionRating team={team} gameState={gameState} questionId={q.id} />
                 </div>
               )}
             </div>
           )
         })}
-        {/* Оценки и комментарий — под списком вопросов, пока идёт раунд */}
-        <RoundFeedback team={team} gameState={gameState}
-          questions={questions.map(q => ({ id: q.id, text: q.question_text }))} />
+        {/* Внизу — только комментарий к раунду: оценки переехали в карточки */}
+        <RoundComment team={team} gameState={gameState} />
       </div>
     </div>
   )
@@ -666,76 +669,67 @@ function PlayerReview({ team, round, roundNumber, label }: {
   )
 }
 
-/** Оценка вопросов и комментарий к раунду — с телефона игрока.
- *
- *  Оценку можно поставить любому вопросу в любой момент, пока идёт раунд,
- *  и переголосовать сколько угодно. Комментарий один на раунд, поле под
- *  всеми вопросами, доступно до конца раунда.
- *
- *  Ничего не блокирует игру: это обратная связь ведущему, а не часть
- *  механики. Ошибки записи глотаем молча — упавший запрос оценки не должен
- *  мешать команде отвечать. */
-function RoundFeedback({ team, gameState, questions }: {
+/** Оценка ОДНОГО вопроса, 1..10. Живёт внутри карточки и раскрывается
+ *  вместе с ней, поэтому на экране всегда ровно тот вопрос, который перед
+ *  глазами. Переголосовать можно сколько угодно, пока идёт раунд.
+ *  Ошибки записи глотаем: обратная связь не должна мешать отвечать. */
+function QuestionRating({ team, gameState, questionId }: {
   team: Team
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
-  questions: { id: string; text: string }[]
+  questionId: string
 }) {
-  const [open, setOpen] = useState(false)
-  const [marks, setMarks] = useState<Record<string, number>>({})
-  const [comment, setComment] = useState('')
-  const [saved, setSaved] = useState(false)
+  const [mark, setMark] = useState<number | null>(null)
+  // новый раунд — своя оценка, чужая на экране путала бы
+  useEffect(() => { setMark(null) }, [gameState.round_number])
 
-  // Новый раунд — чистый лист: оценки прошлого раунда на экране путали бы.
-  useEffect(() => { setMarks({}); setComment(''); setSaved(false) },
-    [gameState.round_number])
-
-  const rate = (qid: string, value: number) => {
-    setMarks(m => ({ ...m, [qid]: value }))
+  const rate = (v: number) => {
+    setMark(v)
     void rateQuestion({
       teamId: team.id, gameId: gameState.game_id,
       roundNumber: gameState.round_number,
-      questionRef: `q-${qid}`, rating: value,
+      questionRef: `q-${questionId}`, rating: v,
     }).catch(() => {})
   }
-  const sendComment = () => {
+  return (
+    <div className="pl-fb-q">
+      <div className="pl-fb-qtext">
+        {mark ? `Ваша оценка: ${mark}` : 'Оцените вопрос'}
+      </div>
+      <div className="pl-fb-scale">
+        {Array.from({ length: 10 }, (_, k) => k + 1).map(v => (
+          <button key={v} className={`pl-fb-dot${mark === v ? ' on' : ''}`}
+            onClick={() => rate(v)}>{v}</button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Комментарий к раунду — один на весь раунд, поле под списком вопросов.
+ *  Открыт, пока раунд не кончится. */
+function RoundComment({ team, gameState }: {
+  team: Team
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [comment, setComment] = useState('')
+  const [saved, setSaved] = useState(false)
+  useEffect(() => { setComment(''); setSaved(false) }, [gameState.round_number])
+
+  const send = () => {
     setSaved(true)
     void saveRoundComment({
       teamId: team.id, gameId: gameState.game_id,
       roundNumber: gameState.round_number, comment,
     }).catch(() => {})
   }
-
-  if (!open) {
-    return (
-      <button className="pl-fb-open" onClick={() => setOpen(true)}>
-        ☆ Оценить вопросы раунда
-      </button>
-    )
-  }
   return (
     <div className="pl-feedback">
-      <div className="pl-fb-head">
-        <b>Как вам раунд?</b>
-        <button className="pl-fb-hide" onClick={() => setOpen(false)}>свернуть</button>
-      </div>
-      {questions.map((q, i) => (
-        <div key={q.id} className="pl-fb-q">
-          <div className="pl-fb-qtext">{i + 1}. {q.text || 'вопрос'}</div>
-          <div className="pl-fb-scale">
-            {Array.from({ length: 10 }, (_, k) => k + 1).map(v => (
-              <button key={v} className={`pl-fb-dot${marks[q.id] === v ? ' on' : ''}`}
-                onClick={() => rate(q.id, v)}>{v}</button>
-            ))}
-          </div>
-        </div>
-      ))}
+      <div className="pl-fb-head"><b>Комментарий к раунду</b></div>
       <div className="pl-fb-comment">
-        <textarea rows={3} value={comment} placeholder="Комментарий к раунду — по желанию"
+        <textarea rows={3} value={comment} placeholder="По желанию — что понравилось, что нет"
           onChange={e => { setComment(e.target.value); setSaved(false) }}
-          onBlur={sendComment} />
-        <button disabled={saved} onClick={sendComment}>
-          {saved ? 'Сохранено' : 'Отправить'}
-        </button>
+          onBlur={send} />
+        <button disabled={saved} onClick={send}>{saved ? 'Сохранено' : 'Отправить'}</button>
       </div>
     </div>
   )

@@ -18,7 +18,11 @@
 .theme-potter button { border-color: rgba(211,166,37,.55); }
 .theme-potter .answer-reveal .answer-main { color: #e9c766; }
 /* сцена */
-.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+/* Слой сцены ниже контента. z-index 2 конкурировал с плитками вариантов,
+   и свечи всплывали поверх них — теперь спор невозможен. */
+.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.theme-potter .choices-grid, .theme-potter .choice-plate,
+.theme-potter .img-answers, .theme-potter .q-media-grid { position: relative; z-index: 6; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
 .host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
@@ -72,3 +76,63 @@
 
 /* Спринт: вопрос-«герой» на всю ширину над колонками (нечётное число вопросов) */
 .sprint-screen.with-hero { grid-template-rows: auto 1fr; }
+
+/* ═══════ 8.18: наложения и «больше магии» ═══════ */
+
+/* Таймер-змея крупнее шапки и заходил на рамку вопроса под ней.
+   Даём экрану вопроса такой же запас сверху, как сделали для киберпанка. */
+.theme-potter .host-screen:has(> .q-frame),
+.theme-potter .host-screen.has-media,
+.theme-potter .host-screen.has-choices { padding-top: 190px; }
+
+/* Пергаментное свечение под текстом вопроса: буквы будто проступают на
+   старой бумаге. Это фон, поэтому под текстом, а не поверх. */
+.theme-potter .q-text { position: relative; }
+.theme-potter .q-text::before {
+  content: ''; position: absolute; inset: -6% -4%; z-index: -1;
+  border-radius: 40% 60% 55% 45% / 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 205, 110, .10), transparent 70%);
+  animation: ptGlow 6s ease-in-out infinite; }
+@keyframes ptGlow { 0%, 100% { opacity: .5; transform: scale(.98); }
+  50% { opacity: 1; transform: scale(1.03); } }
+
+/* Новый вопрос «проявляется» золотой волной по строке. */
+.theme-potter .q-text.title-anim, .theme-potter .wind-text {
+  animation: ptInk 1.1s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes ptInk {
+  0% { opacity: 0; letter-spacing: .18em; filter: blur(6px); }
+  60% { opacity: 1; filter: blur(1px); }
+  100% { opacity: 1; letter-spacing: normal; filter: blur(0); } }
+
+/* Появление верного ответа: вспышка золота вокруг слова. */
+.theme-potter .answer-block.reveal-in .answer-main,
+.theme-potter .answer-reveal .answer-main { position: relative; }
+.theme-potter .answer-block.reveal-in .answer-main::after,
+.theme-potter .answer-reveal .answer-main::after {
+  content: ''; position: absolute; inset: -18% -8%; pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 214, 120, .45), rgba(255, 190, 80, .12) 45%, transparent 72%);
+  animation: ptBurst 1.6s ease-out both; }
+@keyframes ptBurst {
+  0% { opacity: 0; transform: scale(.4); }
+  35% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.35); } }
+
+/* На заставке раунда — парящие искры вокруг заголовка. */
+.theme-potter .round-intro .ri-main::after {
+  content: '✦   ✧   ✦'; position: absolute; left: 50%; bottom: -2.2em;
+  transform: translateX(-50%); pointer-events: none;
+  letter-spacing: .8em; color: rgba(255, 210, 120, .75);
+  font-size: clamp(10px, 1vw, 16px);
+  animation: ptSpark 4.2s ease-in-out infinite; }
+@keyframes ptSpark { 0%, 100% { opacity: .3; letter-spacing: .8em; }
+  50% { opacity: 1; letter-spacing: 1.1em; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .q-text::before, .theme-potter .q-text.title-anim,
+  .theme-potter .wind-text, .theme-potter .round-intro .ri-main::after,
+  .theme-potter .answer-block.reveal-in .answer-main::after {
+    animation: none; }
+}
