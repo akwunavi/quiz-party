@@ -126,6 +126,18 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
                 ))}
               </div>
 
+              <label>Когда показывать</label>
+              <select value={slide.show_at ?? 'manual'}
+                onChange={e => patch({ show_at: e.target.value })}>
+                <option value="manual">только по кнопке в админке</option>
+                <option value="lobby">сразу после лобби, перед первым раундом</option>
+                {(loaded?.rounds ?? []).map((r, i) => (
+                  <option key={r.id} value={`round:${i + 1}`}>
+                    перед раундом {i + 1} — {(r.title_lines ?? []).join(' ') || '—'}
+                  </option>
+                ))}
+              </select>
+
               <label className="sm-check">
                 <input type="checkbox" checked={!!slide.show_rounds}
                   onChange={e => patch({ show_rounds: e.target.checked })} />

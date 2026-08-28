@@ -249,3 +249,12 @@
   padding: clamp(8px, 1.4vh, 18px) 0 clamp(14px, 2vh, 26px);
   text-align: center; color: var(--dim);
   font-size: clamp(13px, 1.3vw, 24px); line-height: 1.35; }
+
+/* Текст брифинга рядом с картинкой: колонка вдвое уже, кегль обязан
+   следовать за ней — иначе пункты уезжают за нижний край экрана. */
+.info-screen.has-media .info-list li { font-size: clamp(15px, 1.55vw, 30px); }
+.info-screen.has-media .info-round { font-size: clamp(12px, 1.15vw, 20px); }
+.info-screen.has-media .info-col { max-height: 100%; overflow: hidden; }
+/* много пунктов — ещё мельче, иначе список не помещается */
+.info-screen .info-list:has(li:nth-child(7)) li { font-size: clamp(13px, 1.35vw, 24px); }
+.info-screen .info-list:has(li:nth-child(10)) li { font-size: clamp(12px, 1.15vw, 20px); }

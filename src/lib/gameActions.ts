@@ -21,12 +21,29 @@ export async function setPhase(phase: string) {
   if (error) throw error
 }
 
-export async function gotoRound(round_number: number) {
+/** Перейти к раунду.
+ *  Если на это место в игре назначен слайд-брифинг, сначала показываем его:
+ *  ведущему не надо помнить про кнопку, слайд выходит сам там, где задуман.
+ *  Индекс слайда кладём в question_index — как на экране финала. */
+export async function gotoRound(round_number: number, slideIndex?: number) {
   const { error } = await supabase.from('game_sessions').update({
-    phase: 'round_intro', round_number, question_index: 0,
+    phase: slideIndex == null ? 'round_intro' : 'info',
+    round_number,
+    question_index: slideIndex ?? 0,
     timer_started_at: null, reveal: false,
   }).eq('id', getRoomId())
   if (error) throw error
+}
+
+/** Индекс слайда, назначенного на вход в раунд, или null.
+ *  'lobby' — перед первым раундом, 'round:N' — перед раундом N (с единицы). */
+export function slideForRound(
+  slides: { show_at?: string }[] | undefined, roundNumber: number,
+): number | null {
+  if (!slides?.length) return null
+  const want = roundNumber === 0 ? ['lobby', 'round:1'] : [`round:${roundNumber + 1}`]
+  const i = slides.findIndex(s => s.show_at && want.includes(s.show_at))
+  return i >= 0 ? i : null
 }
 
 /** Останавливает звук на ЭТОЙ вкладке. На проекторе то же делает

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  selectPackAndStart, gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
+  selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime, setFinaleStep,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
@@ -205,7 +205,8 @@ function HostInner({ gameState, pack }: {
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
               }}>⟲ Сменить пакет</button>
-              <button onClick={() => void gotoRound(0)}>К первому раунду →</button>
+              <button onClick={() => void gotoRound(0,
+                slideForRound(pack?.settings?.info_slides, 0) ?? undefined)}>К первому раунду →</button>
             </div>
           </>
         )}
@@ -328,7 +329,9 @@ function HostInner({ gameState, pack }: {
     // Есть ли вообще текст вопроса: у ребусов его не бывает, и в обычных
     // вопросах поле могут оставить пустым, когда всё говорит картинка.
     const hasText = !!q.question_text.trim()
-    const frameCls = isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
+    const isPotter = pack.theme === 'potter'
+    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'pt-frame'
+      : isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
       : isCyber ? 'cyber-frame' : ''
     // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
     const lettered = !q.media.hidden && imgs.length > 1 && (
@@ -1911,7 +1914,8 @@ function AfterRoundNav({ pack, gameState }: {
     if (step.kind === 'scoreboard') return void showScoreboard()
     if (step.kind === 'break') return void startBreak()
     if (step.kind === 'finale') return void finishGame(gameState.pack_id)
-    return void gotoRound(gameState.round_number + 1)
+    return void gotoRound(gameState.round_number + 1,
+      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
   }
   return <button onClick={run}>
     {label.charAt(0).toUpperCase() + label.slice(1)} →

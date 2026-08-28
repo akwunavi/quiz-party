@@ -7,7 +7,7 @@ import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  gotoRound, gotoQuestion, revealAnswer, finishGame, resetGame,
+  gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
@@ -186,7 +186,8 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
           pack.settings?.play_mode === 'paper'
             && (r.mechanic === 'melody' || r.mechanic === 'jeopardy') ? null :
           <button key={r.id} className={`adm-round${current === i ? ' active' : ''}`}
-            onClick={() => void gotoRound(i)}>
+            onClick={() => void gotoRound(i,
+              slideForRound(pack.settings?.info_slides, i) ?? undefined)}>
             Р{displayRoundNumber(pack, i)} {r.title_lines.join(' ')}
           </button>
         ))}
@@ -217,7 +218,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     if (st.kind === 'scoreboard') return void showScoreboard()
     if (st.kind === 'break') return void startBreak()
     if (st.kind === 'finale') return void finishGame(gameState.pack_id)
-    return void gotoRound(gameState.round_number + 1)
+    return void gotoRound(gameState.round_number + 1,
+      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
   }
   const endRound = runAfterRound
 
@@ -400,7 +402,8 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           // после разбора сразу уходили в финал или в табло независимо от неё
           if (showSb) { void showScoreboard(); return }
           if (last) void finishGame(gameState.pack_id)
-          else void gotoRound(gameState.round_number + 1)
+          else void gotoRound(gameState.round_number + 1,
+            slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
         }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'
           : showSb ? 'К ТАБЛО →' : last ? 'ФИНАЛ →' : 'СЛЕД. РАУНД →'}</button>
       </div>
