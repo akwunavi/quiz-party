@@ -70,7 +70,22 @@ function stripIds<T extends { id?: string }>(row: T): Omit<T, 'id'> {
 }
 
 // ── Раунды ──
-export async function createRound(pack_id: string, position: number, mechanic: MechanicKey, title: string) {
+/** Создать раунд.
+ *
+ *  Позицию считаем ЗДЕСЬ, как максимум + 1, а не берём количество раундов
+ *  из интерфейса. Позиции не обязаны начинаться с нуля и идти подряд:
+ *  после удалений и перестановок в реальных пакетах встречается [1,2] и
+ *  [1..6]. При двух раундах с позициями [1,2] «количество» давало 2 —
+ *  позиция занята, и вставка падала с 409 duplicate key.
+ *
+ *  Аргумент position оставлен для совместимости с вызовами, но
+ *  игнорируется: единственный источник истины — сама таблица. */
+export async function createRound(pack_id: string, _position: number, mechanic: MechanicKey, title: string) {
+  const { data: maxRow } = await supabase.from('pack_rounds')
+    .select('position').eq('pack_id', pack_id)
+    .order('position', { ascending: false }).limit(1).maybeSingle()
+  const position = ((maxRow as { position?: number } | null)?.position ?? -1) + 1
+
   const defaults: Record<string, unknown> = mechanic === 'stakes_unique'
     ? { stakesValues: [0, 1, 2, 3, 4, 5] }
     : mechanic === 'stakes_free' ? { stakesValues: [0, 2] }
@@ -82,6 +97,8 @@ export async function createRound(pack_id: string, position: number, mechanic: M
       ? { dogs: ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета'], betSec: 30, raceSec: 18 }
     : mechanic === 'melody'
       ? { themes: [], spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
+    : mechanic === 'blitz'
+      ? { teamSeconds: 60, timeoutPenalty: 10 }
     : {}
   const { data, error } = await supabase.from('pack_rounds').insert({
     pack_id, position, mechanic, title_lines: [title.toUpperCase()],
