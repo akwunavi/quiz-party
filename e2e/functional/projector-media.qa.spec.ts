@@ -9,8 +9,7 @@ describe('QA: projector media regression contracts', () => {
     expect(source).toContain('const media = q.media.question ?? []')
     expect(source).toContain('const imgs = media.filter')
     expect(source).toContain('const avs = media.filter')
-    expect(source).toContain('.mp4')
-    expect(source).toContain('.webm')
+    expect(source).toMatch(/mp4\|webm/)
   })
 
   it('round rules audio is rendered from the round media reference', async () => {
