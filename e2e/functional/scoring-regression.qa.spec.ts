@@ -3,7 +3,7 @@ import { scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree, score
 
 describe('QA: scoring regression matrix', () => {
   it('standard awards only correct answers', () => expect(scoreStandard([{ questionIndex: 0, isCorrect: true }, { questionIndex: 1, isCorrect: false }, { questionIndex: 2, isCorrect: null }])).toBe(1))
-  it('test stop stops after first wrong answer but ignores skipped answers', () => expect(scoreTestStop([{ questionIndex: 2, isCorrect: true }, { questionIndex: 0, isCorrect: true }, { questionIndex: 1, isCorrect: false }, { questionIndex: 3, isCorrect: true }])).toBe(2))
+  it('test stop stops after first wrong answer but ignores skipped answers', () => expect(scoreTestStop([{ questionIndex: 2, isCorrect: true }, { questionIndex: 0, isCorrect: true }, { questionIndex: 1, isCorrect: false }, { questionIndex: 3, isCorrect: true }])).toBe(1))
   it('unique stakes add stake+1 for correct and subtract stake for wrong', () => expect(scoreStakesUnique([{ questionIndex: 0, isCorrect: true, stake: 3 }, { questionIndex: 1, isCorrect: false, stake: 2 }])).toBe(2))
   it('free stakes use 0 as ordinary one-point mode', () => expect(scoreStakesFree([{ questionIndex: 0, isCorrect: true, stake: 0 }, { questionIndex: 1, isCorrect: true, stake: 2 }, { questionIndex: 2, isCorrect: false, stake: 2 }])).toBe(2))
   it('thematic doubling is applied exactly once', () => {
