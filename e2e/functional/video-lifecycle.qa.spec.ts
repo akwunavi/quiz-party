@@ -23,8 +23,9 @@ describe('QA: projector video lifecycle', () => {
     expect(source).toContain('m.currentTime = 0')
   })
 
-  it('question navigation invokes media cleanup before entering the next question', async () => {
+  it('question navigation invokes local media cleanup before the state change', async () => {
     const source = await read('src/lib/gameActions.ts')
-    expect(source).toContain('stopAllAudio()')
+    expect(source).toContain('hushLocal()')
+    expect(source).toContain('export async function gotoQuestion')
   })
 })
