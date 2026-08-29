@@ -4,6 +4,8 @@ import { useGameState } from '../hooks/useGameState'
 import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
 import { registerTeam, heartbeat } from '../lib/gameActions'
 import { rateQuestion, saveRoundComment } from '../lib/ratings'
+import { useBlitz } from '../lib/blitzApi'
+import { currentTeam, MAX_ATTEMPTS } from '../lib/blitzState'
 import { enqueueAnswer } from '../lib/answerQueue'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
@@ -123,6 +125,8 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'question' && round?.mechanic === 'jeopardy')
     return <JeopardyPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'blitz')
+    return <BlitzPlayer team={team} gameState={gameState} round={round} />
   if ((phase === 'question' || phase === 'answer_time') && round)
     return <AnswerForm team={team} round={round} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -673,6 +677,85 @@ function PlayerReview({ team, round, roundNumber, label }: {
  *  вместе с ней, поэтому на экране всегда ровно тот вопрос, который перед
  *  глазами. Переголосовать можно сколько угодно, пока идёт раунд.
  *  Ошибки записи глотаем: обратная связь не должна мешать отвечать. */
+/** Блиц на телефоне.
+ *
+ *  Ходит одна команда за раз. Своей команде показываем вопрос и поле
+ *  ответа, остальным — «ждите своей очереди»: они не должны видеть вопрос
+ *  заранее, иначе подготовятся к нему на своём ходу.
+ *
+ *  Вердикт автопроверки показываем СРАЗУ — так решено при обсуждении
+ *  механики. Ведущий может поправить его у себя, тогда вердикт обновится
+ *  при следующем опросе.
+ *
+ *  Кнопка после первой отправки называется «Изменить»: попыток три, и
+ *  команда должна понимать, что ещё может исправиться. */
+function BlitzPlayer({ team, gameState, round }: {
+  team: Team
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  round: LoadedPack['rounds'][number]
+}) {
+  const { state } = useBlitz(gameState.game_id, gameState.round_number)
+  const [value, setValue] = useState('')
+  const [sentText, setSentText] = useState<string | null>(null)
+  const myTurn = !!state && currentTeam(state) === team.id
+  const q = state?.current
+    ? round.questions.find(x => x.id === state.current!.questionId)
+    : undefined
+
+  // Новый вопрос — чистое поле. Иначе прошлый ответ остаётся на экране и
+  // команда случайно отправляет его снова.
+  useEffect(() => { setValue(''); setSentText(null) }, [state?.current?.questionId])
+
+  if (!state) return <div className="pl-wait">Раунд ещё не начался</div>
+  if (state.finished) return <div className="pl-wait">Раунд окончен</div>
+
+  if (!myTurn) {
+    return (
+      <div className="pl-blitz waiting">
+        <div className="pl-bz-head">Ждите своей очереди</div>
+        <div className="pl-bz-dim">
+          отвечает {/* имя соперника не прячем: это видно и на проекторе */}
+          <b>{currentTeam(state) ?? '—'}</b>
+        </div>
+      </div>
+    )
+  }
+
+  const attempts = state.current?.attempts ?? 0
+  const left = Math.max(0, MAX_ATTEMPTS - attempts)
+  const verdict = sentText && attempts > 0 ? 'wrong' : sentText ? 'sent' : null
+
+  const send = () => {
+    const text = value.trim()
+    if (!text) return
+    setSentText(text)
+    void enqueueAnswer({
+      team_id: team.id, game_id: gameState.game_id,
+      question_ref: `q-${q?.id ?? state.current?.questionId ?? ''}`,
+      round_number: gameState.round_number,
+      answer_text: text,
+    })
+  }
+
+  return (
+    <div className="pl-blitz mine" style={{ ['--tc' as string]: team.color }}>
+      <div className="pl-bz-head">Ваш ход</div>
+      <div className="pl-bz-q">{q?.question_text ?? '…'}</div>
+      <input value={value} placeholder="Ответ"
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') send() }} />
+      <button className="pl-bz-send" onClick={send} disabled={!value.trim()}>
+        {sentText ? 'Изменить' : 'Отправить'}
+      </button>
+      {verdict === 'wrong' && (
+        <div className="pl-bz-verdict bad">Неверно · попыток осталось {left}</div>
+      )}
+      {verdict === 'sent' && <div className="pl-bz-verdict ok">Отправлено</div>}
+    </div>
+  )
+}
+
+
 function QuestionRating({ team, gameState, questionId }: {
   team: Team
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>

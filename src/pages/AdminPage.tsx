@@ -13,6 +13,15 @@ import {
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { loadRatings, summarize, type RatingRow } from '../lib/ratings'
+import { useBlitz, saveBlitz } from '../lib/blitzApi'
+import {
+  initBlitz, showQuestion, answerCorrect, answerWrong, skip,
+  pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext,
+  remainingCount, currentTeam, toResults, MAX_ATTEMPTS, type BlitzState,
+} from '../lib/blitzState'
+import { blitzResults } from '../lib/blitz'
+import { hideQuestion } from '../lib/editorApi'
+import { enqueueAnswer } from '../lib/answerQueue'
 import {
   isDevMode, disableDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
   type CheckRow,
@@ -209,7 +218,9 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const isJeopardy = round.mechanic === 'jeopardy'
   // интерактивные механики управляются с проектора; стандартный маршрут
   // «вопрос → время ответов → разбор» для них не существует
-  const isInteractive = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
+  const isBlitz = round.mechanic === 'blitz'
+  const isInteractive = isJeopardy || isBlitz
+    || round.mechanic === 'melody' || round.mechanic === 'race'
   const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
   // шаг после раунда берём из общего модуля: раньше здесь была своя копия
   // логики, которая игнорировала перерыв и расходилась с проектором
@@ -271,6 +282,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       )}
 
       <div className="adm-footer">
+        {isBlitz && phase === 'question' && (
+          <BlitzControls pack={pack} round={round} gameState={gameState} />
+        )}
+
         {!isInteractive && phase !== 'show_answers' && (
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
@@ -865,4 +880,194 @@ function RatingsPanel({ pack, gameState }: {
       )}
     </div>
   )
+}
+
+
+/** Пульт ведущего для блица.
+ *
+ *  Все действия идут через чистые переходы из blitzState: админка только
+ *  вызывает их и сохраняет результат. Логику здесь не дублируем — иначе
+ *  проектор и пульт разойдутся, как это уже было с маршрутом после раунда.
+ *
+ *  Вопрос показывается ведущим вручную, а не автоматически: ему нужно
+ *  успеть прочитать вопрос вслух и убедиться, что команда готова. */
+function BlitzControls({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const { state, setState } = useBlitz(gameState.game_id, gameState.round_number)
+  const teams = useTeams(gameState.game_id)
+  const [busy, setBusy] = useState(false)
+
+  const settings = round.settings as { teamSeconds?: number; timeoutPenalty?: number }
+  const bank = round.questions.map(q => ({ id: q.id, hidden: q.hidden }))
+  const cur = state?.current
+  const q = cur ? round.questions.find(x => x.id === cur.questionId) : undefined
+  const active = state ? currentTeam(state) : undefined
+  const activeName = teams.find(t => t.id === active)?.name ?? '—'
+
+  const push = async (next: BlitzState) => {
+    setBusy(true)
+    setState(next)                       // мгновенно в интерфейсе
+    try {
+      await saveBlitz(gameState.game_id, gameState.round_number, next)
+      // Раунд закрылся — отправляем БАЛЛЫ за места в общий зачёт.
+      // Очки живут в blitz_state, а общий подсчёт читает только answers,
+      // поэтому итог кладём готовой строкой `q-blitz`.
+      if (next.finished && !state?.finished) {
+        const rows = blitzResults(toResults(next), settings.timeoutPenalty ?? 10)
+        await Promise.all(rows.map(r => enqueueAnswer({
+          team_id: r.teamId, game_id: gameState.game_id,
+          question_ref: 'q-blitz', round_number: gameState.round_number,
+          answer_text: `место ${r.place}`, stake: r.score,
+        })))
+      }
+    } finally { setBusy(false) }
+  }
+
+  // ── Раунд ещё не начат: кубик выбирает первую команду ──
+  if (!state) {
+    return (
+      <div className="adm-blitz">
+        <div className="adm-dim">БЛИЦ · раунд не начат</div>
+        <button className="adm-btn primary" disabled={busy || teams.length < 2}
+          onClick={() => {
+            // Кубик кидается ОДИН раз: дальше ходы идут по кругу от него.
+            const order = [...teams].sort(() => Math.random() - 0.5).map(t => t.id)
+            void push(initBlitz(order, settings.teamSeconds ?? 60))
+          }}>
+          🎲 БРОСИТЬ КУБИК И НАЧАТЬ
+        </button>
+        {teams.length < 2 && <div className="adm-dim">нужно минимум две команды</div>}
+      </div>
+    )
+  }
+
+  if (state.finished) {
+    const rows = blitzResults(toResults(state), settings.timeoutPenalty ?? 10)
+    return (
+      <div className="adm-blitz">
+        <div className="adm-dim">БЛИЦ ОКОНЧЕН</div>
+        {state.timedOutTeam && (
+          <div className="adm-bz-warn">
+            время вышло у «{teams.find(t => t.id === state.timedOutTeam)?.name}» ·
+            штраф {settings.timeoutPenalty ?? 10} очков
+          </div>
+        )}
+        <table className="adm-dev-table">
+          <thead><tr><th>команда</th><th>очки</th><th>место</th><th>баллы</th></tr></thead>
+          <tbody>
+            {rows.map(r => (
+              <tr key={r.teamId}>
+                <td>{teams.find(t => t.id === r.teamId)?.name ?? r.teamId}</td>
+                <td>{r.points}</td>
+                <td>{r.place}{r.shared ? '=' : ''}</td>
+                <td>{r.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  const left = remainingCount(bank, state.used)
+
+  return (
+    <div className="adm-blitz">
+      <div className="adm-dim">ХОД: {activeName} · в банке {left}</div>
+
+      {!cur && (
+        <button className="adm-btn primary" disabled={busy || left === 0}
+          onClick={() => {
+            const next = pickNext(bank, state.used)
+            if (!next) return void push(finishNoQuestions(state))
+            void push(showQuestion(state, next.id, Date.now()))
+          }}>
+          {left === 0 ? 'ВОПРОСЫ КОНЧИЛИСЬ' : 'ПОКАЗАТЬ ВОПРОС →'}
+        </button>
+      )}
+
+      {cur && (
+        <>
+          {/* Верный ответ у ведущего перед глазами: он и решает спорные */}
+          <div className="adm-bz-q">{q?.question_text}</div>
+          <div className="adm-bz-answer">ответ: <b>{displayAnswerText(q)}</b></div>
+          <div className="adm-dim">попытка {cur.attempts + 1} из {MAX_ATTEMPTS}</div>
+          <div className="adm-dev-row">
+            <button className="adm-btn primary" disabled={busy}
+              onClick={() => void push(answerCorrect(state, Date.now()))}>ВЕРНО ✓</button>
+            <button className="adm-btn" disabled={busy}
+              onClick={() => void push(answerWrong(state, Date.now()))}>НЕВЕРНО ✗</button>
+          </div>
+          <div className="adm-dev-row">
+            <button className="adm-btn" disabled={busy}
+              onClick={() => void push(skip(state, Date.now()))}>СКИП −1</button>
+            <button className="adm-btn" disabled={busy}
+              onClick={() => void push(pauseForCheck(state, Date.now()))}>⏸ ПАУЗА</button>
+            <button className="adm-btn" disabled={busy}
+              onClick={() => void push(resumeAfterCheck(state, Date.now()))}>▶ ДАЛЬШЕ</button>
+          </div>
+        </>
+      )}
+
+      <button className="adm-btn" disabled={busy}
+        onClick={() => { if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state)) }}>
+        ЗАВЕРШИТЬ РАУНД
+      </button>
+
+      <UsedQuestions round={round} used={state.used} />
+    </div>
+  )
+}
+
+/** Отыгранные вопросы с кнопкой «убрать навсегда».
+ *
+ *  Две пометки намеренно разные. «Сгорел» живёт в состоянии раунда и
+ *  действует только эту игру — так вопросы не повторяются за вечер.
+ *  «Убран навсегда» — это флаг hidden у самого вопроса, и ставит его
+ *  ведущий руками. Система помечает, решает человек. */
+function UsedQuestions({ round, used }: {
+  round: LoadedPack['rounds'][number]; used: string[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [gone, setGone] = useState<string[]>([])
+  if (used.length === 0) return null
+  const items = used
+    .map(id => round.questions.find(q => q.id === id))
+    .filter((q): q is NonNullable<typeof q> => !!q)
+
+  return (
+    <div className="adm-bz-used">
+      <button className="adm-link" onClick={() => setOpen(o => !o)}>
+        ОТЫГРАНО: {used.length}
+      </button>
+      {open && items.map(q => {
+        const removed = gone.includes(q.id) || q.hidden
+        return (
+          <div key={q.id} className={`adm-bz-used-row${removed ? ' gone' : ''}`}>
+            <span>{q.question_text.slice(0, 60)}</span>
+            <button className="adm-btn" disabled={removed}
+              onClick={() => {
+                if (!confirm('Убрать вопрос из банка навсегда?')) return
+                setGone(g => [...g, q.id])
+                void hideQuestion(q.id, true)
+              }}>
+              {removed ? 'убран' : 'убрать'}
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/** Текст верного ответа для пульта: у блица вопросы простые, но формат
+ *  ответа общий для всего проекта. */
+function displayAnswerText(q?: { answer: unknown }): string {
+  const a = q?.answer as { display?: string | string[]; correct?: string } | undefined
+  if (!a) return '—'
+  if (Array.isArray(a.display)) return a.display.join(' / ')
+  return a.display ?? a.correct ?? '—'
 }

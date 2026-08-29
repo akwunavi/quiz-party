@@ -167,6 +167,28 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <div className="ed-hint">Строка под заголовком раунда. Сотри всё — вернётся автотекст</div>
         </div>
 
+        {round.mechanic === 'blitz' && (
+          <div className="ed-field"><label>Блиц</label>
+            <div className="ed-row">
+              <span className="ed-hint">секунд каждой команде</span>
+              <NumField min={10} max={600} suffix="сек"
+                value={Number((round.settings as { teamSeconds?: number }).teamSeconds ?? 60)}
+                onCommit={(v: number) => void patch({
+                  settings: { ...round.settings, teamSeconds: v } as never })} />
+              <span className="ed-hint">штраф за таймаут</span>
+              <NumField min={0} max={50} suffix="очк"
+                value={Number((round.settings as { timeoutPenalty?: number }).timeoutPenalty ?? 10)}
+                onCommit={(v: number) => void patch({
+                  settings: { ...round.settings, timeoutPenalty: v } as never })} />
+            </div>
+            <div className="ed-hint">
+              Штраф вычитается из ОЧКОВ раунда до распределения мест, поэтому
+              он может изменить итоговое место команды. Ноль — штрафа нет.
+              Баллы за места фиксированные: 10 / 7 / 5, дальше по 3
+            </div>
+          </div>
+        )}
+
         <div className="ed-field"><label>Перед ответами</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}

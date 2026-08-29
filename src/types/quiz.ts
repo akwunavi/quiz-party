@@ -65,6 +65,7 @@ export type MechanicKey =
   | 'sprint'        // «120 секунд»: все вопросы на одном слайде
   | 'melody'        // «Угадай мелодию»: аукцион секунд
   | 'race'          // «Скачки бульдогов»: ставка на номер, баллы по месту
+  | 'blitz'         // «100 вопросов»: ход по кругу, у каждой команды свой таймер
 
 export type AnswersReveal = 'after_question' | 'after_round' | 'never'
 

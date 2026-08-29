@@ -100,3 +100,26 @@
 .adm-rt-worst b { color: #fbbf24; }
 .adm-rt-comment { margin-top: 6px; padding: 6px 8px; border-radius: 6px;
   background: rgba(255,255,255,.04); font-size: 12px; font-style: italic; }
+
+/* ═══ ПУЛЬТ БЛИЦА ═══
+   Отличается рамкой от остальных блоков админки: во время раунда ведущий
+   жмёт кнопки быстро и не должен путать их с общей навигацией. */
+.adm-blitz { margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--accent); background: rgba(255,255,255,.03);
+  display: flex; flex-direction: column; gap: 8px; }
+.adm-bz-q { font-size: 15px; line-height: 1.35; }
+.adm-bz-answer { font-size: 14px; color: var(--ok); }
+.adm-bz-answer b { font-size: 16px; }
+.adm-bz-warn { padding: 6px 10px; border-radius: 8px; font-size: 13px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+/* список отыгранных вопросов блица */
+.adm-bz-used { margin-top: 6px; border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 6px; }
+.adm-bz-used-row { display: flex; align-items: center; gap: 8px;
+  padding: 4px 0; font-size: 12px; }
+.adm-bz-used-row > span { flex: 1 1 auto; min-width: 0; color: var(--dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-bz-used-row > button { flex: 0 0 auto; padding: 3px 10px; font-size: 11px; }
+.adm-bz-used-row.gone > span { text-decoration: line-through; opacity: .5; }

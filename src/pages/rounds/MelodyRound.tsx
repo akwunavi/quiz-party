@@ -64,6 +64,32 @@ async function saveMelody(next: MelodyState) {
 }
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
+
+/** Трек на показе ответа: ровно 15 секунд с начала.
+ *  Длину держим фиксированной, а не «до конца файла»: полноразмерная песня
+ *  растянула бы раунд, а короткий отрывок доиграет и остановится сам.
+ *  Отсчёт от появления ответа, поэтому музыка и текст идут вместе. */
+function RevealTrack({ src }: { src: string }) {
+  useEffect(() => {
+    const a = createAudio()
+    a.src = src
+    a.currentTime = 0
+    let cancelled = false
+    // play() асинхронный: pause() до его старта не делает ничего,
+    // и трек заиграл бы уже на следующем экране.
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    const t = setTimeout(() => { try { a.pause() } catch { /* уже мёртв */ } }, 15_000)
+    return () => {
+      cancelled = true
+      clearTimeout(t)
+      try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
+    }
+  }, [src])
+  return <div className="mel-reveal-track">♪ играет 15 секунд</div>
+}
+
 export function MelodyBoard({ pack, round, gameState }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
 }) {
@@ -342,6 +368,10 @@ export function MelodyBoard({ pack, round, gameState }: {
                 <div className="answer-label">ВЕРНО ✓ · +{m.wonPts ?? 0}</div>
                 <div className="answer-main">{track?.correct}</div>
               </div>
+              {/* Дослушать трек: 15 секунд с начала, вместе с показом ответа.
+                  Раньше музыка обрывалась в момент угадывания, и зал не
+                  успевал узнать песню. */}
+              {track?.audio && <RevealTrack src={mediaUrl(track.audio)} />}
               <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
                 {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
               </div>

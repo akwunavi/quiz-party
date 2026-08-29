@@ -125,3 +125,25 @@
   .pl-fb-scale { grid-template-columns: repeat(5, 1fr); }
   .pl-fb-dot { padding: 12px 0; font-size: 15px; }
 }
+
+/* ═══ БЛИЦ НА ТЕЛЕФОНЕ ═══
+   Два состояния: «ваш ход» с вопросом и полем, и ожидание.
+   Ожидание намеренно скучное — команда не должна залипать в экран,
+   пока играют соперники. */
+.pl-blitz { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.pl-blitz.waiting { align-items: center; justify-content: center;
+  min-height: 50vh; text-align: center; color: var(--dim); }
+.pl-bz-head { font-family: var(--font-display); letter-spacing: .04em;
+  font-size: clamp(20px, 6vw, 30px); color: var(--tc, var(--accent)); }
+.pl-blitz.waiting .pl-bz-head { color: var(--dim); }
+.pl-bz-dim { color: var(--dim); font-size: 14px; }
+.pl-bz-q { font-size: clamp(17px, 4.6vw, 24px); line-height: 1.35; }
+.pl-blitz input { width: 100%; font: inherit; font-size: 18px;
+  padding: 14px; border-radius: 12px; }
+.pl-bz-send { width: 100%; padding: 16px; font-size: 17px; border-radius: 12px; }
+.pl-bz-verdict { text-align: center; padding: 10px; border-radius: 10px;
+  font-weight: 700; }
+.pl-bz-verdict.ok { color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.pl-bz-verdict.bad { color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent); }

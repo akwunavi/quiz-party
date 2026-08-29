@@ -40,6 +40,18 @@ function scoreJeopardyRound(
   return total
 }
 
+// ── Блиц «100 вопросов» ──────────────────────────────────────────────────
+// В раунде две валюты: ОЧКИ внутри раунда и БАЛЛЫ за место, которые уходят
+// в общий зачёт. Считать очки здесь нельзя — они живут в blitz_state, а не
+// в answers. Поэтому при завершении раунда пульт ведущего записывает уже
+// готовый результат строкой `q-blitz` со ставкой, равной баллам за место.
+// Тут остаётся только прочитать её.
+function scoreBlitzRound(ri: number, teamId: string, answers: Answer[]): number {
+  const row = answers.find(a =>
+    a.team_id === teamId && a.round_number === ri && a.question_ref === 'q-blitz')
+  return Number(row?.stake ?? 0)
+}
+
 export function computeTotals(
   pack: LoadedPack, teams: Team[], answers: Answer[],
   doubledByTeam: Record<string, boolean> = {}, doubledRoundIdx: number | null = null,
@@ -72,6 +84,10 @@ export function computeTotals(
       // своя игра: балл = цена плитки, см. scoreJeopardyRound
       if (round.mechanic === 'jeopardy') {
         total += scoreJeopardyRound(round, ri, t.id, answers)
+        return
+      }
+      if (round.mechanic === 'blitz') {
+        total += scoreBlitzRound(ri, t.id, answers)
         return
       }
       if (round.mechanic === 'race') {
@@ -156,6 +172,10 @@ export function computeRoundScores(
       // своя игра: балл = цена плитки, см. scoreJeopardyRound
       if (round.mechanic === 'jeopardy') {
         per.push(scoreJeopardyRound(round, ri, t.id, answers))
+        return
+      }
+      if (round.mechanic === 'blitz') {
+        per.push(scoreBlitzRound(ri, t.id, answers))
         return
       }
       if (round.mechanic === 'race') {
