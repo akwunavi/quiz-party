@@ -214,6 +214,11 @@ export interface Question {
   is_final_question: boolean
   status: 'draft' | 'ready'
   hidden: boolean
+  /** Когда вопрос показывали в игре. Ставит блиц в момент показа.
+   *  Не путать с hidden: это «система показала», а hidden — «убран
+   *  из банка навсегда», и ставит его ведущий руками. */
+  played_at?: string | null
+
 }
 
 // ── Игра ───────────────────────────────────────────────

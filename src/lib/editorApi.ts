@@ -255,7 +255,16 @@ export function exportPackJson(pack: LoadedPack) {
       questions: r.questions.map(q => ({
         position: q.position, text: q.question_text, answer: q.answer,
         note: q.answer_note, media: q.media, hidden: q.hidden,
+        played_at: q.played_at,
       })),
     })),
   }, null, 2)
+}
+
+/** Отметить вопрос отыгранным. Ставится автоматически в момент ПОКАЗА —
+ *  так отметка остаётся, даже если игра прервалась на середине.
+ *  Ошибку глушим: провал отметки не должен ломать ход раунда. */
+export async function markPlayed(id: string): Promise<void> {
+  await supabase.from('pack_questions')
+    .update({ played_at: new Date().toISOString() }).eq('id', id)
 }

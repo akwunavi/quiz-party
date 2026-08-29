@@ -44,6 +44,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
 
   const isJeopardy = round.mechanic === 'jeopardy'
+  const isBlitz = round.mechanic === 'blitz'
   // в этих механиках контент задаётся не вопросами, а темами/треками
   const noQuestions = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
 
@@ -104,7 +105,10 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </label>
         </div>
 
-        {!noQuestions && <>
+        {/* Блицу эти поля не нужны: у него свой таймер на КОМАНДУ, свои три
+            попытки и своя очередь ходов. Раньше они показывались и путали —
+            на сам раунд не влияли, но выглядели как настройки. */}
+        {!noQuestions && !isBlitz && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
             <NumField
               value={round.timer_seconds}
@@ -189,7 +193,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </div>
         )}
 
-        <div className="ed-field"><label>Перед ответами</label>
+        {!isBlitz && <div className="ed-field"><label>Перед ответами</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
               checked={!!(round.settings as { recap_before_answers?: boolean }).recap_before_answers}
@@ -202,9 +206,9 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             Затем обычное время на ответы. Работает только когда ответы
             собираются в конце раунда.
           </div>
-        </div>
+        </div>}
 
-        <div className="ed-field"><label>После раунда</label>
+                <div className="ed-field"><label>После раунда</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
               checked={!!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after}
@@ -237,6 +241,11 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
       {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}
+          {isBlitz && (() => {
+            const played = round.questions.filter(q => !q.hidden && q.played_at).length
+            const fresh = round.questions.filter(q => !q.hidden && !q.played_at).length
+            return <span className="ed-blitz-count"> · свежих {fresh}, отыграно {played}</span>
+          })()}
           {estimateRoundMinutes(round) > 0 &&
             <span className="round-time" title="Оценка: вступление + таймеры + разбор ответов">
               ≈ {estimateRoundMinutes(round)} мин
@@ -256,6 +265,13 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
                 {(q.media.question ?? []).length > 0 &&
                   <span className="ed-row-meta">🖼 {(q.media.question ?? []).length}</span>}
                 {q.hidden && <span className="ed-row-meta">скрыт из игры</span>}
+                {/* Отметка ставится автоматически, когда вопрос показали в
+                    игре. Убирать его из банка или нет — решает ведущий. */}
+                {q.played_at && !q.hidden && (
+                  <span className="ed-row-meta played">
+                    отыгран {new Date(q.played_at).toLocaleDateString('ru-RU')}
+                  </span>
+                )}
               </div>
             </div>
             <div className="ed-actions">

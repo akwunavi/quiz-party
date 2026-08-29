@@ -201,3 +201,7 @@
   transform-origin: top left; transform: scale(var(--s));
   pointer-events: none; }
 @media (max-width: 1500px) { .sm-screen { --s: .24; } }
+
+/* пометка «отыгран» в списке вопросов блица */
+.ed-row-meta.played { color: #fbbf24; }
+.ed-blitz-count { color: var(--dim); font-weight: 400; font-size: 13px; }

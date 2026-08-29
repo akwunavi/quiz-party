@@ -20,7 +20,7 @@ import {
   remainingCount, currentTeam, toResults, MAX_ATTEMPTS, type BlitzState,
 } from '../lib/blitzState'
 import { blitzResults } from '../lib/blitz'
-import { hideQuestion } from '../lib/editorApi'
+import { hideQuestion, markPlayed } from '../lib/editorApi'
 import { enqueueAnswer } from '../lib/answerQueue'
 import {
   isDevMode, disableDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
@@ -983,6 +983,9 @@ function BlitzControls({ pack, round, gameState }: {
           onClick={() => {
             const next = pickNext(bank, state.used)
             if (!next) return void push(finishNoQuestions(state))
+            // Отметка «отыгран» ставится в момент ПОКАЗА и переживает игру:
+            // ведущий увидит её в редакторе и решит, убирать ли вопрос.
+            void markPlayed(next.id).catch(() => {})
             void push(showQuestion(state, next.id, Date.now()))
           }}>
           {left === 0 ? 'ВОПРОСЫ КОНЧИЛИСЬ' : 'ПОКАЗАТЬ ВОПРОС →'}
