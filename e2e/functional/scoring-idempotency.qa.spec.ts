@@ -7,7 +7,7 @@ describe('QA: scoring idempotency and duplicate-answer guards', () => {
   it('answer persistence uses a stable team/question conflict key', async () => {
     const source = await read('src/lib/answerQueue.ts')
     expect(source).toContain("onConflict: 'team_id,question_ref'")
-    expect(source).toContain('upsert(row')
+    expect(source).toContain("supabase.from('answers').upsert({")
   })
 
   it('answer queue does not create an unconditional second answer for the same question', async () => {
