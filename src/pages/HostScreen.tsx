@@ -1252,16 +1252,34 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
 
     if (!q.media.voice) { runQuestion(); return }
 
-    // озвучка блокирует старт: пока читают вопрос, время не тикает
+    // Озвучка блокирует старт: пока читают вопрос, время не тикает.
+    //
+    // ГОНКА, из-за которой звучала чужая озвучка. play() асинхронный: он
+    // возвращает обещание и начинает воспроизведение ПОЗЖЕ. Если ведущий
+    // успевал перелистнуть вопрос до этого момента, отмена вызывала
+    // pause() у ещё не запустившегося элемента — то есть не делала ничего,
+    // а через миг play() всё-таки стартовал. В итоге на экране вопрос B,
+    // а из колонок читают вопрос A, иногда вообще из прошлого раунда.
+    //
+    // Лечение: после того как play() действительно начался, проверяем, не
+    // отменили ли нас, и глушим. И src обнуляем при отмене, чтобы
+    // недокачанный файл не смог заиграть вовсе.
     const v = createAudio(); v.src = mediaUrl(q.media.voice)
     voiceRef.current = v
     v.onended = runQuestion
     v.onerror = runQuestion            // нет файла — не зависаем
-    v.play().catch(runQuestion)        // запрет автозапуска — тоже
+    v.play().then(() => {
+      if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
+    }).catch(runQuestion)              // запрет автозапуска — тоже
 
     return () => {
       cancelled = true
-      voiceRef.current?.pause()
+      const old = voiceRef.current
+      if (old) {
+        old.onended = null; old.onerror = null
+        try { old.pause(); old.src = '' } catch { /* уже мёртв */ }
+      }
+      voiceRef.current = null
       audioRef.current?.pause()
     }
   }, [q.id])

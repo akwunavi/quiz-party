@@ -116,11 +116,13 @@
 @keyframes ptGlow { 0%, 100% { opacity: .5; transform: scale(.98); }
   50% { opacity: 1; transform: scale(1.03); } }
 
+/* Вес поднят по той же причине — 01-base.css задаёт .q-word позже? нет,
+   раньше; но 03/19 могут перебивать, поэтому целимся точнее. */
 /* НОВЫЙ ВОПРОС: слова проступают чернилами, по одному.
    Первая версия целилась в .title-anim и .wind-text — таких классов нет,
    правило не работало ни дня. Настоящая цель — .q-word: именно из них
    собран текст вопроса, и у каждого слова уже есть своя задержка. */
-.theme-potter .q-word {
+.theme-potter .host-screen .q-word {
   animation: ptInk .75s cubic-bezier(.2,.75,.25,1) forwards; }
 @keyframes ptInk {
   0%   { opacity: 0; filter: blur(7px); transform: translateY(6px) scale(.96);
@@ -184,20 +186,26 @@
 @keyframes ptCorner { 0%,100% { opacity: .35; transform: scale(.85) rotate(0); }
   50% { opacity: 1; transform: scale(1.15) rotate(180deg); } }
 
-/* ── Плитки вариантов проявляются по очереди, как страницы книги ── */
-.theme-potter .choices-grid .choice-plate {
+/* ── Плитки вариантов проявляются по очереди, как страницы книги ──
+   Специфичность намеренно завышена: этот файл грузится РАНЬШЕ, чем
+   19-patch-746.css, где у .choice-plate свои правила. При равном весе
+   побеждал бы тот файл, и анимация просто не появлялась.
+   Плитки со скрытым состоянием (.hidden-yet) исключены — им анимация
+   выключена по своей причине, ломать это нельзя. */
+.theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet) {
   animation: ptPlate .55s cubic-bezier(.2,.8,.3,1) both; }
-.theme-potter .choices-grid .choice-plate:nth-child(1) { animation-delay: .10s; }
-.theme-potter .choices-grid .choice-plate:nth-child(2) { animation-delay: .22s; }
-.theme-potter .choices-grid .choice-plate:nth-child(3) { animation-delay: .34s; }
-.theme-potter .choices-grid .choice-plate:nth-child(4) { animation-delay: .46s; }
+.theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet):nth-child(1) { animation-delay: .10s; }
+.theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet):nth-child(2) { animation-delay: .22s; }
+.theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet):nth-child(3) { animation-delay: .34s; }
+.theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet):nth-child(4) { animation-delay: .46s; }
 @keyframes ptPlate {
   from { opacity: 0; transform: translateY(14px) rotateX(18deg);
          box-shadow: 0 0 34px rgba(255,205,110,.35); }
   to   { opacity: 1; transform: none; } }
 
 /* ── Золотая пыль при показе верного ответа ── */
-.theme-potter .answer-block.reveal-in .answer-label::after {
+/* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
+.theme-potter .host-screen .answer-block.reveal-in .answer-label::after {
   content: '· ✦ · ✧ · ✦ ·'; display: block;
   color: rgba(255,205,110,.8); letter-spacing: .4em;
   font-size: .6em; margin-top: .3em;
@@ -210,6 +218,7 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-potter .q-word, .pt-frame::before, .pt-frame::after,
   .theme-potter .choices-grid .choice-plate,
-  .theme-potter .answer-block.reveal-in .answer-label::after {
+  /* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
+.theme-potter .host-screen .answer-block.reveal-in .answer-label::after {
     animation: none; opacity: 1; }
 }
