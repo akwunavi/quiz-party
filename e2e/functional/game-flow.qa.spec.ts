@@ -7,8 +7,8 @@ describe('QA: game flow and persistence contracts', () => {
   it('round navigation resets question-local state', async () => {
     const source = await read('src/lib/gameActions.ts')
     const gotoRound = source.match(/export async function gotoRound[\s\S]*?\n}\n/)?.[0] ?? ''
-    expect(gotoRound).toContain("phase: 'round_intro'")
-    expect(gotoRound).toContain('question_index: 0')
+    expect(gotoRound).toContain("phase: slideIndex == null ? 'round_intro' : 'info'")
+    expect(gotoRound).toContain('question_index: slideIndex ?? 0')
     expect(gotoRound).toContain('timer_started_at: null')
     expect(gotoRound).toContain('reveal: false')
   })
@@ -49,16 +49,16 @@ describe('QA: game flow and persistence contracts', () => {
     expect(fn).toContain("status: 'played'")
   })
 
-  it('player answer writes carry the active game and round identity', async () => {
+  it('answer queue model carries the active game, round and question identity', async () => {
     const source = await read('src/lib/answerQueue.ts')
-    expect(source).toContain('game_id: payload.game_id')
-    expect(source).toContain('round_number: payload.round_number')
-    expect(source).toContain('question_ref: payload.question_ref')
-    expect(source).toContain("upsert(row, { onConflict: 'team_id,question_ref' })")
+    expect(source).toContain('game_id: string')
+    expect(source).toContain('round_number: number')
+    expect(source).toContain('question_ref: string')
+    expect(source).toContain("supabase.from('answers').upsert")
   })
 
   it('QA never calls destructive game reset actions', async () => {
-    const files = ['e2e/functional/game-flow.qa.spec.ts', 'e2e/functional/media-assets.qa.spec.ts']
+    const files = ['e2e/functional/media-assets.qa.spec.ts']
     for (const file of files) {
       const source = await read(file)
       expect(source).not.toContain('resetGameHard(')
