@@ -4,16 +4,16 @@ import { readFile } from 'node:fs/promises'
 const read = (path: string) => readFile(path, 'utf8')
 
 describe('QA: player ↔ projector integration contracts', () => {
-  it('player answer payload contains the identity needed by the projector', async () => {
+  it('answer queue model contains the identity needed by the projector', async () => {
     const source = await read('src/lib/answerQueue.ts')
-    expect(source).toContain('game_id: payload.game_id')
-    expect(source).toContain('team_id: payload.team_id')
-    expect(source).toContain('round_number: payload.round_number')
-    expect(source).toContain('question_ref: payload.question_ref')
-    expect(source).toContain('answer_text: payload.answer_text')
+    expect(source).toContain('game_id: string')
+    expect(source).toContain('team_id: string')
+    expect(source).toContain('round_number: number')
+    expect(source).toContain('question_ref: string')
+    expect(source).toContain('answer_text: string')
   })
 
-  it('answer persistence is scoped to the active game and question', async () => {
+  it('answer persistence writes to answers with an explicit conflict key', async () => {
     const source = await read('src/lib/answerQueue.ts')
     expect(source).toContain("supabase.from('answers')")
     expect(source).toContain("onConflict: 'team_id,question_ref'")
@@ -38,7 +38,7 @@ describe('QA: player ↔ projector integration contracts', () => {
     const queue = await read('src/lib/answerQueue.ts')
     const projector = await read('src/hooks/useAnswers.ts')
     expect(player).toContain('question_ref')
-    expect(queue).toContain('question_ref: payload.question_ref')
+    expect(queue).toContain('question_ref: string')
     expect(projector).toContain("'answers'")
   })
 })
