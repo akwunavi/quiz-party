@@ -124,3 +124,42 @@ describe('блиц в общем зачёте', () => {
     expect(computeTotals(pack, [team], [row(10, 'q-blitz', 1)]).get('t1')).toBe(0)
   })
 })
+
+describe('блиц: бонус за остаток времени', () => {
+  const T = (id: string, correct: number, leftMs: number, timedOut = false) =>
+    ({ teamId: id, correct, missed: 0, leftMs, timedOut }) as BlitzTeamState
+
+  it('3 / 2 / 1 по убыванию остатка, остальным ноль', () => {
+    const rows = blitzResults([
+      T('a', 5, 30_000), T('b', 5, 20_000), T('c', 5, 10_000), T('d', 5, 5_000),
+    ])
+    const by = (id: string) => rows.find(r => r.teamId === id)!
+    expect(by('a').bonus).toBe(3)
+    expect(by('b').bonus).toBe(2)
+    expect(by('c').bonus).toBe(1)
+    expect(by('d').bonus).toBe(0)
+  })
+
+  it('равный остаток — равный бонус, следующая группа получает следующий', () => {
+    const rows = blitzResults([
+      T('a', 5, 30_000), T('b', 5, 30_000), T('c', 5, 10_000),
+    ])
+    expect(rows.find(r => r.teamId === 'a')!.bonus).toBe(3)
+    expect(rows.find(r => r.teamId === 'b')!.bonus).toBe(3)
+    expect(rows.find(r => r.teamId === 'c')!.bonus).toBe(2)
+  })
+
+  it('у кого время кончилось — бонуса нет, штраф остаётся', () => {
+    const rows = blitzResults([T('a', 12, 0, true), T('b', 5, 10_000)], 10)
+    const a = rows.find(r => r.teamId === 'a')!
+    expect(a.bonus).toBe(0)
+    expect(a.points).toBe(2)          // 12 − 10 штрафа + 0 бонуса
+  })
+
+  it('бонус может изменить место', () => {
+    // одинаковые очки за ответы, но у 'b' остался запас времени
+    const rows = blitzResults([T('a', 6, 1_000), T('b', 6, 40_000)])
+    expect(rows.find(r => r.teamId === 'b')!.place).toBe(1)
+    expect(rows.find(r => r.teamId === 'a')!.place).toBe(2)
+  })
+})

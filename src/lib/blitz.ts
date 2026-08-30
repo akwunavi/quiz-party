@@ -32,12 +32,36 @@ export type BlitzTeamState = {
   missed: number
   /** true у той единственной команды, на которой остановился таймер. */
   timedOut?: boolean
+  /** Остаток времени в миллисекундах на момент конца раунда.
+   *  По нему раздаётся бонус за скорость. */
+  leftMs?: number
+}
+
+/** Бонус за остаток времени: кто сэкономил больше, тот и получил.
+ *  Команды с нулевым остатком бонуса не получают вовсе — иначе тот, у
+ *  кого время кончилось, оказался бы в одной группе с теми, кто просто
+ *  доиграл впритык. */
+export const TIME_BONUS = [3, 2, 1] as const
+
+/** Раздать бонус за скорость. Равный остаток — равный бонус, следующая
+ *  группа получает следующий по величине, а не пропущенный. */
+export function timeBonuses(teams: BlitzTeamState[]): Map<string, number> {
+  const out = new Map<string, number>()
+  const withTime = teams.filter(t => (t.leftMs ?? 0) > 0)
+  const tiers = [...new Set(withTime.map(t => t.leftMs ?? 0))].sort((a, b) => b - a)
+  for (const t of teams) {
+    const i = tiers.indexOf(t.leftMs ?? 0)
+    out.set(t.teamId, (t.leftMs ?? 0) > 0 && i >= 0 ? (TIME_BONUS[i] ?? 0) : 0)
+  }
+  return out
 }
 
 export type BlitzResultRow = {
   teamId: string
-  /** Очки до штрафа — их полезно показывать на экране по ходу раунда. */
+  /** Очки до штрафа и бонуса — их видно на экране по ходу раунда. */
   raw: number
+  /** Бонус за остаток времени: 3 / 2 / 1 или 0. */
+  bonus: number
   /** Очки после штрафа: по ним определяются места. */
   points: number
   place: number
@@ -61,10 +85,14 @@ export function blitzResults(
   timeoutPenalty: number = TIMEOUT_PENALTY,
 ): BlitzResultRow[] {
   const penalty = Math.max(0, timeoutPenalty)
+  const bonus = timeBonuses(teams)
   const withPoints = teams.map(t => ({
     teamId: t.teamId,
     raw: rawPoints(t),
-    points: rawPoints(t) - (t.timedOut ? penalty : 0),
+    bonus: bonus.get(t.teamId) ?? 0,
+    // Порядок важен: сначала очки за ответы, потом штраф за таймаут,
+    // потом бонус за скорость. Места считаются уже по итогу.
+    points: rawPoints(t) - (t.timedOut ? penalty : 0) + (bonus.get(t.teamId) ?? 0),
   }))
 
   // Плотная нумерация мест: равные очки — одно место, следующее не

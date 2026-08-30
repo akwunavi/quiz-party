@@ -5,7 +5,7 @@ import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from 
 import { registerTeam, heartbeat } from '../lib/gameActions'
 import { rateQuestion, saveRoundComment } from '../lib/ratings'
 import { useBlitz } from '../lib/blitzApi'
-import { currentTeam, MAX_ATTEMPTS } from '../lib/blitzState'
+import { currentTeam, MAX_ATTEMPTS, SKIP_MARK } from '../lib/blitzState'
 import { enqueueAnswer } from '../lib/answerQueue'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
@@ -710,13 +710,11 @@ function BlitzPlayer({ team, gameState, round }: {
   if (state.finished) return <div className="pl-wait">Раунд окончен</div>
 
   if (!myTurn) {
+    // Имя соперника не показываем: раньше сюда попадал его ID из базы,
+    // а он команде ни о чём не говорит. Кто отвечает — видно на проекторе.
     return (
       <div className="pl-blitz waiting">
-        <div className="pl-bz-head">Ждите своей очереди</div>
-        <div className="pl-bz-dim">
-          отвечает {/* имя соперника не прячем: это видно и на проекторе */}
-          <b>{currentTeam(state) ?? '—'}</b>
-        </div>
+        <div className="pl-bz-head">Ждите вашего хода</div>
       </div>
     )
   }
@@ -751,6 +749,17 @@ function BlitzPlayer({ team, gameState, round }: {
         <div className="pl-bz-verdict bad">Неверно · попыток осталось {left}</div>
       )}
       {verdict === 'sent' && <div className="pl-bz-verdict ok">Отправлено</div>}
+      {/* Скип — решение КОМАНДЫ, а не ведущего: она одна знает, знает ли
+          ответ. Цена скипа честно написана на кнопке. */}
+      <button className="pl-bz-skip" onClick={() => {
+        if (!confirm('Пропустить вопрос? Это минус одно очко.')) return
+        void enqueueAnswer({
+          team_id: team.id, game_id: gameState.game_id,
+          question_ref: `q-${q?.id ?? state.current?.questionId ?? ''}`,
+          round_number: gameState.round_number,
+          answer_text: SKIP_MARK,
+        })
+      }}>Пропустить · −1</button>
     </div>
   )
 }

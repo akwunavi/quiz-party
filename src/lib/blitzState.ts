@@ -170,6 +170,8 @@ export function toResults(s: BlitzState) {
     correct: s.correct[teamId] ?? 0,
     missed: s.missed[teamId] ?? 0,
     timedOut: s.timedOutTeam === teamId,
+    // остаток времени нужен для бонуса за скорость
+    leftMs: Math.max(0, s.left[teamId] ?? 0),
   }))
 }
 
@@ -198,3 +200,9 @@ export function pickNext(
   const i = Math.min(pool.length - 1, Math.max(0, Math.floor(rnd * pool.length)))
   return pool[i]
 }
+
+/** Метка «команда пропустила вопрос».
+ *  Скип приходит обычным ответом с этим текстом: отдельного канала связи
+ *  у телефона нет, а вводить его ради одной кнопки — лишняя сложность.
+ *  Текст заведомо не совпадёт с настоящим ответом. */
+export const SKIP_MARK = '__skip__'

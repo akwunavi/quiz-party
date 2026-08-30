@@ -6,10 +6,11 @@ import { useBlitz } from '../lib/blitzApi'
 import {
   toResults, initBlitz, showQuestion, answerCorrect, answerWrong, skip,
   pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext, currentTeam,
-  NEXT_DELAY_MS, type BlitzState,
+  NEXT_DELAY_MS, MAX_ATTEMPTS, SKIP_MARK, type BlitzState,
 } from '../lib/blitzState'
 import { saveBlitz } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
+import { enqueueAnswer } from '../lib/answerQueue'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -1191,8 +1192,20 @@ function BlitzScreen({ pack, round, gameState }: {
     if (busy.current) return
     busy.current = true
     setState(next)
-    try { await saveBlitz(gameState.game_id, gameState.round_number, next) }
-    finally { busy.current = false }
+    try {
+      await saveBlitz(gameState.game_id, gameState.round_number, next)
+      // Итоги раунда пишет ТОТ, КТО ЕГО ВЕДЁТ. Когда управление переехало
+      // на проектор, запись осталась в админке — и в общий зачёт улетали
+      // нули, хотя таблица на экране показывала баллы.
+      if (next.finished && !state?.finished) {
+        const rows = blitzResults(toResults(next), settings.timeoutPenalty ?? 10)
+        await Promise.all(rows.map(r => enqueueAnswer({
+          team_id: r.teamId, game_id: gameState.game_id,
+          question_ref: 'q-blitz', round_number: gameState.round_number,
+          answer_text: `место ${r.place}`, stake: r.score,
+        })))
+      }
+    } finally { busy.current = false }
   }
 
   // ── 1. Кубик бросается САМ ──
@@ -1233,6 +1246,12 @@ function BlitzScreen({ pack, round, gameState }: {
       a.team_id === active && a.question_ref === `q-${q.id}`)
     if (!mine?.answer_text) return
     if (cur.lastAnswer === mine.answer_text) return      // уже проверяли
+    // Скип приходит обычным ответом с меткой: команда сама решает, когда
+    // сдаться. Проверять его нечего — сразу минус очко и ход дальше.
+    if (mine.answer_text === SKIP_MARK) {
+      void push(skip(resumeAfterCheck(state, Date.now()), Date.now()))
+      return
+    }
     const ok = autocheck(q.answer, mine.answer_text) === true
     void push(pauseForCheck(state, Date.now(), ok ? 'ok' : 'no', mine.answer_text))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1245,6 +1264,14 @@ function BlitzScreen({ pack, round, gameState }: {
     const t = setTimeout(() => {
       const now = Date.now()
       const resumed = resumeAfterCheck(state, now)
+      // Оценку проставляем и самому ответу: иначе он остаётся
+      // «неоценённым» и портит сводку по раунду.
+      const row = answers.find(a =>
+        a.team_id === active && a.question_ref === `q-${cur.questionId}`)
+      if (row) {
+        void supabase.from('answers')
+          .update({ is_correct: cur.verdict === 'ok' }).eq('id', row.id).then(() => {})
+      }
       void push(cur.verdict === 'ok' ? answerCorrect(resumed, now) : answerWrong(resumed, now))
     }, NEXT_DELAY_MS)
     return () => clearTimeout(t)
@@ -1293,7 +1320,12 @@ function BlitzScreen({ pack, round, gameState }: {
       <BlitzBoard teams={teams} state={state} bank={bank}
         questionText={q?.question_text}
         verdict={cur?.verdict}
-        answerText={cur?.verdict ? displayAnswer(q as Question) : undefined}
+        // Верный ответ показываем ТОЛЬКО когда ход закрыт: команда ответила
+        // верно или исчерпала попытки. При неверной попытке с оставшимися
+        // шансами подсказывать нельзя — иначе следующая попытка бессмысленна.
+        answerText={cur?.verdict === 'ok'
+          || (cur?.verdict === 'no' && cur.attempts + 1 >= MAX_ATTEMPTS)
+          ? displayAnswer(q as Question) : undefined}
         dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} /> : undefined}
       />
       {/* ── 5. Управление с проектора ──

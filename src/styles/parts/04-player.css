@@ -147,3 +147,8 @@
   background: color-mix(in srgb, var(--ok) 12%, transparent); }
 .pl-bz-verdict.bad { color: var(--danger);
   background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+/* скип у игрока: намеренно неяркий, но и не спрятанный */
+.pl-bz-skip { width: 100%; padding: 12px; border-radius: 12px; font-size: 15px;
+  background: transparent; color: var(--dim);
+  border: 1px dashed rgba(255,255,255,.25); }

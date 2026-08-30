@@ -21,10 +21,9 @@ export function blockLayout(n: number): { top: boolean; cols: number } {
   return { top: n % 2 === 1, cols: n <= 6 ? 3 : 4 }
 }
 
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.ceil(ms / 1000))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
+// Просто секунды, без минут: раунд короткий, «60» читается с дальнего
+// ряда быстрее, чем «1:00», и не путается с часами.
+const fmt = (ms: number) => String(Math.max(0, Math.ceil(ms / 1000)))
 
 function TeamBlock({ team, state, active, now }: {
   team: Team; state: BlitzState; active: boolean; now: number
