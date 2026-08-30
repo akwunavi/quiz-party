@@ -148,7 +148,25 @@
 .pl-bz-verdict.bad { color: var(--danger);
   background: color-mix(in srgb, var(--danger) 12%, transparent); }
 
+/* «ваш ход, вопрос сейчас будет» — то же ожидание, но своим цветом:
+   команда должна понять, что это уже её минута, а не чужая */
+.pl-blitz.waiting.ready .pl-bz-head { color: var(--tc, var(--accent)); }
+
+/* Строка состояния ответа. Одна на все случаи, меняется только цвет —
+   так команда читает её боковым зрением, не разбирая заново каждый раз. */
+.pl-bz-state { text-align: center; padding: 10px 12px; border-radius: 10px;
+  font-size: 15px; line-height: 1.35; color: var(--dim);
+  border: 1px solid rgba(255,255,255,.12); }
+.pl-bz-state.wait { opacity: .8; }
+.pl-bz-state.sent { color: var(--accent); border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.pl-bz-state.bad { color: var(--danger); border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  font-weight: 600; }
+
 /* скип у игрока: намеренно неяркий, но и не спрятанный */
 .pl-bz-skip { width: 100%; padding: 12px; border-radius: 12px; font-size: 15px;
   background: transparent; color: var(--dim);
   border: 1px dashed rgba(255,255,255,.25); }
+.pl-bz-skip:disabled { opacity: .5; }
+.pl-bz-send:disabled { opacity: .45; }

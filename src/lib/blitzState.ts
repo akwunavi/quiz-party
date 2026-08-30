@@ -146,7 +146,12 @@ export function answerWrong(s: BlitzState, now: number): BlitzState {
   if (!team || !s.current) return s
   const attempts = s.current.attempts + 1
   if (attempts < MAX_ATTEMPTS) {
-    return { ...s, current: { ...s.current, attempts } }
+    // Вердикт ОБЯЗАН сняться вместе с попыткой. Раньше он оставался в
+    // состоянии навсегда: на проекторе висело «НЕВЕРНО», у ведущего вместо
+    // скипа торчала кнопка «исправить», а телефон не понимал, что можно
+    // отвечать снова. Текст ответа оставляем — по нему автопроверка
+    // отличает новый ответ от уже проверенного.
+    return { ...s, current: { ...s.current, attempts, verdict: undefined } }
   }
   return endTurn({ ...s, missed: { ...s.missed, [team]: (s.missed[team] ?? 0) + 1 } }, now)
 }

@@ -5,7 +5,7 @@ import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from 
 import { registerTeam, heartbeat } from '../lib/gameActions'
 import { rateQuestion, saveRoundComment } from '../lib/ratings'
 import { useBlitz } from '../lib/blitzApi'
-import { currentTeam, MAX_ATTEMPTS, SKIP_MARK } from '../lib/blitzState'
+import { currentTeam, MAX_ATTEMPTS, SKIP_MARK, NEXT_DELAY_MS } from '../lib/blitzState'
 import { enqueueAnswer } from '../lib/answerQueue'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
@@ -680,15 +680,20 @@ function PlayerReview({ team, round, roundNumber, label }: {
 /** Блиц на телефоне.
  *
  *  Ходит одна команда за раз. Своей команде показываем вопрос и поле
- *  ответа, остальным — «ждите своей очереди»: они не должны видеть вопрос
- *  заранее, иначе подготовятся к нему на своём ходу.
+ *  ответа, остальным — «ждите вашего хода»: они не должны видеть вопрос
+ *  заранее, иначе подготовятся к нему на своём ходу. Имя соперника тоже
+ *  не показываем — раньше сюда попадал его id из базы, а он команде ни о
+ *  чём не говорит; кто отвечает, видно на проекторе.
  *
- *  Вердикт автопроверки показываем СРАЗУ — так решено при обсуждении
- *  механики. Ведущий может поправить его у себя, тогда вердикт обновится
- *  при следующем опросе.
+ *  ФОРМА ПОЯВЛЯЕТСЯ ВМЕСТЕ С ВОПРОСОМ. Между ходами `current` пуст, и
+ *  раньше команда пять секунд смотрела на пустое поле и многоточие вместо
+ *  вопроса — казалось, что телефон завис.
  *
- *  Кнопка после первой отправки называется «Изменить»: попыток три, и
- *  команда должна понимать, что ещё может исправиться. */
+ *  Состояние отправки берётся из состояния раунда, а не из локального
+ *  флага: пока проектор не подтвердил приём (`lastAnswer`), пишем
+ *  «отправляем», после — вердикт и обратный отсчёт окна на исправление.
+ *  Команда должна видеть, ушёл ли ответ, и сколько секунд осталось,
+ *  чтобы его поправить. */
 function BlitzPlayer({ team, gameState, round }: {
   team: Team
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
@@ -697,39 +702,65 @@ function BlitzPlayer({ team, gameState, round }: {
   const { state } = useBlitz(gameState.game_id, gameState.round_number)
   const [value, setValue] = useState('')
   const [sentText, setSentText] = useState<string | null>(null)
+  const [skipSent, setSkipSent] = useState(false)
+  // Секунды окна на исправление тикают локально: состояние в базе
+  // опрашивается раз в секунду, и отсчёт по нему дёргался бы.
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 250)
+    return () => clearInterval(t)
+  }, [])
+
+  const cur = state?.current ?? null
+  const qid = cur?.questionId
   const myTurn = !!state && currentTeam(state) === team.id
-  const q = state?.current
-    ? round.questions.find(x => x.id === state.current!.questionId)
-    : undefined
+  const q = qid ? round.questions.find(x => x.id === qid) : undefined
 
   // Новый вопрос — чистое поле. Иначе прошлый ответ остаётся на экране и
   // команда случайно отправляет его снова.
-  useEffect(() => { setValue(''); setSentText(null) }, [state?.current?.questionId])
+  useEffect(() => { setValue(''); setSentText(null); setSkipSent(false) }, [qid])
+  // Новая попытка по тому же вопросу: отметку «отправлено» снимаем, а
+  // текст оставляем — чаще правят опечатку, чем пишут ответ заново.
+  useEffect(() => { setSentText(null) }, [cur?.attempts])
 
   if (!state) return <div className="pl-wait">Раунд ещё не начался</div>
   if (state.finished) return <div className="pl-wait">Раунд окончен</div>
 
   if (!myTurn) {
-    // Имя соперника не показываем: раньше сюда попадал его ID из базы,
-    // а он команде ни о чём не говорит. Кто отвечает — видно на проекторе.
     return (
       <div className="pl-blitz waiting">
         <div className="pl-bz-head">Ждите вашего хода</div>
+        <div className="pl-bz-dim">Вопрос соперника — на проекторе</div>
       </div>
     )
   }
 
-  const attempts = state.current?.attempts ?? 0
-  const left = Math.max(0, MAX_ATTEMPTS - attempts)
-  const verdict = sentText && attempts > 0 ? 'wrong' : sentText ? 'sent' : null
+  // Ход наш, но вопрос ещё не выехал на экран: формы быть не должно.
+  if (!cur || !q) {
+    return (
+      <div className="pl-blitz waiting ready" style={{ ['--tc' as string]: team.color }}>
+        <div className="pl-bz-head">Ваш ход</div>
+        <div className="pl-bz-dim">Вопрос сейчас появится на экране</div>
+      </div>
+    )
+  }
+
+  const attemptsLeft = Math.max(0, MAX_ATTEMPTS - cur.attempts)
+  const verdict = cur.verdict
+  const done = verdict === 'ok'
+  // Ответ дошёл до ведущего, когда он попал в состояние раунда.
+  const delivered = sentText != null && cur.lastAnswer === sentText
+  const editLeft = cur.pausedAt != null
+    ? Math.max(0, Math.ceil((cur.pausedAt + NEXT_DELAY_MS - now) / 1000))
+    : 0
 
   const send = () => {
     const text = value.trim()
-    if (!text) return
+    if (!text || text === sentText) return
     setSentText(text)
     void enqueueAnswer({
       team_id: team.id, game_id: gameState.game_id,
-      question_ref: `q-${q?.id ?? state.current?.questionId ?? ''}`,
+      question_ref: `q-${q.id}`,
       round_number: gameState.round_number,
       answer_text: text,
     })
@@ -738,28 +769,55 @@ function BlitzPlayer({ team, gameState, round }: {
   return (
     <div className="pl-blitz mine" style={{ ['--tc' as string]: team.color }}>
       <div className="pl-bz-head">Ваш ход</div>
-      <div className="pl-bz-q">{q?.question_text ?? '…'}</div>
-      <input value={value} placeholder="Ответ"
-        onChange={e => setValue(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter') send() }} />
-      <button className="pl-bz-send" onClick={send} disabled={!value.trim()}>
-        {sentText ? 'Изменить' : 'Отправить'}
-      </button>
-      {verdict === 'wrong' && (
-        <div className="pl-bz-verdict bad">Неверно · попыток осталось {left}</div>
+      <div className="pl-bz-q">{q.question_text}</div>
+
+      {done ? (
+        <div className="pl-bz-verdict ok">Верно ✓</div>
+      ) : (
+        <>
+          <input value={value} placeholder="Ответ"
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') send() }} />
+          <button className="pl-bz-send" onClick={send}
+            disabled={!value.trim() || value.trim() === sentText}>
+            {sentText ? 'Отправить исправление' : 'Отправить'}
+          </button>
+
+          {/* Одна строка состояния вместо двух разных подписей: команда
+              должна с одного взгляда понимать, что происходит с её ответом. */}
+          {sentText == null && (
+            <div className="pl-bz-state">Попыток осталось: {attemptsLeft}</div>
+          )}
+          {sentText != null && !delivered && (
+            <div className="pl-bz-state wait">Отправляем «{sentText}»…</div>
+          )}
+          {delivered && !verdict && (
+            <div className="pl-bz-state sent">Ответ принят: «{sentText}» · проверяем</div>
+          )}
+          {delivered && verdict === 'no' && (
+            <div className="pl-bz-state bad">
+              «{sentText}» — неверно · осталось попыток: {Math.max(0, attemptsLeft - 1)}
+              {editLeft > 0 && <> · исправить можно ещё {editLeft} с</>}
+            </div>
+          )}
+        </>
       )}
-      {verdict === 'sent' && <div className="pl-bz-verdict ok">Отправлено</div>}
+
       {/* Скип — решение КОМАНДЫ, а не ведущего: она одна знает, знает ли
-          ответ. Цена скипа честно написана на кнопке. */}
-      <button className="pl-bz-skip" onClick={() => {
-        if (!confirm('Пропустить вопрос? Это минус одно очко.')) return
-        void enqueueAnswer({
-          team_id: team.id, game_id: gameState.game_id,
-          question_ref: `q-${q?.id ?? state.current?.questionId ?? ''}`,
-          round_number: gameState.round_number,
-          answer_text: SKIP_MARK,
-        })
-      }}>Пропустить · −1</button>
+          ответ. Кнопка видна ВСЁ время, пока ход не закрыт: раньше она
+          пропадала после первой ошибки, и сдаться было нечем. */}
+      {!done && (
+        <button className="pl-bz-skip" disabled={skipSent} onClick={() => {
+          if (!confirm('Пропустить вопрос? Это минус одно очко.')) return
+          setSkipSent(true)
+          void enqueueAnswer({
+            team_id: team.id, game_id: gameState.game_id,
+            question_ref: `q-${q.id}`,
+            round_number: gameState.round_number,
+            answer_text: SKIP_MARK,
+          })
+        }}>{skipSent ? 'Пропускаем…' : 'Пропустить · −1'}</button>
+      )}
     </div>
   )
 }

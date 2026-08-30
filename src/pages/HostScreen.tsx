@@ -1261,6 +1261,10 @@ function BlitzScreen({ pack, round, gameState }: {
   // Окно нужно ведущему: он видит верный ответ и успевает поправить.
   useEffect(() => {
     if (!state || !cur?.verdict) return
+    // Отсчёт идёт от ПЕРВОЙ паузы, а не от последнего ответа. Иначе команда,
+    // отправляя правки каждые четыре секунды, держала бы свой таймер
+    // остановленным сколько угодно: время на проверку не списывается.
+    const wait = Math.max(0, NEXT_DELAY_MS - (Date.now() - (cur.pausedAt ?? Date.now())))
     const t = setTimeout(() => {
       const now = Date.now()
       const resumed = resumeAfterCheck(state, now)
@@ -1273,7 +1277,7 @@ function BlitzScreen({ pack, round, gameState }: {
           .update({ is_correct: cur.verdict === 'ok' }).eq('id', row.id).then(() => {})
       }
       void push(cur.verdict === 'ok' ? answerCorrect(resumed, now) : answerWrong(resumed, now))
-    }, NEXT_DELAY_MS)
+    }, wait)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cur?.verdict, cur?.lastAnswer])
@@ -1339,7 +1343,10 @@ function BlitzScreen({ pack, round, gameState }: {
             void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
           }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
         )}
-        {cur && !cur.verdict && (
+        {/* Скип доступен, пока команда ещё может отвечать. Условие было
+            `!cur.verdict`, и кнопка исчезала на первой же ошибке — вернуть
+            ход было нечем, кроме завершения раунда. */}
+        {cur && cur.verdict !== 'ok' && (
           <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>
             Скип −1
           </button>

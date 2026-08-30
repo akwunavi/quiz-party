@@ -180,3 +180,24 @@ describe('блиц: раскладка блоков на проекторе', ()
     expect(blockLayout(8).cols).toBe(4)
   })
 })
+
+describe('блиц: вердикт живёт только до применения', () => {
+  it('после ошибки с оставшимися попытками вердикт снимается', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = pauseForCheck(s, 3000, 'no', 'мимо')
+    s = answerWrong(resumeAfterCheck(s, 8000), 8000)
+    expect(s.current?.attempts).toBe(1)
+    // иначе проектор навсегда показывает «НЕВЕРНО», а у ведущего вместо
+    // скипа висит кнопка «исправить»
+    expect(s.current?.verdict).toBeUndefined()
+    // текст оставляем: по нему автопроверка отличает новый ответ
+    expect(s.current?.lastAnswer).toBe('мимо')
+  })
+
+  it('пауза на проверку не съедает время команды', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = pauseForCheck(s, 5000, 'no', 'мимо')          // потрачено 3 с (2 с фора)
+    s = answerWrong(resumeAfterCheck(s, 15000), 15000)
+    expect(liveLeft(s, 'a', 15000)).toBe(60000 - 3000)
+  })
+})
