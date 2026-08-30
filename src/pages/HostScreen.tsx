@@ -1,6 +1,10 @@
 import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
 import { InfoSlideView } from '../components/InfoSlideView'
+import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
+import { useBlitz } from '../lib/blitzApi'
+import { toResults } from '../lib/blitzState'
+import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
@@ -294,6 +298,15 @@ function HostInner({ gameState, pack }: {
         </div>
       </div>
     )
+  }
+
+  // ── Блиц «100 вопросов» ──
+  // Экран собирается из состояния раунда: пока его нет, показываем кубик,
+  // который ведущий бросает из админки. Без этой ветки проектор рисовал
+  // блиц как обычный раунд — механика была написана целиком, но нигде не
+  // подключена, и на телефонах висело «Раунд ещё не начался».
+  if (gameState.phase === 'question' && round.mechanic === 'blitz') {
+    return <BlitzScreen pack={pack} round={round} gameState={gameState} />
   }
 
   // ── «Скачки бульдогов» ──
@@ -1146,6 +1159,74 @@ function InfoNav({ slides, index }: { slides: InfoSlide[]; index: number }) {
       )}
       <button onClick={() => void setPhase('round_intro')}>К раунду →</button>
     </>
+  )
+}
+
+/** Блиц на проекторе: кубик до старта, доска во время раунда, итоги после.
+ *  Состояние читается тем же опросом, что и в админке, — общий источник
+ *  правды, чтобы пульт и экран не разошлись. */
+function BlitzScreen({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const { state } = useBlitz(gameState.game_id, gameState.round_number)
+  const teams = useTeams(gameState.game_id)
+  const bank = round.questions.map(q => ({ id: q.id, hidden: q.hidden }))
+
+  // Раунд ещё не начат — кубик крутится, пока ведущий не бросит его.
+  if (!state) {
+    return (
+      <div className="host-screen grid-bg bz-screen">
+        <div className="host-topbar"><span className="mono-tag">БЛИЦ</span></div>
+        <BlitzDice teams={teams} rolling />
+      </div>
+    )
+  }
+
+  // Первый кадр после броска: показываем, кому выпало начинать.
+  const started = state.current != null
+    || Object.values(state.correct).some(v => v > 0)
+    || Object.values(state.missed).some(v => v > 0)
+  if (!started && !state.finished) {
+    return (
+      <div className="host-screen grid-bg bz-screen">
+        <div className="host-topbar"><span className="mono-tag">БЛИЦ</span></div>
+        <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} />
+      </div>
+    )
+  }
+
+  if (state.finished) {
+    const settings = round.settings as { timeoutPenalty?: number }
+    const rows = blitzResults(toResults(state), settings.timeoutPenalty ?? 10)
+    return (
+      <div className="host-screen grid-bg sb-screen">
+        <div className="mono-tag">ИТОГИ БЛИЦА</div>
+        <table className="score-table">
+          <thead><tr><th></th><th>Команда</th><th>Очки</th><th>Баллы</th></tr></thead>
+          <tbody>
+            {rows.map(r => (
+              <tr key={r.teamId}>
+                <td>{r.place}{r.shared ? '=' : ''}</td>
+                <td>{teams.find(t => t.id === r.teamId)?.name ?? '—'}</td>
+                <td>{r.points}</td>
+                <td>{r.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="host-actions"><AfterRoundNav pack={pack} gameState={gameState} /></div>
+      </div>
+    )
+  }
+
+  const q = state.current
+    ? round.questions.find(x => x.id === state.current!.questionId)
+    : undefined
+  return (
+    <BlitzBoard teams={teams} state={state} bank={bank}
+      questionText={q?.question_text} />
   )
 }
 
