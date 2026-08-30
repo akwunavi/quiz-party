@@ -216,3 +216,22 @@
 @media (prefers-reduced-motion: reduce) {
   .bz-block.low, .bz-dice.rolling, .bz-dice.done, .bz-question { animation: none; }
 }
+
+/* Контейнер вопроса живёт всегда — держит раскладку между ходами. */
+.bz-question { min-height: clamp(110px, 16vh, 190px);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: .3em; }
+/* вердикт автопроверки прямо в контейнере */
+.bz-question.v-ok { border-color: var(--ok);
+  box-shadow: 0 0 50px color-mix(in srgb, var(--ok) 28%, transparent); }
+.bz-question.v-no { border-color: var(--danger);
+  box-shadow: 0 0 50px color-mix(in srgb, var(--danger) 28%, transparent); }
+.bz-verdict { font-family: var(--font-display); letter-spacing: .1em;
+  font-size: clamp(16px, 1.9vw, 32px); }
+.bz-verdict.ok { color: var(--ok); }
+.bz-verdict.no { color: var(--danger); }
+.bz-right { color: var(--dim); letter-spacing: 0; }
+/* кубик внутри контейнера вопроса — без отдельного экрана */
+.bz-question .bz-dice-wrap { margin: 0; }
+.bz-question .bz-dice { padding: clamp(8px, 1.4vh, 18px) clamp(18px, 2.2vw, 40px);
+  font-size: clamp(22px, 3vw, 52px); }

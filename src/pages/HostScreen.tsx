@@ -3,7 +3,13 @@ import { RoomPicker } from './RoomPicker'
 import { InfoSlideView } from '../components/InfoSlideView'
 import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
 import { useBlitz } from '../lib/blitzApi'
-import { toResults } from '../lib/blitzState'
+import {
+  toResults, initBlitz, showQuestion, answerCorrect, answerWrong, skip,
+  pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext, currentTeam,
+  NEXT_DELAY_MS, type BlitzState,
+} from '../lib/blitzState'
+import { saveBlitz } from '../lib/blitzApi'
+import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -301,10 +307,9 @@ function HostInner({ gameState, pack }: {
   }
 
   // ── Блиц «100 вопросов» ──
-  // Экран собирается из состояния раунда: пока его нет, показываем кубик,
-  // который ведущий бросает из админки. Без этой ветки проектор рисовал
-  // блиц как обычный раунд — механика была написана целиком, но нигде не
-  // подключена, и на телефонах висело «Раунд ещё не начался».
+  // Без этой ветки проектор рисует блиц как обычный раунд: состояние
+  // никто не создаёт, и на телефонах висит «Раунд ещё не начался».
+  // Механика может быть написана целиком и всё равно не работать.
   if (gameState.phase === 'question' && round.mechanic === 'blitz') {
     return <BlitzScreen pack={pack} round={round} gameState={gameState} />
   }
@@ -1163,18 +1168,89 @@ function InfoNav({ slides, index }: { slides: InfoSlide[]; index: number }) {
 }
 
 /** Блиц на проекторе: кубик до старта, доска во время раунда, итоги после.
- *  Состояние читается тем же опросом, что и в админке, — общий источник
+ *  Состояние читается тем же опросом, что и в админке, — один источник
  *  правды, чтобы пульт и экран не разошлись. */
 function BlitzScreen({ pack, round, gameState }: {
   pack: LoadedPack
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
-  const { state } = useBlitz(gameState.game_id, gameState.round_number)
+  const { state, setState } = useBlitz(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
-  const bank = round.questions.map(q => ({ id: q.id, hidden: q.hidden }))
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const bank = useMemo(
+    () => round.questions.map(q => ({ id: q.id, hidden: q.hidden })),
+    [round.questions])
+  const settings = round.settings as { teamSeconds?: number; timeoutPenalty?: number }
 
-  // Раунд ещё не начат — кубик крутится, пока ведущий не бросит его.
+  // Проектор ведёт раунд сам: он бросает кубик, ловит ответы, проверяет их
+  // и листает вопросы. Ведущему остаются только кнопки вмешательства.
+  // Раньше каждый шаг требовал нажатия в админке — играть было невозможно.
+  const busy = useRef(false)
+  const push = async (next: BlitzState) => {
+    if (busy.current) return
+    busy.current = true
+    setState(next)
+    try { await saveBlitz(gameState.game_id, gameState.round_number, next) }
+    finally { busy.current = false }
+  }
+
+  // ── 1. Кубик бросается САМ ──
+  // Крутится ~3 секунды и останавливается. Ведущему не надо ничего нажимать.
+  useEffect(() => {
+    if (state || teams.length < 2) return
+    const t = setTimeout(() => {
+      const order = [...teams].sort(() => Math.random() - 0.5).map(x => x.id)
+      void push(initBlitz(order, settings.teamSeconds ?? 60))
+    }, 3000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, teams.length])
+
+  // ── 2. Первый вопрос выезжает сам после показа кубика ──
+  useEffect(() => {
+    if (!state || state.finished || state.current) return
+    const t = setTimeout(() => {
+      const next = pickNext(bank, state.used)
+      if (!next) return void push(finishNoQuestions(state))
+      void markPlayed(next.id).catch(() => {})
+      void push(showQuestion(state, next.id, Date.now()))
+    }, NEXT_DELAY_MS)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.current, state?.turn, state?.finished])
+
+  // ── 3. АВТОПРОВЕРКА ──
+  // Как только команда прислала ответ, время замирает и считается вердикт.
+  // По спеке таймер не должен идти во время проверки — раньше он тикал,
+  // пока ведущий не нажмёт кнопку.
+  const cur = state?.current
+  const q = cur ? round.questions.find(x => x.id === cur.questionId) : undefined
+  const active = state ? currentTeam(state) : undefined
+  useEffect(() => {
+    if (!state || !cur || !q || !active) return
+    const mine = answers.find(a =>
+      a.team_id === active && a.question_ref === `q-${q.id}`)
+    if (!mine?.answer_text) return
+    if (cur.lastAnswer === mine.answer_text) return      // уже проверяли
+    const ok = autocheck(q.answer, mine.answer_text) === true
+    void push(pauseForCheck(state, Date.now(), ok ? 'ok' : 'no', mine.answer_text))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answers, cur?.questionId, cur?.lastAnswer])
+
+  // ── 4. Вердикт применяется сам через 5 секунд ──
+  // Окно нужно ведущему: он видит верный ответ и успевает поправить.
+  useEffect(() => {
+    if (!state || !cur?.verdict) return
+    const t = setTimeout(() => {
+      const now = Date.now()
+      const resumed = resumeAfterCheck(state, now)
+      void push(cur.verdict === 'ok' ? answerCorrect(resumed, now) : answerWrong(resumed, now))
+    }, NEXT_DELAY_MS)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cur?.verdict, cur?.lastAnswer])
+
   if (!state) {
     return (
       <div className="host-screen grid-bg bz-screen">
@@ -1184,21 +1260,7 @@ function BlitzScreen({ pack, round, gameState }: {
     )
   }
 
-  // Первый кадр после броска: показываем, кому выпало начинать.
-  const started = state.current != null
-    || Object.values(state.correct).some(v => v > 0)
-    || Object.values(state.missed).some(v => v > 0)
-  if (!started && !state.finished) {
-    return (
-      <div className="host-screen grid-bg bz-screen">
-        <div className="host-topbar"><span className="mono-tag">БЛИЦ</span></div>
-        <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} />
-      </div>
-    )
-  }
-
   if (state.finished) {
-    const settings = round.settings as { timeoutPenalty?: number }
     const rows = blitzResults(toResults(state), settings.timeoutPenalty ?? 10)
     return (
       <div className="host-screen grid-bg sb-screen">
@@ -1221,12 +1283,40 @@ function BlitzScreen({ pack, round, gameState }: {
     )
   }
 
-  const q = state.current
-    ? round.questions.find(x => x.id === state.current!.questionId)
-    : undefined
+  // Кубик показываем, пока не выехал первый вопрос: так видно, кому выпало.
+  const started = state.current != null
+    || Object.values(state.correct).some(v => v > 0)
+    || Object.values(state.missed).some(v => v > 0)
+
   return (
-    <BlitzBoard teams={teams} state={state} bank={bank}
-      questionText={q?.question_text} />
+    <>
+      <BlitzBoard teams={teams} state={state} bank={bank}
+        questionText={q?.question_text}
+        verdict={cur?.verdict}
+        answerText={cur?.verdict ? displayAnswer(q as Question) : undefined}
+        dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} /> : undefined}
+      />
+      {/* ── 5. Управление с проектора ──
+          Те же действия, что в админке: ведущему не надо держать телефон,
+          чтобы вести раунд. */}
+      <div className="host-actions">
+        {cur?.verdict && (
+          <button className="ghost" onClick={() => {
+            const now = Date.now()
+            const r = resumeAfterCheck(state, now)
+            void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
+          }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
+        )}
+        {cur && !cur.verdict && (
+          <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>
+            Скип −1
+          </button>
+        )}
+        <button className="ghost dark" onClick={() => {
+          if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state))
+        }}>Завершить раунд</button>
+      </div>
+    </>
   )
 }
 

@@ -47,12 +47,18 @@ function TeamBlock({ team, state, active, now }: {
   )
 }
 
-export function BlitzBoard({ teams, state, bank, questionText }: {
+export function BlitzBoard({ teams, state, bank, questionText, verdict, answerText, dice }: {
   teams: Team[]
   state: BlitzState
   bank: BlitzQuestion[]
-  /** Текст текущего вопроса. Пусто — идёт кубик или пауза. */
+  /** Текст текущего вопроса. Пусто — идёт пауза между ходами. */
   questionText?: string
+  /** Итог автопроверки последнего ответа. */
+  verdict?: 'ok' | 'no'
+  /** Верный ответ — показываем вместе с вердиктом. */
+  answerText?: string
+  /** Кубик: вставляется в контейнер вопроса, пока раунд не начался. */
+  dice?: React.ReactNode
 }) {
   // Таймер перерисовываем сами: состояние в базе меняется редко, а секунды
   // на экране обязаны идти ровно.
@@ -91,13 +97,25 @@ export function BlitzBoard({ teams, state, bank, questionText }: {
         ))}
       </div>
 
-      {questionText && (
-        <div className="bz-question" style={{ ['--tc' as string]: activeTeam?.color }}>
+      {/* Контейнер вопроса ВСЕГДА на экране: он держит раскладку.
+          Раньше между ходами он исчезал, блоки команд схлопывались к
+          центру и экран дёргался при каждом переходе. */}
+      <div className={`bz-question${verdict ? ` v-${verdict}` : ''}`}
+        style={{ ['--tc' as string]: activeTeam?.color }}>
+        {dice ?? (questionText ? <>
           {/* чей ход — крупно и цветом команды, иначе с дальнего ряда не видно */}
           <div className="bz-asking">отвечают: <b>{activeTeam?.name ?? '—'}</b></div>
           <div className="bz-qtext">{questionText}</div>
-        </div>
-      )}
+          {verdict && (
+            <div className={`bz-verdict ${verdict}`}>
+              {verdict === 'ok' ? 'ВЕРНО' : 'НЕВЕРНО'}
+              {answerText && <span className="bz-right"> · {answerText}</span>}
+            </div>
+          )}
+        </> : (
+          <div className="bz-asking">следующий вопрос…</div>
+        ))}
+      </div>
 
       <div className="bz-row" style={{ ['--cols' as string]: Math.max(1, rest.length) }}>
         {rest.map(t => (

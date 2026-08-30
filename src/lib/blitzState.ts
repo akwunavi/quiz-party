@@ -22,9 +22,19 @@ export type BlitzCurrent = {
   attempts: number
   /** Когда вопрос показан. Время начинает тикать через GRACE_MS. */
   shownAt: number
-  /** Пауза на проверку ответа ведущим: пока не null, время стоит. */
+  /** Пауза на проверку ответа: пока не null, время стоит.
+   *  Ставится АВТОМАТИЧЕСКИ, как только команда отправила ответ. */
   pausedAt?: number
+  /** Что показала автопроверка последнего ответа. Ведущий может
+   *  переопределить, пока идёт окно на исправление. */
+  verdict?: 'ok' | 'no'
+  /** Текст последнего ответа — чтобы не проверять его дважды. */
+  lastAnswer?: string
 }
+
+/** Пауза между ходами: команда видит вердикт, зал успевает среагировать,
+ *  и только потом выезжает следующий вопрос. */
+export const NEXT_DELAY_MS = 5000
 
 export type BlitzState = {
   order: string[]                    // teamId в порядке ходов
@@ -78,10 +88,23 @@ export function showQuestion(s: BlitzState, questionId: string, now: number): Bl
   }
 }
 
-/** Пауза на проверку: время команды замирает. */
-export function pauseForCheck(s: BlitzState, now: number): BlitzState {
-  if (!s.current || s.current.pausedAt != null) return s
-  return { ...s, current: { ...s.current, pausedAt: now } }
+/** Пауза на проверку: время команды замирает.
+ *  Вызывается автоматически при поступлении ответа — по спеке таймер
+ *  не должен идти, пока идёт проверка. Раньше это делал ведущий кнопкой,
+ *  и время команды утекало, пока он тянулся к админке. */
+export function pauseForCheck(s: BlitzState, now: number, verdict?: 'ok' | 'no',
+  answerText?: string): BlitzState {
+  if (!s.current) return s
+  const cur = s.current
+  return {
+    ...s,
+    current: {
+      ...cur,
+      pausedAt: cur.pausedAt ?? now,
+      verdict: verdict ?? cur.verdict,
+      lastAnswer: answerText ?? cur.lastAnswer,
+    },
+  }
 }
 
 /** Снять паузу: сдвигаем точку отсчёта, чтобы простой не списался. */
