@@ -1,3 +1,4 @@
+import { canEditPack, whyReadOnly } from '../../lib/packRights'
 import { useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { metaLine } from '../../lib/packLoader'
@@ -40,7 +41,10 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   const [sendIdx, setSendIdx] = useState<number | null>(null)
   const isBank = pack.status === 'bank'
   const backdropDown = useRef(false)
-  const locked = pack.status === 'active' && user.role !== 'owner'
+  // то же правило, что в списке пакетов и в политиках базы: статус «идёт
+  // игра» больше не отбирает у редактора его собственный пакет
+  const locked = !canEditPack(user, pack)
+  const readOnlyWhy = whyReadOnly(user, pack)
 
 
   const isJeopardy = round.mechanic === 'jeopardy'
@@ -81,6 +85,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           <div className="ed-sub">{MECHANIC_NAMES[round.mechanic]}</div>
         </div>
       </div>
+      {readOnlyWhy && <div className="ed-note ed-note-lock">🔒 {readOnlyWhy}</div>}
 
       <div className="ed-card"><h4>Настройки раунда</h4><div className="ed-grid2">
         {round.mechanic === 'melody' &&
@@ -295,7 +300,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
                     onClick={async () => { await hideQuestion(q.id, true); onChanged() }}>🚫</button>)}
               {!locked && !isBank && <button className="ico" data-tip="Перенести в банк"
                 onClick={() => setSendIdx(i)}>📥</button>}
-              {user.role === 'owner' && <button className="ico danger" data-tip="Удалить"
+              {!locked && <button className="ico danger" data-tip="Удалить"
                 onClick={async () => {
                   if (confirm('Удалить вопрос безвозвратно?')) { await deleteQuestion(q.id); onChanged() }
                 }}>🗑</button>}
@@ -317,7 +322,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           onClose={() => setBankOpen(false)} onAdded={onChanged} />}
         {sendIdx !== null && round.questions[sendIdx] &&
           <BankSend questionId={round.questions[sendIdx].id}
-            canDelete={user.role === 'owner'}
+            canDelete={!locked}
             onClose={() => setSendIdx(null)} onDone={onChanged} />}
         </div>
       </>}

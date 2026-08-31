@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEditorUser, signIn, signOut, type EditorUser } from '../../lib/auth'
 import { Hint, useHint } from '../../components/Hint'
+import { canEditPack, isLiveNow, whyReadOnly } from '../../lib/packRights'
 import { listPacks, loadPack, type LoadedPack } from '../../lib/packLoader'
 import { estimateRoundMinutes } from '../../lib/duration'
 import {
@@ -283,7 +284,14 @@ function PackScreen({ packId, user, onBack }: {
   }, [packId, pack?.updated_at])
 
   if (!pack) return <div>Загрузка пакета…</div>
-  const locked = pack.status === 'active' && user.role !== 'owner'
+  // Право правки считает общий модуль — то же условие, что в политиках базы.
+  // Раньше здесь стояло `pack.status === 'active' && user.role !== 'owner'`:
+  // у редактора пропадали кнопки удаления, стрелки порядка и «добавить
+  // вопрос», как только пакет попадал в статус «идёт игра» — а он залипает
+  // и после игры. Человек видел свой пакет и не мог с ним ничего сделать.
+  const locked = !canEditPack(user, pack)
+  const liveNow = isLiveNow(pack)
+  const readOnlyWhy = whyReadOnly(user, pack)
   // банк — хранилище, а не игра: игровые настройки в нём бессмысленны
   const isBank = pack.status === 'bank'
 
@@ -301,6 +309,12 @@ function PackScreen({ packId, user, onBack }: {
             onSave={async v => { await renamePack(pack.id, v); reload() }} />
         </div>
       </div>
+      {/* Молчаливой серости больше нет: если правки закрыты — сказано, почему.
+          Если пакет прямо сейчас играется — предупреждение, а не блокировка. */}
+      {readOnlyWhy && <div className="ed-note ed-note-lock">🔒 {readOnlyWhy}</div>}
+      {!readOnlyWhy && liveNow &&
+        <div className="ed-note ed-note-live">▶ Пакет сейчас в игре. Правки видны на
+          проекторе сразу — если игра идёт, лучше дождаться её конца.</div>}
       <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}
         <span className="pack-tools"><PackExport pack={pack} /><MediaCleanup pack={pack} onDone={reload} /></span>
       </h4>
@@ -481,7 +495,7 @@ function PackScreen({ packId, user, onBack }: {
             <button className="ico" data-tip="Ниже" disabled={i === pack.rounds.length - 1 || locked}
               onClick={async () => { await swapRounds(pack.rounds[i], pack.rounds[i + 1]); reload() }}>↓</button>
             <button className="ico" data-tip="Редактировать" onClick={() => setOpenRoundIdx(i)}>✏️</button>
-            {user.role === 'owner' &&
+            {!locked &&
               <button className="ico danger" data-tip="Удалить раунд"
                 onClick={async () => {
                   if (confirm(`Удалить раунд «${r.title_lines.join(' ')}» со всеми вопросами?`)) {

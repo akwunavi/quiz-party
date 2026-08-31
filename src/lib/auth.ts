@@ -7,6 +7,10 @@ export interface EditorUser {
   email: string
   role: 'owner' | 'editor'
   display_name: string
+  /** редактор правит ЛЮБЫЕ непривтные пакеты, а не только свои.
+   *  Читается из editor_roles и повторяет условие политик в базе —
+   *  без него интерфейс не знает, что человеку разрешено. */
+  can_edit_all: boolean
 }
 
 export async function signIn(email: string, password: string): Promise<EditorUser> {
@@ -22,6 +26,7 @@ export async function signIn(email: string, password: string): Promise<EditorUse
   return {
     id: user.id, email: user.email ?? '',
     role: roleRow.role, display_name: roleRow.display_name,
+    can_edit_all: !!roleRow.can_edit_all,
   }
 }
 
@@ -43,6 +48,7 @@ export function useEditorUser() {
           setUser({
             id: data.user.id, email: data.user.email ?? '',
             role: roleRow.role, display_name: roleRow.display_name,
+            can_edit_all: !!roleRow.can_edit_all,
           })
         }
       }

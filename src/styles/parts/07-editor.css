@@ -205,3 +205,19 @@
 /* пометка «отыгран» в списке вопросов блица */
 .ed-row-meta.played { color: #fbbf24; }
 .ed-blitz-count { color: var(--dim); font-weight: 400; font-size: 13px; }
+
+/* ── Плашки состояния пакета (редактор) ──
+   Раньше при заблокированном пакете кнопки просто исчезали, и человек
+   гадал, почему «ничего нельзя». Плашка называет причину. */
+.ed-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin: 10px 0; padding: 10px 14px;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.5;
+  border-radius: 4px; border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--fg);
+}
+.ed-note-lock { border-left-color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, transparent); }
+.ed-note-live { border-left-color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, transparent); }

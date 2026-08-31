@@ -8,7 +8,7 @@ import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame,
+  gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
@@ -85,7 +85,13 @@ export function AdminPage() {
       {phase === 'finale' && <FinalePanel pack={pack} gameId={gameState.game_id}
         teams={teams} gameState={gameState} />}
 
-      {gameState.pack_id && phase !== 'lobby' && phase !== 'finale' && pack && round && (
+      {/* Пока на проекторе висит «считаем баллы», ведущий как раз и вносит
+          их — поэтому здесь не пульт раунда, а таблица баллов и выход к итогам */}
+      {phase === 'counting' && pack && <CountingPanel pack={pack}
+        gameState={gameState} teams={teams} />}
+
+      {gameState.pack_id && phase !== 'lobby' && phase !== 'finale'
+        && phase !== 'counting' && pack && round && (
         <RoundView pack={pack} round={round} gameState={gameState} teams={teams} answers={answers} />
       )}
     </div>
@@ -339,6 +345,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
                 title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
             )}
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
+            {paperMode && <button className="adm-btn" onClick={() => void startCounting()}
+              title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>}
             <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
@@ -401,6 +409,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
   const q = questions[step]
   const rows = answers.filter(a => a.question_ref === `q-${q?.id}`)
   const last = gameState.round_number + 1 >= pack.rounds.length
+  const paperMode = pack.settings?.play_mode === 'paper'
   const showSb = !!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after
 
   return (
@@ -441,11 +450,14 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           // настройка раунда «показать табло» раньше игнорировалась здесь:
           // после разбора сразу уходили в финал или в табло независимо от неё
           if (showSb) { void showScoreboard(); return }
+          // на бумаге между последним раундом и итогами всегда есть пауза:
+          // ведущий сводит бланки. Ведём зал на заставку подсчёта, а не в финал
+          if (last && paperMode) { void startCounting(); return }
           if (last) void finishGame(gameState.pack_id)
           else void gotoRound(gameState.round_number + 1,
             slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
         }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'
-          : showSb ? 'К ТАБЛО →' : last ? 'ФИНАЛ →' : 'СЛЕД. РАУНД →'}</button>
+          : showSb ? 'К ТАБЛО →' : last ? (paperMode ? 'К ПОДСЧЁТУ →' : 'ФИНАЛ →') : 'СЛЕД. РАУНД →'}</button>
       </div>
     </div>
   )
@@ -599,6 +611,7 @@ function PaperScores({ pack, gameState, teams }: {
   useEffect(() => { setRi(gameState.round_number) }, [gameState.round_number])
   const [vals, setVals] = useState<Record<string, string>>({})
   const [saved, setSaved] = useState<Record<string, boolean>>({})
+  const hint = useHint(12000)   // ошибку записи держим на экране дольше
 
   // подтягиваем уже сохранённые баллы, иначе ведущий правит вслепую
   const stored = new Map<string, number>()
@@ -610,11 +623,24 @@ function PaperScores({ pack, gameState, teams }: {
   const save = async (teamId: string) => {
     const raw = vals[teamId]
     const pts = Number(raw === undefined || raw === '' ? stored.get(teamId) ?? 0 : raw)
-    if (Number.isNaN(pts)) return
-    await supabase.from('answers').upsert({
+    if (Number.isNaN(pts)) return hint.show('Балл должен быть числом. Дробные пиши через точку.')
+    // onConflict ОБЯЗАН совпадать с уникальным индексом в базе, а он —
+    // `unique (team_id, question_ref)` (миграция 0001). Здесь стояло
+    // «team_id,game_id,question_ref», такого индекса нет, и Postgres отвечал
+    // 400: «no unique or exclusion constraint matching the ON CONFLICT
+    // specification». Баллы не сохранялись НИ РАЗУ, а галочка всё равно
+    // загоралась зелёным — потому что ошибку никто не смотрел. В итогах
+    // стояли нули, и понять причину можно было только из консоли браузера.
+    const { error } = await supabase.from('answers').upsert({
       team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
       round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
-    } as never, { onConflict: 'team_id,game_id,question_ref' } as never)
+      updated_at: new Date().toISOString(),
+    } as never, { onConflict: 'team_id,question_ref' } as never)
+    if (error) {
+      // молчать нельзя: на бумаге это единственный источник баллов
+      return hint.show(`Балл НЕ сохранён: ${error.message}. Проверь связь и нажми ещё раз.`)
+    }
+    hint.clear()
     setSaved(v => ({ ...v, [teamId]: true }))
     setTimeout(() => setSaved(v => ({ ...v, [teamId]: false })), 1500)
   }
@@ -650,8 +676,26 @@ function PaperScores({ pack, gameState, teams }: {
           </div>
         )
       })}
+      <Hint text={hint.text} />
       <div className="adm-dim">введено за раунд: {sum} · без оценки: {
         teams.filter(t => !stored.has(t.id) && !vals[t.id]).length}</div>
+    </div>
+  )
+}
+
+/** Пульт на время подсчёта (игра в баре). */
+function CountingPanel({ pack, gameState, teams }: {
+  pack: LoadedPack; teams: Team[]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  return (
+    <div className="adm-pad">
+      <div className="adm-h1">СЧИТАЕМ БАЛЛЫ</div>
+      <div className="adm-dim">На проекторе — заставка с отсчётом. Внеси баллы за
+        раунды и, когда всё сойдётся, уводи зал к итогам.</div>
+      <PaperScores pack={pack} gameState={gameState} teams={teams} />
+      <button className="adm-btn primary adm-start-question"
+        onClick={() => void finishGame(gameState.pack_id)}>ПЕРЕЙТИ К ИТОГАМ →</button>
     </div>
   )
 }

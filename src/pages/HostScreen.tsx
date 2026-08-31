@@ -523,6 +523,10 @@ function HostInner({ gameState, pack }: {
     return <BreakScreen pack={pack} round={round} gameState={gameState} />
   }
 
+  if (gameState.phase === 'counting') {
+    return <CountingScreen pack={pack} gameState={gameState} />
+  }
+
   if (gameState.phase === 'finale') {
     return <Finale pack={pack} gameId={gameState.game_id} gameState={gameState} />
   }
@@ -2294,6 +2298,55 @@ function BreakScreen({ pack, round, gameState }: {
       <div className="break-timer">{mm}:{ss}</div>
       <div className="host-actions">
         <AfterRoundNav pack={pack} gameState={gameState} />
+      </div>
+    </div>
+  )
+}
+
+/** «Считаем баллы» — игра в баре.
+ *
+ *  Ведущий собрал бланки и сводит результаты; это несколько минут, за которые
+ *  зал не должен смотреть в пустой экран. Отсчёт идёт вниз от пяти минут, но
+ *  сам ничего не переключает: закончил считать раньше — жмёшь «К итогам»,
+ *  затянулось — экран спокойно висит с нулями, а не выкидывает зал в финал
+ *  посреди подсчёта. Уйти можно и отсюда, и из админки. */
+function CountingScreen({ pack, gameState }: {
+  pack: LoadedPack
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const MINUTES = 5
+  const [left, setLeft] = useState(MINUTES * 60)
+  useEffect(() => {
+    const started = gameState.timer_started_at
+      ? new Date(gameState.timer_started_at).getTime() : Date.now()
+    const tick = () => setLeft(Math.max(0, Math.round(MINUTES * 60 - (Date.now() - started) / 1000)))
+    tick()
+    const t = setInterval(tick, 500)
+    return () => clearInterval(t)
+  }, [gameState.timer_started_at])
+
+  // Музыка: своя для финала, иначе общая фоновая — тишина в баре читается
+  // как «что-то сломалось».
+  useEffect(() => {
+    const src = pack.settings?.finale_music ?? pack.settings?.bg_music
+    if (!src || document.hidden) return
+    const a = createAudio(); a.src = mediaUrl(src)
+    a.loop = true; a.volume = .55
+    a.play().catch(() => {})
+    return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+  }, [pack.settings?.finale_music, pack.settings?.bg_music])
+
+  const mm = String(Math.floor(left / 60)).padStart(2, '0')
+  const ss = String(left % 60).padStart(2, '0')
+  return (
+    <div className="host-screen grid-bg break-screen counting-screen">
+      <div className="mono-tag accent">ПОДВОДИМ ИТОГИ</div>
+      <Title theme={pack.theme} lines={['СЧИТАЕМ', 'БАЛЛЫ']} />
+      <Deco theme={pack.theme} />
+      <div className="break-timer">{mm}:{ss}</div>
+      <div className="counting-sub">Скоро объявим победителей</div>
+      <div className="host-actions">
+        <button onClick={() => void finishGame(gameState.pack_id)}>К итогам →</button>
       </div>
     </div>
   )

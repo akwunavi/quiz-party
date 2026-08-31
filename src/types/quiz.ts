@@ -47,6 +47,9 @@ export interface Pack {
   status: PackStatus
   theme: ThemeKey
   is_private?: boolean       // виден только владельцам
+  /** кто создал пакет. По нему редактор получает право править СВОЙ пакет,
+   *  даже если can_edit_all у него выключен (так же считают политики в базе) */
+  created_by?: string | null
   settings?: PackSettings
   created_at: string
   updated_at: string

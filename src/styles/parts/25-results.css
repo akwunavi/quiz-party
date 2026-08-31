@@ -113,3 +113,20 @@
   color: #ffb020; font-size: clamp(13px, 1.2vw, 18px); }
 /* отыгранная плитка гаснет заметнее: 0.22 на проекторе читалось как «активна» */
 .jp-tile.done { opacity: .18; filter: grayscale(1); pointer-events: none; }
+
+/* ── Заставка «считаем баллы» (игра в баре) ──
+   Наследует раскладку перерыва: тот же крупный отсчёт по центру и заголовок
+   темы. Отличие одно — подпись под таймером, чтобы зал понимал, чего ждёт,
+   и не решил, что игра кончилась. */
+.counting-screen .counting-sub {
+  margin-top: clamp(10px, 2vh, 22px);
+  font-family: var(--font-mono);
+  font-size: clamp(15px, 1.6vw, 26px);
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--muted);
+  animation: counting-breathe 3.4s ease-in-out infinite;
+}
+@keyframes counting-breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .counting-screen .counting-sub { animation: none; }
+}

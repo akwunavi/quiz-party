@@ -112,6 +112,18 @@ export async function markRoundCompleted(completed: number[]) {
   if (error) throw error
 }
 
+/** Экран «считаем баллы» — игра в баре.
+ *  Ведущий закрыл последний раунд и сводит бланки: залу нужен экран, который
+ *  честно говорит, чего ждать, и не оставляет тишину на пять минут. Отдельная
+ *  фаза, а не перерыв: из перерыва маршрут ведёт в следующий раунд, а отсюда —
+ *  только к итогам, и уводит с неё ведущий, когда закончит считать. */
+export async function startCounting() {
+  const { error } = await supabase.from('game_sessions').update({
+    phase: 'counting', timer_started_at: new Date().toISOString(), reveal: false,
+  }).eq('id', getRoomId())
+  if (error) throw error
+}
+
 export async function finishGame(packId: string | null) {
   // финал всегда начинается с нулевого шага, иначе подхватится индекс вопроса
   await supabase.from('game_sessions')

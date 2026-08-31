@@ -112,6 +112,8 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'round_intro') return <Waiting team={team}
     message={`РАУНД ${pack ? displayRoundNumber(pack, gameState.round_number) : ''}`} sub="Слушай правила" />
   if (phase === 'scoreboard') return <Waiting team={team} message="ПОДВОДИМ ИТОГИ…" />
+  if (phase === 'counting') return <Waiting team={team} message="СЧИТАЕМ БАЛЛЫ"
+    sub="Ведущий сводит результаты — скоро объявим победителей" />
   if (phase === 'break') return <Waiting team={team} message="ПЕРЕРЫВ" sub="Разомнись, налей выпить :)" />
   if (phase === 'finale') return <Waiting team={team} message="ИГРА ЗАВЕРШЕНА" sub="Спасибо за игру! Смотри на проектор 🎉" />
   if (phase === 'show_answers' && round)
