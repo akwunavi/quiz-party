@@ -13,9 +13,8 @@ import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { SnakeTimer } from '../../components/SnakeTimer'
 import { useEffect, useRef, useState } from 'react'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from '../../lib/supabase'
-import { mediaUrl } from '../HostScreen'
+import { mediaUrl } from '../../lib/media'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -252,6 +251,11 @@ export function MelodyBoard({ pack, round, gameState }: {
     return () => { a.pause(); a.onended = null }
   }, [m.stage])
 
+  // Хук стоит ВЫШЕ раннего выхода намеренно. Пока он был ниже, раунд без
+  // тем рендерился с другим набором хуков — React #310 на проекторе в тот
+  // момент, когда темы приезжают из пакета и заглушка сменяется доской.
+  const [manualPick, setManualPick] = useState(false)
+
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">УГАДАЙ МЕЛОДИЮ</div>
@@ -261,7 +265,6 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
   const freeKeys = allKeys.filter(k => !played.includes(k))
-  const [manualPick, setManualPick] = useState(false)
   const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
 
   /** Открыть выбранную плитку без рулетки. */

@@ -2,7 +2,7 @@
 // Поток: слайд → пауза startDelaySec → таймер + фоновая музыка →
 // таймер вышел → пауза afterTimerSec → фаза разбора (по одному вопросу).
 import { useEffect, useState } from 'react'
-import { mediaUrl, lenClass } from '../HostScreen'
+import { mediaUrl, lenClass } from '../../lib/media'
 import { startTimer, gotoAnswers } from '../../lib/gameActions'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'

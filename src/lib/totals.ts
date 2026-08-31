@@ -1,4 +1,5 @@
 // ═══ Подсчёт итогов по пакету (общий для админки и финала) ═══
+import { jeopardyTile } from './jeopardyRef'
 import type { Answer, Team, JeopardyTheme } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
 import { finalQuestionOf, scoringQuestionsOf } from './thematic'
@@ -13,7 +14,8 @@ import {
 // секунды заявки на него не влияют — порядок ответов в модалке нужен только
 // ведущему, чтобы понимать, кто успел раньше, и в баллы он не попадает.
 //
-// Ответы лежат по ключу `q-t<сквозной номер плитки>`: нумерация идёт по темам
+// Ответы лежат по ключу `q-t<раунд>-<плитка>` (старые игры — `q-t<плитка>`,
+// он читается тоже, см. lib/jeopardyRef.ts): нумерация плиток идёт по темам
 // слева направо, внутри темы — сверху вниз (тот же расчёт, что в проекторе и
 // на телефоне игрока). Раунд отбирается по round_number.
 //
@@ -33,9 +35,9 @@ function scoreJeopardyRound(
     if (a.team_id !== teamId) continue
     if (a.round_number !== ri) continue
     if (a.is_correct !== true) continue
-    const m = /^q-t(\d+)$/.exec(a.question_ref)
-    if (!m) continue
-    total += values[Number(m[1])] ?? 0
+    const tile = jeopardyTile(a.question_ref, ri)
+    if (tile == null) continue
+    total += values[tile] ?? 0
   }
   return total
 }

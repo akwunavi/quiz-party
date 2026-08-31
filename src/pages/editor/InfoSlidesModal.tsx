@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { InfoSlideView } from '../../components/InfoSlideView'
 import { MediaSlot } from './QuestionForm'
-import { mediaUrl } from '../HostScreen'
+import { mediaUrl } from '../../lib/media'
 import { setPackSettings } from '../../lib/editorApi'
 import type { InfoSlide, Pack } from '../../types/quiz'
 import type { LoadedPack } from '../../lib/packLoader'

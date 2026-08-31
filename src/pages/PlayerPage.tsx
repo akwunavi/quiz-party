@@ -7,6 +7,7 @@ import { rateQuestion, saveRoundComment } from '../lib/ratings'
 import { useBlitz } from '../lib/blitzApi'
 import { currentTeam, MAX_ATTEMPTS, SKIP_MARK, NEXT_DELAY_MS } from '../lib/blitzState'
 import { enqueueAnswer } from '../lib/answerQueue'
+import { jeopardyRef } from '../lib/jeopardyRef'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
@@ -188,7 +189,9 @@ function JeopardyPlayer({ team, gameState, roundLabel, round }: {
               <button className="pl-send" disabled={!draft.trim() || draft.trim() === sent} onClick={() => {
                 void enqueueAnswer({
                   team_id: team.id, game_id: gameState.game_id,
-                  question_ref: `q-t${gameState.question_index}`,  // номер открытой плитки, синхронно с проектором
+                  // ключ с номером раунда: два раунда «Своей игры» в одном
+                  // паке иначе перетирали ответы друг друга (см. lib/jeopardyRef.ts)
+                  question_ref: jeopardyRef(gameState.round_number, gameState.question_index),
                   round_number: gameState.round_number, answer_text: draft.trim(),
                 })
                 setSent(draft.trim())
@@ -351,11 +354,9 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const questions = round.questions.filter(q => !q.hidden)
-  if (questions.length === 0) return (
-    <div className="pl-center"><ConnectionDot />
-      <div className="pl-wait">В раунде нет вопросов</div>
-      <div className="pl-wait-sub">Сообщите ведущему</div></div>
-  )
+  // Заглушка «в раунде нет вопросов» стоит НИЖЕ всех хуков — см. конец функции.
+  // Здесь её быть не может: при скрытии последнего вопроса набор хуков менялся
+  // бы между рендерами, а это падение React #310 прямо на телефоне игрока.
   const isStakes = round.mechanic === 'stakes_unique' || round.mechanic === 'stakes_free'
   const uniqueStakes = round.mechanic === 'stakes_unique'
   const stakeValues = (round.settings as { stakesValues?: number[] }).stakesValues ?? []
@@ -445,6 +446,13 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
     })
     return lettersFromAnswers(grid, byWord)
   }, [grid, state.answers])
+
+  // Ранние выходы — только после последнего хука.
+  if (questions.length === 0) return (
+    <div className="pl-center"><ConnectionDot />
+      <div className="pl-wait">В раунде нет вопросов</div>
+      <div className="pl-wait-sub">Сообщите ведущему</div></div>
+  )
 
   const currentPlacement = grid && questions[gameState.question_index]?.answer.mode === 'crossword_word'
     ? grid.words.find(w => w.word === (questions[gameState.question_index].answer as { word: string }).word

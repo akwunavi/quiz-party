@@ -3,7 +3,7 @@ import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
 import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
-import { mediaUrl } from '../HostScreen'
+import { mediaUrl } from '../../lib/media'
 import type { AnswerSpec, ChoiceOption, Question } from '../../types/quiz'
 import { AiQuestionReview } from './AiReview'
 

@@ -12,6 +12,8 @@ import { saveBlitz } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
+import { jeopardyTile } from '../lib/jeopardyRef'
+import { mediaUrl, lenClass } from '../lib/media'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
@@ -574,13 +576,7 @@ export function noteClass(text: string): string {
 
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
 
-export function lenClass(text: string): string {
-  const n = (text ?? '').trim().length
-  if (n <= 70) return ''
-  if (n <= 140) return ' len-m'
-  if (n <= 240) return ' len-l'
-  return ' len-xl'
-}
+// lenClass переехал в src/lib/media.ts — см. импорт вверху файла.
 
 /** Ступень кегля для плиток вариантов — по САМОМУ ДЛИННОМУ варианту.
  *  Раньше кегль был фиксированным: четыре развёрнутые формулировки не
@@ -1382,16 +1378,7 @@ function displayAnswer(q: Question): string {
   return empty
 }
 
-export function mediaUrl(path: string): string {
-  if (/^https?:\/\//.test(path)) return path
-  const base = import.meta.env.VITE_SUPABASE_URL
-  // Путь ОБЯЗАН быть закодирован. В именах файлов встречаются пробелы
-  // («song r7 9 1 .mp3»), а ссылка с пробелами невалидна: браузер её
-  // «чинит» по-своему, и запрос падает с невнятной ошибкой безопасности.
-  // Кодируем каждый сегмент отдельно, чтобы не съесть разделители «/».
-  const safe = path.replace(/^\//, '').split('/').map(encodeURIComponent).join('/')
-  return `${base}/storage/v1/object/public/quiz-media/${safe}`
-}
+// mediaUrl переехал в src/lib/media.ts — см. импорт вверху файла.
 
 /** Видео вопроса. Если у вопроса есть озвучка — ждём её окончания
  *  (признак: пошёл таймер), иначе играем сразу. Аудио вопроса здесь НЕ
@@ -1986,7 +1973,7 @@ function JeopardyBoard({ pack, round, gameState }: {
       {active && (
         <TileModal packTheme={pack.theme} round={round} gameState={gameState}
           theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
-          refKey={`t${themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}`}
+          tileIndex={themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}
           onClose={() => { void setOpened([...opened, `${active.t}-${active.i}`]); setActive(null) }} />
       )}
     </div>
@@ -1995,13 +1982,14 @@ function JeopardyBoard({ pack, round, gameState }: {
 
 /** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
  *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
-function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }: {
+function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme }: {
   packTheme?: string
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
   theme: JeopardyTheme
   tile: { value: number; audio: string; correct: string }
-  refKey: string
+  /** сквозной номер плитки в раунде */
+  tileIndex: number
   onClose: () => void
 }) {
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
@@ -2032,10 +2020,13 @@ function TileModal({ round, gameState, theme, tile, refKey, onClose, packTheme }
   useEffect(() => {
     play()
     return () => { handleRef.current?.stop() }
-  }, [refKey])
+  }, [tileIndex])
 
+  // Ключ ответа содержит номер раунда, но старые игры писали его без раунда —
+  // разбор обеих форм лежит в lib/jeopardyRef.ts, чтобы проектор, телефон и
+  // подсчёт читали ответы одинаково.
   const rows = answers
-    .filter(a => a.question_ref === `q-${refKey}`)
+    .filter(a => jeopardyTile(a.question_ref, gameState.round_number) === tileIndex)
     .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
 
   const grade = async (id: string, correct: boolean) => {

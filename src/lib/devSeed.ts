@@ -1,3 +1,4 @@
+import { jeopardyRef } from './jeopardyRef'
 import { supabase } from './supabase'
 import { registerTeam } from './gameActions'
 import { computeTotals } from './totals'
@@ -10,7 +11,7 @@ import type { Answer, Question, Team, JeopardyTheme } from '../types/quiz'
 // любой раунд за минуту, без регистрации с телефонов и ручного ввода.
 // Переписан, а не скопирован: там были ключи вида `r4-q0-1`, номер раунда
 // зашит числом, а тип вопроса определялся по наличию полей. У нас ключи
-// `q-<uuid>` и `q-t<номер плитки>`, тип лежит в `answer.mode`, механик
+// `q-<uuid>` и `q-t<раунд>-<плитка>`, тип лежит в `answer.mode`, механик
 // больше, добавились кроссворд и ребусы.
 //
 // Что сохранено из старого по смыслу:
@@ -135,7 +136,7 @@ export async function seedRoundAnswers(
           const ok = lucky()
           rows.push({
             team_id: team.id, game_id: gameId,
-            question_ref: `q-t${flat}`, round_number: roundNumber,
+            question_ref: jeopardyRef(roundNumber, flat), round_number: roundNumber,
             answer_text: ok ? (tile.correct ?? 'ответ') : pick(WRONG_TEXT),
             is_correct: ok, updated_at: now(),
           })
@@ -198,7 +199,10 @@ function expectedForRound(
     for (const t of themes) for (const tile of t.tiles ?? []) values.push(Number(tile.value) || 0)
     let sum = 0
     for (const a of mine) {
-      const m = /^q-t(\d+)$/.exec(a.question_ref)
+      // Ключ разбираем ЗДЕСЬ своим выражением, а не общей функцией: сверка
+      // обязана оставаться независимой от кода подсчёта. Форм две — с номером
+      // раунда (`q-t<раунд>-<плитка>`) и старая, без него.
+      const m = /^q-t(?:\d+-)?(\d+)$/.exec(a.question_ref)
       if (m && a.is_correct === true) sum += values[Number(m[1])] ?? 0
     }
     return sum

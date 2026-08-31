@@ -1,6 +1,6 @@
 // ═══ Полноэкранный предпросмотр вопроса: ровно как увидят на проекторе ═══
 import { ThemeLayer } from '../../components/ThemeLayer'
-import { mediaUrl, lenClass } from '../HostScreen'
+import { mediaUrl, lenClass } from '../../lib/media'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
 

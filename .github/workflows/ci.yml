@@ -15,5 +15,8 @@ jobs:
         with: { node-version: 20, cache: npm }
       - run: npm ci
       - run: npx tsc --noEmit
+      # Линтер: ловит хук после раннего return (React #310) — тесты его не видят.
+      # Падает только на ошибках; предупреждения деплою не мешают.
+      - run: npx eslint .
       - run: npx vitest run
       - run: npx vite build
