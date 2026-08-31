@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useEditorUser, signIn, signOut, type EditorUser } from '../../lib/auth'
+import { Hint, useHint } from '../../components/Hint'
 import { listPacks, loadPack, type LoadedPack } from '../../lib/packLoader'
 import { estimateRoundMinutes } from '../../lib/duration'
 import {
@@ -206,6 +207,8 @@ function PackList({ packs, user, onOpen, onChanged }: {
 }) {
   const [name, setName] = useState('')
   const [showEditors, setShowEditors] = useState(false)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const hint = useHint()
   return (
     <div>
       {user.role === 'owner' && (
@@ -217,15 +220,22 @@ function PackList({ packs, user, onOpen, onChanged }: {
         </div>
       )}
       <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
-        <input placeholder="Название нового пакета" value={name}
-          onChange={e => setName(e.target.value)} style={{ padding: 8, flex: 1 }} />
-        <button disabled={!name.trim()} onClick={async () => {
+        <input ref={nameRef} placeholder="Название нового пакета" value={name}
+          onChange={e => { setName(e.target.value); hint.clear() }} style={{ padding: 8, flex: 1 }} />
+        {/* Кнопка не серая, а говорящая: раньше она молча не срабатывала, и
+            связь «сначала название — потом кнопка» приходилось угадывать. */}
+        <button onClick={async () => {
+          if (!name.trim()) return hint.show(
+            'Сначала впиши название пакета в поле слева — по нему ты найдёшь его в списке.',
+            nameRef.current)
+          hint.clear()
           const p = await createPack(name.trim()); setName(''); onChanged(); onOpen(p.id)
         }}>+ Новый пакет</button>
         {/* банк один на всех: кнопка либо создаст его, либо просто откроет */}
         <button onClick={async () => { const b = await getOrCreateBank(); onChanged(); onOpen(b.id) }}
           title="Хранилище вопросов для будущих игр">📚 Банк</button>
       </div>
+      <Hint text={hint.text} />
       {packs.length === 0 && <p style={{ opacity: .6 }}>Пакетов пока нет — создай первый.</p>}
       {/* строка пакета: название во всю ширину, под ним состояние,
           под ними кнопки — иначе на 390px кнопки вылезали за экран */}
@@ -496,18 +506,23 @@ function AddRound({ packId, nextPos, onDone }: {
 }) {
   const [mechanic, setMechanic] = useState<MechanicKey>('standard')
   const [title, setTitle] = useState('')
+  const titleRef = useRef<HTMLInputElement>(null)
+  const hint = useHint()
   return (
     <div className="ed-addround" style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
       <select value={mechanic} onChange={e => setMechanic(e.target.value as MechanicKey)}>
         {(Object.keys(MECHANIC_NAMES) as MechanicKey[]).map(k =>
           <option key={k} value={k}>{MECHANIC_NAMES[k]}</option>)}
       </select>
-      <input placeholder="Название раунда" value={title} onChange={e => setTitle(e.target.value)}
-        style={{ padding: 6 }} />
-      <button disabled={!title.trim()} onClick={async () => {
+      <input ref={titleRef} placeholder="Название раунда" value={title}
+        onChange={e => { setTitle(e.target.value); hint.clear() }} style={{ padding: 6 }} />
+      <button onClick={async () => {
+        if (!title.trim()) return hint.show(
+          'У раунда должно быть название — оно показывается залу на заставке.', titleRef.current)
         await createRound(packId, nextPos, mechanic, title.trim()); onDone()
       }}>Создать</button>
       <button onClick={onDone}>Отмена</button>
+      <Hint text={hint.text} />
     </div>
   )
 }
@@ -547,6 +562,9 @@ function EditorsPanel({ me }: { me: EditorUser }) {
   const [canAll, setCanAll] = useState(false)
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passRef = useRef<HTMLInputElement>(null)
+  const hint = useHint()
 
   const load = async () => {
     const { data } = await supabase.from('editor_roles').select('*').order('role')
@@ -619,9 +637,11 @@ function EditorsPanel({ me }: { me: EditorUser }) {
       <h4 style={{ marginTop: 16 }}>Добавить редактора</h4>
       <div className="ed-grid2">
         <div className="ed-field"><label>Email</label>
-          <input value={email} onChange={ev => setEmail(ev.target.value)} placeholder="name@mail.ru" /></div>
+          <input ref={emailRef} value={email} onChange={ev => { setEmail(ev.target.value); hint.clear() }}
+            placeholder="name@mail.ru" /></div>
         <div className="ed-field"><label>Временный пароль</label>
-          <input value={pass} onChange={ev => setPass(ev.target.value)} placeholder="минимум 6 символов" /></div>
+          <input ref={passRef} value={pass} onChange={ev => { setPass(ev.target.value); hint.clear() }}
+            placeholder="минимум 6 символов" /></div>
         <div className="ed-field"><label>Имя (видно в списке)</label>
           <input value={dname} onChange={ev => setDname(ev.target.value)} placeholder="Толян" /></div>
         <div className="ed-field"><label>Права</label>
@@ -631,7 +651,15 @@ function EditorsPanel({ me }: { me: EditorUser }) {
           </label></div>
       </div>
       {msg && <div className="ed-hint" style={{ marginTop: 8 }}>{msg}</div>}
-      <button disabled={busy || !email.trim() || pass.length < 6} onClick={() => void add()}>
+      <Hint text={hint.text} />
+      <button disabled={busy} onClick={() => {
+        // Требования к паролю знает только Supabase — скажем о них до отправки,
+        // иначе кнопка просто серая и непонятно, чего ей не хватает.
+        if (!email.trim()) return hint.show('Нужен email — на него редактор будет входить.', emailRef.current)
+        if (pass.length < 6) return hint.show('Временный пароль — минимум 6 символов. Редактор сменит его сам.', passRef.current)
+        hint.clear()
+        void add()
+      }}>
         {busy ? 'Создаём…' : '+ Добавить редактора'}
       </button>
       <div className="ed-hint" style={{ marginTop: 8 }}>

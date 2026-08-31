@@ -4,6 +4,7 @@ import { updateQuestion } from '../../lib/editorApi'
 import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
 import { mediaUrl } from '../../lib/media'
+import { questionFields } from '../../lib/questionFields'
 import type { AnswerSpec, ChoiceOption, Question } from '../../types/quiz'
 import { AiQuestionReview } from './AiReview'
 
@@ -62,13 +63,8 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
   // Правило: если поле в механике не работает, его не должно быть на экране.
   // Иначе редактор заполняет его и удивляется, что на игре ничего не изменилось.
   const mech = round.mechanic
-  const fixedMode = mech === 'crossword' || mech === 'melody'   // тип ответа задан
-  const noQuestionMedia = mech === 'crossword'                  // сетка рисуется сама
-  const noVoice = mech === 'melody' || mech === 'crossword'      // озвучка не играет
-  const mediaLabel = mech === 'melody' ? 'Трек (mp3)'
-    : mech === 'rebus' ? 'Две картинки ребуса' : 'Медиа вопроса (до 4)'
-  const mediaMax = mech === 'melody' ? 1 : mech === 'rebus' ? 2 : 4
-  const mediaAccept = mech === 'melody' ? 'audio/*' : undefined
+  const { fixedMode, questionMedia, voice: showVoice,
+          mediaLabel, mediaMax, mediaAccept } = questionFields(mech)
 
   return (
     <div>
@@ -93,7 +89,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
           <textarea value={q.question_text} rows={5} style={{ width: '100%', padding: 8 }}
             onChange={e => save({ question_text: e.target.value })} /></div>
 
-          {!noQuestionMedia && (
+          {questionMedia && (
             <MediaSlot label={mediaLabel} packId={pack.id}
               paths={media.question ?? []} max={mediaMax} accept={mediaAccept}
               onChange={paths => save({ media: { ...media, question: paths } })} />
@@ -109,7 +105,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             <MediaScale value={media.scale}
               onChange={scale => save({ media: { ...media, scale } })} />
           )}
-          {!noVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
+          {showVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"
             onChange={paths => save({ media: { ...media, voice: paths[0] ?? null } })} />}
           <MediaSlot label="Медиа ответа" packId={pack.id}

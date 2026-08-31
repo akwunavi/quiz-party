@@ -1,7 +1,8 @@
 import { getRoomId } from '../lib/room'
+import { Hint, useHint } from '../components/Hint'
 import { RoomPicker } from './RoomPicker'
 import { VERSION } from '../version'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
@@ -95,16 +96,25 @@ export function AdminPage() {
 function PackPicker() {
   const [packs, setPacks] = useState<Pack[]>([])
   const [sel, setSel] = useState('')
+  const selectRef = useRef<HTMLSelectElement>(null)
+  const hint = useHint()
   useEffect(() => { void listPacks().then(setPacks).catch(() => {}) }, [])
   return (
     <div className="adm-pad">
       <div className="adm-dim">ВЫБЕРИ ПАКЕТ</div>
-      <select value={sel} onChange={e => setSel(e.target.value)} style={{ width: '100%' }}>
+      <select ref={selectRef} value={sel} onChange={e => { setSel(e.target.value); hint.clear() }}
+        style={{ width: '100%' }}>
         <option value="">—</option>
         {packs.map(p => <option key={p.id} value={p.id}>{p.name} ({p.status})</option>)}
       </select>
-      <button className="adm-btn primary" disabled={!sel}
-        onClick={() => void selectPackAndStart(sel)}>НАЧАТЬ ИГРУ</button>
+      {/* кнопка живая всегда: она объясняет, чего не хватает, а не молчит серым */}
+      <button className="adm-btn primary" onClick={() => {
+        if (!sel) return hint.show(packs.length === 0
+          ? 'Пакетов пока нет. Их создают в редакторе — вкладка «Редактор», кнопка «+ Новый пакет».'
+          : 'Сначала выбери пакет в списке выше — из него соберётся игра.', selectRef.current)
+        void selectPackAndStart(sel)
+      }}>НАЧАТЬ ИГРУ</button>
+      <Hint text={hint.text} />
     </div>
   )
 }
@@ -516,10 +526,19 @@ function TeamsPanel({ gameId, teams }: { gameId: string; teams: Team[] }) {
 
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const hint = useHint()
 
   const add = async () => {
     const n = name.trim()
-    if (!n || busy) return
+    if (busy) return
+    // Пустое поле — не молчаливый отказ, а объяснение: на бумажной игре
+    // команды заводит ведущий руками, и «ничего не произошло» здесь особенно
+    // сбивает с толку.
+    if (!n) return hint.show('Впиши название команды в поле слева, потом жми «+ ДОБАВИТЬ».', inputRef.current)
+    if (teams.some(t => t.name.toLowerCase() === n.toLowerCase()))
+      return hint.show(`Команда «${n}» уже есть. Придумай другое название, иначе на табло их не различить.`, inputRef.current)
+    hint.clear()
     setBusy(true)
     try {
       await registerTeam(n, nextFreeColor(teams.map(t => t.color)), gameId)
@@ -543,12 +562,13 @@ function TeamsPanel({ gameId, teams }: { gameId: string; teams: Team[] }) {
         </div>
       ))}
       <div className="paper-row">
-        <input placeholder="Название команды" value={name} style={{ flex: 1, minWidth: 0 }}
+        <input ref={inputRef} placeholder="Название команды" value={name} style={{ flex: 1, minWidth: 0 }}
           onChange={e => setName(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') void add() }} />
         <button className="adm-btn primary" style={{ flex: '0 0 auto' }}
-          disabled={!name.trim() || busy} onClick={() => void add()}>+ ДОБАВИТЬ</button>
+          disabled={busy} onClick={() => void add()}>+ ДОБАВИТЬ</button>
       </div>
+      <Hint text={hint.text} />
     </div>
   )
 }
@@ -899,6 +919,8 @@ function BlitzControls({ pack, round, gameState }: {
   const { state, setState } = useBlitz(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
   const [busy, setBusy] = useState(false)
+  // хук до ранних return — иначе React #310 (см. CLAUDE.md)
+  const hint = useHint()
 
   const settings = round.settings as { teamSeconds?: number; timeoutPenalty?: number }
   const bank = round.questions.map(q => ({ id: q.id, hidden: q.hidden }))
@@ -931,15 +953,19 @@ function BlitzControls({ pack, round, gameState }: {
     return (
       <div className="adm-blitz">
         <div className="adm-dim">БЛИЦ · раунд не начат</div>
-        <button className="adm-btn primary" disabled={busy || teams.length < 2}
+        <button className="adm-btn primary" disabled={busy}
           onClick={() => {
-            // Кубик кидается ОДИН раз: дальше ходы идут по кругу от него.
+            // Блиц — игра по кругу: одной команде ходить не с кем.
+            if (teams.length < 2) return hint.show(teams.length === 0
+              ? 'Ни одной команды. Заведи их в блоке «КОМАНДЫ» или дай залу подключиться по QR.'
+              : 'Для блица нужны минимум две команды: ход передаётся по кругу.')
             const order = [...teams].sort(() => Math.random() - 0.5).map(t => t.id)
             void push(initBlitz(order, settings.teamSeconds ?? 60))
           }}>
           🎲 БРОСИТЬ КУБИК И НАЧАТЬ
         </button>
         {teams.length < 2 && <div className="adm-dim">нужно минимум две команды</div>}
+        <Hint text={hint.text} />
       </div>
     )
   }
