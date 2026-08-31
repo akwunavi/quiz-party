@@ -362,12 +362,13 @@ function HostInner({ gameState, pack }: {
 
     return (
       <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
+        paperMode ? ' paper-question' : ''}${
         imgs.length && !q.media.hidden ? ' has-media' : ''}${
         (choices && !lettered) || (q.answer.mode === 'match'
           && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
         <AudioGate />
         {round.mechanic !== 'jeopardy' && <>
-          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} />
+          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
@@ -382,17 +383,23 @@ function HostInner({ gameState, pack }: {
         </div>
 
         {split ? (
-          <div className={frameCls}>
-            {isNY && <Icicles seed={q.id} low={timeLow} />}
-            {isCyber && <span className="cf-scan" aria-hidden="true" />}
-            <div className="q-split">
-            <WindText key={q.id} text={q.question_text} />
+          /* Картинка лежит РЯДОМ с рамкой вопроса, а не внутри неё.
+             Пока она была вложена в рамку, экран выглядел так: рамка держит
+             свою высоту, картинка тянется на 68vh и вылезает за её нижний
+             край — прямо под плитки вариантов. Теперь колонки делят место
+             честно: слева рамка с текстом, справа картинка во всю
+             доступную высоту, и наезжать друг на друга им нечем. */
+          <div className="q-split">
+            <div className={frameCls}>
+              {isNY && <Icicles seed={q.id} low={timeLow} />}
+              {isCyber && <span className="cf-scan" aria-hidden="true" />}
+              <WindText key={q.id} text={q.question_text} />
+            </div>
             <div className="q-media-grid n1" style={mediaScaleVar(q)}>
               {imgs.map((m, i) => (
                 <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
                   {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
               ))}
-            </div>
             </div>
           </div>
         ) : (
@@ -1403,13 +1410,16 @@ function QuestionVideo({ src, hidden, waitFor, go }: {
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
  *  скрытая вкладка (второй проектор) молчит. */
-function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
+function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manual = false }: {
   startedAt?: string | null
   seconds?: number
   q: LoadedPack['rounds'][number]['questions'][number]
   round: LoadedPack['rounds'][number]
   timerRunning: boolean
   pack?: LoadedPack
+  /** игра на бумаге: ничего не звучит и время не идёт, пока ведущий не
+   *  нажмёт «ЗАПУСТИТЬ» в админке — он сначала читает вопрос залу вслух */
+  manual?: boolean
 }) {
   const hasOwnAV = (q.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
   const voiceRef = useRef<HTMLAudioElement | null>(null)
@@ -1436,6 +1446,12 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
     // была только в очистке эффекта и не покрывала плееры, созданные вне
     // этого компонента: при переходе аудио продолжало играть поверх.
     stopAllMedia()
+    // ── ИГРА В БАРЕ: старт по кнопке ведущего ──
+    // Вопрос читает человек с микрофоном, и пока он читает, время идти не
+    // должно, а музыка — играть поверх его голоса. Поэтому здесь тишина,
+    // а всё остальное запускает второй эффект, когда ведущий нажмёт кнопку
+    // (то есть когда в игре появится timer_started_at).
+    if (manual) return
     if (timerRunning) return
     let cancelled = false
     const ownAudio = (q.media.question ?? [])
@@ -1487,7 +1503,45 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
       voiceRef.current = null
       audioRef.current?.pause()
     }
-  }, [q.id])
+  }, [q.id, manual])
+
+  // ── Игра на бумаге: ведущий нажал «ЗАПУСТИТЬ» ──
+  // Кнопка ставит timer_started_at, и по нему стартует звук вопроса: сначала
+  // озвучка, если она задана, следом собственное аудио. Фоновая музыка
+  // подхватывается общим эффектом ниже — он и так завязан на таймер.
+  useEffect(() => {
+    if (!manual || !timerRunning) return
+    let cancelled = false
+    const ownAudio = (q.media.question ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
+    const playOwn = () => {
+      if (cancelled || !ownAudio) return
+      const a = createAudio(); a.src = mediaUrl(ownAudio)
+      audioRef.current = a
+      a.play().catch(() => {})
+    }
+    if (q.media.voice) {
+      const v = createAudio(); v.src = mediaUrl(q.media.voice)
+      voiceRef.current = v
+      v.onended = playOwn
+      v.onerror = playOwn
+      // play() асинхронный — та же гонка, что и в обычном режиме:
+      // проверяем отмену уже после реального старта
+      v.play().then(() => {
+        if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
+      }).catch(playOwn)
+    } else playOwn()
+
+    return () => {
+      cancelled = true
+      const old = voiceRef.current
+      if (old) {
+        old.onended = null; old.onerror = null
+        try { old.pause(); old.src = '' } catch { /* уже мёртв */ }
+      }
+      voiceRef.current = null
+      audioRef.current?.pause()
+    }
+  }, [q.id, manual, timerRunning])
 
   // ── Страховка: таймер обязан пойти ──
   // Запрос на старт мог не дойти (у команд и проектора связь рвётся), а
@@ -1495,6 +1549,9 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
   // Здесь проверяем результат и повторяем попытку, пока таймер не пошёл.
   useEffect(() => {
     if (timerRunning) return
+    // В баре таймер запускает ведущий — страховке тут делать нечего,
+    // иначе она сама пустит время через две секунды после показа вопроса.
+    if (manual) return
     // Пока озвучка РЕАЛЬНО играет — не вмешиваемся, сколько бы она ни длилась.
     // Фиксированный лимит был ошибкой: озвучки длиннее его обрывались таймером.
     const t = setInterval(() => {
@@ -1505,7 +1562,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds }: {
       void startTimer()
     }, 2000)
     return () => clearInterval(t)
-  }, [q.id, timerRunning])
+  }, [q.id, timerRunning, manual])
 
   // фоновая музыка раунда, пока тикает таймер
   useEffect(() => {

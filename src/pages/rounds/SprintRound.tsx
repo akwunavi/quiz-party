@@ -17,12 +17,17 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
   const afterTimer = s.afterTimerSec ?? 5
   const questions = round.questions.filter(q => !q.hidden)
   const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
+  // В баре (игра на бумаге) слайд с вопросами открывает ведущий и сам решает,
+  // когда пускать время: он ещё объясняет правила или ждёт, пока раздадут
+  // бланки. Отсчёт «через 5 секунд поехали» тут неуместен — старт по кнопке
+  // в админке, как и у обычных вопросов.
+  const manualStart = pack.settings?.play_mode === 'paper'
 
   useEffect(() => {
-    if (gameState.timer_started_at || document.hidden) return
+    if (manualStart || gameState.timer_started_at || document.hidden) return
     const t = setTimeout(() => { void startTimer() }, startDelay * 1000)
     return () => clearTimeout(t)
-  }, [gameState.timer_started_at])
+  }, [gameState.timer_started_at, manualStart])
 
   useEffect(() => {
     if (!gameState.timer_started_at || !bgMusic || document.hidden) return
@@ -42,10 +47,10 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
 
   const [countdown, setCountdown] = useState(startDelay)
   useEffect(() => {
-    if (gameState.timer_started_at) return
+    if (manualStart || gameState.timer_started_at) return
     const t = setInterval(() => setCountdown(c => Math.max(0, c - 1)), 1000)
     return () => clearInterval(t)
-  }, [gameState.timer_started_at])
+  }, [gameState.timer_started_at, manualStart])
 
   // нечётное число вопросов: первый — «герой» на всю ширину над таймером
   const hero = questions.length % 2 === 1 ? questions[0] : null
@@ -69,7 +74,10 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
       <div className="sprint-center">
         {gameState.timer_started_at
           ? <div className="sprint-timer">{timerNode}</div>
-          : <div className="sprint-pre"><div className="sprint-pre-num">{countdown}</div>
+          : <div className="sprint-pre">
+              {/* в баре цифры обратного отсчёта нет: время пускает ведущий,
+                  и «0» на экране висел бы неизвестно сколько */}
+              {!manualStart && <div className="sprint-pre-num">{countdown}</div>}
               <div className="mono-tag">ЧИТАЕМ ВОПРОСЫ</div></div>}
       </div>
       <div className="sprint-col">

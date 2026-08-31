@@ -123,3 +123,24 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .adm-bz-used-row > button { flex: 0 0 auto; padding: 3px 10px; font-size: 11px; }
 .adm-bz-used-row.gone > span { text-decoration: line-through; opacity: .5; }
+
+/* Кнопка «прочитал — пускаем время» (игра на бумаге).
+   Она главная на экране, пока вопрос не запущен: ведущий держит телефон в
+   одной руке и микрофон в другой, промахиваться некогда. Поэтому во всю
+   ширину и выше остальных кнопок ряда. */
+.adm-start-question {
+  width: 100%; margin-bottom: 10px;
+  padding-block: clamp(14px, 2.4vh, 20px);
+  font-size: clamp(16px, 4.4vw, 22px);
+  letter-spacing: .06em;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent);
+  animation: adm-start-pulse 2.4s ease-in-out infinite;
+}
+@keyframes adm-start-pulse {
+  0%, 100% { box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 30%, transparent); }
+  50%      { box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
+.adm-start-question:hover { filter: brightness(1.1); }
+@media (prefers-reduced-motion: reduce) {
+  .adm-start-question { animation: none; }
+}

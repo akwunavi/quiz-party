@@ -28,8 +28,24 @@
 .answers-layout { padding-top: clamp(8px, 1.6vh, 24px); }
 .host-screen > .q-text:first-of-type { margin-top: clamp(6px, 1.2vh, 18px); }
 
-/* ── п.5: на бумаге колонки «ответы команд» нет — контент на всю ширину ── */
-.paper-answers .answers-layout { width: 96vw; max-width: none; gap: clamp(16px, 2vw, 34px); }
+/* ── п.5: на бумаге колонки «ответы команд» нет — контент на всю ширину ──
+
+   ЭТА ПРАВКА ОДНАЖДЫ «ПОТЕРЯЛАСЬ», хотя строки никто не удалял. Причина:
+   раскладка разбора — не flex, а СЕТКА, и колонок в ней две (см.
+   `11-projector-media.css`: `grid-template-columns: minmax(0,1fr)
+   clamp(240px,22vw,340px)`). Вторая колонка резервируется под ответы
+   команд ВСЕГДА, даже когда их некому показывать: на бумаге блок
+   `.team-answers` просто не рендерится, а место под него остаётся.
+   `flex: 1 1 auto` и `width: 100%` внутри сетки на это не влияют — они
+   про другую модель раскладки, поэтому и выглядели как «правка есть,
+   а толку нет».
+   Лечение — убрать вторую колонку. Правило лежит ниже файла 11, поэтому
+   перебивает его. */
+.paper-answers .answers-layout {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;              /* не vw: у экрана свои боковые отступы */
+  max-width: none; gap: clamp(16px, 2vw, 34px);
+}
 .paper-answers .answers-main { flex: 1 1 auto; width: 100%; }
 .paper-answers .answer-reveal { width: 100%; }
 /* ── п.7: варианты-картинки в разборе уезжали за правый край ──

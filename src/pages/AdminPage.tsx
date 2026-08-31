@@ -229,6 +229,9 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   // интерактивные механики управляются с проектора; стандартный маршрут
   // «вопрос → время ответов → разбор» для них не существует
   const isBlitz = round.mechanic === 'blitz'
+  // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
+  // музыку и звук вопроса он запускает сам — кнопкой ниже
+  const paperMode = pack.settings?.play_mode === 'paper'
   const isInteractive = isJeopardy || isBlitz
     || round.mechanic === 'melody' || round.mechanic === 'race'
   const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
@@ -315,6 +318,18 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             ЗАВЕРШИТЬ РАУНД {`${(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after ? '→ ТАБЛО' : '→'}`}
           </button>
         </>)}
+        {/* ── ИГРА В БАРЕ: вопрос читает ведущий, старт — по кнопке ──
+            На бумаге проектор молчит и время не идёт, пока не нажата эта
+            кнопка: сначала человек с микрофоном читает вопрос залу, и только
+            потом включаются таймер, музыка и звук вопроса. Одинаково для
+            вопросов с аудио и без — ведущему не надо помнить, где как. */}
+        {paperMode && phase === 'question' && !gameState.timer_started_at && (
+          <button className="adm-btn primary adm-start-question"
+            onClick={() => void startTimer()}
+            title="Прочитал вопрос залу — пускаем время, музыку и звук вопроса">
+            ▶ ПРОЧИТАЛ — ПУСКАЕМ ВРЕМЯ
+          </button>
+        )}
         {phase !== 'show_answers' && (
           <div className="adm-row-btns">
             {/* повтор вопроса: перезапускает таймер, не сбивая номер вопроса.

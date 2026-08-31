@@ -314,3 +314,105 @@
 @media (prefers-reduced-motion: reduce) {
   .recap-screen .recap-body { animation: none; }
 }
+
+/* ═══ 8.40: СПЛИТ «ТЕКСТ + КАРТИНКА» — картинка вынута из рамки ═══
+
+   Как было: картинка лежала ВНУТРИ рамки вопроса. Рамка держала свою
+   высоту от текста, а картинка тянулась на 68vh — и вылезала за нижний
+   край рамки прямо под плитки вариантов. На проекторе это выглядело так,
+   будто снимок «вываливается» из вопроса; замер показывал 86px наезда.
+
+   Как стало: `.q-split` — прямой потомок экрана и делит место на две
+   колонки: слева рамка с текстом, справа картинка. Картинка занимает всю
+   высоту своей колонки и НЕ обёрнута в вопрос.
+
+   Пропорции: картинке отдана большая доля (в баре её видно с дальних
+   столов, а текст ведущий и так читает вслух). */
+.host-screen .q-split {
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  align-items: stretch;
+  /* Колонки берут остаток высоты экрана — это и есть «определённая
+     высота», без которой max-height: 100% у картинки не разрешается
+     (та же ловушка, что описана выше в этом файле). */
+  flex: 1 1 0; min-height: 0;
+  width: min(1760px, 96%);   /* проценты, не vw: внутри экрана свои отступы */
+}
+/* рамка вопроса больше не тянется на всю колонку — она по содержимому,
+   по центру своей половины, иначе пустая рамка на пол-экрана */
+.host-screen .q-split > .cyber-frame,
+.host-screen .q-split > .q-frame,
+.host-screen .q-split > .pt-frame,
+.host-screen .q-split > div:first-child { align-self: center; min-height: 0; }
+/* Кегль считается от ширины КОЛОНКИ ТЕКСТА, а не всего сплита: иначе
+   единица cqw берётся от полной ширины и текст выходит вдвое крупнее места,
+   которое ему отведено. */
+.host-screen .q-split > div:first-child { container-type: inline-size; }
+.host-screen .q-split > div:first-child > .q-text { margin-block: 0; }
+
+/* колонка картинки: занимает свою высоту целиком */
+.host-screen .q-split > .q-media-grid,
+.host-screen .q-split > .q-media-grid.n1 {
+  height: 100%; width: 100%; min-height: 0; min-width: 0; margin: 0;
+  align-items: center;
+}
+.host-screen .q-split > .q-media-grid .q-img { height: 100%; min-height: 0; }
+/* max-height в vh здесь ВРЕДЕН: он не знает про плитки вариантов снизу.
+   Высоту диктует колонка, картинка вписывается в неё. */
+.host-screen .q-split .q-img img {
+  max-height: 100%; max-width: 100%; height: 100%; width: auto;
+  object-fit: contain; }
+
+/* Текст считается от ширины СВОЕЙ колонки (cqw). Крупнее прежнего: колонка
+   стала уже, но экран от этого читается лучше — вопрос короткий, а зал
+   смотрит на картинку. */
+.host-screen .q-split .q-text,
+.theme-potter .host-screen .q-split .q-text { font-size: clamp(22px, 5.4cqw, 60px); }
+.host-screen .q-split .q-text.len-m,
+.theme-potter .host-screen .q-split .q-text.len-m { font-size: clamp(20px, 4.6cqw, 50px); }
+.host-screen .q-split .q-text.len-l,
+.theme-potter .host-screen .q-split .q-text.len-l { font-size: clamp(18px, 3.8cqw, 40px); }
+.host-screen .q-split .q-text.len-xl,
+.theme-potter .host-screen .q-split .q-text.len-xl { font-size: clamp(16px, 3.2cqw, 32px); }
+
+/* Игра на бумаге (бар): телефонов у зала нет, вопрос читает ведущий —
+   картинке отдаём ещё больше места, текст уходит в узкую колонку. */
+.host-screen.paper-question .q-split {
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+}
+
+/* Плитки вариантов рядом с картинкой — компактнее.
+   Экран вопроса делят три жильца: шапка с кольцом таймера (её трогать
+   нельзя, кольцо реально висит сверху), картинка и варианты. Отобрать
+   высоту у первого нельзя, поэтому её отдают варианты: кегль на ступень
+   мельче и поля уже. Читается по-прежнему с дальних столов, а картинка
+   получает почти сотню пикселей. */
+.host-screen.has-media.has-choices > .choices-grid { gap: clamp(8px, 1vh, 14px); }
+.host-screen.has-media.has-choices > .choices-grid .choice-plate {
+  padding: clamp(6px, 1vh, 11px) clamp(12px, 1.4vw, 20px);
+  font-size: clamp(18px, 1.9vw, 32px);
+}
+.host-screen.has-media.has-choices > .choices-grid.c-m .choice-plate { font-size: clamp(17px, 1.7vw, 28px); }
+.host-screen.has-media.has-choices > .choices-grid.c-l .choice-plate { font-size: clamp(15px, 1.5vw, 24px); }
+.host-screen.has-media.has-choices > .choices-grid.c-xl .choice-plate { font-size: clamp(14px, 1.3vw, 21px); }
+
+/* Кольцо таймера в классике/киберпанке висит сверху до 188px (top: 20 плюс
+   диаметр до 168), а верхний отступ экрана — 168. Пока картинка лежала
+   внутри рамки вопроса, зазор давала сама рамка; теперь колонка начинается
+   сразу и правым верхним углом заезжала под кольцо. Отступ ровно на эту
+   разницу — больше отнимать у картинки нечего. */
+.theme-classic .host-screen .q-split,
+.cyber .host-screen .q-split { margin-top: 26px; }
+
+/* ── Игра в баре: картинке отдаём всё, что можно отнять у остального ──
+   Телефонов у зала нет, отвечают на бланках, поэтому единственное, ради
+   чего зал смотрит на экран, — это снимок. Варианты здесь подсказка, а не
+   рабочий интерфейс: им хватает более плотной вёрстки, и освободившиеся
+   пикселы уходят картинке. */
+.host-screen.paper-question.has-media.has-choices > .choices-grid {
+  gap: clamp(6px, .8vh, 10px);
+  margin-bottom: 0;
+}
+.host-screen.paper-question.has-media.has-choices > .choices-grid .choice-plate {
+  padding: clamp(4px, .7vh, 8px) clamp(10px, 1.2vw, 16px);
+  font-size: clamp(16px, 1.65vw, 27px);
+}
