@@ -10,7 +10,6 @@ import {
 } from '../lib/blitzState'
 import { saveBlitz } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
-import { enqueueAnswer } from '../lib/answerQueue'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -1199,11 +1198,20 @@ function BlitzScreen({ pack, round, gameState }: {
       // нули, хотя таблица на экране показывала баллы.
       if (next.finished && !state?.finished) {
         const rows = blitzResults(toResults(next), settings.timeoutPenalty ?? 10)
-        await Promise.all(rows.map(r => enqueueAnswer({
-          team_id: r.teamId, game_id: gameState.game_id,
-          question_ref: 'q-blitz', round_number: gameState.round_number,
-          answer_text: `место ${r.place}`, stake: r.score,
-        })))
+        // Пишем ОДНИМ запросом, а не через очередь ответов.
+        // Очередь читает список из localStorage и записывает обратно; три
+        // параллельных вызова читают один и тот же снимок, и выживает
+        // только последний. В базу попадала одна команда из трёх, а на
+        // табло остальные показывали нули.
+        const { error } = await supabase.from('answers').upsert(
+          rows.map(r => ({
+            team_id: r.teamId, game_id: gameState.game_id,
+            question_ref: 'q-blitz', round_number: gameState.round_number,
+            answer_text: `место ${r.place}`, stake: r.score,
+            updated_at: new Date().toISOString(),
+          })),
+          { onConflict: 'team_id,question_ref' })
+        if (error) console.error('блиц: итоги не записались', error)
       }
     } finally { busy.current = false }
   }

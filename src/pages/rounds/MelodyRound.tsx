@@ -59,6 +59,13 @@ function playShared(src: string): HTMLAudioElement {
   return sharedAudio
 }
 
+/** Заглушить общий трек. Нужен, когда ход уходит дальше сам: иначе музыка
+ *  продолжает играть уже над следующей командой. */
+function stopShared() {
+  if (!sharedAudio) return
+  try { sharedAudio.pause(); sharedAudio.currentTime = 0 } catch { /* уже мёртв */ }
+}
+
 async function saveMelody(next: MelodyState) {
   await supabase.from('game_sessions').update({ melody: next }).eq('id', getRoomId())
 }
@@ -182,9 +189,28 @@ export function MelodyBoard({ pack, round, gameState }: {
       const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
       void saveMelody({ ...m, stage: 'bids', order, turn: 0, deadline: undefined })
     } else if (m.stage === 'answering' || m.stage === 'passed') {
-      void saveMelody({ ...m, deadline: undefined })   // время вышло — судит ведущий
+      // Время на ответ вышло. Дальше два разных случая, и раньше они были
+      // склеены в один: экран просто замирал, музыка играла, а форма у
+      // игрока оставалась открытой, пока ведущий что-нибудь не нажмёт.
+      const submitted = answers.some(a =>
+        a.question_ref === `q-mel-${m.key}` && a.team_id === m.order?.[m.turn ?? 0]
+        && !!a.answer_text?.trim())
+      if (submitted) {
+        // Ответ есть — судит ведущий, время просто останавливаем.
+        void saveMelody({ ...m, deadline: undefined })
+      } else {
+        // Ответа нет — ход уходит дальше сам. Музыку глушим: иначе трек
+        // продолжает играть уже над следующей командой.
+        stopShared()
+        if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
+          void saveMelody({ ...m, stage: 'passed', turn: 1, deadline: undefined })
+        } else {
+          void saveMelody({ ...m, stage: 'done', deadline: undefined,
+            played: [...played, m.key!] })
+        }
+      }
     }
-  }, [expired, m.stage])
+  }, [expired, m.stage, answers])
 
   // ── 1 секунда трека на стадии listen ──
   useEffect(() => {
@@ -235,7 +261,15 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
   const freeKeys = allKeys.filter(k => !played.includes(k))
+  const [manualPick, setManualPick] = useState(false)
   const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
+
+  /** Открыть выбранную плитку без рулетки. */
+  const pickManually = (key: string) => {
+    setManualPick(false)
+    void saveMelody({ ...m, key, stage: 'listen', deadline: inSec(3),
+      order: undefined, turn: 0, chooser: undefined })
+  }
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
@@ -276,12 +310,28 @@ export function MelodyBoard({ pack, round, gameState }: {
   return (
     <div className="host-screen grid-bg mel-screen" onPointerDown={unlockAudio}>
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
-        spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10} />
+        spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10}
+        onPick={manualPick ? pickManually : undefined} />
 
       {idle && (
         <div className="host-actions">
           {freeKeys.length > 0
-            ? <button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Следующий трек'}</button>
+            ? (manualPick
+                ? <>
+                    <div className="mono-tag">ВЫБЕРИТЕ ПЛИТКУ НА ЭКРАНЕ</div>
+                    <button className="ghost" onClick={() => setManualPick(false)}>Отмена</button>
+                  </>
+                : <>
+                    <button onClick={startSpin}>
+                      {played.length === 0 ? 'Стартуем!' : 'Рулетка'}
+                    </button>
+                    {/* Второй путь: ведущий сам решает, какой трек следующий.
+                        Иногда нужно подвести к теме или подстроиться под зал,
+                        и ждать рулетку ради этого незачем. */}
+                    <button className="ghost" onClick={() => setManualPick(true)}>
+                      Выбрать вручную
+                    </button>
+                  </>)
             : <>
                 <div className="mono-tag">ВСЕ ТРЕКИ ОТЫГРАНЫ</div>
                 <button onClick={() => void finishMelodyRound(gameState, pack)}>
@@ -388,7 +438,7 @@ export function MelodyBoard({ pack, round, gameState }: {
                   + 'Баллы за него никто не получит.')) return
                 await saveMelody({ ...m, stage: 'done', deadline: undefined,
                   played: [...played, m.key!] })
-              }}>аварийно закрыть трек</button>
+              }}>Закрыть</button>
             )}
 
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
@@ -437,9 +487,11 @@ export function MelodyBoard({ pack, round, gameState }: {
 }
 
 /** Барабан: подсветка бежит по плиткам и замедляется к концу. */
-function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: {
+function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, onPick }: {
   themes: MelodyTheme[]; played: string[]
   spinning: boolean; spinKey?: string; spinLeft: number; spinTotal: number
+  /** Ручной выбор плитки. Не задан — плитки не кликабельны. */
+  onPick?: (key: string) => void
 }) {
   const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
   const free = keys.filter(k => !played.includes(k))
@@ -486,7 +538,10 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal }: 
         const done = played.includes(key)
         const hot = highlighted === key
         return (
-          <div key={key} className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}`}
+          <div key={key}
+            className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}${
+              onPick && !done ? ' pickable' : ''}`}
+            onClick={onPick && !done ? () => onPick(key) : undefined}
             data-c={String((ti % 4))} style={{ gridColumn: ti + 1, gridRow: i + 2 }}>
             {/* нейтральная «морда» плитки: вид целиком задаёт тема
                 (НГ — ёлочный шар, киберпанк — неон-чип, ГП — письмо с печатью) */}

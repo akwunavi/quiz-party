@@ -83,3 +83,7 @@
 .mel-reveal-track { margin-top: 8px; color: var(--dim);
   font-family: var(--font-mono, monospace); letter-spacing: .16em;
   font-size: clamp(11px, 1vw, 15px); }
+
+/* плитка доступна для ручного выбора */
+.mel-tile.pickable { cursor: pointer; }
+.mel-tile.pickable:hover { transform: scale(1.06); filter: brightness(1.15); }

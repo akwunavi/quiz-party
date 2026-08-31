@@ -265,7 +265,7 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
             ? <Wait text="ВЫ ИГРАЕТЕ!" sub="Ждите включения музыки" />
             : alreadyFailed
               ? <Wait text="ВЫ НЕ УГАДАЛИ" sub="Ждём другую команду" />
-              : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Если не угадают — ход перейдёт к вам, 0.5 балла" />)}
+              : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ" sub="Ход достанется следующей команде по ставке" />)}
 
           {(stage === 'snippet' || stage === 'answering' || stage === 'passed') && (myTurn ? (
             <div className="pl-card">
@@ -288,7 +288,7 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
           ) : alreadyFailed
             ? <Wait text="ВЫ НЕ УГАДАЛИ" sub="Ждём вторую команду" />
             : <Wait text="ЖДЁМ ДРУГУЮ КОМАНДУ"
-                sub="Слушайте трек — если не угадают, ход перейдёт к вам (0.5 балла)" />)}
+                sub="Слушайте трек. Если не угадают, ход достанется следующей по ставке — за 0.5 балла" />)}
         </>)}
       </div>
     </div>
