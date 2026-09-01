@@ -8,7 +8,8 @@ import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
 import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
+  gotoRound, slideForRound, slideBeforeFinale, showSlide,
+  gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
@@ -247,7 +248,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     const st = afterRoundStep(pack, gameState.round_number, gameState.phase)
     if (st.kind === 'scoreboard') return void showScoreboard()
     if (st.kind === 'break') return void startBreak()
-    if (st.kind === 'finale') return void finishGame(gameState.pack_id)
+    if (st.kind === 'finale') {
+      const sl = slideBeforeFinale(pack.settings?.info_slides)
+      return sl == null ? void finishGame(gameState.pack_id) : void showSlide(sl)
+    }
     return void gotoRound(gameState.round_number + 1,
       slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
   }
@@ -452,8 +456,13 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           if (showSb) { void showScoreboard(); return }
           // на бумаге между последним раундом и итогами всегда есть пауза:
           // ведущий сводит бланки. Ведём зал на заставку подсчёта, а не в финал
-          if (last && paperMode) { void startCounting(); return }
-          if (last) void finishGame(gameState.pack_id)
+          if (last) {
+            // слайд «перед итогами», если он назначен, идёт первым
+            const sl = slideBeforeFinale(pack.settings?.info_slides)
+            if (sl != null) { void showSlide(sl); return }
+            if (paperMode) { void startCounting(); return }
+            void finishGame(gameState.pack_id); return
+          }
           else void gotoRound(gameState.round_number + 1,
             slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
         }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'

@@ -35,15 +35,16 @@ export async function gotoRound(round_number: number, slideIndex?: number) {
   if (error) throw error
 }
 
-/** Индекс слайда, назначенного на вход в раунд, или null.
- *  'lobby' — перед первым раундом, 'round:N' — перед раундом N (с единицы). */
-export function slideForRound(
-  slides: { show_at?: string }[] | undefined, roundNumber: number,
-): number | null {
-  if (!slides?.length) return null
-  const want = roundNumber === 0 ? ['lobby', 'round:1'] : [`round:${roundNumber + 1}`]
-  const i = slides.findIndex(s => s.show_at && want.includes(s.show_at))
-  return i >= 0 ? i : null
+// Правила размещения слайдов живут в отдельном модуле без клиента базы —
+// так их можно покрыть тестами. Реэкспорт, чтобы места вызова не менялись.
+export { slideForRound, slideBeforeFinale } from './slides'
+
+/** Показать слайд-брифинг, не трогая номер раунда. */
+export async function showSlide(slideIndex: number) {
+  const { error } = await supabase.from('game_sessions').update({
+    phase: 'info', question_index: slideIndex, reveal: false,
+  }).eq('id', getRoomId())
+  if (error) throw error
 }
 
 /** Останавливает звук на ЭТОЙ вкладке. На проекторе то же делает

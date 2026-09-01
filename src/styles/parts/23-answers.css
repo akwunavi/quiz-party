@@ -476,3 +476,35 @@
   .answers-layout:not(.revealed) .answers-main:has(> .q-media-grid.n1) > .q-media-grid {
     grid-column: 1; }
 }
+
+/* ── 8.43: вопрос остаётся на экране разбора ──
+   Ужатая копия текста вопроса над блоком ответа. Кегль примерно вдвое
+   меньше «боевого»: это напоминание, а не сам вопрос — на нём глаз не
+   должен останавливаться дольше, чем на ответе.
+   Высота ограничена: длинный вопрос забирал бы место у ответа, а он тут
+   главный. Что не влезло — обрезается по строкам, а не наезжает вниз. */
+.answers-main > .q-recall {
+  flex: 0 0 auto;
+  margin: 0 0 clamp(8px, 1.4vh, 18px);
+  padding-inline: clamp(12px, 2vw, 40px);
+  font-family: 'Rajdhani', sans-serif; font-weight: 600;
+  font-size: clamp(18px, 2vw, 34px); line-height: 1.18;
+  color: var(--muted);
+  text-align: center;
+  max-height: 22vh; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+}
+.answers-main > .q-recall.len-l { font-size: clamp(16px, 1.7vw, 28px); }
+.answers-main > .q-recall.len-xl { font-size: clamp(15px, 1.5vw, 24px); -webkit-line-clamp: 5; }
+
+/* Блок ответа — главный: он забирает остаток высоты и НЕ выпускает контент
+   за экран. Картинка внутри гибкая, текст и подпись — по содержимому. */
+.answers-main > .answer-block { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.answers-main > .answer-block > .answer-media { flex: 1 1 0; min-height: 0; }
+
+/* Подпись к ответу под сеткой вариантов прижималась к плиткам вплотную и
+   заезжала на подсветку верного варианта (свечение выходит за рамку плитки).
+   Небольшой отступ решает: только там, где перед подписью действительно
+   идут плитки. */
+.answer-block > .choices-grid + .answer-note,
+.answer-block > .order-answer + .answer-note { margin-top: clamp(10px, 1.6vh, 22px); }

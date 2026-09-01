@@ -131,11 +131,16 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
                 onChange={e => patch({ show_at: e.target.value })}>
                 <option value="manual">только по кнопке в админке</option>
                 <option value="lobby">сразу после лобби, перед первым раундом</option>
+                {/* «После раунда N» — это и есть «перед раундом N+1», отдельного
+                    пункта не нужно; подпись говорит об этом прямо, чтобы не
+                    приходилось держать в голове. */}
                 {(loaded?.rounds ?? []).map((r, i) => (
                   <option key={r.id} value={`round:${i + 1}`}>
-                    перед раундом {i + 1} — {(r.title_lines ?? []).join(' ') || '—'}
+                    перед раундом {i + 1}{i > 0 ? ` (то есть сразу после ${i}-го)` : ''}
+                    {' — '}{(r.title_lines ?? []).join(' ') || '—'}
                   </option>
                 ))}
+                <option value="finale">после последнего раунда, перед итогами</option>
               </select>
 
               <label className="sm-check">

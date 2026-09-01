@@ -20,6 +20,7 @@ import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } fr
 import {
   selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime, setFinaleStep,
+  slideBeforeFinale, showSlide, startCounting,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { SnowCurtain } from '../components/NewYearScene'
@@ -476,9 +477,22 @@ function HostInner({ gameState, pack }: {
             <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
             <div className="answer-main">{displayAnswer(q)}</div>
             {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
-            <div className="q-media-grid" style={{ maxHeight: '26vh' }}>
-              {(q.media.answer ?? []).map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
-            </div>
+            {/* Раньше сюда как <img> уходило ВСЁ медиа ответа, включая mp3:
+                звук не играл, а на экране висела битая картинка. Теперь
+                картинки показываем, звук играем. */}
+            {(() => {
+              const media = q.media.answer ?? []
+              const pics = media.filter(m => !/\.(mp3|wav|m4a|ogg)$/i.test(m))
+              const sound = media.find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
+              return (<>
+                {sound && <AnswerAudio src={mediaUrl(sound)} />}
+                {pics.length > 0 && (
+                  <div className="q-media-grid" style={{ maxHeight: '26vh' }}>
+                    {pics.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
+                  </div>
+                )}
+              </>)
+            })()}
           </div>
         )}
 
@@ -499,7 +513,7 @@ function HostInner({ gameState, pack }: {
   if (gameState.phase === 'info') {
     const slides = pack?.settings?.info_slides ?? []
     const slide = slides[gameState.question_index] ?? slides[0]
-    if (slide) return <InfoScreen pack={pack} slide={slide} />
+    if (slide) return <InfoScreen pack={pack} slide={slide} packId={gameState.pack_id} />
   }
 
   if (gameState.phase === 'recap') {
@@ -883,6 +897,35 @@ function RevealVideo({ src }: { src: string }) {
   )
 }
 
+/** Звук, приложенный к ОТВЕТУ, — играет на экране разбора целиком.
+ *
+ *  Его никто не запускал: медиа ответа фильтровалось на картинки, а mp3 из
+ *  списка просто выбрасывался. Ведущий вставлял в разбор трек или отбивку —
+ *  и слышал тишину.
+ *
+ *  Играет ПОЛНОСТЬЮ, без таймера на 10–15 секунд: ушёл ведущий со слайда —
+ *  звук глохнет вместе с экраном, остался — трек доигрывает до конца.
+ *  play() асинхронный, поэтому глушим уже после реального старта: иначе
+ *  pause() до его начала не делает ничего и трек заиграет поверх
+ *  следующего экрана (та же гонка, что была с озвучкой вопроса). */
+function AnswerAudio({ src }: { src: string }) {
+  useEffect(() => {
+    if (document.hidden) return
+    let cancelled = false
+    const a = createAudio()
+    a.src = src
+    a.loop = false
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => {
+      cancelled = true
+      try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
+    }
+  }, [src])
+  return null
+}
+
 /** Боковая панель лобби в киберпанке.
  *
  *  Три элемента, все — чистый CSS, без картинок и без данных:
@@ -1136,7 +1179,9 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
  *
  *  К раундам слайд не привязан: показывается кнопкой из админки в любой
  *  момент, поэтому и живёт в настройках ПАКЕТА, а не раунда. */
-function InfoScreen({ pack, slide }: { pack: LoadedPack; slide: InfoSlide }) {
+function InfoScreen({ pack, slide, packId }: {
+  pack: LoadedPack; slide: InfoSlide; packId: string | null
+}) {
   // Внешний вид живёт в общем компоненте: им же рисуется превью в
   // редакторе, поэтому «на экране» и «в редакторе» совпадают всегда.
   const rounds = pack.rounds.filter(r => !r.off_scoreboard).map(r => ({
@@ -1148,7 +1193,8 @@ function InfoScreen({ pack, slide }: { pack: LoadedPack; slide: InfoSlide }) {
     <>
       <InfoSlideView slide={slide} rounds={rounds} mediaUrl={mediaUrl} />
       <div className="host-actions">
-        <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)} />
+        <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)}
+          packId={packId} paper={pack.settings?.play_mode === 'paper'} />
       </div>
     </>
   )
@@ -1159,7 +1205,13 @@ function indexOfSlide(pack: LoadedPack, slide: InfoSlide): number {
 }
 
 /** Кнопки перехода: между слайдами и обратно в игру. */
-function InfoNav({ slides, index }: { slides: InfoSlide[]; index: number }) {
+function InfoNav({ slides, index, packId, paper }: {
+  slides: InfoSlide[]; index: number; packId: string | null; paper: boolean
+}) {
+  // Слайд, назначенный «перед итогами», ведёт ВПЕРЁД — в финал. Кнопка
+  // «к раунду» на нём была бы дорогой назад, в уже сыгранный раунд.
+  // В баре между ним и итогами есть ещё подсчёт баллов — туда и ведём.
+  const toFinale = slides[index]?.show_at === 'finale'
   return (
     <>
       {index > 0 && (
@@ -1168,7 +1220,11 @@ function InfoNav({ slides, index }: { slides: InfoSlide[]; index: number }) {
       {index + 1 < slides.length && (
         <button className="ghost" onClick={() => void setFinaleStep(index + 1)}>Дальше →</button>
       )}
-      <button onClick={() => void setPhase('round_intro')}>К раунду →</button>
+      {toFinale
+        ? (paper
+            ? <button onClick={() => void startCounting()}>К подсчёту →</button>
+            : <button onClick={() => void finishGame(packId)}>К итогам →</button>)
+        : <button onClick={() => void setPhase('round_intro')}>К раунду →</button>}
     </>
   )
 }
@@ -1718,6 +1774,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const hiddenVideo = q.media.hidden
     ? (q.media.question ?? []).find(m => /\.(mp4|webm)$/i.test(m))
     : undefined
+  // Звук, приложенный к ОТВЕТУ. Раньше из медиа ответа брались только
+  // картинки, а mp3 молча выбрасывался — вставленный трек не играл вообще.
+  const answerAudio = (q.media.answer ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -1745,12 +1804,24 @@ function ShowAnswers({ pack, round, q, gameState }: {
             )}
           </>}
 
-          {/* ── ПОСЛЕ ПОКАЗА: старые картинки убираем, показываем ответ ── */}
+          {/* ── ПОСЛЕ ПОКАЗА: вопрос остаётся сверху, мельче ──
+              Зал разбирает ответ через минуту после того, как вопрос
+              прозвучал, и половина стола уже не помнит формулировку. Поэтому
+              текст вопроса не исчезает, а ужимается и уходит наверх, а ответ
+              встаёт под ним.
+              Сопоставление — исключение: у него свой разбор во всю ширину
+              (пары «номер — буква»), и лишняя строка сверху его ломает. */}
+          {revealed && q.answer.mode !== 'match' && q.question_text.trim() && (
+            <p className={`q-recall${lenClass(q.question_text)}`}>{q.question_text}</p>
+          )}
+
           {revealed && (
             <div className="answer-block reveal-in">
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
+              {/* звук ответа — целиком, пока ведущий не перелистнёт слайд */}
+              {answerAudio && <AnswerAudio src={mediaUrl(answerAudio)} />}
 
               {round.mechanic === 'rebus' ? (
                 // у ребуса свой разбор: две картинки с подсветкой слогов
@@ -2206,7 +2277,12 @@ function AfterRoundNav({ pack, gameState }: {
   const run = () => {
     if (step.kind === 'scoreboard') return void showScoreboard()
     if (step.kind === 'break') return void startBreak()
-    if (step.kind === 'finale') return void finishGame(gameState.pack_id)
+    if (step.kind === 'finale') {
+      // слайд «перед итогами» показываем до финала — ведущему не надо
+      // помнить про кнопку, слайд выходит сам там, где задуман
+      const sl = slideBeforeFinale(pack.settings?.info_slides)
+      return sl == null ? void finishGame(gameState.pack_id) : void showSlide(sl)
+    }
     return void gotoRound(gameState.round_number + 1,
       slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
   }
