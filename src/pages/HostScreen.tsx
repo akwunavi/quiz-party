@@ -2099,9 +2099,10 @@ function JeopardyBoard({ pack, round, gameState }: {
           const done = opened.includes(`${ti}-${i}`)
           return (
             // data-c — номер темы для раскраски: у плиток мелодии цвет неона
-            // берётся так же, и «Своя игра» теперь выглядит с ней одинаково
+            // берётся так же. У мелодии всего 4 темы за раз, а в «Своей игре»
+            // их бывает 5+ — на 4 цветах пятая колонка повторяла первую.
             <button key={`${ti}-${i}`} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
-              data-c={ti % 4}
+              data-c={ti % 8}
               style={{ gridColumn: ti + 1, gridRow: i + 2 }}
               onClick={() => {
                 // синхронизируем номер открытой плитки с игроками:

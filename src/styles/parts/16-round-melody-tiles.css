@@ -274,6 +274,11 @@
 .theme-classic .jp-tile[data-c="1"], .cyber .jp-tile[data-c="1"] { --neon: var(--accent2); }
 .theme-classic .jp-tile[data-c="2"], .cyber .jp-tile[data-c="2"] { --neon: var(--ok); }
 .theme-classic .jp-tile[data-c="3"], .cyber .jp-tile[data-c="3"] { --neon: #eab308; }
+/* до 8 тем без повтора цвета — «Своя игра» часто шире 4 колонок мелодии */
+.theme-classic .jp-tile[data-c="4"], .cyber .jp-tile[data-c="4"] { --neon: #ff2fa0; }
+.theme-classic .jp-tile[data-c="5"], .cyber .jp-tile[data-c="5"] { --neon: #40e0d0; }
+.theme-classic .jp-tile[data-c="6"], .cyber .jp-tile[data-c="6"] { --neon: #9d7bff; }
+.theme-classic .jp-tile[data-c="7"], .cyber .jp-tile[data-c="7"] { --neon: #ff8c42; }
 @media (hover: hover) {
   .theme-classic .jp-tile:not(.done):not(:disabled):hover,
   .cyber .jp-tile:not(.done):not(:disabled):hover {
