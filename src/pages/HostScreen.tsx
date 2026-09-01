@@ -23,6 +23,7 @@ import {
   slideBeforeFinale, showSlide, startCounting,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
+import { ScreenFx } from '../components/ScreenFx'
 import { SnowCurtain } from '../components/NewYearScene'
 import { CrosswordView } from '../components/CrosswordView'
 import { computeTotals, computeRoundScores } from '../lib/totals'
@@ -30,6 +31,7 @@ import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { useFitText } from '../hooks/useFitText'
+import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
@@ -56,11 +58,24 @@ export function HostScreen() {
     else setPack(null)
   }, [gameState?.pack_id])
   if (!gsLoading && !roomId) return <RoomPicker route="/" />
+  const theme = pack?.theme ?? 'classic'
+  // Ключ вспышки перехода: финал и рекап листают свои слайды САМИ каждые
+  // 3-5с (question_index меняется автоматически) — вспышка на каждом слайде
+  // дала бы стробоскоп, поэтому для них ключ БЕЗ question_index.
+  const fxTrigger = gameState
+    ? (gameState.phase === 'finale' || gameState.phase === 'recap'
+        ? `${gameState.phase}-${gameState.round_number}`
+        : `${gameState.phase}-${gameState.round_number}-${gameState.question_index}`)
+    : ''
   return (
-    <ThemeLayer theme={pack?.theme ?? 'classic'} isProjector>
-      {pack?.theme === 'new_year' &&
+    <ThemeLayer theme={theme} isProjector>
+      {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />
+      {/* Рендерится ВСЕГДА (условие на тему — внутри компонента), а не
+          {theme !== 'new_year' && ...}: постоянное число детей ThemeLayer
+          важно, чтобы новая сборка не перемонтировала проектор целиком. */}
+      <ScreenFx theme={theme} trigger={fxTrigger} />
       {pack && <div className="pack-badge">{pack.name}</div>}
     </ThemeLayer>
   )
@@ -642,12 +657,19 @@ function longestWord(lines: string[]): number {
 
 function Title({ theme, lines }: { theme: string; lines: string[] }) {
   const longest = longestWord(lines)
+  // «Взлом терминала»: заголовок дешифруется посимвольно, только в классике.
+  // Длина строки не меняется (см. lib/scramble.ts) — кегль, посчитанный по
+  // --longest, не прыгает во время дешифровки. Хук стоит ДО раннего return
+  // ниже — иначе разное число хуков между темами уронило бы React (#310).
+  const joined = lines.join('\n')
+  const scrambled = useScrambleReveal(joined, theme === 'classic')
+  const shown = theme === 'classic' ? scrambled.split('\n') : lines
   if (theme !== 'new_year') {
     return (
       <h1 className="neon-title title-anim" data-longest={longest}
         style={{ '--longest': longest, '--lines': lines.length } as CSSProperties}>
         {lines.map((l, i) => (
-          <span key={i} style={i === lines.length - 1 && lines.length > 1 ? { color: 'var(--accent)' } : {}}>{l}<br /></span>
+          <span key={i} style={i === lines.length - 1 && lines.length > 1 ? { color: 'var(--accent)' } : {}}>{shown[i] ?? l}<br /></span>
         ))}
       </h1>
     )
@@ -2070,6 +2092,11 @@ function JeopardyBoard({ pack, round, gameState }: {
       .update({ timer_started_at: null, reveal: false }).eq('id', getRoomId())
   }
 
+  // Хук — ДО раннего return ниже (иначе число хуков между рендерами
+  // «темы пустые / темы заполнены» плавало бы и падало React #310).
+  const jpTitleText = round.title_lines.join(' ') || 'СВОЯ ИГРА'
+  const jpTitleScrambled = useScrambleReveal(jpTitleText, pack.theme === 'classic')
+
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">СВОЯ ИГРА</div>
@@ -2083,7 +2110,8 @@ function JeopardyBoard({ pack, round, gameState }: {
   const rows = Math.max(...themes.map(t => t.tiles.length))
   return (
     <div className="host-screen grid-bg jp-screen">
-      <h1 className="neon-title jp-title">{round.title_lines.join(' ') || 'СВОЯ ИГРА'}</h1>
+      <h1 className="neon-title jp-title">
+        {pack.theme === 'classic' ? jpTitleScrambled : jpTitleText}</h1>
       <div className="jp-board" style={{
         gridTemplateColumns: `repeat(${themes.length}, minmax(0, 1fr))`,
         gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
@@ -2329,7 +2357,6 @@ function ScoreboardScreen({ pack, gameState }: {
     const t = setInterval(() => setRevealed(p => (p >= ranked.length ? p : p + 1)), 2200)
     return () => clearInterval(t)
   }, [ranked.length, gameState.round_number])
-  const visible = ranked.slice(Math.max(0, ranked.length - revealed))
   const medals = ['🥇', '🥈', '🥉']
   // Ступени tableSize() считают по ЧИСЛУ КОМАНД и калиброваны по ширине
   // (vw). На невысоких экранах (1366×768, 1600×900) при восьми командах и
@@ -2357,14 +2384,22 @@ function ScoreboardScreen({ pack, gameState }: {
           </tr>
         </thead>
         <tbody>
-          {visible.map(t => {
+          {/* ВСЕ строки рендерятся ВСЕГДА (константная разметка) — иначе
+              useFitText мерил бы таблицу из нуля строк на первом кадре и
+              подгонял кегль по пустоте (баг 8.47). Раскрытие — только
+              видимостью: строка «в игре», если её индекс попал в последние
+              `revealed` мест снизу списка (последнее место открывается
+              первым, лидер — последним). */}
+          {ranked.map((t, idx) => {
             const row = rows.find(r => r.team.id === t.id)
             const place = row?.place ?? 1
+            const isIn = idx >= ranked.length - revealed
             return (
-            <tr key={t.id} className={`sb-row${place === 1 ? ' leader' : ''}`}>
+            <tr key={t.id} className={`sb-row${isIn ? ' is-in' : ' is-veiled'}${place === 1 ? ' leader' : ''}`}>
               {/* при равных очках место общее: 1, 2, 2, 4 */}
               <td>{medals[place - 1] ?? place}{row?.shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>{t.name}</td>
+              <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
+                <span className="sb-name">{t.name}</span></td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
                   сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
                   все баллы на колонку влево */}
@@ -2504,6 +2539,29 @@ function Finale({ pack, gameId, gameState }: {
     return () => clearTimeout(t)
   }, [bar, step, winnerStep])
 
+  // Полная таблица раскрывается от последнего места к первому, с
+  // ускорением — та же интрига, что у промежуточного табло, только резче
+  // (зал уже смотрит на финал, ждать нечего). deps НЕ включают rows
+  // целиком: массив пересоздаётся на каждый REST-поллинг, эффект
+  // перезапускался бы на каждый тик, а не только при реальной смене шага.
+  const [revealedFin, setRevealedFin] = useState(0)
+  useEffect(() => {
+    setRevealedFin(0)
+    if (rows.length === 0) return
+    let cancelled = false
+    let n = 0
+    let timer: ReturnType<typeof setTimeout>
+    const tick = () => {
+      if (cancelled) return
+      n += 1
+      setRevealedFin(n)
+      if (n >= rows.length) return
+      timer = setTimeout(tick, Math.max(320, 900 - 90 * n))
+    }
+    timer = setTimeout(tick, Math.max(320, 900 - 90 * n))
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [rows.length, step, bar])
+
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
   const fireworks = (
     <>
@@ -2537,16 +2595,22 @@ function Finale({ pack, gameId, gameState }: {
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
           <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
         <tbody>
-          {rows.map(({ team: t, place, shared }) => (
-            <tr key={t.id} className={place <= 3 ? 'top3' : ''}>
+          {/* Строки — ВСЕ и ВСЕГДА (та же причина, что у табло): подгон
+              кегля меряет постоянную разметку, не растущую по одной
+              строке. Раскрытие — от последнего места к первому. */}
+          {rows.map(({ team: t, place, shared }, idx) => {
+            const isIn = idx >= rows.length - revealedFin
+            return (
+            <tr key={t.id} className={`fin-row${place <= 3 ? ' top3' : ''}${
+              place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
               <td className="fin-pos">{place}{shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color }}>{t.name}</td>
+              <td style={{ color: t.color }}><span className="sb-name">{t.name}</span></td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}
               <td><b>{totals.get(t.id) ?? 0}</b></td>
             </tr>
-          ))}
+          )})}
         </tbody>
       </table>
       </div>

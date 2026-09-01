@@ -26,10 +26,17 @@
 .theme-potter .choices-grid, .theme-potter .choice-plate,
 .theme-potter .img-answers, .theme-potter .q-media-grid { position: relative; z-index: 6; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner { z-index: 30; }
+/* доска «Своей игры»: лёгкий 3D-наклон плиток при наведении (8.48).
+   Ни у неё, ни у .jp-tile нет fixed-потомков — модалка плитки уходит
+   порталом в document.body, перспектива на её позиционирование не влияет. */
+.theme-potter .jp-board { perspective: 900px; }
+.theme-potter .mel-board { perspective: 900px; }
+.theme-potter .sprint-card:hover { border-color: #d3a625;
+  box-shadow: 0 0 24px rgba(211,166,37,.55), inset 0 0 14px rgba(211,166,37,.15); }
 /* Номер вопроса и метка раунда подняты выше свечей. Тёмную подложку под
    них не ставим — она смотрелась заплаткой; вместо этого свечи опущены
    ниже строки (см. ThemeLayer: крайние свечи и так уже сдвинуты). */
@@ -221,4 +228,63 @@
   /* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
 .theme-potter .host-screen .answer-block.reveal-in .answer-label::after {
     animation: none; opacity: 1; }
+}
+
+/* ═══ 8.48: таблицы итогов — «проступают чернилами» ═══
+   Вес обязателен: файл 14 грузится РАНЬШЕ 25 (база) — целимся точно, с
+   .sb-screen/.fin-screen. Blur — ТОЛЬКО на имени команды (.sb-name), не
+   на всей строке: на 3840 при 16×10 строках blur на td целиком — лишний
+   GPU-paint. Цифры баллов проступают чистой opacity — её уже даёт базовый
+   sbRowIn из 25-results.css на самом <td>, трогать не нужно. */
+.theme-potter .sb-screen .sb-row.is-in .sb-name, .theme-potter .fin-screen .fin-row.is-in .sb-name {
+  display: inline-block;
+  animation: ptInk .75s cubic-bezier(.2,.75,.25,1) forwards;
+}
+/* чемпион финала: золотая вспышка + пыль под именем, как у верного ответа */
+.theme-potter .fin-screen .fin-row.fin-first.is-in .sb-name { position: relative; }
+.theme-potter .fin-screen .fin-row.fin-first.is-in .sb-name::after {
+  content: ''; position: absolute; inset: -30% -15%; pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255,214,120,.5), rgba(255,190,80,.12) 45%, transparent 72%);
+  animation: ptBurst 1.6s ease-out both; }
+.theme-potter .fin-screen .fin-row.fin-first.is-in .sb-name::before {
+  content: '· ✦ · ✧ · ✦ ·'; position: absolute; left: 50%; bottom: -1.3em;
+  transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  color: rgba(255,205,110,.8); letter-spacing: .4em; font-size: .5em;
+  animation: ptDust 1.8s ease-out both .2s; }
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .sb-screen .sb-row.is-in .sb-name, .theme-potter .fin-screen .fin-row.is-in .sb-name,
+  .theme-potter .fin-screen .fin-row.fin-first.is-in .sb-name::after,
+  .theme-potter .fin-screen .fin-row.fin-first.is-in .sb-name::before {
+    animation: none; opacity: 1; }
+}
+
+/* ═══ 8.48: вспышка перехода (ScreenFx) — «редукто» + «люмос» ═══
+   Живёт ВНЕ .grid-bg (см. разбор в 28-theme-cyber.css), pointer-events:none
+   на всём слое — клик ведущего по .fin-screen обязан доходить до контента.
+   Фаза 1 (0-320мс): искры-«мотыльки» разлетаются от центра, только
+   transform+opacity. Фаза 2 (240-700мс): бело-голубая вспышка «люмос». */
+.fx-potter { position: relative; }
+.fx-potter .fx-mote {
+  position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px;
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #ffe9a8, rgba(255,233,168,0) 70%);
+  opacity: 0; animation: fxMote .32s ease-out forwards; }
+@keyframes fxMote {
+  0% { opacity: 0; transform: rotate(var(--a)) translateX(0) scale(.4); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(1); } }
+.fx-potter::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(255,250,235,.55), rgba(211,166,37,.35) 40%, transparent 72%);
+  opacity: 0; transform: scale(.2);
+  animation: fxLumos .46s ease-out .24s forwards; }
+@keyframes fxLumos {
+  0% { opacity: 0; transform: scale(.2); }
+  35% { opacity: .45; }
+  100% { opacity: 0; transform: scale(1.6); } }
+@media (prefers-reduced-motion: reduce) {
+  .fx-flash, .fx-potter .fx-mote, .fx-potter::after { display: none; animation: none; }
 }

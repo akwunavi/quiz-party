@@ -238,3 +238,30 @@
   display: flex; align-items: flex-start; justify-content: center;
 }
 .fin-table-wrap > .fin-table { min-height: 0; }
+
+/* ═══ 8.48: построчное раскрытие таблиц итогов ═══
+   .sb-row/.fin-row рендерятся ВСЕГДА — конкретная строка входит в разметку
+   независимо от того, «раскрыта» она уже или нет. Иначе useFitText мерил бы
+   таблицу из нуля/части строк на первом кадре и подгонял кегль по неполной
+   высоте (баг 8.47 — см. HANDOFF). Видимость переключает `visibility`,
+   а не `display`/`visibility: collapse`: оба ломают раскладку таблицы и
+   сбивают уже посчитанный кегль.
+   Анимация появления — на `td`, НЕ на `tr`: `transform` на строке таблицы
+   исторически ненадёжен в части браузеров, а на `td` работает везде
+   одинаково. */
+.sb-row.is-veiled, .fin-row.is-veiled { visibility: hidden; }
+.sb-row.is-in, .fin-row.is-in { visibility: visible; }
+.sb-row.is-in > td, .fin-row.is-in > td {
+  animation: sbRowIn .5s ease both;
+}
+@keyframes sbRowIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Вес ОБЯЗАН совпадать с `.sb-row.is-in > td` (0,2,1) выше — иначе более
+     специфичное базовое правило побеждает и reduced-motion ничего не гасит
+     (проверено рендером: `.sb-row > td` без `.is-in` проигрывало). */
+  .sb-row, .fin-row, .sb-row.is-in > td, .fin-row.is-in > td {
+    animation: none; visibility: visible; }
+}

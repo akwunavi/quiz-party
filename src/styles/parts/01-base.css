@@ -198,6 +198,32 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
 .lobby-teams { flex-wrap: wrap; justify-content: center; max-width: 80vw; }
 .lobby-team { border-radius: 999px; animation: titleIn .4s both; }
 
+/* ── Переключатель вспышек перехода (ScreenFx, 8.48) ──
+   Локальная кнопка на самом экране проектора, видна только в classic/potter
+   (только там ScreenFx что-то рисует). Правый верхний угол — зеркально
+   .round-badge (левый верх). .host-topbar (right: 44px, 01-base.css выше)
+   и Timer внутри него занимают полосу ДО x = viewportWidth-44px — кнопка
+   обязана уместиться СТРОГО в оставшихся 44px (right + width < 44), иначе
+   на экране вопроса цепляет кольцо таймера. Замерено рендером на 1366/
+   1920/3840 в обеих темах (right:6 + width:34 = 40, запас 4px) — см. HANDOFF.
+   z-index выше .fx-flash (70).
+   position: fixed — с !important: `.theme-potter button` (16-round-melody-
+   tiles.css, вес 0,1,1) иначе перебивает его на `position: relative`,
+   ровно как когда-то у .host-actions (тот же файл, тот же приём). */
+.fx-toggle {
+  position: fixed !important; top: 8px !important; right: 6px !important;
+  left: auto !important; bottom: auto !important; z-index: 72;
+  width: 34px; height: 34px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--bg2) 82%, transparent);
+  color: var(--accent); font-size: 15px; line-height: 1; cursor: pointer;
+  pointer-events: auto; opacity: .55;
+  transition: opacity .15s, transform .15s, box-shadow .15s; }
+.fx-toggle:hover { opacity: 1; transform: scale(1.1);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+.fx-toggle[aria-pressed="false"] { opacity: .3; filter: grayscale(1); }
+
 /* ── Мини-подсказка при ошибочном действии (components/Hint.tsx) ──
    Живёт рядом с кнопкой, которую нажали, и гаснет сама. Цвета — только
    переменными: подсказка появляется во всех трёх темах и в обоих режимах. */
