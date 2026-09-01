@@ -215,3 +215,26 @@
   .fin-screen .fin-table.rows-14 { font-size: clamp(15px, 1.5vw, 52px); }
   .fin-screen .fin-table.rows-16 { font-size: clamp(13px, 1.25vw, 44px); }
 }
+
+/* ═══ 8.47: таблицы итогов не уезжают под кнопки на невысоких экранах ═══
+   Ступени .rows-N в правилах выше калиброваны по ШИРИНЕ (vw) — на 1366×768
+   и 1600×900 при восьми командах и восьми раундах нижняя строка всё равно
+   пряталась под кнопку «Дальше»: формула не знает про реальную высоту.
+
+   Лечение — тот же приём, что для текста вопроса (см. useFitText):
+   обёртка держит границы по высоте (flex: 1 1 0 + min-height: 0 +
+   overflow: hidden), таблица довписывается в неё замером. Ступени
+   .rows-N остаются первым, грубым подгоном — без них шрифт стартовал бы
+   со слишком крупного и подгон делал бы лишнюю работу. */
+.sb-table-wrap {
+  flex: 1 1 0; min-height: 0; width: 100%; overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.sb-table-wrap > .score-table { min-height: 0; }
+
+.fin-breakdown { display: flex; flex-direction: column; min-height: 0; }
+.fin-table-wrap {
+  flex: 1 1 0; min-height: 0; width: 100%; overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.fin-table-wrap > .fin-table { min-height: 0; }

@@ -2330,16 +2330,24 @@ function ScoreboardScreen({ pack, gameState }: {
   }, [ranked.length, gameState.round_number])
   const visible = ranked.slice(Math.max(0, ranked.length - revealed))
   const medals = ['🥇', '🥈', '🥉']
+  // Ступени tableSize() считают по ЧИСЛУ КОМАНД и калиброваны по ширине
+  // (vw). На невысоких экранах (1366×768, 1600×900) при восьми командах и
+  // восьми раундах нижняя строка всё равно уезжала под кнопку «Дальше»:
+  // формула не знает про реальную высоту экрана. Досчитывает useFitText —
+  // тот же приём, что и для текста вопроса: таблица лежит в подрезанной по
+  // высоте обёртке (.sb-table-wrap, flex: 1 1 0 + overflow: hidden) и
+  // довписывается в неё замером, а не только формулой.
+  const fitTable = useFitText<HTMLTableElement>([ranked.length, scored.length])
   return (
     <div className="host-screen grid-bg sb-screen">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
       {/* заголовок намеренно НЕ через Title: он был крупнее самой таблицы */}
       <h2 className="sb-title">ПРОМЕЖУТОЧНЫЕ РЕЗУЛЬТАТЫ</h2>
-      {/* Кегль крупный, но строки должны влезать в экран целиком, а не
-          заезжать под кнопки. Три ступени по числу команд: до шести —
-          крупно, до девяти — средне, дальше компактно. Пороги подобраны
-          замером на 1920×1080 с девятью раундами (самый широкий случай). */}
-      <table className={`score-table${tableSize(ranked.length)}`}>
+      {/* Кегль крупный, ступени по числу команд — это первый, грубый подгон
+          под ширину. Обёртка ниже держит границы по высоте, а useFitText
+          довписывает то, что ступени не учли. */}
+      <div className="sb-table-wrap">
+      <table ref={fitTable} className={`score-table${tableSize(ranked.length)}`}>
         <thead>
           <tr>
             <th></th><th>Команда</th>
@@ -2368,6 +2376,7 @@ function ScoreboardScreen({ pack, gameState }: {
           )})}
         </tbody>
       </table>
+      </div>
       <div className="host-actions">
         <AfterRoundNav pack={pack} gameState={gameState} />
       </div>
@@ -2469,6 +2478,10 @@ function Finale({ pack, gameId, gameState }: {
   const bar = !!gameState.reveal
   const step = gameState.question_index ?? 0
 
+  // та же обёртка + подгон, что у промежуточного табло: ступени tableSize()
+  // калиброваны по ширине и не знают про реальную высоту невысоких экранов
+  const fitFinTable = useFitText<HTMLTableElement>([rows.length])
+
   // раунды, идущие в зачёт, и победитель каждого из них
   const scored = pack.rounds.map((r, i) => ({ r, i })).filter(x => !x.r.off_scoreboard)
   const roundWinners = scored.map(({ r, i }) => {
@@ -2516,7 +2529,8 @@ function Finale({ pack, gameId, gameState }: {
   const fullTable = (
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
-      <table className={`fin-table${tableSize(rows.length)}`}>
+      <div className="fin-table-wrap">
+      <table ref={fitFinTable} className={`fin-table${tableSize(rows.length)}`}>
         {/* ДВЕ пустые колонки: место и название команды. Была одна —
             заголовки раундов съезжали влево на целый столбец. */}
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
@@ -2534,6 +2548,7 @@ function Finale({ pack, gameId, gameState }: {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 
