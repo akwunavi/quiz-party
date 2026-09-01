@@ -362,7 +362,6 @@ function HostInner({ gameState, pack }: {
 
     return (
       <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
-        paperMode ? ' paper-question' : ''}${
         imgs.length && !q.media.hidden ? ' has-media' : ''}${
         (choices && !lettered) || (q.answer.mode === 'match'
           && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
@@ -1618,7 +1617,7 @@ function AnswerTime({ pack, round, gameState }: {
   }, [round.id])
 
   return (
-    <div className="host-screen grid-bg">
+    <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`}>
       <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
       <div className="answer-pulse"><Title theme={pack.theme}
         lines={[paper ? 'СДАВАЙТЕ БЛАНКИ' : 'ОТВЕЧАЙТЕ!']} /></div>
@@ -1626,17 +1625,23 @@ function AnswerTime({ pack, round, gameState }: {
         ? 'ПЕРЕДАЙТЕ БЛАНКИ ВЕДУЩЕМУ'
         : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>
       <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
-      <div className="answer-time-teams">
-        {teams.map(t => {
-          const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
-          const done = got >= totalQ
-          return (
-            <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
-              <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
-            </div>
-          )
-        })}
-      </div>
+      {/* Список команд со счётчиком «сколько ответов долетело» нужен только
+          при игре с телефонов: он показывает, кого ещё ждать. На бумаге
+          ответы едут на бланках, счётчик всегда нулевой и смысла не несёт —
+          вместо него зал видит крупный таймер. */}
+      {!paper && (
+        <div className="answer-time-teams">
+          {teams.map(t => {
+            const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
+            const done = got >= totalQ
+            return (
+              <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
+                <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
+              </div>
+            )
+          })}
+        </div>
+      )}
       <div className="host-actions">
         <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1)}>← Назад</button>
         <button onClick={() => void gotoAnswers(0)}>К ответам →</button>
