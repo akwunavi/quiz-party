@@ -130,3 +130,42 @@
 @media (prefers-reduced-motion: reduce) {
   .counting-screen .counting-sub { animation: none; }
 }
+
+/* ═══ 8.44: таблицы итогов крупнее ═══
+   Табло и финал читают с дальних столов, а строк там немного: в живых играх
+   6 команд максимум, имена до 17 знаков (замер по базе 01.09.2026). Поэтому
+   кегль поднят примерно в полтора раза — места хватает с запасом.
+   Страховка на большой зал: с девяти команд таблица получает класс `many`
+   и возвращается к прежнему компактному размеру. */
+.sb-screen .score-table { font-size: clamp(26px, 3vw, 56px); }
+.sb-screen .score-table th { font-size: clamp(15px, 1.6vw, 28px); }
+.sb-screen .score-table td,
+.sb-screen .score-table th { padding: clamp(8px, 1.3vh, 18px) clamp(12px, 1.4vw, 26px); }
+.sb-title { font-size: clamp(24px, 2.8vw, 48px); }
+
+/* 7–9 команд — средняя ступень */
+.sb-screen .score-table.many { font-size: clamp(20px, 2.1vw, 38px); }
+.sb-screen .score-table.many th { font-size: clamp(13px, 1.3vw, 22px); }
+.sb-screen .score-table.many td,
+.sb-screen .score-table.many th { padding: clamp(6px, 1vh, 13px) clamp(9px, 1.1vw, 20px); }
+/* 10 и больше — компактно, как было */
+.sb-screen .score-table.lots { font-size: clamp(17px, 1.8vw, 30px); }
+.sb-screen .score-table.lots th { font-size: clamp(12px, 1.15vw, 20px); }
+.sb-screen .score-table.lots td,
+.sb-screen .score-table.lots th { padding: clamp(5px, .8vh, 11px) clamp(8px, 1vw, 16px); }
+
+/* Финальная разбивка по раундам — тот же принцип.
+   Селектор с `.fin-screen` намеренно: в 23-answers.css лежит
+   `.fin-screen .fin-table { font-size: clamp(16px, 1.7vw, 30px) }` весом
+   0,2,0, и голый `.fin-table` (0,1,0) ему проигрывает, сколько его ни правь.
+   Та же ловушка, что была с текстом вопроса в сплите. */
+.fin-screen .fin-table { font-size: clamp(24px, 2.7vw, 48px); }
+.fin-screen .fin-table th { font-size: clamp(14px, 1.4vw, 24px); }
+.fin-screen .fin-table td,
+.fin-screen .fin-table th { padding: clamp(7px, 1.1vh, 15px) clamp(10px, 1.2vw, 22px); }
+.fin-screen .fin-table.many { font-size: clamp(19px, 2vw, 34px); }
+.fin-screen .fin-table.many td,
+.fin-screen .fin-table.many th { padding: clamp(5px, .9vh, 12px) clamp(8px, 1vw, 17px); }
+.fin-screen .fin-table.lots { font-size: clamp(16px, 1.7vw, 28px); }
+.fin-screen .fin-table.lots td,
+.fin-screen .fin-table.lots th { padding: clamp(4px, .7vh, 10px) clamp(7px, .9vw, 14px); }

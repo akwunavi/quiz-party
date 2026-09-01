@@ -897,6 +897,15 @@ function RevealVideo({ src }: { src: string }) {
   )
 }
 
+/** Ступень кегля таблицы итогов по числу команд.
+ *  Шесть команд — обычный зал (замер по базе), там таблица крупная; дальше
+ *  строки начинают не влезать, и кегль уступает место читаемости целиком. */
+function tableSize(teams: number): string {
+  if (teams > 9) return ' lots'
+  if (teams > 6) return ' many'
+  return ''
+}
+
 /** Звук, приложенный к ОТВЕТУ, — играет на экране разбора целиком.
  *
  *  Его никто не запускал: медиа ответа фильтровалось на картинки, а mp3 из
@@ -2318,7 +2327,11 @@ function ScoreboardScreen({ pack, gameState }: {
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
       {/* заголовок намеренно НЕ через Title: он был крупнее самой таблицы */}
       <h2 className="sb-title">ПРОМЕЖУТОЧНЫЕ РЕЗУЛЬТАТЫ</h2>
-      <table className="score-table">
+      {/* Кегль крупный, но строки должны влезать в экран целиком, а не
+          заезжать под кнопки. Три ступени по числу команд: до шести —
+          крупно, до девяти — средне, дальше компактно. Пороги подобраны
+          замером на 1920×1080 с девятью раундами (самый широкий случай). */}
+      <table className={`score-table${tableSize(ranked.length)}`}>
         <thead>
           <tr>
             <th></th><th>Команда</th>
@@ -2495,7 +2508,7 @@ function Finale({ pack, gameId, gameState }: {
   const fullTable = (
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
-      <table className="fin-table">
+      <table className={`fin-table${tableSize(rows.length)}`}>
         {/* ДВЕ пустые колонки: место и название команды. Была одна —
             заголовки раундов съезжали влево на целый столбец. */}
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&

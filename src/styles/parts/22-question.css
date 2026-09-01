@@ -415,3 +415,50 @@
   border-width: 5px;
 }
 .host-screen.paper-answer-time .timer-num { font-size: clamp(84px, 12vw, 200px); }
+
+/* ═══ 8.44: РЕБУС — ДВЕ ОДИНАКОВЫЕ КАРТОЧКИ ═══
+
+   Что было не так. Ячейки под картинки были равные, но рамку рисует сам
+   <img>, а он вписывается по СВОЕЙ пропорции: горизонтальный снимок давал
+   низкую широкую рамку, вертикальный — узкую высокую. Две половины одного
+   слова выглядели как случайная пара разных картинок — «вкривь и вкось».
+
+   Как стало. Рамка переехала на ячейку: обе карточки одной формы и одного
+   размера, снимок вписан внутрь и отцентрован. Форма 4:3 — среднее между
+   типичным горизонтальным и вертикальным кадром, так меньше пустых полей.
+
+   И крупнее. У ребуса НЕТ текста вопроса — весь экран его. Прежний потолок
+   46vh был расчётом на пустую рамку вопроса сверху, которой давно нет:
+   поднят до 70vh, то есть примерно в полтора раза. */
+.host-screen .q-media-grid.rebus .q-img {
+  /* Карточки — это сами ячейки сетки: в одной строке они равны по высоте
+     автоматически, а колонки 1fr дают равную ширину. Никаких aspect-ratio:
+     он бы ограничил высоту пропорцией и отдал экран впустую. */
+  width: 100%; height: 100%;
+  padding: clamp(6px, 1vh, 14px);
+  border: 2px solid var(--dim); border-radius: 12px;
+  background: color-mix(in srgb, var(--fg) 3%, transparent);
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+/* рамку теперь рисует ячейка — у самой картинки её быть не должно,
+   иначе получается рамка в рамке */
+.host-screen .q-media-grid.rebus .q-img img {
+  border: none; border-radius: 6px; box-shadow: none;
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
+  object-fit: contain;
+}
+/* потолок высоты: пересиливает и общее «вписаться в контейнер», и старые
+   46vh из 01-base.css — оба менее специфичны */
+.host-screen.has-media > .q-media-grid.rebus .q-img img,
+.host-screen.no-qtext.has-media > .q-media-grid.rebus .q-img img {
+  max-height: 100%; }
+/* Сетке — вся свободная высота экрана: у ребуса нет ни текста вопроса, ни
+   вариантов, забирать её больше нечему. Отсюда и «крупнее раза в полтора». */
+.host-screen.has-media > .q-media-grid.rebus {
+  flex: 1 1 0; min-height: 0; max-height: none;
+  width: min(1800px, 96%); max-width: none;
+  align-content: stretch;
+}
+/* кольцо таймера сверху — тот же отступ, что у сплита */
+.theme-classic .host-screen > .q-media-grid.rebus,
+.cyber .host-screen > .q-media-grid.rebus { margin-top: 26px; }
