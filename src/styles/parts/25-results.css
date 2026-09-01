@@ -131,41 +131,87 @@
   .counting-screen .counting-sub { animation: none; }
 }
 
-/* ═══ 8.44: таблицы итогов крупнее ═══
-   Табло и финал читают с дальних столов, а строк там немного: в живых играх
-   6 команд максимум, имена до 17 знаков (замер по базе 01.09.2026). Поэтому
-   кегль поднят примерно в полтора раза — места хватает с запасом.
-   Страховка на большой зал: с девяти команд таблица получает класс `many`
-   и возвращается к прежнему компактному размеру. */
+/* ═══ 8.45: таблицы итогов — крупно и с запасом на большой зал ═══
+   Табло и финальную таблицу читают с дальних столов бара, поэтому кегль
+   поднят почти вдвое против прежнего (было 30px). Ступени подобраны ЗАМЕРОМ
+   на 1920×1080 и 3840×2160 с самой широкой таблицей (8 раундов): на каждой
+   ступени строки целиком помещаются в экран и не заезжают под кнопки.
+
+     до 6 команд — 56px (обычный зал)
+     7–9         — 48px
+     10–11       — 40px
+     12–13       — 34px
+     14–15       — 28px
+     16 и больше — 23px (турнир; в баре такого не бывает, но не ломается)
+
+   Потолки clamp подняты отдельным медиазапросом для панелей шире 2200px:
+   без него на экране 3840 таблица оставалась ровно такой же, как на
+   ноутбуке, то есть вдвое мельче относительно экрана. */
 .sb-screen .score-table { font-size: clamp(26px, 3vw, 56px); }
 .sb-screen .score-table th { font-size: clamp(15px, 1.6vw, 28px); }
 .sb-screen .score-table td,
 .sb-screen .score-table th { padding: clamp(8px, 1.3vh, 18px) clamp(12px, 1.4vw, 26px); }
 .sb-title { font-size: clamp(24px, 2.8vw, 48px); }
 
-/* 7–9 команд — средняя ступень */
-.sb-screen .score-table.many { font-size: clamp(20px, 2.1vw, 38px); }
-.sb-screen .score-table.many th { font-size: clamp(13px, 1.3vw, 22px); }
-.sb-screen .score-table.many td,
-.sb-screen .score-table.many th { padding: clamp(6px, 1vh, 13px) clamp(9px, 1.1vw, 20px); }
-/* 10 и больше — компактно, как было */
-.sb-screen .score-table.lots { font-size: clamp(17px, 1.8vw, 30px); }
-.sb-screen .score-table.lots th { font-size: clamp(12px, 1.15vw, 20px); }
-.sb-screen .score-table.lots td,
-.sb-screen .score-table.lots th { padding: clamp(5px, .8vh, 11px) clamp(8px, 1vw, 16px); }
+.sb-screen .score-table.rows-7 { font-size: clamp(24px, 2.6vw, 48px); }
+.sb-screen .score-table.rows-7 td,
+.sb-screen .score-table.rows-7 th { padding: clamp(7px, 1.1vh, 15px) clamp(10px, 1.2vw, 22px); }
+
+.sb-screen .score-table.rows-10 { font-size: clamp(20px, 2.2vw, 40px); }
+.sb-screen .score-table.rows-10 td,
+.sb-screen .score-table.rows-10 th { padding: clamp(5px, .9vh, 12px) clamp(8px, 1vw, 18px); }
+
+.sb-screen .score-table.rows-12 { font-size: clamp(18px, 1.9vw, 34px); }
+.sb-screen .score-table.rows-12 td,
+.sb-screen .score-table.rows-12 th { padding: clamp(4px, .7vh, 10px) clamp(7px, .9vw, 15px); }
+
+.sb-screen .score-table.rows-14 { font-size: clamp(15px, 1.5vw, 28px); }
+.sb-screen .score-table.rows-16 { font-size: clamp(13px, 1.25vw, 23px); }
+.sb-screen .score-table.rows-16 td,
+.sb-screen .score-table.rows-16 th { padding: clamp(3px, .45vh, 7px) clamp(6px, .8vw, 12px); }
+.sb-screen .score-table.rows-14 td,
+.sb-screen .score-table.rows-14 th { padding: clamp(4px, .6vh, 9px) clamp(7px, .9vw, 14px); }
 
 /* Финальная разбивка по раундам — тот же принцип.
    Селектор с `.fin-screen` намеренно: в 23-answers.css лежит
    `.fin-screen .fin-table { font-size: clamp(16px, 1.7vw, 30px) }` весом
-   0,2,0, и голый `.fin-table` (0,1,0) ему проигрывает, сколько его ни правь.
-   Та же ловушка, что была с текстом вопроса в сплите. */
+   0,2,0, и голый `.fin-table` (0,1,0) ему проигрывает, сколько его ни правь. */
 .fin-screen .fin-table { font-size: clamp(24px, 2.7vw, 48px); }
 .fin-screen .fin-table th { font-size: clamp(14px, 1.4vw, 24px); }
 .fin-screen .fin-table td,
 .fin-screen .fin-table th { padding: clamp(7px, 1.1vh, 15px) clamp(10px, 1.2vw, 22px); }
-.fin-screen .fin-table.many { font-size: clamp(19px, 2vw, 34px); }
-.fin-screen .fin-table.many td,
-.fin-screen .fin-table.many th { padding: clamp(5px, .9vh, 12px) clamp(8px, 1vw, 17px); }
-.fin-screen .fin-table.lots { font-size: clamp(16px, 1.7vw, 28px); }
-.fin-screen .fin-table.lots td,
-.fin-screen .fin-table.lots th { padding: clamp(4px, .7vh, 10px) clamp(7px, .9vw, 14px); }
+.fin-screen .fin-table.rows-7 { font-size: clamp(21px, 2.3vw, 42px); }
+.fin-screen .fin-table.rows-7 td,
+.fin-screen .fin-table.rows-7 th { padding: clamp(6px, .9vh, 13px) clamp(9px, 1.1vw, 19px); }
+.fin-screen .fin-table.rows-10 { font-size: clamp(18px, 2vw, 36px); }
+.fin-screen .fin-table.rows-10 td,
+.fin-screen .fin-table.rows-10 th { padding: clamp(5px, .8vh, 11px) clamp(8px, 1vw, 16px); }
+.fin-screen .fin-table.rows-12 { font-size: clamp(17px, 1.8vw, 32px); }
+.fin-screen .fin-table.rows-12 td,
+.fin-screen .fin-table.rows-12 th { padding: clamp(4px, .7vh, 10px) clamp(7px, .9vw, 14px); }
+.fin-screen .fin-table.rows-14 { font-size: clamp(15px, 1.5vw, 26px); }
+.fin-screen .fin-table.rows-16 { font-size: clamp(13px, 1.25vw, 22px); }
+.fin-screen .fin-table.rows-16 td,
+.fin-screen .fin-table.rows-16 th { padding: clamp(3px, .45vh, 7px) clamp(6px, .8vw, 11px); }
+.fin-screen .fin-table.rows-14 td,
+.fin-screen .fin-table.rows-14 th { padding: clamp(4px, .6vh, 9px) clamp(7px, .9vw, 13px); }
+
+/* Панели шире 2200px: потолки вдвое, иначе на большом экране всё мельчает
+   относительно него самого. Значения по vw при этом те же. */
+@media (min-width: 2200px) {
+  .sb-screen .score-table { font-size: clamp(26px, 3vw, 112px); }
+  .sb-screen .score-table th { font-size: clamp(15px, 1.6vw, 56px); }
+  .sb-screen .score-table.rows-7 { font-size: clamp(24px, 2.6vw, 96px); }
+  .sb-screen .score-table.rows-10 { font-size: clamp(20px, 2.2vw, 80px); }
+  .sb-screen .score-table.rows-12 { font-size: clamp(18px, 1.9vw, 68px); }
+  .sb-screen .score-table.rows-14 { font-size: clamp(15px, 1.5vw, 56px); }
+  .sb-screen .score-table.rows-16 { font-size: clamp(13px, 1.25vw, 46px); }
+  .sb-title { font-size: clamp(24px, 2.8vw, 96px); }
+  .fin-screen .fin-table { font-size: clamp(24px, 2.7vw, 96px); }
+  .fin-screen .fin-table th { font-size: clamp(14px, 1.4vw, 48px); }
+  .fin-screen .fin-table.rows-7 { font-size: clamp(21px, 2.3vw, 84px); }
+  .fin-screen .fin-table.rows-10 { font-size: clamp(18px, 2vw, 72px); }
+  .fin-screen .fin-table.rows-12 { font-size: clamp(17px, 1.8vw, 64px); }
+  .fin-screen .fin-table.rows-14 { font-size: clamp(15px, 1.5vw, 52px); }
+  .fin-screen .fin-table.rows-16 { font-size: clamp(13px, 1.25vw, 44px); }
+}
