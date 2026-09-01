@@ -29,6 +29,7 @@ import { computeTotals, computeRoundScores } from '../lib/totals'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
+import { useFitText } from '../hooks/useFitText'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
@@ -615,8 +616,12 @@ export function choicesLenClass(texts: (string | undefined)[]): string {
 function WindText({ text }: { text: string }) {
   const words = text.split(/(\s+)/)
   let idx = 0
+  // Кегль из CSS — это подгон под ширину ЭКРАНА. Дальше текст вписывается в
+  // реально доступное место: вопрос на 440 знаков иначе наезжает на шапку,
+  // на варианты или на кнопки ведущего — на каждом экране по-своему.
+  const fit = useFitText<HTMLParagraphElement>([text])
   return (
-    <p className={`q-text${lenClass(text)}`}>
+    <p ref={fit} className={`q-text${lenClass(text)}`}>
       {words.map((w, i) => {
         if (/^\s+$/.test(w)) return w
         const delay = 0.12 * idx++

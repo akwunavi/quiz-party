@@ -1,6 +1,7 @@
 // ═══ Полноэкранный предпросмотр вопроса: ровно как увидят на проекторе ═══
 import { ThemeLayer } from '../../components/ThemeLayer'
 import { mediaUrl, lenClass } from '../../lib/media'
+import { useFitText } from '../../hooks/useFitText'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
 
@@ -13,6 +14,10 @@ export function QuestionPreview({ pack, round, q, onClose }: {
   const choices = q.answer.mode === 'choice' || q.answer.mode === 'order' ? q.answer.choices : null
   const isNY = pack.theme === 'new_year'
   const frameCls = isNY && round.mechanic !== 'rebus' ? 'q-frame' : ''
+  // тот же автоподгон кегля, что на проекторе: предпросмотр должен показывать
+  // ровно то, что увидит зал, включая уменьшённый под длинный вопрос шрифт
+  const fitSplit = useFitText<HTMLParagraphElement>([q.question_text])
+  const fitPlain = useFitText<HTMLParagraphElement>([q.question_text])
 
   // «120 секунд»: предпросмотр показывает ВЕСЬ слайд, как на проекторе
   if (round.mechanic === 'sprint') {
@@ -65,21 +70,24 @@ export function QuestionPreview({ pack, round, q, onClose }: {
             <span className="timer-num timer-ico">{round.timer_seconds}</span>
           </div>
           {split ? (
-            <div className={frameCls}>
-              <div className="q-split">
-                <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
-                <div className="q-media-grid n1">
-                  {imgs.map((m, i) => (
-                    <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
-                      {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
-                  ))}
-                </div>
+            /* Структура ровно как на проекторе (8.40): картинка РЯДОМ с рамкой
+               вопроса, а не внутри неё. Пока предпросмотр жил по старой
+               схеме, редактор показывал не то, что увидит зал. */
+            <div className="q-split">
+              <div className={frameCls}>
+                <p ref={fitSplit} className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+              </div>
+              <div className="q-media-grid n1">
+                {imgs.map((m, i) => (
+                  <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
+                    {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
+                ))}
               </div>
             </div>
           ) : (
             <>
               <div className={frameCls}>
-                <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
+                <p ref={fitPlain} className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
               </div>
               {!q.media.hidden && imgs.length > 0 && (
                 <div className={`q-media-grid n${Math.min(imgs.length, 4)}${round.mechanic === 'rebus' ? ' rebus' : ''}${choices ? ' with-choices' : ''}`}>

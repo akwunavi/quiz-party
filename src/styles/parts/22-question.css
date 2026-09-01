@@ -508,3 +508,40 @@
   .answers-main > .q-recall { font-size: clamp(18px, 2vw, 68px); }
   .timer-num { font-size: clamp(44px, 5.4vw, 168px); }
 }
+
+/* ═══ 8.46: РАМКА ВОПРОСА ДЕРЖИТ ГРАНИЦЫ, ТЕКСТ ВПИСЫВАЕТСЯ ═══
+
+   Наезды текста на шапку, варианты и кнопки ведущего происходили из-за
+   того, что рамка росла по содержимому: сколько текста — такая и высота,
+   и никакой преграды. Кегль при этом подбирался по ШИРИНЕ ЭКРАНА
+   (`clamp(..., Nvw, ...)`), то есть про длину конкретного вопроса ничего
+   не знал.
+
+   Теперь рамка занимает РОВНО свободное место между шапкой и тем, что снизу
+   (варианты или кнопки), и наружу не выходит: `flex: 1 1 0` + `min-height: 0`
+   + `overflow: hidden`. А текст внутри вписывается в неё автоподгоном кегля
+   (`useFitText`, src/hooks/useFitText.ts) — он меряет реальную высоту и
+   уменьшает шрифт, пока содержимое не влезет.
+
+   Пара «ограниченная рамка + автоподгон» и даёт обещание, которое одним CSS
+   не выполняется: НИ НА ОДНОМ экране и НИ ПРИ КАКОЙ длине вопроса ничего
+   ни на что не налезает. */
+.host-screen > .cyber-frame,
+.host-screen > .q-frame,
+.host-screen > .pt-frame {
+  flex: 1 1 0; min-height: 0; overflow: hidden;
+  display: grid; place-items: center;
+}
+/* та же опора внутри сплита: колонка текста ограничена высотой ряда */
+.host-screen .q-split > .cyber-frame,
+.host-screen .q-split > .q-frame,
+.host-screen .q-split > .pt-frame,
+.host-screen .q-split > div:first-child {
+  height: 100%; min-height: 0; overflow: hidden;
+  display: grid; place-items: center;
+}
+/* текст внутри рамки не должен сам себе задавать поля: место считает рамка */
+.host-screen > .cyber-frame > .q-text,
+.host-screen > .q-frame > .q-text,
+.host-screen > .pt-frame > .q-text,
+.host-screen .q-split > div:first-child > .q-text { margin-block: 0; max-width: 100%; }
