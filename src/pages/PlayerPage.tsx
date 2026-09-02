@@ -17,6 +17,7 @@ import { spendsEdit } from '../lib/edits'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
+import { Hint, useHint } from '../components/Hint'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -915,6 +916,13 @@ function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: strin
   const [icon, setIcon] = useState('')
   const [busy, setBusy] = useState(false)
   const [sheet, setSheet] = useState<'color' | 'icon' | null>(null)
+  // 8.58: тут был try/finally без catch — при ошибке записи (например, база
+  // ещё не знает колонку icon: миграция 0008 не прогнана) кнопка молча
+  // отпускала busy и ничего не происходило. Игрок видел ровно то же самое,
+  // что при полном молчании сети: «нажал — ничего». Теперь ошибка говорит,
+  // в чём дело, тем же языком подсказок, что у остальной админки/редактора
+  // (components/Hint.tsx) — вместо тишины.
+  const hint = useHint(10000)
   return (
     <div className="pl-register">
       <h1>Регистрация команды</h1>
@@ -931,9 +939,16 @@ function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: strin
       </div>
       <button disabled={!name.trim() || busy} onClick={async () => {
         setBusy(true)
-        try { onDone(await registerTeam(name.trim(), color, gameId, icon || null) as Team) }
-        finally { setBusy(false) }
+        try {
+          const t = await registerTeam(name.trim(), color, gameId, icon || null)
+          hint.clear()
+          onDone(t as Team)
+        } catch (err) {
+          hint.show(`Не получилось зарегистрироваться: ${
+            err instanceof Error ? err.message : String(err)}. Проверь связь и нажми ещё раз.`)
+        } finally { setBusy(false) }
       }}>Играть!</button>
+      <Hint text={hint.text} />
 
       {sheet === 'color' && (
         <BottomSheet title="Выберите цвет" onClose={() => setSheet(null)}>
