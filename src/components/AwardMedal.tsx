@@ -15,6 +15,7 @@ const EMOJI = ['🥇', '🥈', '🥉'] as const
 export function AwardMedal({ theme, place }: { theme: ThemeKey; place: number }) {
   if (theme === 'classic') return <CyberMedal place={place} />
   if (theme === 'potter') return <MerlinMedal place={place} />
+  if (theme === 'new_year') return <BaubleMedal place={place} />
   return <span className="award-emoji">{EMOJI[place - 1] ?? EMOJI[2]}</span>
 }
 
@@ -27,6 +28,19 @@ function CyberMedal({ place }: { place: number }) {
     <div className={`award-hex p${place}`} aria-hidden="true">
       <span className="ah-orbit" />
       <span className="ah-face"><b>{place}</b></span>
+    </div>
+  )
+}
+
+/** НГ: ёлочная игрушка-шар с петлёй сверху, цвет по месту (золото/лёд/
+ *  красный — как в наборе настоящих ёлочных шаров, а не медальный
+ *  металл — 8.59, раньше тут был голый эмодзи, добавлено вместе со
+ *  сверкой промежуточных результатов). */
+function BaubleMedal({ place }: { place: number }) {
+  return (
+    <div className={`award-bauble p${place}`} aria-hidden="true">
+      <span className="ab-cap" />
+      <span className="ab-ball"><span className="ab-shine" /><b>{place}</b></span>
     </div>
   )
 }

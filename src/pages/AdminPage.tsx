@@ -78,6 +78,10 @@ export function AdminPage() {
 
       {!gameState.pack_id && <PackPicker />}
 
+      {/* Сверка баллов и ручная коррекция — доступны в любой момент игры,
+          не только в финале (8.59). */}
+      {pack && teams.length > 0 && <ResultsPanel pack={pack} gameId={gameState.game_id} teams={teams} />}
+
       {gameState.pack_id && phase === 'lobby' && pack && (
         <div className="adm-pad">
           <TeamRandomizer />
@@ -434,7 +438,8 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
             borderLeft: `4px solid ${a.is_correct === true ? '#22c55e' : a.is_correct === false ? '#ef4444' : (team?.color ?? '#333')}`,
           }}>
             <div className="adm-answer-top">
-              <span style={{ color: team?.color, fontWeight: 700 }}>{team?.name ?? '—'}</span>
+              <span style={{ color: team?.color, fontWeight: 700 }}>
+                {team?.icon && <span className="pl-team-icon">{team.icon}</span>}{team?.name ?? '—'}</span>
               <span className="adm-answer-text">{a.answer_text || '—'}
                 {a.stake != null && <span className="acc"> · ст.{a.stake}</span>}</span>
             </div>
@@ -711,6 +716,57 @@ function CountingPanel({ pack, gameState, teams }: {
   )
 }
 
+/** Таблица результатов + ручная коррекция баллов (8.59) — раньше жили
+ *  только внутри FinalePanel (видны лишь на фазе «финал»), а ведущему
+ *  нужна сверка в ЛЮБОЙ момент игры, не только в конце. Вынесено сюда и
+ *  рендерится в AdminPage() безусловно (пока выбран пакет и есть команды),
+ *  а не по фазе. Сама себе тянет ответы за ВСЮ игру (useAnswers(gameId)
+ *  без round_number) — top-level `answers` в AdminPage() нарочно обрезан
+ *  текущим раундом (для панели проверки ответов ЭТОГО раунда), для
+ *  подсчёта итогов такой обрезанный список даст неверную сумму. */
+function ResultsPanel({ pack, gameId, teams }: {
+  pack: LoadedPack; gameId: string; teams: Team[]
+}) {
+  const answers = useAnswers(gameId)
+  const totals = computeTotals(pack, teams, answers)
+  const perRound = computeRoundScores(pack, teams, answers)
+  const scored = pack.rounds.filter(r => !r.off_scoreboard)
+  const rows = rankTeams(teams, totals, answers, perRound)
+  return (
+    <div className="adm-pad">
+      <details className="adm-why">
+        <summary>Таблица результатов (сверка)</summary>
+        <div className="adm-score-wrap">
+          <table className="adm-score-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Команда</th>
+                {scored.map((r, i) => <th key={r.id}>Р{i + 1}</th>)}
+                <th>Σ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(row => {
+                const t = row.team
+                const all = perRound.get(t.id) ?? []
+                return (
+                  <tr key={t.id}>
+                    <td>{row.place}{row.shared && '='}</td>
+                    <td style={{ color: t.color }}>{t.name}</td>
+                    {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
+                    <td className="total">{totals.get(t.id) ?? 0}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />
+    </div>
+  )
+}
+
 // ── Финал ──
 function FinalePanel({ pack, gameId, teams, gameState }: {
   pack: LoadedPack | null; gameId: string; teams: Team[]
@@ -756,50 +812,6 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
           </button>
         </div>
       </div>
-
-      {/* Таблица результатов для сверки — то же самое, что видят игроки на
-          табло/финале (computeTotals/computeRoundScores/rankTeams — общие
-          функции с проектором, HostScreen.tsx:ScoreboardScreen, никогда не
-          разойдутся), но у ведущего под рукой на телефоне, без раскрытия
-          интригой построчно и без огромного кегля под зал. */}
-      {pack && (() => {
-        const totals = computeTotals(pack, teams, answers)
-        const perRound = computeRoundScores(pack, teams, answers)
-        const scored = pack.rounds.filter(r => !r.off_scoreboard)
-        const rows = rankTeams(teams, totals, answers, perRound)
-        return (
-          <details className="adm-why">
-            <summary>Таблица результатов (сверка)</summary>
-            <div className="adm-score-wrap">
-              <table className="adm-score-table">
-                <thead>
-                  <tr>
-                    <th>#</th><th>Команда</th>
-                    {scored.map((r, i) => <th key={r.id}>Р{i + 1}</th>)}
-                    <th>Σ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map(row => {
-                    const t = row.team
-                    const all = perRound.get(t.id) ?? []
-                    return (
-                      <tr key={t.id}>
-                        <td>{row.place}{row.shared && '='}</td>
-                        <td style={{ color: t.color }}>{t.name}</td>
-                        {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
-                        <td className="total">{totals.get(t.id) ?? 0}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </details>
-        )
-      })()}
-
-      {pack && <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />}
 
       {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
           перед игрой. Здесь был её дубль с тем же действием: две кнопки

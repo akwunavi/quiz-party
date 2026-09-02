@@ -85,7 +85,12 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); box-shad
   align-items: center; justify-content: center; text-align: center; gap: 16px;
   padding: 28px 44px; position: relative; }
 .host-actions { position: fixed; right: 28px; bottom: 24px; display: flex; gap: 12px; }
-.pack-badge { position: fixed; right: 28px; bottom: 78px; font-family: var(--font-mono);
+/* 8.59: справа снизу, над .host-actions, надпись перекрывалась кнопками —
+   у некоторых экранов ряд кнопок навигации выше 54px (несколько кнопок в
+   .host-actions). Левый нижний угол свободнее: там либо ничего, либо QR
+   лобби/примечание слайда-брифинга — оба заметно компактнее и ниже, так
+   что запас в 200px их не задевает ни на одном экране. */
+.pack-badge { position: fixed; left: 28px; bottom: 200px; font-family: var(--font-mono);
   font-size: 11px; letter-spacing: .2em; opacity: .35; text-transform: uppercase; }
 .host-topbar { position: fixed; top: 20px; left: 44px; right: 44px; display: flex;
   justify-content: space-between; align-items: baseline; }

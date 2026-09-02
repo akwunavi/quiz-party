@@ -12,7 +12,7 @@ import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
-import type { AnswerSpec, Team, CrosswordGrid, Question, Answer, JeopardyTheme } from '../types/quiz'
+import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme } from '../types/quiz'
 import { spendsEdit } from '../lib/edits'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
@@ -121,7 +121,7 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'finale') return <Waiting team={team} message="ИГРА ЗАВЕРШЕНА" sub="Спасибо за игру! Смотри на проектор 🎉" />
   if (phase === 'show_answers' && round)
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
-      label={displayRoundNumber(pack, gameState.round_number)} />
+      label={displayRoundNumber(pack, gameState.round_number)} gameState={gameState} />
   if (phase === 'question' && round?.mechanic === 'race')
     return <RacePlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -643,8 +643,9 @@ function MatchPicker({ spec, value, locked, onChange }: {
 }
 
 /** Разбор своих ответов на фазе показа ответов (перенос PlayerReview). */
-function PlayerReview({ team, round, roundNumber, label }: {
+function PlayerReview({ team, round, roundNumber, label, gameState }: {
   team: Team; round: LoadedRound; roundNumber: number; label: string
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const [marks, setMarks] = useState<Answer[]>([])
   useEffect(() => {
@@ -659,24 +660,42 @@ function PlayerReview({ team, round, roundNumber, label }: {
     return () => { stop = true; clearInterval(t) }
   }, [roundNumber, team.id])
 
+  // 8.59: is_correct пишется в базу, как только ведущий оценит ответ — это
+  // может случиться и раньше, чем проектор реально дошёл (и показал залу)
+  // именно этот вопрос: экран разбора идёт по вопросам ПО ОДНОМУ
+  // (HostScreen.tsx:ShowAnswers, gameState.question_index + reveal), и на
+  // самом проекторе есть отдельная задержка записи is_correct именно ради
+  // синхронности с зала — но телефон эту задержку не видит, он просто
+  // читает уже готовое значение из базы. Раньше отметка на телефоне
+  // загоралась раньше, чем ответ появлялся на экране. Индекс — СЫРОЙ (по
+  // round.questions, как у проектора), не по отфильтрованному списку:
+  // скрытые вопросы тоже занимают свой шаг в question_index.
+  const step = gameState.question_index
+  const revealed = gameState.reveal
+  const visible = round.questions
+    .map((q, rawIndex) => ({ q, rawIndex }))
+    .filter(x => !x.q.hidden)
+
   return (
     <div className="pl-root">
       <PlayerHeader team={team} round={label} />
       <div className="pl-notice acc">СЕЙЧАС УЗНАЕМ ПРАВИЛЬНЫЕ ОТВЕТЫ!</div>
       <div className="pl-list">
-        {round.questions.filter(q => !q.hidden).map((q: Question, i) => {
+        {visible.map(({ q, rawIndex }, i) => {
           const a = marks.find(x => x.question_ref === `q-${q.id}`)
+          const shown = rawIndex < step || (rawIndex === step && revealed)
+          const correct = shown ? a?.is_correct : null
           return (
             <div key={q.id} className="pl-card" style={{
-              borderLeftColor: a?.is_correct === true ? 'var(--ok)'
-                : a?.is_correct === false ? 'var(--danger)' : 'var(--dim)',
+              borderLeftColor: correct === true ? 'var(--ok)'
+                : correct === false ? 'var(--danger)' : 'var(--dim)',
             }}>
               <div className="pl-review-row">
                 <span className="num">{i + 1}</span>
                 <span className="txt">{a?.answer_text || '—'}</span>
-                {a?.is_correct != null &&
-                  <span className="mark" style={{ color: a.is_correct ? 'var(--ok)' : 'var(--danger)' }}>
-                    {a.is_correct ? '✓' : '✗'}</span>}
+                {correct != null &&
+                  <span className="mark" style={{ color: correct ? 'var(--ok)' : 'var(--danger)' }}>
+                    {correct ? '✓' : '✗'}</span>}
               </div>
             </div>
           )
@@ -842,11 +861,19 @@ function QuestionRating({ team, gameState, questionId }: {
   questionId: string
 }) {
   const [mark, setMark] = useState<number | null>(null)
+  // 8.59: шкала из 10 кнопок раньше висела на экране всегда, отвлекая от
+  // самого вопроса — теперь свёрнута под шеврон (не дропдаун: это не выбор
+  // ОДНОГО значения из закрытого списка, как цвет/значок команды, а
+  // необязательное лёгкое действие тут же, рядом с вопросом — открывать
+  // для него отдельную шторку было бы лишним слоем). Раскрыта — до выбора
+  // оценки, после выбора сама схлопывается: смотреть там больше не на что.
+  const [open, setOpen] = useState(false)
   // новый раунд — своя оценка, чужая на экране путала бы
-  useEffect(() => { setMark(null) }, [gameState.round_number])
+  useEffect(() => { setMark(null); setOpen(false) }, [gameState.round_number])
 
   const rate = (v: number) => {
     setMark(v)
+    setOpen(false)
     void rateQuestion({
       teamId: team.id, gameId: gameState.game_id,
       roundNumber: gameState.round_number,
@@ -855,15 +882,20 @@ function QuestionRating({ team, gameState, questionId }: {
   }
   return (
     <div className="pl-fb-q">
-      <div className="pl-fb-qtext">
-        {mark ? `Ваша оценка: ${mark}` : 'Оцените вопрос'}
-      </div>
-      <div className="pl-fb-scale">
-        {Array.from({ length: 10 }, (_, k) => k + 1).map(v => (
-          <button key={v} className={`pl-fb-dot${mark === v ? ' on' : ''}`}
-            onClick={() => rate(v)}>{v}</button>
-        ))}
-      </div>
+      <button type="button" className="pl-fb-toggle" onClick={() => setOpen(v => !v)}>
+        <span className="pl-fb-qtext">
+          {mark ? `Ваша оценка: ${mark}` : 'Оцените вопрос'}
+        </span>
+        <span className={`pl-fb-chevron${open ? ' open' : ''}`}>▾</span>
+      </button>
+      {open && (
+        <div className="pl-fb-scale">
+          {Array.from({ length: 10 }, (_, k) => k + 1).map(v => (
+            <button key={v} className={`pl-fb-dot${mark === v ? ' on' : ''}`}
+              onClick={() => rate(v)}>{v}</button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

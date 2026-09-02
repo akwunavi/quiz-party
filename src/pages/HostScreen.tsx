@@ -2376,7 +2376,6 @@ function ScoreboardScreen({ pack, gameState }: {
     const t = setInterval(() => setRevealed(p => (p >= ranked.length ? p : p + 1)), 2200)
     return () => clearInterval(t)
   }, [ranked.length, gameState.round_number])
-  const medals = ['🥇', '🥈', '🥉']
   // Ступени tableSize() считают по ЧИСЛУ КОМАНД и калиброваны по ширине
   // (vw). На невысоких экранах (1366×768, 1600×900) при восьми командах и
   // восьми раундах нижняя строка всё равно уезжала под кнопку «Дальше»:
@@ -2415,8 +2414,15 @@ function ScoreboardScreen({ pack, gameState }: {
             const isIn = idx >= ranked.length - revealed
             return (
             <tr key={t.id} className={`sb-row${isIn ? ' is-in' : ' is-veiled'}${place === 1 ? ' leader' : ''}`}>
-              {/* при равных очках место общее: 1, 2, 2, 4 */}
-              <td>{medals[place - 1] ?? place}{row?.shared && <span className="sb-eq">=</span>}</td>
+              {/* при равных очках место общее: 1, 2, 2, 4. Медаль — та же
+                  тематическая, что на экране награждения (components/
+                  AwardMedal.tsx): цифра места уже нарисована на самом
+                  элементе, --medal-size ужат под ячейку таблицы. Для мест
+                  ниже третьего своей картинки нет — как и раньше, просто
+                  номер места текстом. */}
+              <td>{place <= 3
+                ? <span className="sb-medal"><AwardMedal theme={pack.theme} place={place} /></span>
+                : place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
                 <span className="sb-name">{t.name}</span></td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
