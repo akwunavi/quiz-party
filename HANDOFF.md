@@ -1137,6 +1137,20 @@ true` — `matchMedia('(hover: hover)')` даёт `false`, фон кнопки �
 
 ---
 
+## 3u. Скиллы GSAP для Claude Code (8.61)
+
+По запросу подключены официальные скиллы GreenSock (`npx skills add
+https://github.com/greensock/gsap-skills`): `gsap-core`, `gsap-timeline`,
+`gsap-scrolltrigger`, `gsap-react`, `gsap-plugins`, `gsap-utils`,
+`gsap-performance`, `gsap-frameworks`. Легли в `.agents/skills/*` (сами
+`SKILL.md`), `.claude/skills/*` — симлинки на них для Claude Code, и
+`skills-lock.json` с хешами версий пакетов на будущее обновление. Это
+справочные материалы для будущих правок с анимацией (GSAP в проекте пока
+нигде не используется — вся анимация сейчас на CSS, см. раздел 3h), кода
+приложения это не меняет.
+
+---
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и
