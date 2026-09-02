@@ -6,7 +6,7 @@ import { useBlitz } from '../lib/blitzApi'
 import {
   toResults, initBlitz, showQuestion, answerCorrect, answerWrong, skip,
   pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext, currentTeam,
-  NEXT_DELAY_MS, MAX_ATTEMPTS, SKIP_MARK, type BlitzState,
+  NEXT_DELAY_MS, FINAL_WRONG_DELAY_MS, MAX_ATTEMPTS, SKIP_MARK, type BlitzState,
 } from '../lib/blitzState'
 import { saveBlitz } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
@@ -78,7 +78,11 @@ export function HostScreen() {
           {theme !== 'new_year' && ...}: постоянное число детей ThemeLayer
           важно, чтобы новая сборка не перемонтировала проектор целиком. */}
       <ScreenFx theme={theme} trigger={fxTrigger} />
-      {pack && <div className="pack-badge">{pack.name}</div>}
+      {/* В лобби (не на бумаге) в том же углу QR — подпись поднимается
+          над ним, чтобы не наехать (см. .pack-badge-lobby, 01-base.css). */}
+      {pack && <div className={`pack-badge${
+        gameState?.phase === 'lobby' && pack.settings?.play_mode !== 'paper' ? ' pack-badge-lobby' : ''
+      }`}>{pack.name}</div>}
     </ThemeLayer>
   )
 }
@@ -1385,14 +1389,21 @@ function BlitzScreen({ pack, round, gameState }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers, cur?.questionId, cur?.lastAnswer])
 
-  // ── 4. Вердикт применяется сам через 5 секунд ──
-  // Окно нужно ведущему: он видит верный ответ и успевает поправить.
+  // ── 4. Вердикт применяется сам через 5 секунд (на исчерпанной 3-й
+  //      попытке — быстрее, см. FINAL_WRONG_DELAY_MS) ──
+  // Окно нужно ведущему: он видит верный ответ и успевает поправить. На
+  // последней попытке поправлять уже нечего — команда всё равно не может
+  // попробовать снова, и полное окно ощущалось как зависание (кнопки не
+  // отвечают, ход не передаётся). Ответ команда узнает после передачи
+  // хода — BlitzBoard берёт его из state.lastReveal.
+  const isFinalWrong = cur?.verdict === 'no' && cur.attempts + 1 >= MAX_ATTEMPTS
   useEffect(() => {
     if (!state || !cur?.verdict) return
     // Отсчёт идёт от ПЕРВОЙ паузы, а не от последнего ответа. Иначе команда,
     // отправляя правки каждые четыре секунды, держала бы свой таймер
     // остановленным сколько угодно: время на проверку не списывается.
-    const wait = Math.max(0, NEXT_DELAY_MS - (Date.now() - (cur.pausedAt ?? Date.now())))
+    const delay = isFinalWrong ? FINAL_WRONG_DELAY_MS : NEXT_DELAY_MS
+    const wait = Math.max(0, delay - (Date.now() - (cur.pausedAt ?? Date.now())))
     const t = setTimeout(() => {
       const now = Date.now()
       const resumed = resumeAfterCheck(state, now)
@@ -1447,11 +1458,25 @@ function BlitzScreen({ pack, round, gameState }: {
     || Object.values(state.correct).some(v => v > 0)
     || Object.values(state.missed).some(v => v > 0)
 
+  // Пауза между ходами (current уже null, следующий вопрос ещё не выехал,
+  // см. эффект 2 выше) — момент показать, каким был верный ответ, ЛЮБОЙ
+  // команде: правильно ответившей, ошибившейся все три раза и скипнувшей.
+  // Раньше ответ узнавала только команда, угадавшая с первой попытки (и то
+  // не факт — сам блок исчезал вместе с current). lastReveal переживает
+  // обнуление current именно для этого разрыва (lib/blitzState.ts).
+  const reveal = !cur && state.lastReveal ? (() => {
+    const rq = round.questions.find(x => x.id === state.lastReveal!.questionId)
+    if (!rq) return undefined
+    return { questionText: rq.question_text, answerText: displayAnswer(rq as Question),
+      verdict: state.lastReveal!.verdict }
+  })() : undefined
+
   return (
     <>
       <BlitzBoard teams={teams} state={state} bank={bank}
         questionText={q?.question_text}
         verdict={cur?.verdict}
+        reveal={reveal}
         // Верный ответ показываем ТОЛЬКО когда ход закрыт: команда ответила
         // верно или исчерпала попытки. При неверной попытке с оставшимися
         // шансами подсказывать нельзя — иначе следующая попытка бессмысленна.

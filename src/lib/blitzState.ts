@@ -36,6 +36,25 @@ export type BlitzCurrent = {
  *  и только потом выезжает следующий вопрос. */
 export const NEXT_DELAY_MS = 5000
 
+/** Окно на ПОСЛЕДНЕЙ (третьей) неверной попытке — короче обычного.
+ *  У обычной ошибки (попытки ещё есть) полные 5 секунд оправданы: команда
+ *  готовится пробовать снова, ведущий может успеть поправить автопроверку.
+ *  На третьей попытке пробовать больше нечего — полные 5 секунд ощущались
+ *  как зависание: кнопки уже неактивны, а ход всё не передаётся, хотя
+ *  таймер (на самом деле стоящий, см. spentMs) выглядит идущим. Правильный
+ *  ответ команда всё равно узнает — но уже ПОСЛЕ передачи хода, через
+ *  BlitzState.lastReveal, в паузе перед следующим вопросом. */
+export const FINAL_WRONG_DELAY_MS = 1200
+
+/** Чем закончился только что закрытый ход — держим ПОСЛЕ того, как
+ *  `current` уже обнулён, чтобы экран мог показать верный ответ в паузе
+ *  перед следующим вопросом. Раньше ответ показывался только во время
+ *  окна проверки (5 сек ПЕРЕД закрытием хода) и то не всегда: скип вообще
+ *  не проходит через это окно (закрывает ход сразу), и команда, которая
+ *  сдалась или ошиблась в третий раз, никогда не узнавала правильный
+ *  ответ. */
+export type BlitzReveal = { questionId: string; verdict: 'ok' | 'no' | 'skip'; at: number }
+
 export type BlitzState = {
   order: string[]                    // teamId в порядке ходов
   turn: number                       // индекс в order
@@ -46,6 +65,7 @@ export type BlitzState = {
   current: BlitzCurrent | null
   finished: boolean
   timedOutTeam?: string
+  lastReveal?: BlitzReveal
 }
 
 export function initBlitz(order: string[], teamSeconds: number): BlitzState {
@@ -117,8 +137,11 @@ export function resumeAfterCheck(s: BlitzState, now: number): BlitzState {
 /** Списать потраченное и передать ход следующей команде.
  *  Если у ходившей команды время вышло — раунд закрывается, и именно она
  *  получает штраф. Открытый вопрос при этом уже доигран: сюда попадаем
- *  только после ответа или скипа. */
-function endTurn(s: BlitzState, now: number): BlitzState {
+ *  только после ответа или скипа. Заодно кладём lastReveal — вопрос и его
+ *  исход переживают обнуление current, и экран может показать верный
+ *  ответ в паузе перед следующим вопросом ЛЮБОЙ команде, а не только той,
+ *  что отвечала верно. */
+function endTurn(s: BlitzState, now: number, verdict: 'ok' | 'no' | 'skip'): BlitzState {
   const team = currentTeam(s)
   if (!team || !s.current) return s
   const rest = Math.max(0, (s.left[team] ?? 0) - spentMs(s.current, now))
@@ -127,6 +150,7 @@ function endTurn(s: BlitzState, now: number): BlitzState {
     left: { ...s.left, [team]: rest },
     current: null,
     turn: (s.turn + 1) % s.order.length,
+    lastReveal: { questionId: s.current.questionId, verdict, at: now },
   }
   if (rest <= 0) return { ...next, finished: true, timedOutTeam: team }
   return next
@@ -136,7 +160,7 @@ function endTurn(s: BlitzState, now: number): BlitzState {
 export function answerCorrect(s: BlitzState, now: number): BlitzState {
   const team = currentTeam(s)
   if (!team || !s.current) return s
-  return endTurn({ ...s, correct: { ...s.correct, [team]: (s.correct[team] ?? 0) + 1 } }, now)
+  return endTurn({ ...s, correct: { ...s.correct, [team]: (s.correct[team] ?? 0) + 1 } }, now, 'ok')
 }
 
 /** Неверный ответ. Пока попытки есть — остаёмся на вопросе.
@@ -153,14 +177,14 @@ export function answerWrong(s: BlitzState, now: number): BlitzState {
     // отличает новый ответ от уже проверенного.
     return { ...s, current: { ...s.current, attempts, verdict: undefined } }
   }
-  return endTurn({ ...s, missed: { ...s.missed, [team]: (s.missed[team] ?? 0) + 1 } }, now)
+  return endTurn({ ...s, missed: { ...s.missed, [team]: (s.missed[team] ?? 0) + 1 } }, now, 'no')
 }
 
 /** Скип: минус очко, вопрос уже сгорел при показе. */
 export function skip(s: BlitzState, now: number): BlitzState {
   const team = currentTeam(s)
   if (!team || !s.current) return s
-  return endTurn({ ...s, missed: { ...s.missed, [team]: (s.missed[team] ?? 0) + 1 } }, now)
+  return endTurn({ ...s, missed: { ...s.missed, [team]: (s.missed[team] ?? 0) + 1 } }, now, 'skip')
 }
 
 /** Вопросы кончились. Раунд закрывается БЕЗ штрафа — так в спеке. */

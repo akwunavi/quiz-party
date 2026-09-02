@@ -46,7 +46,7 @@ function TeamBlock({ team, state, active, now }: {
   )
 }
 
-export function BlitzBoard({ teams, state, bank, questionText, verdict, answerText, dice }: {
+export function BlitzBoard({ teams, state, bank, questionText, verdict, answerText, dice, reveal }: {
   teams: Team[]
   state: BlitzState
   bank: BlitzQuestion[]
@@ -58,6 +58,10 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
   answerText?: string
   /** Кубик: вставляется в контейнер вопроса, пока раунд не начался. */
   dice?: React.ReactNode
+  /** Пауза между ходами: чем закончился только что закрытый ход — верно,
+   *  неверно (попытки кончились) или скип. Показываем верный ответ ЛЮБОЙ
+   *  из трёх причин — раньше его узнавала только угадавшая команда. */
+  reveal?: { questionText: string; answerText: string; verdict: 'ok' | 'no' | 'skip' }
 }) {
   // Таймер перерисовываем сами: состояние в базе меняется редко, а секунды
   // на экране обязаны идти ровно.
@@ -111,7 +115,21 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
               {answerText && <span className="bz-right"> · {answerText}</span>}
             </div>
           )}
-        </> : (
+        </> : reveal ? (
+          // Пауза между ходами: ход уже передан, следующий вопрос ещё не
+          // выехал — тут виден правильный ответ ЛЮБОЙ команде, чем бы ход
+          // ни закрылся (верно / три неверных / скип).
+          <>
+            <div className="bz-asking">
+              {reveal.verdict === 'ok' ? 'ответили верно!'
+                : reveal.verdict === 'skip' ? 'вопрос пропущен' : 'не угадали'}
+            </div>
+            <div className="bz-qtext">{reveal.questionText}</div>
+            <div className={`bz-verdict ${reveal.verdict === 'ok' ? 'ok' : 'no'}`}>
+              Правильный ответ: {reveal.answerText}
+            </div>
+          </>
+        ) : (
           <div className="bz-asking">следующий вопрос…</div>
         ))}
       </div>

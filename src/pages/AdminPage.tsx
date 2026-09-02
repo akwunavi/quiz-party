@@ -31,6 +31,7 @@ import {
 import { teamColor, nextFreeColor } from '../lib/teamColors'
 import { computeTotals, computeRoundScores } from '../lib/totals'
 import { rankTeams } from '../lib/ranking'
+import { exportAnswersCsv } from '../lib/exportAnswers'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
 import type { Answer, Pack, Team } from '../types/quiz'
@@ -761,6 +762,15 @@ function ResultsPanel({ pack, gameId, teams }: {
             </tbody>
           </table>
         </div>
+        <button className="adm-link" onClick={() => {
+          const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-')
+          const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
+          const csv = exportAnswersCsv(pack, teams, answers)
+          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+          const a = document.createElement('a')
+          a.href = url; a.download = `${safe}_ответы_${stamp}.csv`; a.click()
+          URL.revokeObjectURL(url)
+        }}>⤓ ВЫГРУЗИТЬ ОТВЕТЫ (CSV)</button>
       </details>
       <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />
     </div>

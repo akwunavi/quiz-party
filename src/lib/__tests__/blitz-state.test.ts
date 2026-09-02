@@ -201,3 +201,39 @@ describe('блиц: вердикт живёт только до применен
     expect(liveLeft(s, 'a', 15000)).toBe(60000 - 3000)
   })
 })
+
+describe('блиц: lastReveal переживает закрытие хода', () => {
+  // Раньше правильный ответ узнавала только угадавшая команда — current
+  // обнулялся вместе с вопросом, и ни скип, ни исчерпанные попытки не
+  // оставляли следа, который можно было бы показать в паузе между ходами.
+  it('верный ответ — lastReveal.verdict === "ok"', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = answerCorrect(s, 5000)
+    expect(s.current).toBeNull()
+    expect(s.lastReveal).toEqual({ questionId: 'q1', verdict: 'ok', at: 5000 })
+  })
+
+  it('три неверных подряд — lastReveal.verdict === "no", только на третьей', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = answerWrong(s, 3000)
+    expect(s.lastReveal).toBeUndefined()               // попытки ещё есть
+    s = answerWrong(s, 4000)
+    expect(s.lastReveal).toBeUndefined()
+    s = answerWrong(s, 5000)                            // третья — ход закрыт
+    expect(s.current).toBeNull()
+    expect(s.lastReveal).toEqual({ questionId: 'q1', verdict: 'no', at: 5000 })
+  })
+
+  it('скип — lastReveal.verdict === "skip"', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = skip(s, 4000)
+    expect(s.lastReveal).toEqual({ questionId: 'q1', verdict: 'skip', at: 4000 })
+  })
+
+  it('новый вопрос не трогает lastReveal предыдущего — он живёт до следующего закрытия хода', () => {
+    let s = showQuestion(start(), 'q1', 0)
+    s = skip(s, 4000)
+    s = showQuestion(s, 'q2', 10000)
+    expect(s.lastReveal).toEqual({ questionId: 'q1', verdict: 'skip', at: 4000 })
+  })
+})

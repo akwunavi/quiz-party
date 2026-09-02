@@ -101,8 +101,11 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 @keyframes fwFlash { 0% { transform: scale(0); opacity: .9; }
   12% { transform: scale(1); opacity: .6; } 25%, 100% { transform: scale(1.4); opacity: 0; } }
 
-/* ГП: свои ховеры (золото вместо неона), мягкое мерцание заголовков как свеча */
-.theme-potter button:hover { box-shadow: 0 0 16px rgba(211,166,37,.55); filter: brightness(1.12); }
+/* ГП: свои ховеры (золото вместо неона), мягкое мерцание заголовков как свеча.
+   :hover только на устройствах с настоящим курсором — см. 01-base.css (8.60). */
+@media (hover: hover) and (pointer: fine) {
+  .theme-potter button:hover { box-shadow: 0 0 16px rgba(211,166,37,.55); filter: brightness(1.12); }
+}
 @keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
   50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
 .theme-potter .neon-title, .theme-potter .round-title {

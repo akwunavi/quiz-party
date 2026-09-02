@@ -17,13 +17,17 @@
 .gate-card button { padding: 13px 18px; border-radius: 10px; border: none;
   background: #ea580c; color: #fff; font-size: 17px; font-weight: 700;
   font-family: inherit; letter-spacing: .04em; cursor: pointer; transition: all .15s; }
-.gate-card button:hover:not(:disabled) { background: #22d3ee; color: #06121a;
-  box-shadow: 0 0 18px rgba(34,211,238,.5); }
+/* :hover только на устройствах с настоящим курсором — RoomPicker открыт и
+   на телефоне игрока (см. разбор в 01-base.css, 8.60). */
+@media (hover: hover) and (pointer: fine) {
+  .gate-card button:hover:not(:disabled) { background: #22d3ee; color: #06121a;
+    box-shadow: 0 0 18px rgba(34,211,238,.5); }
+  .gate-player-link a:hover { text-shadow: 0 0 10px rgba(34,211,238,.6); }
+}
 .gate-card button:disabled { opacity: .45; cursor: default; }
 .gate-err { color: #ef4444; font-size: 14px; }
 .gate-player-link { text-align: center; font-size: 14px; color: #9aa7bd; }
 .gate-player-link a { color: #22d3ee; text-decoration: none; }
-.gate-player-link a:hover { text-shadow: 0 0 10px rgba(34,211,238,.6); }
 
 /* Админка: сервисные кнопки не липнут к контенту */
 .adm-root .adm-link { display: inline-flex; align-items: center; }

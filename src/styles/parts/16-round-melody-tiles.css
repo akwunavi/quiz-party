@@ -128,11 +128,15 @@
   border: 1.5px solid #d3a625; color: #f3e9cf;
   font-family: 'Cinzel Decorative', 'Russo One', serif; letter-spacing: .04em;
   position: relative; transition: all .18s; }
-.theme-potter button:hover { transform: translateY(-2px);
-  box-shadow: 0 0 26px rgba(211,166,37,.7), inset 0 0 12px rgba(211,166,37,.2);
-  border-color: #ffe9a8; color: #ffe9a8; filter: none; }
-.theme-potter button:hover::after { content: '✦'; position: absolute; top: -10px; right: -6px;
-  color: #ffe9a8; font-size: 13px; animation: sparkTwinkle 1s ease-in-out infinite; }
+/* :hover только на устройствах с настоящим курсором — см. разбор в
+   01-base.css (8.60): на телефоне тап иначе застревал «наведённым». */
+@media (hover: hover) and (pointer: fine) {
+  .theme-potter button:hover { transform: translateY(-2px);
+    box-shadow: 0 0 26px rgba(211,166,37,.7), inset 0 0 12px rgba(211,166,37,.2);
+    border-color: #ffe9a8; color: #ffe9a8; filter: none; }
+  .theme-potter button:hover::after { content: '✦'; position: absolute; top: -10px; right: -6px;
+    color: #ffe9a8; font-size: 13px; animation: sparkTwinkle 1s ease-in-out infinite; }
+}
 .theme-potter button.ghost { background: transparent; border-color: rgba(211,166,37,.5); }
 .theme-potter button:disabled { opacity: .4; box-shadow: none; transform: none; }
 
@@ -254,11 +258,16 @@
 /* Игрок: крупное поле ввода (просьба 7.35-3) */
 .pl-card input { font-size: 19px; padding: 15px 16px; min-height: 54px; }
 
-/* Киберпанк: ховеры кнопок КАК В СТАРОМ (btn-primary/btn-ghost as is) */
-.theme-classic button:not(.ghost):hover { background: var(--accent2); color: #061018;
-  box-shadow: var(--glow); filter: none; }
-.theme-classic button.ghost:hover { border-color: var(--accent2); color: var(--accent2);
-  box-shadow: var(--glow2); }
+/* Киберпанк: ховеры кнопок КАК В СТАРОМ (btn-primary/btn-ghost as is).
+   :hover только на устройствах с настоящим курсором (8.60) — на тапе
+   телефон подсвечивал кнопку так, будто она уже выбрана (именно этот
+   cyan-фон путал на регистрации команды). */
+@media (hover: hover) and (pointer: fine) {
+  .theme-classic button:not(.ghost):hover { background: var(--accent2); color: #061018;
+    box-shadow: var(--glow); filter: none; }
+  .theme-classic button.ghost:hover { border-color: var(--accent2); color: var(--accent2);
+    box-shadow: var(--glow2); }
+}
 /* глитч на титуле раунда — чаще (5с), как glitch-title в эталоне */
 .theme-classic .round-intro .neon-title { animation: glitchRGB 5s steps(1) infinite; }
 /* кнопки навигации: неубиваемое позиционирование в правом нижнем углу */
