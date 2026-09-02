@@ -74,3 +74,52 @@
 .theme-potter .pl-register h1 { color: #e9c766; }
 .theme-potter .pl-register input { background: rgba(243,233,207,.08);
   border-color: rgba(211,166,37,.5); }
+
+/* 8.55: цвет и значок команды — раньше цвет висел рядами кружков прямо на
+   экране регистрации, теперь оба спрятаны за кнопкой-превью, открывающей
+   шторку снизу (см. BottomSheet.tsx) — экран регистрации короче, шторка
+   не толкает раскладку под собой. */
+.pl-picks { display: flex; gap: 14px; }
+.pl-pick { display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 18px; border-radius: 12px; border: 1.5px solid var(--dim);
+  background: rgba(255,255,255,.04); color: var(--fg); font-size: 13px; }
+.pl-pick-swatch { width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.35); }
+.pl-pick-emoji { display: flex; align-items: center; justify-content: center;
+  font-size: 20px; background: rgba(255,255,255,.06); }
+
+/* Значок рядом с именем команды — на телефоне игрока (шапка/бейдж ожидания)
+   и в ростере на проекторе (.lobby-team). Один класс, разный контекст. */
+.pl-team-icon, .lobby-team-icon { margin-right: .4em; }
+
+/* Шторка снизу — общая для выбора цвета и значка. Подложка гасит экран,
+   сама панель едет снизу и не выше 70vh: список из 45 эмодзи не должен
+   выталкивать крестик закрытия за экран на маленьком телефоне. */
+.pl-sheet-backdrop { position: fixed; inset: 0; z-index: 60;
+  background: rgba(0,0,0,.55); display: flex; align-items: flex-end;
+  animation: plSheetFade .2s ease-out both; }
+@keyframes plSheetFade { from { opacity: 0; } to { opacity: 1; } }
+.pl-sheet { width: 100%; max-height: 70vh; overflow-y: auto;
+  background: var(--bg2, #141126); border-radius: 20px 20px 0 0;
+  border-top: 1.5px solid var(--dim); padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+  animation: plSheetUp .25s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes plSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.pl-sheet-head { display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-display); color: var(--fg); font-size: 18px; margin-bottom: 14px; }
+.pl-sheet-close { width: 34px; height: 34px; border-radius: 50%; padding: 0;
+  font-size: 16px; line-height: 1; background: rgba(255,255,255,.08); border: none; color: var(--fg); }
+.pl-emoji-groups { display: flex; flex-direction: column; gap: 16px; }
+.pl-emoji-group-label { font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+.pl-emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; }
+.pl-emoji-cell { font-size: 24px; padding: 8px 0; border-radius: 10px;
+  border: 1.5px solid transparent; background: rgba(255,255,255,.04); }
+.pl-emoji-cell.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }
+
+.theme-potter .pl-pick, .theme-potter .pl-pick-emoji { background: rgba(243,233,207,.06);
+  border-color: rgba(211,166,37,.45); }
+.theme-potter .pl-sheet { background: #1b1630; border-color: rgba(211,166,37,.45); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-sheet-backdrop, .pl-sheet { animation: none; }
+}

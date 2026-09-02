@@ -132,9 +132,9 @@ export async function finishGame(packId: string | null) {
   if (packId) await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
 }
 
-export async function registerTeam(name: string, color: string, game_id: string) {
+export async function registerTeam(name: string, color: string, game_id: string, icon: string | null = null) {
   const { data, error } = await supabase.from('teams')
-    .upsert({ name, color, game_id, last_seen_at: new Date().toISOString() }, { onConflict: 'name' })
+    .upsert({ name, color, icon, game_id, last_seen_at: new Date().toISOString() }, { onConflict: 'name' })
     .select().single()
   if (error) throw error
   return data

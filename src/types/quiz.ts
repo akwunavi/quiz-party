@@ -262,6 +262,9 @@ export interface Team {
   id: string
   name: string
   color: string
+  /** Эмодзи-значок команды, выбирается при регистрации (lib/teamEmoji.ts).
+   *  null/пусто — значка нет, миграция 0008 добавила колонку задним числом. */
+  icon: string | null
   game_id: string | null
   last_seen_at: string | null
 }

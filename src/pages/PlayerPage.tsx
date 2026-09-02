@@ -15,6 +15,8 @@ import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Question, Answer, JeopardyTheme } from '../types/quiz'
 import { spendsEdit } from '../lib/edits'
 import { TEAM_PALETTE } from '../lib/teamColors'
+import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
+import { BottomSheet } from '../components/BottomSheet'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -898,7 +900,7 @@ function RoundComment({ team, gameState }: {
 function PlayerHeader({ team, round }: { team: Team; round: string }) {
   return (
     <div className="pl-header">
-      <span style={{ color: team.color }}>{team.name}</span>
+      <span style={{ color: team.color }}>{team.icon && <span className="pl-team-icon">{team.icon}</span>}{team.name}</span>
       <span className="pl-round">РАУНД {round}</span>
     </div>
   )
@@ -910,22 +912,56 @@ const COLORS = TEAM_PALETTE
 function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: string }) {
   const [name, setName] = useState('')
   const [color, setColor] = useState(COLORS[0])
+  const [icon, setIcon] = useState('')
   const [busy, setBusy] = useState(false)
+  const [sheet, setSheet] = useState<'color' | 'icon' | null>(null)
   return (
     <div className="pl-register">
       <h1>Регистрация команды</h1>
       <input value={name} onChange={e => setName(e.target.value)} placeholder="Название команды" />
-      <div className="colors">
-        {COLORS.map(c => (
-          <button key={c} className={`color-dot${color === c ? ' sel' : ''}`}
-            onClick={() => setColor(c)} style={{ background: c, color: c }} />
-        ))}
+      <div className="pl-picks">
+        <button type="button" className="pl-pick" onClick={() => setSheet('color')}>
+          <span className="pl-pick-swatch" style={{ background: color }} />
+          <span>Цвет</span>
+        </button>
+        <button type="button" className="pl-pick" onClick={() => setSheet('icon')}>
+          <span className="pl-pick-swatch pl-pick-emoji">{icon || '❔'}</span>
+          <span>Значок</span>
+        </button>
       </div>
       <button disabled={!name.trim() || busy} onClick={async () => {
         setBusy(true)
-        try { onDone(await registerTeam(name.trim(), color, gameId) as Team) }
+        try { onDone(await registerTeam(name.trim(), color, gameId, icon || null) as Team) }
         finally { setBusy(false) }
       }}>Играть!</button>
+
+      {sheet === 'color' && (
+        <BottomSheet title="Выберите цвет" onClose={() => setSheet(null)}>
+          <div className="colors">
+            {COLORS.map(c => (
+              <button key={c} className={`color-dot${color === c ? ' sel' : ''}`}
+                onClick={() => { setColor(c); setSheet(null) }} style={{ background: c, color: c }} />
+            ))}
+          </div>
+        </BottomSheet>
+      )}
+      {sheet === 'icon' && (
+        <BottomSheet title="Выберите значок" onClose={() => setSheet(null)}>
+          <div className="pl-emoji-groups">
+            {TEAM_EMOJI_GROUPS.map(g => (
+              <div key={g.label} className="pl-emoji-group">
+                <div className="pl-emoji-group-label">{g.label}</div>
+                <div className="pl-emoji-grid">
+                  {g.items.map(e => (
+                    <button key={e} type="button" className={`pl-emoji-cell${icon === e ? ' sel' : ''}`}
+                      onClick={() => { setIcon(e); setSheet(null) }}>{e}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </BottomSheet>
+      )}
     </div>
   )
 }
@@ -934,7 +970,9 @@ function Waiting({ message, sub, team }: { message: string; sub?: string; team?:
   return (
     <div className="pl-center">
       <ConnectionDot />
-      {team && <div className="pl-team-badge" style={{ color: team.color }}>{team.name}</div>}
+      {team && <div className="pl-team-badge" style={{ color: team.color }}>
+        {team.icon && <span className="pl-team-icon">{team.icon}</span>}{team.name}
+      </div>}
       <div className="pl-wait">{message}</div>
       {sub && <div className="pl-wait-sub">{sub}</div>}
     </div>

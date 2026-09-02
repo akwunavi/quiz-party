@@ -216,7 +216,7 @@ function HostInner({ gameState, pack }: {
                 : teams.map(t => (
                   <span key={t.id} className="lobby-team team-chip-fx"
                     style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
-                    {t.name}
+                    {t.icon && <span className="lobby-team-icon">{t.icon}</span>}{t.name}
                   </span>
                 ))}
             </div>
