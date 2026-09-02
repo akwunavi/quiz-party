@@ -232,7 +232,16 @@
 }
 .sb-table-wrap > .score-table { min-height: 0; }
 
-.fin-breakdown { display: flex; flex-direction: column; min-height: 0; }
+/* .fin-breakdown — прямой потомок .host-screen (у него justify-content:
+   center), и без flex-grow сам получал бы высоту по контенту (=строка
+   mono-tag, ~16px), а не долю экрана. .fin-table-wrap внутри просил
+   flex:1 1 0 у РОДИТЕЛЯ БЕЗ лишней высоты — считать было не от чего,
+   получал 0, и overflow:hidden обрезал таблицу целиком: подпись «РАЗБИВКА
+   ПО РАУНДАМ» была видна, самой таблицы — нет. Заголовок и промежуточное
+   табло (.sb-title + .sb-table-wrap) от этой ловушки не страдали — они
+   висят на .host-screen напрямую, без промежуточной обёртки. */
+.fin-breakdown { display: flex; flex-direction: column; flex: 1 1 auto;
+  min-height: 0; width: 100%; }
 .fin-table-wrap {
   flex: 1 1 0; min-height: 0; width: 100%; overflow: hidden;
   display: flex; align-items: flex-start; justify-content: center;
