@@ -3,7 +3,7 @@ import type { PackStats } from '../lib/duration'
 import { useFitText } from '../hooks/useFitText'
 
 export type RoundLine = { id: string; name: string; count: number }
-type BlockKey = 'media' | 'meta'
+type BlockKey = 'media' | 'meta' | 'label'
 
 function formatMinutes(total: number): string {
   if (total < 60) return `~${total} мин`
@@ -45,10 +45,19 @@ export function InfoSlideView({ slide, rounds, stats, mediaUrl }: {
   const hasMedia = imgs.length > 0
   const hasRules = lines.length > 0
 
+  /* Без картинки блок раундов/статистики раньше занимал вторую строку
+     ОДИН, во всю ширину — рядом с полосой правил над ним это смотрелось
+     пусто, «не играет». Слева от него — большой заголовок «ПРАВИЛА» тем
+     же языком глитча, что у других заголовков экрана (.neon-title,
+     см. 15-projector-interactive.css), просто заполняет пару и держит
+     раскладку симметричной. Появляется только когда нечем занять место —
+     если есть картинка, она и так уже даёт вторую колонку. `layout`
+     («слева»/«справа») тут ни при чём: это поле про картинку, а не про
+     заголовок, поэтому порядок для label+meta не зависит от него. */
   const present: BlockKey[] = hasMedia
     ? (layout === 'right' ? [...(hasMeta ? (['meta'] as const) : []), 'media']
       : ['media', ...(hasMeta ? (['meta'] as const) : [])])
-    : (hasMeta ? ['meta'] : [])
+    : (hasMeta ? ['label', 'meta'] : [])
 
   const fitRules = useFitText<HTMLUListElement>([lines.length, present.length === 0])
   const fitMeta = useFitText<HTMLDivElement>(
@@ -66,6 +75,12 @@ export function InfoSlideView({ slide, rounds, stats, mediaUrl }: {
 
   const blockNode = (key: BlockKey) => {
     switch (key) {
+      case 'label':
+        return (
+          <div key={key} className="info-block ib-label" style={{ gridArea: grid.areaOf('label') }}>
+            <span className="neon-title ib-label-text">{slide.title || 'ПРАВИЛА'}</span>
+          </div>
+        )
       case 'media':
         return (
           <div key={key} className={`q-media-grid n${Math.min(imgs.length, 4)}${
