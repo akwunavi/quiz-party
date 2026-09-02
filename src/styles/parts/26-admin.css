@@ -65,6 +65,17 @@
 .adm-why-row { display: flex; justify-content: space-between; gap: 12px;
   flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--ed-line); }
 
+/* Таблица результатов для сверки (8.55) — та же раскладка что и у
+   .adm-dev-table (компактная, для телефона), но нейтральных цветов: у
+   dev-таблицы фиолетовый — сигнал «это репетиция», здесь боевые данные,
+   красить в тот же цвет было бы обманчиво. */
+.adm-score-wrap { overflow-x: auto; margin-top: 4px; }
+.adm-score-table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+.adm-score-table th { text-align: left; color: var(--dim); font-weight: 600;
+  padding: 4px 6px; border-bottom: 1px solid var(--ed-line); }
+.adm-score-table td { padding: 4px 6px; font-variant-numeric: tabular-nums; }
+.adm-score-table td.total { font-weight: 700; color: var(--fg); }
+
 /* ═══ ПАНЕЛЬ РЕПЕТИЦИИ (?dev=1) ═══
    Видна только в dev-режиме. Намеренно отличается по цвету от боевых
    кнопок: если она вдруг оказалась на экране во время игры, это видно

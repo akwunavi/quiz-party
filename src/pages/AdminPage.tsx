@@ -29,6 +29,8 @@ import {
   type CheckRow,
 } from '../lib/devSeed'
 import { teamColor, nextFreeColor } from '../lib/teamColors'
+import { computeTotals, computeRoundScores } from '../lib/totals'
+import { rankTeams } from '../lib/ranking'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
 import type { Answer, Pack, Team } from '../types/quiz'
@@ -754,6 +756,48 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
           </button>
         </div>
       </div>
+
+      {/* Таблица результатов для сверки — то же самое, что видят игроки на
+          табло/финале (computeTotals/computeRoundScores/rankTeams — общие
+          функции с проектором, HostScreen.tsx:ScoreboardScreen, никогда не
+          разойдутся), но у ведущего под рукой на телефоне, без раскрытия
+          интригой построчно и без огромного кегля под зал. */}
+      {pack && (() => {
+        const totals = computeTotals(pack, teams, answers)
+        const perRound = computeRoundScores(pack, teams, answers)
+        const scored = pack.rounds.filter(r => !r.off_scoreboard)
+        const rows = rankTeams(teams, totals, answers, perRound)
+        return (
+          <details className="adm-why">
+            <summary>Таблица результатов (сверка)</summary>
+            <div className="adm-score-wrap">
+              <table className="adm-score-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Команда</th>
+                    {scored.map((r, i) => <th key={r.id}>Р{i + 1}</th>)}
+                    <th>Σ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map(row => {
+                    const t = row.team
+                    const all = perRound.get(t.id) ?? []
+                    return (
+                      <tr key={t.id}>
+                        <td>{row.place}{row.shared && '='}</td>
+                        <td style={{ color: t.color }}>{t.name}</td>
+                        {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
+                        <td className="total">{totals.get(t.id) ?? 0}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        )
+      })()}
 
       {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
           перед игрой. Здесь был её дубль с тем же действием: две кнопки
