@@ -1151,6 +1151,22 @@ https://github.com/greensock/gsap-skills`): `gsap-core`, `gsap-timeline`,
 
 ---
 
+## 3v. Скиллы Three.js для Claude Code (8.62)
+
+По запросу подключены скиллы `cloudai-x/threejs-skills` (`npx skills add
+https://github.com/cloudai-x/threejs-skills`), сторонний (не официальный
+Three.js) источник: `threejs-fundamentals`, `threejs-geometry`,
+`threejs-materials`, `threejs-lighting`, `threejs-shaders`,
+`threejs-textures`, `threejs-loaders`, `threejs-animation`,
+`threejs-interaction`, `threejs-postprocessing`. Легли туда же, куда GSAP
+в 3u — `.agents/skills/*` + симлинки `.claude/skills/*`, добавились в
+`skills-lock.json`. Содержимое перед коммитом просмотрено (ссылки внутри
+— только стандартные CDN Draco/Basis из документации three.js, ничего
+похожего на инъекцию команд). Как и GSAP — пока просто справочные
+материалы, в проекте не используется, 3D-графики в приложении нет.
+
+---
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и
