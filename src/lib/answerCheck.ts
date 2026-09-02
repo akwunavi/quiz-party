@@ -40,12 +40,20 @@ function tolerance(len: number): number {
   return len <= 4 ? 1 : len <= 8 ? 2 : 3
 }
 
-/** Фаззи: варианты правильного через " / ", допуск на опечатки по длине. */
+/** Числа опечаток не прощают: "9" и "19"/"10"/"90" — РАЗНЫЕ ответы, а не
+ *  опечатка друг друга, хотя Левенштейн между ними может быть 1 — такой же,
+ *  как между "начяло" и "начало". Для чисто цифрового варианта ответа
+ *  нужно точное совпадение, не расстояние редактирования. */
+const isNumeric = (s: string) => /^\d+$/.test(s)
+
+/** Фаззи: варианты правильного через " / ", допуск на опечатки по длине —
+ *  кроме чисто числовых вариантов (см. isNumeric выше), там только точное
+ *  совпадение. */
 export function isFuzzyMatch(answer: string, correct: string): boolean | null {
   const a = normalize(answer)
   if (!a) return null
   const variants = String(correct ?? '').split('/').map(normalize).filter(Boolean)
-  return variants.some(v => levenshtein(a, v) <= tolerance(v.length))
+  return variants.some(v => isNumeric(v) ? a === v : levenshtein(a, v) <= tolerance(v.length))
 }
 
 /** Гомоглифы: А/В/С/Е/К/М/Н/О/Р/Т/Х латиница↔кириллица. */

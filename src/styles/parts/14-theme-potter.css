@@ -25,8 +25,14 @@
 .pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
 .theme-potter .choices-grid, .theme-potter .choice-plate,
 .theme-potter .img-answers, .theme-potter .q-media-grid { position: relative; z-index: 6; }
-/* контент выше свечей; fixed-элементы НЕ трогаем (только z-index) */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle),
+/* контент выше свечей; fixed-элементы НЕ трогаем (только z-index).
+   Селектор без .theme-potter — работает на ЛЮБОЙ теме, не только ГП (файл
+   назван по теме, правило — нет). Тот же список исключений, что у похожего
+   сброса в 15-projector-interactive.css (.grid-bg > *:not(...)) — и та же
+   ловушка: 8.53 добавила .info-note-corner (fixed, левый нижний угол
+   слайда-брифинга), не попавший сюда, слетал на position:relative и
+   уезжал в поток документа вместо угла экрана. */
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner { z-index: 30; }

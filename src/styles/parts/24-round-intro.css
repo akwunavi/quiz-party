@@ -206,20 +206,115 @@
    инлайн-стилем — раскладок слишком много (1..4 блока × слева/справа/сверху),
    чтобы держать их все статичными классами в CSS; здесь только то, что ВНУТРИ
    каждой area — размеры, типографика, подгон под содержимое. */
-.info-screen .info-body { flex: 1 1 0; min-height: 0; width: min(1500px, 94%);
-  margin: 0 auto; display: grid;
-  gap: clamp(20px, 3vw, 56px); }
+/* 8.53: правила ушли из сетки — полоса на всю ширину сверху (.ib-rules-band),
+   ниже неё сетка из того, что осталось (картинка/раунды-статистика, максимум
+   два блока). .info-stack держит фиксированную высоту от родителя (flex:1 1 0
+   у самого .host-screen), поэтому оба замера (.ib-rules-band → useFitText,
+   .info-body → CSS grid) считают от ГАРАНТИРОВАННОГО размера, а не от
+   содержимого — то же правило, что для .info-block ниже. */
+.info-screen .info-stack { flex: 1 1 0; min-height: 0; width: min(1500px, 94%);
+  margin: 0 auto; display: flex; flex-direction: column;
+  gap: clamp(16px, 2.4vw, 40px); }
+.info-screen .info-body { flex: 1 1 0; min-height: 0; width: 100%;
+  display: grid; gap: clamp(20px, 3vw, 56px); }
+/* Полоса правил: фиксированная доля высоты через flex-basis (НЕ auto — auto
+   был бы «высота по контенту», а тогда useFitText внутри меряет то, что сам
+   же и определяет размер родителя — замкнутый круг, подгон не срабатывает).
+   Когда правила — единственный блок на слайде (.solo, нет картинки/меты),
+   отдаём им всю высоту .info-stack. */
+.ib-rules-band { flex: 0 0 clamp(140px, 32vh, 440px); width: 100%; }
+.ib-rules-band.solo { flex: 1 1 0; }
 
 /* Каждый блок — контейнер с container-query: кегль внутри считается от
    РЕАЛЬНОЙ ширины своей ячейки (cqw), а не от вьюпорта (vw). Экран с двумя
    блоками рядом и тот же экран с четырьмя блоками дают ячейке разную
    ширину — vw про это ничего не знает, отсюда и не помещалось при новых
    галочках (см. HANDOFF 8.50: lay-full ловушка). */
+/* 8.53: раньше блоки были голым текстом на фоне — «блёкло», по слову
+   ведущего. Теперь у каждого своя рамка-контейнер (язык темы — тот же,
+   что уже есть на экране: неоновые засечки классики/киберпанка, золотой
+   пергамент ГП, снежная рамка НГ) и анимация «сборки» при появлении вместо
+   плоского fade — ниже, в теме-секциях. Рамка сама НЕ трогает overflow
+   (он остаётся hidden только у этого, внешнего контейнера — гарантированный
+   размер, см. HANDOFF 8.52 про useFitText). */
 .info-block { container-type: inline-size; min-width: 0; min-height: 0;
   overflow: hidden; text-align: left; display: flex; flex-direction: column;
-  justify-content: center; }
+  justify-content: center; position: relative; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--dim) 40%, transparent);
+  background: rgba(255,255,255,.02);
+  padding: clamp(14px, 2vh, 28px) clamp(16px, 2vw, 30px); }
+/* Картинка — та же рамка-контейнер, что у текстовых блоков (иначе на
+   слайде с фото рядом с боксом раундов один блок «в рамке», другой голый —
+   ровно то, от чего ушли: «оч блёкло»). Общий селектор с .info-block ниже
+   везде, кроме overflow/padding: фото должно доходить до внутреннего края
+   рамки без утекания под кегль текста. */
 .info-media { min-width: 0; min-height: 0; height: 100%; width: 100%;
-  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  position: relative; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--dim) 40%, transparent);
+  background: rgba(255,255,255,.02);
+  padding: clamp(10px, 1.4vh, 20px); box-sizing: border-box; }
+
+/* классика/киберпанк: тот же язык, что у .cyber-frame (угловые засечки +
+   неоновое свечение) — здесь без бегущей линии cf-scan, она для рамки
+   вопроса, тут была бы лишней деталью на статичном слайде. */
+.theme-classic .info-block, .cyber .info-block,
+.theme-classic .info-media, .cyber .info-media {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 14%, transparent),
+              inset 0 0 26px rgba(0,0,0,.3); }
+.theme-classic .info-block::before, .cyber .info-block::before,
+.theme-classic .info-block::after, .cyber .info-block::after,
+.theme-classic .info-media::before, .cyber .info-media::before,
+.theme-classic .info-media::after, .cyber .info-media::after {
+  content: ''; position: absolute; width: 18px; height: 18px; pointer-events: none;
+  border: 2px solid var(--accent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 70%, transparent)); }
+.theme-classic .info-block::before, .cyber .info-block::before,
+.theme-classic .info-media::before, .cyber .info-media::before {
+  left: -1px; top: -1px; border-right: none; border-bottom: none; }
+.theme-classic .info-block::after, .cyber .info-block::after,
+.theme-classic .info-media::after, .cyber .info-media::after {
+  right: -1px; bottom: -1px; border-left: none; border-top: none; }
+/* появление — «сборка через помехи», тот же приём, что у glitchRGB на
+   заголовках, но однократно (fill both) и с раскрытием по ширине, а не
+   бесконечным дёрганьем: слайд статичный, зацикленный глитч отвлекал бы. */
+.theme-classic .info-block, .cyber .info-block,
+.theme-classic .info-media, .cyber .info-media {
+  animation: infoGlitchIn .7s steps(1) both; }
+@keyframes infoGlitchIn {
+  0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-8px); }
+  10% { opacity: 1; clip-path: inset(0 55% 0 0); transform: translateX(5px);
+        filter: drop-shadow(-3px 0 var(--danger)) drop-shadow(3px 0 var(--accent2)); }
+  18% { clip-path: inset(0 30% 0 0); transform: translateX(-4px); }
+  26% { clip-path: inset(0 8% 0 0); transform: translateX(3px);
+        filter: drop-shadow(3px 0 var(--danger)) drop-shadow(-3px 0 var(--accent2)); }
+  34%, 100% { clip-path: inset(0 0 0 0); transform: none; filter: none; }
+}
+
+/* волшебная школа: тот же пергамент+золото, что у .pt-frame, и «чернильное»
+   проступание блока целиком (язык ptInk уже используется на словах вопроса). */
+.theme-potter .info-block, .theme-potter .info-media {
+  border-color: rgba(211,166,37,.5); border-radius: 8px;
+  background: linear-gradient(180deg, rgba(243,233,207,.06), rgba(243,233,207,.015));
+  box-shadow: 0 0 34px rgba(211,166,37,.14), inset 0 0 30px rgba(0,0,0,.35);
+  animation: infoInkIn .8s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes infoInkIn {
+  0% { opacity: 0; filter: blur(7px); transform: translateY(10px) scale(.97); }
+  55% { opacity: 1; filter: blur(1.5px); }
+  100% { opacity: 1; filter: blur(0); transform: none; }
+}
+
+/* новый год: заснеженная рамка, тот же язык, что у .rules-frame */
+.theme-new_year .info-block, .theme-new_year .info-media {
+  border-color: rgba(150,200,255,.5); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(180,220,255,.08), rgba(180,220,255,.02));
+  box-shadow: 0 0 30px rgba(150,200,255,.18), inset 0 0 26px rgba(10,30,60,.4);
+  animation: infoFrostIn .6s ease-out both; }
+@keyframes infoFrostIn {
+  from { opacity: 0; filter: blur(4px); transform: translateY(10px) scale(.98); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
 .info-media .q-img img { max-width: 100%; max-height: 100%; }
 /* .q-media-grid.n1 несёт свой фиксированный width: min(1100px, 80vw)
    (19-patch-746.css, вес 0,2,0 — тяжелее голого .info-media) — вне сетки
@@ -234,7 +329,11 @@
    половину экрана и отжимает текстовые блоки снизу в узкую полосу, где они
    обрезаются (даже с useFitText: подгону просто некуда сжимать блок, если
    ему физически не осталось высоты). Потолок — тот же, что был исторически. */
-.info-screen.lay-full .info-media { max-height: 42vh; }
+/* потолок нужен, только когда под картинкой РЕАЛЬНО есть вторая строка
+   (мета) — если картинка в full-раскладке одна (мета выключена/пусто),
+   data-blocks="1" и колонка вообще не делится на строки: капать высоту
+   там нечем, кроме мёртвой пустоты под картинкой. */
+.info-screen.lay-full[data-blocks="2"] .info-media { max-height: 42vh; }
 
 /* Кегль — на КОНТЕЙНЕРЕ (.info-list/.ib-meta-fit/.info-note), не на строках
    внутри. Это не стиль ради стиля: именно контейнер меряет useFitText
@@ -296,20 +395,40 @@
 .info-stats li { line-height: 1.3; animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
 .info-stats li::before { content: '◆ '; color: var(--accent); }
 
-/* доп. информация — раньше отдельная полоса ПОД экраном вне сетки, теперь
-   такой же блок в сетке, просто тише остальных (приглушённый цвет, кегль
-   поменьше) — сохраняет прежний тон «сноски», не конкурирует за внимание */
-.ib-note { justify-content: center; }
-.info-note { color: var(--dim); font-size: clamp(11px, 3.6cqw, 22px);
-  line-height: 1.4; text-align: left; }
+/* 8.53: примечание больше не блок в сетке — мелкий серый текст, отжатый
+   в отдельную ячейку, читался как «зачем тут этот квадрат». Теперь это
+   лёгкая подпись в углу, вне сетки и вне .info-stack: fixed относительно
+   экрана, как .host-actions (см. HANDOFF 8.52/CLAUDE.md п.4 про кнопки
+   ведущего) — только слева, справа уже занято кнопками навигации слайдов
+   (InfoNav в host-actions, HostScreen.tsx). ВАЖНО: это прямой потомок
+   .grid-bg → обязана попасть в список :not() в 15-projector-interactive.css,
+   иначе получит position:relative и слетит из угла (та же ловушка, что уже
+   была с шапкой/QR/audio-gate). */
+/* !important на позиции — как у .host-actions (01-base.css): сбросов
+   position:relative на прямых детях .host-screen/.grid-bg в этой кодовой
+   базе несколько (15-projector-interactive.css и 14-theme-potter.css, оба
+   уже учитывают этот класс через :not() — но !important здесь ещё и
+   страховка от следующего такого правила, которое забудут дополнить). */
+.info-note-corner { position: fixed !important; left: 28px; bottom: 24px; z-index: 15;
+  max-width: min(40vw, 480px); color: var(--dim);
+  font-size: clamp(11px, 1.1vw, 16px); line-height: 1.4; text-align: left;
+  opacity: 0; animation: infoNoteIn .6s ease-out .3s both; pointer-events: none; }
+@keyframes infoNoteIn { from { opacity: 0; transform: translateY(6px); }
+  to { opacity: .85; transform: none; } }
 
+/* 8.53: правила ушли из сетки — здесь у неё максимум 2 блока (картинка,
+   мета), было до 4. .ib-rules-band сама по ширине 100% и в адаптации на
+   узких экранах не нуждается. */
 @media (max-width: 900px) {
-  .info-screen[data-blocks="2"] .info-body,
-  .info-screen[data-blocks="3"] .info-body,
-  .info-screen[data-blocks="4"] .info-body {
+  .info-screen[data-blocks="2"] .info-body {
     grid-template-columns: 1fr !important; grid-template-rows: none !important;
     grid-template-areas: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .info-list li, .info-stats li { animation: none; }
+  .info-block, .info-media, .theme-classic .info-block, .cyber .info-block,
+  .theme-classic .info-media, .cyber .info-media,
+  .theme-potter .info-block, .theme-potter .info-media,
+  .theme-new_year .info-block, .theme-new_year .info-media,
+  .info-note-corner { animation: none; opacity: 1; }
 }

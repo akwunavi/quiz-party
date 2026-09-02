@@ -23,6 +23,21 @@ describe('fuzzy', () => {
   it('другое слово — неверно', () => {
     expect(isFuzzyMatch('матрица', 'Начало')).toBe(false)
   })
+  it('числа: опечатки НЕ прощаются — соседнее число это не опечатка', () => {
+    expect(isFuzzyMatch('19', '9')).toBe(false)
+    expect(isFuzzyMatch('10', '9')).toBe(false)
+    expect(isFuzzyMatch('8', '9')).toBe(false)
+    expect(isFuzzyMatch('90', '9')).toBe(false)
+  })
+  it('числа: точное совпадение по-прежнему проходит', () => {
+    expect(isFuzzyMatch('9', '9')).toBe(true)
+    expect(isFuzzyMatch(' 42 ', '42')).toBe(true)
+  })
+  it('число среди вариантов через / — только точное числовое совпадение', () => {
+    expect(isFuzzyMatch('9', '9 / девять')).toBe(true)
+    expect(isFuzzyMatch('девят', '9 / девять')).toBe(true) // текстовый вариант — опечатки как обычно
+    expect(isFuzzyMatch('19', '9 / девять')).toBe(false)
+  })
 })
 
 describe('letterEq (гомоглифы)', () => {

@@ -1293,7 +1293,11 @@ function BlitzScreen({ pack, round, gameState }: {
 }) {
   const { state, setState } = useBlitz(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
-  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  // Опрос чаще, чем обычные 2000мс: таймер команды тикает, пока проектор
+  // не заметил присланный ответ (пауза ставится ПОСЛЕ этого, см. шаг 3
+  // «АВТОПРОВЕРКА» ниже) — на редком опросе секунды команды сгорали
+  // впустую на ожидание, хотя реально ждать было нечего.
+  const answers = useAnswers(gameState.game_id, gameState.round_number, 400)
   const bank = useMemo(
     () => round.questions.map(q => ({ id: q.id, hidden: q.hidden })),
     [round.questions])

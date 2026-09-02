@@ -16,7 +16,7 @@
 /* ВНИМАНИЕ: это правило перебивает position у ЛЮБОГО прямого потомка экрана.
    На нём уже трижды спотыкались (шапка, номер раунда, QR). Любой элемент,
    которому нужен собственный position, ОБЯЗАН быть в этом списке. */
-.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.audio-gate):not(.groups-overlay):not(.fx-toggle) {
+.grid-bg > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.audio-gate):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner) {
   position: relative; z-index: 1; }
 .grid-bg > .host-topbar, .grid-bg > .host-actions, .grid-bg > .pack-badge,
 .grid-bg > .round-badge, .grid-bg > .lobby-qr-corner { z-index: 20; }
