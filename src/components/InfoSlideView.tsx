@@ -1,4 +1,5 @@
 import type { InfoSlide } from '../types/quiz'
+import type { PackStats } from '../lib/duration'
 
 // ═══ ВНЕШНИЙ ВИД СЛАЙДА-БРИФИНГА ═══
 //
@@ -9,9 +10,20 @@ import type { InfoSlide } from '../types/quiz'
 
 export type RoundLine = { id: string; name: string; count: number }
 
-export function InfoSlideView({ slide, rounds, mediaUrl }: {
+/** «85» → «1 ч 25 мин», «40» → «40 мин» — коротко и понятно с одного взгляда. */
+function formatMinutes(total: number): string {
+  if (total < 60) return `~${total} мин`
+  const h = Math.floor(total / 60)
+  const m = total % 60
+  return m > 0 ? `~${h} ч ${m} мин` : `~${h} ч`
+}
+
+export function InfoSlideView({ slide, rounds, stats, mediaUrl }: {
   slide: InfoSlide
   rounds: RoundLine[]
+  /** Сводная статистика пакета — блок «Раундов/Вопросов/…». Опционален:
+   *  показывается только если slide.show_stats и есть что считать. */
+  stats?: PackStats
   /** Преобразование пути в адрес — снаружи, чтобы файл не тянул Supabase. */
   mediaUrl: (p: string) => string
 }) {
@@ -19,6 +31,7 @@ export function InfoSlideView({ slide, rounds, mediaUrl }: {
   const imgs = slide.images ?? []
   const layout = slide.layout ?? 'left'
   const showRounds = !!slide.show_rounds && rounds.length > 0
+  const showStats = !!slide.show_stats && !!stats
 
   const text = (
     <div className="info-col">
@@ -39,6 +52,22 @@ export function InfoSlideView({ slide, rounds, mediaUrl }: {
             </div>
           ))}
         </div>
+      )}
+      {showStats && (
+        <ul className="info-stats">
+          <li style={{ animationDelay: `${0.12 * lines.length}s` }}>Раундов: {stats!.roundsCount}</li>
+          <li style={{ animationDelay: `${0.12 * (lines.length + 1)}s` }}>
+            Вопросов: {stats!.questionsCount}</li>
+          {stats!.hasMiniGame && (
+            <li style={{ animationDelay: `${0.12 * (lines.length + 2)}s` }}>Мини-игра: 1</li>
+          )}
+          {stats!.musicTracks > 0 && (
+            <li style={{ animationDelay: `${0.12 * (lines.length + 3)}s` }}>
+              Музыкальных треков: {stats!.musicTracks} шт</li>
+          )}
+          <li style={{ animationDelay: `${0.12 * (lines.length + 4)}s` }}>
+            Примерное время игры: {formatMinutes(stats!.totalMinutes)}</li>
+        </ul>
       )}
     </div>
   )

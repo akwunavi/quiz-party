@@ -14,6 +14,7 @@ import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { jeopardyTile } from '../lib/jeopardyRef'
 import { mediaUrl, lenClass } from '../lib/media'
+import { packStats } from '../lib/duration'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
@@ -526,7 +527,8 @@ function HostInner({ gameState, pack }: {
   if (gameState.phase === 'info') {
     const slides = pack?.settings?.info_slides ?? []
     const slide = slides[gameState.question_index] ?? slides[0]
-    if (slide) return <InfoScreen pack={pack} slide={slide} packId={gameState.pack_id} />
+    if (slide) return <InfoScreen pack={pack} slide={slide} packId={gameState.pack_id}
+      gameState={gameState} />
   }
 
   if (gameState.phase === 'recap') {
@@ -1218,8 +1220,9 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
  *
  *  К раундам слайд не привязан: показывается кнопкой из админки в любой
  *  момент, поэтому и живёт в настройках ПАКЕТА, а не раунда. */
-function InfoScreen({ pack, slide, packId }: {
+function InfoScreen({ pack, slide, packId, gameState }: {
   pack: LoadedPack; slide: InfoSlide; packId: string | null
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   // Внешний вид живёт в общем компоненте: им же рисуется превью в
   // редакторе, поэтому «на экране» и «в редакторе» совпадают всегда.
@@ -1228,9 +1231,14 @@ function InfoScreen({ pack, slide, packId }: {
     name: (r.title_lines ?? []).join(' ') || '—',
     count: r.questions.filter(q => !q.hidden).length,
   }))
+  // Слайд показывается после лобби — команды к этому моменту уже
+  // зарегистрированы, реальное число известно (в отличие от редактора,
+  // где игры ещё нет и packStats получает teamCount === undefined).
+  const teams = useTeams(gameState.game_id)
+  const stats = packStats(pack, teams.length)
   return (
     <>
-      <InfoSlideView slide={slide} rounds={rounds} mediaUrl={mediaUrl} />
+      <InfoSlideView slide={slide} rounds={rounds} stats={stats} mediaUrl={mediaUrl} />
       <div className="host-actions">
         <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)}
           packId={packId} paper={pack.settings?.play_mode === 'paper'} />

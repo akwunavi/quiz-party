@@ -232,17 +232,38 @@
 .info-round .ir-count { flex: 0 0 auto; color: var(--dim);
   font-family: var(--font-mono, monospace); font-size: .82em; }
 
+/* сводная статистика пакета (раунды/вопросы/музыка/время) — считается в
+   lib/duration.ts:packStats, рисуется отдельным блоком, чтобы не путать со
+   сводкой по раундам выше (.info-rounds — по каждому раунду отдельно,
+   .info-stats — итоговые числа по всему пакету) */
+.info-stats { list-style: none; margin: 0; padding-top: clamp(8px, 1.4vh, 18px);
+  display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px);
+  border-top: 1px solid color-mix(in srgb, var(--dim) 50%, transparent);
+  text-align: left; }
+.info-stats li { font-size: clamp(14px, 1.5vw, 26px); line-height: 1.3;
+  animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
+.info-stats li::before { content: '◆ '; color: var(--accent); }
+
 @media (max-width: 900px) {
   .info-screen .info-body { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .info-list li { animation: none; }
+  .info-list li, .info-stats li { animation: none; }
 }
 
 /* ── Раскладки слайда-брифинга (выбор в редакторе) ── */
 /* Порядок в потоке задаёт JSX, здесь только ширины и выравнивание. */
 .info-screen.lay-full .info-body { flex-direction: column; align-items: stretch; }
 .info-screen.lay-full .info-media { max-height: 46vh; width: 100%; }
+/* При раскладке «во всю ширину» текстовый блок и картинка — НЕ равные
+   половины (как в left/right), а последовательные блоки в столбик: у
+   картинки уже есть свой потолок (max-height: 46vh) выше, а текстовому
+   блоку жёсткий flex:1 1 0 обрезал бы третий пункт (список раундов +
+   статистику пакета разом) ровно посередине экрана — сам текст оставался
+   бы за overflow:hidden невидимым, хотя formально «был в DOM». Пусть
+   колонка занимает столько, сколько нужно её содержимому. */
+.info-screen.lay-full.has-media .info-body > .info-col {
+  flex: 0 1 auto; max-height: none; overflow: visible; }
 .info-screen.lay-right .info-body > .info-col { text-align: left; }
 /* дополнительный текст внизу — сноска, не конкурирует с пунктами */
 .info-note { flex: 0 0 auto; width: min(1500px, 94%); margin: 0 auto;
@@ -254,6 +275,7 @@
    следовать за ней — иначе пункты уезжают за нижний край экрана. */
 .info-screen.has-media .info-list li { font-size: clamp(15px, 1.55vw, 30px); }
 .info-screen.has-media .info-round { font-size: clamp(12px, 1.15vw, 20px); }
+.info-screen.has-media .info-stats li { font-size: clamp(12px, 1.15vw, 20px); }
 .info-screen.has-media .info-col { max-height: 100%; overflow: hidden; }
 /* много пунктов — ещё мельче, иначе список не помещается */
 .info-screen .info-list:has(li:nth-child(7)) li { font-size: clamp(13px, 1.35vw, 24px); }

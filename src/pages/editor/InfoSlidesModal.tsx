@@ -3,6 +3,7 @@ import { InfoSlideView } from '../../components/InfoSlideView'
 import { MediaSlot } from './QuestionForm'
 import { mediaUrl } from '../../lib/media'
 import { setPackSettings } from '../../lib/editorApi'
+import { packStats } from '../../lib/duration'
 import type { InfoSlide, Pack } from '../../types/quiz'
 import type { LoadedPack } from '../../lib/packLoader'
 
@@ -69,6 +70,9 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
       name: (r.title_lines ?? []).join(' ') || '—',
       count: r.questions.filter(q => !q.hidden).length,
     }))
+  // teamCount не передаём: в редакторе игры ещё нет, живого числа команд
+  // не существует — внутри packStats/estimateRoundMinutes сработает дефолт.
+  const stats = packStats({ rounds: loaded?.rounds ?? [] })
 
   return (
     <div className="slides-overlay" onClick={close}>
@@ -149,6 +153,12 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
                 список раундов с числом вопросов
               </label>
 
+              <label className="sm-check">
+                <input type="checkbox" checked={!!slide.show_stats}
+                  onChange={e => patch({ show_stats: e.target.checked })} />
+                статистика пакета (раунды, вопросы, музыка, время игры)
+              </label>
+
               <MediaSlot label="Картинки (до 4)" packId={pack.id} max={4} accept="image/*"
                 paths={slide.images ?? []}
                 onChange={images => {
@@ -180,7 +190,7 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
             <div className="sm-dim">так это увидит зал</div>
             <div className="sm-screen">
               {slide
-                ? <InfoSlideView slide={slide} rounds={rounds} mediaUrl={mediaUrl} />
+                ? <InfoSlideView slide={slide} rounds={rounds} stats={stats} mediaUrl={mediaUrl} />
                 : <div className="sm-dim" style={{ padding: 20 }}>слайд не выбран</div>}
             </div>
           </div>
