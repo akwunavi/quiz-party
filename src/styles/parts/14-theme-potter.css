@@ -294,3 +294,46 @@
 @media (prefers-reduced-motion: reduce) {
   .fx-flash, .fx-potter .fx-mote, .fx-potter::after { display: none; animation: none; }
 }
+
+/* ═══ 8.52: медаль награждения — «Орден Мерлина» ═══
+   Канонiчная награда волшебного мира: золотой медальон на ленте, класс —
+   цвет ленты (I — зелёная, «за выдающуюся отвагу», II — фиолетовая,
+   III — белая). Медальон — тот же вocковой язык, что у печати
+   .mel-tile/.jp-tile (радиальный градиент + emboss-кольцо), а не новый
+   мотив с нуля. Размер — --medal-size из 25-results.css. */
+.award-merlin {
+  position: relative; width: var(--medal-size);
+  height: calc(var(--medal-size) * 1.55);
+  display: flex; flex-direction: column; align-items: center;
+  animation: amIn .55s cubic-bezier(.2,.8,.2,1) both; }
+/* лента: два сходящихся книзу «хвоста», выемка — clip-path из двух клиньев */
+.award-merlin .am-ribbon {
+  position: absolute; top: calc(var(--medal-size) * .38); left: 50%;
+  transform: translateX(-50%); width: calc(var(--medal-size) * .62);
+  height: calc(var(--medal-size) * 1.05);
+  background: linear-gradient(180deg, #2f7d3a, #1d5426);
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 96%, 0 82%); }
+.award-merlin.p2 .am-ribbon { background: linear-gradient(180deg, #6b3fa0, #472a6b); }
+.award-merlin.p3 .am-ribbon { background: linear-gradient(180deg, #e8e2d0, #b7b09c); }
+/* медальон — восковой круг золота поверх ленты */
+.award-merlin .am-disc {
+  position: relative; z-index: 1; width: var(--medal-size); aspect-ratio: 1;
+  border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #d3a625 55%, #8a6812 100%);
+  box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 0 0 3px rgba(255,255,255,.35),
+    inset 0 -6px 14px rgba(0,0,0,.35);
+  display: flex; align-items: center; justify-content: center; }
+.award-merlin .am-disc b { position: relative; font-family: 'Cinzel Decorative', serif;
+  font-size: calc(var(--medal-size) * .4); color: #4a3208;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4); }
+/* блик, скользящий по медальону при появлении — тот же приём, что у cf-scan */
+.award-merlin .am-shine { position: absolute; inset: -20%; pointer-events: none;
+  background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.65) 50%, transparent 60%);
+  animation: amShine 1.6s ease-out .3s both; }
+@keyframes amShine { from { transform: translateX(-120%); } to { transform: translateX(120%); } }
+@keyframes amIn { from { opacity: 0; transform: translateY(-16px) scale(.7); }
+  to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .award-merlin { animation: none; }
+  .award-merlin .am-shine { animation: none; opacity: 0; }
+}

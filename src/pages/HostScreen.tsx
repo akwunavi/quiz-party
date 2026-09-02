@@ -25,6 +25,7 @@ import {
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { ScreenFx } from '../components/ScreenFx'
+import { AwardMedal } from '../components/AwardMedal'
 import { SnowCurtain } from '../components/NewYearScene'
 import { CrosswordView } from '../components/CrosswordView'
 import { computeTotals, computeRoundScores } from '../lib/totals'
@@ -796,8 +797,14 @@ function Timer({ startedAt, seconds, theme, chime = true }: {
   // либо ещё не запущен, либо уже дотикал до нуля. Это единственный
   // элемент, по которому с дальнего конца зала видно, идёт время или нет.
   const running = !!startedAt && left > 0
+  // «Не запущен» и «дотикал до нуля» — оба .paused (искра стоит на месте,
+  // видно, что время не идёт), но ДО старта её вообще не должно быть на
+  // экране: в этот момент нечему «стоять на месте», ведущий ещё не нажал
+  // кнопку. .not-started гасит саму искру и кольцо, .paused остаётся как
+  // был — сигнал «дотикало» никуда не делся.
   return (
-    <div className={`timer-wrap${low ? ' low' : ''}${running ? '' : ' paused'}`}>
+    <div className={`timer-wrap${low ? ' low' : ''}${running ? '' : ' paused'}${
+      startedAt ? '' : ' not-started'}`}>
       <span className="tm-orbit" aria-hidden="true"><i className="tm-spark" /></span>
       <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
@@ -2649,7 +2656,7 @@ function Finale({ pack, gameId, gameState }: {
         <div className="mono-tag">НАГРАЖДЕНИЕ</div>
         <div className={`fin-award p${place}`}>
           <div className="fin-award-place">{place} МЕСТО</div>
-          <div className="fin-award-medal">{['🥇', '🥈', '🥉'][place - 1]}</div>
+          <div className="fin-award-medal"><AwardMedal theme={pack.theme} place={place} /></div>
           {winners.length > 0
             ? <>
                 {winners.map(r => (
@@ -2700,7 +2707,7 @@ function Finale({ pack, gameId, gameState }: {
           {champs.length > 1 ? 'ПОБЕДИТЕЛИ ИГРЫ' : 'ПОБЕДИТЕЛЬ ИГРЫ'}
         </div>
         <div className="fin-award p1">
-          <div className="fin-award-medal">🥇</div>
+          <div className="fin-award-medal"><AwardMedal theme={pack.theme} place={1} /></div>
           {champs.length > 0
             ? champs.map(r => (
                 <div key={r.team.id} className="fin-award-name"

@@ -37,6 +37,12 @@
 .theme-classic .timer-wrap.paused .tm-spark,
 .cyber .timer-wrap.paused .tm-spark { background: var(--dim);
   box-shadow: 0 0 8px 2px color-mix(in srgb, var(--dim) 60%, transparent); }
+/* до старта таймера искру не показываем вообще — ей ещё нечего означать:
+   таймер не «стоит», он просто ещё не начат. Хвост кольца гасим тоже. */
+.theme-classic .timer-wrap.not-started .tm-spark,
+.cyber .timer-wrap.not-started .tm-spark,
+.theme-classic .timer-wrap.not-started .tm-orbit::before,
+.cyber .timer-wrap.not-started .tm-orbit::before { opacity: 0; }
 /* цифра дышит в такт секундам */
 .theme-classic .timer-num, .cyber .timer-num {
   position: relative; z-index: 1;
@@ -272,4 +278,46 @@
   .theme-classic .fin-screen .fin-row.is-in .sb-name, .cyber .fin-screen .fin-row.is-in .sb-name,
   .theme-classic .fin-screen .fin-row.fin-first.is-in > td, .cyber .fin-screen .fin-row.fin-first.is-in > td {
     animation: none; background-image: none; clip-path: none; box-shadow: none; }
+}
+
+/* ═══ 8.52: медаль награждения — неоновый hex-жетон ═══
+   Тот же clip-path, что у .jp-tile/.mel-tile (16-round-melody-tiles.css) —
+   медаль читается как часть той же темы, а не отдельно нарисованная деталь.
+   Цвет ободка/искры — по месту: 1 золото, 2 серебро, 3 бронза. Размер —
+   --medal-size из 25-results.css (пиксели, не em — чтобы не зависеть от
+   font-size .fin-award-medal). */
+.award-hex {
+  /* Золото/серебро/бронза — фиксированные цвета, НЕ var(--accent): в
+     классике accent сам оранжевый (#ea580c), и место 1 против бронзы места
+     3 сливались в один и тот же оттенок — ранг переставал читаться. */
+  --neon: #ffd700;
+  position: relative; width: var(--medal-size); height: var(--medal-size);
+  animation: ahIn .5s cubic-bezier(.2,.8,.2,1) both; }
+.award-hex.p2 { --neon: #c9d6e3; }
+.award-hex.p3 { --neon: #cd7f32; }
+.award-hex .ah-face {
+  position: absolute; inset: 6%; display: flex; align-items: center; justify-content: center;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: #131a2e;
+  box-shadow: inset 0 0 0 3px var(--neon),
+    inset 0 0 24px color-mix(in srgb, var(--neon) 45%, transparent); }
+.award-hex .ah-face b { font-family: var(--font-digits); font-weight: 700;
+  font-size: calc(var(--medal-size) * .42); color: var(--neon);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--neon) 70%, transparent); }
+/* орбитальная искра — тот же язык, что .tm-orbit/.tm-spark у таймера */
+.award-hex .ah-orbit { position: absolute; inset: -8%; border-radius: 50%;
+  animation: ahOrbit 3.2s linear infinite; }
+.award-hex .ah-orbit::before { content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 268deg,
+    color-mix(in srgb, var(--neon) 85%, transparent) 0deg,
+    color-mix(in srgb, var(--neon) 30%, transparent) 40deg,
+    transparent 80deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); }
+@keyframes ahOrbit { to { transform: rotate(360deg); } }
+@keyframes ahIn { from { opacity: 0; transform: scale(.4) rotate(-25deg); }
+  to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .award-hex { animation: none; }
+  .award-hex .ah-orbit { animation: none; }
 }

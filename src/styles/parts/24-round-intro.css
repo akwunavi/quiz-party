@@ -195,88 +195,121 @@
   .theme-classic .round-intro::after { animation: none; }
 }
 
-/* ═══ СЛАЙД-БРИФИНГ (фаза info) ═══
+/* ═══ СЛАЙД-БРИФИНГ (фаза info) — сетка из НЕЗАВИСИМЫХ блоков (8.52) ═══
    Универсальный экран: правила, туториал, реклама. Показывается кнопкой из
-   админки в любой момент. Раскладка — две колонки, если есть картинки,
-   одна широкая, если их нет. */
+   админки в любой момент. До 8.52 тут была ЖЁСТКАЯ раскладка «одна текстовая
+   колонка (правила+раунды+статистика подряд) плюс картинка», и note вообще
+   висела отдельной полосой ПОД экраном. Теперь до 4 независимых блоков —
+   картинка, правила, доп. информация, раунды/статистика — и сетка считает
+   место под каждый присутствующий. Сам grid-template (сколько колонок/строк,
+   где чья area) вычисляется в JS (InfoSlideView.tsx:buildGrid) и приходит
+   инлайн-стилем — раскладок слишком много (1..4 блока × слева/справа/сверху),
+   чтобы держать их все статичными классами в CSS; здесь только то, что ВНУТРИ
+   каждой area — размеры, типографика, подгон под содержимое. */
 .info-screen .info-body { flex: 1 1 0; min-height: 0; width: min(1500px, 94%);
-  margin: 0 auto; display: flex; align-items: center;
+  margin: 0 auto; display: grid;
   gap: clamp(20px, 3vw, 56px); }
-.info-screen.has-media .info-body > .info-col { flex: 1 1 0; min-width: 0; }
-.info-screen .info-body > .info-col { flex: 1 1 auto; min-width: 0; text-align: left;
-  display: flex; flex-direction: column; gap: clamp(14px, 2.4vh, 30px); }
-.info-screen .info-media { flex: 1 1 0; min-width: 0; min-height: 0;
-  max-height: 74vh; }
 
+/* Каждый блок — контейнер с container-query: кегль внутри считается от
+   РЕАЛЬНОЙ ширины своей ячейки (cqw), а не от вьюпорта (vw). Экран с двумя
+   блоками рядом и тот же экран с четырьмя блоками дают ячейке разную
+   ширину — vw про это ничего не знает, отсюда и не помещалось при новых
+   галочках (см. HANDOFF 8.50: lay-full ловушка). */
+.info-block { container-type: inline-size; min-width: 0; min-height: 0;
+  overflow: hidden; text-align: left; display: flex; flex-direction: column;
+  justify-content: center; }
+.info-media { min-width: 0; min-height: 0; height: 100%; width: 100%;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.info-media .q-img img { max-width: 100%; max-height: 100%; }
+/* .q-media-grid.n1 несёт свой фиксированный width: min(1100px, 80vw)
+   (19-patch-746.css, вес 0,2,0 — тяжелее голого .info-media) — вне сетки
+   слайда это нормально (там картинка одна и ей нужен потолок), но ВНУТРИ
+   grid-ячейки фиксированная ширина ломает раскладку: колонка с картинкой
+   растягивается до 1100px и отжимает соседние колонки, даже когда сетка
+   должна делить место поровну. Перебиваем именно в этом контексте. */
+.info-screen .info-media.n1 { width: 100%; }
+/* lay-full: картинка — верхняя строка (grid-template-rows: auto 1fr,
+   см. buildGrid в InfoSlideView.tsx). Без потолка «auto» считает высоту по
+   натуральной пропорции картинки при доступной ширине — легко занимает
+   половину экрана и отжимает текстовые блоки снизу в узкую полосу, где они
+   обрезаются (даже с useFitText: подгону просто некуда сжимать блок, если
+   ему физически не осталось высоты). Потолок — тот же, что был исторически. */
+.info-screen.lay-full .info-media { max-height: 42vh; }
+
+/* Кегль — на КОНТЕЙНЕРЕ (.info-list/.ib-meta-fit/.info-note), не на строках
+   внутри. Это не стиль ради стиля: именно контейнер меряет useFitText
+   (InfoSlideView.tsx) и уменьшает ЕГО font-size, если контент не влезает —
+   строки внутри обязаны наследовать (без своего em/px), иначе подгон
+   визуально ничего не делает (у li был бы собственный clamp(), не зависящий
+   от родителя, и хук уменьшал бы кегль, который никто не показывает).
+   cqw-клампы здесь — стартовая точка ДО замера (чтобы контент не мигал от
+   большого кегля к маленькому на первом кадре), сам замер может уйти ниже.
+
+   ВАЖНО: ни на самом измеряемом элементе (тот, что получает `ref`), ни на
+   его детях НЕЛЬЗЯ ставить `min-height: 0` или `overflow: hidden` — только
+   на ОБЁРТКЕ (.info-block). useFitText сравнивает `el.scrollHeight` с
+   доступной высотой родителя; если у el (или у его вложенных детей вроде
+   .info-rounds) есть свой overflow:hidden + сосед без явного flex-grow, то
+   flex-shrink сжимает el ДО измерения (min-height:0 снимает защитный пол
+   flex-item'а от сжатия ниже контента) — el визуально становится ровно
+   такого же размера, как его собственный overflow-родитель, и
+   scrollHeight/clientHeight совпадают, хотя реальный контент в разы выше:
+   подгон видит «всё влезает» и не трогает кегль, а лишние строки просто
+   обрезаются НЕ на границе .info-block, а где-то на границе .info-rounds —
+   найдено рендером: 16 раундов дали scrollHeight 613 у .info-rounds, но
+   .ib-meta-fit (родитель) при этом сам отчитался 380/380 — сжался вместе
+   с контентом вместо того, чтобы остаться высоким и позволить измерить
+   реальный размер. */
 .info-list { list-style: none; margin: 0; padding: 0;
-  display: flex; flex-direction: column; gap: clamp(10px, 1.8vh, 22px); }
+  font-size: clamp(14px, 6.5cqw, 40px);
+  display: flex; flex-direction: column; gap: .5em; }
 /* Список правил читают, а не любуются им: выравнивание по левому краю
    обязательно, по центру строки «скачут» и глаз теряет начало. */
 .info-list li { position: relative; padding-left: 1.6em; text-align: left;
-  font-size: clamp(18px, 2.1vw, 40px); line-height: 1.3;
-  animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
+  line-height: 1.3; animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
 .info-list li::before { content: '▸'; position: absolute; left: 0;
   color: var(--accent); }
 @keyframes infoIn { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; } }
 
-/* сводка по раундам — собирается из пакета, руками не дублируется */
-.info-rounds { display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px);
-  padding-top: clamp(8px, 1.4vh, 18px);
+/* сводка по раундам + статистика пакета — общий подгоняемый контейнер:
+   .ib-meta-fit держит кегль (замеряется целиком, обе части одного масштаба),
+   .info-rounds — построчно по раунду, .info-stats — итоговые числа. */
+.ib-meta-fit { font-size: clamp(11px, 4.2cqw, 26px);
+  display: flex; flex-direction: column; }
+.info-rounds { display: flex; flex-direction: column; gap: .3em; }
+.info-rounds + .info-stats { margin-top: .5em; padding-top: .5em;
   border-top: 1px solid color-mix(in srgb, var(--dim) 50%, transparent); }
-.info-round { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 16px);
-  text-align: left;
-  font-size: clamp(14px, 1.5vw, 26px); }
+.info-round { display: flex; align-items: baseline; gap: .5em; text-align: left; }
 .info-round .ir-num { flex: 0 0 auto; min-width: 1.6em;
   font-family: var(--font-digits); color: var(--accent); font-weight: 700; }
-.info-round .ir-name { flex: 1 1 auto; min-width: 0; }
+.info-round .ir-name { flex: 1 1 auto; min-width: 0; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; }
 .info-round .ir-count { flex: 0 0 auto; color: var(--dim);
   font-family: var(--font-mono, monospace); font-size: .82em; }
 
 /* сводная статистика пакета (раунды/вопросы/музыка/время) — считается в
-   lib/duration.ts:packStats, рисуется отдельным блоком, чтобы не путать со
+   lib/duration.ts:packStats, рисуется отдельным списком, чтобы не путать со
    сводкой по раундам выше (.info-rounds — по каждому раунду отдельно,
    .info-stats — итоговые числа по всему пакету) */
-.info-stats { list-style: none; margin: 0; padding-top: clamp(8px, 1.4vh, 18px);
-  display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px);
-  border-top: 1px solid color-mix(in srgb, var(--dim) 50%, transparent);
-  text-align: left; }
-.info-stats li { font-size: clamp(14px, 1.5vw, 26px); line-height: 1.3;
-  animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
+.info-stats { list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: .3em; text-align: left; }
+.info-stats li { line-height: 1.3; animation: infoIn .5s cubic-bezier(.2,.8,.3,1) both; }
 .info-stats li::before { content: '◆ '; color: var(--accent); }
 
+/* доп. информация — раньше отдельная полоса ПОД экраном вне сетки, теперь
+   такой же блок в сетке, просто тише остальных (приглушённый цвет, кегль
+   поменьше) — сохраняет прежний тон «сноски», не конкурирует за внимание */
+.ib-note { justify-content: center; }
+.info-note { color: var(--dim); font-size: clamp(11px, 3.6cqw, 22px);
+  line-height: 1.4; text-align: left; }
+
 @media (max-width: 900px) {
-  .info-screen .info-body { flex-direction: column; }
+  .info-screen[data-blocks="2"] .info-body,
+  .info-screen[data-blocks="3"] .info-body,
+  .info-screen[data-blocks="4"] .info-body {
+    grid-template-columns: 1fr !important; grid-template-rows: none !important;
+    grid-template-areas: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .info-list li, .info-stats li { animation: none; }
 }
-
-/* ── Раскладки слайда-брифинга (выбор в редакторе) ── */
-/* Порядок в потоке задаёт JSX, здесь только ширины и выравнивание. */
-.info-screen.lay-full .info-body { flex-direction: column; align-items: stretch; }
-.info-screen.lay-full .info-media { max-height: 46vh; width: 100%; }
-/* При раскладке «во всю ширину» текстовый блок и картинка — НЕ равные
-   половины (как в left/right), а последовательные блоки в столбик: у
-   картинки уже есть свой потолок (max-height: 46vh) выше, а текстовому
-   блоку жёсткий flex:1 1 0 обрезал бы третий пункт (список раундов +
-   статистику пакета разом) ровно посередине экрана — сам текст оставался
-   бы за overflow:hidden невидимым, хотя formально «был в DOM». Пусть
-   колонка занимает столько, сколько нужно её содержимому. */
-.info-screen.lay-full.has-media .info-body > .info-col {
-  flex: 0 1 auto; max-height: none; overflow: visible; }
-.info-screen.lay-right .info-body > .info-col { text-align: left; }
-/* дополнительный текст внизу — сноска, не конкурирует с пунктами */
-.info-note { flex: 0 0 auto; width: min(1500px, 94%); margin: 0 auto;
-  padding: clamp(8px, 1.4vh, 18px) 0 clamp(14px, 2vh, 26px);
-  text-align: center; color: var(--dim);
-  font-size: clamp(13px, 1.3vw, 24px); line-height: 1.35; }
-
-/* Текст брифинга рядом с картинкой: колонка вдвое уже, кегль обязан
-   следовать за ней — иначе пункты уезжают за нижний край экрана. */
-.info-screen.has-media .info-list li { font-size: clamp(15px, 1.55vw, 30px); }
-.info-screen.has-media .info-round { font-size: clamp(12px, 1.15vw, 20px); }
-.info-screen.has-media .info-stats li { font-size: clamp(12px, 1.15vw, 20px); }
-.info-screen.has-media .info-col { max-height: 100%; overflow: hidden; }
-/* много пунктов — ещё мельче, иначе список не помещается */
-.info-screen .info-list:has(li:nth-child(7)) li { font-size: clamp(13px, 1.35vw, 24px); }
-.info-screen .info-list:has(li:nth-child(10)) li { font-size: clamp(12px, 1.15vw, 20px); }
