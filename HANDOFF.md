@@ -1167,6 +1167,19 @@ Three.js) источник: `threejs-fundamentals`, `threejs-geometry`,
 
 ---
 
+## 3w. Скиллы motion-design для Claude Code (8.63)
+
+По запросу подключены `iart-ai/motion-design-skills` (`npx skills add
+https://github.com/iart-ai/motion-design-skills`), тоже сторонний
+источник: `after-effects`, `animation-principles`, `beat-sync-editing`,
+`color-motion`, `logo-animation`, `motion-art-direction`,
+`motion-background`, `remotion-video`, `shot-composition`. Легли туда же,
+куда GSAP/Three.js в 3u/3v. Содержимое просмотрено перед коммитом — из
+внешних ссылок только `cdn.jsdelivr.net` и сайт автора, ничего похожего
+на инъекцию команд. Справочные материалы, в проекте пока не используются.
+
+---
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и
