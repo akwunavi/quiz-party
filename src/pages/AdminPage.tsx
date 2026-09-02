@@ -799,6 +799,8 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
         )
       })()}
 
+      {pack && <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />}
+
       {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
           перед игрой. Здесь был её дубль с тем же действием: две кнопки
           с одинаковым смыслом только путали. */}
@@ -829,6 +831,99 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
           + 'Полная очистка — кнопкой в лобби.')) void resetGame()
       }}>⟲ НОВАЯ ИГРА</button>
     </div>
+  )
+}
+
+/** Ручная корректировка баллов (8.56) — на случай, если автоподсчёт где-то
+ *  сбойнул (задвоенный проход, забытая оценка). Пишет запись answers с
+ *  ключом `q-adjust-<раунд>` (тот же приём, что у бумажных баллов) —
+ *  computeTotals/computeRoundScores читают её и прибавляют поверх обычного
+ *  счёта раунда, см. lib/totals.ts. Список ниже — уже применённые
+ *  корректировки, их можно снять кнопкой «убрать» (обнуляет ставку). */
+function ScoreAdjustPanel({ pack, gameId, teams, answers }: {
+  pack: LoadedPack; gameId: string; teams: Team[]; answers: Answer[]
+}) {
+  const hint = useHint(12000)
+  const [teamId, setTeamId] = useState(teams[0]?.id ?? '')
+  const [ri, setRi] = useState(0)
+  const [delta, setDelta] = useState('')
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const existing = answers.filter(a =>
+    a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0)
+
+  const write = async (tId: string, roundIdx: number, stake: number, text: string) => {
+    const { error } = await supabase.from('answers').upsert({
+      team_id: tId, game_id: gameId, question_ref: `q-adjust-${roundIdx}`,
+      round_number: roundIdx, answer_text: text, stake, is_correct: true,
+      updated_at: new Date().toISOString(),
+    } as never, { onConflict: 'team_id,question_ref' } as never)
+    return error
+  }
+
+  const save = async () => {
+    const n = Number(delta)
+    if (!teamId) return hint.show('Выбери команду.')
+    if (delta.trim() === '' || Number.isNaN(n) || n === 0) {
+      return hint.show('Введи число очков, отличное от нуля — можно со знаком минус.')
+    }
+    setBusy(true)
+    try {
+      const error = await write(teamId, ri, n, note.trim())
+      if (error) return hint.show(`Не сохранено: ${error.message}. Проверь связь и нажми ещё раз.`)
+      hint.clear()
+      setDelta(''); setNote('')
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <details className="adm-why">
+      <summary>Ручная коррекция баллов</summary>
+      <div className="adm-dim">
+        Прибавляет или вычитает очки к счёту команды за раунд — если
+        автоподсчёт где-то сбойнул. Сразу отражается в таблице выше и на
+        табло/финале у игроков.
+      </div>
+      <div className="adm-adjust-form">
+        <select value={teamId} onChange={e => setTeamId(e.target.value)}>
+          {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+        </select>
+        <select value={ri} onChange={e => setRi(Number(e.target.value))}>
+          {pack.rounds.map((r, i) => (
+            <option key={r.id} value={i}>Р{i + 1}. {(r.title_lines ?? []).join(' ') || '—'}</option>
+          ))}
+        </select>
+        <input type="number" placeholder="+5 или -3" value={delta}
+          onChange={e => setDelta(e.target.value)} />
+        <input type="text" placeholder="комментарий (необязательно)" value={note}
+          onChange={e => setNote(e.target.value)} />
+        <button className="adm-btn" disabled={busy} onClick={() => void save()}>Сохранить</button>
+      </div>
+      <Hint text={hint.text} />
+      {existing.length > 0 && (
+        <div className="adm-adjust-list">
+          {existing.map(a => {
+            const t = teams.find(x => x.id === a.team_id)
+            const rNum = Number(a.question_ref.slice('q-adjust-'.length))
+            const stake = Number(a.stake ?? 0)
+            return (
+              <div key={a.id} className="adm-adjust-row">
+                <span style={{ color: t?.color }}>{t?.name ?? '?'}</span>
+                <span className="adm-dim">Р{rNum + 1}</span>
+                <span className={stake > 0 ? 'adm-adjust-plus' : 'adm-adjust-minus'}>
+                  {stake > 0 ? `+${stake}` : stake}
+                </span>
+                {a.answer_text && <span className="adm-dim">{a.answer_text}</span>}
+                <button className="adm-link" onClick={() => void write(a.team_id, rNum, 0, '')}>
+                  убрать
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </details>
   )
 }
 

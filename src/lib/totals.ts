@@ -54,6 +54,20 @@ function scoreBlitzRound(ri: number, teamId: string, answers: Answer[]): number 
   return Number(row?.stake ?? 0)
 }
 
+// ── Ручная корректировка (8.56) ──────────────────────────────────────────
+// Админ поправляет счёт раунда вручную, когда автоподсчёт где-то сбойнул
+// (задвоенный проход, забытая оценка и т.п.). Хранится как обычная запись
+// answers с ключом `q-adjust-<раунд>` — тот же приём, что у бумажных
+// баллов (`q-paper-<раунд>`), только ДОБАВЛЯЕТСЯ поверх обычного счёта
+// раунда, какой бы механикой он ни считался, а не заменяет его целиком.
+// Читается и в computeTotals, и в computeRoundScores — иначе Σ и
+// построчная разбивка разойдутся (см. CLAUDE.md: «правя computeTotals,
+// правь computeRoundScores»).
+function manualAdjustment(ri: number, teamId: string, answers: Answer[]): number {
+  const row = answers.find(a => a.team_id === teamId && a.question_ref === `q-adjust-${ri}`)
+  return Number(row?.stake ?? 0)
+}
+
 export function computeTotals(
   pack: LoadedPack, teams: Team[], answers: Answer[],
   doubledByTeam: Record<string, boolean> = {}, doubledRoundIdx: number | null = null,
@@ -139,6 +153,13 @@ export function computeTotals(
         default:
           total += scoreStandard(rows, (s.pointsPerQuestion as number | undefined) ?? 1)
       }
+    })
+    // корректировки — отдельным проходом ПОСЛЕ обычного счёта, а не внутри
+    // веток выше: так они действуют независимо от механики раунда и не
+    // требуют правки в каждой ветке switch/if по отдельности
+    pack.rounds.forEach((round, ri) => {
+      if (round.off_scoreboard) return
+      total += manualAdjustment(ri, t.id, answers)
     })
     map.set(t.id, total)
   }
@@ -228,6 +249,14 @@ export function computeRoundScores(
         default: v = scoreStandard(rows, (s.pointsPerQuestion as number | undefined) ?? 1)
       }
       per.push(v)
+    })
+    // та же корректировка, что в computeTotals — применяется ПОСЛЕ, чтобы
+    // не трогать каждую ветку механики выше по отдельности. per[ri] уже
+    // существует для каждого раунда (индексы не пропускаются, см. коммент
+    // у вызова в HostScreen.tsx:ScoreboardScreen).
+    pack.rounds.forEach((round, ri) => {
+      const adj = manualAdjustment(ri, t.id, answers)
+      if (adj) per[ri] = (per[ri] ?? 0) + adj
     })
     map.set(t.id, per)
   }

@@ -76,6 +76,18 @@
 .adm-score-table td { padding: 4px 6px; font-variant-numeric: tabular-nums; }
 .adm-score-table td.total { font-weight: 700; color: var(--fg); }
 
+/* Ручная коррекция баллов (8.56) — форма + список уже применённых. */
+.adm-adjust-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.adm-adjust-form select, .adm-adjust-form input { width: 100%; box-sizing: border-box;
+  padding: 9px 10px; border-radius: 8px; border: 1px solid var(--ed-line);
+  background: rgba(255,255,255,.05); color: var(--fg); font-size: 14px; }
+.adm-adjust-list { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+.adm-adjust-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 5px 0; border-bottom: 1px solid var(--ed-line); font-size: 13px; }
+.adm-adjust-row > button { margin-left: auto; }
+.adm-adjust-plus { color: var(--ok); font-weight: 700; }
+.adm-adjust-minus { color: #f87171; font-weight: 700; }
+
 /* ═══ ПАНЕЛЬ РЕПЕТИЦИИ (?dev=1) ═══
    Видна только в dev-режиме. Намеренно отличается по цвету от боевых
    кнопок: если она вдруг оказалась на экране во время игры, это видно
