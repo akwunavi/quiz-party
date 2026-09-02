@@ -22,8 +22,11 @@ const STORAGE_KEY = 'qp-fx-enabled'
 /** Не чаще одной вспышки в 4 секунды — иначе финал «шоу» (слайд каждые 3с
  *  восемь раз подряд) мигал бы почти непрерывно. */
 const MIN_GAP_MS = 4000
-/** Длительность CSS-анимации каждой темы + запас на снятие из DOM. */
-const FLASH_MS: Record<string, number> = { classic: 260, potter: 700 }
+/** Длительность CSS-анимации каждой темы + запас на снятие из DOM.
+ *  Классика: cxNoise .42s (28-theme-cyber.css) — поднято с .26s, потому что
+ *  на исходной длительности пик держался меньше кадра при 60Гц и не был
+ *  виден физически (проверено покадровым рендером). */
+const FLASH_MS: Record<string, number> = { classic: 470, potter: 700 }
 
 function readEnabled(): boolean {
   try {

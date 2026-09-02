@@ -71,16 +71,22 @@
   border-right: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%); }
-/* угловые засечки сверху и снизу */
+/* угловые засечки сверху и снизу.
+   Раньше кромка была чистой линией 2px без свечения — на тёмном фоне зала
+   это физически на грани видимости (проверено рендером: 2px без box-shadow
+   не читается даже в упор, тогда как та же линия с толщиной 8px видна
+   сразу). Толщина поднята и добавлено свечение, как у искры таймера
+   (.tm-spark) — тот же язык подсветки, что уже работает в этой теме. */
 .theme-classic .cyber-frame::before, .cyber .cyber-frame::before,
 .theme-classic .cyber-frame::after, .cyber .cyber-frame::after {
   content: ''; position: absolute; left: -2px; right: -2px; height: 14px;
   pointer-events: none;
-  border-left: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+  border-left: 3px solid var(--accent); border-right: 3px solid var(--accent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 70%, transparent)); }
 .theme-classic .cyber-frame::before, .cyber .cyber-frame::before {
-  top: -2px; border-top: 2px solid var(--accent); }
+  top: -2px; border-top: 3px solid var(--accent); }
 .theme-classic .cyber-frame::after, .cyber .cyber-frame::after {
-  bottom: -2px; border-bottom: 2px solid var(--accent); }
+  bottom: -2px; border-bottom: 3px solid var(--accent); }
 /* тонкая бегущая линия по верхней кромке — «идёт передача» */
 .theme-classic .cyber-frame > .cf-scan, .cyber .cyber-frame > .cf-scan {
   position: absolute; left: 0; top: -1px; height: 2px; width: 34%;
@@ -208,15 +214,20 @@
   background-size: 34% 3px, 160px 160px;
   background-position: -34% 30%, 0 0;
   opacity: 0;
-  animation: cxNoise .26s ease-out forwards; }
+  animation: cxNoise .42s ease-out forwards; }
 .fx-cyber::before, .fx-cyber::after {
   content: ''; position: absolute; left: 0; right: 0; height: 3px;
   background: color-mix(in srgb, var(--accent2) 70%, transparent);
-  animation: cxBar .24s ease-out forwards;
+  animation: cxBar .4s ease-out forwards;
 }
 .fx-cyber::before { top: 28%; animation-delay: .01s; }
 .fx-cyber::after { top: 64%; animation-delay: .05s; }
-@keyframes cxNoise { 0% { opacity: 0; } 6% { opacity: .32; } 100% { opacity: 0; } }
+/* Пик держится 15-45% времени (а не мгновение на 6%) — на замере первой
+   версии (0-6-100%, пик .32) кадр на пике физически не успевал попасть в
+   поле зрения: 260мс всего, а видимая часть — меньше одного кадра при
+   60Гц. Теперь плато на глаз ловится, потолок яркости (HANDOFF §3h) не
+   тронут — только его длительность. */
+@keyframes cxNoise { 0% { opacity: 0; } 15% { opacity: .55; } 45% { opacity: .5; } 100% { opacity: 0; } }
 @keyframes cxBar { 0% { transform: translateX(-100%); opacity: .85; }
   55% { opacity: .45; } 100% { transform: translateX(100%); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {

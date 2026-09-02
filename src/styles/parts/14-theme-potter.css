@@ -266,25 +266,31 @@
    Фаза 1 (0-320мс): искры-«мотыльки» разлетаются от центра, только
    transform+opacity. Фаза 2 (240-700мс): бело-голубая вспышка «люмос». */
 .fx-potter { position: relative; }
+/* Мотыльки и вспышка были слабо видны: искры — крошечная точка в 104px от
+   центра посреди экрана 1920+, вспышка — мгновенный пик на 35% из 460мс
+   (меньше кадра при 60Гц). Крупнее сама точка, дальше разлёт, и у вспышки
+   теперь плато, а не укол — тот же потолок яркости (HANDOFF §3h), просто
+   дольше держится в кадре. */
 .fx-potter .fx-mote {
-  position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px;
+  position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px;
   border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle, #ffe9a8, rgba(255,233,168,0) 70%);
-  opacity: 0; animation: fxMote .32s ease-out forwards; }
+  opacity: 0; animation: fxMote .4s ease-out forwards; }
 @keyframes fxMote {
   0% { opacity: 0; transform: rotate(var(--a)) translateX(0) scale(.4); }
-  22% { opacity: 1; }
+  20% { opacity: 1; }
   100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(1); } }
 .fx-potter::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(circle at 50% 50%,
-    rgba(255,250,235,.55), rgba(211,166,37,.35) 40%, transparent 72%);
+    rgba(255,250,235,.6), rgba(211,166,37,.4) 40%, transparent 72%);
   opacity: 0; transform: scale(.2);
-  animation: fxLumos .46s ease-out .24s forwards; }
+  animation: fxLumos .5s ease-out .2s forwards; }
 @keyframes fxLumos {
   0% { opacity: 0; transform: scale(.2); }
-  35% { opacity: .45; }
-  100% { opacity: 0; transform: scale(1.6); } }
+  30% { opacity: .6; transform: scale(1.1); }
+  55% { opacity: .55; transform: scale(1.3); }
+  100% { opacity: 0; transform: scale(1.8); } }
 @media (prefers-reduced-motion: reduce) {
   .fx-flash, .fx-potter .fx-mote, .fx-potter::after { display: none; animation: none; }
 }
