@@ -36,7 +36,14 @@ function verdictText(v: boolean | null): string {
   return v === true ? 'верно' : v === false ? 'неверно' : 'не оценено'
 }
 
-export function exportAnswersCsv(pack: LoadedPack, teams: Team[], answers: Answer[]): string {
+/** @param shownAt `question_ref → shown_at` из таблицы question_shown (см.
+ *  миграцию 0009) — момент, когда ведущий запустил таймер вопроса. Вместе с
+ *  answers.created_at даёт скорость ответа команды. Необязательный: без
+ *  него колонки тайминга просто остаются пустыми (старые игры, до миграции,
+ *  или строки с нестандартным question_ref, для которых показа не было). */
+export function exportAnswersCsv(
+  pack: LoadedPack, teams: Team[], answers: Answer[], shownAt?: Map<string, string>,
+): string {
   const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const teamName = new Map(teams.map(t => [t.id, t.name]))
 
@@ -64,11 +71,18 @@ export function exportAnswersCsv(pack: LoadedPack, teams: Team[], answers: Answe
   const rows: string[][] = [[
     '№ раунда', 'Раунд', 'Команда', 'Вопрос', 'Ответ команды',
     'Правильный ответ', 'Ставка', 'Вердикт', 'Обновлено',
+    'Вопрос показан', 'Ответ отправлен', 'Скорость ответа (сек)',
   ]]
   for (const a of sorted) {
     const q = questionByRef.get(a.question_ref)
     const roundIndex = q?.roundIndex ?? a.round_number
     const roundLabel = q?.roundLabel ?? roundLabelByIndex.get(a.round_number) ?? `Раунд ${a.round_number + 1}`
+    const shown = shownAt?.get(a.question_ref)
+    // created_at — на старых играх (до миграции 0009) в ответе базы может
+    // не быть, тогда скорость посчитать не из чего
+    const elapsed = shown && a.created_at
+      ? Math.round((new Date(a.created_at).getTime() - new Date(shown).getTime()) / 1000)
+      : null
     rows.push([
       String(roundIndex + 1), roundLabel, teamName.get(a.team_id) ?? '—',
       q?.text ?? describeSpecialRef(a.question_ref),
@@ -76,6 +90,8 @@ export function exportAnswersCsv(pack: LoadedPack, teams: Team[], answers: Answe
       a.stake != null ? String(a.stake) : '',
       verdictText(a.is_correct),
       a.updated_at ?? '',
+      shown ?? '', a.created_at ?? '',
+      elapsed != null && elapsed >= 0 ? String(elapsed) : '',
     ])
   }
   // разделитель «;» — Excel с русской локалью ждёт именно его

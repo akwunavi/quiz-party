@@ -72,4 +72,18 @@ describe('выгрузка ответов по раундам (апелляци�
     expect(lines[1]).toContain('РАЗМИНКА')
     expect(lines[2]).toContain('БЛИЦ')
   })
+
+  it('время показа + created_at — считает скорость ответа в секундах', () => {
+    const shownAt = new Map([['q-a', '2026-01-01T00:00:00Z']])
+    const csv = exportAnswersCsv(pack, teams, [
+      ans({ team_id: 't1', question_ref: 'q-a', created_at: '2026-01-01T00:00:07Z' }),
+    ], shownAt)
+    expect(csv).toContain('"7"')
+  })
+
+  it('нет данных о показе — колонка скорости пустая, а не падает', () => {
+    const csv = exportAnswersCsv(pack, teams,
+      [ans({ team_id: 't1', question_ref: 'q-a' })])
+    expect(csv).not.toContain('NaN')
+  })
 })

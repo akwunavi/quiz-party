@@ -67,11 +67,29 @@ export async function gotoQuestion(question_index: number) {
   if (error) throw error
 }
 
-/** Старт таймера (вызывается хостом после озвучки вопроса). */
-export async function startTimer() {
+/** Старт таймера (вызывается хостом после озвучки вопроса).
+ *  Момент старта — это и есть «вопрос показан залу» для тайминга ответов
+ *  (см. миграцию 0009): до этого момента отвечать формально можно, но
+ *  реально команды ждут именно этой команды. question — необязательный:
+ *  таймер используется и там, где посекундный анализ вопросов не нужен
+ *  (например, обратный отсчёт «время ответов» между раундами) — тогда
+ *  запись в question_shown просто не делается. */
+export async function startTimer(question?: {
+  gameId: string; roundNumber: number; questionRef: string
+}) {
+  const now = new Date().toISOString()
   const { error } = await supabase.from('game_sessions')
-    .update({ timer_started_at: new Date().toISOString() }).eq('id', getRoomId())
+    .update({ timer_started_at: now }).eq('id', getRoomId())
   if (error) throw error
+  if (question) {
+    const { error: qError } = await supabase.from('question_shown').upsert({
+      game_id: question.gameId, round_number: question.roundNumber,
+      question_ref: question.questionRef, shown_at: now,
+    }, { onConflict: 'game_id,question_ref' })
+    // не блокируем игру, если это не записалось — тайминг это аналитика,
+    // а не то, без чего раунд не может продолжаться
+    if (qError) console.error('время показа вопроса не записалось', qError)
+  }
 }
 
 /** «Время ответов»: минута на подумать перед разбором (как в старом проекте). */

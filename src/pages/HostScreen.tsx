@@ -12,7 +12,7 @@ import { saveBlitz } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
-import { jeopardyTile } from '../lib/jeopardyRef'
+import { jeopardyTile, jeopardyRef } from '../lib/jeopardyRef'
 import { mediaUrl, lenClass } from '../lib/media'
 import { packStats } from '../lib/duration'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -390,7 +390,7 @@ function HostInner({ gameState, pack }: {
           && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
         <AudioGate />
         {round.mechanic !== 'jeopardy' && <>
-          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} />
+          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
@@ -1552,7 +1552,7 @@ function QuestionVideo({ src, hidden, waitFor, go }: {
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
  *  скрытая вкладка (второй проектор) молчит. */
-function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manual = false }: {
+function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manual = false, gameId, roundNumber }: {
   startedAt?: string | null
   seconds?: number
   q: LoadedPack['rounds'][number]['questions'][number]
@@ -1562,6 +1562,8 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
   /** игра на бумаге: ничего не звучит и время не идёт, пока ведущий не
    *  нажмёт «ЗАПУСТИТЬ» в админке — он сначала читает вопрос залу вслух */
   manual?: boolean
+  gameId?: string
+  roundNumber?: number
 }) {
   const hasOwnAV = (q.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
   const voiceRef = useRef<HTMLAudioElement | null>(null)
@@ -1610,7 +1612,8 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
         audioRef.current = a
         a.play().catch(() => {})        // не смогли — таймер всё равно идёт
       }
-      void startTimer()
+      void startTimer(gameId && roundNumber != null
+        ? { gameId, roundNumber, questionRef: `q-${q.id}` } : undefined)
     }
 
     if (!q.media.voice) { runQuestion(); return }
@@ -1701,7 +1704,8 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
       const v = voiceRef.current
       const voicePlaying = !!v && !v.paused && !v.ended
       if (voicePlaying) return          // ждём дальше, время не идёт
-      void startTimer()
+      void startTimer(gameId && roundNumber != null
+        ? { gameId, roundNumber, questionRef: `q-${q.id}` } : undefined)
     }, 2000)
     return () => clearInterval(t)
   }, [q.id, timerRunning, manual])
@@ -2183,7 +2187,10 @@ function JeopardyBoard({ pack, round, gameState }: {
                 // gotoQuestion обнуляет timer_started_at, а телефоны именно по
                 // нему понимают, что плитка открыта — без старта они вечно
                 // показывали «ждём, пока ведущий откроет плитку».
-                void gotoQuestion(flat).then(() => startTimer())
+                void gotoQuestion(flat).then(() => startTimer({
+                  gameId: gameState.game_id, roundNumber: gameState.round_number,
+                  questionRef: jeopardyRef(gameState.round_number, flat),
+                }))
                 setActive({ t: ti, i })
               }}>{done ? '·' : tile.value}</button>
           )

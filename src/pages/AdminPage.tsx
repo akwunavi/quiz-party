@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { useTeams } from '../hooks/useTeams'
 import { useAnswers } from '../hooks/useAnswers'
+import { useQuestionShown } from '../hooks/useQuestionShown'
 import { loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   gotoRound, slideForRound, slideBeforeFinale, showSlide,
@@ -342,7 +343,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             вопросов с аудио и без — ведущему не надо помнить, где как. */}
         {paperMode && phase === 'question' && !gameState.timer_started_at && (
           <button className="adm-btn primary adm-start-question"
-            onClick={() => void startTimer()}
+            onClick={() => void startTimer({
+              gameId: gameState.game_id, roundNumber: gameState.round_number,
+              questionRef: `q-${round.questions[step].id}`,
+            })}
             title="Прочитал вопрос залу — пускаем время, музыку и звук вопроса">
             ▶ ПРОЧИТАЛ — ПУСКАЕМ ВРЕМЯ
           </button>
@@ -352,7 +356,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             {/* повтор вопроса: перезапускает таймер, не сбивая номер вопроса.
                 Нужен, когда команды не расслышали или зависла музыка */}
             {(phase === 'question' || phase === 'answer_time') && (
-              <button className="adm-btn" onClick={() => void startTimer()}
+              <button className="adm-btn" onClick={() => void startTimer(
+                phase === 'question' ? {
+                  gameId: gameState.game_id, roundNumber: gameState.round_number,
+                  questionRef: `q-${round.questions[step].id}`,
+                } : undefined)}
                 title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
             )}
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
@@ -729,6 +737,7 @@ function ResultsPanel({ pack, gameId, teams }: {
   pack: LoadedPack; gameId: string; teams: Team[]
 }) {
   const answers = useAnswers(gameId)
+  const shownAt = useQuestionShown(gameId)
   const totals = computeTotals(pack, teams, answers)
   const perRound = computeRoundScores(pack, teams, answers)
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
@@ -765,7 +774,7 @@ function ResultsPanel({ pack, gameId, teams }: {
         <button className="adm-link" onClick={() => {
           const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-')
           const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
-          const csv = exportAnswersCsv(pack, teams, answers)
+          const csv = exportAnswersCsv(pack, teams, answers, shownAt)
           const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
           const a = document.createElement('a')
           a.href = url; a.download = `${safe}_ответы_${stamp}.csv`; a.click()
