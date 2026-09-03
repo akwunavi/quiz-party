@@ -52,6 +52,13 @@
   color: var(--fg); padding: 11px 2px; font-size: 13px; text-align: left; }
 .adm-cmd-row:first-child { border-top: none; }
 .adm-cmd-row .car { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 11.5px; }
+/* Заголовок блока — «▸ команды» / «▸ служебное» (8.67, по референсу
+   макета «Пульт ведущего»): не строка списка, а мелкий моно-кикер, тем же
+   приёмом, что уже есть в проекте под .adm-dim (мокап называет его
+   .mk-chevron) — просто раньше не был применён именно тут. Компоновка,
+   клик и раскрытие НЕ трогали — только цвет/шрифт/регистр текста. */
+.adm-cmd-row.head { color: var(--muted); font-family: 'Share Tech Mono', monospace;
+  letter-spacing: .08em; text-transform: uppercase; font-size: 11.5px; border-top: none; }
 
 .adm-ov-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.6);
   display: flex; align-items: flex-end; justify-content: center; }

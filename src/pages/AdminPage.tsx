@@ -497,7 +497,7 @@ function ServiceDrawer({ pack, round, gameState }: {
   const [open, setOpen] = useState(false)
   return (
     <div className="adm-box">
-      <button className="adm-cmd-row" onClick={() => setOpen(o => !o)}>
+      <button className="adm-cmd-row head" onClick={() => setOpen(o => !o)}>
         <span>{open ? '▾' : '▸'} служебное</span><span className="car">—</span>
       </button>
       {open && (
@@ -977,7 +977,7 @@ function ResultsPanel({ pack, gameState, teams }: {
   return (
     <>
       <div className="adm-box">
-        <button className="adm-cmd-row" onClick={() => setExpanded(e => !e)}>
+        <button className="adm-cmd-row head" onClick={() => setExpanded(e => !e)}>
           <span>{expanded ? '▾' : '▸'} команды</span><span className="car">—</span>
         </button>
         {expanded && (
