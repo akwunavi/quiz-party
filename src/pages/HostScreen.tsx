@@ -20,12 +20,13 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
-  startTimer, gotoAnswers, showScoreboard, startBreak, startAnswerTime, setFinaleStep,
-  slideBeforeFinale, showSlide, startCounting,
+  startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
+  startCounting,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
+import { AfterRoundNav } from '../components/AfterRoundNav'
 import { SnowCurtain } from '../components/NewYearScene'
 import { CrosswordView } from '../components/CrosswordView'
 import { computeTotals, computeRoundScores } from '../lib/totals'
@@ -43,7 +44,6 @@ import { teamColor } from '../lib/teamColors'
 import { probeMedia, createAudio, stopAllAudio, playSynced,
   type SyncedHandle } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
-import { afterRoundStep } from '../lib/flow'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -2363,30 +2363,9 @@ function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][numbe
   )
 }
 
-/** Навигация после раунда: табло → перерыв → следующий раунд/финал (по флагам раунда). */
-function AfterRoundNav({ pack, gameState }: {
-  pack: LoadedPack
-  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
-}) {
-  // маршрут считает общий модуль — проектор и админка не могут разойтись
-  const step = afterRoundStep(pack, gameState.round_number, gameState.phase)
-  const label = step.label.replace(' →', '').toLowerCase()
-  const run = () => {
-    if (step.kind === 'scoreboard') return void showScoreboard()
-    if (step.kind === 'break') return void startBreak()
-    if (step.kind === 'finale') {
-      // слайд «перед итогами» показываем до финала — ведущему не надо
-      // помнить про кнопку, слайд выходит сам там, где задуман
-      const sl = slideBeforeFinale(pack.settings?.info_slides)
-      return sl == null ? void finishGame(gameState.pack_id) : void showSlide(sl)
-    }
-    return void gotoRound(gameState.round_number + 1,
-      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
-  }
-  return <button onClick={run}>
-    {label.charAt(0).toUpperCase() + label.slice(1)} →
-  </button>
-}
+// AfterRoundNav переехал в components/AfterRoundNav.tsx (8.62) — понадобился
+// и RaceRound.tsx, а импортировать что-либо из HostScreen.tsx нельзя: утащит
+// весь проектор в чужой чанк (см. CLAUDE.md, раздел про разрез бандла).
 
 /** Табло с разбивкой по раундам (перенос идеи старого Scoreboard, новогодний визуал). */
 function ScoreboardScreen({ pack, gameState }: {

@@ -8,6 +8,12 @@
   color: var(--muted); padding: 8px 12px; font-size: 12px; letter-spacing: .1em; }
 .adm-link:hover { border-color: var(--neon); color: var(--fg); }
 .adm-link.danger { border-color: #5a1c28; color: #ff6b81; }
+/* отклик на копирование ссылки игрокам (8.62) — раньше кнопка молчала,
+   и было не понять, сработало ли; при недоступном clipboard сюда же
+   попадает сама ссылка текстом — длинная, поэтому не обрезаем и не жмём */
+.adm-link.ok { border-color: var(--answer, #57f5c0); color: var(--answer, #57f5c0);
+  max-width: min(78vw, 420px); overflow-wrap: break-word; white-space: normal;
+  text-align: left; }
 .adm-status { padding: 6px 16px; background: #0a1120; color: var(--muted);
   font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: .1em; }
 .adm-pad { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -25,6 +31,37 @@
 .adm-round { padding: 12px 8px; border-radius: 8px; background: #121c31;
   border: 1px solid #26344f; color: var(--fg); font-size: 13px; text-align: left; }
 .adm-round.active { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,229,255,.35); }
+/* ═══ Блок «Команды» (8.62): свёрнутые строки-превью + оверлей ═══
+   Раскрытие НА МЕСТЕ не подходит: внутри таблица на N раундов со скроллом
+   и форма со списком правок — на десктопе колонка узкая (не влезет), на
+   телефоне раскрытие двигало бы «Служебное» и низ экрана при каждом тапе,
+   а кнопки ведущего в этом проекте специально держат на стабильном месте
+   (см. .host-actions). Вместо этого — оверлей: шторка снизу на телефоне,
+   модалка по центру на широком экране (один и тот же разметочный узел,
+   переключает только медиазапрос). */
+.adm-cmd-row { display: flex; justify-content: space-between; align-items: center;
+  width: 100%; background: transparent; border: none; border-top: 1px solid #1c2740;
+  color: var(--fg); padding: 11px 2px; font-size: 13px; text-align: left; }
+.adm-cmd-row:first-child { border-top: none; }
+.adm-cmd-row .car { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 11.5px; }
+
+.adm-ov-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.6);
+  display: flex; align-items: flex-end; justify-content: center; }
+.adm-ov-panel { width: 100%; max-height: 82vh; overflow-y: auto; background: var(--panel);
+  border: 1px solid #1c2740; border-bottom: none; border-radius: 18px 18px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.adm-ov-head { display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; font-family: 'Share Tech Mono', monospace; letter-spacing: .08em;
+  text-transform: uppercase; font-size: 12px; color: var(--muted); }
+.adm-ov-close { background: transparent; border: none; color: var(--muted); font-size: 18px;
+  line-height: 1; padding: 4px 8px; }
+.adm-ov-close:hover { color: var(--fg); }
+@media (min-width: 760px) {
+  .adm-ov-backdrop { align-items: center; }
+  .adm-ov-panel { width: min(640px, 92vw); max-height: 86vh; border-radius: 14px;
+    border-bottom: 1px solid #1c2740; }
+}
+
 .adm-box { border: 1px solid #1c2740; border-radius: 8px; padding: 12px;
   display: flex; flex-direction: column; gap: 10px; }
 .adm-box textarea { background: #0d1626; border: 1px solid #26344f; color: var(--fg);
@@ -33,8 +70,11 @@
 .adm-centered { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .adm-h1 { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; }
 .adm-h1.ok { color: #22c55e; }
-.adm-qtext { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.3; }
-.adm-correct { font-size: 14px; color: #ffd700; }
+/* Экран вопроса/ответа (8.62) — по правому краю, отдельно от .adm-centered
+   (те остаются по центру: заставка раунда, табло, перерыв — не трогаем). */
+.adm-qgame { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; }
+.adm-qtext { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.3; text-align: right; }
+.adm-correct { font-size: 14px; color: #ffd700; text-align: right; }
 .adm-counter { font-family: 'Orbitron', monospace; font-size: 22px; }
 .adm-chip { padding: 4px 12px; font-size: 13px; font-weight: 700; border-radius: 6px;
   border: 1px solid #26344f; color: var(--muted); }

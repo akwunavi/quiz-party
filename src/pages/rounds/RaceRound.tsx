@@ -6,7 +6,8 @@
 import { getRoomId } from '../../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { gotoRound, finishGame, showScoreboard } from '../../lib/gameActions'
+import { openRaceBets, startRace } from '../../lib/raceActions'
+import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { mediaUrl } from '../../lib/media'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
@@ -140,18 +141,10 @@ export function RaceBoard({ pack, round, gameState }: {
     if (!race.stage && !document.hidden) void openBets()
   }, [race.stage])
 
-  const start = async () => {
-    // сид рождается ЗДЕСЬ — до этого клика исход не существует
-    const seed = (crypto.getRandomValues(new Uint32Array(1))[0]) >>> 0
-    await supabase.from('game_sessions').update({
-      melody: { ...gameState.melody, race: { seed, stage: 'running', startedAt: new Date().toISOString() } },
-    }).eq('id', getRoomId())
-  }
-  const openBets = async () => {
-    await supabase.from('game_sessions').update({
-      melody: { ...gameState.melody, race: { stage: 'betting' } },
-    }).eq('id', getRoomId())
-  }
+  // Сама запись — в lib/raceActions.ts, общая с кнопкой «Начать скачки» в
+  // админке (8.62): один вызов вместо двух копий одной и той же логики.
+  const start = () => startRace(gameState)
+  const openBets = () => openRaceBets(gameState)
 
   return (
     <div className="host-screen grid-bg race-screen">
@@ -208,15 +201,11 @@ export function RaceBoard({ pack, round, gameState }: {
 
       {done && scenario && (
         <div className="race-result">
-          <div className="host-actions">
-            <button className="ghost" onClick={() => void showScoreboard()}>Табло</button>
-            <button onClick={() => {
-              if (gameState.round_number + 1 < pack.rounds.length)
-                void gotoRound(gameState.round_number + 1)
-              else void finishGame(gameState.pack_id)
-            }}>{gameState.round_number + 1 < pack.rounds.length
-              ? 'Следующий раунд →' : 'Финальные итоги →'}</button>
-          </div>
+          {/* Раньше прыгало в следующий раунд НАПРЯМУЮ, минуя общий маршрут —
+              табло/перерыв, настроенные для раунда, молча пропускались. Та же
+              ошибка уже случалась у «Своей игры» и мелодии (см. HANDOFF.md),
+              лечится тем же приёмом: маршрут считает общий модуль. */}
+          <div className="host-actions"><AfterRoundNav pack={pack} gameState={gameState} /></div>
           <div className="answer-reveal" style={{ padding: '14px 30px' }}>
             <div className="answer-label">ПОБЕДИТЕЛЬ</div>
             <div className="answer-main">№{scenario.places[0] + 1} {dogs[scenario.places[0]]}</div>

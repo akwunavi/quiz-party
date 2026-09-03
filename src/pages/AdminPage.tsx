@@ -33,6 +33,8 @@ import { teamColor, nextFreeColor } from '../lib/teamColors'
 import { computeTotals, computeRoundScores } from '../lib/totals'
 import { rankTeams } from '../lib/ranking'
 import { exportAnswersCsv } from '../lib/exportAnswers'
+import { autocheck } from '../lib/autocheck'
+import { startRace } from '../lib/raceActions'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
 import type { Answer, Pack, Team } from '../types/quiz'
@@ -46,6 +48,7 @@ export function AdminPage() {
   const [pack, setPack] = useState<LoadedPack | null>(null)
   const teams = useTeams(gameState?.game_id ?? null)
   const answers = useAnswers(gameState?.game_id ?? null, gameState?.round_number)
+  const [linkCopied, setLinkCopied] = useState<string | null>(null)
 
   useEffect(() => {
     if (gameState?.pack_id) void loadPack(gameState.pack_id, true).then(setPack).catch(() => {})
@@ -64,17 +67,24 @@ export function AdminPage() {
         <div className="adm-brand">ВЕДУЩИЙ <span style={{ opacity: .45, fontSize: 11 }}>v{VERSION}</span></div>
         <div style={{ display: 'flex', gap: 8 }}>
           <a className="adm-link" href="./" target="_blank" rel="noreferrer">ПРОЕКТОР ↗</a>
-          <button className="adm-link" onClick={() => {
+          <button className={`adm-link${linkCopied ? ' ok' : ''}`} onClick={() => {
             const url = `${location.origin}${location.pathname}#/player?room=${getRoomId() ?? ''}`
-            void navigator.clipboard?.writeText(url)
-          }}>ССЫЛКА ИГРОКАМ</button>
+            // Тихое копирование раньше не давало отклика: нажал — и не видно,
+            // сработало ли. При недоступном clipboard (некоторые webview,
+            // http без TLS) показываем саму ссылку текстом — скопировать
+            // руками всё равно можно, а молчать нельзя.
+            navigator.clipboard?.writeText(url).then(() => {
+              setLinkCopied('✓ СКОПИРОВАНО')
+              setTimeout(() => setLinkCopied(null), 2000)
+            }, () => setLinkCopied(url))
+          }}>{linkCopied ?? 'ССЫЛКА ИГРОКАМ'}</button>
         </div>
       </div>
 
       <div className="adm-status">
         {pack ? `${pack.name} · Р${displayRoundNumber(pack, gameState.round_number)}` : 'пакет не выбран'} · {phase}
         {round && (phase === 'question' || phase === 'show_answers')
-          && round.mechanic !== 'melody' && round.mechanic !== 'jeopardy'
+          && round.mechanic !== 'melody' && round.mechanic !== 'jeopardy' && round.mechanic !== 'sprint'
           ? ` · ${gameState.question_index + 1}/${round.questions.length}` : ''}
       </div>
 
@@ -82,7 +92,7 @@ export function AdminPage() {
 
       {/* Сверка баллов и ручная коррекция — доступны в любой момент игры,
           не только в финале (8.59). */}
-      {pack && teams.length > 0 && <ResultsPanel pack={pack} gameId={gameState.game_id} teams={teams} />}
+      {pack && teams.length > 0 && <ResultsPanel pack={pack} gameState={gameState} teams={teams} />}
 
       {gameState.pack_id && phase === 'lobby' && pack && (
         <div className="adm-pad">
@@ -237,7 +247,6 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
   teams: Team[]; answers: Answer[]
 }) {
-  const [showRoundSwitch, setShowRoundSwitch] = useState(false)
   const phase = gameState.phase
   const step = gameState.question_index
   const isJeopardy = round.mechanic === 'jeopardy'
@@ -249,6 +258,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const paperMode = pack.settings?.play_mode === 'paper'
   const isInteractive = isJeopardy || isBlitz
     || round.mechanic === 'melody' || round.mechanic === 'race'
+  // «120 секунд»: все вопросы раунда на одном слайде (см. HostScreen.tsx),
+  // а не по одному — обычный «Дальше» листал их по одному 5 раз подряд,
+  // хотя на экране они и так все сразу. У раунда свой пульт: назад — на
+  // заставку, вперёд — сразу к разбору первого вопроса.
+  const isSprint = round.mechanic === 'sprint'
   const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
   // шаг после раунда берём из общего модуля: раньше здесь была своя копия
   // логики, которая игнорировала перерыв и расходилась с проектором
@@ -294,6 +308,16 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       if (recapOn) void setPhase('recap')
       else void gotoQuestion(round.questions.length - 1)
     }
+    // «Табло»/«Перерыв» раньше не входили в goBack вообще — кнопка «Назад»
+    // была на экране, но клик не делал ничего. Возврат тем же путём, каким
+    // сюда пришли: с перерыва — на табло (если оно было в маршруте) или на
+    // разбор последнего вопроса; с табло — на разбор последнего вопроса.
+    else if (phase === 'break') {
+      const s = (round.settings as { show_scoreboard_after?: boolean })
+      if (s.show_scoreboard_after) void setPhase('scoreboard')
+      else void gotoAnswers(round.questions.length - 1, true)
+    }
+    else if (phase === 'scoreboard') void gotoAnswers(round.questions.length - 1, true)
   }
 
   return (
@@ -303,10 +327,23 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           answers={answers} teams={teams} onGrade={grade} />
       )}
 
-      {phase !== 'show_answers' && (
+      {/* «120 секунд» показывает все вопросы разом на проекторе — question_index
+          тут не «текущий вопрос», а просто 0 всю дорогу. Шпаргалка по одному
+          вопросу (QuestionTextOnly) и счётчик «ответили» вводили бы в
+          заблуждение — на проекторе разом отвечают на всё, а не на «вопрос 1». */}
+      {/* «Время ответов»: своя раскладка — простой таймер (не стилизованный,
+          те же секунды, что и на проекторе) и по сколько вопросов раунда
+          сдала каждая команда, а не «ответили N/M» на текущий вопрос —
+          во «время ответов» отвечают на ВЕСЬ раунд разом, а не по одному. */}
+      {phase === 'answer_time' && (
+        <div className="adm-mid">
+          <AnswerTimeBoard round={round} gameState={gameState} answers={answers} teams={teams} />
+        </div>
+      )}
+      {phase !== 'show_answers' && phase !== 'answer_time' && !(isSprint && phase === 'question') && (
         <div className="adm-mid">
           <QuestionTextOnly round={round} gameState={gameState} />
-          {(phase === 'question' || phase === 'recap' || phase === 'answer_time') && (
+          {(phase === 'question' || phase === 'recap') && (
             <AnsweredIndicator round={round} gameState={gameState} answers={answers} teams={teams} />
           )}
         </div>
@@ -314,19 +351,53 @@ function RoundView({ pack, round, gameState, teams, answers }: {
 
       <div className="adm-footer">
         {isBlitz && phase === 'question' && (
-          <BlitzControls pack={pack} round={round} gameState={gameState} />
+          <BlitzControls pack={pack} round={round} gameState={gameState} onFinished={endRound} />
         )}
 
-        {!isInteractive && phase !== 'show_answers' && (
+        {round.mechanic === 'race' && phase === 'question' && (
+          <RaceControls gameState={gameState} />
+        )}
+
+        {isSprint && phase === 'question' && (
           <div style={{ display: 'flex', gap: 8 }}>
+            <button className="adm-btn" onClick={() => void setPhase('round_intro')}>← НАЗАД</button>
+            <button className="adm-btn primary" onClick={() => void gotoAnswers(0)}>К ОТВЕТАМ →</button>
+          </div>
+        )}
+        {/* Назад / Повтор вопроса / Дальше — теперь один ряд, а не два разных
+            (раньше «Повтор» жил в отдельной группе вместе с «Табло» и
+            «Показать ответ», которые на самом экране вопроса не нужны —
+            обычный маршрут и так доводит до разбора кнопкой «Дальше»). */}
+        {!isInteractive && !(isSprint && phase === 'question') && phase !== 'show_answers' && (
+          <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
-            <button className="adm-btn primary" onClick={advance}>ДАЛЬШЕ →</button>
+            {(phase === 'question' || phase === 'answer_time') && (
+              <button className="adm-btn" onClick={() => void startTimer(
+                phase === 'question' ? {
+                  gameId: gameState.game_id, roundNumber: gameState.round_number,
+                  questionRef: `q-${round.questions[step].id}`,
+                } : undefined)}
+                title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
+            )}
+            {/* На бумаге вопрос читает ведущий вслух — «Дальше» неактивна,
+                пока не нажата «▶ ПРОЧИТАЛ» ниже: иначе можно проскочить
+                вопрос, ни разу не пустив по нему время. */}
+            <button className="adm-btn primary" disabled={paperMode && phase === 'question'
+              && !gameState.timer_started_at} onClick={advance}>
+              {phase === 'answer_time' ? 'К ОТВЕТАМ →' : 'ДАЛЬШЕ →'}
+            </button>
           </div>
         )}
         {isInteractive && phase === 'round_intro' && (
           <button className="adm-btn primary" onClick={() => void gotoQuestion(0)}>НАЧАТЬ РАУНД →</button>
         )}
-        {isInteractive && phase !== 'round_intro' && (<>
+        {/* У блица своя кнопка «дальше» — внутри BlitzControls, только когда
+            раунд реально завершён (state.finished). Раньше этот блок рисовался
+            для блица тоже, всегда, с чужим текстом «плитками на проекторе»
+            (от «Своей игры») — и второй кнопкой «ЗАВЕРШИТЬ РАУНД» поверх той,
+            что уже есть в BlitzControls, с другим смыслом (там — досрочный
+            обрыв, тут — обычная навигация дальше). */}
+        {isInteractive && !isBlitz && phase !== 'round_intro' && (<>
           <div className="adm-dim">
             {round.mechanic === 'race' ? 'ЗАБЕГ УПРАВЛЯЕТСЯ С ПРОЕКТОРА'
               : round.mechanic === 'melody' ? 'РАУНД УПРАВЛЯЕТСЯ С ПРОЕКТОРА (ШАРЫ/МОДАЛКА)'
@@ -351,18 +422,14 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             ▶ ПРОЧИТАЛ — ПУСКАЕМ ВРЕМЯ
           </button>
         )}
-        {phase !== 'show_answers' && (
+        {/* Табло / Показать ответ вручную — на самой раскладке вопроса и
+            ответа их убрали (см. выше), но на «времени ответов» и повторе
+            слайдами оставляем как раньше: до этих экранов редизайн ещё не
+            дошёл, отдельным заходом макетов после игры. У интерактивных
+            механик (блиц/скачки/своя игра/мелодия/спринт) эта пара тоже
+            была лишней — реагировать на «Показать ответ» там нечему. */}
+        {!isInteractive && !isSprint && phase !== 'show_answers' && phase !== 'question' && (
           <div className="adm-row-btns">
-            {/* повтор вопроса: перезапускает таймер, не сбивая номер вопроса.
-                Нужен, когда команды не расслышали или зависла музыка */}
-            {(phase === 'question' || phase === 'answer_time') && (
-              <button className="adm-btn" onClick={() => void startTimer(
-                phase === 'question' ? {
-                  gameId: gameState.game_id, roundNumber: gameState.round_number,
-                  questionRef: `q-${round.questions[step].id}`,
-                } : undefined)}
-                title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
-            )}
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
             {paperMode && <button className="adm-btn" onClick={() => void startCounting()}
               title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>}
@@ -370,46 +437,58 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </div>
         )}
 
-        <RatingsPanel pack={pack} gameState={gameState} />
-
-        <InfoSlidesButtons pack={pack} gameState={gameState} />
-
         <DevSeedPanel pack={pack} gameState={gameState} />
 
-        <button className="adm-link" onClick={() => setShowRoundSwitch(s => !s)}>
-          {showRoundSwitch ? 'СКРЫТЬ СПИСОК РАУНДОВ' : 'СМЕНИТЬ РАУНД'}
-        </button>
-        {showRoundSwitch && <RoundPicker pack={pack} current={gameState.round_number} />}
+        <ServiceDrawer pack={pack} round={round} gameState={gameState} />
 
-        {/* на бумаге: сначала заводим команды, потом ставим им баллы.
-            Блоки доступны всегда — команда может прийти в середине игры */}
-        {pack.settings?.play_mode === 'paper' && <>
-          <TeamsPanel gameId={gameState.game_id} teams={teams} />
-          {phase !== 'lobby' &&
-            <PaperScores pack={pack} gameState={gameState} teams={teams} />}
-        </>}
-
-        <TeamRandomizer />
-
-        {round.mechanic === 'melody' && (
-          <button className="adm-link" onClick={async () => {
-            if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
-            await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
-          }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
-        )}
-        <div className="adm-footer-links">
-        <button className="adm-link" onClick={async () => {
-          if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
-          await supabase.from('game_sessions').update({
-            phase: 'lobby', round_number: 0, question_index: 0,
-            timer_started_at: null, reveal: false, melody: {},
-          }).eq('id', getRoomId())
-        }}>⇄ СМЕНИТЬ ПАКЕТ</button>
-        <button className="adm-link danger" onClick={() => {
-          if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
-        }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
-        </div>
+        {/* на бумаге: заводим команды. Доступно всегда — команда может
+            прийти в середине игры. Баллы за раунд теперь вносятся через
+            «Команды → Внести баллы» (см. ResultsPanel) — то же самое
+            действие, что раньше жило отдельным блоком прямо в подвале. */}
+        {pack.settings?.play_mode === 'paper' && <TeamsPanel gameId={gameState.game_id} teams={teams} />}
       </div>
+    </div>
+  )
+}
+
+/** Служебное (8.62): смена раунда, рандомайзер команд, показ слайда,
+ *  сброс плиток мелодии, смена пакета, новая игра — раньше разбросаны по
+ *  подвалу россыпью ссылок, теперь под одним шевроном. Ничего из этого не
+ *  нужно ведущему каждый вопрос, поэтому сворачиваем по умолчанию. */
+function ServiceDrawer({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="adm-box">
+      <button className="adm-cmd-row" onClick={() => setOpen(o => !o)}>
+        <span>{open ? '▾' : '▸'} служебное</span><span className="car">—</span>
+      </button>
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+          <RoundPicker pack={pack} current={gameState.round_number} />
+          <TeamRandomizer />
+          <InfoSlidesButtons pack={pack} gameState={gameState} />
+          {round.mechanic === 'melody' && (
+            <button className="adm-link" onClick={async () => {
+              if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
+              await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
+            }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
+          )}
+          <button className="adm-link" onClick={async () => {
+            if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
+            await supabase.from('game_sessions').update({
+              phase: 'lobby', round_number: 0, question_index: 0,
+              timer_started_at: null, reveal: false, melody: {},
+            }).eq('id', getRoomId())
+          }}>⇄ СМЕНИТЬ ПАКЕТ</button>
+          <button className="adm-link danger" onClick={() => {
+            if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
+          }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
+        </div>
+      )}
     </div>
   )
 }
@@ -430,6 +509,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
   const last = gameState.round_number + 1 >= pack.rounds.length
   const paperMode = pack.settings?.play_mode === 'paper'
   const showSb = !!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after
+  const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
 
   return (
     <div className="adm-answers">
@@ -439,9 +519,22 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
       </div>
       {q && <div className="adm-correct">Верный: <b>{correctOf(q)}</b></div>}
 
-      {rows.length === 0 && <div className="adm-empty">ответов нет</div>}
+      {/* На бумаге команды пишут на бланк, а не в телефон — ответов в базе
+          на КАЖДЫЙ вопрос физически нет, только итоговый балл за раунд
+          (см. «Команды → Внести баллы»). Обычное «ответов нет» тут читалось
+          бы как сбой, а не как норма для этого режима. */}
+      {rows.length === 0 && (
+        <div className="adm-empty">{paperMode
+          ? 'команды пишут на бланк — сверки по ответам здесь нет'
+          : 'ответов нет'}</div>
+      )}
       {rows.map(a => {
         const team = teams.find(t => t.id === a.team_id)
+        // Пока ведущий не оценил сам — подсказка автопроверки, тем же
+        // приёмом, что уже красит разбор ответов на проекторе для зала
+        // (a.is_correct ?? autocheck(...), см. HostScreen.tsx:ShowAnswers).
+        // Нажатие любой из кнопок — это уже РЕШЕНИЕ ведущего, а не догадка.
+        const shown = a.is_correct ?? (q ? autocheck(q.answer, a.answer_text) : null)
         return (
           <div key={a.id} className="adm-answer" style={{
             borderLeft: `4px solid ${a.is_correct === true ? '#22c55e' : a.is_correct === false ? '#ef4444' : (team?.color ?? '#333')}`,
@@ -453,9 +546,9 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
                 {a.stake != null && <span className="acc"> · ст.{a.stake}</span>}</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className={`adm-grade ok${a.is_correct === true ? ' on' : ''}`}
+              <button className={`adm-grade ok${shown === true ? ' on' : ''}`}
                 onClick={() => void onGrade(a, true)}>✓ ВЕРНО</button>
-              <button className={`adm-grade no${a.is_correct === false ? ' on' : ''}`}
+              <button className={`adm-grade no${shown === false ? ' on' : ''}`}
                 onClick={() => void onGrade(a, false)}>✗ НЕВЕРНО</button>
             </div>
           </div>
@@ -463,8 +556,14 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
       })}
 
       <div className="adm-answers-nav">
-        <button className="adm-btn" disabled={step === 0}
-          onClick={() => void gotoAnswers(step - 1, true)}>← НАЗАД</button>
+        {/* На первом вопросе разбора «Назад» раньше просто гас — вернуться
+            во «время ответов» или к повтору вопросов было некуда, хотя
+            маршрут туда есть (см. RoundView.goBack). */}
+        <button className="adm-btn" onClick={() => {
+          if (step > 0) { void gotoAnswers(step - 1, true); return }
+          if (recapOn) void setPhase('recap')
+          else void startAnswerTime()
+        }}>← НАЗАД</button>
         <button className="adm-btn primary" onClick={() => {
           if (step < total - 1) { void gotoAnswers(step + 1); return }
           // настройка раунда «показать табло» раньше игнорировалась здесь:
@@ -524,19 +623,23 @@ function QuestionTextOnly({ round, gameState }: {
   )
   if (phase === 'question') {
     const q = round.questions[step]
+    // Текст вопроса и ответ — с выравниванием по правому краю (запрошено
+    // отдельно): картинку/медиа сюда сознательно не выводим, это шпаргалка
+    // для чтения вслух, а не копия экрана зала.
     return (
-      <div className="adm-centered">
-        <div className="adm-dim">ВОПРОС {step + 1} / {round.questions.length}</div>
+      <div className="adm-qgame">
+        <div className="adm-dim" style={{ textAlign: 'right' }}>ВОПРОС {step + 1} / {round.questions.length}</div>
         <div className="adm-qtext">{q?.question_text || '(без текста — только медиа на проекторе)'}</div>
         {q && <div className="adm-correct">Верный: <b>{correctOf(q)}</b></div>}
         {q?.answer.mode === 'choice' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 320, width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignSelf: 'flex-end',
+            maxWidth: 320, width: '100%' }}>
             {q.answer.choices.map(c => (
-              <div key={c.key} style={{ fontSize: 14, opacity: .7 }}>{c.key} — {c.text}</div>
+              <div key={c.key} style={{ fontSize: 14, opacity: .7, textAlign: 'right' }}>{c.key} — {c.text}</div>
             ))}
           </div>
         )}
-        {q?.answer_note && <div className="adm-dim">{q.answer_note}</div>}
+        {q?.answer_note && <div className="adm-dim" style={{ textAlign: 'right' }}>{q.answer_note}</div>}
       </div>
     )
   }
@@ -565,6 +668,51 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
           <span key={team.id} className={`adm-chip${done ? ' done' : ''}`}>
             {done ? '✓ ' : ''}{team.name}
           </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** «Время ответов» (8.62): голый счётчик секунд — те же startedAt/seconds,
+ *  что и у стилизованного таймера на проекторе (lib/gameActions.ts:
+ *  startAnswerTime пишет timer_started_at), просто без колец и подсветки —
+ *  и по сколько вопросов раунда сдала каждая команда, не по одному вопросу
+ *  за раз, как AnsweredIndicator: во «время ответов» отвечают на весь
+ *  раунд сразу. */
+function AnswerTimeBoard({ round, gameState, answers, teams }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  answers: Answer[]; teams: Team[]
+}) {
+  const seconds = (round.settings as { answerTimeSeconds?: number }).answerTimeSeconds ?? 60
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t) }, [])
+  const startedAt = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : null
+  const left = startedAt ? Math.max(0, Math.ceil(seconds - (now - startedAt) / 1000)) : seconds
+  const mm = String(Math.floor(left / 60)).padStart(2, '0')
+  const ss = String(left % 60).padStart(2, '0')
+
+  const refs = new Set(round.questions.filter(q => !q.hidden).map(q => `q-${q.id}`))
+  const total = refs.size
+  const tally = [...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => ({
+    team: t,
+    done: answers.filter(a => a.team_id === t.id && refs.has(a.question_ref) && a.answer_text?.trim()).length,
+  }))
+
+  return (
+    <div style={{ textAlign: 'center', width: '100%' }}>
+      <div className="adm-counter" style={{ fontSize: 40, color: left <= 10 ? '#ef4444' : undefined }}>
+        {mm}:{ss}
+      </div>
+      <div className="adm-dim">до конца времени на ответы</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14 }}>
+        {tally.map(({ team, done }) => (
+          <div key={team.id} style={{ display: 'flex', justifyContent: 'space-between',
+            fontSize: 14, borderBottom: '1px solid #1c2740', paddingBottom: 6 }}>
+            <span style={{ color: team.color }}>{team.name}</span>
+            <span className="adm-dim">{done} / {total}</span>
+          </div>
         ))}
       </div>
     </div>
@@ -725,63 +873,127 @@ function CountingPanel({ pack, gameState, teams }: {
   )
 }
 
-/** Таблица результатов + ручная коррекция баллов (8.59) — раньше жили
- *  только внутри FinalePanel (видны лишь на фазе «финал»), а ведущему
- *  нужна сверка в ЛЮБОЙ момент игры, не только в конце. Вынесено сюда и
- *  рендерится в AdminPage() безусловно (пока выбран пакет и есть команды),
- *  а не по фазе. Сама себе тянет ответы за ВСЮ игру (useAnswers(gameId)
- *  без round_number) — top-level `answers` в AdminPage() нарочно обрезан
- *  текущим раундом (для панели проверки ответов ЭТОГО раунда), для
- *  подсчёта итогов такой обрезанный список даст неверную сумму. */
-function ResultsPanel({ pack, gameId, teams }: {
-  pack: LoadedPack; gameId: string; teams: Team[]
+/** Оверлей блока «Команды» (8.62): шторка снизу на телефоне, модалка по
+ *  центру на широком экране (переключает только медиазапрос, см.
+ *  .adm-ov-backdrop). Раскрытие НА МЕСТЕ не подходит: внутри — таблица на
+ *  N раундов со скроллом и форма со списком правок, которые в узкой боковой
+ *  колонке не поместятся, а на телефоне двигали бы «Служебное» и низ экрана
+ *  при каждом открытии — кнопки ведущего в этом проекте держат на
+ *  стабильном месте (см. .host-actions). */
+function AdmOverlay({ title, onClose, children }: {
+  title: string; onClose: () => void; children: React.ReactNode
 }) {
+  return (
+    <div className="adm-ov-backdrop" onClick={onClose}>
+      <div className="adm-ov-panel" onClick={e => e.stopPropagation()}>
+        <div className="adm-ov-head">
+          <span>{title}</span>
+          <button type="button" className="adm-ov-close" onClick={onClose} aria-label="Закрыть">✕</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/** Блок «Команды» (8.59, переверстан 8.62) — таблица результатов, ручная
+ *  коррекция баллов (или «внести баллы» на бумаге) и оценки игры. Раньше
+ *  жили только внутри FinalePanel (видны лишь на фазе «финал»), а ведущему
+ *  нужна сверка в ЛЮБОЙ момент игры, не только в конце. Рендерится в
+ *  AdminPage() безусловно (пока выбран пакет и есть команды), а не по фазе.
+ *  Сама себе тянет ответы за ВСЮ игру (useAnswers(gameId) без round_number)
+ *  — top-level `answers` в AdminPage() нарочно обрезан текущим раундом (для
+ *  панели проверки ответов ЭТОГО раунда), для подсчёта итогов такой
+ *  обрезанный список даст неверную сумму. */
+function ResultsPanel({ pack, gameState, teams }: {
+  pack: LoadedPack
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  teams: Team[]
+}) {
+  const gameId = gameState.game_id
   const answers = useAnswers(gameId)
   const shownAt = useQuestionShown(gameId)
   const totals = computeTotals(pack, teams, answers)
   const perRound = computeRoundScores(pack, teams, answers)
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
   const rows = rankTeams(teams, totals, answers, perRound)
+  const paperMode = pack.settings?.play_mode === 'paper'
+  const [open, setOpen] = useState<'results' | 'adjust' | 'ratings' | null>(null)
+
+  const existingAdjust = answers.filter(a =>
+    a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0).length
+
   return (
     <div className="adm-pad">
-      <details className="adm-why">
-        <summary>Таблица результатов (сверка)</summary>
-        <div className="adm-score-wrap">
-          <table className="adm-score-table">
-            <thead>
-              <tr>
-                <th>#</th><th>Команда</th>
-                {scored.map((r, i) => <th key={r.id}>Р{i + 1}</th>)}
-                <th>Σ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(row => {
-                const t = row.team
-                const all = perRound.get(t.id) ?? []
-                return (
-                  <tr key={t.id}>
-                    <td>{row.place}{row.shared && '='}</td>
-                    <td style={{ color: t.color }}>{t.name}</td>
-                    {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
-                    <td className="total">{totals.get(t.id) ?? 0}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-        <button className="adm-link" onClick={() => {
-          const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-')
-          const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
-          const csv = exportAnswersCsv(pack, teams, answers, shownAt)
-          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-          const a = document.createElement('a')
-          a.href = url; a.download = `${safe}_ответы_${stamp}.csv`; a.click()
-          URL.revokeObjectURL(url)
-        }}>⤓ ВЫГРУЗИТЬ ОТВЕТЫ (CSV)</button>
-      </details>
-      <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />
+      <div className="adm-box">
+        <div className="adm-dim">КОМАНДЫ</div>
+        <button className="adm-cmd-row" onClick={() => setOpen('results')}>
+          <span>▸ Таблица результатов</span><span className="car">сверка</span>
+        </button>
+        <button className="adm-cmd-row" onClick={() => setOpen('adjust')}>
+          <span>▸ {paperMode ? 'Внести баллы за раунд' : 'Ручная коррекция баллов'}</span>
+          <span className="car">{paperMode ? '' : (existingAdjust > 0 ? `${existingAdjust} правок` : '')}</span>
+        </button>
+        {!paperMode && (
+          <button className="adm-cmd-row" onClick={() => setOpen('ratings')}>
+            <span>▸ Оценки игры</span><span className="car">★</span>
+          </button>
+        )}
+      </div>
+
+      {open === 'results' && (
+        <AdmOverlay title="Таблица результатов" onClose={() => setOpen(null)}>
+          <div className="adm-score-wrap">
+            <table className="adm-score-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Команда</th>
+                  {scored.map((r, i) => <th key={r.id}>Р{i + 1}</th>)}
+                  <th>Σ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(row => {
+                  const t = row.team
+                  const all = perRound.get(t.id) ?? []
+                  return (
+                    <tr key={t.id}>
+                      <td>{row.place}{row.shared && '='}</td>
+                      <td style={{ color: t.color }}>{t.name}</td>
+                      {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
+                      <td className="total">{totals.get(t.id) ?? 0}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <button className="adm-link" onClick={() => {
+            const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-')
+            const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
+            const csv = exportAnswersCsv(pack, teams, answers, shownAt)
+            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+            const a = document.createElement('a')
+            a.href = url; a.download = `${safe}_ответы_${stamp}.csv`; a.click()
+            URL.revokeObjectURL(url)
+          }}>⤓ ВЫГРУЗИТЬ ОТВЕТЫ (CSV)</button>
+        </AdmOverlay>
+      )}
+
+      {open === 'adjust' && (
+        <AdmOverlay title={paperMode ? 'Внести баллы за раунд' : 'Ручная коррекция баллов'}
+          onClose={() => setOpen(null)}>
+          {paperMode
+            ? <PaperScores pack={pack} gameState={gameState} teams={teams} />
+            : <ScoreAdjustPanel pack={pack} gameId={gameId} teams={teams} answers={answers} />}
+        </AdmOverlay>
+      )}
+
+      {open === 'ratings' && !paperMode && (
+        <AdmOverlay title="Оценки игры" onClose={() => setOpen(null)}>
+          <RatingsBody pack={pack} gameState={gameState} />
+        </AdmOverlay>
+      )}
     </div>
   )
 }
@@ -909,11 +1121,10 @@ function ScoreAdjustPanel({ pack, gameId, teams, answers }: {
   }
 
   return (
-    <details className="adm-why">
-      <summary>Ручная коррекция баллов</summary>
+    <div>
       <div className="adm-dim">
         Прибавляет или вычитает очки к счёту команды за раунд — если
-        автоподсчёт где-то сбойнул. Сразу отражается в таблице выше и на
+        автоподсчёт где-то сбойнул. Сразу отражается в таблице результатов и на
         табло/финале у игроков.
       </div>
       <div className="adm-adjust-form">
@@ -954,7 +1165,7 @@ function ScoreAdjustPanel({ pack, gameId, teams, answers }: {
           })}
         </div>
       )}
-    </details>
+    </div>
   )
 }
 
@@ -1072,13 +1283,14 @@ function InfoSlidesButtons({ pack, gameState }: {
 
 
 /** Оценки команд: средняя по раундам, худшие вопросы, комментарии.
- *  Грузится по кнопке, а не сама: во время игры лишний опрос базы не нужен,
- *  а смотреть эти цифры ведущий будет в перерыве или после. */
-function RatingsPanel({ pack, gameState }: {
+ *  Раньше грузилось по отдельной кнопке «★ ОЦЕНКИ КОМАНД», сейчас содержимое
+ *  оверлея «Команды → Оценки игры» — монтируется только когда оверлей открыт
+ *  (см. ResultsPanel), а значит грузить можно сразу, без своей кнопки-триггера:
+ *  лишнего опроса базы вне оверлея по-прежнему нет. */
+function RatingsBody({ pack, gameState }: {
   pack: LoadedPack
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
-  const [open, setOpen] = useState(false)
   const [rows, setRows] = useState<RatingRow[] | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -1088,6 +1300,7 @@ function RatingsPanel({ pack, gameState }: {
     catch { setRows([]) }
     finally { setBusy(false) }
   }
+  useEffect(() => { void load() }, [])
 
   const sum = rows ? summarize(rows) : null
   const qText = new Map<string, string>()
@@ -1095,51 +1308,78 @@ function RatingsPanel({ pack, gameState }: {
     qText.set(`q-${q.id}`, `${i + 1}. ${q.question_text.slice(0, 60)}`)))
 
   return (
-    <div className="adm-ratings">
-      <button className="adm-link" onClick={() => {
-        setOpen(o => !o); if (!rows) void load()
-      }}>★ ОЦЕНКИ КОМАНД</button>
-      {open && (
-        <div className="adm-rt">
-          <button className="adm-btn" disabled={busy} onClick={() => void load()}>
-            {busy ? 'загружаю…' : 'обновить'}
-          </button>
-          {sum && sum.size === 0 && <div className="adm-dim">оценок пока нет</div>}
-          {sum && [...sum.values()].sort((a, b) => a.roundNumber - b.roundNumber).map(s => {
-            const round = pack.rounds[s.roundNumber]
-            const worst = [...s.byQuestion.entries()]
-              .sort((a, b) => a[1].avg - b[1].avg).slice(0, 3)
-            return (
-              <div key={s.roundNumber} className="adm-rt-round">
-                <div className="adm-rt-head">
-                  <b>Р{s.roundNumber + 1} {(round?.title_lines ?? []).join(' ')}</b>
-                  <span className={`adm-rt-avg${(s.avg ?? 0) < 6 ? ' low' : ''}`}>
-                    {s.avg == null ? '—' : s.avg.toFixed(1)}
-                  </span>
-                  <span className="adm-dim">{s.votes} голосов</span>
-                </div>
-                {worst.length > 0 && (
-                  <div className="adm-rt-worst">
-                    слабее всего:
-                    {worst.map(([ref, v]) => (
-                      <div key={ref}>
-                        <b>{v.avg.toFixed(1)}</b> {qText.get(ref) ?? ref}
-                      </div>
-                    ))}
+    <div className="adm-rt">
+      <button className="adm-btn" disabled={busy} onClick={() => void load()}>
+        {busy ? 'загружаю…' : 'обновить'}
+      </button>
+      {sum && sum.size === 0 && <div className="adm-dim">оценок пока нет</div>}
+      {sum && [...sum.values()].sort((a, b) => a.roundNumber - b.roundNumber).map(s => {
+        const round = pack.rounds[s.roundNumber]
+        const worst = [...s.byQuestion.entries()]
+          .sort((a, b) => a[1].avg - b[1].avg).slice(0, 3)
+        return (
+          <div key={s.roundNumber} className="adm-rt-round">
+            <div className="adm-rt-head">
+              <b>Р{s.roundNumber + 1} {(round?.title_lines ?? []).join(' ')}</b>
+              <span className={`adm-rt-avg${(s.avg ?? 0) < 6 ? ' low' : ''}`}>
+                {s.avg == null ? '—' : s.avg.toFixed(1)}
+              </span>
+              <span className="adm-dim">{s.votes} голосов</span>
+            </div>
+            {worst.length > 0 && (
+              <div className="adm-rt-worst">
+                слабее всего:
+                {worst.map(([ref, v]) => (
+                  <div key={ref}>
+                    <b>{v.avg.toFixed(1)}</b> {qText.get(ref) ?? ref}
                   </div>
-                )}
-                {s.comments.map((c, i) => (
-                  <div key={i} className="adm-rt-comment">«{c}»</div>
                 ))}
               </div>
-            )
-          })}
-        </div>
-      )}
+            )}
+            {s.comments.map((c, i) => (
+              <div key={i} className="adm-rt-comment">«{c}»</div>
+            ))}
+          </div>
+        )
+      })}
     </div>
   )
 }
 
+
+/** Пульт ведущего для скачек (8.62) — «Начать скачки» с телефона, по
+ *  аналогии с кнопкой «Старт!» на проекторе. Сама запись — в
+ *  lib/raceActions.ts, общая с проектором: кто нажал первым, тот и запустил
+ *  забег, второй клик (если случится) просто перезапишет то же самое поле
+ *  тем же значением по факту. Пока забег идёт — ставить нечего, статус
+ *  без кнопок; итог и переход дальше уже даёт общий блок «ЗАВЕРШИТЬ РАУНД»
+ *  ниже (isInteractive в RoundView) — второй такой кнопки здесь не нужно. */
+function RaceControls({ gameState }: {
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const bets = answers.filter(a => a.question_ref === `q-race-${gameState.round_number}`)
+  const stage = gameState.melody?.race?.stage
+
+  if (stage === 'running') {
+    return <div className="adm-dim">🐾 ЗАБЕГ ИДЁТ НА ПРОЕКТОРЕ</div>
+  }
+  if (stage === 'done') {
+    return <div className="adm-dim">🏁 ЗАБЕГ ЗАВЕРШЁН</div>
+  }
+  return (
+    <div className="adm-blitz">
+      <div className="adm-dim" style={{
+        color: bets.length === teams.length && teams.length > 0 ? '#22c55e' : undefined,
+      }}>СДЕЛАЛИ ВЫБОР: {bets.length} / {teams.length}</div>
+      <button className="adm-btn primary" disabled={bets.length === 0}
+        onClick={() => void startRace(gameState)}>
+        🏁 НАЧАТЬ СКАЧКИ (СТАВКИ ЗАКРЫВАЮТСЯ)
+      </button>
+    </div>
+  )
+}
 
 /** Пульт ведущего для блица.
  *
@@ -1149,10 +1389,16 @@ function RatingsPanel({ pack, gameState }: {
  *
  *  Вопрос показывается ведущим вручную, а не автоматически: ему нужно
  *  успеть прочитать вопрос вслух и убедиться, что команда готова. */
-function BlitzControls({ pack, round, gameState }: {
+function BlitzControls({ pack, round, gameState, onFinished }: {
   pack: LoadedPack
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  /** Обычная навигация «раунд закончен, идём дальше» — та же функция, что
+   *  и у остальных механик (RoundView.endRound). Показывается ТОЛЬКО когда
+   *  блиц действительно завершён (state.finished): пока он идёт, кнопка
+   *  «дальше» тут не при чём, а тут же рядом есть другая — досрочный обрыв
+   *  (см. ниже) — раньше обе стояли одновременно с одинаковым текстом. */
+  onFinished: () => void
 }) {
   const { state, setState } = useBlitz(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
@@ -1232,6 +1478,7 @@ function BlitzControls({ pack, round, gameState }: {
             ))}
           </tbody>
         </table>
+        <button className="adm-btn primary" onClick={onFinished}>ДАЛЬШЕ →</button>
       </div>
     )
   }
@@ -1261,6 +1508,12 @@ function BlitzControls({ pack, round, gameState }: {
           {/* Верный ответ у ведущего перед глазами: он и решает спорные */}
           <div className="adm-bz-q">{q?.question_text}</div>
           <div className="adm-bz-answer">ответ: <b>{displayAnswerText(q)}</b></div>
+          {/* Что реально прислала команда — раньше не показывалось вообще,
+              хотя текст уже лежит в cur.lastAnswer: ведущий решал «верно/
+              неверно» вслепую, глядя только на правильный ответ. */}
+          <div className="adm-bz-answer">
+            {cur.lastAnswer ? <>ответила: <b>{cur.lastAnswer}</b></> : 'ответ: ждём…'}
+          </div>
           <div className="adm-dim">попытка {cur.attempts + 1} из {MAX_ATTEMPTS}</div>
           <div className="adm-dev-row">
             <button className="adm-btn primary" disabled={busy}
@@ -1279,9 +1532,14 @@ function BlitzControls({ pack, round, gameState }: {
         </>
       )}
 
+      {/* Раньше называлась так же, как соседняя кнопка «ЗАВЕРШИТЬ РАУНД» у
+          других механик — а делает другое: не «идём дальше», а «оборвать
+          блиц прямо сейчас, до истечения времени/вопросов». Разные подписи,
+          чтобы не перепутать посреди раунда. */}
       <button className="adm-btn" disabled={busy}
-        onClick={() => { if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state)) }}>
-        ЗАВЕРШИТЬ РАУНД
+        onClick={() => { if (confirm('Прервать блиц досрочно? Раунд закроется по текущим очкам.'))
+          void push(finishNoQuestions(state)) }}>
+        ⏹ ПРЕРВАТЬ БЛИЦ ДОСРОЧНО
       </button>
 
       <UsedQuestions round={round} used={state.used} />
