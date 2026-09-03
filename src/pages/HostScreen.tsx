@@ -1590,12 +1590,16 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     // была только в очистке эффекта и не покрывала плееры, созданные вне
     // этого компонента: при переходе аудио продолжало играть поверх.
     stopAllMedia()
-    // ── ИГРА В БАРЕ: старт по кнопке ведущего ──
+    // ── ИГРА В БАРЕ: старт по кнопке ведущего — КРОМЕ вопросов со своим
+    // аудио/видео ──
     // Вопрос читает человек с микрофоном, и пока он читает, время идти не
     // должно, а музыка — играть поверх его голоса. Поэтому здесь тишина,
     // а всё остальное запускает второй эффект, когда ведущий нажмёт кнопку
-    // (то есть когда в игре появится timer_started_at).
-    if (manual) return
+    // (то есть когда в игре появится timer_started_at). НО если у вопроса
+    // есть собственное аудио/видео — оно само «читает» вопрос залу, ждать
+    // ведущего незачем: кнопка «Прочитал» тут просто лишний шаг, запускаем
+    // сразу, как в обычном (не бумажном) режиме.
+    if (manual && !hasOwnAV) return
     if (timerRunning) return
     let cancelled = false
     const ownAudio = (q.media.question ?? [])
@@ -1654,8 +1658,11 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
   // Кнопка ставит timer_started_at, и по нему стартует звук вопроса: сначала
   // озвучка, если она задана, следом собственное аудио. Фоновая музыка
   // подхватывается общим эффектом ниже — он и так завязан на таймер.
+  // Вопросы со своим аудио/видео сюда не попадают — их уже запустил и
+  // без кнопки первый эффект выше; если бы оба сработали, трек заиграл
+  // бы дважды поверх самого себя.
   useEffect(() => {
-    if (!manual || !timerRunning) return
+    if (!manual || !timerRunning || hasOwnAV) return
     let cancelled = false
     const ownAudio = (q.media.question ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
     const playOwn = () => {
@@ -2528,8 +2535,10 @@ function CountingScreen({ pack, gameState }: {
       <Deco theme={pack.theme} />
       <div className="break-timer">{mm}:{ss}</div>
       <div className="counting-sub">Скоро объявим победителей</div>
+      {/* Экран подсчёта существует только в бумажном режиме — сценарий
+          финала сразу «награждение», как и у аналогичной кнопки в админке. */}
       <div className="host-actions">
-        <button onClick={() => void finishGame(gameState.pack_id)}>К итогам →</button>
+        <button onClick={() => void finishGame(gameState.pack_id, true)}>К итогам →</button>
       </div>
     </div>
   )
@@ -2657,7 +2666,14 @@ function Finale({ pack, gameId, gameState }: {
   if (bar) {
     // Идём по МЕСТАМ (3 → 2 → 1), а не по позициям в списке: при ничьей
     // одно место могут занимать несколько команд, и все они выходят вместе.
-    const places = [3, 2, 1]
+    // Раньше список мест был жёстко [3,2,1] — с плотной нумерацией (см.
+    // lib/ranking.ts) третьего места иногда просто НЕ существует (мало
+    // команд или общая ничья), и шаг «3 место» показывал пустой прочерк,
+    // а с точки зрения ведущего — «место пропущено». Берём места, которые
+    // РЕАЛЬНО есть в rows, не больше трёх (медали и цвета есть только под
+    // 1/2/3 место, см. AwardMedal).
+    const places = [...new Set(rows.map(r => r.place))]
+      .filter(p => p <= 3).sort((a, b) => b - a)
     if (step >= places.length) return (
       <div className="host-screen grid-bg fin-screen">
         {fireworks}

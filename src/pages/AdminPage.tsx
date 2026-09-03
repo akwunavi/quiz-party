@@ -268,7 +268,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     if (st.kind === 'break') return void startBreak()
     if (st.kind === 'finale') {
       const sl = slideBeforeFinale(pack.settings?.info_slides)
-      return sl == null ? void finishGame(gameState.pack_id) : void showSlide(sl)
+      return sl == null ? void finishGame(gameState.pack_id, paperMode) : void showSlide(sl)
     }
     return void gotoRound(gameState.round_number + 1,
       slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
@@ -409,9 +409,12 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         {/* ── ИГРА В БАРЕ: вопрос читает ведущий, старт — по кнопке ──
             На бумаге проектор молчит и время не идёт, пока не нажата эта
             кнопка: сначала человек с микрофоном читает вопрос залу, и только
-            потом включаются таймер, музыка и звук вопроса. Одинаково для
-            вопросов с аудио и без — ведущему не надо помнить, где как. */}
-        {paperMode && phase === 'question' && !gameState.timer_started_at && (
+            потом включаются таймер, музыка и звук вопроса. НО если у вопроса
+            есть своё аудио/видео — оно само «читает» вопрос залу, кнопка не
+            нужна вовсе: таймер и трек стартуют сами (HostScreen.tsx:
+            QuestionAudio), как в обычном режиме. */}
+        {paperMode && phase === 'question' && !gameState.timer_started_at
+          && !(round.questions[step]?.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m)) && (
           <button className="adm-btn primary adm-start-question"
             onClick={() => void startTimer({
               gameId: gameState.game_id, roundNumber: gameState.round_number,
@@ -426,12 +429,21 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             слайдами оставляем как раньше: до этих экранов редизайн ещё не
             дошёл, отдельным заходом макетов после игры. У интерактивных
             механик (блиц/скачки/своя игра/мелодия/спринт) эта пара тоже
-            была лишней — реагировать на «Показать ответ» там нечему. */}
-        {!isInteractive && !isSprint && phase !== 'show_answers' && phase !== 'question' && (
+            была лишней — реагировать на «Показать ответ» там нечему. На
+            фазе «info» (слайд-брифинг) — тоже нечего показывать/оценивать,
+            эти кнопки там просто лишние. */}
+        {!isInteractive && !isSprint && phase !== 'show_answers' && phase !== 'question'
+          && phase !== 'info' && (
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
-            {paperMode && <button className="adm-btn" onClick={() => void startCounting()}
-              title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>}
+            {/* «Подсчёт» уводит на заставку, из которой пути назад в раунд
+                нет — только вперёд, к финалу. Случайный тап посреди игры
+                раньше уносил на финальный слайд без возможности вернуться;
+                кнопка нужна ровно один раз, после последнего раунда. */}
+            {paperMode && gameState.round_number + 1 >= pack.rounds.length && (
+              <button className="adm-btn" onClick={() => void startCounting()}
+                title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>
+            )}
             <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
@@ -860,8 +872,11 @@ function CountingPanel({ pack, gameState, teams }: {
       <div className="adm-dim">На проекторе — заставка с отсчётом. Внеси баллы за
         раунды и, когда всё сойдётся, уводи зал к итогам.</div>
       <PaperScores pack={pack} gameState={gameState} teams={teams} />
+      {/* CountingPanel существует только в бумажном режиме (фаза «considering»
+          включается кнопкой, которая сама видна лишь при paperMode) — сценарий
+          финала сразу «награждение», выбирать «шоу» тут незачем. */}
       <button className="adm-btn primary adm-start-question"
-        onClick={() => void finishGame(gameState.pack_id)}>ПЕРЕЙТИ К ИТОГАМ →</button>
+        onClick={() => void finishGame(gameState.pack_id, true)}>ПЕРЕЙТИ К ИТОГАМ →</button>
     </div>
   )
 }
@@ -876,6 +891,19 @@ function CountingPanel({ pack, gameState, teams }: {
 function AdmOverlay({ title, onClose, children }: {
   title: string; onClose: () => void; children: React.ReactNode
 }) {
+  // Без этого фон страницы под шторкой оставался прокручиваемым — на
+  // телефоне это давало ровно то самое «залипание» при вводе баллов:
+  // тапаешь по клавиатуре/полю ввода, страница ПОЗАДИ шторки чуть
+  // прокручивается или скроллится вместе с открытием клавиатуры, и
+  // следующий тап по кнопке «✓» физически попадает уже не в неё, а в
+  // то, что оказалось под пальцем на фоне. Стандартный приём модалок —
+  // блокировать скролл body, пока оверлей открыт, и вернуть как было
+  // при закрытии.
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
   return (
     <div className="adm-ov-backdrop" onClick={onClose}>
       <div className="adm-ov-panel" onClick={e => e.stopPropagation()}>
@@ -912,6 +940,12 @@ function ResultsPanel({ pack, gameState, teams }: {
   const rows = rankTeams(teams, totals, answers, perRound)
   const paperMode = pack.settings?.play_mode === 'paper'
   const [open, setOpen] = useState<'roster' | 'results' | 'adjust' | 'ratings' | null>(null)
+  // Свёрнут по умолчанию — как «Служебное»: строки-превью на постоянном
+  // экране вопроса занимали место каждый раз, хотя нужны не на каждом
+  // вопросе. Сворачивается/разворачивается мгновенно (обычный JSX-if, не
+  // ленивая загрузка) — данные уже под рукой из хуков выше, показывать
+  // нечего ждать.
+  const [expanded, setExpanded] = useState(false)
 
   const existingAdjust = answers.filter(a =>
     a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0).length
@@ -919,7 +953,10 @@ function ResultsPanel({ pack, gameState, teams }: {
   return (
     <div className="adm-pad">
       <div className="adm-box">
-        <div className="adm-dim">КОМАНДЫ</div>
+        <button className="adm-cmd-row" onClick={() => setExpanded(e => !e)}>
+          <span>{expanded ? '▾' : '▸'} команды</span><span className="car">—</span>
+        </button>
+        {expanded && (<>
         {/* На бумаге QR никто не сканирует — список команд заводит ведущий
             здесь же, рядом с баллами, а не отдельным блоком в другом месте
             экрана (были рассинхронизированы — заводишь команду в одном
@@ -941,6 +978,7 @@ function ResultsPanel({ pack, gameState, teams }: {
             <span>▸ Оценки игры</span><span className="car">★</span>
           </button>
         )}
+        </>)}
       </div>
 
       {open === 'roster' && (
@@ -1015,7 +1053,18 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
   const bar = !!gameState?.reveal
   const step = gameState?.question_index ?? 0
   const scoredRounds = pack ? pack.rounds.filter(r => !r.off_scoreboard).length : 0
-  const barLabels = ['ПОКАЗАТЬ 3 МЕСТО', 'ПОКАЗАТЬ 2 МЕСТО', 'ПОКАЗАТЬ ПОБЕДИТЕЛЯ', 'ПОКАЗАТЬ ТАБЛИЦУ']
+  // Те же места, что считает и показывает проектор (components/… нет,
+  // логика короткая — держим формулу один в один с HostScreen.tsx:Finale,
+  // чтобы подпись кнопки и то, что реально откроется на экране, не
+  // разъезжались). Плотная нумерация мест (lib/ranking.ts) — раньше
+  // жёсткий список [3,2,1] предполагал ровно три РАЗНЫХ места, а при
+  // ничьей или маленьком числе команд третьего места могло не быть вовсе:
+  // шаг «показать 3 место» открывал пустоту, а подписи следующих кнопок
+  // после этого расходились со start тем, что реально видно на экране.
+  const totals = pack ? computeTotals(pack, teams, answers) : new Map<string, number>()
+  const roundScores = pack ? computeRoundScores(pack, teams, answers) : new Map<string, number[]>()
+  const rows = rankTeams(teams, totals, answers, roundScores)
+  const places = [...new Set(rows.map(r => r.place))].filter(p => p <= 3).sort((a, b) => b - a)
   return (
     <div className="adm-pad">
       <div className="adm-h1">ФИНАЛ</div>
@@ -1039,15 +1088,20 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
 
       <div className="adm-box">
         <div className="adm-dim">
-          {bar ? `ШАГ ${Math.min(step + 1, 4)} ИЗ 4` : 'МОЖНО ПРОМОТАТЬ ВРУЧНУЮ'}
+          {bar ? `ШАГ ${Math.min(step + 1, places.length + 1)} ИЗ ${places.length + 1}` : 'МОЖНО ПРОМОТАТЬ ВРУЧНУЮ'}
         </div>
         <div className="adm-two">
           <button className="adm-btn" disabled={step <= 0}
             onClick={() => void setFinaleStep(Math.max(0, step - 1))}>← НАЗАД</button>
           <button className="adm-btn primary"
-            disabled={bar && step >= 3}
+            disabled={bar && step >= places.length}
             onClick={() => void setFinaleStep(step + 1)}>
-            {bar ? (barLabels[step] ?? 'ДАЛЬШЕ →') : 'ДАЛЬШЕ →'}
+            {/* Раньше подпись называла место, которое УЖЕ на экране (его
+                открыл предыдущий клик) — «показать 3 место» жала кнопку,
+                а на экране появлялось 2-е. Без номера эта путаница
+                невозможна: следующий клик всегда открывает следующего
+                призёра, пока не закончатся, потом — таблицу. */}
+            {bar ? (step < places.length - 1 ? 'СЛЕДУЮЩИЙ ПОБЕДИТЕЛЬ →' : 'ПОКАЗАТЬ ТАБЛИЦУ →') : 'ДАЛЬШЕ →'}
           </button>
         </div>
       </div>

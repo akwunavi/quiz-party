@@ -143,10 +143,15 @@ export async function startCounting() {
   if (error) throw error
 }
 
-export async function finishGame(packId: string | null) {
+/** @param bar Сценарий финала: true — сразу «награждение» (ручной, по
+ *  команде ведущего), false/не задан — «шоу» (авто). На бумаге сценарий
+ *  всегда нужен ручной — ведущий стоит с микрофоном и вручает места сам,
+ *  выбирать «шоу» там просто нет смысла, поэтому вызовы из бара передают
+ *  bar: true явно, а не оставляют ведущему выбор перед каждой игрой. */
+export async function finishGame(packId: string | null, bar = false) {
   // финал всегда начинается с нулевого шага, иначе подхватится индекс вопроса
   await supabase.from('game_sessions')
-    .update({ phase: 'finale', question_index: 0, reveal: false }).eq('id', getRoomId())
+    .update({ phase: 'finale', question_index: 0, reveal: bar }).eq('id', getRoomId())
   if (packId) await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
 }
 

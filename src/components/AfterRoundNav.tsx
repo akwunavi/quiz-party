@@ -23,7 +23,9 @@ export function AfterRoundNav({ pack, gameState }: {
       // слайд «перед итогами» показываем до финала — ведущему не надо
       // помнить про кнопку, слайд выходит сам там, где задуман
       const sl = slideBeforeFinale(pack.settings?.info_slides)
-      return sl == null ? void finishGame(gameState.pack_id) : void showSlide(sl)
+      return sl == null
+        ? void finishGame(gameState.pack_id, pack.settings?.play_mode === 'paper')
+        : void showSlide(sl)
     }
     return void gotoRound(gameState.round_number + 1,
       slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)

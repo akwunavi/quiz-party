@@ -29,7 +29,8 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   const step = afterRoundStep(pack, gameState.round_number, 'show_answers')
   if (step.kind === 'scoreboard') return void showScoreboard()
   if (step.kind === 'break') return void startBreak()
-  if (step.kind === 'finale') return void finishGame(gameState.pack_id)
+  if (step.kind === 'finale')
+    return void finishGame(gameState.pack_id, pack.settings?.play_mode === 'paper')
   await supabase.from('game_sessions').update({
     phase: 'round_intro', round_number: gameState.round_number + 1,
     question_index: 0, timer_started_at: null, reveal: false, melody: {},

@@ -18,14 +18,18 @@
    в один ряд, как в макете. Общее правило выше (7.67) растягивало .primary
    на всю ширину, и «Дальше» падала на свою строку отдельно от «Назад» —
    специфичность здесь выше нарочно, чтобы точно победить то правило. */
+/* white-space:nowrap (7.67) не даёт тексту переноситься — «↻ ПОВТОР
+   ВОПРОСА» в трети экрана 390px не помещается в одну строку и вылезает
+   за границы кнопки. Разрешаем перенос ИМЕННО тут (не везде — другие
+   ряды кнопок короче и одну строку держат нормально). */
 .adm-footer .adm-row-btns .adm-btn,
 .adm-footer .adm-row-btns .adm-btn.primary {
-  flex: 1 1 0;
+  flex: 1 1 0; white-space: normal; line-height: 1.2;
 }
 @media (max-width: 720px) {
   .adm-footer .adm-row-btns .adm-btn,
   .adm-footer .adm-row-btns .adm-btn.primary {
-    flex: 1 1 0; padding: 11px 4px; font-size: 12.5px;
+    flex: 1 1 0; padding: 10px 4px; font-size: 12px;
   }
 }
 
