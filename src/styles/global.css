@@ -11,7 +11,10 @@
    Файлы 21–27 разложены ПО СМЫСЛУ: редактор, вопрос, ответы, заставка,
    итоги, админка, лобби. Новые правки кладём в подходящий по смыслу файл.
    ═══════════════════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap');
+/* Шрифты — своим файлом, локально (8.66), не внешним @import с
+   fonts.googleapis.com. Первым в каскаде: объявления @font-face должны
+   отработать до того, как их начнут запрашивать правила ниже. */
+@import './parts/00-fonts.css';
 
 @import './parts/01-base.css';
 @import './parts/02-editor-cyber.css';
