@@ -27,15 +27,15 @@
   50% { opacity: .32; } 100% { opacity: 0; } }
 
 .intro-stage { position: absolute; inset: 0; z-index: 11; display: none;
-  align-items: center; justify-content: center; flex-direction: column; gap: 16px; text-align: center; }
+  align-items: center; justify-content: center; flex-direction: column; gap: 40px; text-align: center; }
 .intro-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: .42em;
   text-transform: uppercase; color: #9a5cff; opacity: .85; }
 .intro-eyebrow::before { content: '// '; color: #ea580c; }
 .intro-frame { position: relative; min-height: .9em; }
 .intro-glyph { position: relative; margin: 0; font-family: 'Rajdhani', sans-serif; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .02em; color: #eef6f4; font-size: clamp(90px, 20vw, 260px);
+  text-transform: uppercase; letter-spacing: .02em; color: #eef6f4; font-size: clamp(90px, 18vw, 220px);
   line-height: 1;
-  text-shadow: 0 0 4px rgba(43,224,204,.85), 0 0 26px rgba(43,224,204,.55), 0 0 64px rgba(154,92,255,.35); }
+  text-shadow: 0 0 4px rgba(43,224,204,.85), 0 0 22px rgba(43,224,204,.55), 0 0 40px rgba(154,92,255,.35); }
 .intro-glyph::before, .intro-glyph::after { content: attr(data-t); position: absolute; inset: 0;
   mix-blend-mode: screen; pointer-events: none; animation: introHum 2.4s ease-in-out infinite; }
 .intro-glyph::before { color: #2be0cc; animation-delay: -.4s; transform: translate(1px, 0); }
@@ -63,8 +63,13 @@
   text-transform: uppercase; color: #7fa39d; }
 .intro-subline b { color: #ea580c; font-weight: 400; }
 
-.intro-flight-label { position: absolute; left: 0; right: 0; bottom: 150px; z-index: 11;
-  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;
+/* Раньше сидела внизу (bottom:150px) — на реальном прогоне это оказалось
+   ровно там, куда проецируется 3D-табличка с фразой (её экранная позиция
+   зависит от камеры/FOV, не от вёрстки), и текст статуса налезал прямо
+   на саму фразу. Наверх, подальше от 3D-контента — как в HUD-угле, а не
+   поверх главного объекта сцены. */
+.intro-flight-label { position: fixed; left: 0; right: 0; top: 64px; z-index: 11;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
   opacity: 0; transition: opacity .3s; }
 .intro-flight-label.intro-on { opacity: 1; }
 
@@ -73,6 +78,30 @@
   backdrop-filter: brightness(1.35) saturate(1.3); -webkit-backdrop-filter: brightness(1.35) saturate(1.3);
   box-shadow: inset 0 0 0 1px rgba(238,246,244,.3); opacity: 0; will-change: transform, opacity; }
 
+/* ── HUD-обвязка (перенесена обратно из прототипа-артефакта: рамка по
+   углам + бегущие тикеры по бортам) — атмосфера, без функции, поэтому
+   pointer-events:none везде и вне потока флекса .intro-root. ── */
+.intro-bracket { position: fixed; width: 34px; height: 34px; z-index: 11; opacity: .8;
+  pointer-events: none; }
+.intro-bracket b { position: absolute; inset: 0; border: 2px solid #2be0cc;
+  filter: drop-shadow(0 0 5px rgba(43,224,204,.7)); }
+.intro-bracket.tl { top: 24px; left: 24px; } .intro-bracket.tl b { border-width: 2px 0 0 2px; }
+.intro-bracket.tr { top: 24px; right: 24px; } .intro-bracket.tr b { border-width: 2px 2px 0 0; }
+.intro-bracket.bl { bottom: 24px; left: 24px; } .intro-bracket.bl b { border-width: 0 0 2px 2px; }
+.intro-bracket.br { bottom: 24px; right: 24px; } .intro-bracket.br b { border-width: 0 2px 2px 0; }
+
+.intro-ticker { position: fixed; top: 90px; bottom: 100px; width: 130px; z-index: 9;
+  overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+          mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent); }
+.intro-ticker.left { left: 24px; } .intro-ticker.right { right: 24px; text-align: right; }
+.intro-ticker-col { display: flex; flex-direction: column; gap: 5px; font-size: 10px;
+  font-family: 'Share Tech Mono', monospace; color: #2be0cc; opacity: .65;
+  animation: introTickerUp 14s linear infinite; }
+.intro-ticker.right .intro-ticker-col { animation-duration: 18s; animation-direction: reverse; }
+@keyframes introTickerUp { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+.intro-ticker-col span.hi { color: #ea580c; opacity: 1; }
+
 @media (max-width: 720px) {
-  .intro-flight-label { bottom: 110px; }
+  .intro-ticker, .intro-bracket { display: none; }
 }

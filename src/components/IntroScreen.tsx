@@ -17,7 +17,7 @@
 // было нужно только мне для проверки), и с honestным prefers-reduced-motion
 // (в артефакте он был сознательно отключён для показа ведущему — здесь,
 // на боевом экране, это неправильно, поэтому уважается по-настоящему).
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 // Именованные импорты, не `import * as THREE` — так бандлер реально может
 // выбросить неиспользуемые классы three.js (у namespace-импорта
 // tree-shaking куда менее надёжный, а библиотека немаленькая).
@@ -56,6 +56,16 @@ const phaseZ = (i: number) => -(i + 1) * SEGMENT
 const easeOutExpo = (x: number) => (x === 1 ? 1 : 1 - Math.pow(2, -10 * x))
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
+// ── Тикер по бортам (декоративный HUD, перенесён обратно из
+// прототипа-артефакта) — случайные hex-коды, чисто атмосфера. ──
+const TICKER_WORDS = ['SYNC', 'AUTH', 'NODE', 'PING', 'LOAD', 'SCAN', 'LINK', 'BUFF', 'CORE', 'GRID']
+function buildTickerRows(n: number): string[] {
+  return Array.from({ length: n }, (_, i) => {
+    const hex = Math.floor(Math.random() * 0xffff).toString(16).toUpperCase().padStart(4, '0')
+    return `0x${hex} ${TICKER_WORDS[i % TICKER_WORDS.length]}`
+  })
+}
+
 interface CrackLine { pts: [number, number][]; color: string; width: number }
 
 export function IntroScreen({ onDone }: { onDone: () => void }) {
@@ -74,6 +84,8 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
   // Подсказка «звук заблокирован» на случай, если это вообще первый жест
   // ведущего в этой вкладке — тот же приём, что и на экране вопроса.
   useAudioUnlock()
+  const tickerLeft = useMemo(() => buildTickerRows(16), [])
+  const tickerRight = useMemo(() => buildTickerRows(16), [])
 
   useEffect(() => {
     let cancelled = false
@@ -148,10 +160,23 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
     let crackLines: CrackLine[] = []
     let currentCrackLevel = 0
 
+    // КРИТИЧНО: у <canvas> битмап по умолчанию 300×150px, а CSS (inset:0)
+    // только РАСТЯГИВАЕТ эту картинку на весь экран — размер самого
+    // битмапа надо выставлять явно. Без этой строки все трещины рисуются
+    // координатами вида x=800/y=400 на холсте 300×150 и физически не
+    // попадают в него — на боевом прогоне трещин не было видно вообще
+    // ни разу, ровно по этой причине.
+    function resizeCrackCanvas() {
+      if (!crackCanvas) return
+      crackCanvas.width = window.innerWidth
+      crackCanvas.height = window.innerHeight
+    }
+    resizeCrackCanvas()
+
     function buildCracks(W: number, H: number) {
       crackLines = []
       let colorSeed = 0
-      const impacts = 4
+      const impacts = 6 // было 4 — «больше трещин», прямая просьба
       function grow(x: number, y: number, ang: number, len: number, depth: number, width: number) {
         const segs = 3 + Math.floor(Math.random() * 3)
         const pts: [number, number][] = [[x, y]]
@@ -161,7 +186,7 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
           const stepLen = len / segs
           cx += Math.cos(a) * stepLen; cy += Math.sin(a) * stepLen
           pts.push([cx, cy])
-          if (depth > 0 && Math.random() < .45) {
+          if (depth > 0 && Math.random() < .5) {
             const ba = a + (Math.random() < .5 ? 1 : -1) * (0.5 + Math.random() * .9)
             grow(cx, cy, ba, len * (0.35 + Math.random() * .3), depth - 1, width * .78)
           }
@@ -172,23 +197,23 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
       for (let k = 0; k < impacts; k++) {
         const ox = W * (0.15 + Math.random() * 0.7)
         const oy = k < originsY.length ? originsY[k] : H * (0.1 + Math.random() * 0.8)
-        const rays = 7 + Math.floor(Math.random() * 5)
+        const rays = 9 + Math.floor(Math.random() * 6) // было 7-11, теперь 9-14
         for (let i = 0; i < rays; i++) {
           const ang = (i / rays) * Math.PI * 2 + (Math.random() - .5) * .4
           const len = Math.max(W, H) * (0.18 + Math.random() * .38)
-          grow(ox, oy, ang, len, 2, 0.7)
+          grow(ox, oy, ang, len, 2, 0.9) // было 0.7 — чуть плотнее, теперь реально видно
         }
       }
     }
     function drawCracksOnly(level: number) {
       if (!crackCtx || level <= 0) return
-      const reveal = Math.min(1, level / 3.2)
+      const reveal = Math.min(1, level / 2.4) // было /3.2 — раскрывается быстрее по уровням
       const activeCount = Math.round(crackLines.length * reveal)
       for (let i = 0; i < activeCount; i++) {
         const ln = crackLines[i]
-        crackCtx.lineWidth = ln.width * (0.8 + level * .08)
-        crackCtx.strokeStyle = ln.color; crackCtx.globalAlpha = .7 + level * .1
-        crackCtx.shadowColor = ln.color; crackCtx.shadowBlur = 4 + level * 1.8
+        crackCtx.lineWidth = ln.width * (0.9 + level * .1)
+        crackCtx.strokeStyle = ln.color; crackCtx.globalAlpha = .75 + level * .1
+        crackCtx.shadowColor = ln.color; crackCtx.shadowBlur = 5 + level * 2.2
         crackCtx.beginPath()
         ln.pts.forEach(([x, y], idx) => idx === 0 ? crackCtx!.moveTo(x, y) : crackCtx!.lineTo(x, y))
         crackCtx.stroke()
@@ -304,11 +329,15 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
     function initGL() {
       const canvas = glRef.current
       if (!canvas) return
-      renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true })
+      // alpha:true + без scene.background — канва прозрачна там, где
+      // сцена не рисует, и сквозь неё виден собственный «сеточный» фон
+      // приложения (.grid-bg, styles/parts/01-base.css). Раньше scene.
+      // background красил ВЕСЬ канвас сплошным цветом и полностью
+      // перекрывал сетку — «не хватает сетки» была ровно об этом.
+      renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
 
       scene = new Scene()
-      scene.background = new Color(0x04070a)
       scene.fog = new FogExp2(0x04070a, 0.0011)
 
       camera = new PerspectiveCamera(62, window.innerWidth / window.innerHeight, 1, 6000)
@@ -393,6 +422,7 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
     }
     function onResize() {
       resizeGL()
+      resizeCrackCanvas()
       buildCracks(window.innerWidth, window.innerHeight)
       paintCracks(currentCrackLevel, window.innerWidth, window.innerHeight)
     }
@@ -670,6 +700,24 @@ export function IntroScreen({ onDone }: { onDone: () => void }) {
         <div className="intro-vignette" />
         <div className="intro-scanlines" />
         <div ref={noiseRef} className="intro-noise" />
+        <div className="intro-bracket tl"><b /></div>
+        <div className="intro-bracket tr"><b /></div>
+        <div className="intro-bracket bl"><b /></div>
+        <div className="intro-bracket br"><b /></div>
+        <div className="intro-ticker left">
+          <div className="intro-ticker-col">
+            {[...tickerLeft, ...tickerLeft].map((row, i) => (
+              <span key={i} className={i % 6 === 0 ? 'hi' : undefined}>{row}</span>
+            ))}
+          </div>
+        </div>
+        <div className="intro-ticker right">
+          <div className="intro-ticker-col">
+            {[...tickerRight, ...tickerRight].map((row, i) => (
+              <span key={i} className={i % 5 === 0 ? 'hi' : undefined}>{row}</span>
+            ))}
+          </div>
+        </div>
         <div ref={stageRef} className="intro-stage">
           <div className="intro-eyebrow">protocol // boot sequence</div>
           <div ref={frameRef} className="intro-frame" />
