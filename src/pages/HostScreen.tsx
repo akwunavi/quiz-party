@@ -15,7 +15,7 @@ import { getRoomId } from '../lib/room'
 import { jeopardyTile, jeopardyRef } from '../lib/jeopardyRef'
 import { mediaUrl, lenClass } from '../lib/media'
 import { packStats } from '../lib/duration'
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
@@ -662,7 +662,11 @@ function longestWord(lines: string[]): number {
   return Math.min(20, words.reduce((m, w) => Math.max(m, w.length), 0))
 }
 
-function Title({ theme, lines }: { theme: string; lines: string[] }) {
+// forwardRef: экран полной таблицы итогов (Finale) ужимает этот заголовок,
+// когда таблице не хватает места даже на минимальном кегле — см.
+// useFitText/shrinkBefore и вызов ниже в fullTable.
+const Title = forwardRef<HTMLHeadingElement, { theme: string; lines: string[] }>(
+  function Title({ theme, lines }, ref) {
   const longest = longestWord(lines)
   // «Взлом терминала»: заголовок дешифруется посимвольно, только в классике.
   // Длина строки не меняется (см. lib/scramble.ts) — кегль, посчитанный по
@@ -673,7 +677,7 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   const shown = theme === 'classic' ? scrambled.split('\n') : lines
   if (theme !== 'new_year') {
     return (
-      <h1 className="neon-title title-anim" data-longest={longest}
+      <h1 ref={ref} className="neon-title title-anim" data-longest={longest}
         style={{ '--longest': longest, '--lines': lines.length } as CSSProperties}>
         {lines.map((l, i) => (
           <span key={i} style={i === lines.length - 1 && lines.length > 1 ? { color: 'var(--accent)' } : {}}>{shown[i] ?? l}<br /></span>
@@ -683,7 +687,7 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
   }
   let n = 0
   return (
-    <h1 className="neon-title" data-longest={longest}
+    <h1 ref={ref} className="neon-title" data-longest={longest}
       style={{ '--longest': longest, '--lines': lines.length } as CSSProperties}>
       {lines.map((line, li) => (
         <span key={li} style={{ display: 'block' }}>
@@ -694,7 +698,7 @@ function Title({ theme, lines }: { theme: string; lines: string[] }) {
       ))}
     </h1>
   )
-}
+  })
 
 /** Останавливает ВСЁ звучащее на странице.
  *  Пауз через ссылки на конкретные плееры недостаточно: элементы создаются
@@ -2401,12 +2405,19 @@ function ScoreboardScreen({ pack, gameState }: {
   // тот же приём, что и для текста вопроса: таблица лежит в подрезанной по
   // высоте обёртке (.sb-table-wrap, flex: 1 1 0 + overflow: hidden) и
   // довписывается в неё замером, а не только формулой.
-  const fitTable = useFitText<HTMLTableElement>([ranked.length, scored.length])
+  // Заголовок — «клапан» на случай, если даже минимальный кегль таблицы не
+  // влезает (много команд на невысоком экране): подгон сперва жмёт саму
+  // таблицу, а если и так не влезло — ужимает title, освобождая высоту
+  // соседу по flex-колонке. Полный список команд важнее размера заголовка.
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const fitTable = useFitText<HTMLTableElement>(
+    [ranked.length, scored.length], { shrinkBefore: titleRef },
+  )
   return (
     <div className="host-screen grid-bg sb-screen">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
       {/* заголовок намеренно НЕ через Title: он был крупнее самой таблицы */}
-      <h2 className="sb-title">ПРОМЕЖУТОЧНЫЕ РЕЗУЛЬТАТЫ</h2>
+      <h2 className="sb-title" ref={titleRef}>ПРОМЕЖУТОЧНЫЕ РЕЗУЛЬТАТЫ</h2>
       {/* Кегль крупный, ступени по числу команд — это первый, грубый подгон
           под ширину. Обёртка ниже держит границы по высоте, а useFitText
           довписывает то, что ступени не учли. */}
@@ -2560,8 +2571,13 @@ function Finale({ pack, gameId, gameState }: {
   const step = gameState.question_index ?? 0
 
   // та же обёртка + подгон, что у промежуточного табло: ступени tableSize()
-  // калиброваны по ширине и не знают про реальную высоту невысоких экранов
-  const fitFinTable = useFitText<HTMLTableElement>([rows.length])
+  // калиброваны по ширине и не знают про реальную высоту невысоких экранов.
+  // titleRef — тот же «клапан», что и там: не влезло даже на минимальном
+  // кегле таблицы — подгон ужимает заголовок «РЕЗУЛЬТАТЫ» над ней.
+  const finTitleRef = useRef<HTMLHeadingElement>(null)
+  const fitFinTable = useFitText<HTMLTableElement>(
+    [rows.length], { shrinkBefore: finTitleRef },
+  )
 
   // раунды, идущие в зачёт, и победитель каждого из них
   const scored = pack.rounds.map((r, i) => ({ r, i })).filter(x => !x.r.off_scoreboard)
@@ -2678,7 +2694,7 @@ function Finale({ pack, gameId, gameState }: {
       <div className="host-screen grid-bg fin-screen">
         {fireworks}
         <div className="mono-tag">ИТОГИ ИГРЫ</div>
-        <Title theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+        <Title ref={finTitleRef} theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
         {fullTable}
         <div className="host-actions">
           <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
@@ -2695,16 +2711,12 @@ function Finale({ pack, gameId, gameState }: {
           <div className="fin-award-place">{place} МЕСТО</div>
           <div className="fin-award-medal"><AwardMedal theme={pack.theme} place={place} /></div>
           {winners.length > 0
-            ? <>
-                {winners.map(r => (
-                  <div key={r.team.id} className="fin-award-name"
-                    style={{ color: r.team.color }}>{r.team.name}</div>
-                ))}
-                <div className="fin-award-score">{winners[0].total}</div>
-              </>
+            ? winners.map(r => (
+                <div key={r.team.id} className="fin-award-name"
+                  style={{ color: r.team.color }}>{r.team.name}</div>
+              ))
             : <div className="fin-award-name">—</div>}
         </div>
-        <div className="fin-hint">дальше — по команде ведущего</div>
       </div>
     )
   }

@@ -295,6 +295,18 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     // с табло и из перерыва идём по общему маршруту: с табло может быть
     // ещё перерыв, а вот из перерыва — только вперёд
     if (phase === 'scoreboard' || phase === 'break') runAfterRound()
+    // Слайд-брифинг («Дальше» тут раньше молчала — ни одно из условий выше
+    // не про info, клик просто ничего не делал). Слайд перед раундом — это
+    // то же место, что gotoRound уже поставил (round_number готов, не
+    // хватает только войти в round_intro); слайд перед финалом — отдельный
+    // show_at, там «дальше» значит «показать итоги». Слайды, вызванные
+    // ведущим вручную (show_at: 'manual'), возвращают туда же, куда и
+    // существующая кнопка «Вернуться к раунду» — round_intro.
+    if (phase === 'info') {
+      const sl = pack.settings?.info_slides?.[step]
+      if (sl?.show_at === 'finale') return void finishGame(gameState.pack_id, paperMode)
+      return void setPhase('round_intro')
+    }
   }
   const goBack = () => {
     if (phase === 'question' && step > 0) void gotoQuestion(step - 1)
@@ -367,7 +379,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             (раньше «Повтор» жил в отдельной группе вместе с «Табло» и
             «Показать ответ», которые на самом экране вопроса не нужны —
             обычный маршрут и так доводит до разбора кнопкой «Дальше»). */}
-        {!isInteractive && !(isSprint && phase === 'question') && phase !== 'show_answers' && (
+        {!isInteractive && !(isSprint && phase === 'question') && phase !== 'show_answers'
+          && phase !== 'info' && (
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             {(phase === 'question' || phase === 'answer_time') && (
@@ -385,6 +398,17 @@ function RoundView({ pack, round, gameState, teams, answers }: {
               && !gameState.timer_started_at} onClick={advance}>
               {phase === 'answer_time' ? 'К ОТВЕТАМ →' : 'ДАЛЬШЕ →'}
             </button>
+          </div>
+        )}
+        {/* Слайд-брифинг — отдельный, ВНЕ гейта !isInteractive: слайд может
+            стоять перед любым раундом, в том числе перед «Своей игрой» или
+            блицем, у которых своя раскладка ниже. «Назад» здесь не кнопка:
+            у слайда нет своего определённого «предыдущего места» (слайд
+            перед раундом 3 мог прийти и с табло раунда 2, и с перерыва) —
+            молчаливая кнопка хуже отсутствующей. */}
+        {phase === 'info' && (
+          <div className="adm-row-btns">
+            <button className="adm-btn primary" onClick={advance}>ДАЛЬШЕ →</button>
           </div>
         )}
         {isInteractive && phase === 'round_intro' && (
@@ -951,12 +975,13 @@ function ResultsPanel({ pack, gameState, teams }: {
     a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0).length
 
   return (
-    <div className="adm-pad">
+    <>
       <div className="adm-box">
         <button className="adm-cmd-row" onClick={() => setExpanded(e => !e)}>
           <span>{expanded ? '▾' : '▸'} команды</span><span className="car">—</span>
         </button>
-        {expanded && (<>
+        {expanded && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
         {/* На бумаге QR никто не сканирует — список команд заводит ведущий
             здесь же, рядом с баллами, а не отдельным блоком в другом месте
             экрана (были рассинхронизированы — заводишь команду в одном
@@ -978,7 +1003,8 @@ function ResultsPanel({ pack, gameState, teams }: {
             <span>▸ Оценки игры</span><span className="car">★</span>
           </button>
         )}
-        </>)}
+        </div>
+        )}
       </div>
 
       {open === 'roster' && (
@@ -1040,7 +1066,7 @@ function ResultsPanel({ pack, gameState, teams }: {
           <RatingsBody pack={pack} gameState={gameState} />
         </AdmOverlay>
       )}
-    </div>
+    </>
   )
 }
 
