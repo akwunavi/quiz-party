@@ -21,7 +21,7 @@ import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } fr
 import {
   selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
-  startCounting,
+  startCounting, startIntro,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { ScreenFx } from '../components/ScreenFx'
@@ -44,6 +44,7 @@ import { teamColor } from '../lib/teamColors'
 import { probeMedia, createAudio, stopAllAudio, playSynced,
   type SyncedHandle } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
+import { IntroScreen } from '../components/IntroScreen'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -240,13 +241,22 @@ function HostInner({ gameState, pack }: {
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
               }}>⟲ Сменить пакет</button>
-              <button onClick={() => void gotoRound(0,
-                slideForRound(pack?.settings?.info_slides, 0) ?? undefined)}>К первому раунду →</button>
+              <button onClick={() => void (pack?.settings?.show_intro
+                ? startIntro()
+                : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
+                К первому раунду →</button>
             </div>
           </>
         )}
       </div>
     )
+  }
+
+  // ── Интро (заставка перед первым раундом, если включена в пакете) ──
+  if (gameState.phase === 'intro') {
+    return <IntroScreen onDone={() => {
+      void gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined)
+    }} />
   }
 
   const round = pack.rounds[gameState.round_number]

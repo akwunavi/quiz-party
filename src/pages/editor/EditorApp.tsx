@@ -389,6 +389,21 @@ function PackScreen({ packId, user, onBack }: {
               в любой момент игры — к раундам не привязаны
             </div>
           </div>
+          <div className="ed-field"><label>Интро</label>
+            <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+              <input type="checkbox" checked={!!pack.settings?.show_intro}
+                onChange={async ev => {
+                  await setPackSettings(pack.id, { ...(pack.settings ?? {}), show_intro: ev.target.checked })
+                  reload()
+                }} />
+              показывать заставку перед первым раундом
+            </label>
+            <div className="ed-hint">
+              Отсчёт, пролёт по фразам, разлом экрана — киберпанк-заставка на
+              весь экран. Идёт один раз, сразу после лобби и перед слайдом
+              «lobby» (если он есть) или раундом 1
+            </div>
+          </div>
           <div className="ed-field"><label>Музыка в лобби</label>
             <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
               paths={pack.settings?.lobby_music ? [pack.settings.lobby_music] : []}

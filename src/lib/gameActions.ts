@@ -39,6 +39,16 @@ export async function gotoRound(round_number: number, slideIndex?: number) {
 // так их можно покрыть тестами. Реэкспорт, чтобы места вызова не менялись.
 export { slideForRound, slideBeforeFinale } from './slides'
 
+/** Заставка «Интро» перед первым раундом — см. HostScreen phase 'intro'.
+ *  Сама заставка, доиграв, вызывает gotoRound(0, ...) — тот же переход,
+ *  что случился бы по кнопке «К первому раунду», если бы интро не было. */
+export async function startIntro() {
+  const { error } = await supabase.from('game_sessions').update({
+    phase: 'intro', timer_started_at: null, reveal: false,
+  }).eq('id', getRoomId())
+  if (error) throw error
+}
+
 /** Показать слайд-брифинг, не трогая номер раунда. */
 export async function showSlide(slideIndex: number) {
   const { error } = await supabase.from('game_sessions').update({
