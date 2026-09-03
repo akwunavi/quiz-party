@@ -26,7 +26,10 @@
   font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
 .adm-btn { flex: 1; padding: 13px 0; border-radius: 8px; background: #16203a;
   border: 1px solid #26344f; color: var(--fg); font-weight: 600; }
-.adm-btn.primary { background: #0e3550; border-color: var(--neon); color: #cdefff; }
+/* Основной акцент — var(--accent), тот же оранжевый, что и везде в
+   приложении (проектор, медали, оценки) — раньше тут был отдельный
+   цианово-синий, оставшийся от старой доигровой версии админки. */
+.adm-btn.primary { background: var(--accent); border-color: var(--accent); color: #1a0a02; }
 .adm-btn.ok { background: #14361f; border-color: #22c55e; color: #9df5b8; }
 .adm-round { padding: 12px 8px; border-radius: 8px; background: #121c31;
   border: 1px solid #26344f; color: var(--fg); font-size: 13px; text-align: left; }

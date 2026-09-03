@@ -90,10 +90,6 @@ export function AdminPage() {
 
       {!gameState.pack_id && <PackPicker />}
 
-      {/* Сверка баллов и ручная коррекция — доступны в любой момент игры,
-          не только в финале (8.59). */}
-      {pack && teams.length > 0 && <ResultsPanel pack={pack} gameState={gameState} teams={teams} />}
-
       {gameState.pack_id && phase === 'lobby' && pack && (
         <div className="adm-pad">
           <TeamRandomizer />
@@ -337,13 +333,16 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           во «время ответов» отвечают на ВЕСЬ раунд разом, а не по одному. */}
       {phase === 'answer_time' && (
         <div className="adm-mid">
-          <AnswerTimeBoard round={round} gameState={gameState} answers={answers} teams={teams} />
+          <AnswerTimeBoard round={round} gameState={gameState} answers={answers}
+            teams={teams} showTally={!paperMode} />
         </div>
       )}
       {phase !== 'show_answers' && phase !== 'answer_time' && !(isSprint && phase === 'question') && (
         <div className="adm-mid">
           <QuestionTextOnly round={round} gameState={gameState} />
-          {(phase === 'question' || phase === 'recap') && (
+          {/* На бумаге команды отвечают на бланк — кто уже ответил, узнать
+              неоткуда (в базе этого нет), счётчик врал бы «0 из N» всегда. */}
+          {!paperMode && (phase === 'question' || phase === 'recap') && (
             <AnsweredIndicator round={round} gameState={gameState} answers={answers} teams={teams} />
           )}
         </div>
@@ -437,15 +436,14 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </div>
         )}
 
+        {/* Порядок по макету: Игра (всё выше) → Команды → Служебное. Раньше
+            «Команды» рендерился в AdminPage() над самим экраном вопроса —
+            блок оказывался ПЕРЕД игрой, а не после. */}
+        <ResultsPanel pack={pack} gameState={gameState} teams={teams} />
+
         <DevSeedPanel pack={pack} gameState={gameState} />
 
         <ServiceDrawer pack={pack} round={round} gameState={gameState} />
-
-        {/* на бумаге: заводим команды. Доступно всегда — команда может
-            прийти в середине игры. Баллы за раунд теперь вносятся через
-            «Команды → Внести баллы» (см. ResultsPanel) — то же самое
-            действие, что раньше жило отдельным блоком прямо в подвале. */}
-        {pack.settings?.play_mode === 'paper' && <TeamsPanel gameId={gameState.game_id} teams={teams} />}
       </div>
     </div>
   )
@@ -631,14 +629,6 @@ function QuestionTextOnly({ round, gameState }: {
         <div className="adm-dim" style={{ textAlign: 'right' }}>ВОПРОС {step + 1} / {round.questions.length}</div>
         <div className="adm-qtext">{q?.question_text || '(без текста — только медиа на проекторе)'}</div>
         {q && <div className="adm-correct">Верный: <b>{correctOf(q)}</b></div>}
-        {q?.answer.mode === 'choice' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignSelf: 'flex-end',
-            maxWidth: 320, width: '100%' }}>
-            {q.answer.choices.map(c => (
-              <div key={c.key} style={{ fontSize: 14, opacity: .7, textAlign: 'right' }}>{c.key} — {c.text}</div>
-            ))}
-          </div>
-        )}
         {q?.answer_note && <div className="adm-dim" style={{ textAlign: 'right' }}>{q.answer_note}</div>}
       </div>
     )
@@ -680,10 +670,13 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
  *  и по сколько вопросов раунда сдала каждая команда, не по одному вопросу
  *  за раз, как AnsweredIndicator: во «время ответов» отвечают на весь
  *  раунд сразу. */
-function AnswerTimeBoard({ round, gameState, answers, teams }: {
+function AnswerTimeBoard({ round, gameState, answers, teams, showTally }: {
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
   answers: Answer[]; teams: Team[]
+  /** На бумаге команды пишут на бланк — в базе нет данных, кто сколько
+   *  сдал, список был бы всегда «0 из N». */
+  showTally: boolean
 }) {
   const seconds = (round.settings as { answerTimeSeconds?: number }).answerTimeSeconds ?? 60
   const [now, setNow] = useState(Date.now())
@@ -706,7 +699,7 @@ function AnswerTimeBoard({ round, gameState, answers, teams }: {
         {mm}:{ss}
       </div>
       <div className="adm-dim">до конца времени на ответы</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14 }}>
+      {showTally && <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14 }}>
         {tally.map(({ team, done }) => (
           <div key={team.id} style={{ display: 'flex', justifyContent: 'space-between',
             fontSize: 14, borderBottom: '1px solid #1c2740', paddingBottom: 6 }}>
@@ -714,7 +707,7 @@ function AnswerTimeBoard({ round, gameState, answers, teams }: {
             <span className="adm-dim">{done} / {total}</span>
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   )
 }
@@ -918,7 +911,7 @@ function ResultsPanel({ pack, gameState, teams }: {
   const scored = pack.rounds.filter(r => !r.off_scoreboard)
   const rows = rankTeams(teams, totals, answers, perRound)
   const paperMode = pack.settings?.play_mode === 'paper'
-  const [open, setOpen] = useState<'results' | 'adjust' | 'ratings' | null>(null)
+  const [open, setOpen] = useState<'roster' | 'results' | 'adjust' | 'ratings' | null>(null)
 
   const existingAdjust = answers.filter(a =>
     a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0).length
@@ -927,6 +920,15 @@ function ResultsPanel({ pack, gameState, teams }: {
     <div className="adm-pad">
       <div className="adm-box">
         <div className="adm-dim">КОМАНДЫ</div>
+        {/* На бумаге QR никто не сканирует — список команд заводит ведущий
+            здесь же, рядом с баллами, а не отдельным блоком в другом месте
+            экрана (были рассинхронизированы — заводишь команду в одном
+            разделе, баллы ей ставишь в другом). */}
+        {paperMode && (
+          <button className="adm-cmd-row" onClick={() => setOpen('roster')}>
+            <span>▸ Список команд</span><span className="car">{teams.length}</span>
+          </button>
+        )}
         <button className="adm-cmd-row" onClick={() => setOpen('results')}>
           <span>▸ Таблица результатов</span><span className="car">сверка</span>
         </button>
@@ -940,6 +942,12 @@ function ResultsPanel({ pack, gameState, teams }: {
           </button>
         )}
       </div>
+
+      {open === 'roster' && (
+        <AdmOverlay title="Список команд" onClose={() => setOpen(null)}>
+          <TeamsPanel gameId={gameId} teams={teams} />
+        </AdmOverlay>
+      )}
 
       {open === 'results' && (
         <AdmOverlay title="Таблица результатов" onClose={() => setOpen(null)}>
@@ -1043,6 +1051,10 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
           </button>
         </div>
       </div>
+
+      {/* Команды (8.62) — таблица результатов/коррекция/оценки были видны
+          на любой фазе игры и до этой правки, финал не исключение. */}
+      {pack && gameState && <ResultsPanel pack={pack} gameState={gameState} teams={teams} />}
 
       {/* Кнопка очистки ОДНА на всю админку — она в лобби, где и нужна
           перед игрой. Здесь был её дубль с тем же действием: две кнопки
