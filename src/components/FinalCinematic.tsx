@@ -27,7 +27,7 @@ import {
   WebGLRenderer, Scene, PerspectiveCamera, Color, FogExp2, AmbientLight, PointLight,
   Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, CanvasTexture, AdditiveBlending,
   BufferGeometry, BufferAttribute, PointsMaterial, Points, Group, BoxGeometry,
-  CylinderGeometry, type Material,
+  CylinderGeometry, ConeGeometry, SphereGeometry, TorusGeometry, type Material,
 } from 'three'
 
 export interface CinematicPhase {
@@ -61,59 +61,122 @@ const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
 interface CrackLine { pts: [number, number][]; color: string; width: number }
 
-// ── Процедурный дрон: корпус + два движителя со свечением. Не игрушка —
-// повреждённая тяжёлая машина, поэтому броня тёмная, а свет только из
-// движков и искр, не из самого корпуса. ──
-function buildDrone(): { group: Group; engineL: Mesh; engineR: Mesh; engineLight: PointLight; disposables: Array<{ dispose(): void }> } {
+// ── Процедурный дрон: вытянутый сенсор-корпус (нос + фюзеляж) с двумя
+// роторными дисками на консолях по бокам — по референсам ведущего
+// («боевой сканирующий дрон», не абстрактный кубик с коническими
+// «ушами»). Локальное «вперёд» дрона — тот же -Z, что и у камеры,
+// которой он подвешен ребёнком: никакой отдельной ориентирующей
+// компенс-ротации группе не нужно. ──
+interface RotorPod { pod: Group; rim: Mesh; spokes: Group }
+function buildDrone(): {
+  group: Group; rotorL: RotorPod; rotorR: RotorPod; engineLight: PointLight
+  disposables: Array<{ dispose(): void }>
+} {
   const group = new Group()
   const disposables: Array<{ dispose(): void }> = []
 
-  const bodyGeo = new BoxGeometry(1.7, 0.62, 3.1)
-  const bodyMat = new MeshStandardMaterial({
-    color: 0x232a34, metalness: .7, roughness: .4, emissive: 0x0b141c, emissiveIntensity: .5,
+  // ── корпус: конический нос + цилиндрический фюзеляж, тёмно-красная
+  // повреждённая броня ──
+  const hullMat = new MeshStandardMaterial({
+    color: 0x7a2028, metalness: .55, roughness: .38, emissive: 0x1a0508, emissiveIntensity: .4,
   })
-  const body = new Mesh(bodyGeo, bodyMat)
-  group.add(body)
-  disposables.push(bodyGeo, bodyMat)
+  const noseGeo = new ConeGeometry(0.42, 0.95, 12)
+  const nose = new Mesh(noseGeo, hullMat)
+  nose.rotation.x = Math.PI / 2
+  nose.position.set(0, 0, -1.55)
+  group.add(nose)
+  disposables.push(noseGeo, hullMat)
 
-  // повреждённая пластина брони — смещённый, чуть перекошенный кусок
-  const plateGeo = new BoxGeometry(0.7, 0.16, 1.1)
-  const plateMat = new MeshStandardMaterial({ color: 0x161b22, metalness: .5, roughness: .6 })
+  const hullGeo = new CylinderGeometry(0.42, 0.36, 1.9, 12)
+  const hull = new Mesh(hullGeo, hullMat)
+  hull.rotation.x = Math.PI / 2
+  hull.position.set(0, 0, -0.15)
+  group.add(hull)
+  disposables.push(hullGeo)
+
+  // повреждённая бронепластина сверху — смещённая, перекошенная
+  const plateGeo = new BoxGeometry(0.5, 0.14, 1.0)
+  const plateMat = new MeshStandardMaterial({ color: 0x14171c, metalness: .5, roughness: .6 })
   const plate = new Mesh(plateGeo, plateMat)
-  plate.position.set(0.5, 0.36, -0.4); plate.rotation.z = 0.18
+  plate.position.set(0.08, 0.38, -0.1); plate.rotation.z = 0.1
   group.add(plate)
   disposables.push(plateGeo, plateMat)
 
-  const nacelleGeo = new CylinderGeometry(0.26, 0.34, 1.3, 10)
-  const engineMat = new MeshStandardMaterial({
-    color: 0x0d1013, metalness: .8, roughness: .3, emissive: 0x2be0cc, emissiveIntensity: 1.6,
+  // сенсор-«глаз» на носу + пара мелких боковых линз — светятся, как
+  // на референсе с красным корпусом
+  const lensMat = new MeshStandardMaterial({
+    color: 0x0c1013, emissive: 0x2be0cc, emissiveIntensity: 2.2, metalness: .2, roughness: .3,
   })
-  const engineL = new Mesh(nacelleGeo, engineMat)
-  engineL.rotation.x = Math.PI / 2
-  engineL.position.set(-1.05, -0.05, 1.05)
-  const engineR = new Mesh(nacelleGeo, engineMat.clone())
-  engineR.rotation.x = Math.PI / 2
-  engineR.position.set(1.05, -0.05, 1.05)
-  group.add(engineL, engineR)
-  disposables.push(nacelleGeo, engineMat)
+  const lensGeo = new SphereGeometry(0.13, 12, 12)
+  const lens = new Mesh(lensGeo, lensMat)
+  lens.position.set(0, -0.05, -2.0)
+  group.add(lens)
+  disposables.push(lensGeo, lensMat)
 
-  // тонкие крылья-стабилизаторы
-  const finGeo = new PlaneGeometry(1.3, 0.5)
-  const finMat = new MeshStandardMaterial({
-    color: 0x1a2028, metalness: .6, roughness: .5, side: 2, emissive: 0x0a1014, emissiveIntensity: .3,
+  const smallLensGeo = new SphereGeometry(0.06, 8, 8)
+  ;[-0.22, 0.22].forEach(x => {
+    const l = new Mesh(smallLensGeo, lensMat)
+    l.position.set(x, 0.12, -1.7)
+    group.add(l)
   })
-  const finL = new Mesh(finGeo, finMat)
-  finL.position.set(-0.95, 0, -0.9); finL.rotation.y = 0.3
-  const finR = new Mesh(finGeo, finMat.clone())
-  finR.position.set(0.95, 0, -0.9); finR.rotation.y = -0.3
-  group.add(finL, finR)
-  disposables.push(finGeo, finMat)
+  disposables.push(smallLensGeo)
+
+  // ── роторные диски на консолях — вращающиеся спицы + светящийся
+  // обод, по референсу с двумя «дисками-колёсами» по бокам ──
+  const armGeo = new CylinderGeometry(0.06, 0.06, 1.4, 6)
+  const armMat = new MeshStandardMaterial({ color: 0x1a1d22, metalness: .7, roughness: .4 })
+  disposables.push(armGeo, armMat)
+  const spokeGeo = new BoxGeometry(0.04, 0.86, 0.05)
+  const spokeMat = new MeshStandardMaterial({ color: 0x0a0c0f, metalness: .4, roughness: .6 })
+  disposables.push(spokeGeo, spokeMat)
+  const capGeo = new CylinderGeometry(0.5, 0.5, 0.07, 16)
+  const capMat = new MeshStandardMaterial({ color: 0x15181d, metalness: .6, roughness: .45 })
+  disposables.push(capGeo, capMat)
+  const rimGeo = new TorusGeometry(0.6, 0.09, 8, 20)
+  disposables.push(rimGeo)
+
+  function buildRotorPod(side: number, glow: number): RotorPod {
+    const pod = new Group()
+    const arm = new Mesh(armGeo, armMat)
+    arm.rotation.z = Math.PI / 2
+    arm.position.set(side * 0.72, -0.08, 0.15)
+    pod.add(arm)
+
+    const hubZ = side * 1.45
+    const cap = new Mesh(capGeo, capMat)
+    cap.rotation.x = Math.PI / 2
+    cap.position.set(hubZ, -0.08, 0.15)
+    pod.add(cap)
+
+    const rimMat = new MeshStandardMaterial({
+      color: 0x0d0f12, metalness: .75, roughness: .3, emissive: glow, emissiveIntensity: 1.4,
+    })
+    const rim = new Mesh(rimGeo, rimMat)
+    rim.position.copy(cap.position)
+    pod.add(rim)
+    disposables.push(rimMat)
+
+    const spokes = new Group()
+    spokes.position.copy(cap.position)
+    for (let i = 0; i < 5; i++) {
+      const spoke = new Mesh(spokeGeo, spokeMat)
+      spoke.rotation.z = (i / 5) * Math.PI
+      spokes.add(spoke)
+    }
+    pod.add(spokes)
+
+    return { pod, rim, spokes }
+  }
+
+  const rotorL = buildRotorPod(-1, 0x2be0cc)
+  const rotorR = buildRotorPod(1, 0xea580c)
+  group.add(rotorL.pod, rotorR.pod)
 
   const engineLight = new PointLight(0x2be0cc, 2.2, 14, 2)
-  engineLight.position.set(0, 0, 1.4)
+  engineLight.position.set(0, 0, -1.4)
   group.add(engineLight)
 
-  return { group, engineL, engineR, engineLight, disposables }
+  return { group, rotorL, rotorR, engineLight, disposables }
 }
 
 // ── Искры повреждённого двигателя: короткоживущий пул точек, никакого
@@ -377,8 +440,9 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       // вправо, как ведомый корабль в кадре.
       drone = buildDrone()
       camera.add(drone.group)
+      // локальное «вперёд» дрона уже совпадает с локальным -Z камеры
+      // (см. комментарий у buildDrone) — компенсирующий разворот не нужен.
       drone.group.position.set(1.3, -1.0, -6.5)
-      drone.group.rotation.y = Math.PI
 
       sparks = buildSparks()
       drone.group.add(sparks.points)
@@ -423,18 +487,22 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         stateRef.droneRoll = stateRef.droneRoll * 0.9 + (-yaw * 1.4) * 0.1
         const bobFreq = 1.6 + intensity * 2.4
         stateRef.droneBob = Math.sin(t * .001 * bobFreq) * (0.12 + intensity * .35)
-        drone.group.rotation.z = Math.PI + stateRef.droneRoll * .6
+        drone.group.rotation.z = stateRef.droneRoll * .6
         drone.group.rotation.x = Math.sin(t * .0013) * 0.06 * (1 + intensity)
+        // роторы крутятся тем быстрее, чем выше интенсивность сцены;
+        // повреждённый (левый) диск при отказе почти останавливается
+        const spinR = dt * (6 + intensity * 10)
+        drone.rotorR.spokes.rotation.z += spinR
         let dipY = -1.0 + stateRef.droneBob
         if (stateRef.engineOutT > 0) {
           stateRef.engineOutT -= dt
           dipY -= (1 - Math.max(0, stateRef.engineOutT) / 0.5) < 1 ? Math.sin((0.5 - stateRef.engineOutT) * 9) * 0.4 : 0
-          drone.engineL.scale.setScalar(0.4 + Math.random() * .3)
-          ;(drone.engineL.material as MeshStandardMaterial).emissiveIntensity = Math.random() * .6
-          if (Math.random() < 0.5) sparks.spawn(-1.05, -0.05, 1.05, 2)
+          drone.rotorL.spokes.rotation.z += spinR * 0.12
+          ;(drone.rotorL.rim.material as MeshStandardMaterial).emissiveIntensity = Math.random() * .6
+          if (Math.random() < 0.5) sparks.spawn(-1.45, -0.08, 0.15, 2)
         } else {
-          drone.engineL.scale.setScalar(1)
-          ;(drone.engineL.material as MeshStandardMaterial).emissiveIntensity = 1.6 + Math.sin(t * .01) * .3
+          drone.rotorL.spokes.rotation.z += spinR
+          ;(drone.rotorL.rim.material as MeshStandardMaterial).emissiveIntensity = 1.4 + Math.sin(t * .01) * .3
         }
         drone.group.position.y = dipY
         drone.group.position.x = 1.3 + Math.sin(t * .0009) * 0.25 * (1 + intensity)
