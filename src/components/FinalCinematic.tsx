@@ -257,40 +257,56 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     }
     resizeCrackCanvas()
 
+    // «Больше трещин, хаотичнее, вырастают одна из другой» — прямая
+    // правка по отзыву. Три источника хаоса, не один: неровный шаг сегментов
+    // (не /segs, а случайная доля), неравномерный угловой шаг лучей вокруг
+    // очага (не идеальные спицы (i/rays)*2π), и отдельный ВТОРОЙ проход,
+    // который стартует новые трещины из случайных точек НА уже готовых
+    // линиях — не только рекурсия внутри одного grow(), а сеть между
+    // разными очагами, как у реального разбитого стекла.
     function buildCracks(W: number, H: number) {
       crackLines = []
       let colorSeed = 0
-      const impacts = 7
+      const impacts = 9
       function grow(x: number, y: number, ang: number, len: number, depth: number, width: number) {
-        const segs = 3 + Math.floor(Math.random() * 3)
+        const segs = 3 + Math.floor(Math.random() * 4)
         const pts: [number, number][] = [[x, y]]
         let a = ang, cx = x, cy = y
         for (let s = 0; s < segs; s++) {
-          a += (Math.random() - .5) * .6
-          const stepLen = len / segs
+          a += (Math.random() - .5) * .9
+          const stepLen = (len / segs) * (0.55 + Math.random() * .85)
           cx += Math.cos(a) * stepLen; cy += Math.sin(a) * stepLen
           pts.push([cx, cy])
-          if (depth > 0 && Math.random() < .5) {
-            const ba = a + (Math.random() < .5 ? 1 : -1) * (0.5 + Math.random() * .9)
-            grow(cx, cy, ba, len * (0.35 + Math.random() * .3), depth - 1, width * .78)
+          if (depth > 0 && Math.random() < .58) {
+            const ba = a + (Math.random() < .5 ? 1 : -1) * (0.4 + Math.random() * 1.1)
+            grow(cx, cy, ba, len * (0.3 + Math.random() * .35), depth - 1, width * .76)
           }
         }
         crackLines.push({ pts, color: CRACK_COLORS[colorSeed++ % CRACK_COLORS.length], width })
       }
       for (let k = 0; k < impacts; k++) {
-        const ox = W * (0.12 + Math.random() * 0.76)
-        const oy = H * (0.1 + Math.random() * 0.8)
-        const rays = 9 + Math.floor(Math.random() * 6)
+        const ox = W * (0.1 + Math.random() * 0.8)
+        const oy = H * (0.08 + Math.random() * 0.84)
+        const rays = 7 + Math.floor(Math.random() * 7)
+        let ang = Math.random() * Math.PI * 2
         for (let i = 0; i < rays; i++) {
-          const ang = (i / rays) * Math.PI * 2 + (Math.random() - .5) * .4
-          const len = Math.max(W, H) * (0.18 + Math.random() * .4)
+          ang += (Math.PI * 2 / rays) * (0.55 + Math.random() * .9)
+          const len = Math.max(W, H) * (0.16 + Math.random() * .46)
           grow(ox, oy, ang, len, 2, 0.9)
         }
       }
+      // вторичные разломы — «прорастают» из случайных точек на уже
+      // построенных линиях, а не из новых независимых очагов
+      const primary = crackLines.slice()
+      primary.forEach(ln => {
+        if (ln.pts.length < 3 || Math.random() >= .55) return
+        const [sx, sy] = ln.pts[1 + Math.floor(Math.random() * (ln.pts.length - 2))]
+        grow(sx, sy, Math.random() * Math.PI * 2, Math.max(W, H) * (0.08 + Math.random() * .22), 1, 0.55)
+      })
     }
     function drawCracksOnly(level: number) {
       if (!crackCtx || level <= 0) return
-      const reveal = Math.min(1, level / 3.2)
+      const reveal = Math.min(1, level / 2.5)
       const activeCount = Math.round(crackLines.length * reveal)
       for (let i = 0; i < activeCount; i++) {
         const ln = crackLines[i]
@@ -309,10 +325,11 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       drawCracksOnly(level)
     }
 
-    function flash() {
+    function flash(strong = false) {
       const el = noiseRef.current
       if (!el) return
-      el.classList.remove('fincine-hit'); void el.offsetWidth; el.classList.add('fincine-hit')
+      const cls = strong ? 'fincine-hit-big' : 'fincine-hit'
+      el.classList.remove('fincine-hit', 'fincine-hit-big'); void el.offsetWidth; el.classList.add(cls)
     }
 
     // ── Three.js: сцена, камера-с-дроном-ребёнком, надписи-таблички ──
@@ -378,6 +395,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     const stateRef = {
       camZ: 0, camX: 0, warpKick: 0, yawKick: 0, focusZ: -300, fovKick: 0,
       droneRoll: 0, droneBob: 0, engineOutT: 0, // >0 — двигатель сейчас «мигает» отказом
+      impactT: 0, // >0 — дрон только что впечатался в финальную надпись
     }
     let rig1: PointLight, rig2: PointLight
     let drone: ReturnType<typeof buildDrone> | null = null
@@ -461,9 +479,14 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         lastT = t
 
         const intensity = 0.15 + Math.min(1, Math.max(0, (activePhaseIdx + 1) / PHASES.length)) * 0.85
-        const shakeX = Math.sin(t * .0016 + camShakeSeed) * (1 + intensity * 2.2)
+        // impactT — короткий всплеск в момент, когда дрон впечатался в
+        // финальную надпись (см. runFinalImpact): камеру и дрон трясёт
+        // сильнее, чем в любой из обычных манёвров.
+        const impactT = stateRef.impactT
+        if (impactT > 0) stateRef.impactT = Math.max(0, impactT - dt)
+        const shakeX = Math.sin(t * .0016 + camShakeSeed) * (1 + intensity * 2.2 + impactT * 6)
           + Math.sin(t * .0043) * .5 * intensity
-        const shakeY = Math.cos(t * .002 + camShakeSeed) * (.9 + intensity * 1.8)
+        const shakeY = Math.cos(t * .002 + camShakeSeed) * (.9 + intensity * 1.8 + impactT * 5)
           + Math.cos(t * .0038) * .45 * intensity
         camera.position.x = shakeX + stateRef.camX
         camera.position.y = shakeY + 6
@@ -474,7 +497,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         camera.lookAt(lookX, camera.position.y - 4, stateRef.focusZ)
         camera.rotateZ(-yaw * 0.55)
 
-        const fov = 58 + stateRef.fovKick * (14 + intensity * 10)
+        const fov = 58 + stateRef.fovKick * (14 + intensity * 10) + impactT * 24
         if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix() }
 
         rig1.position.set(Math.sin(t * .0006) * 80, 30, stateRef.camZ - 120)
@@ -488,7 +511,9 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         const bobFreq = 1.6 + intensity * 2.4
         stateRef.droneBob = Math.sin(t * .001 * bobFreq) * (0.12 + intensity * .35)
         drone.group.rotation.z = stateRef.droneRoll * .6
+          + (impactT > 0 ? Math.sin(t * .09) * 1.15 * impactT : 0)
         drone.group.rotation.x = Math.sin(t * .0013) * 0.06 * (1 + intensity)
+          + (impactT > 0 ? Math.cos(t * .11) * .75 * impactT : 0)
         // роторы крутятся тем быстрее, чем выше интенсивность сцены;
         // повреждённый (левый) диск при отказе почти останавливается
         const spinR = dt * (6 + intensity * 10)
@@ -506,6 +531,8 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         }
         drone.group.position.y = dipY
         drone.group.position.x = 1.3 + Math.sin(t * .0009) * 0.25 * (1 + intensity)
+        // рывок вперёд «в надпись» в момент столкновения
+        drone.group.position.z = -6.5 - (impactT > 0 ? impactT * 2.6 : 0)
         sparks.tick(dt)
 
         phaseMeshes.forEach(p => {
@@ -552,17 +579,23 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       step()
     }
 
-    function glitch3D() {
+    // strength растёт с фазой (0.4 → ~1.3) — каждый следующий пролёт
+    // рвёт надпись сильнее и на резких фазах бьёт ДВОЙНЫМ глитчем.
+    function glitch3D(strength = 0.5) {
       if (activePhaseIdx < 0) return
       const p = phaseMeshes[activePhaseIdx]
       if (!p) return
-      const dx = 18 + Math.random() * 16
-      p.ghostCy.visible = true; (p.ghostCy.material as MeshBasicMaterial).opacity = .65; p.ghostCy.position.x = -dx
-      p.ghostMg.visible = true; (p.ghostMg.material as MeshBasicMaterial).opacity = .65; p.ghostMg.position.x = dx
+      const dx = (14 + Math.random() * 12) * (0.7 + strength * .6)
+      const op = Math.min(1, .45 + strength * .3)
+      p.ghostCy.visible = true; (p.ghostCy.material as MeshBasicMaterial).opacity = op; p.ghostCy.position.x = -dx
+      p.ghostMg.visible = true; (p.ghostMg.material as MeshBasicMaterial).opacity = op; p.ghostMg.position.x = dx
       setTimeout(() => {
         (p.ghostCy.material as MeshBasicMaterial).opacity = 0; p.ghostCy.visible = false; p.ghostCy.position.x = 0
         ;(p.ghostMg.material as MeshBasicMaterial).opacity = 0; p.ghostMg.visible = false; p.ghostMg.position.x = 0
-      }, 140 + Math.random() * 110)
+      }, (120 + Math.random() * 90) * (0.8 + strength * .5))
+      if (strength > 0.75 && Math.random() < 0.65) {
+        setTimeout(() => glitch3D(strength * 0.55), 70 + Math.random() * 70)
+      }
     }
 
     async function flyTo(z: number, x: number, ms: number, yawStrength: number, yawSign: number) {
@@ -686,13 +719,32 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       })
     }
 
+    // ── дрон реально ВРЕЗАЕТСЯ в «FINAL SCORE» — не просто пролетает мимо
+    // с обычным глитчем, как у предыдущих трёх надписей. Это и запускает
+    // разлом: сильный рывок камеры/дрона, вспышка искр из носа и обоих
+    // роторов, максимальный screenTear — а сразу следом идёт
+    // animateCrackSpread(), так что трещины читаются как ПРЯМОЕ следствие
+    // столкновения, а не отдельный decorативный слой поверх сцены. ──
+    async function runFinalImpact() {
+      stateRef.impactT = 0.55
+      flash(true)
+      if (sparks) {
+        sparks.spawn(0, -0.05, -2.0, 28)
+        sparks.spawn(-1.45, -0.08, 0.15, 16)
+        sparks.spawn(1.45, -0.08, 0.15, 16)
+      }
+      screenTear(1.6, 340)
+      speedLines(1.4, 260)
+      await sleep(160)
+    }
+
     async function runFinalShatter() {
-      flash()
+      flash(true)
       const layer = shatterRef.current
       if (!layer) return
       layer.innerHTML = ''
       const W = window.innerWidth, H = window.innerHeight
-      const cols = 12, rows = 8, cw = W / cols, ch = H / rows, cx = W / 2, cy = H / 2
+      const cols = 14, rows = 9, cw = W / cols, ch = H / rows, cx = W / 2, cy = H / 2
       const frags: { div: HTMLDivElement; dx: number; dy: number; delay: number }[] = []
       for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
         const x = c * cw, y = r * ch
@@ -751,11 +803,20 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         await flyTo(camZTarget, camXTarget, FLIGHT_MS[i] ?? 2200, 0.55 + phase.crack * .1, yawSign)
         if (cancelled) return
 
-        glitch3D()
-        screenTear(Math.min(1, .5 + phase.crack * .15), phase.final ? 320 : 260)
-        if (!phase.final) speedLines(0.85 + phase.crack * .12, 320)
+        // с каждым следующим пролётом — сильнее: glitch/тир/помехи растут
+        // от «еле заметно» на первой надписи до «почти неконтролируемо»
+        // перед самим столкновением (см. просьбу про эскалацию).
+        glitch3D(0.4 + phase.crack * .2)
+        screenTear(Math.min(1.5, .45 + phase.crack * .27), phase.final ? 360 : 240 + phase.crack * 30)
+        if (!phase.final) speedLines(0.8 + phase.crack * .2, 300 + phase.crack * 20)
+        if (phase.crack >= 3) flash(true)
         paintCracks(currentCrackLevel, window.innerWidth, window.innerHeight)
       }
+      if (cancelled) return
+
+      // дрон впечатывается в «FINAL SCORE» — отсюда и идёт разлом, не
+      // из ниоткуда
+      await runFinalImpact()
       if (cancelled) return
 
       // финальный манёвр «пробил надпись» → экран трескается и рассыпается

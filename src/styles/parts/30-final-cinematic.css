@@ -26,6 +26,11 @@
 .fincine-noise.fincine-hit { animation: fincineFlash .5s steps(3, end); }
 @keyframes fincineFlash { 0% { opacity: 0; } 15% { opacity: .4; } 30% { opacity: .05; }
   50% { opacity: .34; } 100% { opacity: 0; } }
+/* Более резкая вспышка — на поздних пролётах (crack>=3) и на столкновении/
+   разломе, где по отзыву нужно сильнее эскалировать глитч и помехи. */
+.fincine-noise.fincine-hit-big { animation: fincineFlashBig .62s steps(4, end); }
+@keyframes fincineFlashBig { 0% { opacity: 0; } 10% { opacity: .62; } 24% { opacity: .08; }
+  40% { opacity: .55; } 58% { opacity: .1; } 76% { opacity: .42; } 100% { opacity: 0; } }
 
 .fincine-label { position: fixed; left: 0; right: 0; top: 56px; z-index: 11;
   text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
