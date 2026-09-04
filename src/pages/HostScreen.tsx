@@ -2582,6 +2582,18 @@ function Finale({ pack, gameId, gameState }: {
   const roundScores = computeRoundScores(pack, teams, answers)
   const rows = rankTeams(teams, totals, answers, roundScores)
 
+  // Музыка финала: раньше играла только на бумажном экране «считаем баллы»
+  // перед этим экраном, а сам финал (табло/награждение) шёл в тишине —
+  // в онлайн-режиме и на «шоу»-сценарии подсчёта нет вовсе, титры молчали.
+  useEffect(() => {
+    const src = pack.settings?.finale_music ?? pack.settings?.bg_music
+    if (!src || document.hidden) return
+    const a = createAudio(); a.src = mediaUrl(src)
+    a.loop = true; a.volume = .55
+    a.play().catch(() => {})
+    return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+  }, [pack.settings?.finale_music, pack.settings?.bg_music])
+
   // Шаг и сценарий живут в сессии: ведущий может вести финал с телефона,
   // стоя у сцены, — для награждения в баре это обязательно.
   const bar = !!gameState.reveal
@@ -2752,7 +2764,6 @@ function Finale({ pack, gameId, gameState }: {
           <div className="fin-slide-team" style={{ color: w.team?.color }}>
             {w.team?.name ?? '—'}
           </div>
-          <div className="fin-slide-score">{Math.max(0, w.score)}</div>
         </div>
         {/* полоска времени: видно, сколько осталось до следующего слайда */}
         <div className="fin-progress" key={step}><i style={{ animationDuration: '3s' }} /></div>
