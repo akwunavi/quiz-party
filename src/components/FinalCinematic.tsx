@@ -348,16 +348,23 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     const disposables: Array<{ dispose(): void }> = []
 
     function makeTextTexture(text: string, glowCss: string, scale = 1) {
-      const textW = Math.ceil(measCtx.measureText(text).width)
-      const canvasW = Math.max(200, textW + 140)
+      // КАПС + фейковый bold (обводка поверх заливки — у Rajdhani 700
+      // и так самый жирный доступный начерк, реальной толщины не добавить)
+      const upper = text.toUpperCase()
+      const strokeW = FONT_PX * 0.05
+      const textW = Math.ceil(measCtx.measureText(upper).width)
+      const canvasW = Math.max(200, textW + 140 + strokeW * 2)
       const c = document.createElement('canvas')
       c.width = canvasW; c.height = CANVAS_H
       const ctx = c.getContext('2d')!
       ctx.font = `700 ${FONT_PX}px "Rajdhani", sans-serif`
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.lineJoin = 'round'
       ctx.shadowColor = glowCss; ctx.shadowBlur = 60
+      ctx.strokeStyle = '#eef6f4'; ctx.lineWidth = strokeW
+      ctx.strokeText(upper, canvasW / 2, CANVAS_H / 2)
       ctx.fillStyle = '#eef6f4'
-      ctx.fillText(text, canvasW / 2, CANVAS_H / 2)
+      ctx.fillText(upper, canvasW / 2, CANVAS_H / 2)
       const tex = new CanvasTexture(c)
       tex.anisotropy = 4
       let worldW = canvasW * PX_TO_WORLD * scale
@@ -449,7 +456,9 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         const glowCss = '#' + phase.light.toString(16).padStart(6, '0')
         // финальная надпись — заметно крупнее (спецификация: «занимает
         // почти весь экран») и притом менее прозрачна к драме дрона.
-        phaseMeshes.push(buildPhraseMesh(phase.text, z, glowCss, phase.final ? 1.7 : 1))
+        // финальная фраза длиннее прежних английских слов — было 1.7,
+        // с русским текстом столько не помещается в кадр целиком
+        phaseMeshes.push(buildPhraseMesh(phase.text, z, glowCss, phase.final ? 1.35 : 1))
         const light = new PointLight(phase.light, 2.6, 950, 2)
         light.position.set(0, 40, z + 60)
         scene!.add(light)
@@ -807,14 +816,36 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         // текст висит выше центра кадра
         if (phase.final) stateRef.focusY = 8
         const yawSign = i % 2 === 0 ? 1 : -1
-        const camXTarget = phase.final ? 0 : yawSign * 70
-        const camZTarget = phase.final ? phaseZ(i) - FINAL_OVERSHOOT : phaseZ(i) + CAM_STANDOFF
-        // «NO WAY BACK» — двигатель отказывает на середине манёвра
-        if (phase.crack >= 2 && !phase.final) {
-          setTimeout(() => { if (!cancelled) stateRef.engineOutT = 0.5 }, FLIGHT_MS[i] * 0.4)
+
+        if (phase.final) {
+          // Раньше камера сразу шла в облёт-с-перелётом (overshoot) —
+          // последняя фраза длиннее прежних английских слов и на таком
+          // сближении с камерой попросту не помещалась в кадр целиком.
+          // Теперь два шага: сперва встать на дистанции, где вся фраза
+          // читается целиком, выдержать паузу — и только потом рвануть
+          // на столкновение, целясь не в геометрический центр фразы, а
+          // со смещением, как будто в конкретную букву слева от центра.
+          const revealZ = phaseZ(i) + CAM_STANDOFF + 280
+          await flyTo(revealZ, 0, FLIGHT_MS[i] ?? 2200, 0.35, yawSign)
+          if (cancelled) return
+          glitch3D(0.4 + phase.crack * .2)
+          screenTear(Math.min(1.5, .45 + phase.crack * .27), 300)
+          paintCracks(currentCrackLevel, window.innerWidth, window.innerHeight)
+          await sleep(700) // время прочитать фразу целиком, прежде чем в неё врежется дрон
+
+          const letterOffsetX = -150 // целимся в букву слева от центра, не в середину фразы
+          await flyTo(phaseZ(i) - FINAL_OVERSHOOT, letterOffsetX, 950, 0.5, yawSign)
+          if (cancelled) return
+        } else {
+          const camXTarget = yawSign * 70
+          const camZTarget = phaseZ(i) + CAM_STANDOFF
+          // «NO WAY BACK» — двигатель отказывает на середине манёвра
+          if (phase.crack >= 2) {
+            setTimeout(() => { if (!cancelled) stateRef.engineOutT = 0.5 }, FLIGHT_MS[i] * 0.4)
+          }
+          await flyTo(camZTarget, camXTarget, FLIGHT_MS[i] ?? 2200, 0.55 + phase.crack * .1, yawSign)
+          if (cancelled) return
         }
-        await flyTo(camZTarget, camXTarget, FLIGHT_MS[i] ?? 2200, 0.55 + phase.crack * .1, yawSign)
-        if (cancelled) return
 
         // с каждым следующим пролётом — сильнее: glitch/тир/помехи растут
         // от «еле заметно» на первой надписи до «почти неконтролируемо»
