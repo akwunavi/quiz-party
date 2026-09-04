@@ -24,6 +24,11 @@ export interface PackSettings {
    *  пролёт по фразам, разлом экрана). Показывается ОДИН раз, между лобби
    *  и слайдом-брифингом 'lobby'/раундом 1 — см. HostScreen phase 'intro'. */
   show_intro?: boolean
+  /** Финальная заставка — дрон летит мимо надписей и врезается в
+   *  последнюю, экран разбивается. Показывается ОДИН раз, сразу по входу
+   *  в фазу finale, ДО ретроспективы по раундам и показа победителя —
+   *  см. HostScreen, компонент Finale. */
+  show_final_cinematic?: boolean
 }
 
 export interface InfoSlide {

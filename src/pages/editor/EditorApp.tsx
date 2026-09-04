@@ -406,6 +406,22 @@ function PackScreen({ packId, user, onBack }: {
               «lobby» (если он есть) или раундом 1
             </div>
           </div>
+          <div className="ed-field"><label>Финальная заставка</label>
+            <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
+              <input type="checkbox" checked={!!pack.settings?.show_final_cinematic}
+                onChange={async ev => {
+                  await setPackSettings(pack.id, { ...(pack.settings ?? {}), show_final_cinematic: ev.target.checked })
+                  reload()
+                }} />
+              показывать перед финалом
+            </label>
+            <div className="ed-hint">
+              Дрон летит через киберпанк-пространство мимо надписей, врезается
+              в последнюю — экран трескается и рассыпается. Идёт один раз,
+              сразу после последнего вопроса, ДО ретроспективы по раундам и
+              показа победителя
+            </div>
+          </div>
           <div className="ed-field"><label>Музыка в лобби</label>
             <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
               paths={pack.settings?.lobby_music ? [pack.settings.lobby_music] : []}

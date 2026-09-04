@@ -29,6 +29,7 @@ import {
   BufferGeometry, BufferAttribute, PointsMaterial, Points, Group, BoxGeometry,
   CylinderGeometry, ConeGeometry, SphereGeometry, TorusGeometry, type Material,
 } from 'three'
+import { useAudioUnlock, AudioGate } from './AudioGate'
 
 export interface CinematicPhase {
   text: string; sub: string; crack: number; light: number; final?: boolean
@@ -227,11 +228,15 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
   const subRef = useRef<HTMLDivElement>(null)
   const noiseRef = useRef<HTMLDivElement>(null)
   const shatterRef = useRef<HTMLDivElement>(null)
+  const musicRef = useRef<HTMLAudioElement>(null)
   const onDoneRef = useRef(onDone)
   onDoneRef.current = onDone
   const phasesRef = useRef(phases)
   phasesRef.current = phases
   const skipRef = useRef<() => void>(() => {})
+  // Подсказка «звук заблокирован», если это первый жест ведущего в
+  // этой вкладке — тот же приём, что на IntroScreen и экране вопроса.
+  useAudioUnlock()
 
   const totalLabel = useMemo(() => phases.map(p => p.text).join(' → '), [phases])
 
@@ -241,6 +246,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     const finish = () => { if (!done) { done = true; onDoneRef.current() } }
     skipRef.current = finish
     const PHASES = phasesRef.current
+    const musicEl = musicRef.current
 
     // ── Трещины (2D-канва поверх сцены) — тот же приём, что в IntroScreen:
     // битмап РЕЗИНОВЫЙ по умолчанию (300×150), CSS его только растягивает,
@@ -330,6 +336,12 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       if (!el) return
       const cls = strong ? 'fincine-hit-big' : 'fincine-hit'
       el.classList.remove('fincine-hit', 'fincine-hit-big'); void el.offsetWidth; el.classList.add(cls)
+    }
+
+    function playMusic() {
+      if (!musicEl) return
+      musicEl.currentTime = 0
+      musicEl.play().catch(() => { /* без разблокированного звука браузер откажет — не критично */ })
     }
 
     // ── Three.js: сцена, камера-с-дроном-ребёнком, надписи-таблички ──
@@ -794,6 +806,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     async function runSequence() {
       buildCracks(window.innerWidth, window.innerHeight)
       initGL()
+      playMusic()
 
       // PHASE 01 — SILENCE: короткое приближение из темноты, минимум эффектов
       if (labelRef.current) labelRef.current.classList.add('fincine-on')
@@ -881,6 +894,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       disposables.forEach(d => d.dispose())
       drone?.disposables.forEach(d => d.dispose())
       renderer?.dispose()
+      try { musicEl?.pause() } catch { /* уже мёртв */ }
     }
   }, [])
 
@@ -897,6 +911,8 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
         <div ref={subRef} className="fincine-sub" />
       </div>
       <div className="fincine-skip">нажмите, чтобы пропустить →</div>
+      <AudioGate />
+      <audio ref={musicRef} src={`${import.meta.env.BASE_URL}intro.mp3`} preload="auto" />
     </div>
   )
 }

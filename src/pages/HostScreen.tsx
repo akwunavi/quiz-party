@@ -2583,28 +2583,33 @@ function Finale({ pack, gameId, gameState }: {
   const roundScores = computeRoundScores(pack, teams, answers)
   const rows = rankTeams(teams, totals, answers, roundScores)
 
-  // Музыка финала: раньше играла только на бумажном экране «считаем баллы»
-  // перед этим экраном, а сам финал (табло/награждение) шёл в тишине —
-  // в онлайн-режиме и на «шоу»-сценарии подсчёта нет вовсе, титры молчали.
-  useEffect(() => {
-    const src = pack.settings?.finale_music ?? pack.settings?.bg_music
-    if (!src || document.hidden) return
-    const a = createAudio(); a.src = mediaUrl(src)
-    a.loop = true; a.volume = .55
-    a.play().catch(() => {})
-    return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-  }, [pack.settings?.finale_music, pack.settings?.bg_music])
-
   // Шаг и сценарий живут в сессии: ведущий может вести финал с телефона,
   // стоя у сцены, — для награждения в баре это обязательно.
   const bar = !!gameState.reveal
   const step = gameState.question_index ?? 0
 
-  // Кинематографическая вставка перед полной таблицей итогов — один раз
-  // за игру (даже если на пуллинге пришло несколько ререндеров подряд с
-  // тем же step). Флаг живёт в состоянии компонента, не в БД: Finale не
-  // размонтируется между шагами финала, ref/state этого достаточно.
-  const [cinematicDone, setCinematicDone] = useState(false)
+  // Кинематографическая вставка — один раз за игру, сразу по входу в фазу
+  // finale (после того как последний ответ озвучен и ведущий продвинул
+  // игру дальше), ДО ретроспективы по раундам и показа победителя. Флаг
+  // живёт в состоянии компонента, не в БД: Finale не размонтируется между
+  // шагами финала, ref/state этого достаточно. Без галочки в редакторе
+  // (settings.show_final_cinematic) сразу считается «уже показана» —
+  // поведение пакетов без нужной настройки не меняется, как и у интро.
+  const [cinematicDone, setCinematicDone] = useState(!pack.settings?.show_final_cinematic)
+
+  // Музыка финала: раньше играла только на бумажном экране «считаем баллы»
+  // перед этим экраном, а сам финал (табло/награждение) шёл в тишине —
+  // в онлайн-режиме и на «шоу»-сценарии подсчёта нет вовсе, титры молчали.
+  // Ждёт cinematicDone: у заставки своя музыка (intro.mp3), поверх неё
+  // фоновый трек финала звучал бы вторым слоем.
+  useEffect(() => {
+    const src = pack.settings?.finale_music ?? pack.settings?.bg_music
+    if (!src || document.hidden || !cinematicDone) return
+    const a = createAudio(); a.src = mediaUrl(src)
+    a.loop = true; a.volume = .55
+    a.play().catch(() => {})
+    return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+  }, [pack.settings?.finale_music, pack.settings?.bg_music, cinematicDone])
 
   // та же обёртка + подгон, что у промежуточного табло: ступени tableSize()
   // калиброваны по ширине и не знают про реальную высоту невысоких экранов.
@@ -2630,11 +2635,13 @@ function Finale({ pack, gameId, gameState }: {
   const SLIDE = 3_000, WINNER = 10_000
   const winnerStep = roundWinners.length
   useEffect(() => {
-    if (bar || step > winnerStep) return
+    // не тикает, пока играет кинематографическая вставка — иначе шаги
+    // ретро успевают проскочить за спиной у зрителя
+    if (bar || step > winnerStep || !cinematicDone) return
     const ms = step === winnerStep ? WINNER : SLIDE
     const t = setTimeout(() => void setFinaleStep(step + 1), ms)
     return () => clearTimeout(t)
-  }, [bar, step, winnerStep])
+  }, [bar, step, winnerStep, cinematicDone])
 
   // Полная таблица раскрывается от последнего места к первому, с
   // ускорением — та же интрига, что у промежуточного табло, только резче
@@ -2658,6 +2665,11 @@ function Finale({ pack, gameId, gameState }: {
     timer = setTimeout(tick, Math.max(320, 900 - 90 * n))
     return () => { cancelled = true; clearTimeout(timer) }
   }, [rows.length, step, bar])
+
+  // Все хуки выше уже отработали — гейт можно ставить здесь: и сценарий
+  // «бар» (медали 3→2→1→таблица), и сценарий «шоу» (ретро по раундам →
+  // победитель → таблица) начинаются ПОСЛЕ этой строки.
+  if (!cinematicDone) return <FinalCinematic onDone={() => setCinematicDone(true)} />
 
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
   const fireworks = (
@@ -2726,9 +2738,6 @@ function Finale({ pack, gameId, gameState }: {
     // 1/2/3 место, см. AwardMedal).
     const places = [...new Set(rows.map(r => r.place))]
       .filter(p => p <= 3).sort((a, b) => b - a)
-    if (step >= places.length && !cinematicDone) return (
-      <FinalCinematic onDone={() => setCinematicDone(true)} />
-    )
     if (step >= places.length) return (
       <div className="host-screen grid-bg fin-screen">
         {fireworks}
@@ -2807,8 +2816,6 @@ function Finale({ pack, gameId, gameState }: {
       </div>
     )
   }
-
-  if (!cinematicDone) return <FinalCinematic onDone={() => setCinematicDone(true)} />
 
   return (
     <div className="host-screen grid-bg fin-screen">
