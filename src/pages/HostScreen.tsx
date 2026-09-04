@@ -466,7 +466,11 @@ function HostInner({ gameState, pack }: {
                       // исключён ради равной ШИРИНЫ половин, но на экране это
                       // читалось хуже: снимки в паре разной высоты и мельче
                       // отведённого места. Равная высота важнее — её и просили.
-                      imgs.length > 1 ? ' eq-row' : ''}`}
+                      imgs.length > 1 ? ' eq-row' : ''}${
+                      // 4 картинки — один ряд, больше — два ряда (см. .wrap2,
+                      // 22-question.css). Сейчас недостижимо (mediaMax у
+                      // вопроса — 4), но правило универсальное.
+                      imgs.length > 4 ? ' wrap2' : ''}`}
                     style={mediaScaleVar(q)}>
                     {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
@@ -1138,7 +1142,8 @@ function RecapSlides({ pack, round, gameState }: {
         )}
         {imgs.length > 0 && (
           <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
-            imgs.length > 1 ? ' eq-row' : ''}`} style={mediaScaleVar(q)}>
+            imgs.length > 1 ? ' eq-row' : ''}${
+            imgs.length > 4 ? ' wrap2' : ''}`} style={mediaScaleVar(q)}>
             {imgs.map((m, k) => <FitImg key={k} src={mediaUrl(m)} />)}
           </div>
         )}
@@ -1905,7 +1910,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
             <p className={`q-text${lenClass(q.question_text)}`}>{q.question_text}</p>
             {questionImgs.length > 0 && !q.media.hidden && (
               <div className={`q-media-grid n${Math.min(questionImgs.length, 4)}${
-                  questionImgs.length > 1 ? ' eq-row' : ''}`}
+                  questionImgs.length > 1 ? ' eq-row' : ''}${
+                  questionImgs.length > 4 ? ' wrap2' : ''}`}
                 style={mediaScaleVar(q)}>
                 {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
               </div>
@@ -1971,7 +1977,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${
-                      revealImgs.length > 1 ? ' eq-row' : ''}`}>
+                      revealImgs.length > 1 ? ' eq-row' : ''}${
+                      revealImgs.length > 4 ? ' wrap2' : ''}`}>
                     {revealImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
                 )}
