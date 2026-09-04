@@ -37,10 +37,10 @@ export interface CinematicPhase {
 // Параметризуемая последовательность надписей — можно свободно менять
 // слова, порядок и длительность каждого манёвра, не трогая логику ниже.
 export const DEFAULT_PHASES: CinematicPhase[] = [
-  { text: 'QUESTIONS', sub: 'сближение с массивом данных', crack: 0, light: 0x2be0cc },
-  { text: 'ANSWERED', sub: 'манёвр уклонения выполнен', crack: 1, light: 0xea580c },
-  { text: 'NO WAY BACK', sub: 'отказ двигателя левого борта', crack: 2, light: 0xff2f5c },
-  { text: 'FINAL SCORE', sub: 'критический разлом системы', crack: 4, light: 0x9a5cff, final: true },
+  { text: 'Вопросы кончились', sub: 'сближение с массивом данных', crack: 0, light: 0x2be0cc },
+  { text: 'Считаем результаты..', sub: 'манёвр уклонения выполнен', crack: 1, light: 0xea580c },
+  { text: 'Финал уже близко', sub: 'отказ двигателя левого борта', crack: 2, light: 0xff2f5c },
+  { text: 'Кто же победил?', sub: 'критический разлом системы', crack: 4, light: 0x9a5cff, final: true },
 ]
 // Длительность манёвра к каждой надписи — по фазе, УБЫВАЕТ: чем дальше,
 // тем резче ускорение. Итог по умолчанию — около 16-17 секунд с учётом
@@ -751,7 +751,9 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
       if (!layer) return
       layer.innerHTML = ''
       const W = window.innerWidth, H = window.innerHeight
-      const cols = 14, rows = 9, cw = W / cols, ch = H / rows, cx = W / 2, cy = H / 2
+      // 14×9 (126 осколков) грузило под самый конец — каждый несёт дорогой
+      // backdrop-filter. 12×8 заметно легче, а на глаз разница почти не видна.
+      const cols = 12, rows = 8, cw = W / cols, ch = H / rows, cx = W / 2, cy = H / 2
       const frags: { div: HTMLDivElement; dx: number; dy: number; delay: number }[] = []
       for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
         const x = c * cw, y = r * ch
