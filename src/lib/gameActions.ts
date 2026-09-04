@@ -162,7 +162,18 @@ export async function finishGame(packId: string | null, bar = false) {
   // финал всегда начинается с нулевого шага, иначе подхватится индекс вопроса
   await supabase.from('game_sessions')
     .update({ phase: 'finale', question_index: 0, reveal: bar }).eq('id', getRoomId())
-  if (packId) await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
+  if (packId) {
+    await supabase.from('packs').update({ status: 'played' }).eq('id', packId)
+    // last_game_id — для выгрузки статистики из редактора (issue #3): там
+    // нет доступа к активной комнате, только к пакету, поэтому запоминаем
+    // сюда id игры, которая только что доиграла. game_id ещё не сброшен —
+    // resetGame() перезапишет его отдельным, более поздним действием.
+    const { data } = await supabase.from('game_sessions')
+      .select('game_id').eq('id', getRoomId()).single()
+    if (data?.game_id) {
+      await supabase.from('packs').update({ last_game_id: data.game_id }).eq('id', packId)
+    }
+  }
 }
 
 export async function registerTeam(name: string, color: string, game_id: string, icon: string | null = null) {

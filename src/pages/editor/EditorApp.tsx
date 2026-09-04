@@ -7,7 +7,7 @@ import { estimateRoundMinutes } from '../../lib/duration'
 import {
   createPack, renamePack, setPackStatus, setPackTheme, setPackSettings, duplicatePack,
   createRound, swapRounds, deleteRound,
-  getOrCreateBank, exportPackJson, exportPackCsv,
+  getOrCreateBank, exportPackJson, exportPackCsv, fetchLastGameData,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
 import { ratingsByQuestion } from '../../lib/ratings'
@@ -104,9 +104,11 @@ function PackExport({ pack }: { pack: LoadedPack }) {
       // основной формат — таблица: открывается в Excel двойным кликом,
       // ссылки на медиа лежат прямо в ячейках, качать можно по клику
       // Оценки собираем по ВСЕМ играм этого пакета: интересна не одна
-      // вечеринка, а то, какие вопросы стабильно проседают.
-      const rated = await ratingsByQuestion()
-      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map, rated), 'text/csv;charset=utf-8')
+      // вечеринка, а то, какие вопросы стабильно проседают. А вот ответы и
+      // тайминг — только по ПОСЛЕДНЕЙ игре (issue #3, решение ведущего):
+      // полной истории может не быть, purgeOldGames чистит старые данные.
+      const [rated, gameData] = await Promise.all([ratingsByQuestion(), fetchLastGameData(pack)])
+      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map, rated, gameData), 'text/csv;charset=utf-8')
       // резервный слепок: из него можно восстановить структуру целиком
       download(`${safe}_${stamp}_резерв.json`, exportPackJson(pack))
     } finally { setBusy(false) }
@@ -114,7 +116,7 @@ function PackExport({ pack }: { pack: LoadedPack }) {
 
   return (
     <button className="ghost" disabled={busy} onClick={() => void exportAll()}
-      title="Таблица CSV для Excel: все вопросы, ответы и ссылки на медиа">
+      title="Таблица CSV для Excel: вопросы, ответы, оценки и статистика последней игры">
       {busy ? 'готовлю…' : '⬇ Выгрузить в Excel'}
     </button>
   )

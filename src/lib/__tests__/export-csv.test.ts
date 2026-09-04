@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { exportPackCsv } from '../exportCsv'
 import type { LoadedPack } from '../packLoader'
+import type { Answer } from '../../types/quiz'
 
 // Колонки шапки и колонки строк живут в разных местах функции — добавил
 // поле в одном и забыл в другом, и вся таблица уезжает вправо, причём
@@ -26,7 +27,7 @@ const parse = (csv: string) =>
 describe('выгрузка в таблицу', () => {
   it('число колонок в строках совпадает с шапкой', () => {
     const rows = parse(exportPackCsv(pack, new Map()))
-    expect(rows[0]).toBe(15)   // 11 базовых + озвучка(2) + оценки(2)
+    expect(rows[0]).toBe(19)   // 11 базовых + озвучка(2) + оценки(2) + статистика игры(4)
     expect(rows[1]).toBe(rows[0])
     expect(rows[2]).toBe(rows[0])
   })
@@ -62,5 +63,56 @@ describe('колонки оценок', () => {
     expect(lines[1]).toContain('"4"')
     // у второго вопроса оценок нет — колонки пустые
     expect(lines[2]).toContain('"";""')
+  })
+})
+
+describe('статистика последней игры (issue #3)', () => {
+  const ans = (question_ref: string, answer_text: string, is_correct: boolean | null,
+    created_at?: string): Answer => ({
+    id: `${question_ref}-${answer_text}-${Math.random()}`, team_id: 't', game_id: 'g',
+    question_ref, round_number: 0, answer_text, stake: null, is_correct,
+    updated_at: '2026-01-01', created_at,
+  })
+
+  it('без ответов игры новые колонки пустые', () => {
+    const csv = exportPackCsv(pack, new Map())
+    expect(csv.split('\r\n')[1]).toContain('"";"";"";""')
+  })
+
+  it('число ответов и % верных считаются по вопросу', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'да', true), ans('q-a', 'нет', false), ans('q-a', 'да', null)],
+    })
+    const line = csv.split('\r\n')[1]
+    expect(line).toContain('"3"')     // три ответа
+    expect(line).toContain('"50"')    // из двух оценённых один верный
+  })
+
+  it('скорость ответа — от показа вопроса до отправки, по всем командам', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [
+        ans('q-a', 'да', true, '2026-01-01T00:00:10.000Z'),
+        ans('q-a', 'да', true, '2026-01-01T00:00:20.000Z'),
+      ],
+      shownAt: new Map([['q-a', '2026-01-01T00:00:00.000Z']]),
+    })
+    expect(csv.split('\r\n')[1]).toContain('"15"')   // среднее (10+20)/2
+  })
+
+  it('распределение по вариантам — только у choice-вопросов', () => {
+    const choicePack = { rounds: [{ ...pack.rounds[0], questions: [{
+      id: 'c', hidden: false, question_text: 'Что?', answer_note: '',
+      answer: { mode: 'choice', correct_choice: 'Б', display: 'Б',
+        choices: [{ key: 'А', text: 'х' }, { key: 'Б', text: 'у' }] },
+      media: { question: [], answer: [] },
+    }] }] } as unknown as LoadedPack
+    const csv = exportPackCsv(choicePack, new Map(), undefined, {
+      answers: [ans('q-c', 'Б', true), ans('q-c', 'Б', true), ans('q-c', 'А', false)],
+    })
+    expect(csv.split('\r\n')[1]).toContain('А: 1 | Б: 2')
+    // у free_text-вопроса распределения нет
+    const plainLine = exportPackCsv(pack, new Map(), undefined,
+      { answers: [ans('q-a', 'да', true)] }).split('\r\n')[1]
+    expect(plainLine.endsWith('""')).toBe(true)
   })
 })

@@ -1,6 +1,6 @@
 // ═══ CRUD редактора + журнал правок ═══
 import { supabase } from './supabase'
-import type { Pack, RoundBase, Question, MechanicKey } from '../types/quiz'
+import type { Pack, RoundBase, Question, MechanicKey, Answer } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
 
 async function log(entity: string, entity_id: string, action: string, diff?: unknown) {
@@ -242,6 +242,24 @@ export async function swapQuestions(
  *  Excel не понимает JSON без плясок, поэтому основной формат — таблица.
  *  BOM в начале обязателен: без него Excel открывает кириллицу кракозябрами. */
 export { exportPackCsv } from './exportCsv'
+
+/** Ответы и тайминг последней доигранной игры пакета (issue #3).
+ *  Разовый фетч, а не хук с поллингом — редактор не живой экран, кнопка
+ *  жмётся один раз, полинг тут был бы просто лишним трафиком в фоне.
+ *  Пакет, который ещё не играли (или последняя игра пришлась на время до
+ *  миграции 0010), возвращает пустые ответы — выгрузка просто идёт без
+ *  колонок статистики, как раньше. */
+export async function fetchLastGameData(pack: Pick<Pack, 'last_game_id'>) {
+  if (!pack.last_game_id) return { answers: [] as Answer[], shownAt: new Map<string, string>() }
+  const [{ data: answers }, { data: shown }] = await Promise.all([
+    supabase.from('answers').select('*').eq('game_id', pack.last_game_id),
+    supabase.from('question_shown').select('question_ref, shown_at').eq('game_id', pack.last_game_id),
+  ])
+  return {
+    answers: (answers ?? []) as Answer[],
+    shownAt: new Map((shown ?? []).map(r => [r.question_ref as string, r.shown_at as string])),
+  }
+}
 
 /** Выгрузка пакета в JSON — страховка перед удалением медиа или раунда. */
 export function exportPackJson(pack: LoadedPack) {

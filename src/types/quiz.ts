@@ -58,6 +58,11 @@ export interface Pack {
    *  даже если can_edit_all у него выключен (так же считают политики в базе) */
   created_by?: string | null
   settings?: PackSettings
+  /** id последней доигранной игры этого пакета (миграция 0010) —
+   *  проставляется в finishGame(). Нужен редактору, чтобы выгрузить
+   *  статистику ответов вне контекста активной комнаты (issue #3):
+   *  сам редактор про game_sessions ничего не знает. */
+  last_game_id?: string | null
   created_at: string
   updated_at: string
 }
