@@ -1,5 +1,5 @@
 import type { LoadedPack } from './packLoader'
-import type { Answer } from '../types/quiz'
+import type { Answer, Team } from '../types/quiz'
 
 // ═══ ВЫГРУЗКА ПАКЕТА В ТАБЛИЦУ ═══
 // Вынесена из editorApi НАРОЧНО: там инициализируется клиент Supabase, и
@@ -21,8 +21,13 @@ export function exportPackCsv(
    *  время живой игры — здесь те же данные, но по вопросу целиком, а не
    *  по командам, и доступны из редактора в любой момент). Необязательный
    *  по той же причине, что и ratings — выгрузка до игры делается без
-   *  ответов. */
-  gameData?: { answers: Answer[]; shownAt?: Map<string, string> },
+   *  ответов.
+   *  ВАЖНО (уточнение ведущего после первой версии): агрегатов (%, скорость,
+   *  распределение) недостаточно для разбора качества вопроса — нужен сырой
+   *  текст, что именно написала каждая команда, иначе непонятно, ЧТО в
+   *  вопросе людей путает. `teams` — только чтобы подписать ответ именем
+   *  команды, а не голым id. */
+  gameData?: { answers: Answer[]; teams?: Team[]; shownAt?: Map<string, string> },
 ): string {
   const esc = (v: unknown) => {
     const t = String(v ?? '').replace(/"/g, '""')
@@ -52,6 +57,7 @@ export function exportPackCsv(
     const arr = answersByRef.get(a.question_ref)
     if (arr) arr.push(a); else answersByRef.set(a.question_ref, [a])
   }
+  const teamName = new Map((gameData?.teams ?? []).map(t => [t.id, t.name]))
 
   const rows: string[][] = [[
     'Раунд', '№ раунда', 'Механика', 'Таймер, сек',
@@ -59,7 +65,7 @@ export function exportPackCsv(
     'Медиа вопроса', 'Медиа ответа', 'Озвучка', 'Есть озвучка',
     'Оценка', 'Голосов', 'Скрыт',
     'Ответов (последняя игра)', '% верных', 'Средняя скорость, сек',
-    'Распределение по вариантам',
+    'Распределение по вариантам', 'Ответы команд',
   ]]
   pack.rounds.forEach((r, ri) => {
     r.questions.forEach((q, qi) => {
@@ -87,6 +93,14 @@ export function exportPackCsv(
             .map(c => `${c.key}: ${qAnswers.filter(a => a.answer_text === c.key).length}`)
             .join(' | ')
         : ''
+      // сырой текст, что именно написала каждая команда — ради этого и
+      // затевалась вся статистика: по цифрам «40% верных» непонятно, что
+      // именно людей путает, а по конкретным неверным ответам видно сразу
+      const rawAnswers = qAnswers.map(a => {
+        const verdict = a.is_correct === true ? ' — верно'
+          : a.is_correct === false ? ' — неверно' : ''
+        return `${teamName.get(a.team_id) ?? '?'}: ${a.answer_text || '—'}${verdict}`
+      }).join(' | ')
       rows.push([
         r.title_lines.join(' '), String(ri + 1), r.mechanic, String(r.timer_seconds),
         String(qi + 1), q.question_text, answerText(q), q.answer_note ?? '',
@@ -103,6 +117,7 @@ export function exportPackCsv(
         correctPct != null ? String(correctPct) : '',
         avgSpeed != null ? String(avgSpeed) : '',
         distribution,
+        rawAnswers,
       ])
     })
   })

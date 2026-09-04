@@ -1,6 +1,6 @@
 // ═══ CRUD редактора + журнал правок ═══
 import { supabase } from './supabase'
-import type { Pack, RoundBase, Question, MechanicKey, Answer } from '../types/quiz'
+import type { Pack, RoundBase, Question, MechanicKey, Answer, Team } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
 
 async function log(entity: string, entity_id: string, action: string, diff?: unknown) {
@@ -250,13 +250,17 @@ export { exportPackCsv } from './exportCsv'
  *  миграции 0010), возвращает пустые ответы — выгрузка просто идёт без
  *  колонок статистики, как раньше. */
 export async function fetchLastGameData(pack: Pick<Pack, 'last_game_id'>) {
-  if (!pack.last_game_id) return { answers: [] as Answer[], shownAt: new Map<string, string>() }
-  const [{ data: answers }, { data: shown }] = await Promise.all([
+  if (!pack.last_game_id) {
+    return { answers: [] as Answer[], teams: [] as Team[], shownAt: new Map<string, string>() }
+  }
+  const [{ data: answers }, { data: teams }, { data: shown }] = await Promise.all([
     supabase.from('answers').select('*').eq('game_id', pack.last_game_id),
+    supabase.from('teams').select('*').eq('game_id', pack.last_game_id),
     supabase.from('question_shown').select('question_ref, shown_at').eq('game_id', pack.last_game_id),
   ])
   return {
     answers: (answers ?? []) as Answer[],
+    teams: (teams ?? []) as Team[],
     shownAt: new Map((shown ?? []).map(r => [r.question_ref as string, r.shown_at as string])),
   }
 }

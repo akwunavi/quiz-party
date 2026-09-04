@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { exportPackCsv } from '../exportCsv'
 import type { LoadedPack } from '../packLoader'
-import type { Answer } from '../../types/quiz'
+import type { Answer, Team } from '../../types/quiz'
 
 // Колонки шапки и колонки строк живут в разных местах функции — добавил
 // поле в одном и забыл в другом, и вся таблица уезжает вправо, причём
@@ -27,7 +27,7 @@ const parse = (csv: string) =>
 describe('выгрузка в таблицу', () => {
   it('число колонок в строках совпадает с шапкой', () => {
     const rows = parse(exportPackCsv(pack, new Map()))
-    expect(rows[0]).toBe(19)   // 11 базовых + озвучка(2) + оценки(2) + статистика игры(4)
+    expect(rows[0]).toBe(20)   // 11 базовых + озвучка(2) + оценки(2) + статистика игры(4) + сырые ответы(1)
     expect(rows[1]).toBe(rows[0])
     expect(rows[2]).toBe(rows[0])
   })
@@ -76,7 +76,7 @@ describe('статистика последней игры (issue #3)', () => {
 
   it('без ответов игры новые колонки пустые', () => {
     const csv = exportPackCsv(pack, new Map())
-    expect(csv.split('\r\n')[1]).toContain('"";"";"";""')
+    expect(csv.split('\r\n')[1]).toContain('"";"";"";"";""')
   })
 
   it('число ответов и % верных считаются по вопросу', () => {
@@ -110,9 +110,38 @@ describe('статистика последней игры (issue #3)', () => {
       answers: [ans('q-c', 'Б', true), ans('q-c', 'Б', true), ans('q-c', 'А', false)],
     })
     expect(csv.split('\r\n')[1]).toContain('А: 1 | Б: 2')
-    // у free_text-вопроса распределения нет
-    const plainLine = exportPackCsv(pack, new Map(), undefined,
-      { answers: [ans('q-a', 'да', true)] }).split('\r\n')[1]
-    expect(plainLine.endsWith('""')).toBe(true)
+    // у free_text-вопроса распределения нет, но сырые ответы всё равно есть
+    const plainCsv = exportPackCsv(pack, new Map(), undefined,
+      { answers: [ans('q-a', 'да', true)] })
+    const cols = plainCsv.split('\r\n')[1].split('";"')
+    expect(cols[cols.length - 2]).toBe('')             // распределение пустое
+    expect(cols[cols.length - 1]).toContain('да — верно')  // а сырой ответ есть
+  })
+})
+
+describe('сырые ответы команд (уточнение ведущего: агрегатов мало)', () => {
+  const ans = (question_ref: string, answer_text: string, is_correct: boolean | null,
+    team_id = 't1'): Answer => ({
+    id: `${question_ref}-${team_id}-${Math.random()}`, team_id, game_id: 'g',
+    question_ref, round_number: 0, answer_text, stake: null, is_correct,
+    updated_at: '2026-01-01',
+  })
+  const team = (id: string, name: string): Team =>
+    ({ id, name, color: '#fff', game_id: 'g', icon: null, last_seen_at: null }) as Team
+
+  it('каждый ответ команды виден с её именем и вердиктом', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'Дели', false, 't1'), ans('q-a', 'Мумбаи', true, 't2')],
+      teams: [team('t1', 'Смешные фламинго'), team('t2', 'Котики')],
+    })
+    const line = csv.split('\r\n')[1]
+    expect(line).toContain('Смешные фламинго: Дели — неверно')
+    expect(line).toContain('Котики: Мумбаи — верно')
+  })
+
+  it('без данных о команде — ответ виден с "?", ничего не теряется', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined,
+      { answers: [ans('q-a', 'Дели', null, 't1')] })
+    expect(csv.split('\r\n')[1]).toContain('?: Дели')
   })
 })
