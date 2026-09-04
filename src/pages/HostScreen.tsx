@@ -45,6 +45,7 @@ import { probeMedia, createAudio, stopAllAudio, playSynced,
   type SyncedHandle } from '../lib/audioSource'
 import { AudioGate } from '../components/AudioGate'
 import { IntroScreen } from '../components/IntroScreen'
+import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 
@@ -2599,6 +2600,12 @@ function Finale({ pack, gameId, gameState }: {
   const bar = !!gameState.reveal
   const step = gameState.question_index ?? 0
 
+  // Кинематографическая вставка перед полной таблицей итогов — один раз
+  // за игру (даже если на пуллинге пришло несколько ререндеров подряд с
+  // тем же step). Флаг живёт в состоянии компонента, не в БД: Finale не
+  // размонтируется между шагами финала, ref/state этого достаточно.
+  const [cinematicDone, setCinematicDone] = useState(false)
+
   // та же обёртка + подгон, что у промежуточного табло: ступени tableSize()
   // калиброваны по ширине и не знают про реальную высоту невысоких экранов.
   // titleRef — тот же «клапан», что и там: не влезло даже на минимальном
@@ -2719,6 +2726,9 @@ function Finale({ pack, gameId, gameState }: {
     // 1/2/3 место, см. AwardMedal).
     const places = [...new Set(rows.map(r => r.place))]
       .filter(p => p <= 3).sort((a, b) => b - a)
+    if (step >= places.length && !cinematicDone) return (
+      <FinalCinematic onDone={() => setCinematicDone(true)} />
+    )
     if (step >= places.length) return (
       <div className="host-screen grid-bg fin-screen">
         {fireworks}
@@ -2797,6 +2807,8 @@ function Finale({ pack, gameId, gameState }: {
       </div>
     )
   }
+
+  if (!cinematicDone) return <FinalCinematic onDone={() => setCinematicDone(true)} />
 
   return (
     <div className="host-screen grid-bg fin-screen">
