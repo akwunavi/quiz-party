@@ -267,7 +267,7 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
     function buildCracks(W: number, H: number) {
       crackLines = []
       let colorSeed = 0
-      const impacts = 9
+      const impacts = 7 // было 9 — просадка FPS к финалу, -20% по отзыву
       function grow(x: number, y: number, ang: number, len: number, depth: number, width: number) {
         const segs = 3 + Math.floor(Math.random() * 4)
         const pts: [number, number][] = [[x, y]]
@@ -394,6 +394,12 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
 
     const stateRef = {
       camZ: 0, camX: 0, warpKick: 0, yawKick: 0, focusZ: -300, fovKick: 0,
+      // null — обычная привязка «чуть ниже камеры»; на финальной надписи
+      // ставится в Y самой таблички (см. runSequence), чтобы «FINAL SCORE»
+      // держалась строго по центру кадра и было видно, во что врезается
+      // дрон — раньше камера целилась ниже текста, и надпись уходила
+      // в верхнюю часть экрана.
+      focusY: null as number | null,
       droneRoll: 0, droneBob: 0, engineOutT: 0, // >0 — двигатель сейчас «мигает» отказом
       impactT: 0, // >0 — дрон только что впечатался в финальную надпись
     }
@@ -494,7 +500,8 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
 
         const yaw = stateRef.yawKick
         const lookX = camera.position.x + Math.sin(yaw) * 640
-        camera.lookAt(lookX, camera.position.y - 4, stateRef.focusZ)
+        const lookY = stateRef.focusY ?? camera.position.y - 4
+        camera.lookAt(lookX, lookY, stateRef.focusZ)
         camera.rotateZ(-yaw * 0.55)
 
         const fov = 58 + stateRef.fovKick * (14 + intensity * 10) + impactT * 24
@@ -793,6 +800,10 @@ export function FinalCinematic({ onDone, phases = DEFAULT_PHASES }: {
 
         crossfadeToPhase(i)
         stateRef.focusZ = phaseZ(i)
+        // на финальной надписи камера целится точно в её Y (8, см.
+        // buildPhraseMesh) — не понятно, во что врезается дрон, если
+        // текст висит выше центра кадра
+        if (phase.final) stateRef.focusY = 8
         const yawSign = i % 2 === 0 ? 1 : -1
         const camXTarget = phase.final ? 0 : yawSign * 70
         const camZTarget = phase.final ? phaseZ(i) - FINAL_OVERSHOOT : phaseZ(i) + CAM_STANDOFF
