@@ -110,9 +110,21 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </label>
         </div>
 
-        {/* Блицу эти поля не нужны: у него свой таймер на КОМАНДУ, свои три
-            попытки и своя очередь ходов. Раньше они показывались и путали —
-            на сам раунд не влияли, но выглядели как настройки. */}
+        {/* Музыка блицу как раз нужна (в отличие от таймера/автопролистывания
+            ниже — у него свой таймер на КОМАНДУ) — раньше поле было скрыто
+            вместе со всем остальным блоком, и раунд играл в тишине. */}
+        {!noQuestions && isBlitz &&
+          <div className="ed-field"><label>Фоновая музыка блица</label>
+            <MediaSlot label="" packId={pack.id} accept="audio/*" max={1}
+              paths={(round.settings as { bg_music?: string }).bg_music
+                ? [(round.settings as { bg_music: string }).bg_music] : []}
+              onChange={paths => void patch({ settings: { ...round.settings, bg_music: paths[0] ?? undefined } as never })} />
+            <div className="ed-hint">Играет всё время, пока идёт раунд. Пусто — возьмётся общая музыка пакета</div>
+          </div>}
+
+        {/* Остальным полям блиц не нужен: у него свой таймер на КОМАНДУ,
+            свои три попытки и своя очередь ходов. Раньше они показывались
+            и путали — на сам раунд не влияли, но выглядели как настройки. */}
         {!noQuestions && !isBlitz && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
             <NumField

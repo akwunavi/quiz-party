@@ -1325,7 +1325,20 @@ function BlitzScreen({ pack, round, gameState }: {
   const bank = useMemo(
     () => round.questions.map(q => ({ id: q.id, hidden: q.hidden })),
     [round.questions])
-  const settings = round.settings as { teamSeconds?: number; timeoutPenalty?: number }
+  const settings = round.settings as { teamSeconds?: number; timeoutPenalty?: number; bg_music?: string }
+
+  // Фоновая музыка блица — раньше поле было скрыто в редакторе вместе со
+  // всем остальным блоком настроек (у блица свой таймер), и раунд играл в
+  // тишине. Играет всё время, пока раунд открыт, а не по вопросам — у
+  // блица нет общего таймера раунда, только свой на команду.
+  useEffect(() => {
+    const bg = settings.bg_music ?? pack.settings?.bg_music
+    if (!bg) return
+    const a = createAudio(); a.src = mediaUrl(bg)
+    a.loop = true; a.volume = 0.6
+    a.play().catch(() => {})
+    return () => a.pause()
+  }, [round.id, settings.bg_music, pack.settings?.bg_music])
 
   // Проектор ведёт раунд сам: он бросает кубик, ловит ответы, проверяет их
   // и листает вопросы. Ведущему остаются только кнопки вмешательства.
