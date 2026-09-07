@@ -1,0 +1,7 @@
+# Прокси для self-hosted Supabase: Caddy сам получает и продлевает
+# сертификат Let's Encrypt (реальный домен вписать перед стартом).
+# Kong (API-шлюз self-host стека) слушает 8000 на VPS по умолчанию.
+
+твой-домен.ru {
+	reverse_proxy localhost:8000
+}

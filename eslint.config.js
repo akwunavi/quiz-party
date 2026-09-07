@@ -16,7 +16,9 @@ import reactHooks from 'eslint-plugin-react-hooks'
 
 export default tseslint.config(
   // docs/ — это собранный прод, dist — сборка. Линтить их нечего.
-  { ignores: ['docs/**', 'dist/**', 'node_modules/**'] },
+  // infra/ — операционные Node-скрипты (перенос на self-host, issue #5),
+  // не часть приложения — конфиг ниже заточен под browser-код src/.
+  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
