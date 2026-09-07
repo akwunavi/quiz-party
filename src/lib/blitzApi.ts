@@ -32,6 +32,32 @@ export async function saveBlitz(
   if (error) throw error
 }
 
+/** Итоги блица в общий зачёт игры (8.86 — одна функция на оба экрана).
+ *
+ *  Очки блица живут в blitz_state, а общий подсчёт читает только answers —
+ *  поэтому итог кладём готовой строкой `q-blitz`.
+ *
+ *  ОДНИМ upsert'ом, а не через очередь ответов: очередь читает список из
+ *  localStorage и пишет обратно, параллельные вызовы хватают один снимок и
+ *  выживает последний — на этом блиц уже терял две команды из трёх (см.
+ *  HANDOFF §5). Проектор это починил у себя ещё в 8.60, а в админке
+ *  оставалась старая версия на очереди: до 8.86 её было достаточно нажать
+ *  «прервать блиц досрочно» (кнопка есть только в админке), чтобы итоги
+ *  снова поехали через сломанный путь. Теперь путь один. */
+export async function saveBlitzResults(
+  gameId: string, roundNumber: number,
+  rows: { teamId: string; place: number; score: number }[],
+): Promise<void> {
+  const { error } = await supabase.from('answers').upsert(
+    rows.map(r => ({
+      team_id: r.teamId, game_id: gameId, question_ref: 'q-blitz',
+      round_number: roundNumber, answer_text: `место ${r.place}`, stake: r.score,
+      updated_at: new Date().toISOString(),
+    })),
+    { onConflict: 'team_id,question_ref' })
+  if (error) console.error('блиц: итоги не записались', error)
+}
+
 /** Подписка на состояние раунда с опросом раз в секунду.
  *  Секунда — компромисс: чаще нет смысла (таймер экраны считают сами по
  *  shownAt), реже — заметна задержка при передаче хода. */

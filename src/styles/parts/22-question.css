@@ -504,6 +504,16 @@
     margin-bottom: clamp(60px, 5vh, 130px);
   }
   .host-actions button { font-size: clamp(17px, 1.3vw, 46px); padding: clamp(12px, 1vw, 30px) clamp(28px, 2.4vw, 80px); }
+  /* НАЙДЕНО РЕНДЕРОМ (QA, 3840×2160): рамка вопроса без вариантов
+     (.cyber-frame/.q-frame/.pt-frame, flex: 1 1 0 внутри .host-screen)
+     считает «своё» место от .host-screen padding-bottom — а тот на больших
+     панелях остаётся тем же 96px (11-projector-media.css), что и на
+     ноутбуке. Кнопка выше по этой же причине (см. .host-actions button
+     строкой выше) реально занимает 116px — рамка растёт до старого предела
+     96px и на 20px заезжает ПОД кнопку. У `.choices-grid` рядом уже стоял
+     свой запас (margin-bottom, см. выше) — у голого `.host-screen` такого
+     не было вовсе. Запас с потолком чуть выше высоты кнопки на 3840. */
+  .host-screen { padding-bottom: clamp(96px, 7vh, 190px); }
   .mono-tag { font-size: clamp(14px, 1vw, 34px); }
   .host-topbar .qnum { font-size: clamp(15px, 1.1vw, 38px); }
 

@@ -15,6 +15,14 @@ import { SnakeTimer } from '../../components/SnakeTimer'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { mediaUrl } from '../../lib/media'
+// Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
+// здесь inline; пульт писал бы свои копии тех же объектов и рано или поздно
+// разошёлся бы с проектором.
+import { saveMelody, gradeMelody, passMelody } from '../../lib/melodyActions'
+import {
+  melodySpin, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodyToBoard, melodyIdle, melodyFree,
+} from '../../lib/melody'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -66,9 +74,6 @@ function stopShared() {
   try { sharedAudio.pause(); sharedAudio.currentTime = 0 } catch { /* уже мёртв */ }
 }
 
-async function saveMelody(next: MelodyState) {
-  await supabase.from('game_sessions').update({ melody: next }).eq('id', getRoomId())
-}
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
 
@@ -202,12 +207,7 @@ export function MelodyBoard({ pack, round, gameState }: {
         // Ответа нет — ход уходит дальше сам. Музыку глушим: иначе трек
         // продолжает играть уже над следующей командой.
         stopShared()
-        if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
-          void saveMelody({ ...m, stage: 'passed', turn: 1, deadline: undefined })
-        } else {
-          void saveMelody({ ...m, stage: 'done', deadline: undefined,
-            played: [...played, m.key!] })
-        }
+        void saveMelody(melodyPass(m))
       }
     }
   }, [expired, m.stage, answers])
@@ -264,9 +264,8 @@ export function MelodyBoard({ pack, round, gameState }: {
     </div>
   )
 
-  const allKeys = themes.flatMap((t, x) => t.tracks.map((_, y) => `${x}-${y}`))
-  const freeKeys = allKeys.filter(k => !played.includes(k))
-  const idle = !m.stage || m.stage === 'idle' || m.stage === 'done'
+  const freeKeys = melodyFree(themes, played)
+  const idle = melodyIdle(m)
 
   /** Открыть выбранную плитку без рулетки. */
   const pickManually = (key: string) => {
@@ -277,14 +276,7 @@ export function MelodyBoard({ pack, round, gameState }: {
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
-    // одна плитка осталась — крутить нечего, запускаем сразу
-    if (freeKeys.length === 1) {
-      void saveMelody({ ...m, key: target, stage: 'listen', deadline: inSec(3),
-        order: undefined, turn: 0, chooser: undefined })
-      return
-    }
-    void saveMelody({ ...m, key: target, stage: 'spinning',
-      deadline: inSec(Math.min(s.spinSec ?? 5, 8)), order: undefined, turn: 0, chooser: undefined })
+    void saveMelody(melodySpin(m, target, freeKeys.length, s.spinSec ?? 5))
   }
 
   const currentId = m.order?.[m.turn ?? 0]
@@ -292,23 +284,10 @@ export function MelodyBoard({ pack, round, gameState }: {
   const bidSec = Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
   const ans = answers.find(a => a.question_ref === ansRef && a.team_id === currentId)
 
+  // не закрываем модалку: показываем результат, закрытие — кнопкой
   const grade = async (correct: boolean) => {
     if (!ans) return
-    const isFirst = (m.turn ?? 0) === 0
-    const pts = correct ? (isFirst ? (bidSec <= 5 ? 2 : 1) : 0.5) : 0
-    await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
-    if (correct) {
-      // не закрываем модалку: показываем результат, закрытие — кнопкой
-      await saveMelody({ ...m, stage: 'reveal', deadline: undefined,
-        played: [...played, m.key!], wonPts: pts, wonTeam: currentId, chooser: undefined })
-    } else await saveMelody({ ...m, deadline: undefined })  // время стоп, ждём передачи хода
-  }
-  const pass = async () => {
-    if ((m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1) {
-      await saveMelody({ ...m, stage: 'passed', turn: 1, deadline: undefined })
-    } else {
-      await saveMelody({ ...m, stage: 'done', deadline: undefined, played: [...played, m.key!] })
-    }
+    await gradeMelody(m, ans, correct, bidSec)
   }
 
   return (
@@ -396,13 +375,11 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
               <div className="mel-actions">
                 <button disabled={!currentId}
-                  onClick={() => void saveMelody({ ...m, stage: 'snippet',
-                    snippetSec: bidSec || 5, deadline: undefined })}>
+                  onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
                   Играем {bidSec || 5} сек →
                 </button>
                 <button className="ghost dark"
-                  onClick={() => void saveMelody({ ...m, stage: 'done', deadline: undefined,
-                    played: [...played, m.key!] })}>Пропустить трек</button>
+                  onClick={() => void saveMelody(melodyClose(m))}>Пропустить трек</button>
               </div>
             </>)}
 
@@ -412,8 +389,8 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
               {/* если звук не пошёл — ведущий переводит стадию руками */}
               <div className="mel-actions">
-                <button onClick={() => void saveMelody({ ...m, stage: 'answering',
-                  deadline: inSec(s.answerSec ?? 30) })}>Принимаем ответ →</button>
+                <button onClick={() => void saveMelody(melodyAcceptAnswer(m, s.answerSec ?? 30))}>
+                  Принимаем ответ →</button>
               </div>
             </>)}
 
@@ -430,7 +407,7 @@ export function MelodyBoard({ pack, round, gameState }: {
                 {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
               </div>
               <div className="mel-actions">
-                <button onClick={() => void saveMelody({ ...m, stage: 'done' })}>К доске →</button>
+                <button onClick={() => void saveMelody(melodyToBoard(m))}>К доске →</button>
               </div>
             </>)}
             {/* Аварийный выход. Доступен на любой стадии: интернет у команд
@@ -440,8 +417,7 @@ export function MelodyBoard({ pack, round, gameState }: {
               <button className="mel-escape" onClick={async () => {
                 if (!confirm('Закрыть трек и вернуться к доске?\n\n'
                   + 'Баллы за него никто не получит.')) return
-                await saveMelody({ ...m, stage: 'done', deadline: undefined,
-                  played: [...played, m.key!] })
+                await saveMelody(melodyClose(m))
               }}>Закрыть</button>
             )}
 
@@ -472,12 +448,7 @@ export function MelodyBoard({ pack, round, gameState }: {
               )}
               <div className="mel-actions">
                 <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
-                <button className="ghost" onClick={async () => {
-                  // «не верно» и «дальше» — одно действие: отметить и передать/закрыть
-                  if (ans && ans.is_correct == null)
-                    await supabase.from('answers').update({ is_correct: false, stake: 0 }).eq('id', ans.id)
-                  await pass()
-                }}>
+                <button className="ghost" onClick={() => void passMelody(m, ans)}>
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
                 </button>
               </div>

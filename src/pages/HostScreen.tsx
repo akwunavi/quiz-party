@@ -8,11 +8,15 @@ import {
   pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext, currentTeam,
   NEXT_DELAY_MS, FINAL_WRONG_DELAY_MS, MAX_ATTEMPTS, SKIP_MARK, type BlitzState,
 } from '../lib/blitzState'
-import { saveBlitz } from '../lib/blitzApi'
+import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
-import { jeopardyTile, jeopardyRef } from '../lib/jeopardyRef'
+import { jeopardyTile, jpShowAnswer, jpReplay, jpOpenTile, jpLocate } from '../lib/jeopardyRef'
+import {
+  jeopardyOpened, openJeopardyTile, closeJeopardyTile,
+} from '../lib/jeopardyActions'
+import { saveMelody } from '../lib/melodyActions'
 import { mediaUrl, lenClass } from '../lib/media'
 import { packStats } from '../lib/duration'
 import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -33,6 +37,7 @@ import { computeTotals, computeRoundScores } from '../lib/totals'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
 import { useTeams, isAlive } from '../hooks/useTeams'
+import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
@@ -57,10 +62,19 @@ import { RaceBoard } from './rounds/RaceRound'
 export function HostScreen() {
   const { gameState, loading: gsLoading, roomId } = useGameState()
   const [pack, setPack] = useState<LoadedPack | null>(null)
+  // Пакет перечитывается не только при СМЕНЕ пакета, но и при смене раунда
+  // (8.86). Раньше зависимость была одна — pack_id: вкладка, открытая с
+  // начала вечера, держала настройки раунда такими, какими они были на
+  // момент загрузки, а правки в редакторе между раундами (например «штраф
+  // за таймаут» у блица) до неё не доезжали вообще. Хуже того, проектор и
+  // админка могли держать РАЗНЫЕ снимки настроек — и итог раунда зависел от
+  // того, какой из двух экранов записал его первым. Смена раунда — редкое
+  // событие, лишний запрос тут ничего не стоит; force обходит кеш загрузчика,
+  // иначе перечитывать было бы нечего.
   useEffect(() => {
-    if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
+    if (gameState?.pack_id) void loadPack(gameState.pack_id, true).then(setPack).catch(() => {})
     else setPack(null)
-  }, [gameState?.pack_id])
+  }, [gameState?.pack_id, gameState?.round_number])
   if (!gsLoading && !roomId) return <RoomPicker route="/" />
   const theme = pack?.theme ?? 'classic'
   // Ключ вспышки перехода: финал и рекап листают свои слайды САМИ каждые
@@ -119,6 +133,12 @@ function HostInner({ gameState, pack }: {
   useEffect(() => { void listPacks().then(setPacks).catch(() => setPacks([])) }, [])
 
   const teams = useTeams(gameState?.game_id ?? null)
+
+  // Порядок команд в лобби ДОЛЖЕН быть стабильным между опросами — иначе
+  // список «прыгает» (см. lib/teamOrder.ts). Сортируем здесь, а не в самом
+  // хуке: `useTeams` используется много где ещё, и там нужен именно порядок
+  // ответа сервера (например, поиск по id).
+  const lobbyTeams = useMemo(() => sortTeamsForLobby(teams), [teams])
 
   const playerUrl = useMemo(() => {
     const base = `${location.origin}${location.pathname}#/player?room=${getRoomId() ?? ''}`
@@ -219,7 +239,7 @@ function HostInner({ gameState, pack }: {
               {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
               {teams.length === 0
                 ? (paperMode ? null : <span style={{ opacity: .5 }}>ждём команды…</span>)
-                : teams.map(t => (
+                : lobbyTeams.map(t => (
                   <span key={t.id} className="lobby-team team-chip-fx"
                     style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
                     {t.icon && <span className="lobby-team-icon">{t.icon}</span>}{t.name}
@@ -1354,21 +1374,9 @@ function BlitzScreen({ pack, round, gameState }: {
       // на проектор, запись осталась в админке — и в общий зачёт улетали
       // нули, хотя таблица на экране показывала баллы.
       if (next.finished && !state?.finished) {
-        const rows = blitzResults(toResults(next), settings.timeoutPenalty ?? 10)
-        // Пишем ОДНИМ запросом, а не через очередь ответов.
-        // Очередь читает список из localStorage и записывает обратно; три
-        // параллельных вызова читают один и тот же снимок, и выживает
-        // только последний. В базу попадала одна команда из трёх, а на
-        // табло остальные показывали нули.
-        const { error } = await supabase.from('answers').upsert(
-          rows.map(r => ({
-            team_id: r.teamId, game_id: gameState.game_id,
-            question_ref: 'q-blitz', round_number: gameState.round_number,
-            answer_text: `место ${r.place}`, stake: r.score,
-            updated_at: new Date().toISOString(),
-          })),
-          { onConflict: 'team_id,question_ref' })
-        if (error) console.error('блиц: итоги не записались', error)
+        // Одним запросом, не через очередь ответов — см. saveBlitzResults.
+        await saveBlitzResults(gameState.game_id, gameState.round_number,
+          blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
       }
     } finally { busy.current = false }
   }
@@ -2152,15 +2160,26 @@ function JeopardyBoard({ pack, round, gameState }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
-  const [active, setActive] = useState<{ t: number; i: number } | null>(null)
+  // Открытая плитка живёт в ОБЩЕМ состоянии игры (melody.jp), а не в памяти
+  // вкладки: иначе пульт ведущего в телефоне не знает, что плитка открыта, и
+  // управлять ей оттуда нечем (8.86). Локальная копия — только на время, пока
+  // опрос (2 сек) не принёс запись обратно: без неё модалка открывалась бы с
+  // задержкой в пару секунд после клика по плитке.
+  const [tileLocal, setTileLocal] = useState<number | null | undefined>(undefined)
+  const sharedTile = jpOpenTile(gameState.melody)
+  useEffect(() => {
+    // сервер догнал локальную догадку (или ведущий переключил плитку с
+    // телефона) — локальную копию снимаем, дальше правит общее состояние
+    if (tileLocal !== undefined && sharedTile === tileLocal) setTileLocal(undefined)
+  }, [sharedTile, tileLocal])
+  const openTile = tileLocal !== undefined ? tileLocal : sharedTile
   // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
   // перезагрузки страницы они снова становились доступны, и вопрос можно
   // было сыграть дважды.
   // Отдельное поле сессии. Раньше плитки лежали в completed_rounds — там же,
   // где номера сыгранных раундов. Оно перезаписывается целиком при переходе
   // между раундами, поэтому отметки стирались и плитки снова открывались.
-  const fromServer = ((gameState as unknown as { jeopardy_opened?: unknown[] })
-    .jeopardy_opened ?? []).filter((x): x is string => typeof x === 'string')
+  const fromServer = jeopardyOpened(gameState)
   // Локальная копия — страховка: если запись в базу не прошла (например,
   // миграция не применена), плитки всё равно гаснут до конца игры, а не
   // делают вид, что ничего не произошло.
@@ -2168,18 +2187,9 @@ function JeopardyBoard({ pack, round, gameState }: {
   const [saveErr, setSaveErr] = useState<string | null>(null)
   const opened = [...new Set([...fromServer, ...openedLocal])]
 
-  const setOpened = async (next: string[]) => {
-    setOpenedLocal(next)
-    const { error } = await supabase.from('game_sessions')
-      .update({ jeopardy_opened: next } as never).eq('id', getRoomId())
-    if (error) {
-      setSaveErr('Плитки не сохраняются: ' + error.message
-        + '. Выполни миграцию 0006_jeopardy_opened.sql.')
-    } else setSaveErr(null)
-    // Плитка закрыта — у команд должна пропасть форма ответа. Она видна,
-    // пока идёт таймер, поэтому его надо снять, иначе форма висит вечно.
-    await supabase.from('game_sessions')
-      .update({ timer_started_at: null, reveal: false }).eq('id', getRoomId())
+  const closeTile = async (tileKey: string) => {
+    setOpenedLocal([...opened, tileKey])
+    setSaveErr(await closeJeopardyTile(gameState, tileKey, opened))
   }
 
   // Хук — ДО раннего return ниже (иначе число хуков между рендерами
@@ -2226,14 +2236,8 @@ function JeopardyBoard({ pack, round, gameState }: {
                 // синхронизируем номер открытой плитки с игроками:
                 // они шлют ответ по question_index, модалка читает по нему же
                 const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
-                // gotoQuestion обнуляет timer_started_at, а телефоны именно по
-                // нему понимают, что плитка открыта — без старта они вечно
-                // показывали «ждём, пока ведущий откроет плитку».
-                void gotoQuestion(flat).then(() => startTimer({
-                  gameId: gameState.game_id, roundNumber: gameState.round_number,
-                  questionRef: jeopardyRef(gameState.round_number, flat),
-                }))
-                setActive({ t: ti, i })
+                setTileLocal(flat)
+                void openJeopardyTile(gameState, flat)
               }}>{done ? '·' : tile.value}</button>
           )
         }))}
@@ -2246,19 +2250,29 @@ function JeopardyBoard({ pack, round, gameState }: {
             Теперь маршрут считает тот же модуль, что и в админке. */}
         <AfterRoundNav pack={pack} gameState={gameState} />
       </div>
-      {active && (
-        <TileModal packTheme={pack.theme} round={round} gameState={gameState}
-          theme={themes[active.t]} tile={themes[active.t].tiles[active.i]}
-          tileIndex={themes.slice(0, active.t).reduce((s, x) => s + x.tiles.length, 0) + active.i}
-          onClose={() => { void setOpened([...opened, `${active.t}-${active.i}`]); setActive(null) }} />
-      )}
+      {openTile != null && (() => {
+        // сквозной номер → (тема, плитка): пульт в телефоне знает только его
+        const at = jpLocate(themes, openTile)
+        if (!at) return null
+        const { ti, i: rest, tile } = at
+        return (
+          <TileModal packTheme={pack.theme} round={round} gameState={gameState}
+            theme={themes[ti]} tile={tile} tileIndex={openTile}
+            showAnswer={!!gameState.melody?.jp?.answer}
+            replayNonce={gameState.melody?.jp?.replay ?? 0}
+            onShowAnswer={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}
+            onReplay={() => void saveMelody(jpReplay(gameState.melody ?? {}))}
+            onClose={() => { setTileLocal(null); void closeTile(`${ti}-${rest}`) }} />
+        )
+      })()}
     </div>
   )
 }
 
 /** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
  *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
-function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme }: {
+function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme,
+  showAnswer, onShowAnswer, replayNonce, onReplay }: {
   packTheme?: string
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
@@ -2266,6 +2280,14 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
   tile: { value: number; audio: string; correct: string }
   /** сквозной номер плитки в раунде */
   tileIndex: number
+  /** «Показать ответ» нажато. Общее состояние (melody.jp.answer): нажать
+   *  можно и с проектора, и с телефона ведущего — экран один и тот же. */
+  showAnswer: boolean
+  onShowAnswer: () => void
+  /** Счётчик «переслушать»: изменение числа = запустить трек заново. Сам
+   *  факт проигрывания состоянием не является, это событие. */
+  replayNonce: number
+  onReplay: () => void
   onClose: () => void
 }) {
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
@@ -2273,10 +2295,19 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
   const handleRef = useRef<SyncedHandle | null>(null)
   const [remaining, setRemaining] = useState(clipSeconds)
   const [playing, setPlaying] = useState(false)
-  const [showAnswer, setShowAnswer] = useState(false)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const teams = useTeams(gameState.game_id)
   const [audioErr, setAudioErr] = useState<string | null>(null)
+  // Оптимистичный вердикт ✓/✗: без него кнопка «включалась» визуально
+  // только на следующем опросе useAnswers (раз в 2 сек) — с реальной игры
+  // была жалоба «часто приходилось ждать». grade() ничего не обновляет
+  // локально, а тянуть интервал опроса ниже (как у блица, 400мс) означало
+  // бы просто чаще дёргать базу и всё равно ждать; кладём вердикт в
+  // локальную карту СРАЗУ по клику, до ответа сервера, и мержим её поверх
+  // данных с сервера при рендере — сервер всё равно догонит на следующем
+  // опросе и молча подтвердит то же самое значение.
+  const [localGrades, setLocalGrades] = useState<Record<string, boolean>>({})
+  useEffect(() => { setLocalGrades({}) }, [tileIndex])
 
   const play = () => {
     handleRef.current?.stop()
@@ -2293,10 +2324,13 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
       onError: reason => { setPlaying(false); setAudioErr(reason) },
     })
   }
+  // Трек запускается при открытии плитки и на каждое «переслушать» — в том
+  // числе нажатое с телефона ведущего: там меняется replayNonce, здесь это
+  // тот же перезапуск, что и от кнопки на самом проекторе.
   useEffect(() => {
     play()
     return () => { handleRef.current?.stop() }
-  }, [tileIndex])
+  }, [tileIndex, replayNonce])
 
   // Ключ ответа содержит номер раунда, но старые игры писали его без раунда —
   // разбор обеих форм лежит в lib/jeopardyRef.ts, чтобы проектор, телефон и
@@ -2306,6 +2340,7 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
     .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
 
   const grade = async (id: string, correct: boolean) => {
+    setLocalGrades(g => ({ ...g, [id]: correct }))
     await supabase.from('answers').update({ is_correct: correct }).eq('id', id)
   }
 
@@ -2334,9 +2369,12 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
           {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>ждём ответы…</div>}
           {rows.map((a, pos) => {
             const team = teams.find(t => t.id === a.team_id)
+            // Локальный вердикт побеждает, пока сервер не подтвердил своим
+            // опросом — им же он и заменяется, когда придут те же данные.
+            const verdict = localGrades[a.id] ?? a.is_correct
             return (
               <div key={a.id} className="jp-answer" style={{
-                borderLeft: `3px solid ${a.is_correct === true ? 'var(--ok)' : a.is_correct === false ? 'var(--danger)' : 'var(--dim)'}`,
+                borderLeft: `3px solid ${verdict === true ? 'var(--ok)' : verdict === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="pos">#{pos + 1}</span>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
@@ -2346,9 +2384,9 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
                 {/* оценку можно переставить: раньше кнопки блокировались
                     навсегда, и промах мышью стоил команде баллов */}
                 {showAnswer && <>
-                  <button className={`jp-grade ok${a.is_correct === true ? ' chosen' : ''}`}
+                  <button className={`jp-grade ok${verdict === true ? ' chosen' : ''}`}
                     onClick={() => void grade(a.id, true)}>✓</button>
-                  <button className={`jp-grade no${a.is_correct === false ? ' chosen' : ''}`}
+                  <button className={`jp-grade no${verdict === false ? ' chosen' : ''}`}
                     onClick={() => void grade(a.id, false)}>✗</button>
                 </>}
               </div>
@@ -2357,8 +2395,8 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
         </div>
 
         <div className="jp-modal-foot">
-          {!showAnswer && <button onClick={() => setShowAnswer(true)}>Показать ответ</button>}
-          <button className="ghost" onClick={play}>↻ Переслушать</button>
+          {!showAnswer && <button onClick={onShowAnswer}>Показать ответ</button>}
+          <button className="ghost" onClick={onReplay}>↻ Переслушать</button>
           {audioErr && <div className="jp-audio-err">🔇 {audioErr}
             <button className="ghost" style={{ marginLeft: 10 }}
               onClick={() => void probeMedia(mediaUrl(tile.audio)).then(t => alert(t))}>
@@ -2366,9 +2404,9 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
             </button>
           </div>}
           {/* неоценённый ответ даёт 0 баллов — предупреждаем ДО закрытия плитки */}
-          {rows.some(a => a.is_correct == null) && (
+          {rows.some(a => (localGrades[a.id] ?? a.is_correct) == null) && (
             <div className="jp-ungraded">
-              ⚠ не оценено: {rows.filter(a => a.is_correct == null).length}
+              ⚠ не оценено: {rows.filter(a => (localGrades[a.id] ?? a.is_correct) == null).length}
             </div>
           )}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
@@ -2628,9 +2666,14 @@ function Finale({ pack, gameId, gameState }: {
   // калиброваны по ширине и не знают про реальную высоту невысоких экранов.
   // titleRef — тот же «клапан», что и там: не влезло даже на минимальном
   // кегле таблицы — подгон ужимает заголовок «РЕЗУЛЬТАТЫ» над ней.
+  // minScale ниже общего дефолта (0.45): для таблицы итогов полнота списка
+  // команд важнее размера шрифта (см. комментарий у MIN_SCALE в
+  // useFitText.ts — опция для этого и заводилась, но ни один вызов её не
+  // передавал, и на телевизоре с реально уменьшенной высотой экрана
+  // последняя команда обрезалась вместо того, чтобы просто стать мельче).
   const finTitleRef = useRef<HTMLHeadingElement>(null)
   const fitFinTable = useFitText<HTMLTableElement>(
-    [rows.length], { shrinkBefore: finTitleRef },
+    [rows.length], { shrinkBefore: finTitleRef, minScale: 0.3 },
   )
 
   // раунды, идущие в зачёт, и победитель каждого из них

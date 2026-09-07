@@ -16,7 +16,7 @@ import {
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { loadRatings, summarize, type RatingRow } from '../lib/ratings'
-import { useBlitz, saveBlitz } from '../lib/blitzApi'
+import { useBlitz, saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import {
   initBlitz, showQuestion, answerCorrect, answerWrong, skip,
   pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext,
@@ -24,7 +24,6 @@ import {
 } from '../lib/blitzState'
 import { blitzResults } from '../lib/blitz'
 import { hideQuestion, markPlayed } from '../lib/editorApi'
-import { enqueueAnswer } from '../lib/answerQueue'
 import {
   isDevMode, disableDevMode, seedTeams, seedRoundAnswers, checkRoundScoring, clearSeed,
   type CheckRow,
@@ -35,9 +34,21 @@ import { rankTeams } from '../lib/ranking'
 import { exportAnswersCsv } from '../lib/exportAnswers'
 import { autocheck } from '../lib/autocheck'
 import { startRace } from '../lib/raceActions'
+// Пульты «Своей игры» и мелодии в телефоне работают на ТЕХ ЖЕ вызовах, что и
+// проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
+// *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
+import { saveMelody, gradeMelody, passMelody } from '../lib/melodyActions'
+import {
+  melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippet,
+  melodyClose, melodyToBoard,
+} from '../lib/melody'
+import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
+import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
-import type { Answer, Pack, Team } from '../types/quiz'
+import type {
+  Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, Team,
+} from '../types/quiz'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
 // ВЕДУЩИЙ: шапка со ссылками → строка статуса → экран по фазе →
@@ -50,10 +61,19 @@ export function AdminPage() {
   const answers = useAnswers(gameState?.game_id ?? null, gameState?.round_number)
   const [linkCopied, setLinkCopied] = useState<string | null>(null)
 
+  // Пакет перечитывается не только при СМЕНЕ пакета, но и при смене раунда
+  // (8.86). Раньше зависимость была одна — pack_id: вкладка, открытая с
+  // начала вечера, держала настройки раунда такими, какими они были на
+  // момент загрузки, а правки в редакторе между раундами (например «штраф
+  // за таймаут» у блица) до неё не доезжали вообще. Хуже того, проектор и
+  // админка могли держать РАЗНЫЕ снимки настроек — и итог раунда зависел от
+  // того, какой из двух экранов записал его первым. Смена раунда — редкое
+  // событие, лишний запрос тут ничего не стоит; force обходит кеш загрузчика,
+  // иначе перечитывать было бы нечего.
   useEffect(() => {
     if (gameState?.pack_id) void loadPack(gameState.pack_id, true).then(setPack).catch(() => {})
     else setPack(null)
-  }, [gameState?.pack_id])
+  }, [gameState?.pack_id, gameState?.round_number])
 
   if (!gsLoading && !roomId) return <RoomPicker route="/admin" />
   if (!gameState) return <div className="cyber adm-center">// ЗАГРУЗКА…</div>
@@ -249,11 +269,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   // интерактивные механики управляются с проектора; стандартный маршрут
   // «вопрос → время ответов → разбор» для них не существует
   const isBlitz = round.mechanic === 'blitz'
+  const isMelody = round.mechanic === 'melody'
   // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
   // музыку и звук вопроса он запускает сам — кнопкой ниже
   const paperMode = pack.settings?.play_mode === 'paper'
-  const isInteractive = isJeopardy || isBlitz
-    || round.mechanic === 'melody' || round.mechanic === 'race'
+  const isInteractive = isJeopardy || isBlitz || isMelody || round.mechanic === 'race'
   // «120 секунд»: все вопросы раунда на одном слайде (см. HostScreen.tsx),
   // а не по одному — обычный «Дальше» листал их по одному 5 раз подряд,
   // хотя на экране они и так все сразу. У раунда свой пульт: назад — на
@@ -308,6 +328,14 @@ function RoundView({ pack, round, gameState, teams, answers }: {
       return void setPhase('round_intro')
     }
   }
+  /** Куда возвращает «Назад» с табло/перерыва: у обычного раунда — на разбор
+   *  последнего вопроса, у интерактивного — на его доску (фаза вопроса). */
+  const backToRound = () => {
+    // «120 секунд» сюда не относится: у него разбор по вопросам обычный,
+    // своя раскладка только у самой фазы вопроса
+    if (isInteractive) void gotoQuestion(0)
+    else void gotoAnswers(round.questions.length - 1, true)
+  }
   const goBack = () => {
     if (phase === 'question' && step > 0) void gotoQuestion(step - 1)
     else if (phase === 'question') void setPhase('round_intro')
@@ -320,16 +348,28 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     // была на экране, но клик не делал ничего. Возврат тем же путём, каким
     // сюда пришли: с перерыва — на табло (если оно было в маршруте) или на
     // разбор последнего вопроса; с табло — на разбор последнего вопроса.
+    // У интерактивных механик разбора по вопросам нет вообще (вопрос
+    // выбирается плиткой/рулеткой/кубиком) — «назад» для них значит «вернуть
+    // доску раунда», а не «открыть разбор последнего вопроса», которого не
+    // существует: gotoAnswers увёл бы на пустой экран.
     else if (phase === 'break') {
       const s = (round.settings as { show_scoreboard_after?: boolean })
       if (s.show_scoreboard_after) void setPhase('scoreboard')
-      else void gotoAnswers(round.questions.length - 1, true)
+      else backToRound()
     }
-    else if (phase === 'scoreboard') void gotoAnswers(round.questions.length - 1, true)
+    else if (phase === 'scoreboard') backToRound()
   }
 
+  // Раскладка (8.86): на телефоне — один столбец в порядке Игра → Команды →
+  // Служебное (как и был, ведущий его уже обкатал живьём в 8.63); на широком
+  // экране (≥1100px) те же самые узлы становятся двумя колонками —
+  // «Игра» слева, «Команды»/«Служебное» справа фиксированной шириной.
+  // Порядок в DOM один и тот же, переключает только медиазапрос
+  // (.adm-flex в 06-admin.css) — второй раскладки в JSX нет и заводить её
+  // нельзя: разъедутся, как уже разъезжались проектор с админкой.
   return (
     <div className="adm-flex">
+      <div className="adm-main">
       {phase === 'show_answers' && (
         <AnswersView pack={pack} round={round} gameState={gameState}
           answers={answers} teams={teams} onGrade={grade} />
@@ -349,7 +389,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             teams={teams} showTally={!paperMode} />
         </div>
       )}
-      {phase !== 'show_answers' && phase !== 'answer_time' && !(isSprint && phase === 'question') && (
+      {/* У интерактивных механик на фазе вопроса своя раскладка (пульты
+          ниже): шпаргалка «ВОПРОС N/M» с текстом из round.questions там ни о
+          чём — вопрос выбирается плиткой/рулеткой/кубиком, а не по порядку. */}
+      {phase !== 'show_answers' && phase !== 'answer_time'
+        && !((isSprint || isInteractive) && phase === 'question') && (
         <div className="adm-mid">
           <QuestionTextOnly round={round} gameState={gameState} />
           {/* На бумаге команды отвечают на бланк — кто уже ответил, узнать
@@ -367,6 +411,18 @@ function RoundView({ pack, round, gameState, teams, answers }: {
 
         {round.mechanic === 'race' && phase === 'question' && (
           <RaceControls gameState={gameState} />
+        )}
+
+        {/* Пульты «Своей игры» и мелодии (8.86): раньше у обеих механик в
+            телефоне была ровно одна кнопка «ЗАВЕРШИТЬ РАУНД» и надпись
+            «управляется с проектора» — вести раунд с телефона было нельзя. */}
+        {isJeopardy && phase === 'question' && (
+          <JeopardyControls round={round} gameState={gameState}
+            onBack={() => void setPhase('round_intro')} onFinish={endRound} />
+        )}
+
+        {isMelody && phase === 'question' && (
+          <MelodyControls round={round} gameState={gameState} onFinish={endRound} />
         )}
 
         {isSprint && phase === 'question' && (
@@ -420,16 +476,33 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             (от «Своей игры») — и второй кнопкой «ЗАВЕРШИТЬ РАУНД» поверх той,
             что уже есть в BlitzControls, с другим смыслом (там — досрочный
             обрыв, тут — обычная навигация дальше). */}
-        {isInteractive && !isBlitz && phase !== 'round_intro' && (<>
-          <div className="adm-dim">
-            {round.mechanic === 'race' ? 'ЗАБЕГ УПРАВЛЯЕТСЯ С ПРОЕКТОРА'
-              : round.mechanic === 'melody' ? 'РАУНД УПРАВЛЯЕТСЯ С ПРОЕКТОРА (ШАРЫ/МОДАЛКА)'
-              : 'РАУНД УПРАВЛЯЕТСЯ ПЛИТКАМИ НА ПРОЕКТОРЕ'}
+        {/* «Своя игра» и мелодия свою кнопку «завершить раунд» рисуют сами
+            (внутри пульта, там же, где остальные действия) — второй такой же
+            кнопкой снаружи был бы ровно тот дубль с разным смыслом, который
+            уже чинили блицу в 8.62. Остаются скачки: у них пульт про старт
+            забега, а навигация дальше — здесь.
+            «← НАЗАД» у скачек и «Своей игры» рисуется впервые (её не было
+            вообще, только «Завершить раунд») — ведёт на заставку раунда, то
+            же место, куда уводит «Назад» у «120 секунд». */}
+        {round.mechanic === 'race' && phase === 'question' && (
+          <div className="adm-row-btns">
+            <button className="adm-btn" onClick={() => void setPhase('round_intro')}>← НАЗАД</button>
+            <button className="adm-btn primary" onClick={endRound}>
+              ЗАВЕРШИТЬ РАУНД {`${(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after ? '→ ТАБЛО' : '→'}`}
+            </button>
           </div>
-          <button className="adm-btn primary" onClick={endRound}>
-            ЗАВЕРШИТЬ РАУНД {`${(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after ? '→ ТАБЛО' : '→'}`}
-          </button>
-        </>)}
+        )}
+        {/* Интерактивный раунд уже закончился и мы на табло/перерыве: пульта
+            механики тут нет, а обычный ряд Назад/Дальше спрятан гейтом
+            !isInteractive — без этой строки с табло после «Своей игры»,
+            мелодии, блица и скачек не было НИ ОДНОЙ кнопки вперёд. */}
+        {isInteractive && phase !== 'round_intro' && phase !== 'question'
+          && phase !== 'info' && (
+          <div className="adm-row-btns">
+            <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
+            <button className="adm-btn primary" onClick={advance}>ДАЛЬШЕ →</button>
+          </div>
+        )}
         {/* ── ИГРА В БАРЕ: вопрос читает ведущий, старт — по кнопке ──
             На бумаге проектор молчит и время не идёт, пока не нажата эта
             кнопка: сначала человек с микрофоном читает вопрос залу, и только
@@ -472,15 +545,20 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </div>
         )}
 
-        {/* Порядок по макету: Игра (всё выше) → Команды → Служебное. Раньше
-            «Команды» рендерился в AdminPage() над самим экраном вопроса —
-            блок оказывался ПЕРЕД игрой, а не после. */}
+      </div>
+      </div>
+
+      {/* Порядок по макету: Игра (всё выше) → Команды → Служебное. Раньше
+          «Команды» рендерился в AdminPage() над самим экраном вопроса —
+          блок оказывался ПЕРЕД игрой, а не после. На широком экране этот же
+          узел уезжает во вторую колонку — правилом CSS, не вторым JSX. */}
+      <aside className="adm-side">
         <ResultsPanel pack={pack} gameState={gameState} teams={teams} />
 
         <DevSeedPanel pack={pack} gameState={gameState} />
 
         <ServiceDrawer pack={pack} round={round} gameState={gameState} />
-      </div>
+      </aside>
     </div>
   )
 }
@@ -1473,6 +1551,278 @@ function RaceControls({ gameState }: {
   )
 }
 
+/** Пульт «Своей игры» (8.86) — доска и открытая плитка прямо в телефоне.
+ *
+ *  Стало возможным ровно потому, что состояние плитки («какая открыта»,
+ *  «показан ли ответ») переехало из useState вкладки проектора в общее
+ *  состояние игры (`melody.jp`, см. lib/jeopardyRef.ts). Все действия —
+ *  через lib/jeopardyActions.ts, те же вызовы, что делает и сам проектор:
+ *  своей копии здесь нет, иначе два экрана рано или поздно разойдутся. */
+function JeopardyControls({ round, gameState, onBack, onFinish }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  onBack: () => void
+  onFinish: () => void
+}) {
+  const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
+  const [now, setNow] = useState(Date.now())
+  // хуки — все до ранних return (React #310, см. CLAUDE.md)
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t) }, [])
+
+  const opened = jeopardyOpened(gameState)
+  const flat = jpOpenTile(gameState.melody)
+  const at = flat == null ? null : jpLocate(themes, flat)
+  const answerShown = !!gameState.melody?.jp?.answer
+
+  // ── Плитка открыта: отсчёт клипа, ответ и разбор команд ──
+  if (at) {
+    const startedAt = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : null
+    const left = startedAt ? Math.max(0, Math.ceil(clipSeconds - (now - startedAt) / 1000)) : clipSeconds
+    const rows = answers
+      .filter(a => jeopardyTile(a.question_ref, gameState.round_number) === flat)
+      .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
+    return (
+      <div className="adm-blitz">
+        <div className="adm-dim">{at.tile ? `ПЛИТКА · ${at.tile.value}` : 'ПЛИТКА'}</div>
+        <div className="adm-counter" style={{ textAlign: 'center' }}>
+          {String(left).padStart(2, '0')}
+        </div>
+        <div className="adm-correct" style={{ textAlign: 'center' }}>
+          Верный ответ: <b>{at.tile.correct || '—'}</b>
+        </div>
+        {rows.length === 0 && <div className="adm-dim">ждём ответы…</div>}
+        {rows.map((a, pos) => {
+          const team = teams.find(t => t.id === a.team_id)
+          return (
+            <div key={a.id} className="adm-tile-row">
+              <span className="adm-dim">#{pos + 1}</span>
+              <span style={{ color: team?.color, fontWeight: 700 }}>{team?.name ?? '—'}</span>
+              {/* до «Показать ответ» видно только ФАКТ ответа — ровно как на
+                  проекторе: иначе ведущий читает вслух чужой ответ раньше
+                  времени. Автопроверки у плитки нет (ответ свободный,
+                  сравнивать не с чем), поэтому предустановки тут нет тоже. */}
+              <span className="adm-tile-ans">{answerShown ? (a.answer_text || '—') : '• • •'}</span>
+              <button className={`adm-grade ok${a.is_correct === true ? ' on' : ''}`}
+                onClick={() => void supabase.from('answers')
+                  .update({ is_correct: true }).eq('id', a.id)}>✓</button>
+              <button className={`adm-grade no${a.is_correct === false ? ' on' : ''}`}
+                onClick={() => void supabase.from('answers')
+                  .update({ is_correct: false }).eq('id', a.id)}>✗</button>
+            </div>
+          )
+        })}
+        {rows.some(a => a.is_correct == null) && (
+          <div className="adm-bz-warn">⚠ не оценено: {rows.filter(a => a.is_correct == null).length}
+            {' '}— неоценённый ответ баллов не приносит</div>
+        )}
+        <div className="adm-row-btns">
+          <button className="adm-btn"
+            onClick={() => void saveMelody(jpReplay(gameState.melody ?? {}))}>↻ ПЕРЕСЛУШАТЬ</button>
+          <button className="adm-btn" disabled={answerShown}
+            onClick={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}>ПОКАЗАТЬ ОТВЕТ</button>
+        </div>
+        <button className="adm-btn primary"
+          onClick={() => void closeJeopardyTile(gameState, at.key, opened)}>ЗАКРЫТЬ ПЛИТКУ</button>
+      </div>
+    )
+  }
+
+  // ── Доска: плитки кликабельны и с телефона тоже ──
+  const left = themes.reduce((s, t) => s + t.tiles.length, 0) - opened.length
+  return (
+    <div className="adm-blitz">
+      <div className="adm-dim">ОСТАЛОСЬ ПЛИТОК: {left}</div>
+      <div className="adm-jp-grid" style={{
+        gridTemplateColumns: `repeat(${Math.max(themes.length, 1)}, minmax(0, 1fr))`,
+      }}>
+        {themes.map((t, ti) => (
+          <div key={`h${ti}`} className="adm-jp-theme" style={{ gridColumn: ti + 1, gridRow: 1 }}>
+            {t.name || `Тема ${ti + 1}`}
+          </div>
+        ))}
+        {themes.map((t, ti) => t.tiles.map((tile, i) => {
+          const done = opened.includes(`${ti}-${i}`)
+          const idx = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+          return (
+            <button key={`${ti}-${i}`} className={`adm-jp-tile${done ? ' done' : ''}`}
+              disabled={done} style={{ gridColumn: ti + 1, gridRow: i + 2 }}
+              onClick={() => void openJeopardyTile(gameState, idx)}>
+              {done ? '·' : tile.value}
+            </button>
+          )
+        }))}
+      </div>
+      <div className="adm-row-btns">
+        <button className="adm-btn" onClick={onBack}>← НАЗАД</button>
+        <button className="adm-btn primary" onClick={onFinish}>ЗАВЕРШИТЬ РАУНД →</button>
+      </div>
+    </div>
+  )
+}
+
+/** Пульт «Угадай мелодию» (8.86) — все девять стадий раунда.
+ *
+ *  Стадий действительно девять, а не шесть: два коротких автошага
+ *  (рулетка/секунда трека) и проигрывание отрывка кнопок не имеют вовсе —
+ *  экран просто ждёт, как и проектор; ход ВТОРОЙ команды («передан ход») —
+ *  отдельная стадия с теми же кнопками, но другими подписями и другой ценой
+ *  ответа. Переходы — общие с проектором (lib/melody.ts + melodyActions.ts). */
+function MelodyControls({ round, gameState, onFinish }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  onFinish: () => void
+}) {
+  const s = round.settings as MelodySettings
+  const themes = s.themes ?? []
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+
+  const m: MelodyState = gameState.melody ?? {}
+  const played = m.played ?? []
+  const free = melodyFree(themes, played)
+  const total = melodyKeys(themes).length
+  const bids = answers.filter(a => a.question_ref === `q-mel-${m.key}-bid`)
+  const currentId = m.order?.[m.turn ?? 0]
+  const currentTeam = teams.find(t => t.id === currentId)
+  const bidSec = Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
+  const ans = answers.find(a => a.question_ref === `q-mel-${m.key}` && a.team_id === currentId)
+  const [ti, i] = (m.key ?? '0-0').split('-').map(Number)
+  const trackLine = `${themes[ti]?.name ?? '—'} · трек ${(i || 0) + 1}`
+  const first = (m.turn ?? 0) === 0
+  const hasSecond = (m.order?.length ?? 0) > 1
+
+  // Аварийный выход: доступен на любой активной стадии, кроме показа
+  // результата — интернет у команд отваливается, ответы не долетают, и
+  // ведущему нужен способ двигаться дальше, не перезапуская игру.
+  const escape = (
+    <button className="adm-btn" onClick={() => {
+      if (!confirm('Закрыть трек и вернуться к доске?\n\nБаллы за него никто не получит.')) return
+      void saveMelody(melodyClose(m))
+    }}>ЗАКРЫТЬ</button>
+  )
+
+  // ── доска: трек не выбран ──
+  if (melodyIdle(m)) {
+    return (
+      <div className="adm-blitz">
+        {free.length > 0 ? (<>
+          <div className="adm-qtext" style={{ textAlign: 'center' }}>
+            🎵 Отыграно {played.length} из {total} треков.
+          </div>
+          {/* подпись ровно та же, что на проекторе: на первом треке там
+              «Стартуем!», дальше «Рулетка» — разные подписи для одного и
+              того же действия путали бы */}
+          <button className="adm-btn primary" onClick={() => {
+            const target = free[Math.floor(Math.random() * free.length)]
+            void saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5))
+          }}>🎲 {played.length === 0 ? 'СТАРТУЕМ!' : 'РУЛЕТКА'}</button>
+        </>) : (<>
+          <div className="adm-qtext" style={{ textAlign: 'center' }}>
+            Все {total} треков отыграны.
+          </div>
+          <button className="adm-btn primary" onClick={onFinish}>ЗАВЕРШИТЬ РАУНД →</button>
+        </>)}
+      </div>
+    )
+  }
+
+  return (
+    <div className="adm-blitz">
+      <div className="adm-dim">{trackLine}</div>
+
+      {/* рулетка и секунда трека — короткие автошаги, доступного действия
+          нет ни здесь, ни на проекторе: экран сменится сам */}
+      {(m.stage === 'spinning' || m.stage === 'listen') && (
+        <div className="adm-qtext" style={{ textAlign: 'center' }}>
+          {m.stage === 'spinning' ? '🎲 крутится рулетка…' : '♪ слушаем 1 секунду…'}
+        </div>
+      )}
+
+      {m.stage === 'bidding' && (<>
+        <div className="adm-dim">ЗА СКОЛЬКО СЕКУНД УГАДАЮТ</div>
+        {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => {
+          const b = bids.find(x => x.team_id === t.id)
+          return (
+            <div key={t.id} className="adm-tally">
+              <span style={{ color: t.color }}>{t.name}</span>
+              <span className={b ? 'ok' : 'adm-dim'}>{b ? 'ставка принята ✓' : '…'}</span>
+            </div>
+          )
+        })}
+      </>)}
+
+      {m.stage === 'bids' && (<>
+        {(m.order ?? []).map((id, pos) => {
+          const t = teams.find(x => x.id === id)
+          const b = bids.find(x => x.team_id === id)
+          return (
+            <div key={id} className="adm-tally">
+              <span style={{ color: pos === 0 ? t?.color : undefined }}>
+                {pos === 0 ? '① ' : `${pos + 1}. `}{t?.name ?? '—'}
+              </span>
+              <span className="adm-dim">{b?.answer_text ?? '—'} сек</span>
+            </div>
+          )
+        })}
+        {(m.order ?? []).length === 0 && <div className="adm-dim">ставок нет</div>}
+        <div className="adm-row-btns">
+          <button className="adm-btn primary" disabled={!currentId}
+            onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
+            ИГРАЕМ {bidSec || 5} СЕК →
+          </button>
+          <button className="adm-btn"
+            onClick={() => void saveMelody(melodyClose(m))}>ПРОПУСТИТЬ ТРЕК</button>
+        </div>
+      </>)}
+
+      {m.stage === 'snippet' && (
+        <div className="adm-qtext" style={{ textAlign: 'center', color: currentTeam?.color }}>
+          ♪ играет {bidSec || 5} сек для «{currentTeam?.name ?? '—'}»…
+        </div>
+      )}
+
+      {(m.stage === 'answering' || m.stage === 'passed') && (<>
+        <div className="adm-tally">
+          <span style={{ color: currentTeam?.color, fontWeight: 700 }}>
+            {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
+          </span>
+          <span className="adm-dim">
+            {m.stage === 'passed' ? 'слушает трек целиком · 0.5 балла'
+              : `ставка ${bidSec} сек → ${bidSec <= 5 ? 2 : 1} балла`}
+          </span>
+        </div>
+        <div className="adm-correct">
+          {ans?.answer_text ? <>Ответ: <b>{ans.answer_text}</b></> : 'ждём ответ…'}
+        </div>
+        <div className="adm-row-btns">
+          <button className="adm-btn primary" disabled={!ans}
+            onClick={() => ans && void gradeMelody(m, ans, true, bidSec)}>✓ ВЕРНО</button>
+          <button className="adm-btn" onClick={() => void passMelody(m, ans)}>
+            {first && hasSecond ? '✗ ПЕРЕДАТЬ ХОД' : '✗ ЗАКРЫТЬ ТРЕК'}
+          </button>
+        </div>
+      </>)}
+
+      {m.stage === 'reveal' && (<>
+        <div className="adm-correct" style={{ textAlign: 'center' }}>
+          ✓ Верно · +{m.wonPts ?? 0}
+        </div>
+        <div className="adm-qtext" style={{ textAlign: 'center',
+          color: teams.find(t => t.id === m.wonTeam)?.color }}>
+          {teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы
+        </div>
+        <button className="adm-btn primary"
+          onClick={() => void saveMelody(melodyToBoard(m))}>К ДОСКЕ →</button>
+      </>)}
+
+      {m.stage !== 'reveal' && escape}
+    </div>
+  )
+}
+
 /** Пульт ведущего для блица.
  *
  *  Все действия идут через чистые переходы из blitzState: админка только
@@ -1514,12 +1864,11 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
       // Очки живут в blitz_state, а общий подсчёт читает только answers,
       // поэтому итог кладём готовой строкой `q-blitz`.
       if (next.finished && !state?.finished) {
-        const rows = blitzResults(toResults(next), settings.timeoutPenalty ?? 10)
-        await Promise.all(rows.map(r => enqueueAnswer({
-          team_id: r.teamId, game_id: gameState.game_id,
-          question_ref: 'q-blitz', round_number: gameState.round_number,
-          answer_text: `место ${r.place}`, stake: r.score,
-        })))
+        // Одним upsert'ом через общую saveBlitzResults — здесь стояла
+        // построчная запись через очередь ответов, которая на параллельных
+        // вызовах теряет команды (см. HANDOFF §5 и коммент у функции).
+        await saveBlitzResults(gameState.game_id, gameState.round_number,
+          blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
       }
     } finally { setBusy(false) }
   }
@@ -1528,8 +1877,13 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
   if (!state) {
     return (
       <div className="adm-blitz">
-        <div className="adm-dim">БЛИЦ · раунд не начат</div>
-        <button className="adm-btn primary" disabled={busy}
+        <div className="adm-dim">БЛИЦ · кубик выбирает, кто начинает…</div>
+        {/* Кубик бросается САМ через 3 секунды на проекторе (HostScreen.tsx,
+            эффект «1. Кубик бросается САМ»). Эта кнопка — не «начать», а «не
+            ждать»: подпись «БРОСИТЬ КУБИК И НАЧАТЬ» выглядела так, будто без
+            неё раунд не тронется, и ведущий жал её ровно тогда же, когда это
+            делал проектор — два экрана писали состояние одновременно. */}
+        <button className="adm-btn" disabled={busy}
           onClick={() => {
             // Блиц — игра по кругу: одной команде ходить не с кем.
             if (teams.length < 2) return hint.show(teams.length === 0
@@ -1538,8 +1892,9 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
             const order = [...teams].sort(() => Math.random() - 0.5).map(t => t.id)
             void push(initBlitz(order, settings.teamSeconds ?? 60))
           }}>
-          🎲 БРОСИТЬ КУБИК И НАЧАТЬ
+          ПРОПУСТИТЬ БРОСОК
         </button>
+        <div className="adm-dim">кубик бросится сам через 3 секунды</div>
         {teams.length < 2 && <div className="adm-dim">нужно минимум две команды</div>}
         <Hint text={hint.text} />
       </div>
@@ -1581,8 +1936,10 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
     <div className="adm-blitz">
       <div className="adm-dim">ХОД: {activeName} · в банке {left}</div>
 
+      {/* Вопрос тоже выезжает сам, через 5 секунд после хода (NEXT_DELAY_MS
+          на проекторе) — кнопка ускоряет ожидание, а не запускает раунд. */}
       {!cur && (
-        <button className="adm-btn primary" disabled={busy || left === 0}
+        <button className="adm-btn" disabled={busy || left === 0}
           onClick={() => {
             const next = pickNext(bank, state.used)
             if (!next) return void push(finishNoQuestions(state))
@@ -1591,9 +1948,10 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
             void markPlayed(next.id).catch(() => {})
             void push(showQuestion(state, next.id, Date.now()))
           }}>
-          {left === 0 ? 'ВОПРОСЫ КОНЧИЛИСЬ' : 'ПОКАЗАТЬ ВОПРОС →'}
+          {left === 0 ? 'ВОПРОСЫ КОНЧИЛИСЬ' : 'ПОКАЗАТЬ ВОПРОС СЕЙЧАС'}
         </button>
       )}
+      {!cur && left > 0 && <div className="adm-dim">вопрос выедет сам через 5 секунд</div>}
 
       {cur && (
         <>
@@ -1607,11 +1965,16 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
             {cur.lastAnswer ? <>ответила: <b>{cur.lastAnswer}</b></> : 'ответ: ждём…'}
           </div>
           <div className="adm-dim">попытка {cur.attempts + 1} из {MAX_ATTEMPTS}</div>
+          {/* Вердикт предустановлен автопроверкой — тем же результатом, что
+              проектор уже посчитал сам (cur.verdict приходит из autocheck,
+              см. HostScreen.tsx, «3. АВТОПРОВЕРКА»). Обе кнопки остаются
+              живыми: нужно уметь поправить ложное «верно», а не только
+              подтвердить его. */}
           <div className="adm-dev-row">
-            <button className="adm-btn primary" disabled={busy}
-              onClick={() => void push(answerCorrect(state, Date.now()))}>ВЕРНО ✓</button>
-            <button className="adm-btn" disabled={busy}
-              onClick={() => void push(answerWrong(state, Date.now()))}>НЕВЕРНО ✗</button>
+            <button className={`adm-grade ok${cur.verdict === 'ok' ? ' on' : ''}`} disabled={busy}
+              onClick={() => void push(answerCorrect(state, Date.now()))}>✓ ВЕРНО</button>
+            <button className={`adm-grade no${cur.verdict === 'no' ? ' on' : ''}`} disabled={busy}
+              onClick={() => void push(answerWrong(state, Date.now()))}>✗ НЕВЕРНО</button>
           </div>
           <div className="adm-dev-row">
             <button className="adm-btn" disabled={busy}

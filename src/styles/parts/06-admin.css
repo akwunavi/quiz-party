@@ -18,6 +18,14 @@
   font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: .1em; }
 .adm-pad { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .adm-flex { flex: 1; display: flex; flex-direction: column; }
+/* Колонка «Игра» (8.86). На телефоне — просто обёртка, порядок блоков
+   не меняется: Игра → Команды → Служебное, как выстрадано в 8.63.
+   На широком экране обе колонки разъезжаются — см. 26-admin.css. */
+.adm-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+/* Колонка «Команды»/«Служебное». Раньше эти блоки лежали внутри .adm-footer
+   и брали его отступы; теперь у них свои — те же 12px, чтобы на телефоне
+   ничего визуально не сдвинулось. */
+.adm-side { display: flex; flex-direction: column; gap: 10px; padding: 12px; min-width: 0; }
 /* Текст вопроса раньше был крупнее, чем нужно шпаргалке для чтения с
    телефона, — вместе с щедрыми полями это уводило кнопки ряда
    Назад/Повтор/Дальше за нижний край первого экрана, приходилось

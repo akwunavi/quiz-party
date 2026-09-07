@@ -33,6 +33,50 @@
   }
 }
 
+/* ═══ 8.86: ДЕСКТОПНАЯ РАСКЛАДКА АДМИНКИ (issue #2, второй брейкпоинт) ═══
+   До 8.86 админка была спроектирована только как «телефон ведущего»: на
+   1920 это был один растянутый на всю ширину столбец — текст вопроса в
+   строку через весь экран, ряд кнопок шириной с монитор. Макет просит две
+   колонки: слева «Игра», справа «Команды»/«Служебное» фиксированной ширины.
+   ВАЖНО: разметка в JSX ОДНА (см. AdminPage.tsx, .adm-main + .adm-side) —
+   переключает только этот медиазапрос. Второй раскладки в коде нет
+   намеренно: две копии одного экрана рано или поздно разъезжаются.
+   Ширина правой колонки — в процентах, не в vw: у корня админки свои
+   отступы, vw их не учитывает (см. CLAUDE.md). */
+@media (min-width: 1100px) {
+  .adm-flex {
+    display: grid; align-items: start;
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 24%, 400px);
+    gap: 18px; padding: 18px; align-content: start;
+  }
+  /* Колонка «Игра» — панель по макету: рамка, скругление, моно-кикер
+     сверху. На телефоне рамки нет специально: там экран и так один блок,
+     а лишняя рамка съедала бы и без того узкие поля. */
+  .adm-main {
+    border: 1px solid #1c2740; border-radius: 12px; background: var(--panel);
+    overflow: hidden;
+  }
+  .adm-main::before {
+    content: 'игра'; display: block; flex: 0 0 auto;
+    padding: 12px 16px 0; color: var(--muted);
+    font-family: 'Share Tech Mono', monospace; font-size: 11.5px;
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .adm-side {
+    border: 1px solid #1c2740; border-radius: 12px; background: var(--panel);
+    position: sticky; top: 18px;
+  }
+  /* Подвал с кнопками — часть той же панели, отдельной «плиты» не надо */
+  .adm-main .adm-footer { border-top: 1px solid #1c2740; }
+  /* Текст вопроса на большом экране крупнее: его читают не с телефона в
+     руке, а с ноутбука на стойке — 17px там неоправданно мелкие. */
+  .adm-main .adm-qtext { font-size: 21px; }
+  .adm-main .adm-correct { font-size: 16px; }
+  /* Кнопки ряда перестают быть «на весь экран»: на 1920 кнопка «Дальше»
+     шириной в треть монитора выглядит как ошибка вёрстки. */
+  .adm-main .adm-row-btns { max-width: 720px; margin-left: auto; }
+}
+
 /* ═══ 7.73: звук, таймер киберпанка, разбор ═══ */
 
 /* подсказка, пока браузер держит звук заблокированным */
@@ -67,11 +111,24 @@
 /* п.4: картинки вопроса на телефоне игрока */
 
 /* п.7: кнопки проектора не наезжают на контент и совпадают по ширине
-   с колонкой ответов команд */
-.host-actions { z-index: 40; display: flex; gap: 10px; align-items: center;
+   с колонкой ответов команд.
+   ЛОВУШКА (найдена QA на живой игре, живая жалоба ведущего): селектор был
+   голым `.host-actions` — без привязки к экрану разбора ответов он бил по
+   .host-actions ВЕЗДЕ на проекторе. Узкая ширина (260px на минимуме) на
+   1366px давала «← Назад» + «Дальше →» не в один ряд, а внахлёст
+   flex-wrap заворачивал их в ДВЕ строки — блок кнопок вырастал вдвое по
+   высоте и наползал углом на всё, что стояло над ним (рамка вопроса на
+   экране вопроса, список команд на экране «время ответов»). Ограничение
+   ширины сузили ТОЛЬКО до экрана разбора ответов (`.answers-layout` —
+   прямой сосед `.host-actions` внутри того же `.host-screen`), где оно и
+   было задумано ради выравнивания с колонкой ответов. На всех остальных
+   экранах `.host-actions` возвращается к дефолту из 01-base.css: кнопки
+   в один ряд по содержимому, wrap не нужен. */
+.host-screen:has(> .answers-layout) .host-actions {
+  z-index: 40; display: flex; gap: 10px; align-items: center;
   justify-content: flex-end; flex-wrap: wrap;
   width: clamp(260px, 22vw, 420px); }
-.host-actions button { flex: 1 1 auto; white-space: nowrap; }
+.host-screen:has(> .answers-layout) .host-actions button { flex: 1 1 auto; white-space: nowrap; }
 .answers-layout { padding-right: clamp(0px, 1vw, 16px); }
 /* на разборе оставляем место под кнопки, чтобы они ни на что не ложились */
 .host-screen .answers-layout { padding-bottom: clamp(64px, 9vh, 104px); }
@@ -148,12 +205,50 @@
 .adm-blitz { margin-top: 12px; padding: 10px 12px; border-radius: 10px;
   border: 1px solid var(--accent); background: rgba(255,255,255,.03);
   display: flex; flex-direction: column; gap: 8px; }
+/* Внутри пульта подписи длинные («🏁 НАЧАТЬ СКАЧКИ (СТАВКИ ЗАКРЫВАЮТСЯ)»,
+   «ПРОПУСТИТЬ БРОСОК»), а общее правило 7.67 `.adm-footer .adm-btn` держит
+   nowrap — на 390px кнопка не переносилась и вылезала за правый край экрана
+   на 15px, утаскивая за собой соседние строки блока (замерено рендером).
+   Перенос разрешаем ИМЕННО в пультах механик, остальные ряды короче. */
+.adm-footer .adm-blitz .adm-btn { white-space: normal; line-height: 1.25; }
+.adm-blitz { min-width: 0; }
 .adm-bz-q { font-size: 15px; line-height: 1.35; }
 .adm-bz-answer { font-size: 14px; color: var(--ok); }
 .adm-bz-answer b { font-size: 16px; }
 .adm-bz-warn { padding: 6px 10px; border-radius: 8px; font-size: 13px;
   color: var(--danger);
   background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+/* ═══ ПУЛЬТ «СВОЕЙ ИГРЫ» И МЕЛОДИИ (8.86) ═══
+   Живут в той же рамке, что и пульт блица (.adm-blitz): во время раунда
+   ведущий жмёт кнопки быстро и не должен путать их с общей навигацией. */
+
+/* доска плиток в телефоне: те же значения, что на проекторе, но кликабельные
+   — состояние открытой плитки теперь общее (game_sessions.melody.jp) */
+.adm-jp-grid { display: grid; gap: 6px; }
+.adm-jp-theme { font-family: 'Share Tech Mono', monospace; font-size: 10px;
+  letter-spacing: .06em; color: var(--muted); text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-jp-tile { aspect-ratio: 1.7; border-radius: 8px; background: #101b2f;
+  border: 1px solid #26344f; color: var(--neon);
+  font-family: 'Share Tech Mono', monospace; font-size: 14px; }
+.adm-jp-tile:hover:not(:disabled) { border-color: var(--neon);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--neon) 35%, transparent); }
+.adm-jp-tile.done { opacity: .3; color: var(--muted); border-style: dashed; }
+
+/* строка разбора внутри открытой плитки: команда, её ответ, ✓/✗ */
+.adm-tile-row { display: flex; align-items: center; gap: 8px; font-size: 13px;
+  padding: 6px 0; border-bottom: 1px solid #1c2740; }
+.adm-tile-row:last-of-type { border-bottom: none; }
+.adm-tile-ans { flex: 1 1 auto; min-width: 0; color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-tile-row .adm-grade { flex: 0 0 auto; padding: 6px 12px; font-size: 13px; }
+
+/* строка «команда — состояние» у мелодии (ставки, очередь, ход) */
+.adm-tally { display: flex; justify-content: space-between; align-items: baseline;
+  gap: 10px; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #1c2740; }
+.adm-tally:last-of-type { border-bottom: none; }
+.adm-tally .ok { color: var(--ok, #22c55e); }
 
 /* список отыгранных вопросов блица */
 .adm-bz-used { margin-top: 6px; border-top: 1px solid rgba(255,255,255,.1);

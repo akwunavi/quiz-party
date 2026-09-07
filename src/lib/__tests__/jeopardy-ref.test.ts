@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { jeopardyRef, jeopardyTile } from '../jeopardyRef'
+import {
+  jeopardyRef, jeopardyTile, jpOpen, jpClose, jpShowAnswer, jpReplay, jpOpenTile,
+} from '../jeopardyRef'
 import { computeTotals, computeRoundScores } from '../totals'
 import type { LoadedPack } from '../packLoader'
 import type { Answer, Team } from '../../types/quiz'
@@ -60,5 +62,49 @@ describe('два раунда «Своей игры» в одном паке', (
   it('игра, сыгранная на старом ключе, считается как раньше', () => {
     const answers = [answer('q-t3', 0), answer('q-t0', 1)]
     expect(computeTotals(pack, [team], answers).get('t1')).toBe(2 + 0.5)
+  })
+})
+
+// ── Состояние открытой плитки (8.86) — общее для проектора и пульта ──
+describe('«Своя игра»: состояние открытой плитки', () => {
+  it('закрытая плитка — null, чем бы она ни была записана', () => {
+    expect(jpOpenTile(undefined)).toBeNull()
+    expect(jpOpenTile({})).toBeNull()
+    expect(jpOpenTile({ jp: {} })).toBeNull()
+    expect(jpOpenTile({ jp: { tile: null } })).toBeNull()
+  })
+
+  it('нулевая плитка — это плитка, а не «закрыто»', () => {
+    expect(jpOpenTile({ jp: { tile: 0 } })).toBe(0)
+  })
+
+  it('открытие сбрасывает показ ответа и перезапускает трек', () => {
+    const n = jpOpen({ jp: { tile: 2, answer: true, replay: 4 } }, 7)
+    expect(n.jp).toEqual({ tile: 7, answer: false, replay: 5 })
+  })
+
+  it('открытие не затирает соседние механики в том же поле', () => {
+    const n = jpOpen({ played: ['0-0'], race: { stage: 'done' } }, 1)
+    expect(n.played).toEqual(['0-0'])
+    expect(n.race).toEqual({ stage: 'done' })
+  })
+
+  it('закрытие гасит и плитку, и показ ответа', () => {
+    const n = jpClose({ jp: { tile: 3, answer: true, replay: 2 } })
+    expect(jpOpenTile(n)).toBeNull()
+    expect(n.jp?.answer).toBe(false)
+  })
+
+  it('«показать ответ» не трогает номер плитки', () => {
+    const n = jpShowAnswer({ jp: { tile: 3, answer: false, replay: 1 } })
+    expect(n.jp).toEqual({ tile: 3, answer: true, replay: 1 })
+  })
+
+  it('«переслушать» каждый раз меняет число — иначе повтор не сработает', () => {
+    const a = jpReplay({ jp: { tile: 1, replay: 0 } })
+    const b = jpReplay(a)
+    expect(a.jp?.replay).toBe(1)
+    expect(b.jp?.replay).toBe(2)
+    expect(b.jp?.tile).toBe(1)
   })
 })
