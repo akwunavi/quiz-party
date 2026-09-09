@@ -1,4 +1,5 @@
 import { getRoomId } from '../lib/room'
+import { copyText } from '../lib/clipboard'
 import { Hint, useHint } from '../components/Hint'
 import { RoomPicker } from './RoomPicker'
 import { VERSION } from '../version'
@@ -60,6 +61,7 @@ export function AdminPage() {
   const teams = useTeams(gameState?.game_id ?? null)
   const answers = useAnswers(gameState?.game_id ?? null, gameState?.round_number)
   const [linkCopied, setLinkCopied] = useState<string | null>(null)
+  const linkHint = useHint()
 
   // Пакет перечитывается не только при СМЕНЕ пакета, но и при смене раунда
   // (8.86). Раньше зависимость была одна — pack_id: вкладка, открытая с
@@ -90,16 +92,21 @@ export function AdminPage() {
           <button className={`adm-link${linkCopied ? ' ok' : ''}`} onClick={() => {
             const url = `${location.origin}${location.pathname}#/player?room=${getRoomId() ?? ''}`
             // Тихое копирование раньше не давало отклика: нажал — и не видно,
-            // сработало ли. При недоступном clipboard (некоторые webview,
-            // http без TLS) показываем саму ссылку текстом — скопировать
-            // руками всё равно можно, а молчать нельзя.
-            navigator.clipboard?.writeText(url).then(() => {
-              setLinkCopied('✓ СКОПИРОВАНО')
-              setTimeout(() => setLinkCopied(null), 2000)
-            }, () => setLinkCopied(url))
+            // сработало ли. При недоступном clipboard и недоступном фолбэке
+            // (некоторые webview, http без TLS) показываем саму ссылку через
+            // подсказку — скопировать руками всё равно можно, а молчать нельзя.
+            void copyText(url).then(ok => {
+              if (ok) {
+                setLinkCopied('✓ СКОПИРОВАНО')
+                setTimeout(() => setLinkCopied(null), 2000)
+              } else {
+                linkHint.show(`Не удалось скопировать автоматически. Ссылка: ${url}`)
+              }
+            })
           }}>{linkCopied ?? 'ССЫЛКА ИГРОКАМ'}</button>
         </div>
       </div>
+      <Hint text={linkHint.text} />
 
       <div className="adm-status">
         {pack ? `${pack.name} · Р${displayRoundNumber(pack, gameState.round_number)}` : 'пакет не выбран'} · {phase}

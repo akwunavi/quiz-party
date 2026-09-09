@@ -4,6 +4,7 @@ import { MediaSlot } from './QuestionForm'
 import { mediaUrl } from '../../lib/media'
 import { setPackSettings } from '../../lib/editorApi'
 import { packStats } from '../../lib/duration'
+import { uuid } from '../../lib/uuid'
 import type { InfoSlide, Pack } from '../../types/quiz'
 import type { LoadedPack } from '../../lib/packLoader'
 
@@ -100,7 +101,7 @@ export function InfoSlidesModal({ pack, loaded, onClose, reload }: {
             ))}
             <button className="ghost" onClick={() => {
               const next = [...slides, {
-                id: crypto.randomUUID(), title: '', body: '', images: [], layout: 'left' as const,
+                id: uuid(), title: '', body: '', images: [], layout: 'left' as const,
               }]
               setSel(slides.length)
               void save(next)

@@ -1,9 +1,10 @@
 // ═══ Действия ведущего/игры (перенос модели старого проекта) ═══
 import { getRoomId } from '../lib/room'
 import { supabase } from './supabase'
+import { uuid } from './uuid'
 
 export async function selectPackAndStart(packId: string) {
-  const game_id = crypto.randomUUID()
+  const game_id = uuid()
   const { error } = await supabase.from('game_sessions').update({
     game_id, pack_id: packId, phase: 'lobby',
     round_number: 0, question_index: 0,
@@ -194,7 +195,7 @@ export async function heartbeat(teamId: string) {
 export async function resetGame() {
   await supabase.from('packs').update({ status: 'ready' }).eq('status', 'active')
   const { error } = await supabase.from('game_sessions').update({
-    game_id: crypto.randomUUID(), pack_id: null, phase: 'lobby',
+    game_id: uuid(), pack_id: null, phase: 'lobby',
     round_number: 0, question_index: 0,
     timer_started_at: null, reveal: false, completed_rounds: [],
     // разбивка команд показывается ОДИН раз: на следующей игре она не нужна
