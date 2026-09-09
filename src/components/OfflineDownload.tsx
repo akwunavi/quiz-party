@@ -37,29 +37,6 @@ export function OfflineDownloadButton({ offline, className, label = 'Скача�
   )
 }
 
-/** Текстовый индикатор готовности (без кнопки) — для лобби, вне
- *  `.host-actions`, обычным потоком разметки. */
-export function OfflineDownloadStatus({ offline }: { offline: ReturnType<typeof usePackOffline> }) {
-  const { status, progress } = offline
-  if (!status && !progress) return null
-  if (status && status.total === 0) return null
-  const missing = progress
-    ? progress.total - progress.done + progress.failed.length
-    : status
-      ? status.total - status.have
-      : 0
-  const ready = !progress?.running && missing === 0
-  return (
-    <div className="offline-dl-status mono-tag" style={{ opacity: .75 }}>
-      {progress
-        ? `ОФЛАЙН: ${progress.done} / ${progress.total} · ${mb(progress.bytes)} скачано`
-        : ready
-          ? 'ПАКЕТ СКАЧАН ЦЕЛИКОМ ДЛЯ ОФЛАЙНА'
-          : `ОФЛАЙН: не хватает ${missing} из ${status?.total ?? 0} файлов`}
-    </div>
-  )
-}
-
 /** Развёрнутая панель для «Служебного» в админке: кнопка + прогресс +
  *  список того, что не скачалось (ведущему нужно понимать, что чинить в
  *  редакторе — молчать нельзя). */

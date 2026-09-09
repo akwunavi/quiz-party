@@ -56,8 +56,6 @@ import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
-import { usePackOffline } from '../hooks/usePackOffline'
-import { OfflineDownloadButton, OfflineDownloadStatus } from '../components/OfflineDownload'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -173,14 +171,12 @@ function HostInner({ gameState, pack }: {
   usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
 
   // blob-URL текущего+следующего раунда из офлайн-кеша (шаг 5 плана,
-  // Part A) — если пакет скачан кнопкой ниже, mediaUrl() внутри всей игры
-  // отдаёт локальный blob вместо сетевого адреса, без единого запроса.
+  // Part A) — если пакет скачан заранее из админки, mediaUrl() внутри
+  // всей игры отдаёт локальный blob вместо сетевого адреса, без единого
+  // запроса. Саму кнопку запуска скачивания на проекторе не показываем —
+  // это подготовка перед игрой, а не то, что должен видеть зал; кнопка и
+  // прогресс живут только в админке (ServiceDrawer → OfflineDownloadPanel).
   useRoundMediaPriming(pack, gameState?.round_number ?? 0)
-
-  // Офлайн-предзагрузка пакета целиком (шаг 5 плана, Part A). Один хук на
-  // экран — кнопка в .host-actions лобби и индикатор готовности должны
-  // показывать ОДНО состояние, а не гонку двух независимых закачек.
-  const offline = usePackOffline(pack)
 
   if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
 
@@ -278,14 +274,10 @@ function HostInner({ gameState, pack }: {
             {!paperMode && groupsShown && (
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
-            {/* Индикатор готовности — обычным потоком, не .host-actions:
-                это не кнопка ведущего, а статус, который читает и зал. */}
-            <OfflineDownloadStatus offline={offline} />
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
               }}>⟲ Сменить пакет</button>
-              <OfflineDownloadButton offline={offline} className="ghost dark" label="пакет для офлайна" />
               <button onClick={() => void (pack?.settings?.show_intro
                 ? startIntro()
                 : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>

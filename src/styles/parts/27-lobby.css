@@ -127,15 +127,3 @@
   .lobby-qr-lit::after { animation: none; opacity: .9; }
 }
 
-/* ═══ 8.94: индикатор офлайн-готовности пакета в лобби ═══
-   ПОЙМАНО РЕНДЕРОМ: обычным потоком (как список команд) он на низких
-   панелях (1366×768, гость-ноутбук) залезал под .host-actions — на
-   flex-column с justify-content:center высоты не хватало, и статус
-   пересекался с кнопками. Fixed-угол, как QR/pack-badge/link-badge: не
-   зависит от того, сколько контента над ним. Верх-центр — единственное
-   место без соседей (топ-лево/топ-право заняты link-badge/.fx-toggle,
-   низ-лево — QR/pack-badge, низ-право — .host-actions). */
-.offline-dl-status { position: fixed; top: clamp(6px, 1vh, 16px); left: 50%;
-  transform: translateX(-50%); z-index: 30;
-  font-size: clamp(9px, .75vw, 14px); letter-spacing: .16em;
-  white-space: nowrap; pointer-events: none; }
