@@ -8,6 +8,15 @@
 // fetch() из того же кода часто проходит. Поэтому: пробуем как есть, а при
 // отказе скачиваем файл через fetch и играем из памяти (blob). Для игры
 // это незаметно, а звук появляется там, где раньше была тишина.
+//
+// Офлайн-предзагрузка (шаг 5, Part A): та же логика запасного пути теперь
+// СНАЧАЛА смотрит в IndexedDB (`packCache`) — если трек уже скачан кнопкой
+// «Скачать пакет для офлайна», второй запасной путь вообще не идёт в сеть.
+// Разбор ответа сервера (файла нет / сеть заблокировала) не дублируем —
+// он один, в `media.ts:fetchMediaBlob`.
+
+import { readMedia } from './packCache'
+import { fetchMediaBlob } from './media'
 
 const cache = new Map<string, string>()
 
@@ -37,21 +46,39 @@ export function stopAllAudio() {
   })
 }
 
-/** Скачать файл и вернуть локальную ссылку на него. */
+/** Полный адрес медиа-файла → его относительный путь в бакете (обратно к
+ *  `mediaUrl`), чтобы свериться с офлайн-кешем. `null` для внешних ссылок
+ *  (`public/` репозитория, чужой CDN) — их IndexedDB не хранит по такому
+ *  ключу, ничего страшного, просто пропускаем этот шаг. */
+function pathFromUrl(url: string): string | null {
+  const base = import.meta.env.VITE_SUPABASE_URL as string | undefined
+  const prefix = base ? `${base}/storage/v1/object/public/quiz-media/` : null
+  if (!prefix || !url.startsWith(prefix)) return null
+  return url.slice(prefix.length).split('/').map(decodeURIComponent).join('/')
+}
+
+/** Скачать файл и вернуть локальную ссылку на него.
+ *  Сначала — офлайн-кеш (IndexedDB, `packCache`): если трек уже скачан
+ *  кнопкой «Скачать пакет для офлайна», сеть вообще не нужна. Дальше —
+ *  обычная сеть, разбор ответа сервера общий с `packPreload.ts`
+ *  (`media.ts:fetchMediaBlob`), чтобы не дублировать отличение «файла нет»
+ *  от «сеть заблокировала». */
 async function toBlobUrl(url: string): Promise<string> {
   const hit = cache.get(url)
   if (hit) return hit
-  const res = await fetch(url, { mode: 'cors', credentials: 'omit' })
-  if (!res.ok) {
-    // Supabase на отсутствующий объект отвечает коротким JSON — отличаем
-    // «файла нет» от «сеть заблокировала», это разные починки
-    const body = await res.text().catch(() => '')
-    if (/not_found|Object not found/i.test(body) || res.status === 404 || res.status === 400) {
-      throw new Error('ФАЙЛА НЕТ В ХРАНИЛИЩЕ')
-    }
-    throw new Error(`сервер ответил ${res.status}`)
+  const path = pathFromUrl(url)
+  if (path) {
+    try {
+      const cached = await readMedia(path)
+      if (cached) {
+        const blobUrl = URL.createObjectURL(cached)
+        cache.set(url, blobUrl)
+        return blobUrl
+      }
+    } catch { /* IndexedDB недоступен — идём в сеть, как раньше */ }
   }
-  const blobUrl = URL.createObjectURL(await res.blob())
+  const blob = await fetchMediaBlob(path ?? url)
+  const blobUrl = URL.createObjectURL(blob)
   cache.set(url, blobUrl)
   return blobUrl
 }

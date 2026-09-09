@@ -49,6 +49,8 @@ import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../l
 import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
 import { supabase } from '../lib/supabase'
 import { listPacks } from '../lib/packLoader'
+import { usePackOffline } from '../hooks/usePackOffline'
+import { OfflineDownloadPanel } from '../components/OfflineDownload'
 import type {
   Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, Team,
 } from '../types/quiz'
@@ -78,6 +80,11 @@ export function AdminPage() {
     if (gameState?.pack_id) void loadPack(gameState.pack_id, true).then(setPack).catch(() => {})
     else setPack(null)
   }, [gameState?.pack_id, gameState?.round_number])
+
+  // Офлайн-предзагрузка пакета (шаг 5 плана, Part A) — как и usePreloadNext
+  // на проекторе, хук стоит ДО ранних return: иначе число хуков между
+  // рендерами меняется и React #310.
+  const offline = usePackOffline(pack)
 
   if (!gsLoading && !roomId) return <RoomPicker route="/admin" />
   if (!gameState) return <div className="cyber adm-center">// ЗАГРУЗКА…</div>
@@ -137,7 +144,7 @@ export function AdminPage() {
 
       {gameState.pack_id && phase !== 'lobby' && phase !== 'finale'
         && phase !== 'counting' && pack && round && (
-        <RoundView pack={pack} round={round} gameState={gameState} teams={teams} answers={answers} />
+        <RoundView pack={pack} round={round} gameState={gameState} teams={teams} answers={answers} offline={offline} />
       )}
     </div>
   )
@@ -267,11 +274,12 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
 }
 
 // ── Экран раунда ──
-function RoundView({ pack, round, gameState, teams, answers }: {
+function RoundView({ pack, round, gameState, teams, answers, offline }: {
   pack: LoadedPack
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
   teams: Team[]; answers: Answer[]
+  offline: ReturnType<typeof usePackOffline>
 }) {
   const phase = gameState.phase
   const step = gameState.question_index
@@ -581,7 +589,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
 
         <DevSeedPanel pack={pack} gameState={gameState} />
 
-        <ServiceDrawer pack={pack} round={round} gameState={gameState} />
+        <ServiceDrawer pack={pack} round={round} gameState={gameState} offline={offline} />
       </aside>
     </div>
   )
@@ -591,10 +599,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
  *  сброс плиток мелодии, смена пакета, новая игра — раньше разбросаны по
  *  подвалу россыпью ссылок, теперь под одним шевроном. Ничего из этого не
  *  нужно ведущему каждый вопрос, поэтому сворачиваем по умолчанию. */
-function ServiceDrawer({ pack, round, gameState }: {
+function ServiceDrawer({ pack, round, gameState, offline }: {
   pack: LoadedPack
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  offline: ReturnType<typeof usePackOffline>
 }) {
   const [open, setOpen] = useState(false)
   return (
@@ -606,6 +615,7 @@ function ServiceDrawer({ pack, round, gameState }: {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
           <RoundPicker pack={pack} current={gameState.round_number} />
           <TeamRandomizer />
+          <OfflineDownloadPanel pack={pack} offline={offline} />
           <InfoSlidesButtons pack={pack} gameState={gameState} />
           {round.mechanic === 'melody' && (
             <button className="adm-link" onClick={async () => {

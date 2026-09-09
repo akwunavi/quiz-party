@@ -17,7 +17,8 @@ import {
   jeopardyOpened, openJeopardyTile, closeJeopardyTile,
 } from '../lib/jeopardyActions'
 import { saveMelody } from '../lib/melodyActions'
-import { mediaUrl, lenClass } from '../lib/media'
+import { mediaUrl, lenClass, primeMedia, releaseMedia } from '../lib/media'
+import { collectUsedPaths } from '../lib/usedPaths'
 import { packStats } from '../lib/duration'
 import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
@@ -55,6 +56,8 @@ import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
+import { usePackOffline } from '../hooks/usePackOffline'
+import { OfflineDownloadButton, OfflineDownloadStatus } from '../components/OfflineDownload'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -169,6 +172,16 @@ function HostInner({ gameState, pack }: {
   // return: вызов внутри условия однажды уже дал падение React #310.
   usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
 
+  // blob-URL текущего+следующего раунда из офлайн-кеша (шаг 5 плана,
+  // Part A) — если пакет скачан кнопкой ниже, mediaUrl() внутри всей игры
+  // отдаёт локальный blob вместо сетевого адреса, без единого запроса.
+  useRoundMediaPriming(pack, gameState?.round_number ?? 0)
+
+  // Офлайн-предзагрузка пакета целиком (шаг 5 плана, Part A). Один хук на
+  // экран — кнопка в .host-actions лобби и индикатор готовности должны
+  // показывать ОДНО состояние, а не гонку двух независимых закачек.
+  const offline = usePackOffline(pack)
+
   if (!gameState) return <div className="host-screen grid-bg">Загрузка…</div>
 
   // ── Лобби / выбор пакета ──
@@ -265,10 +278,14 @@ function HostInner({ gameState, pack }: {
             {!paperMode && groupsShown && (
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
+            {/* Индикатор готовности — обычным потоком, не .host-actions:
+                это не кнопка ведущего, а статус, который читает и зал. */}
+            <OfflineDownloadStatus offline={offline} />
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
               }}>⟲ Сменить пакет</button>
+              <OfflineDownloadButton offline={offline} className="ghost dark" label="пакет для офлайна" />
               <button onClick={() => void (pack?.settings?.show_intro
                 ? startIntro()
                 : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
@@ -1267,6 +1284,32 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
     }
     return () => { for (const n of nodes) { try { (n as HTMLMediaElement).src = '' } catch { /* ok */ } } }
   }, [round, index])
+}
+
+/** Прогрев blob-URL офлайн-кеша для ТЕКУЩЕГО и СЛЕДУЮЩЕГО раунда (шаг 5
+ *  плана офлайн-устойчивости, Part A).
+ *
+ *  НЕ держим blob-URL на весь пакет одновременно — сотни МБ в памяти
+ *  проектора на весь вечер. Прогреваем на границе раунда, отпускаем при
+ *  выходе из него. `collectUsedPaths` уже умеет обходить произвольную
+ *  структуру settings/questions — переиспользуем её на «пакете» из одного
+ *  раунда, вместо второй копии той же логики.
+ *
+ *  ЛОВУШКА (см. media.ts): `URL.revokeObjectURL` во время игры трека рвёт
+ *  звук. Отпускаем только в cleanup эффекта — то есть строго при смене
+ *  раунда, не раньше. Если ничего не скачано (`primeMedia` не находит блоб
+ *  в IndexedDB), `mediaUrl` просто продолжает отдавать сетевой адрес — как
+ *  было всегда, без этого шага. */
+function useRoundMediaPriming(pack: LoadedPack | null, roundNumber: number) {
+  useEffect(() => {
+    if (!pack) return
+    const rounds = [pack.rounds[roundNumber], pack.rounds[roundNumber + 1]]
+      .filter((r): r is LoadedPack['rounds'][number] => !!r)
+    if (rounds.length === 0) return
+    const paths = [...collectUsedPaths({ id: pack.id, rounds })]
+    void primeMedia(paths)
+    return () => releaseMedia(paths)
+  }, [pack, roundNumber])
 }
 
 /** Слайд-брифинг: правила, туториал, что угодно между раундами.

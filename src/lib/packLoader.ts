@@ -1,8 +1,17 @@
 // ═══ Загрузчик пакетов: Supabase → игровой конфиг ═══
-// Тянет пакет один раз при старте, кеширует в память и localStorage
-// (страховка от мигания сети во время игры).
+// Тянет пакет один раз при старте, кеширует в память и IndexedDB (страховка
+// от мигания сети во время игры и офлайн-старт — шаг 5 плана
+// офлайн-устойчивости, Part A).
+//
+// Порядок чтения: память (рантайм-кеш) → сеть (с учётом `force`) →
+// IndexedDB (`packCache`, кладётся туда кнопкой «Скачать пакет для
+// офлайна» и при каждой успешной загрузке из сети) → localStorage —
+// ТОЛЬКО как legacy-фолбэк на ЧТЕНИЕ для пакетов, сохранённых версией до
+// 8.93 (там писали в localStorage; лимит ~5-10 МБ на источник тихо резал
+// большие пакеты, поэтому НОВЫХ записей в localStorage больше не делаем).
 
 import { supabase } from './supabase'
+import { savePack, readPack } from './packCache'
 import type { Pack, RoundBase, Question } from '../types/quiz'
 
 export interface LoadedRound extends RoundBase {
@@ -43,13 +52,23 @@ export async function loadPack(packId: string, force = false, includeHidden = fa
       })),
     }
     memCache.set(cacheKey, loaded)
-    if (!includeHidden) { try { localStorage.setItem(LS_KEY(packId), JSON.stringify(loaded)) } catch { /* full */ } }
+    // Пишем ТОЛЬКО в IndexedDB — она без лимита в несколько МБ, в отличие
+    // от localStorage (см. шапку файла). includeHidden-снимок (превью
+    // редактора со скрытыми вопросами) в офлайн-кеш не кладём: офлайн нужен
+    // ведущему в игре, а там includeHidden всегда false.
+    if (!includeHidden) { try { await savePack(packId, loaded) } catch { /* IndexedDB недоступен */ } }
     return loaded
   } catch (err) {
-    // сеть мигнула — пробуем localStorage-копию
-    const cached = localStorage.getItem(LS_KEY(packId))
-    if (cached) {
-      const loaded = JSON.parse(cached) as LoadedPack
+    // сеть мигнула — пробуем IndexedDB, потом legacy localStorage
+    if (!includeHidden) {
+      try {
+        const cached = await readPack<LoadedPack>(packId)
+        if (cached) { memCache.set(cacheKey, cached); return cached }
+      } catch { /* IndexedDB недоступен — пробуем localStorage ниже */ }
+    }
+    const cachedLs = localStorage.getItem(LS_KEY(packId))
+    if (cachedLs) {
+      const loaded = JSON.parse(cachedLs) as LoadedPack
       memCache.set(cacheKey, loaded)
       return loaded
     }
