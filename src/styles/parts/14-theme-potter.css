@@ -32,10 +32,10 @@
    ловушка: 8.53 добавила .info-note-corner (fixed, левый нижний угол
    слайда-брифинга), не попавший сюда, слетал на position:relative и
    уезжал в поток документа вместо угла экрана. */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner):not(.link-badge),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
-.host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner { z-index: 30; }
+.host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner, .link-badge { z-index: 30; }
 /* доска «Своей игры»: лёгкий 3D-наклон плиток при наведении (8.48).
    Ни у неё, ни у .jp-tile нет fixed-потомков — модалка плитки уходит
    порталом в document.body, перспектива на её позиционирование не влияет. */
@@ -47,6 +47,16 @@
    них не ставим — она смотрелась заплаткой; вместо этого свечи опущены
    ниже строки (см. ThemeLayer: крайние свечи и так уже сдвинуты). */
 .theme-potter .host-topbar { top: 8px; }
+/* .link-badge-corner (01-base.css) обычно умещается НАД .host-topbar —
+   здесь topbar поднят до top: 8px, и обычная позиция бейджа (top: 1px)
+   уже задевает его по обеим осям (замерено рендером: topbar снизу до
+   46px на 3840). Опускаем бейдж НИЖЕ topbar с запасом — НО только когда
+   topbar реально есть на экране (:has, тот же приём, что у
+   `.host-screen:has(> .answers-layout)` в 26-admin.css): на заставке
+   раунда (round_intro) topbar нет вовсе, зато там гигантский
+   .round-badge с top: 22px — двинь бейдж вниз без этого условия, и он
+   вместо topbar словит round-badge. */
+.theme-potter .host-screen:has(> .host-topbar) ~ .link-badge-corner { top: 50px; }
 .pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
   filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
   animation: candleFloat 3.6s ease-in-out infinite; }

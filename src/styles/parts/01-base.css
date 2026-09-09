@@ -114,6 +114,41 @@ button.ghost.dark { background: rgba(0,0,0,.45); color: var(--muted);
 .host-topbar { position: fixed; top: 20px; left: 44px; right: 44px; display: flex;
   justify-content: space-between; align-items: baseline; }
 
+/* ── Индикатор связи для действий ведущего (components/LinkBadge.tsx) ──
+   Базовый класс — визуал, без позиции: на AdminPage бейдж рендерится
+   инлайн в шапке (рядом с номером версии), а не углом поверх кнопок
+   узкого мобильного экрана. .link-badge-corner — fixed-угол проектора,
+   левый верх (зеркально .fx-toggle справа), очень компактный (height ~16px
+   в обычном состоянии), поэтому остаётся строго НАД .round-badge (не
+   раньше top: 22px, 23-answers.css) — с ним пересечения по факту нет ни
+   разу: экран заставки раунда с этим номером не показывает .host-topbar
+   одновременно (см. HostScreen.tsx: round_intro-ветка без topbar), так
+   что достаточно разойтись с topbar. .theme-potter — отдельный случай:
+   там .host-topbar поднят (top: 8px, 14-theme-potter.css) и НАШ бейдж уже
+   пересекается с ним по обеим осям при обычном top:1 — правка для этой
+   темы в 14-theme-potter.css, см. её комментарий. */
+.link-badge {
+  display: inline-block;
+  padding: 2px 7px; border-radius: 4px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; line-height: 1.15;
+  color: var(--dim); background: transparent; border: 1px solid transparent;
+  opacity: .5;
+  transition: opacity .2s, color .2s, background .2s, border-color .2s;
+}
+.link-badge.is-busy { opacity: .85; }
+.link-badge.is-error {
+  opacity: 1; color: var(--danger); border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  letter-spacing: .03em;
+}
+.link-badge-corner {
+  position: fixed; top: 1px; left: 2px; z-index: 20;
+  opacity: .4; pointer-events: none;
+}
+.link-badge-corner.is-busy { opacity: .75; }
+.link-badge-corner.is-error { opacity: 1; }
+
 /* правила: каскадное появление */
 .rule-item { display: flex; gap: 14px; align-items: baseline; text-align: left;
   font-family: 'Rajdhani', sans-serif; font-weight: 600;

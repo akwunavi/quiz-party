@@ -1,6 +1,7 @@
 import { getRoomId } from '../lib/room'
 import { copyText } from '../lib/clipboard'
 import { Hint, useHint } from '../components/Hint'
+import { LinkBadge } from '../components/LinkBadge'
 import { RoomPicker } from './RoomPicker'
 import { VERSION } from '../version'
 import { useEffect, useRef, useState } from 'react'
@@ -16,6 +17,7 @@ import {
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
+import { runAction } from '../lib/actionStatus'
 import { loadRatings, summarize, type RatingRow } from '../lib/ratings'
 import { useBlitz, saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import {
@@ -86,7 +88,8 @@ export function AdminPage() {
   return (
     <div className="cyber adm-root">
       <div className="adm-header">
-        <div className="adm-brand">ВЕДУЩИЙ <span style={{ opacity: .45, fontSize: 11 }}>v{VERSION}</span></div>
+        <div className="adm-brand">ВЕДУЩИЙ <span style={{ opacity: .45, fontSize: 11 }}>v{VERSION}</span>{' '}
+          <LinkBadge /></div>
         <div style={{ display: 'flex', gap: 8 }}>
           <a className="adm-link" href="./" target="_blank" rel="noreferrer">ПРОЕКТОР ↗</a>
           <button className={`adm-link${linkCopied ? ' ok' : ''}`} onClick={() => {
@@ -160,7 +163,7 @@ function PackPicker() {
         if (!sel) return hint.show(packs.length === 0
           ? 'Пакетов пока нет. Их создают в редакторе — вкладка «Редактор», кнопка «+ Новый пакет».'
           : 'Сначала выбери пакет в списке выше — из него соберётся игра.', selectRef.current)
-        void selectPackAndStart(sel)
+        void runAction('запуск игры с выбранным пакетом', () => selectPackAndStart(sel))
       }}>НАЧАТЬ ИГРУ</button>
       <Hint text={hint.text} />
     </div>
@@ -215,7 +218,7 @@ function TeamRandomizer() {
             if (!confirm('ПОЛНАЯ ОЧИСТКА.\n\nБудут удалены все команды и ответы '
               + 'этой и прошлых игр. Восстановить нельзя. Продолжить?')) return
             if (!confirm('Точно удалить? Второе подтверждение.')) return
-            void resetGameHard()
+            void runAction('очистка команд и ответов', () => resetGameHard())
               .then(() => alert('Готово: команды и ответы удалены.'))
               .catch(e => alert(e instanceof Error ? e.message : 'не удалось очистить'))
           }}>🗑 ОЧИСТИТЬ КОМАНДЫ И ОТВЕТЫ</button>
@@ -253,8 +256,8 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
           pack.settings?.play_mode === 'paper'
             && (r.mechanic === 'melody' || r.mechanic === 'jeopardy') ? null :
           <button key={r.id} className={`adm-round${current === i ? ' active' : ''}`}
-            onClick={() => void gotoRound(i,
-              slideForRound(pack.settings?.info_slides, i) ?? undefined)}>
+            onClick={() => void runAction('переход к раунду', () => gotoRound(i,
+              slideForRound(pack.settings?.info_slides, i) ?? undefined))}>
             Р{displayRoundNumber(pack, i)} {r.title_lines.join(' ')}
           </button>
         ))}
@@ -291,34 +294,43 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   // логики, которая игнорировала перерыв и расходилась с проектором
   const runAfterRound = () => {
     const st = afterRoundStep(pack, gameState.round_number, gameState.phase)
-    if (st.kind === 'scoreboard') return void showScoreboard()
-    if (st.kind === 'break') return void startBreak()
+    if (st.kind === 'scoreboard') return void runAction('показ табло', () => showScoreboard())
+    if (st.kind === 'break') return void runAction('начало перерыва', () => startBreak())
     if (st.kind === 'finale') {
       const sl = slideBeforeFinale(pack.settings?.info_slides)
-      return sl == null ? void finishGame(gameState.pack_id, paperMode) : void showSlide(sl)
+      return sl == null
+        ? void runAction('переход к финалу', () => finishGame(gameState.pack_id, paperMode))
+        : void runAction('показ слайда', () => showSlide(sl))
     }
-    return void gotoRound(gameState.round_number + 1,
-      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
+    return void runAction('переход к раунду', () => gotoRound(gameState.round_number + 1,
+      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined))
   }
   const endRound = runAfterRound
 
   const grade = async (a: Answer, correct: boolean) => {
-    await supabase.from('answers').update({ is_correct: correct }).eq('id', a.id)
+    await runAction('оценка ответа', async () => {
+      const { error } = await supabase.from('answers').update({ is_correct: correct }).eq('id', a.id)
+      if (error) throw error
+    })
   }
 
   const advance = () => {
-    if (phase === 'round_intro') { void gotoQuestion(0); return }
+    if (phase === 'round_intro') { void runAction('следующий вопрос', () => gotoQuestion(0)); return }
     if (phase === 'question') {
-      if (step + 1 < round.questions.length) { void gotoQuestion(step + 1); return }
+      if (step + 1 < round.questions.length) {
+        void runAction('следующий вопрос', () => gotoQuestion(step + 1)); return
+      }
       // Повтор вопросов слайдами — если включён в редакторе. Идёт ПЕРЕД
       // временем на ответы: зал ещё раз видит все вопросы, потом отвечает.
-      if (recapOn && round.answers_reveal === 'after_round') { void setPhase('recap'); return }
-      if (round.answers_reveal === 'after_round') void startAnswerTime()
-      else void gotoAnswers(0)
+      if (recapOn && round.answers_reveal === 'after_round') {
+        void runAction('повтор вопросов', () => setPhase('recap')); return
+      }
+      if (round.answers_reveal === 'after_round') void runAction('время на ответы', () => startAnswerTime())
+      else void runAction('переход к разбору ответов', () => gotoAnswers(0))
       return
     }
-    if (phase === 'recap') { void startAnswerTime(); return }
-    if (phase === 'answer_time') { void gotoAnswers(0); return }
+    if (phase === 'recap') { void runAction('время на ответы', () => startAnswerTime()); return }
+    if (phase === 'answer_time') { void runAction('переход к разбору ответов', () => gotoAnswers(0)); return }
     // с табло и из перерыва идём по общему маршруту: с табло может быть
     // ещё перерыв, а вот из перерыва — только вперёд
     if (phase === 'scoreboard' || phase === 'break') runAfterRound()
@@ -331,8 +343,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     // существующая кнопка «Вернуться к раунду» — round_intro.
     if (phase === 'info') {
       const sl = pack.settings?.info_slides?.[step]
-      if (sl?.show_at === 'finale') return void finishGame(gameState.pack_id, paperMode)
-      return void setPhase('round_intro')
+      if (sl?.show_at === 'finale') {
+        return void runAction('переход к финалу', () => finishGame(gameState.pack_id, paperMode))
+      }
+      return void runAction('возврат к раунду', () => setPhase('round_intro'))
     }
   }
   /** Куда возвращает «Назад» с табло/перерыва: у обычного раунда — на разбор
@@ -340,16 +354,18 @@ function RoundView({ pack, round, gameState, teams, answers }: {
   const backToRound = () => {
     // «120 секунд» сюда не относится: у него разбор по вопросам обычный,
     // своя раскладка только у самой фазы вопроса
-    if (isInteractive) void gotoQuestion(0)
-    else void gotoAnswers(round.questions.length - 1, true)
+    if (isInteractive) void runAction('назад к раунду', () => gotoQuestion(0))
+    else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true))
   }
   const goBack = () => {
-    if (phase === 'question' && step > 0) void gotoQuestion(step - 1)
-    else if (phase === 'question') void setPhase('round_intro')
-    else if (phase === 'recap') void gotoQuestion(round.questions.length - 1)
+    if (phase === 'question' && step > 0) void runAction('предыдущий вопрос', () => gotoQuestion(step - 1))
+    else if (phase === 'question') void runAction('назад к раунду', () => setPhase('round_intro'))
+    else if (phase === 'recap') {
+      void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1))
+    }
     else if (phase === 'answer_time') {
-      if (recapOn) void setPhase('recap')
-      else void gotoQuestion(round.questions.length - 1)
+      if (recapOn) void runAction('назад к повтору вопросов', () => setPhase('recap'))
+      else void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1))
     }
     // «Табло»/«Перерыв» раньше не входили в goBack вообще — кнопка «Назад»
     // была на экране, но клик не делал ничего. Возврат тем же путём, каким
@@ -361,7 +377,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
     // существует: gotoAnswers увёл бы на пустой экран.
     else if (phase === 'break') {
       const s = (round.settings as { show_scoreboard_after?: boolean })
-      if (s.show_scoreboard_after) void setPhase('scoreboard')
+      if (s.show_scoreboard_after) void runAction('назад к табло', () => setPhase('scoreboard'))
       else backToRound()
     }
     else if (phase === 'scoreboard') backToRound()
@@ -425,7 +441,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             «управляется с проектора» — вести раунд с телефона было нельзя. */}
         {isJeopardy && phase === 'question' && (
           <JeopardyControls round={round} gameState={gameState}
-            onBack={() => void setPhase('round_intro')} onFinish={endRound} />
+            onBack={() => void runAction('назад к раунду', () => setPhase('round_intro'))} onFinish={endRound} />
         )}
 
         {isMelody && phase === 'question' && (
@@ -434,8 +450,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
 
         {isSprint && phase === 'question' && (
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="adm-btn" onClick={() => void setPhase('round_intro')}>← НАЗАД</button>
-            <button className="adm-btn primary" onClick={() => void gotoAnswers(0)}>К ОТВЕТАМ →</button>
+            <button className="adm-btn" onClick={() => void runAction('назад к раунду', () => setPhase('round_intro'))}>← НАЗАД</button>
+            <button className="adm-btn primary" onClick={() => void runAction('переход к разбору ответов', () => gotoAnswers(0))}>К ОТВЕТАМ →</button>
           </div>
         )}
         {/* Назад / Повтор вопроса / Дальше — теперь один ряд, а не два разных
@@ -447,11 +463,11 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             {(phase === 'question' || phase === 'answer_time') && (
-              <button className="adm-btn" onClick={() => void startTimer(
+              <button className="adm-btn" onClick={() => void runAction('повтор вопроса', () => startTimer(
                 phase === 'question' ? {
                   gameId: gameState.game_id, roundNumber: gameState.round_number,
                   questionRef: `q-${round.questions[step].id}`,
-                } : undefined)}
+                } : undefined))}
                 title="Заново запустить таймер на этом же вопросе">↻ ПОВТОР ВОПРОСА</button>
             )}
             {/* На бумаге вопрос читает ведущий вслух — «Дальше» неактивна,
@@ -475,7 +491,8 @@ function RoundView({ pack, round, gameState, teams, answers }: {
           </div>
         )}
         {isInteractive && phase === 'round_intro' && (
-          <button className="adm-btn primary" onClick={() => void gotoQuestion(0)}>НАЧАТЬ РАУНД →</button>
+          <button className="adm-btn primary"
+            onClick={() => void runAction('начало раунда', () => gotoQuestion(0))}>НАЧАТЬ РАУНД →</button>
         )}
         {/* У блица своя кнопка «дальше» — внутри BlitzControls, только когда
             раунд реально завершён (state.finished). Раньше этот блок рисовался
@@ -493,7 +510,7 @@ function RoundView({ pack, round, gameState, teams, answers }: {
             же место, куда уводит «Назад» у «120 секунд». */}
         {round.mechanic === 'race' && phase === 'question' && (
           <div className="adm-row-btns">
-            <button className="adm-btn" onClick={() => void setPhase('round_intro')}>← НАЗАД</button>
+            <button className="adm-btn" onClick={() => void runAction('назад к раунду', () => setPhase('round_intro'))}>← НАЗАД</button>
             <button className="adm-btn primary" onClick={endRound}>
               ЗАВЕРШИТЬ РАУНД {`${(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after ? '→ ТАБЛО' : '→'}`}
             </button>
@@ -520,10 +537,10 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         {paperMode && phase === 'question' && !gameState.timer_started_at
           && !(round.questions[step]?.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m)) && (
           <button className="adm-btn primary adm-start-question"
-            onClick={() => void startTimer({
+            onClick={() => void runAction('запуск таймера', () => startTimer({
               gameId: gameState.game_id, roundNumber: gameState.round_number,
               questionRef: `q-${round.questions[step].id}`,
-            })}
+            }))}
             title="Прочитал вопрос залу — пускаем время, музыку и звук вопроса">
             ▶ ПРОЧИТАЛ — ПУСКАЕМ ВРЕМЯ
           </button>
@@ -539,16 +556,16 @@ function RoundView({ pack, round, gameState, teams, answers }: {
         {!isInteractive && !isSprint && phase !== 'show_answers' && phase !== 'question'
           && phase !== 'info' && (
           <div className="adm-row-btns">
-            <button className="adm-btn" onClick={() => void showScoreboard()}>ТАБЛО</button>
+            <button className="adm-btn" onClick={() => void runAction('показ табло', () => showScoreboard())}>ТАБЛО</button>
             {/* «Подсчёт» уводит на заставку, из которой пути назад в раунд
                 нет — только вперёд, к финалу. Случайный тап посреди игры
                 раньше уносил на финальный слайд без возможности вернуться;
                 кнопка нужна ровно один раз, после последнего раунда. */}
             {paperMode && gameState.round_number + 1 >= pack.rounds.length && (
-              <button className="adm-btn" onClick={() => void startCounting()}
+              <button className="adm-btn" onClick={() => void runAction('заставка подсчёта', () => startCounting())}
                 title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>
             )}
-            <button className="adm-btn" onClick={() => void revealAnswer()}>ПОКАЗАТЬ ОТВЕТ</button>
+            <button className="adm-btn" onClick={() => void runAction('показ ответа', () => revealAnswer())}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
 
@@ -593,18 +610,25 @@ function ServiceDrawer({ pack, round, gameState }: {
           {round.mechanic === 'melody' && (
             <button className="adm-link" onClick={async () => {
               if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
-              await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
+              await runAction('сброс плиток мелодии', async () => {
+                const { error } = await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
+                if (error) throw error
+              })
             }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
           )}
           <button className="adm-link" onClick={async () => {
             if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
-            await supabase.from('game_sessions').update({
-              phase: 'lobby', round_number: 0, question_index: 0,
-              timer_started_at: null, reveal: false, melody: {},
-            }).eq('id', getRoomId())
+            await runAction('смена пакета', async () => {
+              const { error } = await supabase.from('game_sessions').update({
+                phase: 'lobby', round_number: 0, question_index: 0,
+                timer_started_at: null, reveal: false, melody: {},
+              }).eq('id', getRoomId())
+              if (error) throw error
+            })
           }}>⇄ СМЕНИТЬ ПАКЕТ</button>
           <button className="adm-link danger" onClick={() => {
-            if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.')) void resetGame()
+            if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.'))
+              void runAction('новая игра', () => resetGame())
           }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
         </div>
       )}
@@ -918,14 +942,18 @@ function PaperScores({ pack, gameState, teams }: {
     // specification». Баллы не сохранялись НИ РАЗУ, а галочка всё равно
     // загоралась зелёным — потому что ошибку никто не смотрел. В итогах
     // стояли нули, и понять причину можно было только из консоли браузера.
-    const { error } = await supabase.from('answers').upsert({
-      team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
-      round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
-      updated_at: new Date().toISOString(),
-    } as never, { onConflict: 'team_id,question_ref' } as never)
-    if (error) {
+    try {
+      await runAction('баллы за раунд (бумага)', async () => {
+        const { error } = await supabase.from('answers').upsert({
+          team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
+          round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
+          updated_at: new Date().toISOString(),
+        } as never, { onConflict: 'team_id,question_ref' } as never)
+        if (error) throw error
+      })
+    } catch (err) {
       // молчать нельзя: на бумаге это единственный источник баллов
-      return hint.show(`Балл НЕ сохранён: ${error.message}. Проверь связь и нажми ещё раз.`)
+      return hint.show(`Балл НЕ сохранён: ${(err as Error).message}. Проверь связь и нажми ещё раз.`)
     }
     hint.clear()
     setSaved(v => ({ ...v, [teamId]: true }))
@@ -1186,9 +1214,9 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
         <div className="adm-dim">СЦЕНАРИЙ</div>
         <div className="adm-two">
           <button className={`adm-btn${!bar ? ' primary' : ''}`}
-            onClick={() => void setFinaleMode('show')}>ШОУ (АВТО)</button>
+            onClick={() => void runAction('сценарий финала', () => setFinaleMode('show'))}>ШОУ (АВТО)</button>
           <button className={`adm-btn${bar ? ' primary' : ''}`}
-            onClick={() => void setFinaleMode('bar')}>НАГРАЖДЕНИЕ (БАР)</button>
+            onClick={() => void runAction('сценарий финала', () => setFinaleMode('bar'))}>НАГРАЖДЕНИЕ (БАР)</button>
         </div>
         <div className="adm-dim">
           {bar
@@ -1203,10 +1231,10 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
         </div>
         <div className="adm-two">
           <button className="adm-btn" disabled={step <= 0}
-            onClick={() => void setFinaleStep(Math.max(0, step - 1))}>← НАЗАД</button>
+            onClick={() => void runAction('шаг финала', () => setFinaleStep(Math.max(0, step - 1)))}>← НАЗАД</button>
           <button className="adm-btn primary"
             disabled={bar && step >= places.length}
-            onClick={() => void setFinaleStep(step + 1)}>
+            onClick={() => void runAction('шаг финала', () => setFinaleStep(step + 1))}>
             {/* Раньше подпись называла место, которое УЖЕ на экране (его
                 открыл предыдущий клик) — «показать 3 место» жала кнопку,
                 а на экране появлялось 2-е. Без номера эта путаница
@@ -1248,7 +1276,7 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
 
       <button className="adm-link danger" onClick={() => {
         if (confirm('Начать новую игру?\n\nКоманды и ответы сохранятся в базе. '
-          + 'Полная очистка — кнопкой в лобби.')) void resetGame()
+          + 'Полная очистка — кнопкой в лобби.')) void runAction('новая игра', () => resetGame())
       }}>⟲ НОВАЯ ИГРА</button>
     </div>
   )
@@ -1274,12 +1302,19 @@ function ScoreAdjustPanel({ pack, gameId, teams, answers }: {
     a.question_ref.startsWith('q-adjust-') && Number(a.stake ?? 0) !== 0)
 
   const write = async (tId: string, roundIdx: number, stake: number, text: string) => {
-    const { error } = await supabase.from('answers').upsert({
-      team_id: tId, game_id: gameId, question_ref: `q-adjust-${roundIdx}`,
-      round_number: roundIdx, answer_text: text, stake, is_correct: true,
-      updated_at: new Date().toISOString(),
-    } as never, { onConflict: 'team_id,question_ref' } as never)
-    return error
+    try {
+      await runAction('корректировка баллов', async () => {
+        const { error } = await supabase.from('answers').upsert({
+          team_id: tId, game_id: gameId, question_ref: `q-adjust-${roundIdx}`,
+          round_number: roundIdx, answer_text: text, stake, is_correct: true,
+          updated_at: new Date().toISOString(),
+        } as never, { onConflict: 'team_id,question_ref' } as never)
+        if (error) throw error
+      })
+      return null
+    } catch (err) {
+      return err instanceof Error ? err : new Error(String(err))
+    }
   }
 
   const save = async () => {
@@ -1442,13 +1477,16 @@ function InfoSlidesButtons({ pack, gameState }: {
         <div className="adm-slide-list">
           {slides.map((sl, i) => (
             <button key={sl.id} className="adm-btn"
-              onClick={() => { void setFinaleStep(i); void setPhase('info'); setOpen(false) }}>
+              onClick={() => {
+                void runAction('показ слайда', async () => { await setFinaleStep(i); await setPhase('info') })
+                setOpen(false)
+              }}>
               {i + 1}. {sl.title || 'без названия'}
             </button>
           ))}
           {active && (
             <button className="adm-btn primary"
-              onClick={() => { void setPhase('round_intro'); setOpen(false) }}>
+              onClick={() => { void runAction('возврат к раунду', () => setPhase('round_intro')); setOpen(false) }}>
               ← ВЕРНУТЬСЯ К РАУНДУ
             </button>
           )}
@@ -1551,7 +1589,7 @@ function RaceControls({ gameState }: {
         color: bets.length === teams.length && teams.length > 0 ? '#22c55e' : undefined,
       }}>СДЕЛАЛИ ВЫБОР: {bets.length} / {teams.length}</div>
       <button className="adm-btn primary" disabled={bets.length === 0}
-        onClick={() => void startRace(gameState)}>
+        onClick={() => void runAction('начало забега', () => startRace(gameState))}>
         🏁 НАЧАТЬ СКАЧКИ (СТАВКИ ЗАКРЫВАЮТСЯ)
       </button>
     </div>
@@ -1613,11 +1651,15 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
                   сравнивать не с чем), поэтому предустановки тут нет тоже. */}
               <span className="adm-tile-ans">{answerShown ? (a.answer_text || '—') : '• • •'}</span>
               <button className={`adm-grade ok${a.is_correct === true ? ' on' : ''}`}
-                onClick={() => void supabase.from('answers')
-                  .update({ is_correct: true }).eq('id', a.id)}>✓</button>
+                onClick={() => void runAction('оценка ответа', async () => {
+                  const { error } = await supabase.from('answers').update({ is_correct: true }).eq('id', a.id)
+                  if (error) throw error
+                })}>✓</button>
               <button className={`adm-grade no${a.is_correct === false ? ' on' : ''}`}
-                onClick={() => void supabase.from('answers')
-                  .update({ is_correct: false }).eq('id', a.id)}>✗</button>
+                onClick={() => void runAction('оценка ответа', async () => {
+                  const { error } = await supabase.from('answers').update({ is_correct: false }).eq('id', a.id)
+                  if (error) throw error
+                })}>✗</button>
             </div>
           )
         })}
@@ -1627,12 +1669,12 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
         )}
         <div className="adm-row-btns">
           <button className="adm-btn"
-            onClick={() => void saveMelody(jpReplay(gameState.melody ?? {}))}>↻ ПЕРЕСЛУШАТЬ</button>
+            onClick={() => void runAction('переслушать плитку', () => saveMelody(jpReplay(gameState.melody ?? {})))}>↻ ПЕРЕСЛУШАТЬ</button>
           <button className="adm-btn" disabled={answerShown}
-            onClick={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}>ПОКАЗАТЬ ОТВЕТ</button>
+            onClick={() => void runAction('показ ответа плитки', () => saveMelody(jpShowAnswer(gameState.melody ?? {})))}>ПОКАЗАТЬ ОТВЕТ</button>
         </div>
         <button className="adm-btn primary"
-          onClick={() => void closeJeopardyTile(gameState, at.key, opened)}>ЗАКРЫТЬ ПЛИТКУ</button>
+          onClick={() => void runAction('закрыть плитку', () => closeJeopardyTile(gameState, at.key, opened))}>ЗАКРЫТЬ ПЛИТКУ</button>
       </div>
     )
   }
@@ -1656,7 +1698,7 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
           return (
             <button key={`${ti}-${i}`} className={`adm-jp-tile${done ? ' done' : ''}`}
               disabled={done} style={{ gridColumn: ti + 1, gridRow: i + 2 }}
-              onClick={() => void openJeopardyTile(gameState, idx)}>
+              onClick={() => void runAction('открыть плитку', () => openJeopardyTile(gameState, idx))}>
               {done ? '·' : tile.value}
             </button>
           )
@@ -1707,7 +1749,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   const escape = (
     <button className="adm-btn" onClick={() => {
       if (!confirm('Закрыть трек и вернуться к доске?\n\nБаллы за него никто не получит.')) return
-      void saveMelody(melodyClose(m))
+      void runAction('закрыть трек мелодии', () => saveMelody(melodyClose(m)))
     }}>ЗАКРЫТЬ</button>
   )
 
@@ -1724,7 +1766,7 @@ function MelodyControls({ round, gameState, onFinish }: {
               того же действия путали бы */}
           <button className="adm-btn primary" onClick={() => {
             const target = free[Math.floor(Math.random() * free.length)]
-            void saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5))
+            void runAction('рулетка мелодии', () => saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5)))
           }}>🎲 {played.length === 0 ? 'СТАРТУЕМ!' : 'РУЛЕТКА'}</button>
         </>) : (<>
           <div className="adm-qtext" style={{ textAlign: 'center' }}>
@@ -1777,11 +1819,11 @@ function MelodyControls({ round, gameState, onFinish }: {
         {(m.order ?? []).length === 0 && <div className="adm-dim">ставок нет</div>}
         <div className="adm-row-btns">
           <button className="adm-btn primary" disabled={!currentId}
-            onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
+            onClick={() => void runAction('играем отрывок', () => saveMelody(melodyPlaySnippet(m, bidSec)))}>
             ИГРАЕМ {bidSec || 5} СЕК →
           </button>
           <button className="adm-btn"
-            onClick={() => void saveMelody(melodyClose(m))}>ПРОПУСТИТЬ ТРЕК</button>
+            onClick={() => void runAction('пропустить трек', () => saveMelody(melodyClose(m)))}>ПРОПУСТИТЬ ТРЕК</button>
         </div>
       </>)}
 
@@ -1806,8 +1848,8 @@ function MelodyControls({ round, gameState, onFinish }: {
         </div>
         <div className="adm-row-btns">
           <button className="adm-btn primary" disabled={!ans}
-            onClick={() => ans && void gradeMelody(m, ans, true, bidSec)}>✓ ВЕРНО</button>
-          <button className="adm-btn" onClick={() => void passMelody(m, ans)}>
+            onClick={() => ans && void runAction('оценка ответа', () => gradeMelody(m, ans, true, bidSec))}>✓ ВЕРНО</button>
+          <button className="adm-btn" onClick={() => void runAction('передать ход', () => passMelody(m, ans))}>
             {first && hasSecond ? '✗ ПЕРЕДАТЬ ХОД' : '✗ ЗАКРЫТЬ ТРЕК'}
           </button>
         </div>
@@ -1822,7 +1864,7 @@ function MelodyControls({ round, gameState, onFinish }: {
           {teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы
         </div>
         <button className="adm-btn primary"
-          onClick={() => void saveMelody(melodyToBoard(m))}>К ДОСКЕ →</button>
+          onClick={() => void runAction('к доске мелодии', () => saveMelody(melodyToBoard(m)))}>К ДОСКЕ →</button>
       </>)}
 
       {m.stage !== 'reveal' && escape}
@@ -1866,17 +1908,19 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
     setBusy(true)
     setState(next)                       // мгновенно в интерфейсе
     try {
-      await saveBlitz(gameState.game_id, gameState.round_number, next)
-      // Раунд закрылся — отправляем БАЛЛЫ за места в общий зачёт.
-      // Очки живут в blitz_state, а общий подсчёт читает только answers,
-      // поэтому итог кладём готовой строкой `q-blitz`.
-      if (next.finished && !state?.finished) {
-        // Одним upsert'ом через общую saveBlitzResults — здесь стояла
-        // построчная запись через очередь ответов, которая на параллельных
-        // вызовах теряет команды (см. HANDOFF §5 и коммент у функции).
-        await saveBlitzResults(gameState.game_id, gameState.round_number,
-          blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
-      }
+      await runAction('ход блица', async () => {
+        await saveBlitz(gameState.game_id, gameState.round_number, next)
+        // Раунд закрылся — отправляем БАЛЛЫ за места в общий зачёт.
+        // Очки живут в blitz_state, а общий подсчёт читает только answers,
+        // поэтому итог кладём готовой строкой `q-blitz`.
+        if (next.finished && !state?.finished) {
+          // Одним upsert'ом через общую saveBlitzResults — здесь стояла
+          // построчная запись через очередь ответов, которая на параллельных
+          // вызовах теряет команды (см. HANDOFF §5 и коммент у функции).
+          await saveBlitzResults(gameState.game_id, gameState.round_number,
+            blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
+        }
+      })
     } finally { setBusy(false) }
   }
 

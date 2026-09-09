@@ -28,6 +28,7 @@ import {
   startCounting, startIntro,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
+import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
 import { AfterRoundNav } from '../components/AfterRoundNav'
@@ -100,6 +101,10 @@ export function HostScreen() {
       {pack && <div className={`pack-badge${
         gameState?.phase === 'lobby' && pack.settings?.play_mode !== 'paper' ? ' pack-badge-lobby' : ''
       }`}>{pack.name}</div>}
+      {/* Действия ведущего идут в основном с админки (телефона), но если
+          последнее из них не прошло (нет сети до базы), зал не должен
+          узнавать об этом только по молчанию проектора — см. LinkBadge. */}
+      <LinkBadge corner />
     </ThemeLayer>
   )
 }
