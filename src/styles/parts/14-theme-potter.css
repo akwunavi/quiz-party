@@ -230,8 +230,15 @@
   100% { opacity: .55; letter-spacing: .4em; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-potter .q-word, .pt-frame::before, .pt-frame::after,
-  .theme-potter .choices-grid .choice-plate,
+  /* .q-word уже гасится выше (.theme-potter .host-screen .q-word, тем же
+     весом 0,3,0) — здесь его не дублируем, второй экземпляр был слабее
+     (.theme-potter .q-word — 0,2,0) и ничего не делал, только сбивал с
+     толку. .choice-plate и .answer-label::after гасим селектором ТОЧНО
+     того же веса, что у анимации — иначе она снова победит: у плиток вес
+     0,5,0 (.host-screen .choices-grid .choice-plate:not(.hidden-yet)),
+     здесь было только 0,3,0, и reduce-motion плитки не выключал. */
+  .pt-frame::before, .pt-frame::after,
+  .theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet),
   /* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
 .theme-potter .host-screen .answer-block.reveal-in .answer-label::after {
     animation: none; opacity: 1; }
