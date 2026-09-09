@@ -5,7 +5,7 @@
 // перезагрузка страницы) разыгрывает одинаковый забег.
 import { getRoomId } from '../../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { room } from '../../lib/transport'
 import { openRaceBets, startRace } from '../../lib/raceActions'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { mediaUrl } from '../../lib/media'
@@ -128,11 +128,11 @@ export function RaceBoard({ pack, round, gameState }: {
         const dog = Number(b.answer_text) - 1
         const pos = placeOf.get(dog)
         const pts = pos != null ? 5 - pos : 0
-        await supabase.from('answers').update({ is_correct: true, stake: pts }).eq('id', b.id)
+        await room.patchAnswer(b.id, { is_correct: true, stake: pts })
       }
-      await supabase.from('game_sessions').update({
+      await room.patchSession(getRoomId(), {
         melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
-      }).eq('id', getRoomId())
+      })
     })()
   }, [running, allFinished])
 

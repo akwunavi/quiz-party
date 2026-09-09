@@ -1,9 +1,9 @@
 import { jeopardyRef } from './jeopardyRef'
-import { supabase } from './supabase'
+import { room } from './transport'
 import { registerTeam } from './gameActions'
 import { computeTotals } from './totals'
 import type { LoadedPack } from './packLoader'
-import type { Answer, Question, Team, JeopardyTheme } from '../types/quiz'
+import type { Answer, Question, JeopardyTheme } from '../types/quiz'
 
 // ═══ СИД ДЛЯ РЕПЕТИЦИЙ (только с ?dev=1 в адресе) ═══
 //
@@ -56,9 +56,8 @@ export const isDemoTeam = (t: { name: string }) => DEMO_NAMES.includes(t.name)
 
 /** Создать демо-команды, которых ещё нет в этой игре. */
 export async function seedTeams(gameId: string): Promise<number> {
-  const { data: existing } = await supabase.from('teams')
-    .select('name').eq('game_id', gameId)
-  const have = new Set((existing ?? []).map(t => t.name))
+  const existing = await room.listTeams(gameId)
+  const have = new Set(existing.map(t => t.name))
   let created = 0
   for (let i = 0; i < DEMO_NAMES.length; i++) {
     if (have.has(DEMO_NAMES[i])) continue
@@ -116,9 +115,8 @@ export async function seedRoundAnswers(
   const round = pack.rounds[roundNumber]
   if (!round) return { rows: 0, teams: 0 }
 
-  const { data: allTeams } = await supabase.from('teams')
-    .select('*').eq('game_id', gameId)
-  const demo = ((allTeams ?? []) as Team[]).filter(isDemoTeam)
+  const allTeams = await room.listTeams(gameId)
+  const demo = allTeams.filter(isDemoTeam)
   if (demo.length === 0) return { rows: 0, teams: 0 }
 
   const rows: Row[] = []
@@ -169,9 +167,7 @@ export async function seedRoundAnswers(
   }
 
   for (let i = 0; i < rows.length; i += BATCH) {
-    const { error } = await supabase.from('answers')
-      .upsert(rows.slice(i, i + BATCH), { onConflict: 'team_id,question_ref' })
-    if (error) throw error
+    await room.upsertAnswers(rows.slice(i, i + BATCH))
   }
   return { rows: rows.length, teams: demo.length }
 }
@@ -264,12 +260,12 @@ function expectedForRound(
 export async function checkRoundScoring(
   pack: LoadedPack, roundNumber: number, gameId: string,
 ): Promise<CheckRow[]> {
-  const [{ data: teamsData }, { data: answersData }] = await Promise.all([
-    supabase.from('teams').select('*').eq('game_id', gameId),
-    supabase.from('answers').select('*').eq('game_id', gameId),
+  const [teamsData, answersData] = await Promise.all([
+    room.listTeams(gameId),
+    room.listAnswers(gameId),
   ])
-  const teams = ((teamsData ?? []) as Team[]).filter(isDemoTeam)
-  const answers = (answersData ?? []) as Answer[]
+  const teams = teamsData.filter(isDemoTeam)
+  const answers = answersData
   const round = pack.rounds[roundNumber]
   if (!round) return []
 
@@ -290,11 +286,11 @@ export async function checkRoundScoring(
 /** Удалить ответы и команды сида. Полный сброс игры делает это сам —
  *  кнопка нужна, когда репетируешь несколько раз подряд в одной игре. */
 export async function clearSeed(gameId: string): Promise<number> {
-  const { data: teams } = await supabase.from('teams').select('*').eq('game_id', gameId)
-  const demo = ((teams ?? []) as Team[]).filter(isDemoTeam)
+  const teams = await room.listTeams(gameId)
+  const demo = teams.filter(isDemoTeam)
   if (demo.length === 0) return 0
   const ids = demo.map(t => t.id)
-  await supabase.from('answers').delete().in('team_id', ids)
-  await supabase.from('teams').delete().in('id', ids)
+  await room.deleteAnswers({ team_id_in: ids })
+  await Promise.all(ids.map(id => room.deleteTeam(id)))
   return demo.length
 }

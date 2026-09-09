@@ -39,6 +39,7 @@ import { CrosswordView } from '../components/CrosswordView'
 import { computeTotals, computeRoundScores } from '../lib/totals'
 import { autocheck } from '../lib/autocheck'
 import { supabase } from '../lib/supabase'
+import { room } from '../lib/transport'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
@@ -1495,8 +1496,7 @@ function BlitzScreen({ pack, round, gameState }: {
       const row = answers.find(a =>
         a.team_id === active && a.question_ref === `q-${cur.questionId}`)
       if (row) {
-        void supabase.from('answers')
-          .update({ is_correct: cur.verdict === 'ok' }).eq('id', row.id).then(() => {})
+        void room.patchAnswer(row.id, { is_correct: cur.verdict === 'ok' }).catch(() => {})
       }
       void push(cur.verdict === 'ok' ? answerCorrect(resumed, now) : answerWrong(resumed, now))
     }, wait)
@@ -1932,7 +1932,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
       if (a.is_correct != null) return
       const ok = autocheck(q.answer, a.answer_text)
       if (ok === null) return
-      void supabase.from('answers').update({ is_correct: ok }).eq('id', a.id).then(() => {})
+      void room.patchAnswer(a.id, { is_correct: ok }).catch(() => {})
     })
   }, [checked, step, rows.length, rows.map(r => r.answer_text).join('|')])
 
@@ -2383,7 +2383,7 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
 
   const grade = async (id: string, correct: boolean) => {
     setLocalGrades(g => ({ ...g, [id]: correct }))
-    await supabase.from('answers').update({ is_correct: correct }).eq('id', id)
+    await room.patchAnswer(id, { is_correct: correct })
   }
 
   return createPortal(

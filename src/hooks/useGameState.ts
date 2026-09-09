@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { room } from '../lib/transport'
 import { getRoomId } from '../lib/room'
+import { createPollLoop } from '../lib/pollLoop'
 import type { GameState } from '../types/quiz'
 
 const POLL_INTERVAL = 2000 // мс — проверенный интервал; Realtime не используем (RKN)
+// Бэкофф при повторных неудачах опроса: офлайн-вкладка не должна копить
+// висящие запросы поверх друг друга каждые 2 сек (см. HANDOFF, шаг 4).
+const BACKOFF_STEPS = [5000, 10000]
 
 /** Состояние ИГРЫ ТЕКУЩЕЙ КОМНАТЫ (?room= в адресе). Без комнаты — null. */
 export function useGameState() {
@@ -20,17 +24,13 @@ export function useGameState() {
 
   useEffect(() => {
     if (!roomId) { setGameState(null); setLoading(false); return }
-    let stopped = false
-    async function load() {
-      const { data } = await supabase.from('game_sessions').select('*').eq('id', roomId).single()
-      if (!stopped) {
-        setGameState((data as GameState) ?? null)
-        setLoading(false)
-      }
-    }
-    void load()
-    const t = setInterval(load, POLL_INTERVAL)
-    return () => { stopped = true; clearInterval(t) }
+    const loop = createPollLoop(
+      () => room.readSession(roomId),
+      data => { setGameState(data); setLoading(false) },
+      { intervalMs: POLL_INTERVAL, backoffStepsMs: BACKOFF_STEPS },
+    )
+    void loop.poll()
+    return () => loop.stop()
   }, [roomId])
 
   return { gameState, loading, roomId }

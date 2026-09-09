@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { supabase } from './supabase'
+import { room } from './transport'
+import { createPollLoop } from './pollLoop'
 import type { BlitzState } from './blitzState'
 
 // ═══ ХРАНИЛИЩЕ СОСТОЯНИЯ БЛИЦА ═══
@@ -15,21 +16,13 @@ import type { BlitzState } from './blitzState'
 export async function loadBlitz(
   gameId: string, roundNumber: number,
 ): Promise<BlitzState | null> {
-  const { data } = await supabase.from('blitz_state')
-    .select('state').eq('game_id', gameId).eq('round_number', roundNumber)
-    .maybeSingle()
-  const st = (data as { state?: BlitzState } | null)?.state
-  return st && Array.isArray(st.order) ? st : null
+  return room.readBlitz(gameId, roundNumber)
 }
 
 export async function saveBlitz(
   gameId: string, roundNumber: number, state: BlitzState,
 ): Promise<void> {
-  const { error } = await supabase.from('blitz_state').upsert({
-    game_id: gameId, round_number: roundNumber,
-    state, updated_at: new Date().toISOString(),
-  }, { onConflict: 'game_id,round_number' })
-  if (error) throw error
+  await room.writeBlitz(gameId, roundNumber, state)
 }
 
 /** Итоги блица в общий зачёт игры (8.86 — одна функция на оба экрана).
@@ -48,15 +41,22 @@ export async function saveBlitzResults(
   gameId: string, roundNumber: number,
   rows: { teamId: string; place: number; score: number }[],
 ): Promise<void> {
-  const { error } = await supabase.from('answers').upsert(
-    rows.map(r => ({
+  try {
+    await room.upsertAnswers(rows.map(r => ({
       team_id: r.teamId, game_id: gameId, question_ref: 'q-blitz',
       round_number: roundNumber, answer_text: `место ${r.place}`, stake: r.score,
       updated_at: new Date().toISOString(),
-    })),
-    { onConflict: 'team_id,question_ref' })
-  if (error) console.error('блиц: итоги не записались', error)
+    })))
+  } catch (err) {
+    console.error('блиц: итоги не записались', err)
+  }
 }
+
+const BLITZ_POLL_MS = 1000
+// Бэкофф пропорционален базовой частоте блица (1 сек, а не 2 сек, как у
+// остальных экранов) — тот же множитель 2.5×/5×, что у useGameState/
+// useTeams/useAnswers (см. HANDOFF, шаг 4).
+const BLITZ_BACKOFF_STEPS = [2500, 5000]
 
 /** Подписка на состояние раунда с опросом раз в секунду.
  *  Секунда — компромисс: чаще нет смысла (таймер экраны считают сами по
@@ -66,16 +66,13 @@ export function useBlitz(gameId: string | null, roundNumber: number) {
 
   useEffect(() => {
     if (!gameId) return
-    let alive = true
-    const tick = async () => {
-      try {
-        const s = await loadBlitz(gameId, roundNumber)
-        if (alive) setState(s)
-      } catch { /* связь моргнула — покажем прежнее состояние */ }
-    }
-    void tick()
-    const t = setInterval(tick, 1000)
-    return () => { alive = false; clearInterval(t) }
+    const loop = createPollLoop(
+      () => loadBlitz(gameId, roundNumber),
+      setState,
+      { intervalMs: BLITZ_POLL_MS, backoffStepsMs: BLITZ_BACKOFF_STEPS },
+    )
+    void loop.poll()
+    return () => loop.stop()
   }, [gameId, roundNumber])
 
   return { state, setState }

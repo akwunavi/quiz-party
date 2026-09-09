@@ -1,7 +1,7 @@
 // ═══ Очередь ответов с retry (перенос из старого проекта, TS) ═══
 // Ответ сохраняется в localStorage до подтверждения сервером.
 // Индикатор связи строится на pending-счётчике + флаге последней ошибки.
-import { supabase } from './supabase'
+import { room } from './transport'
 
 export interface PendingAnswer {
   team_id: string
@@ -50,10 +50,11 @@ export async function flush() {
     let q = read()
     while (q.length > 0) {
       const a = q[0]
-      const { error } = await supabase.from('answers').upsert({
-        ...a, updated_at: new Date().toISOString(),
-      }, { onConflict: 'team_id,question_ref' })
-      if (error) { notify(true); return }   // сеть/БД легли — повторим при следующем flush
+      try {
+        await room.upsertAnswers([{ ...a, updated_at: new Date().toISOString() }])
+      } catch {
+        notify(true); return   // сеть/БД легли — повторим при следующем flush
+      }
       q = q.slice(1)
       write(q)
       notify(false)

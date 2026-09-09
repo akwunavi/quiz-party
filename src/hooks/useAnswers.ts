@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { room } from '../lib/transport'
+import { createPollLoop } from '../lib/pollLoop'
 import type { Answer } from '../types/quiz'
+
+const BACKOFF_STEPS = [5000, 10000]
 
 /** @param intervalMs Период опроса. По умолчанию 2000 — обычным экранам
  *  этого достаточно. Блиц — исключение: там таймер команды продолжает
@@ -13,16 +16,13 @@ export function useAnswers(gameId: string | null, roundNumber?: number, interval
   const [answers, setAnswers] = useState<Answer[]>([])
   useEffect(() => {
     if (!gameId) return
-    let stopped = false
-    async function load() {
-      let q = supabase.from('answers').select('*').eq('game_id', gameId!)
-      if (roundNumber !== undefined) q = q.eq('round_number', roundNumber)
-      const { data } = await q
-      if (!stopped && data) setAnswers(data as Answer[])
-    }
-    void load()
-    const t = setInterval(load, intervalMs)
-    return () => { stopped = true; clearInterval(t) }
+    const loop = createPollLoop(
+      () => room.listAnswers(gameId, roundNumber),
+      setAnswers,
+      { intervalMs, backoffStepsMs: BACKOFF_STEPS },
+    )
+    void loop.poll()
+    return () => loop.stop()
   }, [gameId, roundNumber, intervalMs])
   return answers
 }

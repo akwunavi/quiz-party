@@ -6,7 +6,7 @@
 // обоих — своя копия в админке рано или поздно разошлась бы с проектором
 // (это уже случалось с маршрутом после раунда, см. HANDOFF §3v).
 import { getRoomId } from './room'
-import { supabase } from './supabase'
+import { room } from './transport'
 import { gotoQuestion, startTimer } from './gameActions'
 import { jeopardyRef, jpOpen, jpClose } from './jeopardyRef'
 import type { GameState } from '../types/quiz'
@@ -29,8 +29,7 @@ export async function openJeopardyTile(gameState: GameState, flat: number) {
     gameId: gameState.game_id, roundNumber: gameState.round_number,
     questionRef: jeopardyRef(gameState.round_number, flat),
   })
-  await supabase.from('game_sessions')
-    .update({ melody: jpOpen(gameState.melody ?? {}, flat) }).eq('id', getRoomId())
+  await room.patchSession(getRoomId(), { melody: jpOpen(gameState.melody ?? {}, flat) })
 }
 
 /** Закрыть плитку: пометить отыгранной и вернуть доску.
@@ -40,15 +39,18 @@ export async function openJeopardyTile(gameState: GameState, flat: number) {
 export async function closeJeopardyTile(gameState: GameState, tileKey: string,
   opened: string[]): Promise<string | null> {
   const next = opened.includes(tileKey) ? opened : [...opened, tileKey]
-  const { error } = await supabase.from('game_sessions')
-    .update({ jeopardy_opened: next } as never).eq('id', getRoomId())
+  let errorText: string | null = null
+  try {
+    await room.patchSession(getRoomId(), { jeopardy_opened: next })
+  } catch (err) {
+    errorText = 'Плитки не сохраняются: ' + (err as Error).message
+      + '. Выполни миграцию 0006_jeopardy_opened.sql.'
+  }
   // Плитка закрыта — у команд должна пропасть форма ответа. Она видна, пока
   // идёт таймер, поэтому его надо снять, иначе форма висит вечно.
-  await supabase.from('game_sessions').update({
+  await room.patchSession(getRoomId(), {
     timer_started_at: null, reveal: false,
     melody: jpClose(gameState.melody ?? {}),
-  }).eq('id', getRoomId())
-  return error
-    ? 'Плитки не сохраняются: ' + error.message + '. Выполни миграцию 0006_jeopardy_opened.sql.'
-    : null
+  })
+  return errorText
 }

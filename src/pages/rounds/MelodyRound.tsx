@@ -13,7 +13,7 @@ import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { SnakeTimer } from '../../components/SnakeTimer'
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
 // Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
 // здесь inline; пульт писал бы свои копии тех же объектов и рано или поздно
@@ -33,16 +33,16 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   // Раньше отсюда прыгали СРАЗУ в следующий раунд, минуя общий маршрут:
   // настройки «показать табло» и «перерыв» у музыкального раунда просто
   // игнорировались. Теперь шаг считает тот же модуль, что и везде.
-  await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
+  await room.patchSession(getRoomId(), { melody: {} })
   const step = afterRoundStep(pack, gameState.round_number, 'show_answers')
   if (step.kind === 'scoreboard') return void showScoreboard()
   if (step.kind === 'break') return void startBreak()
   if (step.kind === 'finale')
     return void finishGame(gameState.pack_id, pack.settings?.play_mode === 'paper')
-  await supabase.from('game_sessions').update({
+  await room.patchSession(getRoomId(), {
     phase: 'round_intro', round_number: gameState.round_number + 1,
     question_index: 0, timer_started_at: null, reveal: false, melody: {},
-  }).eq('id', getRoomId())
+  })
 }
 
 // Единый аудио-элемент: «разблокируется» первым кликом по проектору и дальше

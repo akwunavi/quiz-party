@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { room } from '../lib/transport'
+import { createPollLoop } from '../lib/pollLoop'
 import type { Team } from '../types/quiz'
+
+const POLL_INTERVAL = 2000
+const BACKOFF_STEPS = [5000, 10000]
 
 export function useTeams(gameId: string | null) {
   const [teams, setTeams] = useState<Team[]>([])
   useEffect(() => {
     if (!gameId) return
-    let stopped = false
-    async function load() {
-      const { data } = await supabase.from('teams').select('*').eq('game_id', gameId)
-      if (!stopped && data) setTeams(data as Team[])
-    }
-    void load()
-    const t = setInterval(load, 2000)
-    return () => { stopped = true; clearInterval(t) }
+    const loop = createPollLoop(
+      () => room.listTeams(gameId),
+      setTeams,
+      { intervalMs: POLL_INTERVAL, backoffStepsMs: BACKOFF_STEPS },
+    )
+    void loop.poll()
+    return () => loop.stop()
   }, [gameId])
   return teams
 }

@@ -47,7 +47,7 @@ import {
 } from '../lib/melody'
 import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
 import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
-import { supabase } from '../lib/supabase'
+import { room } from '../lib/transport'
 import { listPacks } from '../lib/packLoader'
 import { usePackOffline } from '../hooks/usePackOffline'
 import { OfflineDownloadPanel } from '../components/OfflineDownload'
@@ -200,9 +200,7 @@ function TeamRandomizer() {
   const publish = async () => {
     if (!preview) return
     setPublishing(true)
-    await supabase.from('game_sessions')
-      .update({ random_groups: preview } as never).eq('id', getRoomId())
-      .then(() => {}, () => {})
+    await room.patchSession(getRoomId(), { random_groups: preview }).catch(() => {})
     setPublishing(false)
   }
 
@@ -316,10 +314,7 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
   const endRound = runAfterRound
 
   const grade = async (a: Answer, correct: boolean) => {
-    await runAction('оценка ответа', async () => {
-      const { error } = await supabase.from('answers').update({ is_correct: correct }).eq('id', a.id)
-      if (error) throw error
-    })
+    await runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: correct }))
   }
 
   const advance = () => {
@@ -620,21 +615,15 @@ function ServiceDrawer({ pack, round, gameState, offline }: {
           {round.mechanic === 'melody' && (
             <button className="adm-link" onClick={async () => {
               if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
-              await runAction('сброс плиток мелодии', async () => {
-                const { error } = await supabase.from('game_sessions').update({ melody: {} }).eq('id', getRoomId())
-                if (error) throw error
-              })
+              await runAction('сброс плиток мелодии', () => room.patchSession(getRoomId(), { melody: {} }))
             }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
           )}
           <button className="adm-link" onClick={async () => {
             if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
-            await runAction('смена пакета', async () => {
-              const { error } = await supabase.from('game_sessions').update({
-                phase: 'lobby', round_number: 0, question_index: 0,
-                timer_started_at: null, reveal: false, melody: {},
-              }).eq('id', getRoomId())
-              if (error) throw error
-            })
+            await runAction('смена пакета', () => room.patchSession(getRoomId(), {
+              phase: 'lobby', round_number: 0, question_index: 0,
+              timer_started_at: null, reveal: false, melody: {},
+            }))
           }}>⇄ СМЕНИТЬ ПАКЕТ</button>
           <button className="adm-link danger" onClick={() => {
             if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.'))
@@ -953,14 +942,11 @@ function PaperScores({ pack, gameState, teams }: {
     // загоралась зелёным — потому что ошибку никто не смотрел. В итогах
     // стояли нули, и понять причину можно было только из консоли браузера.
     try {
-      await runAction('баллы за раунд (бумага)', async () => {
-        const { error } = await supabase.from('answers').upsert({
-          team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
-          round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
-          updated_at: new Date().toISOString(),
-        } as never, { onConflict: 'team_id,question_ref' } as never)
-        if (error) throw error
-      })
+      await runAction('баллы за раунд (бумага)', () => room.upsertAnswers([{
+        team_id: teamId, game_id: gameState.game_id, question_ref: `q-paper-${ri}`,
+        round_number: ri, answer_text: String(pts), stake: pts, is_correct: true,
+        updated_at: new Date().toISOString(),
+      }]))
     } catch (err) {
       // молчать нельзя: на бумаге это единственный источник баллов
       return hint.show(`Балл НЕ сохранён: ${(err as Error).message}. Проверь связь и нажми ещё раз.`)
@@ -1313,14 +1299,11 @@ function ScoreAdjustPanel({ pack, gameId, teams, answers }: {
 
   const write = async (tId: string, roundIdx: number, stake: number, text: string) => {
     try {
-      await runAction('корректировка баллов', async () => {
-        const { error } = await supabase.from('answers').upsert({
-          team_id: tId, game_id: gameId, question_ref: `q-adjust-${roundIdx}`,
-          round_number: roundIdx, answer_text: text, stake, is_correct: true,
-          updated_at: new Date().toISOString(),
-        } as never, { onConflict: 'team_id,question_ref' } as never)
-        if (error) throw error
-      })
+      await runAction('корректировка баллов', () => room.upsertAnswers([{
+        team_id: tId, game_id: gameId, question_ref: `q-adjust-${roundIdx}`,
+        round_number: roundIdx, answer_text: text, stake, is_correct: true,
+        updated_at: new Date().toISOString(),
+      }]))
       return null
     } catch (err) {
       return err instanceof Error ? err : new Error(String(err))
@@ -1661,15 +1644,9 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
                   сравнивать не с чем), поэтому предустановки тут нет тоже. */}
               <span className="adm-tile-ans">{answerShown ? (a.answer_text || '—') : '• • •'}</span>
               <button className={`adm-grade ok${a.is_correct === true ? ' on' : ''}`}
-                onClick={() => void runAction('оценка ответа', async () => {
-                  const { error } = await supabase.from('answers').update({ is_correct: true }).eq('id', a.id)
-                  if (error) throw error
-                })}>✓</button>
+                onClick={() => void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: true }))}>✓</button>
               <button className={`adm-grade no${a.is_correct === false ? ' on' : ''}`}
-                onClick={() => void runAction('оценка ответа', async () => {
-                  const { error } = await supabase.from('answers').update({ is_correct: false }).eq('id', a.id)
-                  if (error) throw error
-                })}>✗</button>
+                onClick={() => void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: false }))}>✗</button>
             </div>
           )
         })}

@@ -3,13 +3,13 @@
 // одна на проектор и на пульт ведущего. Разделение то же, что у блица:
 // blitzState.ts (чистый автомат) + blitzApi.ts (запись).
 import { getRoomId } from './room'
-import { supabase } from './supabase'
+import { room } from './transport'
 import { melodyPass, melodyPoints, melodyReveal } from './melody'
 import type { Answer, MelodyState } from '../types/quiz'
 
 /** Единственная точка записи состояния мелодии. */
 export async function saveMelody(next: MelodyState) {
-  await supabase.from('game_sessions').update({ melody: next }).eq('id', getRoomId())
+  await room.patchSession(getRoomId(), { melody: next })
 }
 
 /** Вердикт по ответу на трек. Один вызов на проектор и на пульт ведущего:
@@ -17,7 +17,7 @@ export async function saveMelody(next: MelodyState) {
 export async function gradeMelody(m: MelodyState, ans: Answer, correct: boolean,
   bidSec: number): Promise<void> {
   const pts = correct ? melodyPoints(bidSec, (m.turn ?? 0) === 0) : 0
-  await supabase.from('answers').update({ is_correct: correct, stake: pts }).eq('id', ans.id)
+  await room.patchAnswer(ans.id, { is_correct: correct, stake: pts })
   // верно — показываем результат и кто забрал; неверно — просто снимаем
   // время и ждём, пока ведущий передаст ход
   await saveMelody(correct ? melodyReveal(m, pts, ans.team_id) : { ...m, deadline: undefined })
@@ -27,7 +27,7 @@ export async function gradeMelody(m: MelodyState, ans: Answer, correct: boolean,
  *  отметил его сам) и передать ход второй команде либо закрыть трек. */
 export async function passMelody(m: MelodyState, ans?: Answer): Promise<void> {
   if (ans && ans.is_correct == null) {
-    await supabase.from('answers').update({ is_correct: false, stake: 0 }).eq('id', ans.id)
+    await room.patchAnswer(ans.id, { is_correct: false, stake: 0 })
   }
   await saveMelody(melodyPass(m))
 }
