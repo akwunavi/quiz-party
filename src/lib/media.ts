@@ -6,6 +6,7 @@
 // ради одной строки. Здесь — чистые функции без React и без Supabase.
 
 import { readMedia } from './packCache'
+import { isLocalMode } from './transport/mode'
 
 /** Абсолютный адрес файла в хранилище.
  *  Ссылка, начинающаяся с http, уходит как есть: так работает медиа,
@@ -46,11 +47,16 @@ export async function fetchMediaBlob(path: string): Promise<Blob> {
   return res.blob()
 }
 
-/** Сетевой адрес файла, ИГНОРИРУЯ прогретый blob-URL (для скачивания в кеш). */
+/** Сетевой адрес файла, ИГНОРИРУЯ прогретый blob-URL (для скачивания в кеш).
+ *  В локальном режиме (шаг 6 плана офлайн-устойчивости, Part B) медиа лежит
+ *  не в Supabase Storage, а на диске локального сервера бара — раздаётся
+ *  им же, с того же origin, под `/api/media/*` (с поддержкой Range —
+ *  важно для `<audio>`/`<video>` на iOS Safari, см. server.mjs). */
 function mediaUrlNetwork(path: string): string {
   if (/^https?:\/\//.test(path)) return path
-  const base = import.meta.env.VITE_SUPABASE_URL
   const safe = path.replace(/^\//, '').split('/').map(encodeURIComponent).join('/')
+  if (isLocalMode()) return `/api/media/${safe}`
+  const base = import.meta.env.VITE_SUPABASE_URL
   return `${base}/storage/v1/object/public/quiz-media/${safe}`
 }
 

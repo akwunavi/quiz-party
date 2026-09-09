@@ -1,16 +1,17 @@
 // ═══ Точка входа transport-слоя ═══
-// Сегодня единственная реализация — облако. Шаг 6 плана офлайн-устойчивости
-// добавит выбор между 'cloud' и 'local' (локальный сервер бара); эта
-// заглушка уже здесь, чтобы вызывающему коду не пришлось меняться дважды.
+// Шаг 6 плана офлайн-устойчивости: выбор между облаком и локальным
+// сервером бара — по метке страницы (`mode.ts`), НЕ по health-check. Это
+// архитектурно осознанно: автовыбор по доступности сервера создавал бы
+// риск, что вкладка сама решит писать не туда, куда думает пользователь.
+// Переключение — только явным переходом по URL/QR на другой origin.
 import { supabaseTransport } from './supabaseTransport'
+import { localTransport } from './localTransport'
+import { isLocalMode, transportMode } from './mode'
 import type { RoomTransport } from './types'
 
-export const room: RoomTransport = supabaseTransport
+export const room: RoomTransport = isLocalMode() ? localTransport : supabaseTransport
 
-/** Заглушка на будущее (шаг 6): выбор режима транспорта. Сейчас всегда 'cloud'. */
-export function transportMode(): 'cloud' {
-  return 'cloud'
-}
+export { transportMode }
 
 export type {
   RoomTransport, SessionPatch, TeamUpsert, TeamPatch, AnswerUpsert, AnswerPatch, DeleteAnswersBy,

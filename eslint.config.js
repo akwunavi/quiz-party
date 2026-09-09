@@ -18,7 +18,12 @@ export default tseslint.config(
   // docs/ — это собранный прод, dist — сборка. Линтить их нечего.
   // infra/ — операционные Node-скрипты (перенос на self-host, issue #5),
   // не часть приложения — конфиг ниже заточен под browser-код src/.
-  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**'] },
+  // local-server/ — тот же случай: голый Node ESM (локальный сервер бара,
+  // офлайн-устойчивость шаг 6/Part B), без браузерных глобалов, которые
+  // этот конфиг не объявляет (`fetch`/`console`/`process`/`Buffer` дают
+  // ложный no-undef). Он покрыт своими тестами (local-server/server.test.mjs
+  // через vitest), которые и ловят реальные ошибки.
+  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**', 'local-server/**'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,

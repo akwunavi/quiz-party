@@ -85,6 +85,28 @@ export async function readPack<TPack>(packId: string): Promise<TPack | null> {
   return entry?.pack ?? null
 }
 
+/** Список id пакетов, уже скачанных офлайн (шаг 6 плана офлайн-устойчивости,
+ *  Part B: страница /local читает этим списком, что можно залить на
+ *  локальный сервер, не спрашивая ведущего вводить id руками). */
+export async function listCachedPackIds(): Promise<string[]> {
+  const db = await getDb()
+  return new Promise<string[]>((resolve, reject) => {
+    const t = db.transaction(STORE_PACKS, 'readonly')
+    const s = t.objectStore(STORE_PACKS)
+    const out: string[] = []
+    const cursorReq = s.openKeyCursor()
+    cursorReq.onsuccess = () => {
+      const cursor = cursorReq.result
+      if (!cursor) return
+      out.push(String(cursor.key))
+      cursor.continue()
+    }
+    cursorReq.onerror = () => reject(cursorReq.error ?? new Error('не удалось перечислить пакеты'))
+    t.oncomplete = () => resolve(out)
+    t.onerror = () => reject(t.error ?? new Error('транзакция не выполнена'))
+  })
+}
+
 /** Стереть пакет и служебные записи по нему (медиа НЕ трогает — оно общее по путям). */
 export async function clearPack(packId: string): Promise<void> {
   await withStore(STORE_PACKS, 'readwrite', s => s.delete(packId))

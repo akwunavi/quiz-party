@@ -29,6 +29,10 @@ export default defineConfig({
       'src/**/*.{test,spec}.{ts,tsx}',
       'src/**/*_{test,spec}.{ts,tsx}',
       'src/**/*-{test,spec}.{ts,tsx}',
+      // Локальный сервер (шаг 6, Part B офлайн-устойчивости) — обычный
+      // Node-скрипт вне src/, не часть Vite-сборки фронтенда, но его тесты
+      // прогоняет тот же vitest.
+      'local-server/**/*.{test,spec}.{mjs,ts}',
     ],
   },
 })

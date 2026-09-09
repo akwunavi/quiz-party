@@ -1,0 +1,61 @@
+/* ═══ /local — пульт локального сервера бара (шаг 6/Part B офлайн-устойчивости) ═══
+   Служебный экран без пакета/темы — как .gate-screen (HostGate), поэтому
+   наследует его палитру (переменные :root, классика по умолчанию) и
+   работает одинаково во всех трёх темах: сюда не попадает класс
+   .theme-potter/.theme-new_year/.theme-classic, значит правила тем на него
+   не действуют вовсе — а переменные :root уже заданы под все экраны
+   (см. 01-base.css, комментарий про --mel-portal-fix). */
+
+.local-card { width: min(560px, 94vw); gap: 16px; }
+
+.local-status { display: flex; flex-direction: column; gap: 8px; }
+
+.local-armed-pill {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: .08em;
+  padding: 8px 12px; border-radius: 8px; text-align: center;
+}
+.local-armed-pill.on {
+  background: color-mix(in srgb, var(--ok) 18%, transparent);
+  border: 1px solid var(--ok); color: var(--ok);
+}
+.local-armed-pill.off {
+  background: color-mix(in srgb, var(--muted) 14%, transparent);
+  border: 1px solid var(--muted); color: var(--muted);
+}
+
+.local-toggle {
+  padding: 14px 18px; border-radius: 10px; border: none; cursor: pointer;
+  background: var(--accent); color: #06121a; font-weight: 700; letter-spacing: .04em;
+  transition: filter .15s ease, transform .1s ease;
+}
+.local-toggle:hover:not(:disabled) { filter: brightness(1.12); }
+.local-toggle:active:not(:disabled) { transform: scale(.98); }
+.local-toggle:disabled { opacity: .5; cursor: default; }
+
+.local-warn { color: var(--danger); }
+
+.local-links { display: flex; flex-direction: column; gap: 6px; }
+.local-link-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.local-link-text {
+  font-family: var(--font-mono); font-size: 13px; color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.local-qr {
+  width: min(200px, 60vw); align-self: center; background: #fff;
+  padding: 10px; border-radius: 10px;
+}
+
+.local-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.local-pack-upload {
+  display: flex; flex-direction: column; gap: 8px;
+  border-top: 1px solid #22304a; padding-top: 14px;
+}
+.mono-tag.small { font-size: 11px; opacity: .8; }
+.local-pack-upload select {
+  padding: 10px 12px; border-radius: 8px; border: 1px solid #2c3a55;
+  background: #0d1420; color: var(--fg);
+}

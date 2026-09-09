@@ -23,6 +23,7 @@ const HostScreen = lazy(() => import('./pages/HostScreen').then(m => ({ default:
 const PlayerPage = lazy(() => import('./pages/PlayerPage').then(m => ({ default: m.PlayerPage })))
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })))
 const EditorApp = lazy(() => import('./pages/editor/EditorApp').then(m => ({ default: m.EditorApp })))
+const LocalPage = lazy(() => import('./pages/LocalPage').then(m => ({ default: m.LocalPage })))
 
 /** Заглушка на те доли секунды, пока летит файл экрана.
  *  Классы взяты живые (`gate-screen`, `mono-tag`) — те же, что у экрана
@@ -111,6 +112,7 @@ export function App() {
             <Route path="/player" element={<PlayerPage />} />
             <Route path="/admin" element={<HostGate><AdminPage /></HostGate>} />
             <Route path="/editor" element={<EditorApp />} />
+            <Route path="/local" element={<LocalPage />} />
           </Routes>
         </Suspense>
       </ChunkBoundary>
