@@ -1,6 +1,7 @@
 // ═══ Действия ведущего/игры (перенос модели старого проекта) ═══
 import { getRoomId } from '../lib/room'
 import { room } from './transport'
+import { isLocalMode } from './transport/mode'
 import { supabase } from './supabase'
 import { uuid } from './uuid'
 
@@ -154,10 +155,15 @@ export async function finishGame(packId: string | null, bar = false) {
     // Вне 13 операций транспорта: это поле packs, не game_sessions, и
     // отдельного метода под него сознательно нет (см. transport/types.ts) —
     // прямой вызов Supabase остаётся здесь, как редакторская мелочь на
-    // стыке с игровым потоком.
-    const session = await room.readSession(getRoomId())
-    if (session?.game_id) {
-      await supabase.from('packs').update({ last_game_id: session.game_id }).eq('id', packId)
+    // стыке с игровым потоком. `packs` — облачная таблица, у локального
+    // сервера бара её нет и быть не может (см. HANDOFF §3aq) — в локальном
+    // режиме этот шаг пропускаем целиком, а не даём ему тихо упасть на
+    // недоступном облаке без try/catch.
+    if (!isLocalMode()) {
+      const session = await room.readSession(getRoomId())
+      if (session?.game_id) {
+        await supabase.from('packs').update({ last_game_id: session.game_id }).eq('id', packId)
+      }
     }
   }
 }
@@ -177,8 +183,13 @@ export async function resetGame() {
   // условию «status = active», а не по конкретному id — оставлено прямым
   // вызовом Supabase: setPackStatus в транспорте принимает id пакета, а тут
   // мы его сознательно не знаем (могло смениться несколько активных за
-  // историю комнаты, чистим всё, что осталось активным).
-  await supabase.from('packs').update({ status: 'ready' }).eq('status', 'active')
+  // историю комнаты, чистим всё, что осталось активным). `packs` —
+  // облачная таблица, локальный сервер бара её не имеет (см. HANDOFF §3aq):
+  // в локальном режиме этот шаг пропускаем, а не даём ему упасть на
+  // недоступном облаке.
+  if (!isLocalMode()) {
+    await supabase.from('packs').update({ status: 'ready' }).eq('status', 'active')
+  }
   await room.patchSession(getRoomId(), {
     game_id: uuid(), pack_id: null, phase: 'lobby',
     round_number: 0, question_index: 0,

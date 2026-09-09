@@ -51,6 +51,9 @@ import { room } from '../lib/transport'
 import { listPacks } from '../lib/packLoader'
 import { usePackOffline } from '../hooks/usePackOffline'
 import { OfflineDownloadPanel } from '../components/OfflineDownload'
+import {
+  parseLocalExport, summarizeLocalImport, summaryText, importLocalGame,
+} from '../lib/importLocalGame'
 import type {
   Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, Team,
 } from '../types/quiz'
@@ -629,8 +632,54 @@ function ServiceDrawer({ pack, round, gameState, offline }: {
             if (confirm('НОВАЯ ИГРА: сбросить состояние игры? Ответы останутся в БД.'))
               void runAction('новая игра', () => resetGame())
           }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
+          <ImportLocalGamePanel />
         </div>
       )}
+    </div>
+  )
+}
+
+/** Шаг 7 плана офлайн-устойчивости: приём файла экспорта локального
+ *  сервера бара (`GET /api/export` на `local-server/server.mjs`, скачанного
+ *  ведущим со страницы `/local`) и заливка его в облако — одноразово,
+ *  ручным подтверждением, без автомерджа (см. `lib/importLocalGame.ts`). */
+function ImportLocalGamePanel() {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+
+  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setErr(null)
+    setBusy(true)
+    try {
+      const text = await file.text()
+      const data = parseLocalExport(text)
+      const summary = await summarizeLocalImport(data)
+      const ok = confirm(
+        `Залить локальную игру «${file.name}» в облако?\n\n${summaryText(summary)}\n\n`
+        + 'Заливка одноразовая и необратимая: перезаписанные записи не восстановить.',
+      )
+      if (!ok) return
+      await runAction('заливка локальной игры в облако', () => importLocalGame(data))
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : 'не удалось разобрать файл')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="adm-box">
+      <label className="adm-link" style={{ display: 'block', cursor: busy ? 'wait' : 'pointer' }}>
+        ⇧ ЗАЛИТЬ ЛОКАЛЬНУЮ ИГРУ В ОБЛАКО
+        <input type="file" accept=".json" disabled={busy}
+          style={{ display: 'block', marginTop: 6, fontSize: 12 }}
+          onChange={e => void onPick(e)} />
+      </label>
+      {busy && <div className="adm-dim">разбираю файл…</div>}
+      {err && <div className="adm-dim" style={{ color: '#ef4444' }}>{err}</div>}
     </div>
   )
 }
