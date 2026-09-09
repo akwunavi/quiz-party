@@ -2,15 +2,24 @@
 // Игроков это не касается — /player работает без входа.
 import { useState } from 'react'
 import { signIn, useEditorUser } from '../lib/auth'
+import { isLocalMode } from '../lib/transport/mode'
 import { VERSION } from '../version'
 
 export function HostGate({ children }: { children: React.ReactNode }) {
+  // Локальный сервер бара (шаг 6 офлайн-устойчивости) не имеет своего
+  // Supabase — вход через облако физически недоступен без интернета,
+  // а именно ради его отсутствия локальный режим и существует. Вместо
+  // логина — физический доступ к серверу: он уже даёт доступ ко всему
+  // (см. HostGate.tsx у /local, тот же принцип). Гейт пропускает сразу,
+  // без единого сетевого запроса к auth.
+  const local = isLocalMode()
   const { user, setUser, loading } = useEditorUser()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
 
+  if (local) return <>{children}</>
   if (loading) return <div className="gate-screen"><div className="mono-tag">ПРОВЕРЯЕМ ВХОД…</div></div>
   if (user) return <>{children}</>
 
