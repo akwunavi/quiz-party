@@ -633,9 +633,40 @@ function ServiceDrawer({ pack, round, gameState, offline }: {
               void runAction('новая игра', () => resetGame())
           }}>⟲ НОВАЯ ИГРА (ПОЛНЫЙ СБРОС)</button>
           <ImportLocalGamePanel />
+          <ResetServiceWorkerButton />
         </div>
       )}
     </div>
+  )
+}
+
+/** Шаг 8 плана офлайн-устойчивости: аварийный выход, если Service Worker
+ *  (кеш самого приложения — `public/sw.js`) начал мешать, а не помогать —
+ *  например отдаёт что-то устаревшее. Без этой кнопки чинится только через
+ *  DevTools на чужом ноутбуке, а ведущий в этот момент стоит с микрофоном.
+ *  Снимает регистрацию SW, чистит ВСЕ кеши Cache API этого origin и
+ *  перезагружает страницу. Игру и ответы команд не трогает — это только
+ *  кеш статики в браузере, не данные на сервере. */
+function ResetServiceWorkerButton() {
+  const [busy, setBusy] = useState(false)
+  return (
+    <button className="adm-link danger" disabled={busy} onClick={async () => {
+      if (!confirm('Сбросить кеш приложения (Service Worker) и перезагрузить страницу?\n\n'
+        + 'Игра и ответы команд на сервере не пострадают — это только кеш файлов в браузере.')) return
+      setBusy(true)
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations()
+          await Promise.all(regs.map(r => r.unregister()))
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys()
+          await Promise.all(keys.map(k => caches.delete(k)))
+        }
+      } finally {
+        location.reload()
+      }
+    }}>{busy ? 'сбрасываю…' : '⚠ СБРОСИТЬ КЕШ ПРИЛОЖЕНИЯ И ПЕРЕЗАГРУЗИТЬ'}</button>
   )
 }
 

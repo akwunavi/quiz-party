@@ -4,6 +4,7 @@ import {
   type OfflineStatus, type PreloadProgress, type PersistResult,
 } from '../lib/packPreload'
 import type { LoadedPack } from '../lib/packLoader'
+import { warmServiceWorker } from '../lib/sw'
 
 /** Общее состояние офлайн-загрузки пакета — один вызов на экран (не на
  *  кнопку), чтобы кнопка в `.host-actions` и индикатор готовности в лобби
@@ -29,6 +30,10 @@ export function usePackOffline(pack: LoadedPack | null) {
   const start = useCallback(async () => {
     if (!pack) return
     if (persist == null) setPersist(await requestPersistentStorage())
+    // Прогрев кеша Service Worker'а (шаг 8) — тем же нажатием, что качает
+    // медиа пакета в IndexedDB (шаг 5). Не блокирует и не тормозит закачку
+    // пакета — это отдельный, независимый кеш (сама страница, не медиа).
+    void warmServiceWorker()
     const result = await downloadPackForOffline(pack, p => setProgress(p))
     setStatus({ total: result.total, have: result.total - result.failed.length })
     return result

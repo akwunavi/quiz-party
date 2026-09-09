@@ -23,7 +23,12 @@ export default tseslint.config(
   // этот конфиг не объявляет (`fetch`/`console`/`process`/`Buffer` дают
   // ложный no-undef). Он покрыт своими тестами (local-server/server.test.mjs
   // через vitest), которые и ловят реальные ошибки.
-  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**', 'local-server/**'] },
+  // public/sw.js — Service Worker (офлайн-устойчивость шаг 8): плоский
+  // classic-скрипт вне модульной системы, живёт в ServiceWorkerGlobalScope
+  // (`self`/`caches`/`clients` — не браузерные `window`-глобалы, которых
+  // этот конфиг тоже не объявляет). Копия его решающей функции проверяется
+  // тестом `src/lib/__tests__/swStrategy.test.ts`, не линтером.
+  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**', 'local-server/**', 'public/sw.js'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
