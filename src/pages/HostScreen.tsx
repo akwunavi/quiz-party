@@ -31,6 +31,7 @@ import { ThemeLayer } from '../components/ThemeLayer'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
 import { AfterRoundNav } from '../components/AfterRoundNav'
+import QrCode from '../components/QrCode'
 import { SnowCurtain } from '../components/NewYearScene'
 import { CrosswordView } from '../components/CrosswordView'
 import { computeTotals, computeRoundScores } from '../lib/totals'
@@ -251,9 +252,10 @@ function HostInner({ gameState, pack }: {
                 НАД затемнением и подсвечивается: опоздавшие должны видеть,
                 куда подключаться, даже во время показа команд. */}
             {!paperMode && (
-              <img alt="QR"
+              <QrCode
                 className={`lobby-qr-corner${groupsShown ? ' lobby-qr-lit' : ''}`}
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=1&data=${encodeURIComponent(playerUrl)}`} />
+                value={playerUrl}
+                title="QR для подключения" />
             )}
             {!paperMode && groupsShown && (
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
