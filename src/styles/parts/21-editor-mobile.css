@@ -60,16 +60,16 @@
   /* ── таблицы (редакторы, настройки) ──
      display:block делает таблицу скроллящимся контейнером, но thead/tbody
      остаются table и держат свою ширину — иначе они распирали всю страницу. */
-  .ed-table, .ed-settings { display: block; width: 100%; max-width: 100%;
+  .ed-table { display: block; width: 100%; max-width: 100%;
     overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
   /* Таблицу НЕ разбираем на block: thead и tbody тогда считают колонки
      независимо и шапка съезжает относительно строк. Вместо этого делаем
      прокручиваемой саму карточку, а таблица остаётся цельной. */
-  .ed-card:has(> .ed-table), .ed-card:has(> .ed-settings) {
+  .ed-card:has(> .ed-table) {
     overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .ed-table, .ed-settings { display: table; width: max-content; min-width: 100%;
+  .ed-table { display: table; width: max-content; min-width: 100%;
     white-space: nowrap; }
-  .ed-table th, .ed-table td, .ed-settings th, .ed-settings td { padding: 8px 10px; }
+  .ed-table th, .ed-table td { padding: 8px 10px; }
 
   /* ── модалка вопроса: полноэкранная, одна колонка, футер закреплён ── */
   .qm-backdrop { padding: 0; }

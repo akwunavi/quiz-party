@@ -22,14 +22,7 @@
 .race-treat { position: absolute; right: 3.4%; top: 50%; transform: translateY(-50%);
   font-size: clamp(16px, 1.8vw, 28px); animation: crowd 1s ease-in-out infinite; }
 .race-panel, .race-result { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-/* собака: тряска ушей и попы на бегу */
 .bulldog { width: 100%; height: auto; }
-.bulldog.run .bd-ear { transform-origin: 85px 20px; animation: earFlap .28s ease-in-out infinite; }
-.bulldog.run .bd-leg.a { transform-origin: center top; animation: legRun .22s ease-in-out infinite; }
-.bulldog.run .bd-leg.b { transform-origin: center top; animation: legRun .22s ease-in-out infinite reverse; }
-@keyframes earFlap { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
-@keyframes buttWiggle { 0%,100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
-@keyframes legRun { 0%,100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
 /* новогодняя тема: снег на трибунах */
 .theme-new_year .race-track { background: linear-gradient(180deg, #0d2a55 0%, #10304f 30%, #dfe9f5 100%); }
 .theme-new_year .race-lane { border-color: rgba(255,255,255,.35); }
@@ -71,7 +64,6 @@
 .bulldog:not(.run) .bd-hind, .bulldog:not(.run) .bd-fore { transform: none; }
 /* бег */
 .bulldog.run .bd-all { animation: gallopBounce .42s ease-in-out infinite; transform-origin: 75px 55px; }
-.bulldog.run .bd-torso { animation: torsoStretch .42s ease-in-out infinite; transform-origin: 75px 50px; }
 .bulldog.run .bd-head { animation: headBob .42s ease-in-out infinite; transform-origin: 118px 58px; }
 .bulldog.run .bd-hind { transform-origin: 54px 70px; animation: hindKick .42s ease-in-out infinite; }
 .bulldog.run .bd-hind.h2 { transform-origin: 67px 73px; animation-delay: .07s; }
@@ -85,10 +77,6 @@
   0%, 100% { transform: translateY(0) rotate(1deg); }
   35%      { transform: translateY(-6px) rotate(-1.4deg); }
   70%      { transform: translateY(-1px) rotate(0deg); }
-}
-@keyframes torsoStretch {
-  0%, 100% { transform: scaleX(.96); }   /* сжат при толчке */
-  35%      { transform: scaleX(1.06); }  /* вытянут в полёте */
 }
 @keyframes headBob {
   0%, 100% { transform: translateY(.6px) rotate(1.2deg); }
@@ -104,7 +92,6 @@
   0%, 100% { transform: rotate(18deg); }
   50%      { transform: rotate(-16deg); }
 }
-@keyframes buttWiggle { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
 @keyframes tongueFlap { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2.4px); } }
 @keyframes dustPuff {
   0% { transform: translate(6px, 0) scale(.4); opacity: .9; }

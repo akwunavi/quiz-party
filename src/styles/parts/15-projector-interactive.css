@@ -35,9 +35,9 @@
   94% { text-shadow: 3px 0 var(--danger), -3px 0 var(--accent2); transform: translateY(-2px); }
   95% { text-shadow: var(--glow); transform: none; }
 }
-.neon-title, .round-title { animation: glitchRGB 16s steps(1) infinite; }
-.theme-new_year .neon-title, .theme-new_year .round-title,
-.theme-potter .neon-title, .theme-potter .round-title { animation: none; }
+.neon-title { animation: glitchRGB 16s steps(1) infinite; }
+.theme-new_year .neon-title,
+.theme-potter .neon-title { animation: none; }
 
 /* Чипы команд в лобби: неоновое мерцание + глитч-дёрганье */
 @keyframes neonFlicker {
@@ -108,7 +108,7 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent);
 }
 @keyframes candleGlowTitle { 0%,100% { text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12; }
   50% { text-shadow: 0 0 30px rgba(233,199,102,.85), 0 2px 0 #5c4a12; } }
-.theme-potter .neon-title, .theme-potter .round-title {
+.theme-potter .neon-title {
   animation: candleGlowTitle 3.4s ease-in-out infinite; }
 
 /* Модалка составов накрывает ВЕСЬ экран, поэтому position задаёт она сама.

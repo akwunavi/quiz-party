@@ -67,10 +67,6 @@
 
 /* Сопоставление на экране ответа: картинка → буква/текст */
 .match-answer { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-.match-answer .pair { display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 8px; border: 1px solid rgba(255,215,0,.45); border-radius: 10px; }
-.match-answer .pair img { max-height: 18vh; border-radius: 6px; }
-.match-answer .pair .lbl { font-family: var(--font-display); color: #ffd700; }
 
 /* Кроссворд-раунд: сетка слева, титул и правила справа */
 .cw-layout { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,1fr);
@@ -96,15 +92,10 @@
 /* ═══ ОЦЕНКИ ВОПРОСОВ И КОММЕНТАРИЙ (телефон игрока) ═══
    Блок свёрнут по умолчанию: он не должен мешать отвечать. Кнопки шкалы
    крупные — палец на телефоне, а не курсор. */
-.pl-fb-open { width: 100%; margin-top: 12px; padding: 12px;
-  border-radius: 12px; font-size: 15px;
-  border: 1px dashed rgba(255,255,255,.25); background: transparent;
-  color: var(--accent); }
 .pl-feedback { margin-top: 12px; padding: 12px; border-radius: 12px;
   border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
   display: flex; flex-direction: column; gap: 12px; }
 .pl-fb-head { display: flex; align-items: center; justify-content: space-between; }
-.pl-fb-hide { background: none; border: none; color: var(--dim); font-size: 13px; }
 .pl-fb-q { display: flex; flex-direction: column; gap: 6px; }
 /* 8.59: шкала из 10 кнопок раньше была видна всегда — рядом с полем
    ответа на телефоне это отвлекало от самого вопроса. Теперь строка-

@@ -50,7 +50,6 @@
 .theme-new_year .sprint-card { background: linear-gradient(180deg, rgba(198,230,255,.12), rgba(124,199,255,.04));
   border-color: rgba(198,230,255,.4); }
 .theme-new_year .sprint-num::after { content: ' ❅'; opacity: .6; font-size: .7em; }
-.theme-new_year .sprint-bonus { border-color: #ffd700; color: #ffd700; }
 /* Редактор: разносим «+ Трек» и «+ Тема» */
 .mel-add-track { margin-top: 8px; }
 .mel-add-theme { margin-top: 22px; border-top: 1px solid var(--ed-line); padding-top: 16px; }
@@ -58,7 +57,7 @@
 /* Гирлянда занимает верх — прижимаем контент ниже (мелодия, своя игра, «120 сек») */
 .theme-new_year .mel-screen, .theme-new_year .jp-screen { padding-top: 118px; }
 .theme-new_year .sprint-screen { padding-top: 96px; }
-.mel-title, .jp-title { font-size: clamp(20px, 2.6vw, 40px); margin: 0; line-height: 1.1; }
+.jp-title { font-size: clamp(20px, 2.6vw, 40px); margin: 0; line-height: 1.1; }
 .mel-board, .jp-board { max-height: calc(100vh - 250px); }
 
 /* 6: новогодний вид доски мелодии — подарки с лентой и снежные шапки на темах */

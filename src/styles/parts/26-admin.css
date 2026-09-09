@@ -185,7 +185,6 @@
 .adm-slide-list .adm-btn { text-align: left; font-size: 13px; }
 
 /* ═══ ПАНЕЛЬ ОЦЕНОК КОМАНД ═══ */
-.adm-ratings { margin-top: 10px; }
 .adm-rt { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .adm-rt-round { padding: 8px 10px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); }

@@ -10,7 +10,7 @@
   radial-gradient(ellipse at 50% -10%, rgba(211,166,37,.14), transparent 55%),
   radial-gradient(ellipse at 85% 110%, rgba(116,0,1,.28), transparent 60%),
   #0b0d1a; }
-.theme-potter .neon-title, .theme-potter .round-title {
+.theme-potter .neon-title {
   color: #e9c766; text-shadow: 0 0 18px rgba(211,166,37,.55), 0 2px 0 #5c4a12;
   letter-spacing: .1em; }
 .theme-potter .hud-frame, .theme-potter .mel-modal, .theme-potter .jp-modal {
@@ -132,7 +132,8 @@
 /* Вес поднят по той же причине — 01-base.css задаёт .q-word позже? нет,
    раньше; но 03/19 могут перебивать, поэтому целимся точнее. */
 /* НОВЫЙ ВОПРОС: слова проступают чернилами, по одному.
-   Первая версия целилась в .title-anim и .wind-text — таких классов нет,
+   Первая версия целилась в `.q-text.title-anim` и `.wind-text` — такого
+   сочетания классов на элементе не бывает и такого класса нет вовсе,
    правило не работало ни дня. Настоящая цель — .q-word: именно из них
    собран текст вопроса, и у каждого слова уже есть своя задержка. */
 .theme-potter .host-screen .q-word {
@@ -171,8 +172,8 @@
   50% { opacity: 1; letter-spacing: 1.1em; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-potter .q-text::before, .theme-potter .q-text.title-anim,
-  .theme-potter .wind-text, .theme-potter .round-intro .ri-main::after,
+  .theme-potter .q-text::before, .theme-potter .host-screen .q-word,
+  .theme-potter .round-intro .ri-main::after,
   .theme-potter .answer-block.reveal-in .answer-main::after {
     animation: none; }
 }

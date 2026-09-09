@@ -24,8 +24,6 @@
   text-transform: uppercase; opacity: .5; }
 .fin-slide-team { font-family: var(--font-display); font-weight: 700;
   font-size: clamp(38px, 5.4vw, 104px); line-height: 1.05; max-width: 92vw; }
-.fin-slide-score { font-family: var(--font-digits); font-size: clamp(30px, 3.4vw, 62px);
-  color: var(--accent); }
 
 /* полоска времени слайда */
 .fin-progress { width: min(620px, 60vw); height: 4px; border-radius: 3px;
