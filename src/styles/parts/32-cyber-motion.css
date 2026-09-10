@@ -146,3 +146,26 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-classic .host-screen .q-word { animation: none; opacity: 1; }
 }
+
+/* ── Э2в: HUD-строка (ScreenFx/CyberHudReadout). Курсор ::after на
+   .q-text ЗАМЕРЕН и НЕ РЕАЛИЗОВАН — на реальной длине вопроса он сдвигал
+   подобранный useFitText кегль (0.5-2%) на 1366/1920/3840, см. HANDOFF.md.
+   `.fx-hud` — сосед .host-screen (внутри ScreenFx, тот сам сосед
+   .host-screen), position: fixed, bottom: 60px — НЕ 24px, тот уровень
+   занят .pack-badge (left) и .host-actions (right); середина на этом
+   уровне тоже может быть занята длинным текстом пакета/кнопками на узких
+   экранах, поэтому строка на 36px выше их базовой линии. */
+.fx-hud {
+  position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%);
+  z-index: 20; pointer-events: none;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em;
+  color: color-mix(in srgb, var(--accent2) 70%, transparent);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent2) 45%, transparent);
+  opacity: 0;
+  animation: cbHudIn .6s ease .1s forwards;
+}
+@keyframes cbHudIn { 0% { opacity: 0; } 100% { opacity: .8; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-hud { animation: none; opacity: .8; }
+}

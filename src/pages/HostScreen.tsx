@@ -89,6 +89,12 @@ export function HostScreen() {
         ? `${gameState.phase}-${gameState.round_number}`
         : `${gameState.phase}-${gameState.round_number}-${gameState.question_index}`)
     : ''
+  // Э2 (HUD-строка ScreenFx): чисто декоративный ярлык вопроса, никакого
+  // отношения к таймеру раунда — только для фазы 'question', больше нигде.
+  const hudLabel = gameState?.phase === 'question'
+    ? `Q-${((gameState.round_number + 1) * 97 + gameState.question_index)
+        .toString(16).toUpperCase().padStart(3, '0')}`
+    : null
   return (
     <ThemeLayer theme={theme} isProjector>
       {theme === 'new_year' &&
@@ -97,7 +103,7 @@ export function HostScreen() {
       {/* Рендерится ВСЕГДА (условие на тему — внутри компонента), а не
           {theme !== 'new_year' && ...}: постоянное число детей ThemeLayer
           важно, чтобы новая сборка не перемонтировала проектор целиком. */}
-      <ScreenFx theme={theme} trigger={fxTrigger} />
+      <ScreenFx theme={theme} trigger={fxTrigger} hud={hudLabel} />
       {/* В лобби (не на бумаге) в том же углу QR — подпись поднимается
           над ним, чтобы не наехать (см. .pack-badge-lobby, 01-base.css). */}
       {pack && <div className={`pack-badge${

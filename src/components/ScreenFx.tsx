@@ -49,7 +49,15 @@ function hasNofxParam(): boolean {
   return typeof location !== 'undefined' && location.href.includes('nofx=1')
 }
 
-export function ScreenFx({ theme, trigger }: { theme: ThemeKey; trigger: string }) {
+export function ScreenFx({ theme, trigger, hud }: {
+  theme: ThemeKey; trigger: string
+  /** Э2: декоративная HUD-строка поверх экрана вопроса в classic.
+   *  СТРОГО декоративная — не читает `timer_started_at` и не показывает
+   *  остаток времени (это был бы второй таймер, что запрещено). Ключ
+   *  меняется вместе с вопросом (см. HostScreen), само содержимое строки
+   *  «крутится» внутри независимо, тиками setInterval. */
+  hud?: string | null
+}) {
   const [enabled, setEnabled] = useState(readEnabled)
   const prevTrigger = useRef<string | null>(null)
   const lastFlashAt = useRef(0)
@@ -90,7 +98,26 @@ export function ScreenFx({ theme, trigger }: { theme: ThemeKey; trigger: string 
       )}
       {flash !== null && theme === 'classic' && <CyberFlash key={flash} />}
       {flash !== null && theme === 'potter' && <PotterFlash key={flash} />}
+      {theme === 'classic' && hud && <CyberHudReadout key={hud} label={hud} />}
     </>
+  )
+}
+
+/** Э2: строка HUD снизу по центру, между .pack-badge и .host-actions
+ *  (оба на bottom:24px по углам) — сама на bottom:60px, чтобы точно не
+ *  задеть ни один из них ни на одной ширине (проверено рендером на
+ *  1366/1920/3840). Полностью декоративная: `sig` — случайный процент,
+ *  меняется тиком, к таймеру раунда отношения не имеет. */
+function CyberHudReadout({ label }: { label: string }) {
+  const [sig, setSig] = useState(() => 90 + Math.floor(Math.random() * 10))
+  useEffect(() => {
+    const t = setInterval(() => setSig(90 + Math.floor(Math.random() * 10)), 1400)
+    return () => clearInterval(t)
+  }, [])
+  return (
+    <div className="fx-hud" aria-hidden="true">
+      SYS://{label} · SIG {sig}%
+    </div>
   )
 }
 
