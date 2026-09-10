@@ -20,7 +20,7 @@ import { saveMelody } from '../lib/melodyActions'
 import { mediaUrl, lenClass, primeMedia, releaseMedia } from '../lib/media'
 import { collectUsedPaths } from '../lib/usedPaths'
 import { packStats } from '../lib/duration'
-import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
@@ -89,6 +89,12 @@ export function HostScreen() {
         ? `${gameState.phase}-${gameState.round_number}`
         : `${gameState.phase}-${gameState.round_number}-${gameState.question_index}`)
     : ''
+  // Э2 (HUD-строка ScreenFx): чисто декоративный ярлык вопроса, никакого
+  // отношения к таймеру раунда — только для фазы 'question', больше нигде.
+  const hudLabel = gameState?.phase === 'question'
+    ? `Q-${((gameState.round_number + 1) * 97 + gameState.question_index)
+        .toString(16).toUpperCase().padStart(3, '0')}`
+    : null
   return (
     <ThemeLayer theme={theme} isProjector>
       {theme === 'new_year' &&
@@ -97,7 +103,7 @@ export function HostScreen() {
       {/* Рендерится ВСЕГДА (условие на тему — внутри компонента), а не
           {theme !== 'new_year' && ...}: постоянное число детей ThemeLayer
           важно, чтобы новая сборка не перемонтировала проектор целиком. */}
-      <ScreenFx theme={theme} trigger={fxTrigger} />
+      <ScreenFx theme={theme} trigger={fxTrigger} hud={hudLabel} />
       {/* В лобби (не на бумаге) в том же углу QR — подпись поднимается
           над ним, чтобы не наехать (см. .pack-badge-lobby, 01-base.css). */}
       {pack && <div className={`pack-badge${
@@ -2524,6 +2530,56 @@ function ScoreboardScreen({ pack, gameState }: {
   const fitTable = useFitText<HTMLTableElement>(
     [ranked.length, scored.length], { shrinkBefore: titleRef },
   )
+  // ── Э4 «Цифровая пересборка» (только classic): строки табло один раз
+  // проезжают FLIP-анимацией со своего места В ПРЕДЫДУЩЕМ раунде на место
+  // в ТЕКУЩЕМ. rankTeams/computeTotals/computeRoundScores НЕ трогаем —
+  // предыдущий рейтинг считаем чистой функцией здесь же, вычитая из уже
+  // готовых totals/perRound вклад ИМЕННО текущего раунда (gameState.
+  // round_number — индекс в pack.rounds, как и везде в этом файле).
+  const prevRanked = useMemo(() => {
+    const prevTotals = new Map(teams.map(t => {
+      const cur = totals.get(t.id) ?? 0
+      const thisRoundScore = (perRound.get(t.id) ?? [])[gameState.round_number] ?? 0
+      return [t.id, cur - thisRoundScore] as const
+    }))
+    const prevPerRound = new Map(teams.map(t =>
+      [t.id, (perRound.get(t.id) ?? []).slice(0, gameState.round_number)] as const))
+    return rankTeams(teams, prevTotals, answers, prevPerRound).map(r => r.team)
+  }, [teams, totals, perRound, answers, gameState.round_number])
+  const rowRefs = useRef(new Map<string, HTMLTableRowElement>())
+  const flippedRound = useRef<number | null>(null)
+  useLayoutEffect(() => {
+    if (pack.theme !== 'classic') return
+    if (ranked.length === 0 || revealed < ranked.length) return
+    if (flippedRound.current === gameState.round_number) return
+    flippedRound.current = gameState.round_number
+    // reduced-motion: считаем шаг сделанным (флаг выше уже выставлен), но
+    // саму сдвижку не проигрываем вовсе — ни JS-transform, ни CSS.
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const prevIndex = new Map(prevRanked.map((t, i) => [t.id, i]))
+    ranked.forEach((t, newIdx) => {
+      const el = rowRefs.current.get(t.id)
+      if (!el) return
+      const oldIdx = prevIndex.get(t.id) ?? newIdx
+      const delta = oldIdx - newIdx
+      if (delta === 0) return
+      const h = el.getBoundingClientRect().height
+      el.style.transition = 'none'
+      el.style.transform = `translateY(${delta * h}px)`
+      el.classList.add('sb-flip')
+      // форсируем рефлоу, чтобы браузер зафиксировал стартовую позицию
+      // ДО того, как мы включим transition и уберём transform
+      void el.offsetHeight
+      requestAnimationFrame(() => {
+        el.style.transition = ''
+        el.style.transform = ''
+      })
+    })
+    const t = setTimeout(() => {
+      rowRefs.current.forEach(el => el.classList.remove('sb-flip'))
+    }, 900)
+    return () => clearTimeout(t)
+  }, [revealed, ranked, prevRanked, pack.theme, gameState.round_number])
   return (
     <div className="host-screen grid-bg sb-screen">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
@@ -2553,7 +2609,9 @@ function ScoreboardScreen({ pack, gameState }: {
             const place = row?.place ?? 1
             const isIn = idx >= ranked.length - revealed
             return (
-            <tr key={t.id} className={`sb-row${isIn ? ' is-in' : ' is-veiled'}${place === 1 ? ' leader' : ''}`}>
+            <tr key={t.id} ref={el => {
+              if (el) rowRefs.current.set(t.id, el); else rowRefs.current.delete(t.id)
+            }} className={`sb-row${isIn ? ' is-in' : ' is-veiled'}${place === 1 ? ' leader' : ''}`}>
               {/* при равных очках место общее: 1, 2, 2, 4. Медаль — та же
                   тематическая, что на экране награждения (components/
                   AwardMedal.tsx): цифра места уже нарисована на самом

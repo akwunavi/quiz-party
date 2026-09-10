@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   CYBERPUNK MOTION — доп. декоративные эффекты, ТОЛЬКО тема classic (9.04)
+
+   Этап 1 из 3 (New Year и Magic пока не трогаем). Каждый эффект — свой
+   раздел ниже, с явным номером из плана. Единственный файл, который
+   получает новый JS впридачу к CSS — Э4 (табло FLIP, ScoreboardScreen).
+
+   ПРАВИЛА:
+   - Все селекторы — `.theme-classic .host-screen ...` (с `.host-screen` в
+     цепочке), иначе протечёт на PlayerPage (у него тоже `theme-classic`
+     через ThemeLayer).
+   - Новые keyframes — с префиксом `cb` (cyber-boot/cyber-blitz), чтобы не
+     столкнуться с уже существующими `tmOrbit`/`cfScan`/`cpBar`/`cpRow`/
+     `cpCode`/`cxNoise`/`cxBar`/`sbScan`/`sbPrint`/`sbChampPulse`
+     (28-theme-cyber.css) — их не трогаем и не дублируем.
+   - Каждое новое анимационное правило зеркалится дословно в
+     `@media (prefers-reduced-motion: reduce)` в самом низу файла.
+   - Не переопределяем `animation` на элементах, где он уже занят
+     (`.choice-plate.correct`, `.choice-img.correct`, `.sb-row.is-in > td`)
+     — только на их свободных `::before`/`::after` или на соседних тегах.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Э3: «Сигнал заблокирован» — reveal ответа ───────────────────────────
+   Верный вариант получает таргет-скобки по углам (::before/::after,
+   свободны у .choice-plate/.choice-img в classic — проверено грепом).
+   Отклонённые варианты (.dimmed) получают статические помехи поверх —
+   тоже на ::after, не трогая уже занятый `animation` самого элемента. */
+.theme-classic .host-screen .choice-plate.correct,
+.theme-classic .host-screen .choice-img.correct { position: relative; }
+
+.theme-classic .host-screen .choice-plate.correct::before,
+.theme-classic .host-screen .choice-plate.correct::after,
+.theme-classic .host-screen .choice-img.correct::before,
+.theme-classic .host-screen .choice-img.correct::after {
+  content: ''; position: absolute; width: 22px; height: 22px;
+  border: 2px solid var(--answer); pointer-events: none; opacity: 0;
+  filter: drop-shadow(0 0 6px var(--answer));
+  animation: cbLockIn .5s ease .05s both;
+}
+.theme-classic .host-screen .choice-plate.correct::before,
+.theme-classic .host-screen .choice-img.correct::before {
+  top: 6px; left: 6px; border-right: none; border-bottom: none;
+}
+.theme-classic .host-screen .choice-plate.correct::after,
+.theme-classic .host-screen .choice-img.correct::after {
+  bottom: 6px; right: 6px; border-left: none; border-top: none;
+  animation-delay: .12s;
+}
+@keyframes cbLockIn {
+  0% { opacity: 0; transform: scale(1.6); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.theme-classic .host-screen .choice-plate.dimmed,
+.theme-classic .host-screen .choice-img.dimmed { position: relative; }
+.theme-classic .host-screen .choice-plate.dimmed::after,
+.theme-classic .host-screen .choice-img.dimmed::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background: repeating-linear-gradient(115deg,
+    rgba(255,255,255,.10) 0 2px, transparent 2px 6px);
+  mix-blend-mode: overlay;
+  animation: cbStatic 1.1s steps(6) infinite;
+}
+@keyframes cbStatic {
+  0%, 100% { opacity: .25; }
+  40% { opacity: .55; }
+  70% { opacity: .15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .choice-plate.correct::before,
+  .theme-classic .host-screen .choice-plate.correct::after,
+  .theme-classic .host-screen .choice-img.correct::before,
+  .theme-classic .host-screen .choice-img.correct::after,
+  .theme-classic .host-screen .choice-plate.dimmed::after,
+  .theme-classic .host-screen .choice-img.dimmed::after {
+    animation: none; opacity: 1;
+  }
+}
+
+/* ── Э1: «Скан-переход» — доп. слои поверх существующей вспышки .fx-cyber
+   (ScreenFx/CyberFlash). Свои элементы (`.fx-beam`/`.fx-rgb`), НЕ
+   псевдоэлементы `.fx-cyber` — те заняты `cxBar` (28-theme-cyber.css).
+   `.fx-flash` уже `position: fixed` и живёт СОСЕДОМ .host-screen внутри
+   ThemeLayer (не внутри .grid-bg) — эти правила ничего не меняют в этом
+   контракте, только добавляют детей внутрь уже существующего узла. ── */
+.fx-cyber .fx-beam {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 46%,
+    color-mix(in srgb, var(--accent2) 90%, white) 50%, transparent 54%);
+  filter: drop-shadow(0 0 22px var(--accent2));
+  opacity: 0;
+  animation: cbBeamSweep .5s cubic-bezier(.3,.6,.4,1) forwards;
+}
+@keyframes cbBeamSweep {
+  0% { transform: translateX(-120%); opacity: 0; }
+  12% { opacity: .9; }
+  55% { opacity: .75; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+.fx-cyber .fx-rgb {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,0,90,.22) 0%, transparent 40%),
+    linear-gradient(90deg, transparent 60%, rgba(0,220,255,.22) 100%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: cbRgbFlicker .5s steps(2, jump-end) forwards;
+}
+@keyframes cbRgbFlicker {
+  0% { opacity: 0; transform: translateX(0); }
+  20% { opacity: .8; transform: translateX(-6px); }
+  40% { opacity: .6; transform: translateX(5px); }
+  60% { opacity: .5; transform: translateX(-3px); }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-cyber .fx-beam, .fx-cyber .fx-rgb { display: none; animation: none; }
+}
+
+/* ── Э2а: «Терминал boot» — появление вопроса. Классика получает свою
+   версию входа слов вместо общего `windIn` (01-base.css, вес 0,1,0):
+   вес селектора здесь 0,3,0, как у `.theme-potter .host-screen .q-word`
+   (14-theme-potter.css) — копия приёма, не изобретение нового. `animation`
+   — шорткат, полностью заменяет `windIn` целиком на этом элементе (это
+   разные ЭЛЕМЕНТЫ, не псевдо, поэтому это нормально, а не поломка чужой
+   анимации). Задержка по словам — уже существующий inline
+   `animationDelay` (WindText, HostScreen.tsx), здесь не трогаем. ── */
+.theme-classic .host-screen .q-word {
+  animation: cbBoot .5s steps(1, end) forwards;
+}
+@keyframes cbBoot {
+  0%   { opacity: 0; text-shadow: none; }
+  10%  { opacity: .25; }
+  22%  { opacity: .05; }
+  36%  { opacity: .9; text-shadow: 0 0 14px var(--accent2); }
+  55%  { opacity: .35; }
+  72%  { opacity: 1; text-shadow: 0 0 6px var(--accent2); }
+  100% { opacity: 1; text-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .q-word { animation: none; opacity: 1; }
+}
+
+/* ── Э2в: HUD-строка (ScreenFx/CyberHudReadout). Курсор ::after на
+   .q-text ЗАМЕРЕН и НЕ РЕАЛИЗОВАН — на реальной длине вопроса он сдвигал
+   подобранный useFitText кегль (0.5-2%) на 1366/1920/3840, см. HANDOFF.md.
+   `.fx-hud` — сосед .host-screen (внутри ScreenFx, тот сам сосед
+   .host-screen), position: fixed, bottom: 60px — НЕ 24px, тот уровень
+   занят .pack-badge (left) и .host-actions (right); середина на этом
+   уровне тоже может быть занята длинным текстом пакета/кнопками на узких
+   экранах, поэтому строка на 36px выше их базовой линии. */
+.fx-hud {
+  position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%);
+  z-index: 20; pointer-events: none;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em;
+  color: color-mix(in srgb, var(--accent2) 70%, transparent);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent2) 45%, transparent);
+  opacity: 0;
+  animation: cbHudIn .6s ease .1s forwards;
+}
+@keyframes cbHudIn { 0% { opacity: 0; } 100% { opacity: .8; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-hud { animation: none; opacity: .8; }
+}
+
+/* ── Э6: модалка «Своей игры» (JeopardyTile) — только classic. Модалка
+   уходит `createPortal`-ом в document.body, класс темы висит на самой
+   `.jp-overlay` (см. HostScreen.tsx), поэтому селектор БЕЗ вложенности
+   `.theme-classic .jp-overlay` — сам `.jp-overlay` уже несёт класс темы.
+   `.jp-modal` внутри дополнительно несёт класс `.hud-frame`, чей
+   ::before/::after УЖЕ заняты угловыми скобками (01-base.css) — поэтому
+   новый «скан» кладём на ::before/::after самого `.jp-overlay` (свободны),
+   а на `.jp-modal` — только entrance-анимация и box-shadow (не ::after). */
+.jp-overlay.theme-classic::before {
+  content: ''; position: absolute; left: 0; right: 0; height: 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent,
+    color-mix(in srgb, var(--accent2) 55%, transparent) 50%, transparent);
+  animation: cbModalScan 1.1s ease-out .05s both;
+}
+@keyframes cbModalScan {
+  0%   { transform: translateY(-140%); opacity: 0; }
+  20%  { opacity: .55; }
+  100% { transform: translateY(360%); opacity: 0; }
+}
+.jp-overlay.theme-classic > .jp-modal {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent2) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent2) 25%, transparent);
+}
+@keyframes cbModalBoot {
+  0%   { opacity: 0; transform: scale(.92); filter: brightness(1.6); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-overlay.theme-classic::before { animation: none; opacity: 0; }
+  .jp-overlay.theme-classic > .jp-modal { animation: none; }
+}
+
+/* ── Э5: «Перегрузка → чистый HUD» — экран чемпиона в финале.
+   `.fin-award`/`.fin-award.p1` свободны от `animation` и от `::before`/
+   `::after` (проверено грепом 25-results.css) — можно занимать оба.
+   `.fin-award` уже `position: relative` от общего правила
+   `.grid-bg > *:not(...)` (15-projector-interactive.css, .fin-award не в
+   списке исключений) — свой `position` не задаём повторно.
+   Компонент со ступенью p1 монтируется РОВНО ОДИН РАЗ на этом шаге финала
+   (см. HostScreen.tsx) — `both`-заполнение проигрывает само, вешать это
+   на `ScreenFx`/`fxTrigger` не нужно и запрещено (там намеренно нет
+   question_index в финале — иначе строб на слайдах «шоу» каждые 3-5с). ── */
+.theme-classic .host-screen .fin-award.p1 {
+  animation: cbOverload 1.3s cubic-bezier(.2,.7,.25,1) both;
+}
+@keyframes cbOverload {
+  0%   { filter: brightness(2.2) saturate(1.4); transform: scale(.96); }
+  8%   { filter: brightness(.4); }
+  16%  { filter: brightness(2.6); }
+  26%  { filter: brightness(.5); }
+  40%  { filter: brightness(1.6); transform: scale(1.02); }
+  70%  { filter: brightness(1.05); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+.theme-classic .host-screen .fin-award.p1::before {
+  content: ''; position: absolute; inset: -20% -30%; z-index: -1;
+  pointer-events: none; border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    color-mix(in srgb, var(--accent2) 55%, transparent), transparent 70%);
+  opacity: 0;
+  animation: cbOverloadBurst 1.3s ease-out both;
+}
+@keyframes cbOverloadBurst {
+  0%   { opacity: 0; transform: scale(.3); }
+  20%  { opacity: .9; }
+  45%  { opacity: .5; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .fin-award.p1 { animation: none; }
+  .theme-classic .host-screen .fin-award.p1::before { animation: none; opacity: 0; }
+}
+
+/* ── Э4: «Цифровая пересборка» табло (ScoreboardScreen, только classic).
+   Позицию строки (`transform: translateY`) двигает JS (FLIP), это чистая
+   позиция, её не трогаем. Здесь только визуальный акцент на СОСЕДНЕМ
+   свойстве (box-shadow/цвет ячеек) на время переезда, включается классом
+   `.sb-flip`, который JS сам снимает по таймеру — без `animation`, поэтому
+   без риска столкнуться с уже занятым `animation` у `.sb-row.is-in > td`
+   (25-results.css, sbRowIn). */
+.theme-classic .host-screen .sb-row.sb-flip > td {
+  transition: box-shadow .4s ease, background-color .4s ease;
+  box-shadow: inset 0 0 14px color-mix(in srgb, var(--accent2) 75%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent2) 75%, transparent);
+  background-color: color-mix(in srgb, var(--accent2) 20%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; }
+}
