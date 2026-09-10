@@ -1,7 +1,8 @@
 // ═══ CRUD редактора + журнал правок ═══
 import { supabase } from './supabase'
-import type { Pack, RoundBase, Question, MechanicKey, Answer, Team } from '../types/quiz'
+import type { Pack, RoundBase, Question, MechanicKey, Answer, Team, PackPlay } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
+import { shownKey } from './exportCsv'
 
 async function log(entity: string, entity_id: string, action: string, diff?: unknown) {
   const { data } = await supabase.auth.getUser()
@@ -243,25 +244,58 @@ export async function swapQuestions(
  *  BOM в начале обязателен: без него Excel открывает кириллицу кракозябрами. */
 export { exportPackCsv } from './exportCsv'
 
-/** Ответы и тайминг последней доигранной игры пакета (issue #3).
+/** История отыгрышей пакета (миграция 0013), новые сверху. Разовый фетч,
+ *  как и остальной экспорт редактора — не живой экран, полинг не нужен. */
+export async function listPackPlays(packId: string): Promise<PackPlay[]> {
+  const { data } = await supabase.from('pack_plays')
+    .select('*').eq('pack_id', packId).order('played_at', { ascending: false })
+  return (data ?? []) as PackPlay[]
+}
+
+/** Ответы и тайминг игр пакета (issue #3, расширено миграцией 0013).
  *  Разовый фетч, а не хук с поллингом — редактор не живой экран, кнопка
  *  жмётся один раз, полинг тут был бы просто лишним трафиком в фоне.
- *  Пакет, который ещё не играли (или последняя игра пришлась на время до
- *  миграции 0010), возвращает пустые ответы — выгрузка просто идёт без
- *  колонок статистики, как раньше. */
-export async function fetchLastGameData(pack: Pick<Pack, 'last_game_id'>) {
-  if (!pack.last_game_id) {
-    return { answers: [] as Answer[], teams: [] as Team[], shownAt: new Map<string, string>() }
+ *  @param gameIds Список игр, по которым собрать статистику. Не задан —
+ *  берём ВСЮ историю пакета (pack_plays); если истории нет (пакет доигран
+ *  до 0013) — фолбэк на last_game_id; если и его нет — пустой результат,
+ *  выгрузка идёт без колонок статистики, как раньше. */
+export async function fetchPackGameData(
+  pack: Pick<Pack, 'id' | 'last_game_id'>,
+  gameIds?: string[],
+) {
+  let plays: PackPlay[] = []
+  let ids = gameIds
+  if (!ids) {
+    plays = await listPackPlays(pack.id)
+    ids = plays.length ? plays.map(p => p.game_id)
+      : pack.last_game_id ? [pack.last_game_id] : []
   }
-  const [{ data: answers }, { data: teams }, { data: shown }] = await Promise.all([
-    supabase.from('answers').select('*').eq('game_id', pack.last_game_id),
-    supabase.from('teams').select('*').eq('game_id', pack.last_game_id),
-    supabase.from('question_shown').select('question_ref, shown_at').eq('game_id', pack.last_game_id),
+  if (!ids.length) {
+    return {
+      answers: [] as Answer[], teams: [] as Team[],
+      shownAt: new Map<string, string>(), plays,
+    }
+  }
+  const [{ data: answers }, { data: shown }] = await Promise.all([
+    supabase.from('answers').select('*').in('game_id', ids),
+    supabase.from('question_shown').select('game_id, question_ref, shown_at').in('game_id', ids),
   ])
+  // teams НЕ тянем по game_id: у teams есть unique(name), upsertTeam идёт
+  // onConflict:'name' — значит одна и та же строка команды переиспользуется
+  // между играми, и её game_id перезаписывается последней игрой. Выборка
+  // по game_id для СТАРЫХ отыгрышей вернёт пусто → «?» вместо имени команды
+  // в CSV. Тянем по id из уникальных team_id, реально встретившихся в
+  // ответах — они не переписываются.
+  const teamIds = [...new Set((answers ?? []).map(a => a.team_id as string))]
+  const { data: teams } = teamIds.length
+    ? await supabase.from('teams').select('*').in('id', teamIds)
+    : { data: [] as Team[] }
   return {
     answers: (answers ?? []) as Answer[],
     teams: (teams ?? []) as Team[],
-    shownAt: new Map((shown ?? []).map(r => [r.question_ref as string, r.shown_at as string])),
+    shownAt: new Map((shown ?? [])
+      .map(r => [shownKey(r.game_id as string, r.question_ref as string), r.shown_at as string])),
+    plays,
   }
 }
 
