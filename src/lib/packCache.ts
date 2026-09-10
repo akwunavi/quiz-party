@@ -153,9 +153,16 @@ export async function listMediaPaths(packId: string): Promise<string[]> {
   })
 }
 
-/** Занятое место / квота браузера (для «хватит ли места на пакет»). */
+/** Занятое место / квота браузера (для «хватит ли места на пакет»).
+ *  `navigator` — браузерный глобал, которого в Node нет вообще (не только
+ *  `.storage`): в некоторых версиях Node (22+) есть куцая браузерная
+ *  заглушка `navigator.userAgent`, поэтому баг был не виден локально, но
+ *  в CI (Node 20 в workflow) `navigator` не существует как глобал вовсе,
+ *  и `navigator.storage?.estimate` падает `ReferenceError` ДО того, как
+ *  опциональная цепочка успевает что-то проверить — проверять нужно сам
+ *  `navigator`, а не только `.storage` на нём. */
 export async function estimateSize(): Promise<{ usage: number; quota: number }> {
-  if (!navigator.storage?.estimate) return { usage: 0, quota: 0 }
+  if (typeof navigator === 'undefined' || !navigator.storage?.estimate) return { usage: 0, quota: 0 }
   const { usage, quota } = await navigator.storage.estimate()
   return { usage: usage ?? 0, quota: quota ?? 0 }
 }
