@@ -247,3 +247,20 @@
   .theme-classic .host-screen .fin-award.p1 { animation: none; }
   .theme-classic .host-screen .fin-award.p1::before { animation: none; opacity: 0; }
 }
+
+/* ── Э4: «Цифровая пересборка» табло (ScoreboardScreen, только classic).
+   Позицию строки (`transform: translateY`) двигает JS (FLIP), это чистая
+   позиция, её не трогаем. Здесь только визуальный акцент на СОСЕДНЕМ
+   свойстве (box-shadow/цвет ячеек) на время переезда, включается классом
+   `.sb-flip`, который JS сам снимает по таймеру — без `animation`, поэтому
+   без риска столкнуться с уже занятым `animation` у `.sb-row.is-in > td`
+   (25-results.css, sbRowIn). */
+.theme-classic .host-screen .sb-row.sb-flip > td {
+  transition: box-shadow .4s ease, background-color .4s ease;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent2) 55%, transparent);
+  background-color: color-mix(in srgb, var(--accent2) 10%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; }
+}
