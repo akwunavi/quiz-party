@@ -79,3 +79,45 @@
     animation: none; opacity: 1;
   }
 }
+
+/* ── Э1: «Скан-переход» — доп. слои поверх существующей вспышки .fx-cyber
+   (ScreenFx/CyberFlash). Свои элементы (`.fx-beam`/`.fx-rgb`), НЕ
+   псевдоэлементы `.fx-cyber` — те заняты `cxBar` (28-theme-cyber.css).
+   `.fx-flash` уже `position: fixed` и живёт СОСЕДОМ .host-screen внутри
+   ThemeLayer (не внутри .grid-bg) — эти правила ничего не меняют в этом
+   контракте, только добавляют детей внутрь уже существующего узла. ── */
+.fx-cyber .fx-beam {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 46%,
+    color-mix(in srgb, var(--accent2) 90%, white) 50%, transparent 54%);
+  filter: drop-shadow(0 0 22px var(--accent2));
+  opacity: 0;
+  animation: cbBeamSweep .5s cubic-bezier(.3,.6,.4,1) forwards;
+}
+@keyframes cbBeamSweep {
+  0% { transform: translateX(-120%); opacity: 0; }
+  12% { opacity: .9; }
+  55% { opacity: .75; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+.fx-cyber .fx-rgb {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,0,90,.22) 0%, transparent 40%),
+    linear-gradient(90deg, transparent 60%, rgba(0,220,255,.22) 100%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: cbRgbFlicker .5s steps(2, jump-end) forwards;
+}
+@keyframes cbRgbFlicker {
+  0% { opacity: 0; transform: translateX(0); }
+  20% { opacity: .8; transform: translateX(-6px); }
+  40% { opacity: .6; transform: translateX(5px); }
+  60% { opacity: .5; transform: translateX(-3px); }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-cyber .fx-beam, .fx-cyber .fx-rgb { display: none; animation: none; }
+}

@@ -25,8 +25,12 @@ const MIN_GAP_MS = 4000
 /** Длительность CSS-анимации каждой темы + запас на снятие из DOM.
  *  Классика: cxNoise .42s (28-theme-cyber.css) — поднято с .26s, потому что
  *  на исходной длительности пик держался меньше кадра при 60Гц и не был
- *  виден физически (проверено покадровым рендером). */
-const FLASH_MS: Record<string, number> = { classic: 470, potter: 700 }
+ *  виден физически (проверено покадровым рендером). С 9.06 добавлены
+ *  .fx-beam/.fx-rgb (32-cyber-motion.css, cbBeamSweep/cbRgbFlicker, по
+ *  .5s каждая, без задержки) — они и есть самая длинная анимация вспышки
+ *  теперь, поэтому запас поднят до 520 (500мс анимации + 20мс на кадр),
+ *  чтобы узел не снимался из DOM раньше, чем анимация физически доиграет. */
+const FLASH_MS: Record<string, number> = { classic: 520, potter: 700 }
 
 function readEnabled(): boolean {
   try {
@@ -90,8 +94,18 @@ export function ScreenFx({ theme, trigger }: { theme: ThemeKey; trigger: string 
   )
 }
 
+/** Скан-переход (Э1): к уже существующему шуму-разрыву (`fx-cyber`,
+ *  28-theme-cyber.css) добавлены луч-развёртка (`fx-beam`) и короткий
+ *  хроматический сдвиг (`fx-rgb`) — свои элементы, не псевдоэлементы
+ *  `.fx-cyber` (те заняты `cxBar`, см. 28-theme-cyber.css). CSS — в
+ *  32-cyber-motion.css. */
 function CyberFlash() {
-  return <div className="fx-flash fx-cyber" aria-hidden="true" />
+  return (
+    <div className="fx-flash fx-cyber" aria-hidden="true">
+      <span className="fx-beam" />
+      <span className="fx-rgb" />
+    </div>
+  )
 }
 
 function PotterFlash() {
