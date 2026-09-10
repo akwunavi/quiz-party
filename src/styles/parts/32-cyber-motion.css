@@ -1,0 +1,21 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   CYBERPUNK MOTION — доп. декоративные эффекты, ТОЛЬКО тема classic (9.04)
+
+   Этап 1 из 3 (New Year и Magic пока не трогаем). Каждый эффект — свой
+   раздел ниже, с явным номером из плана. Единственный файл, который
+   получает новый JS впридачу к CSS — Э4 (табло FLIP, ScoreboardScreen).
+
+   ПРАВИЛА:
+   - Все селекторы — `.theme-classic .host-screen ...` (с `.host-screen` в
+     цепочке), иначе протечёт на PlayerPage (у него тоже `theme-classic`
+     через ThemeLayer).
+   - Новые keyframes — с префиксом `cb` (cyber-boot/cyber-blitz), чтобы не
+     столкнуться с уже существующими `tmOrbit`/`cfScan`/`cpBar`/`cpRow`/
+     `cpCode`/`cxNoise`/`cxBar`/`sbScan`/`sbPrint`/`sbChampPulse`
+     (28-theme-cyber.css) — их не трогаем и не дублируем.
+   - Каждое новое анимационное правило зеркалится дословно в
+     `@media (prefers-reduced-motion: reduce)` в самом низу файла.
+   - Не переопределяем `animation` на элементах, где он уже занят
+     (`.choice-plate.correct`, `.choice-img.correct`, `.sb-row.is-in > td`)
+     — только на их свободных `::before`/`::after` или на соседних тегах.
+   ═══════════════════════════════════════════════════════════════════════ */
