@@ -169,3 +169,39 @@
 @media (prefers-reduced-motion: reduce) {
   .fx-hud { animation: none; opacity: .8; }
 }
+
+/* ── Э6: модалка «Своей игры» (JeopardyTile) — только classic. Модалка
+   уходит `createPortal`-ом в document.body, класс темы висит на самой
+   `.jp-overlay` (см. HostScreen.tsx), поэтому селектор БЕЗ вложенности
+   `.theme-classic .jp-overlay` — сам `.jp-overlay` уже несёт класс темы.
+   `.jp-modal` внутри дополнительно несёт класс `.hud-frame`, чей
+   ::before/::after УЖЕ заняты угловыми скобками (01-base.css) — поэтому
+   новый «скан» кладём на ::before/::after самого `.jp-overlay` (свободны),
+   а на `.jp-modal` — только entrance-анимация и box-shadow (не ::after). */
+.jp-overlay.theme-classic::before {
+  content: ''; position: absolute; left: 0; right: 0; height: 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent,
+    color-mix(in srgb, var(--accent2) 55%, transparent) 50%, transparent);
+  animation: cbModalScan 1.1s ease-out .05s both;
+}
+@keyframes cbModalScan {
+  0%   { transform: translateY(-140%); opacity: 0; }
+  20%  { opacity: .55; }
+  100% { transform: translateY(360%); opacity: 0; }
+}
+.jp-overlay.theme-classic > .jp-modal {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent2) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent2) 25%, transparent);
+}
+@keyframes cbModalBoot {
+  0%   { opacity: 0; transform: scale(.92); filter: brightness(1.6); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-overlay.theme-classic::before { animation: none; opacity: 0; }
+  .jp-overlay.theme-classic > .jp-modal { animation: none; }
+}
