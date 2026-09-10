@@ -38,6 +38,11 @@
 --     единообразия сведено к is_editor().
 --   • edit_log: log_ins/log_read дублируют editlog_all — функционально
 --     одинаковые, оставлен только editlog_all.
+--   • blitz_state: blitz_ins/blitz_upd (INSERT/UPDATE, роль public,
+--     qual=true) — любой анонимный гость мог напрямую переписать
+--     состояние блица (минуя REST-запросы приложения, прямым запросом
+--     с anon-ключом из бандла). Пишут блиц только проектор и админка
+--     (авторизованные вкладки хоста) — телефон игрока только читает.
 --
 -- ОТКАТ (если что-то сломалось прямо перед игрой — вставить и запустить,
 -- это за минуту возвращает разрешающий режим как было до этой миграции):
@@ -59,6 +64,10 @@
 --   drop policy if exists ai_feedback_rw on ai_feedback;
 --   create policy ai_feedback_rw on ai_feedback for all to authenticated using (true) with check (true);
 --   drop trigger if exists answers_lock_is_correct on answers;
+--   drop policy if exists blitz_ins on blitz_state;
+--   create policy blitz_ins on blitz_state for insert with check (true);
+--   drop policy if exists blitz_upd on blitz_state;
+--   create policy blitz_upd on blitz_state for update using (true) with check (true);
 --   -- storage-блок в конце файла откатывается своим отдельным SQL там же.
 --
 -- ═══════════════════════════════════════════════════════════════
@@ -190,6 +199,16 @@ drop policy if exists qr_delete on question_ratings;
 create policy qr_delete on question_ratings for delete using (is_editor());
 -- qr_select/qr_insert/qr_update (0005/0010-контекст, true — by design)
 -- остаются.
+
+-- ── blitz_state ────────────────────────────────────────────────
+-- Теневая дыра: анонимный INSERT/UPDATE без условий (см. шапку файла).
+-- Пишут блиц только проектор/админка (авторизованные вкладки хоста),
+-- телефон игрока только читает.
+drop policy if exists blitz_ins on blitz_state;
+create policy blitz_ins on blitz_state for insert with check (is_editor());
+drop policy if exists blitz_upd on blitz_state;
+create policy blitz_upd on blitz_state for update using (is_editor()) with check (is_editor());
+-- blitz_read (true) остаётся — телефон должен видеть текущее состояние.
 
 -- ── ai_reviews / ai_feedback ───────────────────────────────────
 -- `to authenticated using(true)` — не анонимная дыра (нужен хоть какой-то
