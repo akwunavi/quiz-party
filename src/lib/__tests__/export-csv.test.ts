@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { exportPackCsv } from '../exportCsv'
+import { exportPackCsv, shownKey } from '../exportCsv'
 import type { LoadedPack } from '../packLoader'
-import type { Answer, Team } from '../../types/quiz'
+import type { Answer, Team, PackPlay } from '../../types/quiz'
 
 // Колонки шапки и колонки строк живут в разных местах функции — добавил
 // поле в одном и забыл в другом, и вся таблица уезжает вправо, причём
@@ -27,7 +27,8 @@ const parse = (csv: string) =>
 describe('выгрузка в таблицу', () => {
   it('число колонок в строках совпадает с шапкой', () => {
     const rows = parse(exportPackCsv(pack, new Map()))
-    expect(rows[0]).toBe(20)   // 11 базовых + озвучка(2) + оценки(2) + статистика игры(4) + сырые ответы(1)
+    // 11 базовых + озвучка(2) + оценки(2) + отыгрышей(1) + статистика игры(4) + сырые ответы(1)
+    expect(rows[0]).toBe(21)
     expect(rows[1]).toBe(rows[0])
     expect(rows[2]).toBe(rows[0])
   })
@@ -94,9 +95,20 @@ describe('статистика последней игры (issue #3)', () => {
         ans('q-a', 'да', true, '2026-01-01T00:00:10.000Z'),
         ans('q-a', 'да', true, '2026-01-01T00:00:20.000Z'),
       ],
-      shownAt: new Map([['q-a', '2026-01-01T00:00:00.000Z']]),
+      shownAt: new Map([[shownKey('g', 'q-a'), '2026-01-01T00:00:00.000Z']]),
     })
     expect(csv.split('\r\n')[1]).toContain('"15"')   // среднее (10+20)/2
+  })
+
+  it('shownAt по чужому game_id не считается (составной ключ, не голый ref)', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'да', true, '2026-01-01T00:00:10.000Z')],
+      // запись про ДРУГУЮ игру с тем же question_ref не должна подмешаться
+      shownAt: new Map([[shownKey('другая-игра', 'q-a'), '2026-01-01T00:00:00.000Z']]),
+    })
+    // без метки показа СВОЕЙ игры скорость не считается — колонка пустая
+    const line = csv.split('\r\n')[1]
+    expect(line).not.toContain('"10"')
   })
 
   it('распределение по вариантам — только у choice-вопросов', () => {
@@ -143,5 +155,74 @@ describe('сырые ответы команд (уточнение ведуще�
     const csv = exportPackCsv(pack, new Map(), undefined,
       { answers: [ans('q-a', 'Дели', null, 't1')] })
     expect(csv.split('\r\n')[1]).toContain('?: Дели')
+  })
+})
+
+describe('shownKey — составной ключ показа вопроса (истории 0013)', () => {
+  it('детерминированный и одинаковый для одних и тех же аргументов', () => {
+    expect(shownKey('game1', 'q-a')).toBe(shownKey('game1', 'q-a'))
+  })
+
+  it('разные game_id при одном question_ref дают РАЗНЫЕ ключи', () => {
+    // регресс-тест на схлопывание: раньше карта тайминга индексировалась
+    // голым question_ref, и запись одной игры затирала другую
+    expect(shownKey('game1', 'q-a')).not.toBe(shownKey('game2', 'q-a'))
+  })
+
+  it('разные question_ref при одном game_id тоже дают разные ключи', () => {
+    expect(shownKey('game1', 'q-a')).not.toBe(shownKey('game1', 'q-b'))
+  })
+})
+
+describe('история отыгрышей пакета (issue #3 + миграция 0013)', () => {
+  const ans = (question_ref: string, answer_text: string, game_id: string,
+    created_at?: string, team_id = 't1'): Answer => ({
+    id: `${question_ref}-${game_id}-${Math.random()}`, team_id, game_id,
+    question_ref, round_number: 0, answer_text, stake: null, is_correct: null,
+    updated_at: '2026-01-01', created_at,
+  })
+  const play = (game_id: string, played_at: string): PackPlay =>
+    ({ id: game_id, pack_id: 'p', game_id, played_at })
+
+  it('колонка «Отыгрышей в статистике» — в шапке и в строке одновременно', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'да', 'g1')],
+      plays: [play('g1', '2026-09-05T00:00:00.000Z')],
+    })
+    const [header, row] = csv.split('\r\n')
+    expect(header).toContain('Отыгрышей в статистике')
+    expect(row).toContain('"1"')
+  })
+
+  it('без переданного plays считает по числу различных game_id в ответах', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'да', 'g1'), ans('q-a', 'нет', 'g2')],
+    })
+    const row = csv.split('\r\n')[1]
+    const cols = row.split('";"')
+    // индекс колонки «Отыгрышей в статистике» — сразу после «Скрыт» (15-я, 0-based 15)
+    expect(cols[15]).toBe('2')
+  })
+
+  it('при одной игре в выборке ответы идут без даты-префикса', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'да', 'g1')],
+      teams: [{ id: 't1', name: 'Команда', color: '#fff', game_id: 'g1', icon: null, last_seen_at: null }],
+      plays: [play('g1', '2026-09-05T00:00:00.000Z')],
+    })
+    const row = csv.split('\r\n')[1]
+    expect(row).toContain('Команда: да')
+    expect(row).not.toContain('05.09 Команда')
+  })
+
+  it('при нескольких играх в выборке ответ префиксуется короткой датой отыгрыша', () => {
+    const csv = exportPackCsv(pack, new Map(), undefined, {
+      answers: [ans('q-a', 'Дели', 'g1', undefined, 't1'), ans('q-a', 'Мумбаи', 'g2', undefined, 't2')],
+      teams: [{ id: 't2', name: 'Котики', color: '#fff', game_id: 'g2', icon: null, last_seen_at: null }],
+      plays: [play('g1', '2026-09-05T00:00:00.000Z'), play('g2', '2026-09-08T00:00:00.000Z')],
+    })
+    const row = csv.split('\r\n')[1]
+    expect(row).toContain('05.09 ?: Дели')
+    expect(row).toContain('08.09 Котики: Мумбаи')
   })
 })

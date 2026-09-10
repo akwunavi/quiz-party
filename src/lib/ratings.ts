@@ -45,8 +45,14 @@ export async function saveRoundComment(args: {
   const ref = commentRef(args.roundNumber)
   const text = args.comment.trim()
   if (!text) {
-    await supabase.from('question_ratings').delete()
+    // Раньше результат не проверялся: RLS без delete-политики на
+    // question_ratings (до миграции 0012) тихо блокировал удаление —
+    // Postgres не отдаёт ошибку на запрещённый RLS delete, он просто не
+    // видит строк и «успешно» удаляет ноль. Комментарий оставался в базе,
+    // хотя команда его стёрла с телефона.
+    const { error } = await supabase.from('question_ratings').delete()
       .eq('team_id', args.teamId).eq('question_ref', ref)
+    if (error) throw error
     return
   }
   const { error } = await supabase.from('question_ratings').upsert({

@@ -7,7 +7,7 @@ import { estimateRoundMinutes } from '../../lib/duration'
 import {
   createPack, renamePack, setPackStatus, setPackTheme, setPackSettings, duplicatePack,
   createRound, swapRounds, deleteRound,
-  getOrCreateBank, exportPackJson, exportPackCsv, fetchLastGameData,
+  getOrCreateBank, exportPackJson, exportPackCsv, fetchPackGameData, listPackPlays,
 } from '../../lib/editorApi'
 import { MediaSlot } from './QuestionForm'
 import { ratingsByQuestion } from '../../lib/ratings'
@@ -15,7 +15,7 @@ import { packMediaSize, findOrphans, deleteOrphans, mediaLinks, findMissing, typ
 import { supabase, signupClient } from '../../lib/supabase'
 import { validatePack, type Problem } from '../../lib/validate'
 import { RoundScreen } from './RoundScreen'
-import type { Pack, MechanicKey } from '../../types/quiz'
+import type { Pack, MechanicKey, PackPlay } from '../../types/quiz'
 import { InfoSlidesModal } from './InfoSlidesModal'
 
 
@@ -81,11 +81,30 @@ function MediaCleanup({ pack, onDone }: { pack: LoadedPack; onDone: () => void }
 }
 
 
-/** Выгрузка пакета: JSON со всеми вопросами + список медиа со ссылками.
- *  Нужна как страховка перед удалением медиа или раунда: место в хранилище
- *  кончается незаметно, а вопросы должны пережить чистку. */
+/** Короткая дата отыгрыша для подписи в селекторе/имени файла: «08.09.2026». */
+const playLabel = (iso: string) => {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? iso.slice(0, 10) : d.toLocaleDateString('ru-RU')
+}
+
+/** Выгрузка пакета: JSON со всеми вопросами + список медиа со ссылками +
+ *  CSV-таблица с ответами. Нужна как страховка перед удалением медиа или
+ *  раунда: место в хранилище кончается незаметно, а вопросы должны
+ *  пережить чистку.
+ *  Если пакет доигрывали больше одного раза (pack_plays, миграция 0013) —
+ *  можно выбрать конкретный вечер или взять статистику по всем сразу;
+ *  при одном отыгрыше (или их отсутствии) селектор не показываем — нечего
+ *  выбирать. */
 function PackExport({ pack }: { pack: LoadedPack }) {
   const [busy, setBusy] = useState(false)
+  const [plays, setPlays] = useState<PackPlay[]>([])
+  const [gameSel, setGameSel] = useState('all')
+
+  useEffect(() => {
+    let cancelled = false
+    listPackPlays(pack.id).then(p => { if (!cancelled) setPlays(p) }).catch(() => {})
+    return () => { cancelled = true }
+  }, [pack.id])
 
   const download = (name: string, text: string, type = 'application/json') => {
     const url = URL.createObjectURL(new Blob([text], { type }))
@@ -101,24 +120,44 @@ function PackExport({ pack }: { pack: LoadedPack }) {
       const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
       const links = await mediaLinks(pack)
       const map = new Map(links.map(l => [l.path, l.url]))
+      const selected = gameSel === 'all' ? undefined : [gameSel]
       // основной формат — таблица: открывается в Excel двойным кликом,
-      // ссылки на медиа лежат прямо в ячейках, качать можно по клику
+      // ссылки на медиа лежат прямо в ячейках, качать можно по клику.
       // Оценки собираем по ВСЕМ играм этого пакета: интересна не одна
-      // вечеринка, а то, какие вопросы стабильно проседают. А вот ответы и
-      // тайминг — только по ПОСЛЕДНЕЙ игре (issue #3, решение ведущего):
-      // полной истории может не быть, purgeOldGames чистит старые данные.
-      const [rated, gameData] = await Promise.all([ratingsByQuestion(), fetchLastGameData(pack)])
-      download(`${safe}_${stamp}.csv`, exportPackCsv(pack, map, rated, gameData), 'text/csv;charset=utf-8')
+      // вечеринка, а то, какие вопросы стабильно проседают. Ответы и
+      // тайминг — по выбору ведущего: вся история пакета (по умолчанию)
+      // или один конкретный вечер (issue #3 + история 0013).
+      const [rated, gameData] = await Promise.all([
+        ratingsByQuestion(), fetchPackGameData(pack, selected),
+      ])
+      const selPlays = gameSel === 'all' ? plays : plays.filter(p => p.game_id === gameSel)
+      const suffix = plays.length < 2 ? ''
+        : gameSel === 'all' ? '_все-игры'
+        : `_${(selPlays[0]?.played_at ?? '').slice(0, 10) || gameSel.slice(0, 6)}`
+      download(`${safe}_${stamp}${suffix}.csv`,
+        exportPackCsv(pack, map, rated, { ...gameData, plays: selPlays }), 'text/csv;charset=utf-8')
       // резервный слепок: из него можно восстановить структуру целиком
       download(`${safe}_${stamp}_резерв.json`, exportPackJson(pack))
     } finally { setBusy(false) }
   }
 
   return (
-    <button className="ghost" disabled={busy} onClick={() => void exportAll()}
-      title="Таблица CSV для Excel: вопросы, ответы, оценки и статистика последней игры">
-      {busy ? 'готовлю…' : '⬇ Выгрузить в Excel'}
-    </button>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+      {plays.length >= 2 && (
+        <select className="pack-export-select" value={gameSel}
+          onChange={e => setGameSel(e.target.value)}
+          title="Какие отыгрыши включить в статистику ответов">
+          <option value="all">все отыгрыши ({plays.length})</option>
+          {plays.map(p => (
+            <option key={p.game_id} value={p.game_id}>{playLabel(p.played_at)}</option>
+          ))}
+        </select>
+      )}
+      <button className="ghost" disabled={busy} onClick={() => void exportAll()}
+        title="Таблица CSV для Excel: вопросы, ответы, оценки и статистика игр пакета">
+        {busy ? 'готовлю…' : '⬇ Выгрузить в Excel'}
+      </button>
+    </span>
   )
 }
 

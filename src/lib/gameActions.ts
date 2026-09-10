@@ -155,14 +155,26 @@ export async function finishGame(packId: string | null, bar = false) {
     // Вне 13 операций транспорта: это поле packs, не game_sessions, и
     // отдельного метода под него сознательно нет (см. transport/types.ts) —
     // прямой вызов Supabase остаётся здесь, как редакторская мелочь на
-    // стыке с игровым потоком. `packs` — облачная таблица, у локального
-    // сервера бара её нет и быть не может (см. HANDOFF §3aq) — в локальном
-    // режиме этот шаг пропускаем целиком, а не даём ему тихо упасть на
-    // недоступном облаке без try/catch.
+    // стыке с игровым потоком. `packs`/`pack_plays` — облачные таблицы, у
+    // локального сервера бара их нет и быть не может (см. HANDOFF §3aq) —
+    // в локальном режиме этот шаг пропускаем целиком. Весь блок — в
+    // try/catch: запись истории отыгрышей — аналитика для редактора, а не
+    // то, без чего переход в финал обязан сорваться, провал здесь не
+    // должен ронять игру ведущему в руках.
     if (!isLocalMode()) {
-      const session = await room.readSession(getRoomId())
-      if (session?.game_id) {
-        await supabase.from('packs').update({ last_game_id: session.game_id }).eq('id', packId)
+      try {
+        const session = await room.readSession(getRoomId())
+        if (session?.game_id) {
+          await supabase.from('packs').update({ last_game_id: session.game_id }).eq('id', packId)
+          // полная история отыгрышей (миграция 0013) — last_game_id хранит
+          // только последний, этим редактор выбирает конкретный вечер
+          await supabase.from('pack_plays').upsert(
+            { pack_id: packId, game_id: session.game_id },
+            { onConflict: 'pack_id,game_id', ignoreDuplicates: true },
+          )
+        }
+      } catch (e) {
+        console.error('finishGame: не удалось записать историю отыгрышей пакета', e)
       }
     }
   }
