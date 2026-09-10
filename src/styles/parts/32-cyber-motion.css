@@ -205,3 +205,45 @@
   .jp-overlay.theme-classic::before { animation: none; opacity: 0; }
   .jp-overlay.theme-classic > .jp-modal { animation: none; }
 }
+
+/* ── Э5: «Перегрузка → чистый HUD» — экран чемпиона в финале.
+   `.fin-award`/`.fin-award.p1` свободны от `animation` и от `::before`/
+   `::after` (проверено грепом 25-results.css) — можно занимать оба.
+   `.fin-award` уже `position: relative` от общего правила
+   `.grid-bg > *:not(...)` (15-projector-interactive.css, .fin-award не в
+   списке исключений) — свой `position` не задаём повторно.
+   Компонент со ступенью p1 монтируется РОВНО ОДИН РАЗ на этом шаге финала
+   (см. HostScreen.tsx) — `both`-заполнение проигрывает само, вешать это
+   на `ScreenFx`/`fxTrigger` не нужно и запрещено (там намеренно нет
+   question_index в финале — иначе строб на слайдах «шоу» каждые 3-5с). ── */
+.theme-classic .host-screen .fin-award.p1 {
+  animation: cbOverload 1.3s cubic-bezier(.2,.7,.25,1) both;
+}
+@keyframes cbOverload {
+  0%   { filter: brightness(2.2) saturate(1.4); transform: scale(.96); }
+  8%   { filter: brightness(.4); }
+  16%  { filter: brightness(2.6); }
+  26%  { filter: brightness(.5); }
+  40%  { filter: brightness(1.6); transform: scale(1.02); }
+  70%  { filter: brightness(1.05); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+.theme-classic .host-screen .fin-award.p1::before {
+  content: ''; position: absolute; inset: -20% -30%; z-index: -1;
+  pointer-events: none; border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    color-mix(in srgb, var(--accent2) 55%, transparent), transparent 70%);
+  opacity: 0;
+  animation: cbOverloadBurst 1.3s ease-out both;
+}
+@keyframes cbOverloadBurst {
+  0%   { opacity: 0; transform: scale(.3); }
+  20%  { opacity: .9; }
+  45%  { opacity: .5; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .fin-award.p1 { animation: none; }
+  .theme-classic .host-screen .fin-award.p1::before { animation: none; opacity: 0; }
+}
