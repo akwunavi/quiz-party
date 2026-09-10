@@ -122,6 +122,53 @@ function PackExport({ pack }: { pack: LoadedPack }) {
   )
 }
 
+/** Резервная презентация (.pptx) на случай «ведущего вообще нет» — файл
+ *  полностью автономный, открывается на рабочем столе без сети/пароля/
+ *  сервера, ведётся как обычная презентация с листочком для баллов. НЕ
+ *  замена офлайн-устойчивости (issue #4/#5, там — «ведущий на месте, но
+ *  упал интернет»): подробности — HANDOFF.md. Доступна независимо от прав
+ *  на редактирование пакета — как и остальной экспорт (PackExport выше). */
+function PptxExportButton({ pack }: { pack: LoadedPack }) {
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
+  const [err, setErr] = useState('')
+
+  const run = async () => {
+    setBusy(true); setErr(''); setProgress(null)
+    try {
+      const { renderBackupPptx } = await import('../../lib/pptxExport')
+      const blob = await renderBackupPptx(pack, (done, total) => setProgress({ done, total }))
+      const stamp = new Date().toISOString().slice(0, 10)
+      const safe = pack.name.replace(/[^\wА-Яа-яЁё-]+/g, '_').slice(0, 40)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = `${safe}_${stamp}_резерв.pptx`; a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'не удалось собрать презентацию')
+    } finally {
+      setBusy(false); setProgress(null)
+    }
+  }
+
+  return (
+    <span className="pptx-export">
+      <button className="ghost" disabled={busy} onClick={() => void run()}
+        title="Полностью автономный .pptx: вопрос → клик → ответ, без сети и без приложения. На случай, если вести игру придётся кому-то без доступа к системе">
+        {busy
+          ? (progress ? `скачиваю медиа… ${progress.done} / ${progress.total}` : 'собираю…')
+          : '⬇ Скачать резервную презентацию (PPTX)'}
+      </button>
+      {!busy && (
+        <span className="ed-row-meta">
+          может занять время и получиться большим файлом, если в раундах много аудио/видео
+        </span>
+      )}
+      {err && <span className="ed-row-meta" style={{ color: 'var(--danger)' }}>{err}</span>}
+    </span>
+  )
+}
+
 // ═══ Редактор: вход → пакеты → пакет → раунд → вопрос ═══
 
 export const MECHANIC_NAMES: Record<MechanicKey, string> = {
@@ -318,7 +365,7 @@ function PackScreen({ packId, user, onBack }: {
         <div className="ed-note ed-note-live">▶ Пакет сейчас в игре. Правки видны на
           проекторе сразу — если игра идёт, лучше дождаться её конца.</div>}
       <div className="ed-card"><h4>Пакет · медиа {mediaSizeMb === null ? '…' : `${mediaSizeMb} МБ`}
-        <span className="pack-tools"><PackExport pack={pack} /><MediaCleanup pack={pack} onDone={reload} /></span>
+        <span className="pack-tools"><PackExport pack={pack} /><PptxExportButton pack={pack} /><MediaCleanup pack={pack} onDone={reload} /></span>
       </h4>
         <div className="ed-grid2">
           <div className="ed-field"><label>Статус</label>

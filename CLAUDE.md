@@ -52,6 +52,7 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `components/Hint.tsx` | подсказки при ошибочных действиях (не блокируют) |
 | `hooks/useFitText.ts` | текст вопроса вписывается в рамку на любом экране |
 | `lib/packRights.ts` | кто что правит в редакторе (совпадает с политиками БД) |
+| `lib/pptxExport.ts` | резервная презентация .pptx редактора — план слайдов (чистый) + рендер (сеть + `pptxgenjs` динамическим импортом) — HANDOFF §3au |
 | `styles/parts/*.css` | 27 частей, порядок задан в `global.css` |
 
 Механики раундов: `standard`, `test_stop`, `rebus`, `jeopardy`,
