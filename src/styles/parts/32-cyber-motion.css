@@ -121,3 +121,28 @@
 @media (prefers-reduced-motion: reduce) {
   .fx-cyber .fx-beam, .fx-cyber .fx-rgb { display: none; animation: none; }
 }
+
+/* ── Э2а: «Терминал boot» — появление вопроса. Классика получает свою
+   версию входа слов вместо общего `windIn` (01-base.css, вес 0,1,0):
+   вес селектора здесь 0,3,0, как у `.theme-potter .host-screen .q-word`
+   (14-theme-potter.css) — копия приёма, не изобретение нового. `animation`
+   — шорткат, полностью заменяет `windIn` целиком на этом элементе (это
+   разные ЭЛЕМЕНТЫ, не псевдо, поэтому это нормально, а не поломка чужой
+   анимации). Задержка по словам — уже существующий inline
+   `animationDelay` (WindText, HostScreen.tsx), здесь не трогаем. ── */
+.theme-classic .host-screen .q-word {
+  animation: cbBoot .5s steps(1, end) forwards;
+}
+@keyframes cbBoot {
+  0%   { opacity: 0; text-shadow: none; }
+  10%  { opacity: .25; }
+  22%  { opacity: .05; }
+  36%  { opacity: .9; text-shadow: 0 0 14px var(--accent2); }
+  55%  { opacity: .35; }
+  72%  { opacity: 1; text-shadow: 0 0 6px var(--accent2); }
+  100% { opacity: 1; text-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-classic .host-screen .q-word { animation: none; opacity: 1; }
+}
