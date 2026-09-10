@@ -63,11 +63,16 @@ export function OfflineDownloadPanel({ pack, offline }: { pack: LoadedPack; offl
         </div>
       )}
       {persistText(persist) && <div className="adm-dim offline-dl-persist">{persistText(persist)}</div>}
-      {progress && progress.failed.length > 0 && (
+      {progress && !progress.running && progress.failed.length > 0 && (
         <div className="offline-dl-failed">
           <button className="adm-link" onClick={() => setShowFailed(v => !v)}>
             {showFailed ? '▾' : '▸'} не скачалось: {progress.failed.length}
           </button>
+          <div className="adm-dim offline-dl-retry-hint">
+            Часто это просто сеть моргнула, а не что-то реально пропавшее —
+            жми кнопку выше ещё раз: она докачивает только недостающее, не
+            всё заново.
+          </div>
           {showFailed && (
             <ul className="offline-dl-failed-list">
               {progress.failed.map(f => <li key={f}>{f}</li>)}

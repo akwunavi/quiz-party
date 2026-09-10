@@ -12,6 +12,25 @@ import { fetchMediaBlob } from './media'
 import type { LoadedPack } from './packLoader'
 
 const CONCURRENCY = 4
+const RETRY_DELAYS_MS = [400, 1200]  // 2 повтора: 0.4с, потом 1.2с
+
+/** `fetchMediaBlob` кидает `Error('Failed to fetch')` дословно от браузера,
+ *  когда соединение оборвалось/не установилось (не 404 — это отдельная,
+ *  понятная ошибка «ФАЙЛА НЕТ В ХРАНИЛИЩЕ», её не ретраим, повтор не
+ *  поможет). При 4 параллельных скачиваниях на небольшом self-hosted
+ *  сервере (см. HANDOFF) такие обрывы — обычное дело, не признак того,
+ *  что файла нет. Один обрыв не должен сразу попадать в «не скачалось». */
+async function fetchWithRetry(path: string): Promise<Blob> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fetchMediaBlob(path)
+    } catch (e) {
+      const permanent = e instanceof Error && e.message === 'ФАЙЛА НЕТ В ХРАНИЛИЩЕ'
+      if (permanent || attempt >= RETRY_DELAYS_MS.length) throw e
+      await new Promise(r => setTimeout(r, RETRY_DELAYS_MS[attempt]))
+    }
+  }
+}
 
 export interface PreloadProgress {
   total: number
@@ -73,7 +92,7 @@ export async function downloadPackForOffline(
       const path = paths[cursor++]
       try {
         if (!(await hasMedia(path))) {
-          const blob = await fetchMediaBlob(path)
+          const blob = await fetchWithRetry(path)
           await saveMedia(path, blob, blob.type)
           progress.bytes += blob.size
         }
