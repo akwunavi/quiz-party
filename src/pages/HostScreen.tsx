@@ -352,7 +352,13 @@ function HostInner({ gameState, pack }: {
             <div className="rules-frame" data-count={round.rules.length}>
               <div className="rules-frame-label">ПРАВИЛА</div>
               {round.rules.map((r, i) => (
-                <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.7}s` }}>
+                <div key={i} className="rule-item" style={{
+                  /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход
+                     сначала отыгрывает заставку раунда, и только затем — с
+                     паузой около секунды — проступают правила. Другие темы
+                     не трогаем — их тайминг согласован раньше и отдельно. */
+                  animationDelay: `${(pack.theme === 'classic' ? 1.3 : 0.5) + i * 0.7}s`,
+                }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>
               ))}

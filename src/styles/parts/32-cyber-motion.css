@@ -277,6 +277,37 @@
   .jp-overlay.theme-classic > .jp-modal { animation: none; }
 }
 
+/* ── Э6б (9.21): модалка «Угадай мелодию» — тот же приём, что у Э6
+   (jp-overlay), тот же класс темы прямо на портале (MelodyRound.tsx:
+   `className={`mel-overlay theme-${pack.theme}`}`), поэтому селектор без
+   вложенности `.host-screen`. Переиспользуем уже существующие keyframes
+   `cbModalScan`/`cbModalBoot` — тот же визуальный язык HUD-модалки, не
+   новый эффект. Реальное содержимое модалки (ставки/подсказки/кнопки)
+   НЕ трогаем — мокап показывает только внешний вид коробки, не заменяет
+   структуру. */
+.mel-overlay.theme-classic::before {
+  content: ''; position: absolute; left: 0; right: 0; height: 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent,
+    color-mix(in srgb, var(--accent2) 55%, transparent) 50%, transparent);
+  animation: cbModalScan 1.1s ease-out .05s both;
+}
+.mel-overlay.theme-classic > .mel-modal {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+  background: #061018;
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent2) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent2) 25%, transparent);
+}
+.mel-overlay.theme-classic .mel-modal-theme {
+  color: var(--accent2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mel-overlay.theme-classic::before { animation: none; opacity: 0; }
+  .mel-overlay.theme-classic > .mel-modal { animation: none; }
+}
+
 /* ── Э5: «Перегрузка → чистый HUD» — экран чемпиона в финале.
    `.fin-award`/`.fin-award.p1` свободны от `animation` и от `::before`/
    `::after` (проверено грепом 25-results.css) — можно занимать оба.
@@ -320,21 +351,40 @@
 }
 
 /* ── Э4: «Цифровая пересборка» табло (ScoreboardScreen, только classic).
-   Позицию строки (`transform: translateY`) двигает JS (FLIP), это чистая
-   позиция, её не трогаем. Здесь только визуальный акцент на СОСЕДНЕМ
-   свойстве (box-shadow/цвет ячеек) на время переезда, включается классом
-   `.sb-flip`, который JS сам снимает по таймеру — без `animation`, поэтому
-   без риска столкнуться с уже занятым `animation` у `.sb-row.is-in > td`
-   (25-results.css, sbRowIn). */
+   Позицию строки (`transform: translateY`) двигает JS (FLIP) через inline
+   style — НО без объявленной здесь `transition` этот inline-transform
+   переключался мгновенно, без единого видимого кадра движения (проверено
+   рендером: `getBoundingClientRect().top` строки не менялся ни разу за 20
+   замеров по 60мс). Это ровно та ошибка, от которой явно предостерегали —
+   строка не "физически переезжала", а просто исчезала со старого места и
+   появлялась на новом. Добавлена transition на сам `<tr>`: */
+.theme-classic .host-screen .sb-row {
+  transition: transform .62s cubic-bezier(.2,.9,.3,1.1);
+}
+/* Декоративный акцент на СОСЕДНЕМ свойстве (glow + короткий glitch-срез,
+   как в мокапе `.cb-flip-row.glitching`/`cbSliceGlitch`) — на время переезда,
+   включается классом `.sb-flip`, который JS сам снимает по таймеру — без
+   `animation`, поэтому без риска столкнуться с уже занятым `animation` у
+   `.sb-row.is-in > td` (25-results.css, sbRowIn). */
 .theme-classic .host-screen .sb-row.sb-flip > td {
   transition: box-shadow .4s ease, background-color .4s ease;
   box-shadow: inset 0 0 14px color-mix(in srgb, var(--accent2) 75%, transparent),
     inset 0 0 0 1px color-mix(in srgb, var(--accent2) 75%, transparent);
   background-color: color-mix(in srgb, var(--accent2) 20%, transparent);
+  animation: cbSliceGlitch 260ms steps(5) both;
+}
+@keyframes cbSliceGlitch {
+  0%   { clip-path: inset(0 0 0 0); transform: translateX(0); }
+  20%  { clip-path: inset(10% 0 60% 0); transform: translateX(-4px); filter: hue-rotate(90deg); }
+  40%  { clip-path: inset(50% 0 10% 0); transform: translateX(3px); }
+  60%  { clip-path: inset(0 0 70% 0); transform: translateX(-2px); filter: hue-rotate(-60deg); }
+  80%  { clip-path: inset(30% 0 20% 0); transform: translateX(1px); }
+  100% { clip-path: inset(0 0 0 0); transform: translateX(0); filter: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; }
+  .theme-classic .host-screen .sb-row { transition: none; }
+  .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; animation: none; }
 }
 
 /* ── Э4-фон: постоянный тёмно-синий фон строки табло, как в мокапе
@@ -347,6 +397,43 @@
    акцента, которого и так хватает через sb-flip glow выше. */
 .theme-classic .host-screen .sb-row > td {
   background-color: #061018;
+}
+
+/* ── Правила раунда (round_intro, .rules-frame) — точный перенос мокапа
+   v3 «Правила раунда»: тёмно-синий фон + тонкая циановая рамка вместо
+   унаследованного оранжевого свечения с угловыми засечками; подпись —
+   плоский текст без круглой плашки-фона. Композиция (номер слева,
+   заголовок по центру, рамка правил справа, построчный проступ) уже
+   совпадает с мокапом на уровне разметки (23-answers.css) — здесь только
+   цвет/фон/декор конкретно для classic, .theme-potter/.theme-new_year не
+   затронуты (общее правило `.cyber .rules-frame, .theme-classic
+   .rules-frame` в 24-round-intro.css остаётся для .cyber — админки/
+   редактора, эту правку туда сознательно не тащим). */
+.theme-classic .host-screen .rules-frame {
+  background: #061018;
+  border-color: rgba(34,211,238,.4);
+  box-shadow: 0 0 0 1px rgba(34,211,238,.15), 0 0 28px rgba(34,211,238,.15);
+}
+.theme-classic .host-screen .rules-frame::before,
+.theme-classic .host-screen .rules-frame::after {
+  display: none;
+}
+.theme-classic .host-screen .rules-frame-label {
+  background: none; padding: 0; border-radius: 0;
+  color: rgba(34,211,238,.65);
+}
+
+/* ── Блиц (9.21) — навy-панели вместо тёплого полупрозрачного фона.
+   Цвет команды (`--tc`) на границе/подсветке хода СОХРАНЯЕМ — это не
+   декоративная тема, а реальные данные (чья очередь), их удаление было
+   бы регрессией, а не переносом мокапа. Меняем только базовую заливку
+   панелей и полосы вопроса на плоский тёмно-синий, как в `.cb-bz-block`
+   мокапа v2/v3. */
+.theme-classic .host-screen .bz-block {
+  background: #061018;
+}
+.theme-classic .host-screen .bz-question {
+  background: #061018;
 }
 
 /* ── Форс-мотор (9.15): ведущий явно попросил эффекты кнопкой «✨»
@@ -389,6 +476,17 @@ html.fx-force-motion .jp-overlay.theme-classic::before {
 }
 html.fx-force-motion .jp-overlay.theme-classic > .jp-modal {
   animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+}
+
+html.fx-force-motion .mel-overlay.theme-classic::before {
+  animation: cbModalScan 1.1s ease-out .05s both; opacity: 0;
+}
+html.fx-force-motion .mel-overlay.theme-classic > .mel-modal {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+}
+
+html.fx-force-motion .theme-classic .host-screen .sb-row.sb-flip > td {
+  animation: cbSliceGlitch 260ms steps(5) both;
 }
 
 html.fx-force-motion .theme-classic .host-screen .fin-award.p1 {

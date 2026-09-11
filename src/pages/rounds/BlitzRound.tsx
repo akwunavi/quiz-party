@@ -11,14 +11,20 @@ import type { Team } from '../../types/quiz'
 // блока играющей команды: так зал следит за раундом целиком, а не только
 // свою минуту. Это обсуждалось и решено именно так.
 
-/** Раскладка блоков: сколько колонок и нужен ли отдельный верхний блок. */
-export function blockLayout(n: number): { top: boolean; cols: number } {
-  if (n <= 1) return { top: false, cols: 1 }
-  if (n === 2) return { top: false, cols: 2 }
-  if (n === 3) return { top: true, cols: 2 }
-  if (n === 4) return { top: false, cols: 2 }
-  if (n === 5) return { top: true, cols: 2 }
-  return { top: n % 2 === 1, cols: n <= 6 ? 3 : 4 }
+/** Раскладка блоков: сколько команд встаёт в верхний ряд (между вопросом и
+ *  верхней кромкой экрана) и сколько колонок в рядах вообще.
+ *  Согласованное правило: верхний ряд растёт вместе с числом команд, а не
+ *  держит фиксированную «одну одинокую» — 3 команды → 1 сверху, 5 команд →
+ *  2 сверху, дальше по той же логике (нечётное: верх на одну команду меньше
+ *  нижнего ряда; чётное: ровно пополам). */
+export function blockLayout(n: number): { topCount: number; cols: number } {
+  if (n <= 1) return { topCount: n, cols: 1 }
+  if (n === 2) return { topCount: 1, cols: 2 }
+  if (n === 3) return { topCount: 1, cols: 2 }
+  if (n === 4) return { topCount: 2, cols: 2 }
+  if (n === 5) return { topCount: 2, cols: 2 }
+  const cols = n <= 6 ? 3 : 4
+  return { topCount: n % 2 === 1 ? (n - 1) / 2 : n / 2, cols }
 }
 
 // Просто секунды, без минут: раунд короткий, «60» читается с дальнего
@@ -75,15 +81,15 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
     .map(id => teams.find(t => t.id === id))
     .filter((t): t is Team => !!t)
   const active = currentTeam(state)
-  const { top, cols } = blockLayout(ordered.length)
+  const { topCount } = blockLayout(ordered.length)
   const activeTeam = ordered.find(t => t.id === active)
 
   // Вопрос стоит МЕЖДУ блоками, а не над ними: он главный на экране, и
   // сверху терялся. Поэтому команды делятся на две группы — над полосой
-  // вопроса и под ней. При нечётном числе сверху оказывается один блок.
-  const head = top ? ordered.slice(0, 1) : ordered.slice(0, Math.ceil(ordered.length / 2))
-  const rest = top ? ordered.slice(1) : ordered.slice(Math.ceil(ordered.length / 2))
-  const rowCols = top ? cols : Math.max(1, head.length)
+  // вопроса и под ней, по правилу blockLayout() выше.
+  const head = ordered.slice(0, topCount)
+  const rest = ordered.slice(topCount)
+  const rowCols = Math.max(1, head.length)
 
   return (
     <div className="host-screen grid-bg bz-screen">
@@ -93,8 +99,8 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
         <span className="bz-bank">{remainingCount(bank, state.used)}</span>
       </div>
 
-      <div className={`bz-row${top ? ' bz-row-top' : ''}`}
-        style={{ ['--cols' as string]: top ? 1 : rowCols }}>
+      <div className={`bz-row${topCount > 0 && topCount < ordered.length ? ' bz-row-top' : ''}`}
+        style={{ ['--cols' as string]: rowCols }}>
         {head.map(t => (
           <TeamBlock key={t.id} team={t} state={state} active={t.id === active} now={now} />
         ))}
