@@ -123,8 +123,12 @@
 .bz-row { display: grid; width: min(1700px, 94%); margin: 0 auto;
   grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
   gap: clamp(10px, 1.4vw, 24px); }
-/* верхний блок при нечётном числе команд — как в «120 секундах» */
-.bz-row-top { grid-template-columns: minmax(0, 1fr); width: min(560px, 42%); }
+/* Верхний ряд — растёт вместе с числом команд (blockLayout() в
+   BlitzRound.tsx: 3 команды → 1 сверху, 5 → 2, дальше по той же логике),
+   поэтому ширина и число колонок считаются от --cols, а не зафиксированы
+   на «одна одинокая команда», как было раньше. */
+.bz-row-top { grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+  width: min(calc(var(--cols, 1) * 320px + (var(--cols, 1) - 1) * 24px), 94%); }
 
 /* Блоки намеренно компактные: главный герой экрана — вопрос по центру,
    а таймеры команд читаются и в меньшем размере. */

@@ -165,16 +165,25 @@ describe('блиц: выбор вопроса из банка', () => {
 })
 
 describe('блиц: раскладка блоков на проекторе', () => {
-  it('две команды — две колонки, без верхнего блока', () => {
-    expect(blockLayout(2)).toEqual({ top: false, cols: 2 })
+  it('две команды — две колонки, по одной в каждом ряду', () => {
+    expect(blockLayout(2)).toEqual({ topCount: 1, cols: 2 })
   })
-  it('нечётное число — один блок сверху по центру', () => {
-    expect(blockLayout(3).top).toBe(true)
-    expect(blockLayout(5).top).toBe(true)
+  // Согласованное правило (9.21): верхний ряд растёт вместе с числом
+  // команд, а не держит фиксированную «одну одинокую» — 3 → 1 сверху,
+  // 5 → 2 сверху, дальше по той же логике (нечётное: верх на одну команду
+  // меньше нижнего ряда; чётное: ровно пополам).
+  it('3 команды — 1 сверху, 2 снизу', () => {
+    expect(blockLayout(3)).toEqual({ topCount: 1, cols: 2 })
   })
-  it('чётное число — верхнего блока нет', () => {
-    expect(blockLayout(4).top).toBe(false)
-    expect(blockLayout(6).top).toBe(false)
+  it('5 команд — 2 сверху, 3 снизу', () => {
+    expect(blockLayout(5)).toEqual({ topCount: 2, cols: 2 })
+  })
+  it('чётное число — ровно пополам', () => {
+    expect(blockLayout(4).topCount).toBe(2)
+    expect(blockLayout(6).topCount).toBe(3)
+  })
+  it('7 команд — 3 сверху, 4 снизу, по той же логике', () => {
+    expect(blockLayout(7).topCount).toBe(3)
   })
   it('от семи команд колонок становится четыре', () => {
     expect(blockLayout(8).cols).toBe(4)
