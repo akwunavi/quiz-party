@@ -63,13 +63,28 @@ export function ScreenFx({ theme, trigger, hud }: {
   const lastFlashAt = useRef(0)
   const [flash, setFlash] = useState<number | null>(null)
 
+  // Этот экран — личный дисплей ведущего (проектор/ноутбук на вечере), а не
+  // случайная страница для постороннего посетителя: `prefers-reduced-motion`
+  // на его же машине мог включить кто угодно (или это управляемое
+  // корпоративное устройство) и ведущий может быть не в силах это поменять,
+  // а декоративный слой ему явно нужен — это буквально то, зачем это шоу
+  // затевалось. Поэтому единственный источник правды для decorative-motion —
+  // уже существующая кнопка «✨» (`enabled`), а не системная настройка.
+  // Класс на <html> транслирует это решение в CSS (32-cyber-motion.css —
+  // блоки `html.fx-force-motion ...` там же, рядом со своими `@media
+  // (prefers-reduced-motion: reduce)`, которые остаются на месте как
+  // ПРАВИЛЬНЫЙ дефолт для любого, кто эту кнопку не трогал).
+  useEffect(() => {
+    document.documentElement.classList.toggle('fx-force-motion', enabled)
+    return () => { document.documentElement.classList.remove('fx-force-motion') }
+  }, [enabled])
+
   useEffect(() => {
     const isFirst = prevTrigger.current === null
     prevTrigger.current = trigger
     if (isFirst) return
     if (!enabled) return
     if (theme === 'new_year') return
-    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (hasNofxParam()) return
     const now = Date.now()
     if (now - lastFlashAt.current < MIN_GAP_MS) return
