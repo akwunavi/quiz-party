@@ -469,6 +469,7 @@ function HostInner({ gameState, pack }: {
             <div className={frameCls}>
               {isNY && <Icicles seed={q.id} low={timeLow} />}
               {isCyber && <span className="cf-scan" aria-hidden="true" />}
+              {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
               <WindText key={q.id} text={q.question_text} />
             </div>
             <div className="q-media-grid n1" style={mediaScaleVar(q)}>
@@ -488,6 +489,7 @@ function HostInner({ gameState, pack }: {
               <div className={frameCls}>
                 {isNY && <Icicles seed={q.id} low={timeLow} />}
                 {isCyber && <span className="cf-scan" aria-hidden="true" />}
+                {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
                 <WindText key={q.id} text={q.question_text} />
               </div>
             )}

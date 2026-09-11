@@ -20,6 +20,20 @@
      — только на их свободных `::before`/`::after` или на соседних тегах.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* ── Э3-фон (9.19): базовый вид плитки варианта из мокапа (cb-lock-item)
+   — тёмно-синий фон с тонкой циановой рамкой, УЖЕ ТАК на всех четырёх
+   вариантах в мокапе с самого первого кадра, до какого-либо reveal.
+   Это описание вида плитки в этой теме вообще, не только момента
+   раскрытия. Добавляем слоем поверх существующих .choice-plate/
+   .choice-img (01-base.css/19-patch-746.css) — их padding/font-size/
+   border-left (акцент буквы А/Б/В/Г) НЕ трогаем, только фон и тонкая
+   рамка поверх. */
+.theme-classic .host-screen .choice-plate,
+.theme-classic .host-screen .choice-img {
+  background-color: #061018;
+  box-shadow: inset 0 0 0 1px rgba(34,211,238,.2);
+}
+
 /* ── Э3: «Сигнал заблокирован» — reveal ответа ───────────────────────────
    Верный вариант получает таргет-скобки по углам (::before/::after,
    свободны у .choice-plate/.choice-img в classic — проверено грепом).
@@ -199,6 +213,33 @@
   .fx-hud { animation: none; opacity: .8; }
 }
 
+/* ── Э2г (9.19): полный визуальный state сцены «Вопрос» из мокапа
+   (Motion Lab v2, cb-scene) — не только анимация появления текста.
+   Мокап показывает вопрос как HUD-бокс: тёмно-синий тон, циановая рамка,
+   ПОСТОЯННАЯ (не только во время анимации) текстура сканлайнов, подпись
+   в углу. Добавляем СЛОЕМ поверх уже существующей `.cyber-frame`
+   (28-theme-cyber.css, общая с `.cyber` в админке/редакторе — саму эту
+   базовую decorations-правку НЕ трогаем, чтобы не задеть админку;
+   поэтому здесь отдельная, более специфичная запись с `.host-screen` в
+   цепочке). Оранжевые угловые засечки `.cyber-frame::before/::after` —
+   существующий, отдельно выверенный на видимость приём — не убираем,
+   мокап их не показывал убранными явно, только не включал в свой общий
+   демо-бокс. Шрифт/размер/выравнивание/цвет ТЕКСТА вопроса — НЕ трогаем:
+   явное решение пользователя (мокап показывал мелкий моноширинный текст
+   слева, но это конфликтует с useFitText/читаемостью с дальних мест в
+   баре — оставили как в проде, перенесли только рамку/фон/HUD-подпись). */
+.theme-classic .host-screen .cyber-frame {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(34,211,238,.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%);
+  box-shadow: inset 0 0 0 1px rgba(34,211,238,.3);
+}
+.theme-classic .host-screen .cf-hud-corner {
+  position: absolute; top: 8px; right: 14px; z-index: 2;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em;
+  color: rgba(34,211,238,.55); pointer-events: none;
+}
+
 /* ── Э6: модалка «Своей игры» (JeopardyTile) — только classic. Модалка
    уходит `createPortal`-ом в document.body, класс темы висит на самой
    `.jp-overlay` (см. HostScreen.tsx), поэтому селектор БЕЗ вложенности
@@ -221,6 +262,7 @@
 }
 .jp-overlay.theme-classic > .jp-modal {
   animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+  border-color: var(--accent2);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent2) 40%, transparent),
     0 0 40px color-mix(in srgb, var(--accent2) 25%, transparent);
 }
@@ -293,6 +335,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; }
+}
+
+/* ── Э4-фон: постоянный тёмно-синий фон строки табло, как в мокапе
+   (`.cb-flip-row{background:#061018}`). `background-color` — это ДРУГОЕ
+   свойство, чем `background-image`, которым уже занят `.sb-row.is-in`
+   (25-results.css, sbScan) — красится ниже, не перекрывает бегущий блик.
+   `border-left` из мокапа сюда сознательно не переносим: border/box-shadow
+   на <tr> рендерится ненадёжно кросс-браузерно (см. CLAUDE.md/HANDOFF.md
+   про уже случавшиеся тихие поломки на <tr>) — тонкий риск ради decorative
+   акцента, которого и так хватает через sb-flip glow выше. */
+.theme-classic .host-screen .sb-row > td {
+  background-color: #061018;
 }
 
 /* ── Форс-мотор (9.15): ведущий явно попросил эффекты кнопкой «✨»
