@@ -29,8 +29,16 @@ import type {
 export const supabaseTransport: RoomTransport = {
   async readSession(roomId) {
     if (!roomId) return null
-    const { data } = await withNetResilience(signal =>
+    // Бросаем на error, как listTeams/listAnswers ниже — иначе временный
+    // сбой сети (не смертельная сетевая ошибка внутри withNetResilience,
+    // а обычный ответ Supabase вида {data:null, error:{...}}) неотличим от
+    // «комнаты не существует», и поллинг обнуляет gameState. useGameState
+    // тогда рисует «Загрузка…», HostScreen размонтирует текущую фазу
+    // целиком — отсюда мигание экрана и перезапуск музыки/таймера
+    // посреди игры на ровном месте, без всякого реального обрыва игры.
+    const { data, error } = await withNetResilience(signal =>
       supabase.from('game_sessions').select('*').eq('id', roomId).abortSignal(signal).maybeSingle())
+    if (error) throw error
     return (data as GameState) ?? null
   },
 
@@ -120,9 +128,14 @@ export const supabaseTransport: RoomTransport = {
   },
 
   async readBlitz(gameId, roundNumber) {
-    const { data } = await withNetResilience(signal =>
+    // Та же поправка, что у readSession выше: бросаем на error вместо
+    // молчаливого null — иначе временный сбой сети на одном тике поллинга
+    // (blitzApi.ts createPollLoop) обнулял state, компонент блица/мелодии
+    // перемонтировался на пустом месте и трек начинал играть заново.
+    const { data, error } = await withNetResilience(signal =>
       supabase.from('blitz_state').select('state')
         .eq('game_id', gameId).eq('round_number', roundNumber).abortSignal(signal).maybeSingle())
+    if (error) throw error
     const st = (data as { state?: BlitzState } | null)?.state
     return st && Array.isArray(st.order) ? st : null
   },
