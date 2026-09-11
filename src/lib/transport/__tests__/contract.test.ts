@@ -17,6 +17,10 @@ function makeFakeSupabase() {
     game_sessions: [{ id: 'room1', game_id: 'g1', pack_id: null, phase: 'lobby', melody: {} }],
     blitz_state: [], question_shown: [], packs: [{ id: 'pack1', status: 'ready' }],
   }
+  // Таблицы, для которых следующий select должен вернуть {data:null,
+  // error:{...}} — имитация временного сетевого сбоя (не «строки нет»,
+  // а «Supabase ответил ошибкой»), см. тест на readSession/readBlitz ниже.
+  const forceErrorOnce = new Set<string>()
   let idCounter = 1
 
   function builder(table: string) {
@@ -53,6 +57,10 @@ function makeFakeSupabase() {
       then(resolve: (v: unknown) => void, reject?: (e: unknown) => void) {
         try {
           const rows = db[table] ?? (db[table] = [])
+          if (op === 'select' && forceErrorOnce.has(table)) {
+            forceErrorOnce.delete(table)
+            return resolve({ data: null, error: { message: 'simulated network error' } })
+          }
           if (op === 'select') {
             const matched = rows.filter(r => filters.every(f => f(r)))
             if (countOpt) return resolve({ data: null, error: null, count: matched.length })
@@ -95,7 +103,7 @@ function makeFakeSupabase() {
     return api
   }
 
-  return { db, client: { from: (table: string) => builder(table) } }
+  return { db, client: { from: (table: string) => builder(table) }, forceErrorOnce }
 }
 
 const fake = makeFakeSupabase()
@@ -199,5 +207,21 @@ describe('supabaseTransport: контракт', () => {
 
   it('readSession(null) не ходит в сеть и отдаёт null', async () => {
     expect(await supabaseTransport.readSession(null)).toBeNull()
+  })
+
+  // 9.20: временный сбой сети ({data:null, error:{...}}) раньше был
+  // неотличим от «комнаты не существует» — readSession молча отдавал null,
+  // поллинг (useGameState) обнулял gameState, HostScreen рисовал
+  // «Загрузка…» и размонтировал текущую фазу целиком (перезапуск музыки/
+  // таймера) без всякого реального обрыва игры. Должен бросать — тогда
+  // pollLoop просто пропускает тик и оставляет прежний gameState.
+  it('readSession: ошибка сети бросается наружу, а не превращается в null', async () => {
+    fake.forceErrorOnce.add('game_sessions')
+    await expect(supabaseTransport.readSession('room1')).rejects.toBeTruthy()
+  })
+
+  it('readBlitz: ошибка сети бросается наружу, а не превращается в null', async () => {
+    fake.forceErrorOnce.add('blitz_state')
+    await expect(supabaseTransport.readBlitz('g1', 2)).rejects.toBeTruthy()
   })
 })
