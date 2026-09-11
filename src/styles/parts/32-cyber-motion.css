@@ -152,8 +152,20 @@
      animation-delay слова clip-path откатывается к дефолту (`none` —
      полностью видимый), и все слова показались бы сразу, не дожидаясь
      своей очереди. `both` держит стартовый кадр (полностью скрыт) до
-     наступления задержки. */
-  animation: cbBoot .3s steps(5, end) both;
+     наступления задержки.
+
+     ТРЕТИЙ ЗАХОД (9.18): было `steps(5,end)` — на реальном длинном
+     вопросе (40+ слов) часть слов навсегда застревала недопечатанной,
+     обрезанной на ~20% справа. Причина — не логическая, а числовая:
+     `Animation.currentTime`/`progress` на границе конца анимации
+     округляется к `0.999999...`, а не ровно к `1` (двойная точность),
+     и `steps(5,end)` трактует это как «ещё в четвёртом шаге из пяти»,
+     а не «завершено» — `fill:both` затем НАВСЕГДА держит этот кадр.
+     Подтверждено `getAnimations()`: `playState:"finished"`,
+     `progress:0.9999999999999994`, `clip-path: inset(0 20% 0 0)`.
+     У плавной кривой такой границы шагов нет — `linear` интерполирует
+     без разрывов и всегда доходит до точного `to`-кадра. */
+  animation: cbBoot .22s linear both;
 }
 @keyframes cbBoot {
   from { clip-path: inset(0 100% 0 0); }
@@ -315,7 +327,7 @@ html.fx-force-motion .fx-cyber .fx-beam { animation: cbBeamSweep .5s cubic-bezie
 html.fx-force-motion .fx-cyber .fx-rgb { animation: cbRgbFlicker .5s steps(2, jump-end) forwards; }
 
 html.fx-force-motion .theme-classic .host-screen .q-word {
-  animation: cbBoot .3s steps(5, end) both;
+  animation: cbBoot .22s linear both;
 }
 
 html.fx-force-motion .jp-overlay.theme-classic::before {
