@@ -131,15 +131,20 @@
    анимации). Задержка по словам — уже существующий inline
    `animationDelay` (WindText, HostScreen.tsx), здесь не трогаем. ── */
 .theme-classic .host-screen .q-word {
-  animation: cbBoot .5s steps(1, end) forwards;
+  animation: cbBoot .5s cubic-bezier(.16,.8,.3,1) forwards;
 }
+/* Монотонный подъём opacity (как у windIn, 01-base.css) — НЕ ступенчатый
+   (steps()) и БЕЗ провалов между стопами: на коротком тестовом тексте
+   мокапа (4 слова) прежняя версия с steps(1,end) + колебаниями .9→.35→1
+   читалась как «мигание CRT», но на реальном вопросе (30-40 слов,
+   задержка 0.12с на каждое — WindText, не трогаем) те же провалы на
+   каждом слове с чужой фазой давали рябь по всему тексту разом — баг,
+   пойманный только на реальном длинном вопросе в проде (см. HANDOFF.md,
+   §3az). Свечение — только как бонус на пике, opacity никогда не падает
+   после начала подъёма. */
 @keyframes cbBoot {
   0%   { opacity: 0; text-shadow: none; }
-  10%  { opacity: .25; }
-  22%  { opacity: .05; }
-  36%  { opacity: .9; text-shadow: 0 0 14px var(--accent2); }
-  55%  { opacity: .35; }
-  72%  { opacity: 1; text-shadow: 0 0 6px var(--accent2); }
+  55%  { opacity: 1; text-shadow: 0 0 14px var(--accent2); }
   100% { opacity: 1; text-shadow: none; }
 }
 
