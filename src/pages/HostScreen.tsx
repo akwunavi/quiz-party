@@ -2554,8 +2554,14 @@ function ScoreboardScreen({ pack, gameState }: {
     if (flippedRound.current === gameState.round_number) return
     flippedRound.current = gameState.round_number
     // reduced-motion: считаем шаг сделанным (флаг выше уже выставлен), но
-    // саму сдвижку не проигрываем вовсе — ни JS-transform, ни CSS.
-    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    // саму сдвижку не проигрываем вовсе — ни JS-transform, ни CSS. Кроме
+    // случая, когда ведущий явно попросил эффекты кнопкой «✨» — тот же
+    // `fx-force-motion` на <html>, что и в 32-cyber-motion.css, см.
+    // ScreenFx.tsx (это личный экран ведущего, не чужая страница).
+    const forced = typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('fx-force-motion')
+    if (!forced && typeof matchMedia === 'function' &&
+      matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const prevIndex = new Map(prevRanked.map((t, i) => [t.id, i]))
     ranked.forEach((t, newIdx) => {
       const el = rowRefs.current.get(t.id)

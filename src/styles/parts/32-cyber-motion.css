@@ -265,3 +265,52 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-classic .host-screen .sb-row.sb-flip > td { transition: none; }
 }
+
+/* ── Форс-мотор (9.15): ведущий явно попросил эффекты кнопкой «✨»
+   (ScreenFx.tsx, `enabled` → класс `fx-force-motion` на <html>), даже
+   если `prefers-reduced-motion: reduce` стоит на его же машине (личный
+   проекторный экран, не случайная страница для постороннего — ведущий
+   может быть не в силах поменять системную настройку, а декоративный
+   слой ему нужен). Специфичность каждого правила здесь строго выше
+   соответствующего правила внутри `@media (reduce)` выше (на один класс),
+   поэтому побеждает НЕЗАВИСИМО от того, совпал ли сам медиазапрос —
+   дефолт-поведение (уважать `reduce`) остаётся нетронутым для всех, кто
+   кнопку не трогал. Копии анимаций — дословно те же, что в основных
+   правилах выше по файлу. */
+html.fx-force-motion .theme-classic .host-screen .choice-plate.correct::before,
+html.fx-force-motion .theme-classic .host-screen .choice-plate.correct::after,
+html.fx-force-motion .theme-classic .host-screen .choice-img.correct::before,
+html.fx-force-motion .theme-classic .host-screen .choice-img.correct::after {
+  animation: cbLockIn .5s ease .05s both; opacity: 0;
+}
+html.fx-force-motion .theme-classic .host-screen .choice-plate.correct::after,
+html.fx-force-motion .theme-classic .host-screen .choice-img.correct::after {
+  animation-delay: .12s;
+}
+html.fx-force-motion .theme-classic .host-screen .choice-plate.dimmed::after,
+html.fx-force-motion .theme-classic .host-screen .choice-img.dimmed::after {
+  animation: cbStatic 1.1s steps(6) infinite; opacity: .25;
+}
+
+html.fx-force-motion .fx-cyber .fx-beam,
+html.fx-force-motion .fx-cyber .fx-rgb { display: block; }
+html.fx-force-motion .fx-cyber .fx-beam { animation: cbBeamSweep .5s cubic-bezier(.3,.6,.4,1) forwards; }
+html.fx-force-motion .fx-cyber .fx-rgb { animation: cbRgbFlicker .5s steps(2, jump-end) forwards; }
+
+html.fx-force-motion .theme-classic .host-screen .q-word {
+  animation: cbBoot .5s steps(1, end) forwards;
+}
+
+html.fx-force-motion .jp-overlay.theme-classic::before {
+  animation: cbModalScan 1.1s ease-out .05s both; opacity: 0;
+}
+html.fx-force-motion .jp-overlay.theme-classic > .jp-modal {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
+}
+
+html.fx-force-motion .theme-classic .host-screen .fin-award.p1 {
+  animation: cbOverload 1.3s cubic-bezier(.2,.7,.25,1) both;
+}
+html.fx-force-motion .theme-classic .host-screen .fin-award.p1::before {
+  animation: cbOverloadBurst 1.3s ease-out both; opacity: 0;
+}
