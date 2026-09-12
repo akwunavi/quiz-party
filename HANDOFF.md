@@ -4611,6 +4611,29 @@ environment.css` (сцена) → `35-magic-surfaces.css` (поверхност�
   проверено `grep`, совпадений не было).
 - `tsc`/`eslint`/`vitest`(434/47)/`vite build` — зелёные.
 
+**Шаг 4 (единый портал модалок), 12.09.2026:**
+- `.jp-overlay`/`.mel-overlay` уходят `createPortal`-ом в `document.body`
+  с классом темы на самом overlay — селекторы БЕЗ вложенности
+  `.theme-potter .jp-overlay` (сам overlay уже несёт класс), как и у
+  классики (32-cyber-motion.css). `.groups-overlay` — обычный поток внутри
+  `.host-screen`, селектор с вложенностью.
+- Кольцо-вспышка (`mgRingBurst`, один раз) — на `::before` самого overlay
+  (у `.jp-modal`/`.mel-modal` оба псевдоэлемента заняты угловыми скобками
+  `.hud-frame`/собственными border). Панель — конденсация (`mgCondense`
+  из 36). Убрано старое `letterOpen` (открытие письма поворотом) у
+  `.mel-modal` в `16-round-melody-tiles.css` — заменено.
+- Добавлен `html.fx-force-motion` форс той же вспышки/конденсации — по
+  аналогии с тем, что классика форсирует у СВОИХ модалок; раньше у potter
+  такого форса не было вовсе (не баг, а новая параллель с классикой).
+- Проверено рендером: `::before` каждого из трёх overlay — `border-
+  radius:50%`, `animationName: mgRingBurst`; панель — `animationName:
+  mgCondense`, `border-color: rgb(201,166,104)` (латунь из токенов, а не
+  старое золото `rgba(211,166,37,...)`); `prefers-reduced-motion: reduce`
+  гасит оба (`animationName: none`); `html.fx-force-motion` возвращает
+  кольцо даже при эмулированном reduced-motion. Содержимое/поведение
+  модалок не менялось.
+- `tsc`/`eslint`/`vitest`(434/47)/`vite build` — зелёные.
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и

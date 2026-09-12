@@ -29,3 +29,55 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-potter .lobby-screen .neon-title { animation: none; clip-path: none; filter: none; }
 }
+
+/* ═══ Шаг 4: единый портал для всех модалок ═══
+ * `.jp-overlay`/`.mel-overlay` уходят `createPortal`-ом в `document.body` —
+ * класс темы висит на самом overlay (см. HostScreen.tsx/MelodyRound.tsx),
+ * поэтому селекторы БЕЗ вложенности `.theme-potter .jp-overlay` — сам
+ * overlay уже несёт класс `theme-potter`. `.groups-overlay` — обычный
+ * поток внутри `.host-screen`, поэтому его селектор — с вложенностью.
+ * `.jp-modal`/`.mel-modal` несут класс `.hud-frame`/имеют свои border —
+ * их ::before/::after заняты угловыми скобками HUD (01-base.css) — кольцо
+ * поэтому кладём на ::before самого OVERLAY (свободен), не панели. */
+.theme-potter.jp-overlay::before,
+.theme-potter.mel-overlay::before,
+.theme-potter .groups-overlay::before {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 50%; pointer-events: none; z-index: 1;
+  border: 2px solid var(--mg-brass-bright);
+  box-shadow: 0 0 30px rgba(201,166,104,.65), inset 0 0 22px rgba(201,166,104,.45);
+  animation: mgRingBurst .65s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes mgRingBurst {
+  0%   { opacity: 0; transform: scale(0); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(42); }
+}
+.theme-potter.jp-overlay > .jp-modal,
+.theme-potter.mel-overlay > .mel-modal,
+.theme-potter .groups-overlay > .groups-modal {
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
+  border-color: var(--mg-brass);
+  box-shadow: 0 0 0 1px rgba(201,166,104,.35), 0 0 40px rgba(201,166,104,.25);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter.jp-overlay::before, .theme-potter.mel-overlay::before,
+  .theme-potter .groups-overlay::before { animation: none; opacity: 0; }
+  .theme-potter.jp-overlay > .jp-modal, .theme-potter.mel-overlay > .mel-modal,
+  .theme-potter .groups-overlay > .groups-modal { animation: none; }
+}
+/* Форс-кнопка ScreenFx (✨) — та же вспышка, что классика форсирует у
+   СВОИХ модалок (32-cyber-motion.css): здесь дублируем ровно тот же
+   приём для Magic, на один класс специфичнее reduced-motion блока выше,
+   поэтому побеждает независимо от системной настройки. */
+html.fx-force-motion .theme-potter.jp-overlay::before,
+html.fx-force-motion .theme-potter.mel-overlay::before,
+html.fx-force-motion .theme-potter .groups-overlay::before {
+  animation: mgRingBurst .65s cubic-bezier(.2,.8,.2,1) both; opacity: 0;
+}
+html.fx-force-motion .theme-potter.jp-overlay > .jp-modal,
+html.fx-force-motion .theme-potter.mel-overlay > .mel-modal,
+html.fx-force-motion .theme-potter .groups-overlay > .groups-modal {
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
+}

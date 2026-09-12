@@ -111,13 +111,10 @@
      проигрывал и дыхание не гасло. */
   .theme-potter .mel-tile:not(.done):not(.spin)::after { animation: none; opacity: 0; }
 }
-/* модалка ГП: пергамент, открывается как письмо */
-.theme-potter .mel-modal { background: linear-gradient(180deg, #221b38, #171226);
-  border-color: rgba(211,166,37,.6);
-  animation: letterOpen .5s cubic-bezier(.2,.8,.2,1) both;
-  transform-origin: top center; }
-@keyframes letterOpen { from { opacity: 0; transform: perspective(900px) rotateX(-62deg); }
-  to { opacity: 1; transform: perspective(900px) rotateX(0); } }
+/* модалка ГП: фон-стекло; вход теперь конденсация (mgCondense) —
+   35-magic-surfaces.css, шаг 4 rollout'а. Старое letterOpen (открытие
+   письма поворотом) заменено, тут остаётся только сама заливка. */
+.theme-potter .mel-modal { background: linear-gradient(180deg, #221b38, #171226); }
 
 .mel-tile { min-height: 0; min-width: 0; height: 100%; }
 .mel-board { height: 100%; }
