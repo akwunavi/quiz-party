@@ -86,7 +86,7 @@
 /* На 1366x768 фиксированные 190px сверху съедали столько, что варианты
    упирались в кнопки. Отступ должен зависеть от высоты экрана, а не быть
    константой: 190px нужны только на большом проекторе. */
-.theme-potter .host-screen:has(> .pt-frame),
+.theme-potter .host-screen:has(> .mg-frame),
 .theme-potter .host-screen.has-media,
 .theme-potter .host-screen.has-choices { padding-top: clamp(120px, 21vh, 190px); }
 /* Кнопки прибиты к низу и на 1366x768 начинаются с 642px — запас снизу
@@ -102,27 +102,24 @@
     font-size: clamp(15px, 1.5vw, 26px); }
 }
 
-/* Пергаментное свечение под текстом вопроса: буквы будто проступают на
-   старой бумаге. Это фон, поэтому под текстом, а не поверх. */
+/* Блик один раз под текстом вопроса, когда он появляется — свет один раз
+   проходит по тексту наискось (mgSweep), а не пульсирует бесконечно, как
+   старое пергаментное свечение (шаг 6 rollout'а Magic-темы). */
 .theme-potter .q-text { position: relative; }
 .theme-potter .q-text::before {
-  content: ''; position: absolute; inset: -6% -4%; z-index: -1;
-  border-radius: 40% 60% 55% 45% / 50%;
-  background: radial-gradient(ellipse at center,
-    rgba(255, 205, 110, .10), transparent 70%);
-  animation: ptGlow 6s ease-in-out infinite; }
-@keyframes ptGlow { 0%, 100% { opacity: .5; transform: scale(.98); }
-  50% { opacity: 1; transform: scale(1.03); } }
+  content: ''; position: absolute; inset: -10% -20%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 42%, rgba(243,223,168,.5) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: mgSweep .9s ease-out .15s both; }
 
-/* Вес поднят по той же причине — 01-base.css задаёт .q-word позже? нет,
-   раньше; но 03/19 могут перебивать, поэтому целимся точнее. */
-/* НОВЫЙ ВОПРОС: слова проступают чернилами, по одному.
+/* НОВЫЙ ВОПРОС: слова проступают из света, по одному (mgWordReveal —
+   36-magic-motion.css, шаг 6 rollout'а, замена ptInk).
    Первая версия целилась в `.q-text.title-anim` и `.wind-text` — такого
    сочетания классов на элементе не бывает и такого класса нет вовсе,
    правило не работало ни дня. Настоящая цель — .q-word: именно из них
    собран текст вопроса, и у каждого слова уже есть своя задержка. */
 .theme-potter .host-screen .q-word {
-  animation: ptInk .75s cubic-bezier(.2,.75,.25,1) forwards; }
+  animation: mgWordReveal .75s cubic-bezier(.2,.75,.25,1) forwards; }
 @keyframes ptInk {
   0%   { opacity: 0; filter: blur(7px); transform: translateY(6px) scale(.96);
          text-shadow: 0 0 22px rgba(255,205,110,.9); }
@@ -163,26 +160,27 @@
     animation: none; }
 }
 
-/* ── Рамка вопроса: пергамент с золотой каймой ──
+/* ── Рамка вопроса: стекло с латунной каймой (.mg-frame -> .mg-frame,
+   шаг 6 rollout'а) ──
    У НГ обёртка была с сосульками, у киберпанка своя, у ГП — пустой div.
    Отступов снаружи не добавляет, ширину берёт у колонки: раскладку
    вопроса не меняет, только оформляет. */
-.pt-frame { position: relative; width: 100%; min-width: 0;
+.mg-frame { position: relative; width: 100%; min-width: 0;
   padding: clamp(14px, 2.2vh, 30px) clamp(20px, 2.6vw, 50px);
   border-radius: 10px;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(255,205,110,.09), transparent 65%),
-    linear-gradient(180deg, rgba(255,235,190,.045), rgba(255,235,190,.015));
-  box-shadow: inset 0 0 0 1px rgba(255,205,110,.28),
-              0 10px 40px rgba(0,0,0,.35); }
+    radial-gradient(ellipse at 50% 0%, rgba(201,166,104,.10), transparent 65%),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+  box-shadow: inset 0 0 0 1px rgba(201,166,104,.32),
+              0 10px 40px rgba(0,0,0,.4); }
 /* уголки-завитки */
-.pt-frame::before, .pt-frame::after {
-  content: '✦'; position: absolute; color: rgba(255,205,110,.75);
+.mg-frame::before, .mg-frame::after {
+  content: '✦'; position: absolute; color: var(--mg-brass-bright);
   font-size: clamp(11px, 1.1vw, 18px); pointer-events: none;
-  animation: ptCorner 5s ease-in-out infinite; }
-.pt-frame::before { left: 10px; top: 6px; }
-.pt-frame::after { right: 10px; bottom: 6px; animation-delay: 2.5s; }
-@keyframes ptCorner { 0%,100% { opacity: .35; transform: scale(.85) rotate(0); }
+  animation: mgCorner 5s ease-in-out infinite; }
+.mg-frame::before { left: 10px; top: 6px; }
+.mg-frame::after { right: 10px; bottom: 6px; animation-delay: 2.5s; }
+@keyframes mgCorner { 0%,100% { opacity: .35; transform: scale(.85) rotate(0); }
   50% { opacity: 1; transform: scale(1.15) rotate(180deg); } }
 
 /* ── Плитки вариантов проявляются по очереди, как страницы книги ──
@@ -222,7 +220,7 @@
      того же веса, что у анимации — иначе она снова победит: у плиток вес
      0,5,0 (.host-screen .choices-grid .choice-plate:not(.hidden-yet)),
      здесь было только 0,3,0, и reduce-motion плитки не выключал. */
-  .pt-frame::before, .pt-frame::after,
+  .mg-frame::before, .mg-frame::after,
   .theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet),
   /* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
 .theme-potter .host-screen .answer-block.reveal-in .answer-label::after {

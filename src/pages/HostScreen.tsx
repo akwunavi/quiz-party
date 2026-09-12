@@ -440,7 +440,7 @@ function HostInner({ gameState, pack }: {
     // вопросах поле могут оставить пустым, когда всё говорит картинка.
     const hasText = !!q.question_text.trim()
     const isPotter = pack.theme === 'potter'
-    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'pt-frame'
+    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'mg-frame'
       : isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
       : isCyber ? 'cyber-frame' : ''
     // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар

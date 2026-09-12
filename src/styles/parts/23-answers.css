@@ -115,14 +115,17 @@
    Пока ответа нет, тексту принадлежит вся колонка: нет смысла жать его
    до размера, рассчитанного на соседство с рамкой ответа. */
 .answers-layout:not(.revealed) .answers-main { justify-content: center !important; }
-.answers-layout:not(.revealed) .q-text,
-.theme-potter .answers-layout:not(.revealed) .q-text { font-size: clamp(26px, 6.4cqw, 78px); }
-.answers-layout:not(.revealed) .q-text.len-m,
-.theme-potter .answers-layout:not(.revealed) .q-text.len-m { font-size: clamp(24px, 5.4cqw, 64px); }
-.answers-layout:not(.revealed) .q-text.len-l,
-.theme-potter .answers-layout:not(.revealed) .q-text.len-l { font-size: clamp(21px, 4.4cqw, 50px); }
-.answers-layout:not(.revealed) .q-text.len-xl,
-.theme-potter .answers-layout:not(.revealed) .q-text.len-xl { font-size: clamp(18px, 3.6cqw, 40px); }
+.answers-layout:not(.revealed) .q-text { font-size: clamp(26px, 6.4cqw, 78px); }
+.answers-layout:not(.revealed) .q-text.len-m { font-size: clamp(24px, 5.4cqw, 64px); }
+.answers-layout:not(.revealed) .q-text.len-l { font-size: clamp(21px, 4.4cqw, 50px); }
+.answers-layout:not(.revealed) .q-text.len-xl { font-size: clamp(18px, 3.6cqw, 40px); }
+/* Magic — своя лестница (шаг 6 rollout'а), домножена на ~1.12 — EB Garamond
+   ýже Cinzel Decorative при том же кегле (замерено рендером, HANDOFF.md).
+   Расцеплено с базовой темой отдельным правилом ПОСЛЕ общего. */
+.theme-potter .answers-layout:not(.revealed) .q-text { font-size: clamp(29px, 7.2cqw, 87px); }
+.theme-potter .answers-layout:not(.revealed) .q-text.len-m { font-size: clamp(27px, 6cqw, 72px); }
+.theme-potter .answers-layout:not(.revealed) .q-text.len-l { font-size: clamp(24px, 4.9cqw, 56px); }
+.theme-potter .answers-layout:not(.revealed) .q-text.len-xl { font-size: clamp(20px, 4cqw, 45px); }
 
 /* п.5: подпись варианта под буквой в сопоставлении */
 .mi-label { display: flex; flex-direction: column; align-items: center; gap: 2px; }
