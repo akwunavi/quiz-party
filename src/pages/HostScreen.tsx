@@ -96,7 +96,7 @@ export function HostScreen() {
         .toString(16).toUpperCase().padStart(3, '0')}`
     : null
   return (
-    <ThemeLayer theme={theme} isProjector>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />

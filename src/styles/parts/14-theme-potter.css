@@ -17,12 +17,9 @@
   border-color: rgba(211,166,37,.5); box-shadow: 0 0 34px rgba(211,166,37,.15); }
 .theme-potter button { border-color: rgba(211,166,37,.55); }
 .theme-potter .answer-reveal .answer-main { color: #e9c766; }
-/* сцена */
-/* Слой сцены МЕЖДУ фоном и контентом.
-   z-index: 0 увёл его за фон экрана — пропали разом свечи, сова и снитч.
-   z-index: 2 давал спор с плитками вариантов, и свечи всплывали поверх.
-   Единица — ровно посередине: фон ниже, контент (z-index 6) выше. */
-.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+/* сцена — .mg-scene теперь живёт в 34-magic-environment.css (шаг 2
+   rollout'а, см. HANDOFF.md); z-index-арифметика (фон ниже, контент
+   z-index 6 выше) там же, дословно унаследована отсюда. */
 .theme-potter .choices-grid, .theme-potter .choice-plate,
 .theme-potter .img-answers, .theme-potter .q-media-grid { position: relative; z-index: 6; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index).
@@ -43,6 +40,8 @@
 .theme-potter .mel-board { perspective: 900px; }
 .theme-potter .sprint-card:hover { border-color: #d3a625;
   box-shadow: 0 0 24px rgba(211,166,37,.55), inset 0 0 14px rgba(211,166,37,.15); }
+/* ↑ до конца блока — общие правила темы; ↓ сцена (свечи/искры/снитч)
+   удалена в шаге 2 rollout'а, заменена .mg-scene из 34-magic-environment.css */
 /* Номер вопроса и метка раунда подняты выше свечей. Тёмную подложку под
    них не ставим — она смотрелась заплаткой; вместо этого свечи опущены
    ниже строки (см. ThemeLayer: крайние свечи и так уже сдвинуты). */
@@ -57,37 +56,13 @@
    .round-badge с top: 22px — двинь бейдж вниз без этого условия, и он
    вместо topbar словит round-badge. */
 .theme-potter .host-screen:has(> .host-topbar) ~ .link-badge-corner { top: 50px; }
-.pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
-  filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
-  animation: candleFloat 3.6s ease-in-out infinite; }
-@keyframes candleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.pt-spark { position: absolute; width: 5px; height: 5px; border-radius: 50%;
-  background: #ffe9a8; box-shadow: 0 0 10px #ffd35c, 0 0 20px rgba(255,211,92,.6);
-  animation: sparkTwinkle 2.8s ease-in-out infinite; }
+/* sparkTwinkle: keyframe остался — им пользуются button:hover::after
+   (16-round-melody-tiles.css) и .answer-pulse (18-patch-745.css), сама
+   декоративная искра сцены (.pt-spark) удалена вместе со свечами/снитчем
+   в шаге 2 rollout'а (заменены .mg-dust/.mg-flare/.mg-wisp в
+   34-magic-environment.css). */
 @keyframes sparkTwinkle { 0%,100% { opacity: 0; transform: scale(.4); }
   50% { opacity: 1; transform: scale(1); } }
-/* снитч: шарик с крыльями, летает восьмёркой */
-.pt-snitch { position: absolute; top: 18%; left: 8%; width: 64px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  animation: snitchFly 17s ease-in-out infinite; will-change: transform; }
-.pt-ball { width: 18px; height: 18px; border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #ffe9a8, #d3a625 55%, #7a5c10);
-  box-shadow: 0 0 16px rgba(211,166,37,.9); }
-.pt-wing { width: 22px; height: 12px; border-radius: 50% 100% 0 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.35));
-  transform-origin: right center; animation: wingFlap .18s ease-in-out infinite alternate; }
-.pt-wing.r { transform: scaleX(-1); transform-origin: left center; }
-@keyframes wingFlap { from { transform: rotate(-24deg); } to { transform: rotate(18deg); } }
-.pt-wing.r { animation-name: wingFlapR; }
-@keyframes wingFlapR { from { transform: scaleX(-1) rotate(-24deg); } to { transform: scaleX(-1) rotate(18deg); } }
-@keyframes snitchFly {
-  0%   { transform: translate(0, 0) scale(1); }
-  18%  { transform: translate(62vw, 14vh) scale(.8); }
-  36%  { transform: translate(78vw, 52vh) scale(1.05); }
-  55%  { transform: translate(30vw, 64vh) scale(.7); }
-  74%  { transform: translate(10vw, 34vh) scale(1); }
-  100% { transform: translate(0, 0) scale(1); }
-}
 /* таймер ГП: золотое кольцо-«снитч» с крылышками по бокам */
 .theme-potter .timer-wrap { position: relative; width: 118px; height: 118px;
   display: flex; align-items: center; justify-content: center; border-radius: 50%;

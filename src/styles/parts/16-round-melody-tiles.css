@@ -140,36 +140,8 @@
 .theme-potter button.ghost { background: transparent; border-color: rgba(211,166,37,.5); }
 .theme-potter button:disabled { opacity: .4; box-shadow: none; transform: none; }
 
-/* 3: свечи — воск + живое пламя (качается от сквозняка) */
-.pt-candle { position: absolute; width: 12px; height: var(--h, 40px); border-radius: 4px;
-  background: linear-gradient(180deg, #f5ecd8, #d9cba6);
-  box-shadow: 0 3px 8px rgba(0,0,0,.5);
-  animation: candleFloat 3.6s ease-in-out infinite; font-size: 0; }
-.pt-flame { position: absolute; left: 50%; top: -16px; width: 10px; height: 17px;
-  transform: translateX(-50%); transform-origin: bottom center;
-  border-radius: 50% 50% 42% 58% / 62% 62% 38% 38%;
-  background: radial-gradient(circle at 50% 78%, #fff6d8 0%, #ffd35c 45%, #ff9d2e 78%, transparent 100%);
-  filter: drop-shadow(0 0 10px rgba(255,190,80,.95)) drop-shadow(0 0 22px rgba(255,160,60,.5));
-  animation: flameSway 1.5s ease-in-out infinite; }
-@keyframes flameSway {
-  0%, 100% { transform: translateX(-50%) rotate(-7deg) scaleY(1); }
-  30%      { transform: translateX(-46%) rotate(6deg) scaleY(1.12); }
-  60%      { transform: translateX(-54%) rotate(-4deg) scaleY(.94); }
-  80%      { transform: translateX(-48%) rotate(8deg) scaleY(1.06); }
-}
-
-/* 12: сова с письмом (ГП), дрон (кибер), сани (НГ) — редкие пролёты */
-.pt-owl { position: absolute; top: 26%; left: -80px; font-size: clamp(26px, 3vw, 46px);
-  animation: owlFly 26s linear infinite; animation-delay: 6s; opacity: 0; }
-.pt-owl-letter { font-size: .55em; margin-left: -8px; vertical-align: -8px; }
-@keyframes owlFly {
-  0%, 74% { transform: translate(0, 0); opacity: 0; }
-  75% { opacity: 1; }
-  80% { transform: translate(22vw, -4vh); }
-  86% { transform: translate(48vw, 3vh); }
-  93% { transform: translate(78vw, -5vh); opacity: 1; }
-  100% { transform: translate(110vw, -2vh); opacity: 0; }
-}
+/* Свечи и сова ГП (сцена) удалены в шаге 2 rollout'а Magic-темы —
+   заменены .mg-dust/.mg-flare/.mg-wisp в 34-magic-environment.css. */
 .cb-scene { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
 .cb-drone { position: absolute; top: 20%; left: 6%; animation: droneFly 21s ease-in-out infinite; }
 .cb-dot { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent2);
