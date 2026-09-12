@@ -284,3 +284,36 @@ html.fx-force-motion .theme-potter .host-screen .sb-row.sb-flip > td {
 }
 .theme-potter .bz-qtext { font-size: clamp(26px, 3.6vw, 72px); }
 .theme-potter .bz-name { color: var(--tc, var(--mg-brass-bright)); }
+
+/* ═══ Шаг 11: маркер-огонёк на барабане мелодии ═══
+ * `.mel-board` уже `position: relative` (общий список тем в
+ * 14-theme-potter.css) — маркер позиционируется абсолютно внутри него,
+ * координаты считает `useLayoutEffect` в `MelodyRound.tsx` (центр
+ * текущей «горячей» плитки). Сам перелёт — CSS `transition: transform`,
+ * не JS-анимация кадр за кадром: дешевле и не спорит с частотой опроса. */
+.theme-potter .mg-wisp.mel-marker {
+  position: absolute; left: 0; top: 0; width: 34px; height: 34px;
+  margin: -17px 0 0 -17px; z-index: 5; pointer-events: none;
+  border-radius: 50%;
+  transition: transform .22s cubic-bezier(.3,.7,.3,1);
+  background: radial-gradient(circle at 35% 30%, #fff6df, var(--mg-brass-bright) 45%, var(--mg-brass) 80%);
+  box-shadow: 0 0 18px rgba(243,223,168,.9), 0 0 34px rgba(201,166,104,.6);
+}
+/* афтеримидж-след — размытый ореол позади, пульсирует на месте, реального
+   "хвоста" за траекторией не рисует (для этого нужен был бы JS-трейл из
+   нескольких узлов), но вместе с transition-перелётом читается как полёт. */
+.theme-potter .mg-wisp.mel-marker::after {
+  content: ''; position: absolute; inset: -70%; border-radius: 50%; z-index: -1;
+  background: radial-gradient(circle, rgba(243,223,168,.4), transparent 70%);
+  filter: blur(2px);
+  animation: mgWispFlicker 1s ease-in-out infinite;
+}
+/* вспышка в последнюю секунду барабана — трек вот-вот определится */
+.theme-potter .mg-wisp.mel-marker.flare {
+  animation: mgFlarePulse .5s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .mg-wisp.mel-marker { transition: none; }
+  .theme-potter .mg-wisp.mel-marker::after { animation: none; opacity: .5; }
+  .theme-potter .mg-wisp.mel-marker.flare { animation: none; }
+}

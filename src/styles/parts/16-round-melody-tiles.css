@@ -49,62 +49,68 @@
       0 0 26px rgba(140,215,255,.75); }
 }
 
-/* ── ВОЛШЕБНАЯ ШКОЛА: письмо из Хогвартса с сургучной печатью ── */
-.theme-potter .mel-tile .mel-face { position: relative; clip-path: none; border-radius: 5px;
-  aspect-ratio: 100/70; height: min(100%, 13vh); width: auto; max-width: 96%;
-  background: linear-gradient(180deg, #f5ead0, #e9dbb6);
-  border: 2px solid #b39b62; color: #f0d9a8;
-  box-shadow: 0 6px 16px rgba(0,0,0,.5); overflow: visible; }
-/* клапан конверта */
-.theme-potter .mel-tile .mel-face::before { content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to bottom right, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top left / 50% 52% no-repeat,
-    linear-gradient(to bottom left, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top right / 50% 52% no-repeat; }
-/* сургучная печать (номер сидит на ней) */
-.theme-potter .mel-tile .mel-face::after { content: ''; position: absolute; left: 50%; top: 52%;
-  transform: translate(-50%, -50%); width: 42%; aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle at 36% 30%, #a5313a, #8c1d23 60%, #5e1116);
-  box-shadow: 0 2px 6px rgba(0,0,0,.45); }
-.theme-potter .mel-tile .mel-face { z-index: 0; }
-.theme-potter .mel-tile .mel-face::after { z-index: -0; }
-.theme-potter .mel-tile .mel-face > * { position: relative; }
+/* ── MAGIC: «хрустальный шар» — круглый гем со swirl внутри (шаг 11) ──
+   Заменяет прежний конверт+сургуч: тот же язык, что и у .jp-tile ниже. */
+.theme-potter .mel-tile .mel-face { position: relative; clip-path: none; border-radius: 50%;
+  aspect-ratio: 1; height: min(100%, 13vh); width: auto; max-width: 96%;
+  background: radial-gradient(circle at 60% 72%, var(--mg-glass2, #2a2447), var(--mg-void2, #151029) 78%);
+  border: 2px solid var(--mg-brass, #c9a668); color: var(--mg-brass-bright, #f3dfa8);
+  box-shadow: 0 6px 16px rgba(0,0,0,.5), inset 0 0 18px rgba(0,0,0,.4);
+  overflow: hidden; }
+/* энергия внутри шара — медленно вращающийся конический градиент */
+.theme-potter .mel-tile .mel-face::before { content: ''; position: absolute; inset: -12%;
+  border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(201,166,104,.4) 55deg,
+    transparent 130deg, rgba(243,223,168,.28) 210deg, transparent 300deg, transparent 360deg);
+  animation: mgGemSwirl 7s linear infinite; }
+@keyframes mgGemSwirl { to { transform: rotate(360deg); } }
+/* блик стекла — фиксированный, не вращается */
+.theme-potter .mel-tile .mel-face::after { content: ''; position: absolute; top: 14%; left: 20%;
+  width: 30%; height: 20%; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0)); }
+.theme-potter .mel-tile .mel-face > * { position: relative; z-index: 1; }
 .theme-potter .mel-tile .mel-face { font-size: clamp(16px, 1.9vw, 28px);
-  text-shadow: 0 1px 2px rgba(0,0,0,.6); }
-/* номер поверх печати */
-.theme-potter .mel-tile .mel-face { flex-direction: column; }
-.theme-potter .mel-tile .mel-face { padding-top: 4%; }
+  text-shadow: 0 0 8px rgba(0,0,0,.6); }
 @media (hover: hover) {
   .theme-potter .mel-tile:not(.done):hover .mel-face { transform: translateY(-5px) rotateY(5deg);
-    box-shadow: 0 10px 22px rgba(0,0,0,.55), 0 0 22px rgba(211,166,37,.55);
-    border-color: #d3a625; }
+    box-shadow: 0 10px 22px rgba(0,0,0,.55), 0 0 22px rgba(201,166,104,.55);
+    border-color: var(--mg-brass-bright, #f3dfa8); }
 }
-.theme-potter .mel-tile.spin .mel-face { animation: letterFlutter .45s ease-in-out infinite;
-  border-color: #d3a625; box-shadow: 0 0 30px rgba(211,166,37,.8); }
-@keyframes letterFlutter { 0%,100% { transform: rotate(-2deg) translateY(-2px); }
-  50% { transform: rotate(2deg) translateY(-6px); } }
-.theme-potter .mel-tile.done .mel-face { opacity: .3; filter: grayscale(.6); box-shadow: none; }
-.theme-potter .mel-tile.done .mel-face::after { display: none; }
+/* «горячая» плитка (текущая на барабане) — ярче и теплее, не мигает вразнобой */
+.theme-potter .mel-tile.spin .mel-face { animation: mgGemSwirl 7s linear infinite, mgGemHot 1s ease-in-out infinite;
+  border-color: var(--mg-brass-bright, #f3dfa8); box-shadow: 0 0 32px rgba(201,166,104,.85),
+    inset 0 0 22px rgba(243,223,168,.35); }
+@keyframes mgGemHot { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+/* сыгранная — притушена */
+.theme-potter .mel-tile.done .mel-face { opacity: .28; filter: grayscale(.7) brightness(.7); box-shadow: none; }
+/* КРИТИЧНО: во время спина не-текущие плитки притушены относительно
+   горячей — иначе горячая плитка не читается среди остальных гемов.
+   `.spinning` — класс из JSX (MelodyRound.tsx), а не `:has()`: на
+   проекторном WebView поддержка `:has()` не гарантирована, а здесь это
+   не косметика — без дымки барабан нечитаем. */
+.theme-potter .mel-board.spinning .mel-tile:not(.spin):not(.done) .mel-face {
+  filter: brightness(.42) saturate(.55); transition: filter .3s ease; }
 
-/* ── «Живые портреты» (поправка заказчика): плитки дышат в покое, не
-   только на hover. Отдельный слой на .mel-tile (родитель), а НЕ на
-   .mel-face — у неё оба псевдоэлемента заняты клапаном конверта и
-   печатью. Пульсирует golden-контур через opacity одного элемента
-   (::after), НЕ через анимированный box-shadow — на доске бывает
-   десятки плиток разом, а box-shadow с блюром дороже по перерисовке.
-   Фаза сдвинута через nth-child(3n±), чтобы доска не дышала одним
-   организмом (см. прецедент .cp-code i:nth-child(3n) в 28-theme-cyber.css).
-   Играемая (.spin, уже мигает letterFlutter) и отыгранная (.done)
-   плитки не дышат — им нечем/незачем оживать. */
+/* ── Дыхание плиток в покое (mgPulse, шаг 11): отдельный слой на
+   .mel-tile (родитель), а НЕ на .mel-face — у неё оба псевдоэлемента
+   заняты энергией шара и бликом стекла. Пульсирует латунный контур через
+   opacity/scale одного элемента (::after), НЕ через анимированный
+   box-shadow — на доске бывает десятки плиток разом, а box-shadow с
+   блюром дороже по перерисовке. Фаза сдвинута через nth-child(3n±),
+   чтобы доска не дышала одним организмом (см. прецедент .cp-code
+   i:nth-child(3n) в 28-theme-cyber.css). Играемая (.spin, уже светится
+   mgGemHot) и отыгранная (.done) плитки не дышат — им нечем/незачем
+   оживать. */
 .theme-potter .mel-tile:not(.done):not(.spin)::after {
   content: ''; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: min(clamp(96px, 11vw, 170px), 100%); aspect-ratio: 100/70;
-  border-radius: 5px; border: 2px solid #ffe9a8; pointer-events: none;
-  opacity: 0; animation: ptTileBreathe 3.4s ease-in-out infinite; }
+  width: min(clamp(96px, 11vw, 170px), 100%); aspect-ratio: 1;
+  border-radius: 50%; border: 2px solid var(--mg-brass-bright, #f3dfa8); pointer-events: none;
+  opacity: 0; animation: mgPulse 3.4s ease-in-out infinite; }
 .theme-potter .mel-tile:nth-child(3n)::after { animation-delay: -1.1s; }
 .theme-potter .mel-tile:nth-child(3n+1)::after { animation-delay: -2.2s; }
 .theme-potter .mel-tile:nth-child(3n+2)::after { animation-delay: 0s; }
 .theme-potter .mel-tile.done::after, .theme-potter .mel-tile.spin::after { animation: none; opacity: 0; }
-@keyframes ptTileBreathe { 0%, 100% { opacity: .15; } 50% { opacity: .6; } }
 @media (prefers-reduced-motion: reduce) {
   /* Вес ОБЯЗАН совпадать с `.mel-tile:not(.done):not(.spin)::after` выше —
      проверено рендером: голый `.mel-tile::after` (ниже специфичностью)
@@ -188,28 +194,38 @@
 .theme-potter .mel-keys button { border-radius: 10px; }
 .theme-potter .mel-points-hint { color: #7cc79b; }
 
-/* 9: своя игра в ГП — плитки-письма с сургучной печатью (как в мелодии) */
-.theme-potter .jp-tile { position: relative; clip-path: none; border-radius: 5px;
-  background: linear-gradient(180deg, #f5ead0, #e9dbb6); color: #6b4f18;
-  border: 2px solid #b39b62; overflow: hidden; text-shadow: none; font-weight: 700; }
-.theme-potter .jp-tile::before { content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to bottom right, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top left / 50% 46% no-repeat,
-    linear-gradient(to bottom left, transparent 49.4%, #c9b689 49.4%, #c9b689 51%, transparent 51%) top right / 50% 46% no-repeat;
-  pointer-events: none; }
+/* 9: своя игра в Magic — тот же круглый гем, что и у .mel-tile .mel-face
+   (шаг 11) — единый визуальный язык обеих механик. .jp-tile — сам кнопка
+   (нет отдельного дочернего "лица"), гем рисуется прямо на нём и
+   заполняет клетку грида целиком (width/height: 100%, унаследовано из
+   08-projector.css) — при квадратной клетке даёт круг, при вытянутой
+   слегка вытянутый овал: клетки «Своей игры» обычно близки к квадрату,
+   и это дешевле и надёжнее, чем принудительно центрировать круг внутри
+   грида через margin/place-self (риск разъехаться с чужой grid-раскладкой). */
+.theme-potter .jp-tile { position: relative; clip-path: none; border-radius: 50%;
+  background: radial-gradient(circle at 60% 72%, var(--mg-glass2, #2a2447), var(--mg-void2, #151029) 78%);
+  color: var(--mg-brass-bright, #f3dfa8);
+  border: 2px solid var(--mg-brass, #c9a668); overflow: hidden; text-shadow: none; font-weight: 700; }
+/* энергия внутри шара — тот же вращающийся конус, что у .mel-face */
+.theme-potter .jp-tile::before { content: ''; position: absolute; inset: -12%;
+  border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(201,166,104,.4) 55deg,
+    transparent 130deg, rgba(243,223,168,.28) 210deg, transparent 300deg, transparent 360deg);
+  animation: mgGemSwirl 7s linear infinite; }
 .theme-potter .jp-tile:not(:disabled):hover { transform: translateY(-4px) rotateY(5deg);
-  box-shadow: 0 10px 22px rgba(0,0,0,.5), 0 0 22px rgba(211,166,37,.6);
-  border-color: #d3a625; color: #8a6812; }
+  box-shadow: 0 10px 22px rgba(0,0,0,.5), 0 0 22px rgba(201,166,104,.6);
+  border-color: var(--mg-brass-bright, #f3dfa8); color: var(--mg-brass-bright, #f3dfa8); }
 .theme-potter .jp-tile:disabled { opacity: .3; filter: grayscale(.6); }
 
 /* «Живые портреты» на «Своей игре» — то же дыхание, что у мелодии.
-   ::before на .jp-tile уже занят клапаном конверта — дыхание на ::after
-   (он у jp-tile свободен: у него нет отдельной "печати", в отличие от
-   .mel-face). inset ПОЛОЖИТЕЛЬНЫЙ (внутрь), не отрицательный: у .jp-tile
-   overflow: hidden — контур за пределами рамки был бы обрезан. */
+   ::before на .jp-tile занят вращающейся энергией — дыхание на ::after
+   (свободен). inset ПОЛОЖИТЕЛЬНЫЙ (внутрь), не отрицательный: у .jp-tile
+   overflow: hidden — контур за пределами рамки был бы обрезан.
+   `border-radius: inherit` — гем круглый, контур автоматически тоже. */
 .theme-potter .jp-tile:not(.done)::after {
   content: ''; position: absolute; inset: 2px; border-radius: inherit;
-  border: 2px solid #ffe9a8; pointer-events: none;
-  opacity: 0; animation: ptTileBreathe 3.4s ease-in-out infinite; }
+  border: 2px solid var(--mg-brass-bright, #f3dfa8); pointer-events: none;
+  opacity: 0; animation: mgPulse 3.4s ease-in-out infinite; }
 .theme-potter .jp-tile:nth-child(3n)::after { animation-delay: -1.1s; }
 .theme-potter .jp-tile:nth-child(3n+1)::after { animation-delay: -2.2s; }
 .theme-potter .jp-tile:nth-child(3n+2)::after { animation-delay: 0s; }

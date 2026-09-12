@@ -12,7 +12,7 @@ import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { SnakeTimer } from '../../components/SnakeTimer'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
 // Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
@@ -26,7 +26,7 @@ import {
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
-import type { GameState, MelodySettings, MelodyState, MelodyTheme } from '../../types/quiz'
+import type { GameState, MelodySettings, MelodyState, MelodyTheme, ThemeKey } from '../../types/quiz'
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
@@ -294,7 +294,7 @@ export function MelodyBoard({ pack, round, gameState }: {
     <div className="host-screen grid-bg mel-screen" onPointerDown={unlockAudio}>
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10}
-        onPick={manualPick ? pickManually : undefined} />
+        onPick={manualPick ? pickManually : undefined} theme={pack.theme} />
 
       {idle && (
         <div className="host-actions">
@@ -462,11 +462,13 @@ export function MelodyBoard({ pack, round, gameState }: {
 }
 
 /** Барабан: подсветка бежит по плиткам и замедляется к концу. */
-function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, onPick }: {
+function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, onPick, theme }: {
   themes: MelodyTheme[]; played: string[]
   spinning: boolean; spinKey?: string; spinLeft: number; spinTotal: number
   /** Ручной выбор плитки. Не задан — плитки не кликабельны. */
   onPick?: (key: string) => void
+  /** Только для маркера-огонька Magic (шаг 11) — остальным темам не нужен. */
+  theme?: ThemeKey
 }) {
   const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
   const free = keys.filter(k => !played.includes(k))
@@ -499,12 +501,33 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, on
     ? (spinLeft <= 1 ? spinKey : free[cursor % Math.max(1, free.length)])
     : undefined
 
+  // ── Magic: блуждающий огонёк, физически перелетающий на "горячую"
+  // плитку барабана. Карта key→элемент — обычный ref (не state): позиции
+  // плиток не влияют на рендер, только на позиционирование маркера.
+  // Хук стоит здесь, ВЫШЕ любых ранних return — в этом компоненте их и
+  // нет вовсе, но правило то же, что и везде в проекте (React #310).
+  const tileRefs = useRef(new Map<string, HTMLDivElement>())
+  const boardRef = useRef<HTMLDivElement>(null)
+  const markerRef = useRef<HTMLSpanElement>(null)
+  useLayoutEffect(() => {
+    if (theme !== 'potter' || !spinning || !highlighted) return
+    const board = boardRef.current, tile = tileRefs.current.get(highlighted), marker = markerRef.current
+    if (!board || !tile || !marker) return
+    const b = board.getBoundingClientRect(), t = tile.getBoundingClientRect()
+    const x = t.left - b.left + t.width / 2, y = t.top - b.top + t.height / 2
+    marker.style.transform = `translate(${x}px, ${y}px)`
+  }, [theme, spinning, highlighted])
+  const nearEnd = spinning && spinLeft <= 1
+
   return (
-    <div className="mel-board" style={{
+    <div className={`mel-board${spinning ? ' spinning' : ''}`} ref={boardRef} style={{
       gridTemplateColumns: `repeat(${themes.length}, minmax(0,1fr))`,
       // строки с гарантированной высотой: плитки делят место и НЕ наезжают
       gridTemplateRows: `auto repeat(${Math.max(...themes.map(t => t.tracks.length), 1)}, minmax(0, 1fr))`,
     }}>
+      {theme === 'potter' && spinning && (
+        <span ref={markerRef} className={`mg-wisp mel-marker${nearEnd ? ' flare' : ''}`} aria-hidden />
+      )}
       {themes.map((t, ti) => (
         <div key={`h${ti}`} className="mel-theme">{t.name || `Тема ${ti + 1}`}</div>
       ))}
@@ -514,12 +537,13 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, on
         const hot = highlighted === key
         return (
           <div key={key}
+            ref={el => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }}
             className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}${
               onPick && !done ? ' pickable' : ''}`}
             onClick={onPick && !done ? () => onPick(key) : undefined}
             data-c={String((ti % 4))} style={{ gridColumn: ti + 1, gridRow: i + 2 }}>
             {/* нейтральная «морда» плитки: вид целиком задаёт тема
-                (НГ — ёлочный шар, киберпанк — неон-чип, ГП — письмо с печатью) */}
+                (НГ — ёлочный шар, киберпанк — неон-чип, Magic — гем) */}
             <span className="mel-face">{done ? '' : i + 1}</span>
           </div>
         )
