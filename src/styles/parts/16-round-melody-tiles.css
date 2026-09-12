@@ -125,18 +125,18 @@
 .mel-tile { min-height: 0; min-width: 0; height: 100%; }
 .mel-board { height: 100%; }
 
-/* ГП: кнопки-«свитки» вместо кибер-скосов */
+/* Magic: кнопки-«свитки» вместо кибер-скосов */
 .theme-potter button { clip-path: none; border-radius: 10px;
   background: linear-gradient(180deg, #2a2142, #1b1630);
-  border: 1.5px solid #d3a625; color: #f3e9cf;
-  font-family: 'Cinzel Decorative', 'Russo One', serif; letter-spacing: .04em;
+  border: 1.5px solid var(--mg-brass, #c9a668); color: #f3e9cf;
+  font-family: var(--font-display); letter-spacing: .04em;
   position: relative; transition: all .18s; }
 /* :hover только на устройствах с настоящим курсором — см. разбор в
    01-base.css (8.60): на телефоне тап иначе застревал «наведённым». */
 @media (hover: hover) and (pointer: fine) {
   .theme-potter button:hover { transform: translateY(-2px);
-    box-shadow: 0 0 26px rgba(211,166,37,.7), inset 0 0 12px rgba(211,166,37,.2);
-    border-color: #ffe9a8; color: #ffe9a8; filter: none; }
+    box-shadow: 0 0 26px rgba(201,166,104,.7), inset 0 0 12px rgba(201,166,104,.2);
+    border-color: var(--mg-brass-bright, #f3dfa8); color: var(--mg-brass-bright, #f3dfa8); filter: none; }
   .theme-potter button:hover::after { content: '✦'; position: absolute; top: -10px; right: -6px;
     color: #ffe9a8; font-size: 13px; animation: sparkTwinkle 1s ease-in-out infinite; }
 }
@@ -178,21 +178,24 @@
 .theme-new_year .mel-tile .mel-face { height: auto; width: min(clamp(84px, 10vw, 150px), 100%); }
 .theme-potter .mel-tile .mel-face { height: auto; width: min(clamp(96px, 11vw, 170px), 100%); }
 
-/* 6/7: экран игрока в ГП — пергамент, а не киберпанк */
+/* 6/7: экран игрока в Magic — стекло на бархате, латунь вместо золота
+   (шаг 12 rollout'а: токены вместо хардкода, EB Garamond вместо Cinzel
+   Decorative — .pl-*, collapsible-логика/Picker/отправка ответа/
+   PlayerReview НЕ трогались, только оформление готовых узлов). */
 .theme-potter .pl-root { background: var(--bg); color: var(--fg); }
-.theme-potter .pl-card { background: linear-gradient(180deg, #241d3c, #1b1630);
-  border: 1.5px solid rgba(211,166,37,.55); border-radius: 12px;
+.theme-potter .pl-card { background: linear-gradient(180deg, var(--mg-glass2, #2a2447), var(--mg-void2, #151029));
+  border: 1.5px solid rgba(201,166,104,.55); border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,.45); clip-path: none; }
-.theme-potter .pl-qlabel { color: #e9c766; font-family: 'Cinzel Decorative', serif;
+.theme-potter .pl-qlabel { color: var(--mg-brass-bright, #f3dfa8); font-family: var(--font-display);
   letter-spacing: .06em; }
 .theme-potter .pl-card input { background: rgba(243,233,207,.07);
-  border: 1px solid rgba(211,166,37,.4); color: var(--fg); border-radius: 8px; }
-.theme-potter .pl-send { background: linear-gradient(180deg, #b3891c, #8a6812);
-  color: #fff8e6; border: 1px solid #ffe9a8; clip-path: none; border-radius: 10px; }
-.theme-potter .pl-wait { color: #e9c766; font-family: 'Cinzel Decorative', serif; }
+  border: 1px solid rgba(201,166,104,.4); color: var(--fg); border-radius: 8px; }
+.theme-potter .pl-send { background: linear-gradient(180deg, var(--mg-brass, #c9a668), var(--mg-brass-dim, #8a744f));
+  color: #1c1730; border: 1px solid var(--mg-brass-bright, #f3dfa8); clip-path: none; border-radius: 10px; }
+.theme-potter .pl-wait { color: var(--mg-brass-bright, #f3dfa8); font-family: var(--font-display); }
 .theme-potter .pl-wait-sub, .theme-potter .ed-hint { color: var(--muted); }
 .theme-potter .mel-keys button { border-radius: 10px; }
-.theme-potter .mel-points-hint { color: #7cc79b; }
+.theme-potter .mel-points-hint { color: var(--mg-brass-bright, #f3dfa8); }
 
 /* 9: своя игра в Magic — тот же круглый гем, что и у .mel-tile .mel-face
    (шаг 11) — единый визуальный язык обеих механик. .jp-tile — сам кнопка
@@ -259,18 +262,26 @@
 .host-actions { position: fixed !important; right: 28px !important; bottom: 24px !important;
   left: auto !important; top: auto !important; }
 
-/* ГП: шрифты во всех углах */
-.theme-potter { --font-digits: 'Cinzel Decorative', serif; }
+/* Magic: шрифты во всех углах.
+ * ИСПРАВЛЕНО в шаге 12 (найдено финальной чисткой grep по "Cinzel"):
+ * это правило держало ТЕКСТ ВОПРОСА и соседей на хардкоженном
+ * 'Cormorant Garamond' НАПРЯМУЮ, в обход `--font-display` — то есть шаг 6
+ * ("кегль-лестница пересчитана под новый шрифт EB Garamond") на самом
+ * деле измерял смену шрифта, которая для `.q-text` ещё не произошла: та
+ * же Cormorant Garamond была тут и до, и после шага 1. Заменено на
+ * `var(--font-display)` — теперь тут действительно EB Garamond, и
+ * измерение шага 6 наконец соответствует правде, а не только описанию. */
+.theme-potter { --font-digits: var(--font-display); }
 .theme-potter .q-text, .theme-potter .rule-item, .theme-potter .sprint-text,
 .theme-potter .mel-big, .theme-potter .team-answer, .theme-potter .pl-card,
 .theme-potter .answer-main, .theme-potter .fin-table, .theme-potter .race-name,
 .theme-potter .mel-bid-row, .theme-potter .jp-modal, .theme-potter .pl-list {
-  font-family: 'Cormorant Garamond', Georgia, serif; }
-.theme-potter .q-text { font-size: clamp(24px, 2.8vw, 46px); font-weight: 600; }
+  font-family: var(--font-display); }
+.theme-potter .q-text { font-weight: 600; }
 .theme-potter .mono-tag, .theme-potter .meta-line, .theme-potter .qnum,
-.theme-potter .pack-badge { font-family: 'Cinzel Decorative', serif;
+.theme-potter .pack-badge { font-family: var(--font-display);
   letter-spacing: .14em; }
-.theme-potter .timer-num, .theme-potter .mel-count { font-family: 'Cinzel Decorative', serif; }
+.theme-potter .timer-num, .theme-potter .mel-count { font-family: var(--font-display); }
 
 /* мини-версия у отсчёта в модалке мелодии */
 

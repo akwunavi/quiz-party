@@ -47,7 +47,6 @@ import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide, ThemeKey } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
-import { SnakeTimer } from '../components/SnakeTimer'
 import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
@@ -821,8 +820,13 @@ function playChime() {
   } catch { /* звук не критичен: игра идёт дальше */ }
 }
 
-function Timer({ startedAt, seconds, theme, chime = true }: {
+function Timer({ startedAt, seconds, theme, chime = true, variant }: {
   startedAt: string | null; seconds: number; theme?: string; chime?: boolean
+  /** 'ring' — обычное латунное кольцо (как у classic/НГ по духу), а не
+   *  Магический круг: нужно на экране `answer_time` (Р2 решения rollout'а,
+   *  HANDOFF.md) — там таймер один на весь экран, крупный, и рулонная
+   *  «руническая» стилистика туда не просилась. */
+  variant?: 'ring'
 }) {
   const [left, setLeft] = useState(seconds)
   const rang = useRef(false)
@@ -873,8 +877,14 @@ function Timer({ startedAt, seconds, theme, chime = true }: {
       </div>
     )
   }
-  // ГП: круговой таймер-змея, ползущая к своему хвосту
-  if (theme === 'potter') return <SnakeTimer left={left} seconds={seconds} low={low} />
+  // Magic: обычное латунное кольцо на answer_time (Р2), Магический круг
+  // (руны) — везде ещё (шапка вопроса, .mel-count, .sprint-timer).
+  if (theme === 'potter' && variant === 'ring') return (
+    <div className={`timer-wrap${low ? ' low' : ''}`}>
+      <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
+    </div>
+  )
+  if (theme === 'potter') return <MagicCircleTimer left={left} seconds={seconds} low={low} />
   // Киберпанк: искра бежит по кольцу. Замирает, когда таймер не идёт —
   // либо ещё не запущен, либо уже дотикал до нуля. Это единственный
   // элемент, по которому с дальнего конца зала видно, идёт время или нет.
@@ -1879,7 +1889,7 @@ function AnswerTime({ pack, round, gameState }: {
       <div className="meta-line">{paper
         ? 'ПЕРЕДАЙТЕ БЛАНКИ ВЕДУЩЕМУ'
         : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>
-      <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
+      <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} variant="ring" />
       {/* Список команд со счётчиком «сколько ответов долетело» нужен только
           при игре с телефонов: он показывает, кого ещё ждать. На бумаге
           ответы едут на бланках, счётчик всегда нулевой и смысла не несёт —

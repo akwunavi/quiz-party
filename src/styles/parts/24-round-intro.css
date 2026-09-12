@@ -34,11 +34,11 @@
 .theme-classic .rules-frame::before { left: -2px; top: -2px; border-right: none; border-bottom: none; }
 .theme-classic .rules-frame::after { right: -2px; bottom: -2px; border-left: none; border-top: none; }
 
-/* волшебная школа: пергамент с золотым кантом */
-.theme-potter .rules-frame { border-color: rgba(211,166,37,.55); border-radius: 6px;
-  background: linear-gradient(180deg, rgba(243,233,207,.07), rgba(243,233,207,.02));
-  box-shadow: 0 0 40px rgba(211,166,37,.16), inset 0 0 40px rgba(0,0,0,.4); }
-.theme-potter .rules-frame-label { color: #e9c766; font-family: 'Cinzel Decorative', serif;
+/* Magic: стекло с латунным кантом */
+.theme-potter .rules-frame { border-color: rgba(201,166,104,.55); border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+  box-shadow: 0 0 40px rgba(201,166,104,.16), inset 0 0 40px rgba(0,0,0,.4); }
+.theme-potter .rules-frame-label { color: var(--mg-brass-bright, #f3dfa8); font-family: var(--font-display);
   letter-spacing: .18em; }
 
 /* новый год: заснеженная рамка */
@@ -294,12 +294,12 @@
   34%, 100% { clip-path: inset(0 0 0 0); transform: none; filter: none; }
 }
 
-/* волшебная школа: тот же пергамент+золото, что у .pt-frame, и «чернильное»
-   проступание блока целиком (язык ptInk уже используется на словах вопроса). */
+/* Magic: то же латунное стекло, что у .mg-frame, и «конденсирующееся»
+   проступание блока целиком. */
 .theme-potter .info-block, .theme-potter .info-media {
-  border-color: rgba(211,166,37,.5); border-radius: 8px;
-  background: linear-gradient(180deg, rgba(243,233,207,.06), rgba(243,233,207,.015));
-  box-shadow: 0 0 34px rgba(211,166,37,.14), inset 0 0 30px rgba(0,0,0,.35);
+  border-color: rgba(201,166,104,.5); border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+  box-shadow: 0 0 34px rgba(201,166,104,.14), inset 0 0 30px rgba(0,0,0,.35);
   animation: infoInkIn .8s cubic-bezier(.2,.75,.25,1) both; }
 @keyframes infoInkIn {
   0% { opacity: 0; filter: blur(7px); transform: translateY(10px) scale(.97); }

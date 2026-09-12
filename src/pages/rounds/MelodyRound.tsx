@@ -11,7 +11,7 @@ import { playAudio, createAudio } from '../../lib/audioSource'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
-import { SnakeTimer } from '../../components/SnakeTimer'
+import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
@@ -335,7 +335,7 @@ export function MelodyBoard({ pack, round, gameState }: {
                 // те же часы, что у большого таймера: --r = доля остатка
                 <div className="mel-count">
                   {pack.theme === 'potter'
-                    ? <SnakeTimer left={left} seconds={total} low={left <= 5} />
+                    ? <MagicCircleTimer left={left} seconds={total} low={left <= 5} />
                     : left}
                 </div>
               )}
