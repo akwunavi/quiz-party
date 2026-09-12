@@ -2583,7 +2583,7 @@ function ScoreboardScreen({ pack, gameState }: {
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>())
   const flippedRound = useRef<number | null>(null)
   useLayoutEffect(() => {
-    if (pack.theme !== 'classic') return
+    if (pack.theme !== 'classic' && pack.theme !== 'potter') return
     if (ranked.length === 0 || revealed < ranked.length) return
     if (flippedRound.current === gameState.round_number) return
     flippedRound.current = gameState.round_number
