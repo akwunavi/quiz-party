@@ -313,6 +313,12 @@ function HostInner({ gameState, pack }: {
     return (
       <div className="host-screen grid-bg round-intro">
         {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {/* Magic: заставка раунда в две фазы — вуаль золотого света
+            рассеивается (фаза 1, показывает заголовок), затем проступают
+            правила (фаза 2, задержка в тернарке ниже). Прямой ребёнок
+            .host-screen — попадает в оба списка :not() (14/15), иначе
+            общий сброс position/z-index в потоке перебьёт position:absolute. */}
+        {pack.theme === 'potter' && <div className="mg-veil" aria-hidden />}
         {round.mechanic === 'crossword' && grid ? (
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
@@ -357,7 +363,8 @@ function HostInner({ gameState, pack }: {
                      сначала отыгрывает заставку раунда, и только затем — с
                      паузой около секунды — проступают правила. Другие темы
                      не трогаем — их тайминг согласован раньше и отдельно. */
-                  animationDelay: `${(pack.theme === 'classic' ? 1.3 : 0.5) + i * 0.7}s`,
+                  animationDelay: `${(pack.theme === 'classic' ? 1.3
+                    : pack.theme === 'potter' ? 1.15 : 0.5) + i * 0.7}s`,
                 }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>

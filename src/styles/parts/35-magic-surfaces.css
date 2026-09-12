@@ -81,3 +81,26 @@ html.fx-force-motion .theme-potter.mel-overlay > .mel-modal,
 html.fx-force-motion .theme-potter .groups-overlay > .groups-modal {
   animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
 }
+
+/* ═══ Шаг 5: заставка раунда — две фазы ═══
+ * `.mg-veil` — прямой ребёнок `.host-screen` (в обоих списках `:not()`,
+ * 14/15), `position:absolute` берёт `.round-intro` за containing block
+ * (там уже `position:relative`, 23-answers.css) и не участвует в его
+ * `display:grid` авто-раскладке — ни `.ri-main`, ни `.cw-layout` не
+ * сдвигаются. Фаза 1 — вспышка света рассеивается (виден заголовок и
+ * номер раунда), фаза 2 — правила проступают (задержка `1.15s` в
+ * тернарке `HostScreen.tsx`, ровно длина `mgVeilLift`). `.round-badge` не
+ * переносился — он и так поверх (z-index 30, 23-answers.css). */
+.theme-potter .mg-veil {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 42%,
+    rgba(255,244,214,.9), rgba(201,166,104,.35) 45%, rgba(10,8,19,0) 75%);
+  animation: mgVeilLift 1.15s cubic-bezier(.3,.7,.25,1) both;
+}
+@keyframes mgVeilLift {
+  0%   { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .mg-veil { animation: none; opacity: 0; }
+}

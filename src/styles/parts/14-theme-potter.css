@@ -29,7 +29,7 @@
    ловушка: 8.53 добавила .info-note-corner (fixed, левый нижний угол
    слайда-брифинга), не попавший сюда, слетал на position:relative и
    уезжал в поток документа вместо угла экрана. */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner):not(.link-badge),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner):not(.link-badge):not(.mg-veil),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner, .link-badge { z-index: 30; }
