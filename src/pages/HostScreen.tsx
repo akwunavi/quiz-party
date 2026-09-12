@@ -48,6 +48,7 @@ import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide, ThemeKey } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
+import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
 import { probeMedia, createAudio, stopAllAudio, playSynced,
@@ -1872,7 +1873,7 @@ function AnswerTime({ pack, round, gameState }: {
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`}>
-      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
+      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>
       <div className="answer-pulse"><Title theme={pack.theme}
         lines={[paper ? 'СДАВАЙТЕ БЛАНКИ' : 'ОТВЕЧАЙТЕ!']} /></div>
       <div className="meta-line">{paper
@@ -2702,9 +2703,13 @@ function BreakScreen({ pack, round, gameState }: {
   const ss = String(left % 60).padStart(2, '0')
   return (
     <div className="host-screen grid-bg break-screen">
-      <div className="mono-tag accent">АНТРАКТ</div>
+      {/* Р3: у Magic крупного «ПЕРЕРЫВ» достаточно — подпись-дублёр не
+          рендерим вовсе (не прячем CSS-ом, просто не выводим). */}
+      {pack.theme !== 'potter' && <div className="mono-tag accent">АНТРАКТ</div>}
       <Title theme={pack.theme} lines={['ПЕРЕРЫВ']} />
       <Deco theme={pack.theme} />
+      {pack.theme === 'potter' &&
+        <MagicCircleTimer left={left} seconds={minutes * 60} low={left <= 30} />}
       <div className="break-timer">{mm}:{ss}</div>
       <div className="host-actions">
         <AfterRoundNav pack={pack} gameState={gameState} />
@@ -2753,6 +2758,8 @@ function CountingScreen({ pack, gameState }: {
       <div className="mono-tag accent">ПОДВОДИМ ИТОГИ</div>
       <Title theme={pack.theme} lines={['СЧИТАЕМ', 'БАЛЛЫ']} />
       <Deco theme={pack.theme} />
+      {pack.theme === 'potter' &&
+        <MagicCircleTimer left={left} seconds={MINUTES * 60} low={left <= 30} />}
       <div className="break-timer">{mm}:{ss}</div>
       <div className="counting-sub">Скоро объявим победителей</div>
       {/* Экран подсчёта существует только в бумажном режиме — сценарий

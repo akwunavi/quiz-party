@@ -833,7 +833,7 @@ function QuestionTextOnly({ round, gameState }: {
     </div>
   )
   if (phase === 'answer_time') return (
-    <div className="adm-centered"><div className="adm-h1 ok">ВРЕМЯ ОТВЕТОВ</div></div>
+    <div className="adm-centered"><div className="adm-h1 ok">ОЖИДАЮ ОТВЕТЫ</div></div>
   )
   if (phase === 'scoreboard') return (
     <div className="adm-centered"><div className="adm-h1">ТАБЛО</div>

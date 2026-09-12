@@ -469,7 +469,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       {gameState.phase === 'answer_time' &&
-        <div className="pl-notice acc">ВРЕМЯ ОТВЕТОВ — ПРОВЕРЬТЕ И ДОЗАПОЛНИТЕ</div>}
+        <div className="pl-notice acc">ОЖИДАЮ ОТВЕТЫ — ПРОВЕРЬТЕ И ДОЗАПОЛНИТЕ</div>}
       {isCrossword && grid && (
         <div className="pl-crossword">
           <CrosswordView grid={grid} letters={cwLetters}
