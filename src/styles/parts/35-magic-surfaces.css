@@ -253,3 +253,34 @@ html.fx-force-motion .theme-potter .host-screen .sb-row.sb-flip > td {
 /* перерыв/подсчёт — крупный, без своих цифр (см. комментарий выше) */
 .break-screen .mg-circle-timer { width: clamp(220px, 18vw, 300px); margin-bottom: clamp(4px, 1vh, 12px); }
 .break-screen .mg-circle-timer .mg-circle-num { display: none; }
+
+/* ═══ Шаг 10: блиц ═══
+ * Атмосфера/дымка — уже общая: `.mg-scene` рендерится сиблингом
+ * `.host-screen` на ЛЮБОМ экране проектора (ThemeLayer), блиц её получает
+ * бесплатно. Здесь — латунное стекло вместо голого `color-mix` панелей,
+ * крупнее рамка+текст вопроса и заметно крупнее панель ходящей команды
+ * (масштаб, не только цвет). `--tc` (цвет команды) НЕ трогаем — реальные
+ * данные о ходе, не декор. `13-round-race.css` (`.race-*`, `.bz-*` базовые
+ * правила) НЕ трогаем — здесь только добавочные `.theme-potter` overrides. */
+.theme-potter .bz-block {
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    color-mix(in srgb, var(--tc, #888) 8%, transparent);
+  border-color: color-mix(in srgb, var(--tc, var(--mg-brass)) 45%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(201,166,104,.12);
+}
+.theme-potter .bz-block.on {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 55%, transparent),
+    0 0 46px color-mix(in srgb, var(--tc) 50%, transparent),
+    inset 0 0 0 1px rgba(243,223,168,.25);
+  z-index: 2;
+}
+.theme-potter .bz-question {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.014)),
+    color-mix(in srgb, var(--tc, var(--accent)) 7%, transparent);
+  border-color: color-mix(in srgb, var(--tc, var(--mg-brass)) 55%, transparent);
+  padding: clamp(18px, 2.8vh, 40px) clamp(22px, 2.6vw, 52px);
+  min-height: clamp(130px, 18vh, 220px);
+}
+.theme-potter .bz-qtext { font-size: clamp(26px, 3.6vw, 72px); }
+.theme-potter .bz-name { color: var(--tc, var(--mg-brass-bright)); }
