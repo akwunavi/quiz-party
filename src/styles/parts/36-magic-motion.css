@@ -1,0 +1,8 @@
+/* ═══ Тема Magic — motion-примитивы (префикс mg) ═══
+ * Заполняется в шаге 2+ рollout'а: mgCondense, mgWordReveal, mgPulse,
+ * mgGlow, mgSweep и производные keyframes. ОБЯЗАТЕЛЬНО в конце —
+ * зеркальные блоки @media (prefers-reduced-motion: reduce) и
+ * html.fx-force-motion с ДОСЛОВНО теми же селекторами (см. CLAUDE.md
+ * §5 и HANDOFF.md 3h) — иначе выключатель анимаций ничего не выключает.
+ * Пока пусто — старые ptInk/ptBurst/ptDust/... keyframes в
+ * 14-theme-potter.css продолжают работать без изменений. */

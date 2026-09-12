@@ -180,7 +180,9 @@ const CONCURRENCY = 4
  *  чём, проверка headless Chromium для этого шага не нужна. */
 const THEME_COLORS: Record<ThemeKey, { bg: string; panel: string; text: string; accent: string; accent2: string }> = {
   classic: { bg: '0a0f1e', panel: '101728', text: 'f2f5fa', accent: 'ea580c', accent2: '22d3ee' },
-  potter: { bg: '0b0d1a', panel: '1b1630', text: 'f3e9cf', accent: 'd3a625', accent2: 'a45de2' },
+  // Magic (8.99, ключ темы в коде остаётся 'potter'): «Хрустальный шар» —
+  // латунь на глубоком фиолетовом бархате, без бирюзово-зелёного.
+  potter: { bg: '0a0813', panel: '1e1934', text: 'efe9fb', accent: 'c9a668', accent2: 'ff8f6a' },
   new_year: { bg: '071630', panel: '10305e', text: 'eaf3ff', accent: '7cc7ff', accent2: 'ffd700' },
 }
 
