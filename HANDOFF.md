@@ -4705,6 +4705,44 @@ environment.css` (сцена) → `35-magic-surfaces.css` (поверхност�
   в раздел 7 (бэклог).
 - `tsc`/`eslint`/`vitest`(434/47)/`vite build` — зелёные.
 
+**Шаг 7 (разбор ответа, три формата, без зелёного), 12.09.2026:**
+- `--answer`/`--ok` уже латунь с шага 1, но `08-projector.css` красит
+  `.answer-reveal`/`.answer-main`/`.choice-plate.correct`/`.choice-img.
+  correct`/`.rebus-hot` ЗАХАРДКОЖЕННЫМ `rgba(87,245,192,...)` (не через
+  переменную) — погашено точечно в `35-magic-surfaces.css`, включая
+  голый `.answer-main` (задевает и одиночный текстовый ответ в
+  `.answer-block`, не только модалки `.answer-reveal` — раньше это место
+  пропускали, красили только `.answer-reveal .answer-main`).
+- Формат 1 (текстовые варианты, `.choice-plate`): верный — тёплая заливка
+  БЕЗ рамки-акцента + латунная галочка. Галочка — SVG-ребёнок
+  (`MagicCheck` в `HostScreen.tsx`, `StagedChoices` получил проп `theme`),
+  не псевдоэлемент: `stroke-dashoffset`-анимация — SVG-only свойство, на
+  `::after` её не повесить. Плюс одноразовые искры на `::after` (свободен
+  — classic не трогает `.choice-plate.correct::after` без своего префикса
+  темы). Неверные — `saturate(.25) brightness(.8)` + `translateY(6px)`,
+  БЕЗ `display:none` (видно, что вариант был).
+- Формат 2 (одиночный текстовый ответ, `.answer-block`/`.answer-reveal`
+  без вариантов) — та же латунная подсветка текста, БЕЗ галочки.
+- Формат 3 (варианты-картинки, `.choice-img`) — БЕЗ галочки, общая латунная
+  рамка вокруг картинки+подписи (сам контейнер `.choice-img` уже оборачивает
+  оба — рамка на нём и есть «общая рамка», без доп. разметки).
+- `.mel-bid-row.win` (мелодия, ставка-победитель) — та же латунь вместо
+  зелёного фона/рамки.
+- Не трогал `revealDoneMs()`/`CH_STAGE2_MS`/`CH_STAGGER_MS`/
+  `CH_HIGHLIGHT_MS` — новые анимации уложены в существующие тайминги
+  (галочка/искры стартуют с задержкой `.3-.35s` ПОСЛЕ появления плитки,
+  внутри уже существующего окна раскрытия).
+- Проверено рендером: `getComputedStyle` по всем элементам страницы —
+  подстрока `87,245,192` (старый зелёный) НЕ встречается нигде;
+  `.answer-reveal`/`.answer-main`/`.choice-plate.correct`/`.choice-img.
+  correct`/`.rebus-hot`/`.mel-bid-row.win` — все возвращают латунные
+  rgba/rgb; `.mg-check path` реально анимируется (`animationName:
+  mgCheckDraw`); `.dimmed` (оба формата) — `filter: saturate(.25)
+  brightness(.8)`, `transform` со сдвигом вниз, элемент остаётся в DOM
+  (не `display:none`). `prefers-reduced-motion: reduce` гасит галочку/
+  искры (`stroke-dashoffset:0`/`opacity:0` сразу, без анимации).
+- `tsc`/`eslint`/`vitest`(434/47)/`vite build` — зелёные.
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и

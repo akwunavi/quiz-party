@@ -45,7 +45,7 @@ import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide, ThemeKey } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { SnakeTimer } from '../components/SnakeTimer'
 import { rankTeams } from '../lib/ranking'
@@ -2040,9 +2040,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ) : q.answer.mode === 'match' ? (
                 <MatchAnswer q={q} />
               ) : choices && imgChoices.length === choices.length ? (
-                <StagedChoices q={q} choices={choices} imgs={imgChoices} />
+                <StagedChoices q={q} choices={choices} imgs={imgChoices} theme={pack.theme} />
               ) : choices ? (
-                <StagedChoices q={q} choices={choices} />
+                <StagedChoices q={q} choices={choices} theme={pack.theme} />
               ) : q.answer.mode === 'order' ? (
                 <div className="order-answer">
                   {q.answer.correct_order.split('').map((k, i) => {
@@ -2128,10 +2128,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
  *  5.5 сек — подсветка верного и приглушение неверных, плавно.
  *  Место под все варианты зарезервировано сразу (visibility), поэтому
  *  раскладка не дёргается и по позиции ничего не угадывается. */
-function StagedChoices({ q, choices, imgs }: {
+function StagedChoices({ q, choices, imgs, theme }: {
   q: LoadedPack['rounds'][number]['questions'][number]
   choices: { key: string; text: string }[]
   imgs?: string[]
+  theme?: ThemeKey
 }) {
   const [stage, setStage] = useState(0)
   useEffect(() => {
@@ -2157,6 +2158,11 @@ function StagedChoices({ q, choices, imgs }: {
   const delay = (key: string) => (firstWave.has(key) ? 0 : 0.25 * choices
     .filter(c => !firstWave.has(c.key)).findIndex(c => c.key === key))
 
+  // Magic: галочка рисуется stroke-dashoffset — это SVG-свойство, псевдо-
+  // элементу такое не дать, поэтому реальный <svg> ребёнком, только у
+  // правильной ТЕКСТОВОЙ плитки (формат 1). У картинок (формат 3) и у
+  // одиночного текстового ответа (формат 2) галочки нет по решению плана.
+  const magicCheck = theme === 'potter'
   if (imgs) return (
     <div className="choice-imgs">
       {choices.map((c, i) => (
@@ -2175,9 +2181,22 @@ function StagedChoices({ q, choices, imgs }: {
         <div key={c.key} className={`choice-plate${cls(c.key)}`}
           style={{ animationDelay: `${delay(c.key)}s` }}>
           <span className="key">{c.key}</span>{c.text}
+          {magicCheck && cls(c.key) === ' correct' && <MagicCheck />}
         </div>
       ))}
     </div>
+  )
+}
+
+/** Латунная галочка верного варианта (только Magic-тема) — рисуется
+ *  обводкой (stroke-dashoffset), поэтому нужен настоящий <svg>, псевдо-
+ *  элементу такую анимацию не дать. CSS — 35-magic-surfaces.css. */
+function MagicCheck() {
+  return (
+    <svg className="mg-check" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" strokeWidth="3"
+        strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
