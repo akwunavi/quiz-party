@@ -119,7 +119,7 @@ export function HostScreen() {
 
 function Deco({ theme }: { theme: string }) {
   if (theme === 'new_year') return <div className="title-deco">🎄 ❄ 🎁 ❄ 🎄</div>
-  if (theme === 'potter') return <div className="title-deco">⚡ ✦ 🪄 ✦ ⚡</div>
+  if (theme === 'potter') return <div className="title-deco mg-glow">✧ ◆ ✦ ◆ ✧</div>
   return null
 }
 
@@ -192,7 +192,7 @@ function HostInner({ gameState, pack }: {
 
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
-      <div className={`host-screen grid-bg${paperMode ? ' paper-lobby' : ''}`}>
+      <div className={`host-screen grid-bg lobby-screen${paperMode ? ' paper-lobby' : ''}`}>
         {/* Киберпанк-обвязка логотипа. У НГ и ГП экран лобби живой сам по
             себе (снег, свечи), у классики он висел статичной картинкой —
             а игроки смотрят на него дольше, чем на любой другой экран.

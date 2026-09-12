@@ -4,5 +4,28 @@
  * формата, без зелёного акцента), табло, финал, блиц, кнопки, экран
  * игрока, таймер. Здесь же гасятся захардкоженные rgba(87,245,192,...)
  * из 08-projector.css:7-13, которые не берутся через переменные. Пока
- * пусто — старые .theme-potter правила в 14/16/17/18/19/22/23/24
- * продолжают работать без изменений. */
+ * старые .theme-potter правила в 14/16/17/18/19/22/23/24 продолжают
+ * работать без изменений — заменяются по мере прохождения шагов. */
+
+/* ═══ Шаг 3: лобби ═══
+ * `.lobby-screen` — маркер на самом `.host-screen` лобби (HostScreen.tsx),
+ * добавлен специально для точного прицела: `.neon-title`/`.title-deco`
+ * рендерятся ещё на десятке экранов (раунд-интро, перерыв, подсчёт,
+ * финал) через тот же компонент `Title`/`Deco`, а «проступание» логотипа
+ * нужно только на первом появлении в лобби. Title.tsx/useScrambleReveal/
+ * useFitText НЕ трогаем программно — эффект целиком в CSS поверх готовой
+ * разметки (`.neon-title` для ГП — просто текст в <span>, без per-letter
+ * спанов, как у Нового года: посимвольность имитирует clip-path слева
+ * направо, а не покадровая задержка на каждой букве). */
+.theme-potter .lobby-screen .neon-title {
+  animation: mgTitleReveal 1.7s cubic-bezier(.2,.8,.2,1) both,
+             mgGlow 3.2s ease-in-out infinite 1.7s;
+}
+@keyframes mgTitleReveal {
+  0%   { clip-path: inset(0 100% 0 0); filter: blur(6px) brightness(1.6); }
+  60%  { filter: blur(1px) brightness(1.15); }
+  100% { clip-path: inset(0 0 0 0); filter: blur(0) brightness(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .lobby-screen .neon-title { animation: none; clip-path: none; filter: none; }
+}
