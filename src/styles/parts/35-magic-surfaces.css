@@ -85,14 +85,22 @@
 .theme-potter.jp-overlay > .jp-modal,
 .theme-potter.mel-overlay > .mel-modal,
 .theme-potter .groups-overlay > .groups-modal {
-  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
   border-color: var(--mg-brass);
   box-shadow: 0 0 0 1px rgba(201,166,104,.35), 0 0 40px rgba(201,166,104,.25);
+}
+/* Вход mgCondense — только когда `.qt-grow` не поставлен (координаты
+   клика неизвестны, плитка открыта с телефона ведущего). На клик с
+   проектора работает "рост из плитки" (37-tile-card.css) — обе метят
+   transform, поэтому разведены классом, а не гонкой одной анимации. */
+.theme-potter.jp-overlay > .jp-modal:not(.qt-grow),
+.theme-potter.mel-overlay > .mel-modal,
+.theme-potter .groups-overlay > .groups-modal {
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-potter.jp-overlay::before, .theme-potter.mel-overlay::before,
   .theme-potter .groups-overlay::before { animation: none; opacity: 0; }
-  .theme-potter.jp-overlay > .jp-modal, .theme-potter.mel-overlay > .mel-modal,
+  .theme-potter.jp-overlay > .jp-modal:not(.qt-grow), .theme-potter.mel-overlay > .mel-modal,
   .theme-potter .groups-overlay > .groups-modal { animation: none; }
 }
 /* Форс-кнопка ScreenFx (✨) — та же вспышка, что классика форсирует у
@@ -104,7 +112,7 @@ html.fx-force-motion .theme-potter.mel-overlay::before,
 html.fx-force-motion .theme-potter .groups-overlay::before {
   animation: mgRingBurst .65s cubic-bezier(.2,.8,.2,1) both; opacity: 0;
 }
-html.fx-force-motion .theme-potter.jp-overlay > .jp-modal,
+html.fx-force-motion .theme-potter.jp-overlay > .jp-modal:not(.qt-grow),
 html.fx-force-motion .theme-potter.mel-overlay > .mel-modal,
 html.fx-force-motion .theme-potter .groups-overlay > .groups-modal {
   animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
@@ -327,6 +335,15 @@ html.fx-force-motion .theme-potter .host-screen .sb-row.sb-flip > td {
  * текущей «горячей» плитки). Сам перелёт — CSS `transition: transform`,
  * не JS-анимация кадр за кадром: дешевле и не спорит с частотой опроса. */
 .theme-potter .mg-wisp.mel-marker {
+  /* КРИТИЧНО (найдено рендер-проверкой шага 5 TileCard, дополнение Р2):
+     базовый `.mg-wisp` (34-magic-environment.css) несёт СВОЮ вечную
+     анимацию блуждания `mgWispFly`, которая анимирует `transform` — то
+     самое свойство, через которое `MelodyRound.tsx` двигает маркер на
+     "горячую" плитку. У CSS-анимаций приоритет над обычным объявлением
+     (в т.ч. inline-style) ВСЕГДА, поэтому без явного сброса маркер вообще
+     не долетал бы до плитки, а летал случайно по своей эмбиент-траектории
+     — баг существовал до этой правки, просто не был замерен числами. */
+  animation: none;
   position: absolute; left: 0; top: 0; width: 34px; height: 34px;
   margin: -17px 0 0 -17px; z-index: 5; pointer-events: none;
   border-radius: 50%;

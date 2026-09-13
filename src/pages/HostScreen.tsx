@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
 import { InfoSlideView } from '../components/InfoSlideView'
+import { TileCard } from '../components/TileCard'
 import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
 import { useBlitz } from '../lib/blitzApi'
 import {
@@ -2304,6 +2305,12 @@ function JeopardyBoard({ pack, round, gameState }: {
   // число, а как только опрос доносил настоящее — расценивал скачок как
   // «нажали переслушать» и перезапускал трек с нуля (9.36).
   const predictedReplay = useRef<number | null>(null)
+  // Координаты клика по плитке — для перехода "рост из плитки" (Р3).
+  // Известны только когда открытие пришло от клика ЗДЕСЬ, на проекторе;
+  // если плитку открыли с телефона ведущего (AdminPage), tile совпадёт,
+  // но координат нет — модалка входит старым способом (см. 37-tile-card.css).
+  const clickOrigin = useRef<{ tile: number; x: number; y: number } | null>(null)
+  const tileElRefs = useRef(new Map<number, HTMLElement>())
   // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
   // перезагрузки страницы они снова становились доступны, и вопрос можно
   // было сыграть дважды.
@@ -2360,17 +2367,24 @@ function JeopardyBoard({ pack, round, gameState }: {
             // data-c — номер темы для раскраски: у плиток мелодии цвет неона
             // берётся так же. У мелодии всего 4 темы за раз, а в «Своей игре»
             // их бывает 5+ — на 4 цветах пятая колонка повторяла первую.
-            <button key={`${ti}-${i}`} className={`jp-tile${done ? ' done' : ''}`} disabled={done}
-              data-c={ti % 8}
+            <TileCard key={`${ti}-${i}`} kind="jeopardy" done={done} colorIndex={ti % 8}
+              flip={!done} label={done ? '·' : tile.value} backLabel={tile.value}
               style={{ gridColumn: ti + 1, gridRow: i + 2 }}
+              elRef={el => {
+                const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+                if (el) tileElRefs.current.set(flat, el); else tileElRefs.current.delete(flat)
+              }}
               onClick={() => {
                 // синхронизируем номер открытой плитки с игроками:
                 // они шлют ответ по question_index, модалка читает по нему же
                 const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
                 predictedReplay.current = jpNextReplay(gameState.melody)
+                // rect берём ДО открытия модалки — плитка ещё на месте
+                const r = tileElRefs.current.get(flat)?.getBoundingClientRect()
+                clickOrigin.current = r ? { tile: flat, x: r.left + r.width / 2, y: r.top + r.height / 2 } : null
                 setTileLocal(flat)
                 void openJeopardyTile(gameState, flat)
-              }}>{done ? '·' : tile.value}</button>
+              }} />
           )
         }))}
       </div>
@@ -2395,11 +2409,16 @@ function JeopardyBoard({ pack, round, gameState }: {
         const replayNonce = tileLocal !== undefined && predictedReplay.current != null
           ? predictedReplay.current
           : (gameState.melody?.jp?.replay ?? 0)
+        // Координаты клика — только если ЭТУ плитку открыли отсюда, кликом.
+        // Плитка, открытая с телефона ведущего, координат не несёт — рост
+        // из точки клика заменяется старым входом модалки (по теме).
+        const origin = clickOrigin.current?.tile === openTile
+          ? { x: clickOrigin.current.x, y: clickOrigin.current.y } : null
         return (
           <TileModal packTheme={pack.theme} round={round} gameState={gameState}
             theme={themes[ti]} tile={tile} tileIndex={openTile}
             showAnswer={!!gameState.melody?.jp?.answer}
-            replayNonce={replayNonce}
+            replayNonce={replayNonce} origin={origin}
             onShowAnswer={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}
             onReplay={() => void saveMelody(jpReplay(gameState.melody ?? {}))}
             onClose={() => { setTileLocal(null); void closeTile(`${ti}-${rest}`) }} />
@@ -2412,7 +2431,7 @@ function JeopardyBoard({ pack, round, gameState }: {
 /** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
  *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
 function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme,
-  showAnswer, onShowAnswer, replayNonce, onReplay }: {
+  showAnswer, onShowAnswer, replayNonce, onReplay, origin }: {
   packTheme?: string
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
@@ -2429,10 +2448,29 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
   replayNonce: number
   onReplay: () => void
   onClose: () => void
+  /** Координаты клика по плитке (viewport px), если открытие пришло от
+   *  клика на проекторе — используется для входа «рост из плитки» (Р3).
+   *  null — плитку открыли с телефона ведущего, координат нет, входит по
+   *  старому (тематическая анимация без роста). */
+  origin: { x: number; y: number } | null
 }) {
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
   // одна ручка на текущий трек: она глушит и звук, и отсчёт
   const handleRef = useRef<SyncedHandle | null>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
+  // Локальные px клика ОТНОСИТЕЛЬНО модалки (не viewport) — transform-origin
+  // принимает офсеты именно в системе координат самого элемента. Меряем
+  // ПОСЛЕ монтирования (useLayoutEffect — до отрисовки кадра, без мигания).
+  const [growVars, setGrowVars] = useState<CSSProperties | undefined>(undefined)
+  useLayoutEffect(() => {
+    if (!origin || !modalRef.current) { setGrowVars(undefined); return }
+    const r = modalRef.current.getBoundingClientRect()
+    setGrowVars({
+      '--qt-ox': `${origin.x - r.left}px`,
+      '--qt-oy': `${origin.y - r.top}px`,
+    } as CSSProperties)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tileIndex])
   const [remaining, setRemaining] = useState(clipSeconds)
   const [playing, setPlaying] = useState(false)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
@@ -2486,7 +2524,7 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
 
   return createPortal(
     <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
-      <div className="jp-modal hud-frame">
+      <div ref={modalRef} className={`jp-modal hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
         <div className="jp-modal-head">
           <div>
             <div className="jp-modal-theme">{theme.name}</div>

@@ -83,6 +83,10 @@
   font-family: var(--font-mono, monospace); letter-spacing: .16em;
   font-size: clamp(11px, 1vw, 15px); }
 
-/* плитка доступна для ручного выбора */
+/* плитка доступна для ручного выбора. Скейл на корне — только когда
+   разворот НЕ включён (например, плитка сейчас "горячая" на барабане,
+   can-flip нарочно снят — см. MelodyRound.tsx/HANDOFF): иначе transform
+   root'а и transform его qt-front/qt-back (37-tile-card.css) удваивали бы
+   движение одновременно. */
 .mel-tile.pickable { cursor: pointer; }
-.mel-tile.pickable:hover { transform: scale(1.06); filter: brightness(1.15); }
+.mel-tile.pickable:not(.can-flip):hover { transform: scale(1.06); filter: brightness(1.15); }

@@ -1,0 +1,73 @@
+/* ═══ 37: TileCard — общий скелет плиток «Своей игры» и «Угадай мелодию» ═══
+ * Механико-нейтральный слой: только геометрия разворота, ни одного цвета
+ * мимо переменных темы. Оформление обеих граней остаётся в файлах тем
+ * (16-round-melody-tiles.css, 07/12-*-ny-tiles.css, 32-cyber-motion.css) —
+ * этот файл только скелет + «психевдо-флип» + переход клик→модалка «рост
+ * из плитки» (qt-grow, применяется только к .jp-modal).
+ *
+ * ВАЖНО (флэттенинг 3D): на `.qt-flip` — ТОЛЬКО position/размеры/
+ * perspective. Никаких overflow/clip-path/filter на этом уровне — они
+ * создают собственный группирующий контекст и убивают 3D, дочерние грани
+ * начинают вести себя как плоские div'ы без rotateY.
+ */
+:root { --qt-flip-ms: 320ms; }
+
+.qt-flip { position: relative; width: 100%; height: 100%; display: block; }
+.qt-face { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.qt-back { opacity: 0; transform: scaleX(0); pointer-events: none; }
+.qtile.can-flip .qt-flip { perspective: 700px; }
+.qtile.can-flip .qt-face {
+  transition: transform var(--qt-flip-ms) ease, opacity var(--qt-flip-ms) ease;
+  backface-visibility: hidden;
+}
+
+/* Разворот — только у курсорных устройств (тач не снимает :hover после
+ * тапа — плитка залипла бы развёрнутой). Возврат — бесплатный, транзишен
+ * на .qt-face уже объявлен выше, hover просто меняет target-значения. */
+@media (hover: hover) and (pointer: fine) {
+  .qtile.can-flip:not(.done):not(:disabled):hover .qt-front {
+    transform: rotateY(12deg) scaleX(0); opacity: 0;
+  }
+  .qtile.can-flip:not(.done):not(:disabled):hover .qt-back {
+    transform: rotateY(0deg) scaleX(1); opacity: 1; pointer-events: auto;
+  }
+  /* приподнятая (развёрнутая) плитка не должна уезжать под соседнюю */
+  .qtile.can-flip:hover { z-index: 2; }
+}
+
+/* Номинал плитки обязан быть виден ВСЕГДА — выключатель гасит ТОЛЬКО
+ * движение и обратную грань, лицо остаётся видимым и на пике. Селектор
+ * скопирован дословно (тот же список :not()), иначе более специфичное
+ * базовое правило выше побеждает и «отключатель» не выключает ничего. */
+@media (prefers-reduced-motion: reduce) {
+  .qtile.can-flip .qt-face { transition: none; }
+  .qt-front { opacity: 1 !important; transform: none !important; }
+  .qt-back { opacity: 0 !important; transform: scaleX(0) !important; }
+}
+
+/* ═══ Переход «клик → модалка»: рост из места клика (jeopardy, Р3) ═══
+ * `--qt-ox/--qt-oy` — координаты клика ОТНОСИТЕЛЬНО САМОЙ `.jp-modal`
+ * (её локальные px, не viewport) — считает HostScreen.tsx через
+ * useLayoutEffect ПОСЛЕ монтирования модалки, до отрисовки кадра.
+ * Класс `.qt-grow` ставится, только когда координаты клика известны
+ * (клик был на проекторе). Открытие с телефона ведущего (AdminPage) не
+ * знает прямоугольник плитки — класс не добавляется, работает старый
+ * вход (cbModalBoot/mgCondense — теми же файлами, см. `:not(.qt-grow)`
+ * в 32-cyber-motion.css/35-magic-surfaces.css). */
+@keyframes qtGrowFromTile {
+  0% { transform: scale(.12); opacity: 0; filter: brightness(1.6); }
+  55% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+.jp-modal.qt-grow {
+  transform-origin: var(--qt-ox, 50%) var(--qt-oy, 50%);
+  animation: qtGrowFromTile .38s cubic-bezier(.2,.8,.3,1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jp-modal.qt-grow { animation: none; }
+}
+/* Форс-кнопка ScreenFx (✨) возвращает переход даже при reduced-motion —
+ * по аналогии с уже существующими форс-правилами тем (32/35). */
+html.fx-force-motion .jp-modal.qt-grow {
+  animation: qtGrowFromTile .38s cubic-bezier(.2,.8,.3,1) both;
+}

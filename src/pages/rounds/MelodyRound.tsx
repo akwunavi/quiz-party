@@ -12,6 +12,7 @@ import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
+import { TileCard } from '../../components/TileCard'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
@@ -506,7 +507,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, on
   // плиток не влияют на рендер, только на позиционирование маркера.
   // Хук стоит здесь, ВЫШЕ любых ранних return — в этом компоненте их и
   // нет вовсе, но правило то же, что и везде в проекте (React #310).
-  const tileRefs = useRef(new Map<string, HTMLDivElement>())
+  const tileRefs = useRef(new Map<string, HTMLElement>())
   const boardRef = useRef<HTMLDivElement>(null)
   const markerRef = useRef<HTMLSpanElement>(null)
   useLayoutEffect(() => {
@@ -535,17 +536,22 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, on
         const key = `${ti}-${i}`
         const done = played.includes(key)
         const hot = highlighted === key
+        const interactive = !!onPick && !done
+        // Разворот по ховеру — только в режиме «Выбрать вручную» (Р2), и
+        // НЕ на «горячей» плитке барабана: во время spin она уже дымится/
+        // пульсирует (chipPulse/mgGemHot/ballSwing), разворот поверх этого
+        // дал бы визуальный конфликт двух одновременных эффектов на одном
+        // узле — см. разбор в HANDOFF. Р2 про выбор ДО старта спина, не
+        // про сам процесс спина, поэтому запрет только на `.spin` не
+        // нарушает решение пользователя.
+        const flip = interactive && !hot
         return (
-          <div key={key}
-            ref={el => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }}
-            className={`mel-tile${done ? ' done' : ''}${hot ? ' spin' : ''}${
-              onPick && !done ? ' pickable' : ''}`}
-            onClick={onPick && !done ? () => onPick(key) : undefined}
-            data-c={String((ti % 4))} style={{ gridColumn: ti + 1, gridRow: i + 2 }}>
-            {/* нейтральная «морда» плитки: вид целиком задаёт тема
-                (НГ — ёлочный шар, киберпанк — неон-чип, Magic — гем) */}
-            <span className="mel-face">{done ? '' : i + 1}</span>
-          </div>
+          <TileCard key={key} kind="melody" done={done} hot={hot} colorIndex={ti % 4}
+            interactive={interactive} flip={flip}
+            label={done ? '' : i + 1}
+            onClick={onPick ? () => onPick(key) : undefined}
+            elRef={el => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }}
+            style={{ gridColumn: ti + 1, gridRow: i + 2 }} />
         )
       }))}
     </div>
