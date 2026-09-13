@@ -10,15 +10,29 @@
  * создают собственный группирующий контекст и убивают 3D, дочерние грани
  * начинают вести себя как плоские div'ы без rotateY.
  */
-:root { --qt-flip-ms: 320ms; }
+:root { --qt-flip-ms: 480ms; }
 
+/* 9.39: НАСТОЯЩИЙ 3D-переворот вместо кросс-фейда.
+ * Первая версия одновременно гасила opacity+scaleX лица и поднимала их же
+ * у оборота за одно и то же время — с одной палитрой на обеих гранях (тёплое
+ * золото что там, что там) это на глаз читалось просто как «стало ярче»,
+ * не как переворот: пользователь навёл мышь и увидел только подсветку,
+ * ровно об этом и был баг-репорт. `backface-visibility: hidden` тут был
+ * объявлен и раньше, но без настоящего поворота (12° почти незаметны) он
+ * ничего не прятал — обе грани всё время были видны одновременно.
+ * Теперь лицо и оборот — партнёры одного поворота на 180°, каждый висит
+ * на СВОЕЙ стороне воображаемой карты (0deg / -180deg по умолчанию),
+ * hover крутит и то и другое к 0deg синхронно — `backface-visibility`
+ * прячет ту грань, что в данный момент повёрнута к экрану тыльной
+ * стороной, ровно как у настоящей карточки. */
 .qt-flip { position: relative; width: 100%; height: 100%; display: block; }
 .qt-face { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.qt-back { opacity: 0; transform: scaleX(0); pointer-events: none; }
-.qtile.can-flip .qt-flip { perspective: 700px; }
+.qt-back { transform: rotateY(-180deg); pointer-events: none; }
+.qtile.can-flip .qt-flip { perspective: 900px; }
 .qtile.can-flip .qt-face {
-  transition: transform var(--qt-flip-ms) ease, opacity var(--qt-flip-ms) ease;
+  transition: transform var(--qt-flip-ms) cubic-bezier(.3,.1,.2,1);
   backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 /* Разворот — только у курсорных устройств (тач не снимает :hover после
@@ -26,10 +40,10 @@
  * на .qt-face уже объявлен выше, hover просто меняет target-значения. */
 @media (hover: hover) and (pointer: fine) {
   .qtile.can-flip:not(.done):not(:disabled):hover .qt-front {
-    transform: rotateY(12deg) scaleX(0); opacity: 0;
+    transform: rotateY(180deg);
   }
   .qtile.can-flip:not(.done):not(:disabled):hover .qt-back {
-    transform: rotateY(0deg) scaleX(1); opacity: 1; pointer-events: auto;
+    transform: rotateY(0deg); pointer-events: auto;
   }
   /* приподнятая (развёрнутая) плитка не должна уезжать под соседнюю */
   .qtile.can-flip:hover { z-index: 2; }
@@ -41,8 +55,8 @@
  * базовое правило выше побеждает и «отключатель» не выключает ничего. */
 @media (prefers-reduced-motion: reduce) {
   .qtile.can-flip .qt-face { transition: none; }
-  .qt-front { opacity: 1 !important; transform: none !important; }
-  .qt-back { opacity: 0 !important; transform: scaleX(0) !important; }
+  .qt-front { transform: none !important; }
+  .qt-back { transform: rotateY(-180deg) !important; }
 }
 
 /* ═══ Переход «клик → модалка»: рост из места клика (jeopardy, Р3) ═══
