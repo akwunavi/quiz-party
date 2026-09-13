@@ -35,7 +35,7 @@
 // src/version.ts — синхронно бампай и константу ниже (см. CLAUDE.md,
 // раздел 4). Разъедутся — старый кеш не инвалидируется, и на проде долго
 // живёт версия, которую уже никто не собирал.
-const VERSION = '9.33'
+const VERSION = '9.34'
 const CACHE = 'qp-' + VERSION
 const BASE = '/quiz-party/'
 const NETWORK_TIMEOUT_MS = 3500
