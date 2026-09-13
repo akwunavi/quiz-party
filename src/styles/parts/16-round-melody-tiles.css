@@ -81,15 +81,21 @@
     0 0 26px rgba(140,215,255,.7); color: #10336b; font-weight: 700; font-size: 1.15em;
   text-shadow: 0 1px 0 rgba(255,255,255,.5); animation: themeGlow 1.4s ease-in-out infinite; }
 
-/* ── MAGIC: «хрустальный шар» — круглый гем со swirl внутри (шаг 11) ──
-   Заменяет прежний конверт+сургуч: тот же язык, что и у .jp-tile ниже. */
-.theme-potter .mel-tile .qt-flip { aspect-ratio: 1; height: min(100%, 13vh); width: auto; max-width: 96%; }
-.theme-potter .mel-tile .mel-face { clip-path: none; border-radius: 50%;
+/* ── MAGIC: карточка «шоколадной лягушки» — прямоугольная (шаг 13,
+   заменяет прежний круглый «хрустальный шар»: тот вид отклонён ведущим —
+   "вижу овалы", хотя переворот уже работал верно). Тот же латунно-
+   стеклянный язык, только форма — скруглённый прямоугольник вместо круга.
+   Радиус угла — clamp, не фиксированный px: плитки видны на 1366/1920/
+   3840, и на 3840 фиксированные 10px читались бы почти острым углом. */
+.theme-potter .mel-tile .qt-flip { aspect-ratio: 4 / 5; height: min(100%, 15vh); width: auto; max-width: 96%; }
+.theme-potter .mel-tile .mel-face { clip-path: none; border-radius: clamp(10px, 1vw, 20px);
   background: radial-gradient(circle at 60% 72%, var(--mg-glass2, #2a2447), var(--mg-void2, #151029) 78%);
   border: 2px solid var(--mg-brass, #c9a668); color: var(--mg-brass-bright, #f3dfa8);
   box-shadow: 0 6px 16px rgba(0,0,0,.5), inset 0 0 18px rgba(0,0,0,.4);
   overflow: hidden; }
-/* энергия внутри шара — медленно вращающийся конический градиент */
+/* энергия внутри карточки — тот же вращающийся конус, что был у шара;
+   сама форма пятна остаётся круглой (это просто подсветка внутри),
+   overflow:hidden на .mel-face обрезает её по новой скруглённой рамке. */
 .theme-potter .mel-tile .mel-face::before { content: ''; position: absolute; inset: -12%;
   border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
   background: conic-gradient(from 0deg, transparent 0deg, rgba(201,166,104,.4) 55deg,
@@ -119,7 +125,7 @@
 /* Оборот (Р2): тот же шар, латунь ярче + искры sparkFly (уже существующий
    keyframe, определён у .answer-reveal в этом же файле) — номинал виден
    и крупнее (Р1), как и у .jp-tile выше. */
-.theme-potter .mel-tile .qt-back { clip-path: none; border-radius: 50%; overflow: hidden;
+.theme-potter .mel-tile .qt-back { clip-path: none; border-radius: clamp(10px, 1vw, 20px); overflow: hidden;
   background: radial-gradient(circle at 50% 42%, var(--mg-brass-bright, #f3dfa8) 0%,
     var(--mg-brass, #c9a668) 42%, var(--mg-void2, #151029) 86%);
   border: 2px solid var(--mg-brass-bright, #f3dfa8); color: #241d3a;
@@ -141,22 +147,36 @@
 .theme-potter .mel-board.spinning .mel-tile:not(.spin):not(.done) .mel-face {
   filter: brightness(.42) saturate(.55); transition: filter .3s ease; }
 
-/* ── Дыхание плиток в покое (mgPulse, шаг 11): отдельный слой на
-   .mel-tile (родитель), а НЕ на .mel-face — у неё оба псевдоэлемента
-   заняты энергией шара и бликом стекла. Пульсирует латунный контур через
-   opacity/scale одного элемента (::after), НЕ через анимированный
-   box-shadow — на доске бывает десятки плиток разом, а box-shadow с
-   блюром дороже по перерисовке. Фаза сдвинута через nth-child(3n±),
-   чтобы доска не дышала одним организмом (см. прецедент .cp-code
-   i:nth-child(3n) в 28-theme-cyber.css). Играемая (.spin, уже светится
-   mgGemHot) и отыгранная (.done) плитки не дышат — им нечем/незачем
-   оживать. */
+/* ── Дыхание плиток в покое (шаг 11, keyframe заменён на mgPulseCentered
+   в шаге 13): отдельный слой на .mel-tile (родитель), а НЕ на .mel-face —
+   у неё оба псевдоэлемента заняты энергией шара и бликом стекла.
+   Пульсирует латунный контур через opacity/scale одного элемента
+   (::after), НЕ через анимированный box-shadow — на доске бывает десятки
+   плиток разом, а box-shadow с блюром дороже по перерисовке. Фаза
+   сдвинута через nth-child(3n±), чтобы доска не дышала одним организмом
+   (см. прецедент .cp-code i:nth-child(3n) в 28-theme-cyber.css). Играемая
+   (.spin, уже светится mgGemHot) и отыгранная (.done) плитки не дышат —
+   им нечем/незачем оживать.
+   ⚠ ЛОВУШКА (нашлась при переходе круга в карточку, шаг 13): центрирование
+   тут держится на `transform: translate(-50%,-50%)` (нужно — контур
+   рисуется отдельным от плитки боксом, шире её). Общий keyframe `mgPulse`
+   (36-magic-motion.css, `.mg-pulse`) объявляет свой `transform: scale(...)`
+   в каждом кадре — а анимационный `transform` ЦЕЛИКОМ заменяет базовый на
+   всё время работы анимации, не складывается с ним. На круге смещение было
+   почти незаметно (контур более-менее совпадал сам с собой), на
+   прямоугольнике съезжает в угол сразу и режет глаз. Отдельный keyframe
+   ниже держит translate ВНУТРИ каждого кадра — единственный правильный
+   способ совместить статичное позиционирование с анимацией transform на
+   одном и том же свойстве одного элемента. */
+@keyframes mgPulseCentered {
+  0%, 100% { opacity: .5; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
 .theme-potter .mel-tile:not(.done):not(.spin)::after {
   content: ''; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: min(clamp(96px, 11vw, 170px), 100%); aspect-ratio: 1;
-  border-radius: 50%; border: 2px solid var(--mg-brass-bright, #f3dfa8); pointer-events: none;
-  opacity: 0; animation: mgPulse 3.4s ease-in-out infinite; }
+  width: min(clamp(96px, 11vw, 170px), 100%); aspect-ratio: 4 / 5;
+  border-radius: clamp(10px, 1vw, 20px); border: 2px solid var(--mg-brass-bright, #f3dfa8); pointer-events: none;
+  opacity: 0; animation: mgPulseCentered 3.4s ease-in-out infinite; }
 .theme-potter .mel-tile:nth-child(3n)::after { animation-delay: -1.1s; }
 .theme-potter .mel-tile:nth-child(3n+1)::after { animation-delay: -2.2s; }
 .theme-potter .mel-tile:nth-child(3n+2)::after { animation-delay: 0s; }
@@ -253,19 +273,22 @@
 .theme-potter .mel-keys button { border-radius: 10px; }
 .theme-potter .mel-points-hint { color: var(--mg-brass-bright, #f3dfa8); }
 
-/* 9: своя игра в Magic — тот же круглый гем, что и у .mel-tile .mel-face
-   (шаг 11) — единый визуальный язык обеих механик. .jp-tile — сам кнопка
-   (нет отдельного дочернего "лица"), гем рисуется прямо на нём и
+/* 9/13: своя игра в Magic — карточка «шоколадной лягушки» (тот же язык,
+   что и у .mel-tile .mel-face, шаг 13). .jp-tile — сам кнопка (нет
+   отдельного дочернего "лица"), карточка рисуется прямо на нём и
    заполняет клетку грида целиком (width/height: 100%, унаследовано из
-   08-projector.css) — при квадратной клетке даёт круг, при вытянутой
-   слегка вытянутый овал: клетки «Своей игры» обычно близки к квадрату,
-   и это дешевле и надёжнее, чем принудительно центрировать круг внутри
-   грида через margin/place-self (риск разъехаться с чужой grid-раскладкой). */
+   08-projector.css) — раньше здесь стоял border-radius:50%, и на не
+   идеально квадратной клетке это читалось как овал (ровно то, на что
+   пожаловался ведущий: "вижу овалы", после того как переворот уже
+   заработал). Скруглённый прямоугольник вместо круга не требует
+   принудительного aspect-ratio на самой плитке — она честно берёт форму
+   у клетки грида, которая и так прямоугольная, только с скруглёнными
+   углами вместо полного круга. */
 /* Поверхность живёт на `.qt-front` (шаг 3/37-tile-card.css): корень
    остаётся только контейнером геометрии + носителем "живых портретов"
    (::after ниже, завязан на nth-child СРЕДИ ПЛИТОК, а не среди граней). */
-.theme-potter .jp-tile { position: relative; border-radius: 50%; }
-.theme-potter .jp-tile .qt-front { clip-path: none; border-radius: 50%;
+.theme-potter .jp-tile { position: relative; border-radius: clamp(10px, 1vw, 20px); }
+.theme-potter .jp-tile .qt-front { clip-path: none; border-radius: clamp(10px, 1vw, 20px);
   background: radial-gradient(circle at 60% 72%, var(--mg-glass2, #2a2447), var(--mg-void2, #151029) 78%);
   color: var(--mg-brass-bright, #f3dfa8);
   border: 2px solid var(--mg-brass, #c9a668); overflow: hidden; text-shadow: none; font-weight: 700; }
@@ -289,7 +312,7 @@
    крупнее и на искрящейся подложке (решение Р1 — номинал НЕ прячем).
    Искры — существующий sparkFly (см. .answer-reveal ниже в этом файле),
    не новый keyframe. */
-.theme-potter .jp-tile .qt-back { clip-path: none; border-radius: 50%; overflow: hidden;
+.theme-potter .jp-tile .qt-back { clip-path: none; border-radius: clamp(10px, 1vw, 20px); overflow: hidden;
   background: radial-gradient(circle at 50% 42%, var(--mg-brass-bright, #f3dfa8) 0%,
     var(--mg-brass, #c9a668) 42%, var(--mg-void2, #151029) 86%);
   border: 2px solid var(--mg-brass-bright, #f3dfa8); color: #241d3a;
