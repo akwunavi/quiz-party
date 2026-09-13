@@ -30,6 +30,34 @@
   .theme-potter .lobby-screen .neon-title { animation: none; clip-path: none; filter: none; }
 }
 
+/* Фишки команд в лобби: `.lobby-team` — общая разметка для всех тем, но
+   её единственный визуальный язык (17-host-login.css) — угловой
+   клип-путь + толстая цветная левая кромка, чисто киберпанковский приём.
+   У Magic до сих пор не было СВОЕГО оформления: `.theme-potter
+   .team-chip-fx { animation: none }` (15-projector-interactive.css)
+   только гасил неоновое мерцание классики, ничего не давая взамен —
+   фишки оставались угловыми плашками чужой темы. Здесь — латунное
+   стекло, скруглённая форма (как .mg-panel в мокапе), без клип-пути,
+   с лёгким проступанием по очереди при подключении команды. */
+.theme-potter .lobby-team {
+  clip-path: none; border-radius: 999px; border-width: 1.5px;
+  border-left-width: 1.5px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)),
+    color-mix(in srgb, var(--tc, var(--mg-brass)) 14%, var(--mg-glass));
+  box-shadow: inset 0 0 0 1px rgba(201,166,104,.28), 0 0 18px rgba(0,0,0,.35);
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
+}
+.theme-potter .host-screen > .lobby-teams > .lobby-team:nth-child(2) { animation-delay: .1s; }
+.theme-potter .host-screen > .lobby-teams > .lobby-team:nth-child(3) { animation-delay: .2s; }
+.theme-potter .host-screen > .lobby-teams > .lobby-team:nth-child(4) { animation-delay: .3s; }
+.theme-potter .host-screen > .lobby-teams > .lobby-team:nth-child(5) { animation-delay: .4s; }
+.theme-potter .host-screen > .lobby-teams > .lobby-team:nth-child(n+6) { animation-delay: .5s; }
+.theme-potter .lobby-qr-corner { border-radius: 12px; border-color: rgba(201,166,104,.55);
+  box-shadow: 0 0 20px rgba(201,166,104,.25); }
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .lobby-team { animation: none; }
+}
+
 /* ═══ Шаг 4: единый портал для всех модалок ═══
  * `.jp-overlay`/`.mel-overlay` уходят `createPortal`-ом в `document.body` —
  * класс темы висит на самом overlay (см. HostScreen.tsx/MelodyRound.tsx),
@@ -95,10 +123,17 @@ html.fx-force-motion .theme-potter .groups-overlay > .groups-modal {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
   background: radial-gradient(ellipse at 50% 42%,
     rgba(255,244,214,.9), rgba(201,166,104,.35) 45%, rgba(10,8,19,0) 75%);
-  animation: mgVeilLift 1.15s cubic-bezier(.3,.7,.25,1) both;
+  /* 9.35: старая cubic-bezier(.3,.7,.25,1) на 1.15s была разгонной кривой —
+     к 150мс (13% времени) яркость уже падала почти до нуля, вспышку не
+     успевал заметить глаз (проверено скриншотами по кадрам). Теперь вспышка
+     реально ДЕРЖИТСЯ, а не гаснет мгновенно: почти полная яркость до ~35%
+     времени, потом плавное угасание. Хвост в HostScreen.tsx (задержка
+     .rules-frame для potter) синхронизирован с новой длиной 1.8s. */
+  animation: mgVeilLift 1.8s cubic-bezier(.16,.84,.44,1) both;
 }
 @keyframes mgVeilLift {
   0%   { opacity: 1; transform: scale(1.15); }
+  35%  { opacity: .92; transform: scale(1.05); }
   100% { opacity: 0; transform: scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
