@@ -31,10 +31,16 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
 
   useEffect(() => {
     if (!gameState.timer_started_at || !bgMusic || document.hidden) return
+    let cancelled = false
     const a = createAudio(); a.src = mediaUrl(bgMusic)
     a.loop = true; a.volume = .6
-    a.play().catch(() => {})
-    return () => a.pause()
+    // play() асинхронный: пауза до его старта ничего не делает, а трек всё
+    // равно заиграет — уже поверх экрана разбора (та же гонка, что и с
+    // озвучкой вопроса, см. HostScreen.tsx/QuestionAudio).
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [gameState.timer_started_at, bgMusic])
 
   useEffect(() => {
