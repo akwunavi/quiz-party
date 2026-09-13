@@ -228,7 +228,16 @@
 .adm-jp-theme { font-family: 'Share Tech Mono', monospace; font-size: 10px;
   letter-spacing: .06em; color: var(--muted); text-align: center;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.adm-jp-tile { aspect-ratio: 1.7; border-radius: 8px; background: #101b2f;
+/* `aspect-ratio` вместо явной высоты здесь ломало сетку целиком: при
+   auto-высоте строк (grid-template-rows не задан ни здесь, ни в JSX)
+   Chromium считает auto-высоту `.adm-jp-grid` БЕЗ учёта aspect-ratio у
+   плиток — контейнер получал высоту вдвое меньше настоящего содержимого
+   (проверено рендером: scrollHeight/clientHeight расходились ровно
+   вдвое), нижние ряды плиток визуально вылезали из контейнера и
+   наезжали на кнопки «Назад»/«Завершить раунд» сразу под доской — «всё
+   набекрень». Явная высота убирает саму причину: контейнер теперь
+   всегда точно знает высоту содержимого. */
+.adm-jp-tile { height: clamp(48px, 11vw, 72px); border-radius: 8px; background: #101b2f;
   border: 1px solid #26344f; color: var(--neon);
   font-family: 'Share Tech Mono', monospace; font-size: 14px; }
 .adm-jp-tile:hover:not(:disabled) { border-color: var(--neon);
