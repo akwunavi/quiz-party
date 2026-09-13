@@ -12,7 +12,7 @@ import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
-import { jeopardyTile, jpShowAnswer, jpReplay, jpOpenTile, jpLocate } from '../lib/jeopardyRef'
+import { jeopardyTile, jpShowAnswer, jpReplay, jpOpenTile, jpLocate, jpNextReplay } from '../lib/jeopardyRef'
 import {
   jeopardyOpened, openJeopardyTile, closeJeopardyTile,
 } from '../lib/jeopardyActions'
@@ -1180,15 +1180,25 @@ function RecapSlides({ pack, round, gameState }: {
     const voice = q.media.voice
     if (!voice) return () => { alive = false; clearTimeout(timer) }
     // озвучка длиннее слайда — ждём её конца, а не таймер
+    let cancelled = false
     const a = createAudio()
     a.src = mediaUrl(voice)
-    a.play().catch(() => {})
+    // play() асинхронный: pause() до его старта не делает ничего, а звук
+    // всё равно заиграет — уже поверх следующего слайда (та же гонка, что
+    // и с озвучкой вопроса и трека ответа, см. QuestionAudio/AnswerAudio).
+    // Раньше здесь была пауза сразу в cleanup — при быстром пролистывании
+    // (ведущий жмёт «Следующий →», не дожидаясь) слайд успевал смениться
+    // ДО того, как play() реально стартовал, и озвучка звучала уже на
+    // следующем слайде.
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
     const onEnd = () => { clearTimeout(timer); go() }
     a.addEventListener('ended', onEnd)
     return () => {
-      alive = false; clearTimeout(timer)
+      alive = false; cancelled = true; clearTimeout(timer)
       a.removeEventListener('ended', onEnd)
-      try { a.pause() } catch { /* уже остановлено */ }
+      try { a.pause(); a.src = '' } catch { /* уже остановлено */ }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, q?.id])
@@ -1429,10 +1439,16 @@ function BlitzScreen({ pack, round, gameState }: {
   useEffect(() => {
     const bg = settings.bg_music ?? pack.settings?.bg_music
     if (!bg) return
+    let cancelled = false
     const a = createAudio(); a.src = mediaUrl(bg)
     a.loop = true; a.volume = 0.6
-    a.play().catch(() => {})
-    return () => a.pause()
+    // play() асинхронный: пауза до его старта ничего не делает, и трек всё
+    // равно заиграл бы — уже поверх следующего экрана (та же гонка, что и с
+    // озвучкой вопроса, см. QuestionAudio выше).
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [round.id, settings.bg_music, pack.settings?.bg_music])
 
   // Проектор ведёт раунд сам: он бросает кубик, ловит ответы, проверяет их
@@ -1836,9 +1852,15 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack?.settings?.bg_music
     if (!timerRunning || !bg || hasOwnAV) return
+    let cancelled = false
     const a = createAudio(); a.src = mediaUrl(bg)
     a.loop = true; a.volume = 0.6
-    a.play().catch(() => {})
+    // play() асинхронный — та же гонка, что и с озвучкой вопроса: пауза до
+    // реального старта ничего не делает, и трек всё равно заиграет уже над
+    // следующим вопросом.
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
     // по истечении таймера музыка играет ЕЩЁ 3 СЕК и мягко глохнет
     let fade: number | undefined
     const total = (seconds ?? round.timer_seconds ?? 60) * 1000
@@ -1849,7 +1871,11 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
         if (a.volume <= 0.01) { if (fade) clearInterval(fade); a.pause() }
       }, 80)
     }, Math.max(0, msLeft) + 3000)
-    return () => { clearTimeout(stop); if (fade) clearInterval(fade); a.pause() }
+    return () => {
+      cancelled = true
+      clearTimeout(stop); if (fade) clearInterval(fade)
+      try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
+    }
   }, [timerRunning, q.id])
 
   return null
@@ -1875,10 +1901,14 @@ function AnswerTime({ pack, round, gameState }: {
     const bg = (round.settings as { bg_music?: string }).bg_music
       ?? pack.settings?.bg_music
     if (!bg) return
+    let cancelled = false
     const a = createAudio(); a.src = mediaUrl(bg)
     a.loop = true; a.volume = 0.6
-    a.play().catch(() => {})
-    return () => a.pause()
+    // play() асинхронный — та же гонка, что и с озвучкой вопроса.
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [round.id])
 
   return (
@@ -2266,6 +2296,14 @@ function JeopardyBoard({ pack, round, gameState }: {
     if (tileLocal !== undefined && sharedTile === tileLocal) setTileLocal(undefined)
   }, [sharedTile, tileLocal])
   const openTile = tileLocal !== undefined ? tileLocal : sharedTile
+  // Предсказанный `jp.replay` для ТОЛЬКО ЧТО открытой (ещё не подтверждённой
+  // опросом) плитки — тем же способом, что и настоящий переход (jpOpen), см.
+  // jpNextReplay. Пока опрос не догнал клик, `gameState.melody` — это ещё
+  // состояние ПРЕЖНЕЙ плитки, и его «replay» меньше того, что придёт с
+  // сервера через секунду-две. Раньше `TileModal` получал сначала это старое
+  // число, а как только опрос доносил настоящее — расценивал скачок как
+  // «нажали переслушать» и перезапускал трек с нуля (9.36).
+  const predictedReplay = useRef<number | null>(null)
   // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
   // перезагрузки страницы они снова становились доступны, и вопрос можно
   // было сыграть дважды.
@@ -2329,6 +2367,7 @@ function JeopardyBoard({ pack, round, gameState }: {
                 // синхронизируем номер открытой плитки с игроками:
                 // они шлют ответ по question_index, модалка читает по нему же
                 const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+                predictedReplay.current = jpNextReplay(gameState.melody)
                 setTileLocal(flat)
                 void openJeopardyTile(gameState, flat)
               }}>{done ? '·' : tile.value}</button>
@@ -2348,11 +2387,19 @@ function JeopardyBoard({ pack, round, gameState }: {
         const at = jpLocate(themes, openTile)
         if (!at) return null
         const { ti, i: rest, tile } = at
+        // Пока опрос не подтвердил клик (tileLocal ещё не сброшен) — берём
+        // ПРЕДСКАЗАННЫЙ replay, а не «gameState.melody» прежней плитки: иначе
+        // как только опрос доносит настоящее (уже увеличенное) число, эффект
+        // в TileModal видит скачок и запускает трек заново (см. коммент у
+        // predictedReplay выше).
+        const replayNonce = tileLocal !== undefined && predictedReplay.current != null
+          ? predictedReplay.current
+          : (gameState.melody?.jp?.replay ?? 0)
         return (
           <TileModal packTheme={pack.theme} round={round} gameState={gameState}
             theme={themes[ti]} tile={tile} tileIndex={openTile}
             showAnswer={!!gameState.melody?.jp?.answer}
-            replayNonce={gameState.melody?.jp?.replay ?? 0}
+            replayNonce={replayNonce}
             onShowAnswer={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}
             onReplay={() => void saveMelody(jpReplay(gameState.melody ?? {}))}
             onClose={() => { setTileLocal(null); void closeTile(`${ti}-${rest}`) }} />

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  jeopardyRef, jeopardyTile, jpOpen, jpClose, jpShowAnswer, jpReplay, jpOpenTile,
+  jeopardyRef, jeopardyTile, jpOpen, jpClose, jpShowAnswer, jpReplay, jpOpenTile, jpNextReplay,
 } from '../jeopardyRef'
 import { computeTotals, computeRoundScores } from '../totals'
 import type { LoadedPack } from '../packLoader'
@@ -106,5 +106,22 @@ describe('«Своя игра»: состояние открытой плитк�
     expect(a.jp?.replay).toBe(1)
     expect(b.jp?.replay).toBe(2)
     expect(b.jp?.tile).toBe(1)
+  })
+
+  // Регрессия 9.36: проектор рисует модалку плитки оптимистично, ДО ответа
+  // опроса (иначе она открывалась бы с задержкой в пару секунд), и должен
+  // предсказать, каким станет `jp.replay` — тем же способом, что и сам
+  // переход jpOpen. Если предсказание разойдётся с настоящим числом, эффект
+  // в TileModal примет честный ответ опроса за «нажали переслушать» и
+  // перезапустит трек с нуля через секунду после честного старта.
+  it('предсказанный jpNextReplay совпадает с тем, что даст jpOpen', () => {
+    const before = { jp: { tile: 2, answer: true, replay: 4 } }
+    expect(jpNextReplay(before)).toBe(jpOpen(before, 7).jp?.replay)
+  })
+
+  it('jpNextReplay для пустого состояния — 1, как и первый jpOpen', () => {
+    expect(jpNextReplay(undefined)).toBe(1)
+    expect(jpNextReplay({})).toBe(1)
+    expect(jpOpen({}, 0).jp?.replay).toBe(1)
   })
 })

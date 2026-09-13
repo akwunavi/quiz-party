@@ -101,10 +101,14 @@ export function RaceBoard({ pack, round, gameState }: {
     const src = (round.settings as { race_music?: string }).race_music
       ?? pack.settings?.bg_music
     if (race.stage !== 'running' || !src || document.hidden) return
+    let cancelled = false
     const a = createAudio(); a.src = mediaUrl(src)
     a.loop = true; a.volume = .55
-    a.play().catch(() => {})
-    return () => a.pause()
+    // play() асинхронный — та же гонка, что и с озвучкой вопроса.
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [race.stage])
 
   const [now, setNow] = useState(Date.now())
