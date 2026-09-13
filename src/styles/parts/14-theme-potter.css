@@ -172,6 +172,14 @@
   .theme-potter .round-intro .ri-main::after,
   .theme-potter .answer-block.reveal-in .answer-main::after {
     animation: none; }
+  /* .q-word — единственный из четырёх с РЕАЛЬНЫМ содержимым (слова
+     вопроса): у него, в отличие от декоративных ::after/::before рядом,
+     базовое `opacity: 0` в 01-base.css — не финальный кадр keyframe, а
+     буквально стартовое состояние на каждый рендер. `animation: none` без
+     возврата opacity гасило анимацию и оставляло текст невидимым
+     навсегда — раньше замечали только по «текста иногда нет», сам баг
+     ловится лишь эмуляцией prefers-reduced-motion, на глаз без неё не виден. */
+  .theme-potter .host-screen .q-word { opacity: 1; filter: none; transform: none; text-shadow: none; }
 }
 
 /* ── Рамка вопроса: стекло с латунной каймой (.mg-frame -> .mg-frame,
