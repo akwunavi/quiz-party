@@ -61,10 +61,14 @@
 /* Ховеры: кнопки как в старом (primary glow / ghost accent2) */
 button.ghost:hover { border-color: var(--accent); color: var(--accent);
   box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent); }
-/* плитки своей игры */
-.jp-tile:not(:disabled):hover { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent),
+/* плитки своей игры — поверхность (и хвост эффекта) на `.qt-front`
+   (37-tile-card.css, шаг 3): базовый фолбэк для тем без своего hover-
+   правила (сейчас это Новый год — 07/12-round-melody-ny-tiles.css её не
+   переопределяют). `transform` тут больше нет — им целиком владеет
+   разворот плитки, оба правила спорили бы за одно свойство одного узла. */
+.jp-tile:not(:disabled):hover .qt-front { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent),
   inset 0 0 12px color-mix(in srgb, var(--accent) 12%, transparent); border-color: var(--accent); color: var(--accent);
-  transform: translateY(-2px); transition: all .15s; }
+  transition: box-shadow .15s, border-color .15s, color .15s; }
 /* шары мелодии (свободные) */
 /* карточки спринта */
 .sprint-card { transition: border-color .18s, box-shadow .18s; }

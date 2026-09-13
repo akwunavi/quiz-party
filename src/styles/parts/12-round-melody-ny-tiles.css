@@ -41,3 +41,23 @@
 .mel-keys button:focus { outline: none; }
 .mel-keys button:focus:not(.sel) { background: rgba(255,255,255,.06);
   border-color: var(--dim); color: var(--fg); }
+
+/* Своя игра в новогодней теме: плитки-подарки. Перенесено сюда из
+   07-editor.css (тот файл вообще не про плитки, известный класс долга —
+   CLAUDE.md §0.4) и перенацелено на `.qt-front` (поверхность переехала с
+   корня, шаг 3/37-tile-card.css): корень остаётся геометрией. */
+.theme-new_year .jp-tile .qt-front { background: linear-gradient(180deg, #12467f, #0d2a55);
+  border: 1px solid rgba(198,230,255,.5); border-radius: 12px; clip-path: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 16px rgba(124,199,255,.2); }
+.theme-new_year .jp-tile .qt-front::after { content: '🎁'; display: block; font-size: .5em; opacity: .8; }
+.theme-new_year .jp-tile.done .qt-front { background: rgba(255,255,255,.06); }
+
+/* Оборот: та же лента и стекло, номинал виден (Р1) и покрупнее, снежный
+   блик вместо подарка. */
+.theme-new_year .jp-tile .qt-back { background: linear-gradient(180deg, #1c5a9e, #0d2a55);
+  border: 1px solid rgba(198,230,255,.75); border-radius: 12px; clip-path: none;
+  color: #fff; font-weight: 700; font-size: 1.2em;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 0 24px rgba(124,199,255,.5); }
+.theme-new_year .jp-tile .qt-back::before { content: ''; position: absolute; top: 10%; left: 18%;
+  width: 30%; height: 20%; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.8), rgba(255,255,255,0)); }

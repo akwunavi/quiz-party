@@ -116,12 +116,9 @@
 .order-answer { display: flex; flex-direction: column; gap: 8px; align-items: stretch;
   width: min(80vw, 900px); }
 
-/* Своя игра в новогодней теме: плитки-подарки */
-.theme-new_year .jp-tile { background: linear-gradient(180deg, #12467f, #0d2a55);
-  border: 1px solid rgba(198,230,255,.5); border-radius: 12px; clip-path: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 16px rgba(124,199,255,.2); }
-.theme-new_year .jp-tile::after { content: '🎁'; display: block; font-size: .5em; opacity: .8; }
-.theme-new_year .jp-tile.done { background: rgba(255,255,255,.06); }
+/* Своя игра в новогодней теме: плитки-подарки — поверхность переехала в
+   12-round-melody-ny-tiles.css (`.qt-front`, шаг 3/37-tile-card.css) —
+   этот файл вообще не про плитки, известный класс долга (CLAUDE.md §0.4). */
 .theme-new_year .jp-theme-name { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,.4); }
 
 

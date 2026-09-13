@@ -261,10 +261,16 @@
   100% { transform: translateY(360%); opacity: 0; }
 }
 .jp-overlay.theme-classic > .jp-modal {
-  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
   border-color: var(--accent2);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent2) 40%, transparent),
     0 0 40px color-mix(in srgb, var(--accent2) 25%, transparent);
+}
+/* Вход по умолчанию — только когда координаты клика неизвестны (плитка
+   открыта с телефона ведущего, .qt-grow не поставлен, см. 37-tile-card.css:
+   там же — "рост из плитки" на клик с проектора). Обе анимации метят один
+   и тот же transform, поэтому взаимно исключены классом, не гонкой. */
+.jp-overlay.theme-classic > .jp-modal:not(.qt-grow) {
+  animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
 }
 @keyframes cbModalBoot {
   0%   { opacity: 0; transform: scale(.92); filter: brightness(1.6); }
@@ -274,7 +280,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .jp-overlay.theme-classic::before { animation: none; opacity: 0; }
-  .jp-overlay.theme-classic > .jp-modal { animation: none; }
+  .jp-overlay.theme-classic > .jp-modal:not(.qt-grow) { animation: none; }
 }
 
 /* ── Э6б (9.21): модалка «Угадай мелодию» — тот же приём, что у Э6
@@ -474,7 +480,7 @@ html.fx-force-motion .theme-classic .host-screen .q-word {
 html.fx-force-motion .jp-overlay.theme-classic::before {
   animation: cbModalScan 1.1s ease-out .05s both; opacity: 0;
 }
-html.fx-force-motion .jp-overlay.theme-classic > .jp-modal {
+html.fx-force-motion .jp-overlay.theme-classic > .jp-modal:not(.qt-grow) {
   animation: cbModalBoot .45s cubic-bezier(.2,.8,.3,1) both;
 }
 
