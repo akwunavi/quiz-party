@@ -103,10 +103,7 @@
 .theme-potter .host-screen:has(> .mg-frame),
 .theme-potter .host-screen.has-media,
 .theme-potter .host-screen.has-choices { padding-top: clamp(120px, 21vh, 190px); }
-/* Кнопки прибиты к низу и на 1366x768 начинаются с 642px — запас снизу
-   обязан быть НЕ МЕНЬШЕ их высоты с отступом, иначе сетка вариантов
-   упирается в них. 96px не хватало на 16px. */
-.theme-potter .host-screen.has-choices { padding-bottom: clamp(132px, 15vh, 160px); }
+.theme-potter .host-screen.has-choices { padding-bottom: clamp(100px, 12vh, 132px); }
 /* Ниже 1400x760 запаса не хватает даже так: сетка вариантов должна ещё и
    сама ужиматься, а не только отодвигаться. */
 @media (max-height: 760px) {

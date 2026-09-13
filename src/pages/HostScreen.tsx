@@ -364,7 +364,7 @@ function HostInner({ gameState, pack }: {
                      паузой около секунды — проступают правила. Другие темы
                      не трогаем — их тайминг согласован раньше и отдельно. */
                   animationDelay: `${(pack.theme === 'classic' ? 1.3
-                    : pack.theme === 'potter' ? 1.15 : 0.5) + i * 0.7}s`,
+                    : pack.theme === 'potter' ? 1.7 : 0.5) + i * 0.7}s`,
                 }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>

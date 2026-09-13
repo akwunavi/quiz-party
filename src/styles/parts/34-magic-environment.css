@@ -21,46 +21,51 @@
 
 .mg-scene {
   position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden;
-  opacity: .5; transition: opacity 1.1s ease;
+  opacity: .65; transition: opacity 1.1s ease;
 }
 /* лобби/перерыв/подсчёт — некому читать текст вопроса, сцена в полную силу */
 .mg-scene[data-phase="lobby"], .mg-scene[data-phase="break"],
 .mg-scene[data-phase="counting"] { opacity: 1; }
 
-/* ── пылинки в свете ── */
+/* ── пылинки в свете ──
+   9.35: исходные значения (4px, свечение 8px, пик alpha .6) на реальном
+   проекторе/телевизоре в баре не видны вообще — проверено рендером
+   (скриншот 1920×1080): на глаз с обычной дистанции сцена читалась как
+   пустой экран. Тени и alpha подняты примерно вдвое-втрое — «сцена
+   идёт вторым планом» не значит «сцена невидима». */
 .mg-dust {
-  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  position: absolute; width: 7px; height: 7px; border-radius: 50%;
   background: radial-gradient(circle, var(--mg-brass-bright), rgba(243,223,168,0) 72%);
-  box-shadow: 0 0 8px rgba(243,223,168,.55);
+  box-shadow: 0 0 16px rgba(243,223,168,.85), 0 0 4px rgba(255,255,255,.6);
   animation: mgDustFloat 6s ease-in-out infinite;
 }
 @keyframes mgDustFloat {
-  0%, 100% { transform: translateY(0) scale(.8); opacity: .22; }
-  50%      { transform: translateY(-16px) scale(1.15); opacity: .6; }
+  0%, 100% { transform: translateY(0) scale(.8); opacity: .45; }
+  50%      { transform: translateY(-16px) scale(1.15); opacity: .95; }
 }
 
 /* ── дальние вспышки: эхо магии где-то за кадром ── */
 .mg-flare {
-  position: absolute; width: clamp(120px, 14vw, 260px); height: clamp(120px, 14vw, 260px);
-  border-radius: 50%; filter: blur(2px);
-  background: radial-gradient(circle, rgba(255,143,106,.22), transparent 70%);
+  position: absolute; width: clamp(140px, 16vw, 300px); height: clamp(140px, 16vw, 300px);
+  border-radius: 50%; filter: blur(1px);
+  background: radial-gradient(circle, rgba(255,166,120,.42), transparent 70%);
   opacity: 0; animation: mgFlarePulse 7.5s ease-in-out infinite;
 }
 @keyframes mgFlarePulse {
   0%, 100% { opacity: 0; transform: scale(.7); }
-  40%      { opacity: .55; transform: scale(1); }
-  60%      { opacity: .5; transform: scale(1.05); }
+  40%      { opacity: .85; transform: scale(1); }
+  60%      { opacity: .75; transform: scale(1.05); }
 }
 
-/* ── два еле заметных кольца на заднем плане, вращаются в разные стороны ── */
+/* ── два кольца на заднем плане, вращаются в разные стороны ── */
 .mg-ring {
   position: absolute; border-radius: 50%; pointer-events: none;
-  border: 1px solid rgba(201,166,104,.16);
-  box-shadow: inset 0 0 40px rgba(201,166,104,.07);
+  border: 1.5px solid rgba(201,166,104,.38);
+  box-shadow: inset 0 0 50px rgba(201,166,104,.16), 0 0 24px rgba(201,166,104,.12);
 }
 .mg-ring::before {
   content: ''; position: absolute; inset: 9%; border-radius: 50%;
-  border: 1px dashed rgba(201,166,104,.10);
+  border: 1px dashed rgba(201,166,104,.24);
 }
 .mg-ring--a { width: 46vmin; height: 46vmin; left: -14vmin; top: -14vmin;
   animation: mgRingSpin 95s linear infinite; }
@@ -70,25 +75,25 @@
 
 /* ── блуждающий огонёк: единственный, лениво облетает экран ── */
 .mg-wisp {
-  position: absolute; top: 60%; left: -6%; width: 46px; height: 46px;
+  position: absolute; top: 60%; left: -6%; width: 60px; height: 60px;
   display: flex; align-items: center; justify-content: center;
   animation: mgWispFly 38s ease-in-out infinite; will-change: transform;
 }
 .mw-core {
-  width: 14px; height: 14px; border-radius: 50%;
+  width: 20px; height: 20px; border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff6df, var(--mg-brass-bright) 45%, var(--mg-brass) 80%);
-  box-shadow: 0 0 18px rgba(243,223,168,.9), 0 0 34px rgba(201,166,104,.5);
+  box-shadow: 0 0 28px rgba(243,223,168,1), 0 0 54px rgba(201,166,104,.75), 0 0 80px rgba(201,166,104,.35);
   animation: mgWispFlicker 2.4s ease-in-out infinite;
 }
 /* .mw-wing — не крыло-птица, а мягкая аура по бокам ядра (как у язычка
    пламени): два размытых пятна пульсируют в противофазе с ядром. */
 .mw-wing {
-  width: 20px; height: 20px; border-radius: 50%; filter: blur(4px); margin: 0 -10px;
-  background: radial-gradient(circle, rgba(243,223,168,.35), transparent 70%);
+  width: 30px; height: 30px; border-radius: 50%; filter: blur(4px); margin: 0 -14px;
+  background: radial-gradient(circle, rgba(243,223,168,.55), transparent 70%);
   animation: mgWispFlicker 2.4s ease-in-out infinite reverse;
 }
 @keyframes mgWispFlicker {
-  0%, 100% { opacity: .55; transform: scale(.85); }
+  0%, 100% { opacity: .65; transform: scale(.85); }
   50%      { opacity: 1; transform: scale(1.1); }
 }
 @keyframes mgWispFly {
