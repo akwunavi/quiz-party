@@ -18,14 +18,19 @@
 .q-split .q-img img { max-height: 68vh; }
 
 /* размер по ширине КОНТЕЙНЕРА и по длине текста */
-.q-split .q-text,
-.theme-potter .q-split .q-text { font-size: clamp(20px, 2.8cqw, 54px); line-height: 1.15; }
-.q-split .q-text.len-m,
-.theme-potter .q-split .q-text.len-m { font-size: clamp(19px, 2.4cqw, 46px); }
-.q-split .q-text.len-l,
-.theme-potter .q-split .q-text.len-l { font-size: clamp(17px, 2.0cqw, 38px); }
-.q-split .q-text.len-xl,
-.theme-potter .q-split .q-text.len-xl { font-size: clamp(15px, 1.7cqw, 30px); line-height: 1.25; }
+.q-split .q-text { font-size: clamp(20px, 2.8cqw, 54px); line-height: 1.15; }
+.q-split .q-text.len-m { font-size: clamp(19px, 2.4cqw, 46px); }
+.q-split .q-text.len-l { font-size: clamp(17px, 2.0cqw, 38px); }
+.q-split .q-text.len-xl { font-size: clamp(15px, 1.7cqw, 30px); line-height: 1.25; }
+/* Magic — своя лестница (шаг 6 rollout'а): EB Garamond у того же текста
+   ~11% ýже Cinzel Decorative (замерено рендером, HANDOFF.md), числа
+   домножены на ~1.12, а не перенесены механически с базовых. Отдельным
+   правилом ПОСЛЕ общего — раньше делили одно объявление с базовой темой,
+   расцепить пришлось, чтобы шкалы разошлись, не тронув классику/НГ. */
+.theme-potter .q-split .q-text { font-size: clamp(22px, 3.1cqw, 60px); line-height: 1.15; }
+.theme-potter .q-split .q-text.len-m { font-size: clamp(21px, 2.7cqw, 52px); }
+.theme-potter .q-split .q-text.len-l { font-size: clamp(19px, 2.2cqw, 43px); }
+.theme-potter .q-split .q-text.len-xl { font-size: clamp(17px, 1.9cqw, 34px); line-height: 1.25; }
 
 /* на узком экране сплит перестаёт быть сплитом */
 @media (max-width: 900px) {
@@ -363,7 +368,7 @@
 /* рамка вопроса по содержимому, по центру своей колонки */
 .host-screen .q-split > .cyber-frame,
 .host-screen .q-split > .q-frame,
-.host-screen .q-split > .pt-frame,
+.host-screen .q-split > .mg-frame,
 .host-screen .q-split > div:first-child { align-self: center; min-height: 0; }
 /* Кегль считается от ширины КОЛОНКИ ТЕКСТА, а не всего сплита: иначе
    единица cqw берётся от полной ширины и текст выходит вдвое крупнее места,
@@ -505,7 +510,7 @@
   }
   .host-actions button { font-size: clamp(17px, 1.3vw, 46px); padding: clamp(12px, 1vw, 30px) clamp(28px, 2.4vw, 80px); }
   /* НАЙДЕНО РЕНДЕРОМ (QA, 3840×2160): рамка вопроса без вариантов
-     (.cyber-frame/.q-frame/.pt-frame, flex: 1 1 0 внутри .host-screen)
+     (.cyber-frame/.q-frame/.mg-frame, flex: 1 1 0 внутри .host-screen)
      считает «своё» место от .host-screen padding-bottom — а тот на больших
      панелях остаётся тем же 96px (11-projector-media.css), что и на
      ноутбуке. Кнопка выше по этой же причине (см. .host-actions button
@@ -548,7 +553,7 @@
    ни на что не налезает. */
 .host-screen > .cyber-frame,
 .host-screen > .q-frame,
-.host-screen > .pt-frame {
+.host-screen > .mg-frame {
   flex: 1 1 0; min-height: 0; overflow: hidden;
   display: grid; place-items: center;
 }
@@ -570,15 +575,15 @@
    влезает, — переполнения не будет, будет просто мельче). */
 .host-screen.has-media > .cyber-frame,
 .host-screen.has-media > .q-frame,
-.host-screen.has-media > .pt-frame {
+.host-screen.has-media > .mg-frame {
   flex: 0 1 auto; max-height: min(46vh, 420px); }
 .host-screen.has-media.has-choices > .cyber-frame,
 .host-screen.has-media.has-choices > .q-frame,
-.host-screen.has-media.has-choices > .pt-frame { max-height: min(34vh, 300px); }
+.host-screen.has-media.has-choices > .mg-frame { max-height: min(34vh, 300px); }
 /* та же опора внутри сплита: колонка текста ограничена высотой ряда */
 .host-screen .q-split > .cyber-frame,
 .host-screen .q-split > .q-frame,
-.host-screen .q-split > .pt-frame,
+.host-screen .q-split > .mg-frame,
 .host-screen .q-split > div:first-child {
   height: 100%; min-height: 0; overflow: hidden;
   display: grid; place-items: center;
@@ -586,5 +591,5 @@
 /* текст внутри рамки не должен сам себе задавать поля: место считает рамка */
 .host-screen > .cyber-frame > .q-text,
 .host-screen > .q-frame > .q-text,
-.host-screen > .pt-frame > .q-text,
+.host-screen > .mg-frame > .q-text,
 .host-screen .q-split > div:first-child > .q-text { margin-block: 0; max-width: 100%; }

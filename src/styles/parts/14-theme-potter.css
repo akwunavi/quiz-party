@@ -4,7 +4,14 @@
   --fg: #f3e9cf; --muted: #b9ab84; --dim: rgba(211,166,37,.35);
   --ok: #7cc79b; --danger: #d4574e;
   --glow: 0 0 24px rgba(211,166,37,.45); --glow2: 0 0 18px rgba(164,93,226,.4);
-  --font-display: 'Cinzel Decorative', 'Russo One', serif;   /* шрифт «как у ГП» (легальный аналог) */
+  /* Все переменные в этом блоке (кроме `color`) перекрыты токенами Magic
+     в 33-magic-tokens.css (та же селектор `.theme-potter`, файл грузится
+     позже) — оставлены НЕ ради каскада, а как задокументированное
+     ИСХОДНОЕ значение до редизайна: полностью убрать безопасно, но не
+     обязательно, риск не стоит выгоды при текущем объёме правки. Старый
+     `--font-display: 'Cinzel Decorative'...` отсюда удалён при финальной
+     чистке (шаг 12) — эта конкретная строка была не просто перекрыта, а
+     вводила в заблуждение при grep по "Cinzel". */
   color: var(--fg); }
 .theme-potter .grid-bg { background:
   radial-gradient(ellipse at 50% -10%, rgba(211,166,37,.14), transparent 55%),
@@ -17,12 +24,9 @@
   border-color: rgba(211,166,37,.5); box-shadow: 0 0 34px rgba(211,166,37,.15); }
 .theme-potter button { border-color: rgba(211,166,37,.55); }
 .theme-potter .answer-reveal .answer-main { color: #e9c766; }
-/* сцена */
-/* Слой сцены МЕЖДУ фоном и контентом.
-   z-index: 0 увёл его за фон экрана — пропали разом свечи, сова и снитч.
-   z-index: 2 давал спор с плитками вариантов, и свечи всплывали поверх.
-   Единица — ровно посередине: фон ниже, контент (z-index 6) выше. */
-.pt-scene { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+/* сцена — .mg-scene теперь живёт в 34-magic-environment.css (шаг 2
+   rollout'а, см. HANDOFF.md); z-index-арифметика (фон ниже, контент
+   z-index 6 выше) там же, дословно унаследована отсюда. */
 .theme-potter .choices-grid, .theme-potter .choice-plate,
 .theme-potter .img-answers, .theme-potter .q-media-grid { position: relative; z-index: 6; }
 /* контент выше свечей; fixed-элементы НЕ трогаем (только z-index).
@@ -32,7 +36,7 @@
    ловушка: 8.53 добавила .info-note-corner (fixed, левый нижний угол
    слайда-брифинга), не попавший сюда, слетал на position:relative и
    уезжал в поток документа вместо угла экрана. */
-.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner):not(.link-badge),
+.host-screen > *:not(.host-topbar):not(.host-actions):not(.pack-badge):not(.round-badge):not(.lobby-qr-corner):not(.groups-overlay):not(.fx-toggle):not(.info-note-corner):not(.link-badge):not(.mg-veil),
 .mel-board, .mel-theme, .jp-board, .q-text, .neon-title, .answer-reveal {
   z-index: 6; position: relative; }
 .host-topbar, .host-actions, .pack-badge, .round-badge, .lobby-qr-corner, .link-badge { z-index: 30; }
@@ -43,6 +47,8 @@
 .theme-potter .mel-board { perspective: 900px; }
 .theme-potter .sprint-card:hover { border-color: #d3a625;
   box-shadow: 0 0 24px rgba(211,166,37,.55), inset 0 0 14px rgba(211,166,37,.15); }
+/* ↑ до конца блока — общие правила темы; ↓ сцена (свечи/искры/снитч)
+   удалена в шаге 2 rollout'а, заменена .mg-scene из 34-magic-environment.css */
 /* Номер вопроса и метка раунда подняты выше свечей. Тёмную подложку под
    них не ставим — она смотрелась заплаткой; вместо этого свечи опущены
    ниже строки (см. ThemeLayer: крайние свечи и так уже сдвинуты). */
@@ -57,43 +63,26 @@
    .round-badge с top: 22px — двинь бейдж вниз без этого условия, и он
    вместо topbar словит round-badge. */
 .theme-potter .host-screen:has(> .host-topbar) ~ .link-badge-corner { top: 50px; }
-.pt-candle { position: absolute; font-size: clamp(14px, 1.6vw, 24px);
-  filter: drop-shadow(0 0 8px rgba(255,190,80,.8));
-  animation: candleFloat 3.6s ease-in-out infinite; }
-@keyframes candleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.pt-spark { position: absolute; width: 5px; height: 5px; border-radius: 50%;
-  background: #ffe9a8; box-shadow: 0 0 10px #ffd35c, 0 0 20px rgba(255,211,92,.6);
-  animation: sparkTwinkle 2.8s ease-in-out infinite; }
+/* sparkTwinkle: keyframe остался — им пользуются button:hover::after
+   (16-round-melody-tiles.css) и .answer-pulse (18-patch-745.css), сама
+   декоративная искра сцены (.pt-spark) удалена вместе со свечами/снитчем
+   в шаге 2 rollout'а (заменены .mg-dust/.mg-flare/.mg-wisp в
+   34-magic-environment.css). */
 @keyframes sparkTwinkle { 0%,100% { opacity: 0; transform: scale(.4); }
   50% { opacity: 1; transform: scale(1); } }
-/* снитч: шарик с крыльями, летает восьмёркой */
-.pt-snitch { position: absolute; top: 18%; left: 8%; width: 64px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  animation: snitchFly 17s ease-in-out infinite; will-change: transform; }
-.pt-ball { width: 18px; height: 18px; border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #ffe9a8, #d3a625 55%, #7a5c10);
-  box-shadow: 0 0 16px rgba(211,166,37,.9); }
-.pt-wing { width: 22px; height: 12px; border-radius: 50% 100% 0 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.35));
-  transform-origin: right center; animation: wingFlap .18s ease-in-out infinite alternate; }
-.pt-wing.r { transform: scaleX(-1); transform-origin: left center; }
-@keyframes wingFlap { from { transform: rotate(-24deg); } to { transform: rotate(18deg); } }
-.pt-wing.r { animation-name: wingFlapR; }
-@keyframes wingFlapR { from { transform: scaleX(-1) rotate(-24deg); } to { transform: scaleX(-1) rotate(18deg); } }
-@keyframes snitchFly {
-  0%   { transform: translate(0, 0) scale(1); }
-  18%  { transform: translate(62vw, 14vh) scale(.8); }
-  36%  { transform: translate(78vw, 52vh) scale(1.05); }
-  55%  { transform: translate(30vw, 64vh) scale(.7); }
-  74%  { transform: translate(10vw, 34vh) scale(1); }
-  100% { transform: translate(0, 0) scale(1); }
-}
-/* таймер ГП: золотое кольцо-«снитч» с крылышками по бокам */
+/* Обычное латунное кольцо — только на answer_time (Timer variant="ring",
+   Р2 решений rollout'а, HANDOFF.md). Простой контур+число, БЕЗ орбитальной
+   искры classic и БЕЗ рун Магического круга — на этом экране таймер один
+   на весь экран, крупный, рулонная стилистика туда не просилась. */
 .theme-potter .timer-wrap { position: relative; width: 118px; height: 118px;
   display: flex; align-items: center; justify-content: center; border-radius: 50%;
-  border: 3px solid #d3a625;
-  box-shadow: 0 0 22px rgba(211,166,37,.5), inset 0 0 14px rgba(211,166,37,.25); }
-.theme-potter .timer-num { color: #e9c766; }
+  border: 3px solid var(--mg-brass, #c9a668);
+  box-shadow: 0 0 22px rgba(201,166,104,.5), inset 0 0 14px rgba(201,166,104,.25); }
+.theme-potter .timer-num { color: var(--mg-brass-bright, #f3dfa8);
+  font-family: var(--font-display); font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(201,166,104,.55); }
+.theme-potter .timer-num.danger { color: var(--mg-ember, #ff8f6a);
+  text-shadow: 0 0 22px rgba(255,143,106,.7); }
 /* спринт-карточки и плитки в пергаменте */
 .theme-potter .sprint-card { background: rgba(211,166,37,.08);
   border-color: rgba(211,166,37,.4); }
@@ -111,7 +100,7 @@
 /* На 1366x768 фиксированные 190px сверху съедали столько, что варианты
    упирались в кнопки. Отступ должен зависеть от высоты экрана, а не быть
    константой: 190px нужны только на большом проекторе. */
-.theme-potter .host-screen:has(> .pt-frame),
+.theme-potter .host-screen:has(> .mg-frame),
 .theme-potter .host-screen.has-media,
 .theme-potter .host-screen.has-choices { padding-top: clamp(120px, 21vh, 190px); }
 /* Кнопки прибиты к низу и на 1366x768 начинаются с 642px — запас снизу
@@ -127,27 +116,24 @@
     font-size: clamp(15px, 1.5vw, 26px); }
 }
 
-/* Пергаментное свечение под текстом вопроса: буквы будто проступают на
-   старой бумаге. Это фон, поэтому под текстом, а не поверх. */
+/* Блик один раз под текстом вопроса, когда он появляется — свет один раз
+   проходит по тексту наискось (mgSweep), а не пульсирует бесконечно, как
+   старое пергаментное свечение (шаг 6 rollout'а Magic-темы). */
 .theme-potter .q-text { position: relative; }
 .theme-potter .q-text::before {
-  content: ''; position: absolute; inset: -6% -4%; z-index: -1;
-  border-radius: 40% 60% 55% 45% / 50%;
-  background: radial-gradient(ellipse at center,
-    rgba(255, 205, 110, .10), transparent 70%);
-  animation: ptGlow 6s ease-in-out infinite; }
-@keyframes ptGlow { 0%, 100% { opacity: .5; transform: scale(.98); }
-  50% { opacity: 1; transform: scale(1.03); } }
+  content: ''; position: absolute; inset: -10% -20%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 42%, rgba(243,223,168,.5) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: mgSweep .9s ease-out .15s both; }
 
-/* Вес поднят по той же причине — 01-base.css задаёт .q-word позже? нет,
-   раньше; но 03/19 могут перебивать, поэтому целимся точнее. */
-/* НОВЫЙ ВОПРОС: слова проступают чернилами, по одному.
+/* НОВЫЙ ВОПРОС: слова проступают из света, по одному (mgWordReveal —
+   36-magic-motion.css, шаг 6 rollout'а, замена ptInk).
    Первая версия целилась в `.q-text.title-anim` и `.wind-text` — такого
    сочетания классов на элементе не бывает и такого класса нет вовсе,
    правило не работало ни дня. Настоящая цель — .q-word: именно из них
    собран текст вопроса, и у каждого слова уже есть своя задержка. */
 .theme-potter .host-screen .q-word {
-  animation: ptInk .75s cubic-bezier(.2,.75,.25,1) forwards; }
+  animation: mgWordReveal .75s cubic-bezier(.2,.75,.25,1) forwards; }
 @keyframes ptInk {
   0%   { opacity: 0; filter: blur(7px); transform: translateY(6px) scale(.96);
          text-shadow: 0 0 22px rgba(255,205,110,.9); }
@@ -188,26 +174,27 @@
     animation: none; }
 }
 
-/* ── Рамка вопроса: пергамент с золотой каймой ──
+/* ── Рамка вопроса: стекло с латунной каймой (.mg-frame -> .mg-frame,
+   шаг 6 rollout'а) ──
    У НГ обёртка была с сосульками, у киберпанка своя, у ГП — пустой div.
    Отступов снаружи не добавляет, ширину берёт у колонки: раскладку
    вопроса не меняет, только оформляет. */
-.pt-frame { position: relative; width: 100%; min-width: 0;
+.mg-frame { position: relative; width: 100%; min-width: 0;
   padding: clamp(14px, 2.2vh, 30px) clamp(20px, 2.6vw, 50px);
   border-radius: 10px;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(255,205,110,.09), transparent 65%),
-    linear-gradient(180deg, rgba(255,235,190,.045), rgba(255,235,190,.015));
-  box-shadow: inset 0 0 0 1px rgba(255,205,110,.28),
-              0 10px 40px rgba(0,0,0,.35); }
+    radial-gradient(ellipse at 50% 0%, rgba(201,166,104,.10), transparent 65%),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+  box-shadow: inset 0 0 0 1px rgba(201,166,104,.32),
+              0 10px 40px rgba(0,0,0,.4); }
 /* уголки-завитки */
-.pt-frame::before, .pt-frame::after {
-  content: '✦'; position: absolute; color: rgba(255,205,110,.75);
+.mg-frame::before, .mg-frame::after {
+  content: '✦'; position: absolute; color: var(--mg-brass-bright);
   font-size: clamp(11px, 1.1vw, 18px); pointer-events: none;
-  animation: ptCorner 5s ease-in-out infinite; }
-.pt-frame::before { left: 10px; top: 6px; }
-.pt-frame::after { right: 10px; bottom: 6px; animation-delay: 2.5s; }
-@keyframes ptCorner { 0%,100% { opacity: .35; transform: scale(.85) rotate(0); }
+  animation: mgCorner 5s ease-in-out infinite; }
+.mg-frame::before { left: 10px; top: 6px; }
+.mg-frame::after { right: 10px; bottom: 6px; animation-delay: 2.5s; }
+@keyframes mgCorner { 0%,100% { opacity: .35; transform: scale(.85) rotate(0); }
   50% { opacity: 1; transform: scale(1.15) rotate(180deg); } }
 
 /* ── Плитки вариантов проявляются по очереди, как страницы книги ──
@@ -247,7 +234,7 @@
      того же веса, что у анимации — иначе она снова победит: у плиток вес
      0,5,0 (.host-screen .choices-grid .choice-plate:not(.hidden-yet)),
      здесь было только 0,3,0, и reduce-motion плитки не выключал. */
-  .pt-frame::before, .pt-frame::after,
+  .mg-frame::before, .mg-frame::after,
   .theme-potter .host-screen .choices-grid .choice-plate:not(.hidden-yet),
   /* Тот же случай: 23-answers.css грузится позже, поэтому вес поднят. */
 .theme-potter .host-screen .answer-block.reveal-in .answer-label::after {
@@ -339,16 +326,19 @@
   clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 96%, 0 82%); }
 .award-merlin.p2 .am-ribbon { background: linear-gradient(180deg, #6b3fa0, #472a6b); }
 .award-merlin.p3 .am-ribbon { background: linear-gradient(180deg, #e8e2d0, #b7b09c); }
-/* медальон — восковой круг золота поверх ленты */
+/* медальон — латунный круг поверх ленты (шаг 12: токены + EB Garamond
+   вместо хардкода/Cinzel Decorative, Р5 решений rollout'а — геометрию и
+   TSX не трогали, только перекраска готового узла). */
 .award-merlin .am-disc {
   position: relative; z-index: 1; width: var(--medal-size); aspect-ratio: 1;
   border-radius: 50%; overflow: hidden;
-  background: radial-gradient(circle at 35% 30%, #ffe9a8, #d3a625 55%, #8a6812 100%);
+  background: radial-gradient(circle at 35% 30%, var(--mg-brass-bright, #f3dfa8),
+    var(--mg-brass, #c9a668) 55%, var(--mg-brass-dim, #8a744f) 100%);
   box-shadow: 0 4px 14px rgba(0,0,0,.55), inset 0 0 0 3px rgba(255,255,255,.35),
     inset 0 -6px 14px rgba(0,0,0,.35);
   display: flex; align-items: center; justify-content: center; }
-.award-merlin .am-disc b { position: relative; font-family: 'Cinzel Decorative', serif;
-  font-size: calc(var(--medal-size) * .4); color: #4a3208;
+.award-merlin .am-disc b { position: relative; font-family: var(--font-display);
+  font-size: calc(var(--medal-size) * .4); color: #3a2f14;
   text-shadow: 0 1px 0 rgba(255,255,255,.4); }
 /* блик, скользящий по медальону при появлении — тот же приём, что у cf-scan */
 .award-merlin .am-shine { position: absolute; inset: -20%; pointer-events: none;

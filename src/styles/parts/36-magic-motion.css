@@ -1,0 +1,64 @@
+/* ═══ Тема Magic — motion-примитивы (префикс mg) ═══
+ * Пять переиспользуемых keyframes + вспомогательные утилитные классы:
+ *   mgCondense    — панель/модалка «сгущается» из света (появление)
+ *   mgWordReveal  — слово проступает чернилами (замена ptInk)
+ *   mgPulse       — дыхание ауры в покое (замена безымянных pulse-хвостов)
+ *   mgGlow        — мерцание свечения текста/рамки
+ *   mgSweep       — блик, скользящий по поверхности (transform-only —
+ *                   градиент даёт селектор-хозяин в 35-magic-surfaces.css)
+ *
+ * Конкретные экраны (35-magic-surfaces.css, 34-magic-environment.css)
+ * применяют `animation: mgXxx ...` СВОИМИ селекторами напрямую (не через
+ * утилитные классы ниже) — так же, как .theme-potter .q-word делает это
+ * сейчас в 14-theme-potter.css. reduced-motion гасится ТЕМ ЖЕ файлом и
+ * ТЕМ ЖЕ селектором рядом с местом использования (это уже сложившийся
+ * для темы приём — файл побеждает по каскаду сам себя, вес искать не
+ * приходится). Здесь, в 36, гасятся только утилитные классы .mg-condense
+ * /.mg-word-reveal/.mg-pulse/.mg-glow/.mg-sweep — если где-то захочется
+ * навесить эффект без своего кастомного селектора.
+ *
+ * html.fx-force-motion — это НЕ «включить любую анимацию темы вопреки
+ * системной настройке», а конкретно форс-кнопка ScreenFx (переходная
+ * вспышка между экранами, ✨ на пульте) — как и в 32-cyber-motion.css.
+ * У неё есть смысл только там, где Magic-эффект дублирует то, что уже
+ * форсируется у классики (переход модалки, «проступание» вопроса, FLIP
+ * табло) — такие пары лежат рядом со своим экраном (шаги 4/6/8), не
+ * здесь: сами keyframes ниже — не переходы ScreenFx, а фоновые эффекты. */
+
+@keyframes mgCondense {
+  0%   { opacity: 0; filter: blur(18px) brightness(1.6); transform: scale(.88); }
+  55%  { opacity: 1; filter: blur(3px) brightness(1.15); }
+  100% { opacity: 1; filter: blur(0) brightness(1); transform: none; }
+}
+.mg-condense { animation: mgCondense .6s cubic-bezier(.2,.75,.2,1) both; }
+
+@keyframes mgWordReveal {
+  0%   { opacity: 0; filter: blur(6px); transform: translateY(8px) scale(.94);
+         text-shadow: 0 0 20px rgba(201,166,104,.85); }
+  60%  { opacity: 1; filter: blur(1px); text-shadow: 0 0 12px rgba(201,166,104,.55); }
+  100% { opacity: 1; filter: blur(0); transform: none;
+         text-shadow: 0 0 8px rgba(201,166,104,.22); } }
+.mg-word-reveal { animation: mgWordReveal .75s cubic-bezier(.2,.75,.25,1) forwards; }
+
+@keyframes mgPulse {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); } }
+.mg-pulse { animation: mgPulse 3.2s ease-in-out infinite; }
+
+@keyframes mgGlow {
+  0%, 100% { filter: brightness(1); text-shadow: 0 0 14px rgba(201,166,104,.45); }
+  50%      { filter: brightness(1.12); text-shadow: 0 0 26px rgba(243,223,168,.75); } }
+.mg-glow { animation: mgGlow 2.6s ease-in-out infinite; }
+
+/* mgSweep трогает только transform — фон/градиент/размер полосы задаёт
+   тот, кто применяет класс (см. 35-magic-surfaces.css). */
+@keyframes mgSweep {
+  from { transform: translateX(-130%) skewX(-12deg); }
+  to   { transform: translateX(130%) skewX(-12deg); } }
+.mg-sweep { animation: mgSweep 2.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-condense, .mg-word-reveal, .mg-pulse, .mg-glow, .mg-sweep { animation: none; }
+  .mg-condense, .mg-word-reveal { opacity: 1; filter: none; transform: none; text-shadow: none; }
+  .mg-pulse { opacity: 1; transform: none; }
+}

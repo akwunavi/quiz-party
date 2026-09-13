@@ -45,9 +45,9 @@ import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide, ThemeKey } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
-import { SnakeTimer } from '../components/SnakeTimer'
+import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
 import { probeMedia, createAudio, stopAllAudio, playSynced,
@@ -96,7 +96,7 @@ export function HostScreen() {
         .toString(16).toUpperCase().padStart(3, '0')}`
     : null
   return (
-    <ThemeLayer theme={theme} isProjector>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />
@@ -119,7 +119,7 @@ export function HostScreen() {
 
 function Deco({ theme }: { theme: string }) {
   if (theme === 'new_year') return <div className="title-deco">🎄 ❄ 🎁 ❄ 🎄</div>
-  if (theme === 'potter') return <div className="title-deco">⚡ ✦ 🪄 ✦ ⚡</div>
+  if (theme === 'potter') return <div className="title-deco mg-glow">✧ ◆ ✦ ◆ ✧</div>
   return null
 }
 
@@ -192,7 +192,7 @@ function HostInner({ gameState, pack }: {
 
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
-      <div className={`host-screen grid-bg${paperMode ? ' paper-lobby' : ''}`}>
+      <div className={`host-screen grid-bg lobby-screen${paperMode ? ' paper-lobby' : ''}`}>
         {/* Киберпанк-обвязка логотипа. У НГ и ГП экран лобби живой сам по
             себе (снег, свечи), у классики он висел статичной картинкой —
             а игроки смотрят на него дольше, чем на любой другой экран.
@@ -313,6 +313,12 @@ function HostInner({ gameState, pack }: {
     return (
       <div className="host-screen grid-bg round-intro">
         {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {/* Magic: заставка раунда в две фазы — вуаль золотого света
+            рассеивается (фаза 1, показывает заголовок), затем проступают
+            правила (фаза 2, задержка в тернарке ниже). Прямой ребёнок
+            .host-screen — попадает в оба списка :not() (14/15), иначе
+            общий сброс position/z-index в потоке перебьёт position:absolute. */}
+        {pack.theme === 'potter' && <div className="mg-veil" aria-hidden />}
         {round.mechanic === 'crossword' && grid ? (
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
@@ -357,7 +363,8 @@ function HostInner({ gameState, pack }: {
                      сначала отыгрывает заставку раунда, и только затем — с
                      паузой около секунды — проступают правила. Другие темы
                      не трогаем — их тайминг согласован раньше и отдельно. */
-                  animationDelay: `${(pack.theme === 'classic' ? 1.3 : 0.5) + i * 0.7}s`,
+                  animationDelay: `${(pack.theme === 'classic' ? 1.3
+                    : pack.theme === 'potter' ? 1.15 : 0.5) + i * 0.7}s`,
                 }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>
@@ -433,7 +440,7 @@ function HostInner({ gameState, pack }: {
     // вопросах поле могут оставить пустым, когда всё говорит картинка.
     const hasText = !!q.question_text.trim()
     const isPotter = pack.theme === 'potter'
-    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'pt-frame'
+    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'mg-frame'
       : isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
       : isCyber ? 'cyber-frame' : ''
     // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
@@ -813,8 +820,13 @@ function playChime() {
   } catch { /* звук не критичен: игра идёт дальше */ }
 }
 
-function Timer({ startedAt, seconds, theme, chime = true }: {
+function Timer({ startedAt, seconds, theme, chime = true, variant }: {
   startedAt: string | null; seconds: number; theme?: string; chime?: boolean
+  /** 'ring' — обычное латунное кольцо (как у classic/НГ по духу), а не
+   *  Магический круг: нужно на экране `answer_time` (Р2 решения rollout'а,
+   *  HANDOFF.md) — там таймер один на весь экран, крупный, и рулонная
+   *  «руническая» стилистика туда не просилась. */
+  variant?: 'ring'
 }) {
   const [left, setLeft] = useState(seconds)
   const rang = useRef(false)
@@ -865,8 +877,14 @@ function Timer({ startedAt, seconds, theme, chime = true }: {
       </div>
     )
   }
-  // ГП: круговой таймер-змея, ползущая к своему хвосту
-  if (theme === 'potter') return <SnakeTimer left={left} seconds={seconds} low={low} />
+  // Magic: обычное латунное кольцо на answer_time (Р2), Магический круг
+  // (руны) — везде ещё (шапка вопроса, .mel-count, .sprint-timer).
+  if (theme === 'potter' && variant === 'ring') return (
+    <div className={`timer-wrap${low ? ' low' : ''}`}>
+      <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
+    </div>
+  )
+  if (theme === 'potter') return <MagicCircleTimer left={left} seconds={seconds} low={low} />
   // Киберпанк: искра бежит по кольцу. Замирает, когда таймер не идёт —
   // либо ещё не запущен, либо уже дотикал до нуля. Это единственный
   // элемент, по которому с дальнего конца зала видно, идёт время или нет.
@@ -1865,13 +1883,13 @@ function AnswerTime({ pack, round, gameState }: {
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`}>
-      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ВРЕМЯ ОТВЕТОВ</div>
+      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>
       <div className="answer-pulse"><Title theme={pack.theme}
         lines={[paper ? 'СДАВАЙТЕ БЛАНКИ' : 'ОТВЕЧАЙТЕ!']} /></div>
       <div className="meta-line">{paper
         ? 'ПЕРЕДАЙТЕ БЛАНКИ ВЕДУЩЕМУ'
         : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>
-      <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} />
+      <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} variant="ring" />
       {/* Список команд со счётчиком «сколько ответов долетело» нужен только
           при игре с телефонов: он показывает, кого ещё ждать. На бумаге
           ответы едут на бланках, счётчик всегда нулевой и смысла не несёт —
@@ -2033,9 +2051,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ) : q.answer.mode === 'match' ? (
                 <MatchAnswer q={q} />
               ) : choices && imgChoices.length === choices.length ? (
-                <StagedChoices q={q} choices={choices} imgs={imgChoices} />
+                <StagedChoices q={q} choices={choices} imgs={imgChoices} theme={pack.theme} />
               ) : choices ? (
-                <StagedChoices q={q} choices={choices} />
+                <StagedChoices q={q} choices={choices} theme={pack.theme} />
               ) : q.answer.mode === 'order' ? (
                 <div className="order-answer">
                   {q.answer.correct_order.split('').map((k, i) => {
@@ -2121,10 +2139,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
  *  5.5 сек — подсветка верного и приглушение неверных, плавно.
  *  Место под все варианты зарезервировано сразу (visibility), поэтому
  *  раскладка не дёргается и по позиции ничего не угадывается. */
-function StagedChoices({ q, choices, imgs }: {
+function StagedChoices({ q, choices, imgs, theme }: {
   q: LoadedPack['rounds'][number]['questions'][number]
   choices: { key: string; text: string }[]
   imgs?: string[]
+  theme?: ThemeKey
 }) {
   const [stage, setStage] = useState(0)
   useEffect(() => {
@@ -2150,6 +2169,11 @@ function StagedChoices({ q, choices, imgs }: {
   const delay = (key: string) => (firstWave.has(key) ? 0 : 0.25 * choices
     .filter(c => !firstWave.has(c.key)).findIndex(c => c.key === key))
 
+  // Magic: галочка рисуется stroke-dashoffset — это SVG-свойство, псевдо-
+  // элементу такое не дать, поэтому реальный <svg> ребёнком, только у
+  // правильной ТЕКСТОВОЙ плитки (формат 1). У картинок (формат 3) и у
+  // одиночного текстового ответа (формат 2) галочки нет по решению плана.
+  const magicCheck = theme === 'potter'
   if (imgs) return (
     <div className="choice-imgs">
       {choices.map((c, i) => (
@@ -2168,9 +2192,22 @@ function StagedChoices({ q, choices, imgs }: {
         <div key={c.key} className={`choice-plate${cls(c.key)}`}
           style={{ animationDelay: `${delay(c.key)}s` }}>
           <span className="key">{c.key}</span>{c.text}
+          {magicCheck && cls(c.key) === ' correct' && <MagicCheck />}
         </div>
       ))}
     </div>
+  )
+}
+
+/** Латунная галочка верного варианта (только Magic-тема) — рисуется
+ *  обводкой (stroke-dashoffset), поэтому нужен настоящий <svg>, псевдо-
+ *  элементу такую анимацию не дать. CSS — 35-magic-surfaces.css. */
+function MagicCheck() {
+  return (
+    <svg className="mg-check" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" strokeWidth="3"
+        strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
@@ -2557,7 +2594,7 @@ function ScoreboardScreen({ pack, gameState }: {
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>())
   const flippedRound = useRef<number | null>(null)
   useLayoutEffect(() => {
-    if (pack.theme !== 'classic') return
+    if (pack.theme !== 'classic' && pack.theme !== 'potter') return
     if (ranked.length === 0 || revealed < ranked.length) return
     if (flippedRound.current === gameState.round_number) return
     flippedRound.current = gameState.round_number
@@ -2676,9 +2713,13 @@ function BreakScreen({ pack, round, gameState }: {
   const ss = String(left % 60).padStart(2, '0')
   return (
     <div className="host-screen grid-bg break-screen">
-      <div className="mono-tag accent">АНТРАКТ</div>
+      {/* Р3: у Magic крупного «ПЕРЕРЫВ» достаточно — подпись-дублёр не
+          рендерим вовсе (не прячем CSS-ом, просто не выводим). */}
+      {pack.theme !== 'potter' && <div className="mono-tag accent">АНТРАКТ</div>}
       <Title theme={pack.theme} lines={['ПЕРЕРЫВ']} />
       <Deco theme={pack.theme} />
+      {pack.theme === 'potter' &&
+        <MagicCircleTimer left={left} seconds={minutes * 60} low={left <= 30} />}
       <div className="break-timer">{mm}:{ss}</div>
       <div className="host-actions">
         <AfterRoundNav pack={pack} gameState={gameState} />
@@ -2727,6 +2768,8 @@ function CountingScreen({ pack, gameState }: {
       <div className="mono-tag accent">ПОДВОДИМ ИТОГИ</div>
       <Title theme={pack.theme} lines={['СЧИТАЕМ', 'БАЛЛЫ']} />
       <Deco theme={pack.theme} />
+      {pack.theme === 'potter' &&
+        <MagicCircleTimer left={left} seconds={MINUTES * 60} low={left <= 30} />}
       <div className="break-timer">{mm}:{ss}</div>
       <div className="counting-sub">Скоро объявим победителей</div>
       {/* Экран подсчёта существует только в бумажном режиме — сценарий

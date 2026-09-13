@@ -3,8 +3,13 @@
 import type { ThemeKey } from '../types/quiz'
 import { NewYearScene } from './NewYearScene'
 
-export function ThemeLayer({ theme, isProjector, children }: {
-  theme: ThemeKey; isProjector?: boolean; children: React.ReactNode
+export function ThemeLayer({ theme, isProjector, phase, children }: {
+  theme: ThemeKey; isProjector?: boolean
+  /** Фаза игры (gameState.phase) — управляет ТОЛЬКО плотностью сцены
+   *  через [data-phase] на корне .mg-scene (34-magic-environment.css),
+   *  раскладку экранов не трогает. */
+  phase?: string
+  children: React.ReactNode
 }) {
   return (
     <div className={`theme-${theme}`}>
@@ -14,7 +19,7 @@ export function ThemeLayer({ theme, isProjector, children }: {
         {/* сани Деда Мороза: редкий пролёт по небу */}
         <div className="ny-sleigh" aria-hidden>🦌🦌🛷🎅</div>
       </>}
-      {theme === 'potter' && isProjector && <PotterScene />}
+      {theme === 'potter' && isProjector && <MagicScene phase={phase} />}
       {children}
     </div>
   )
@@ -22,50 +27,45 @@ export function ThemeLayer({ theme, isProjector, children }: {
 
 
 
-/** «Волшебная школа»: летающий снитч, искры палочки, свечи под потолком. */
-function PotterScene() {
+/** Magic: «Хрустальный шар» + «Блуждающий огонёк» — пылинки в свете,
+ *  редкие вспышки дальней магии, два еле заметных вращающихся кольца на
+ *  заднем плане и один блуждающий огонёк, лениво облетающий экран.
+ *  Никакой франшизной символики: только абстрактный «магический» декор. */
+function MagicScene({ phase }: { phase?: string }) {
   return (
-    <div className="pt-scene" aria-hidden>
-      {/* Парящие свечи: воск + живое пламя, качающееся от «сквозняка».
-          В углах экрана живут номер раунда и счётчик вопросов, поэтому
-          крайние свечи опускаем ниже — иначе пламя загораживало цифры. */}
-      {/* Парящие свечи вдоль ЛЕВОГО и ПРАВОГО краёв — там, где контента
-          не бывает. Верхнюю полосу (шапка с номером раунда и таймером) и
-          центральную колонку (текст вопроса, плитки) не занимаем вовсе:
-          именно там свечи налезали на текст.
-          Слой сцены лежит ниже контента, но зрительно пламя всё равно
-          мешало читать, поэтому вопрос решается расстановкой, а не слоями. */}
-      {Array.from({ length: 10 }, (_, i) => {
+    <div className="mg-scene" data-phase={phase} aria-hidden>
+      {/* Пылинки в узких коридорах вдоль краёв — та же причина, что была у
+          свечей: центральная колонка держит текст вопроса и плитки, там
+          декор мешает читать даже за слоем ниже контента. */}
+      {Array.from({ length: 16 }, (_, i) => {
         const right = i % 2 === 1
-        // Коридоры узкие: 1…13% слева и 87…99% справа. Шире нельзя —
-        // на 1600px текст вопроса начинается примерно с 18% ширины, и
-        // свеча на 20% уже касалась буквы.
         const lane = 1 + Math.floor(i / 2) * 3
         const left = right ? 100 - lane - 3 : lane
-        const top = 22 + ((i * 13) % 60)
+        const top = 14 + ((i * 11) % 74)
         return (
-        <span key={`c${i}`} className="pt-candle" style={{
-          left: `${left}%`, top: `${top}%`,
-          animationDelay: `${(i % 5) * 0.7}s`,
-          ['--h' as string]: `${34 + (i % 3) * 10}px`,
-        }}>
-          <span className="pt-flame" style={{ animationDelay: `${(i % 4) * 0.35}s` }} />
-        </span>
-      )})}
-      {/* сова с письмом: редкий пролёт через экран */}
-      <div className="pt-owl">🦉<span className="pt-owl-letter">✉️</span></div>
-      {/* искры из палочки в углах */}
-      {Array.from({ length: 14 }, (_, i) => (
-        <span key={`s${i}`} className="pt-spark" style={{
-          left: `${(i * 37) % 100}%`, top: `${55 + ((i * 13) % 40)}%`,
-          animationDelay: `${(i % 7) * 0.5}s`,
+          <span key={`d${i}`} className="mg-dust" style={{
+            left: `${left}%`, top: `${top}%`,
+            animationDelay: `${(i % 6) * 0.6}s`,
+            animationDuration: `${5 + (i % 4)}s`,
+          }} />
+        )
+      })}
+      {/* Редкие дальние вспышки — «эхо» магии где-то за кадром */}
+      {Array.from({ length: 4 }, (_, i) => (
+        <span key={`f${i}`} className="mg-flare" style={{
+          left: `${12 + i * 26}%`, top: `${18 + ((i * 23) % 60)}%`,
+          animationDelay: `${i * 2.3}s`,
         }} />
       ))}
-      {/* золотой снитч с крыльями — летает по экрану */}
-      <div className="pt-snitch">
-        <span className="pt-wing l" />
-        <span className="pt-ball" />
-        <span className="pt-wing r" />
+      {/* Два еле заметных магических кольца в противоположных углах,
+          вращаются в разные стороны — чистая атмосфера, не таймер. */}
+      <span className="mg-ring mg-ring--a" />
+      <span className="mg-ring mg-ring--b" />
+      {/* Блуждающий огонёк: единственный, лениво облетает экран. */}
+      <div className="mg-wisp">
+        <span className="mw-wing l" />
+        <span className="mw-core" />
+        <span className="mw-wing r" />
       </div>
     </div>
   )

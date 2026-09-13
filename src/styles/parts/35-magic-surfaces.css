@@ -1,0 +1,319 @@
+/* ═══ Тема Magic — поверхности ═══
+ * Заполняется в шагах 4-11 рollout'а: рамка вопроса .mg-frame, плитки
+ * «хрустальный шар» (.jp-tile/.mel-tile), модалки, разбор ответа (три
+ * формата, без зелёного акцента), табло, финал, блиц, кнопки, экран
+ * игрока, таймер. Здесь же гасятся захардкоженные rgba(87,245,192,...)
+ * из 08-projector.css:7-13, которые не берутся через переменные. Пока
+ * старые .theme-potter правила в 14/16/17/18/19/22/23/24 продолжают
+ * работать без изменений — заменяются по мере прохождения шагов. */
+
+/* ═══ Шаг 3: лобби ═══
+ * `.lobby-screen` — маркер на самом `.host-screen` лобби (HostScreen.tsx),
+ * добавлен специально для точного прицела: `.neon-title`/`.title-deco`
+ * рендерятся ещё на десятке экранов (раунд-интро, перерыв, подсчёт,
+ * финал) через тот же компонент `Title`/`Deco`, а «проступание» логотипа
+ * нужно только на первом появлении в лобби. Title.tsx/useScrambleReveal/
+ * useFitText НЕ трогаем программно — эффект целиком в CSS поверх готовой
+ * разметки (`.neon-title` для ГП — просто текст в <span>, без per-letter
+ * спанов, как у Нового года: посимвольность имитирует clip-path слева
+ * направо, а не покадровая задержка на каждой букве). */
+.theme-potter .lobby-screen .neon-title {
+  animation: mgTitleReveal 1.7s cubic-bezier(.2,.8,.2,1) both,
+             mgGlow 3.2s ease-in-out infinite 1.7s;
+}
+@keyframes mgTitleReveal {
+  0%   { clip-path: inset(0 100% 0 0); filter: blur(6px) brightness(1.6); }
+  60%  { filter: blur(1px) brightness(1.15); }
+  100% { clip-path: inset(0 0 0 0); filter: blur(0) brightness(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .lobby-screen .neon-title { animation: none; clip-path: none; filter: none; }
+}
+
+/* ═══ Шаг 4: единый портал для всех модалок ═══
+ * `.jp-overlay`/`.mel-overlay` уходят `createPortal`-ом в `document.body` —
+ * класс темы висит на самом overlay (см. HostScreen.tsx/MelodyRound.tsx),
+ * поэтому селекторы БЕЗ вложенности `.theme-potter .jp-overlay` — сам
+ * overlay уже несёт класс `theme-potter`. `.groups-overlay` — обычный
+ * поток внутри `.host-screen`, поэтому его селектор — с вложенностью.
+ * `.jp-modal`/`.mel-modal` несут класс `.hud-frame`/имеют свои border —
+ * их ::before/::after заняты угловыми скобками HUD (01-base.css) — кольцо
+ * поэтому кладём на ::before самого OVERLAY (свободен), не панели. */
+.theme-potter.jp-overlay::before,
+.theme-potter.mel-overlay::before,
+.theme-potter .groups-overlay::before {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 50%; pointer-events: none; z-index: 1;
+  border: 2px solid var(--mg-brass-bright);
+  box-shadow: 0 0 30px rgba(201,166,104,.65), inset 0 0 22px rgba(201,166,104,.45);
+  animation: mgRingBurst .65s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes mgRingBurst {
+  0%   { opacity: 0; transform: scale(0); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(42); }
+}
+.theme-potter.jp-overlay > .jp-modal,
+.theme-potter.mel-overlay > .mel-modal,
+.theme-potter .groups-overlay > .groups-modal {
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
+  border-color: var(--mg-brass);
+  box-shadow: 0 0 0 1px rgba(201,166,104,.35), 0 0 40px rgba(201,166,104,.25);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter.jp-overlay::before, .theme-potter.mel-overlay::before,
+  .theme-potter .groups-overlay::before { animation: none; opacity: 0; }
+  .theme-potter.jp-overlay > .jp-modal, .theme-potter.mel-overlay > .mel-modal,
+  .theme-potter .groups-overlay > .groups-modal { animation: none; }
+}
+/* Форс-кнопка ScreenFx (✨) — та же вспышка, что классика форсирует у
+   СВОИХ модалок (32-cyber-motion.css): здесь дублируем ровно тот же
+   приём для Magic, на один класс специфичнее reduced-motion блока выше,
+   поэтому побеждает независимо от системной настройки. */
+html.fx-force-motion .theme-potter.jp-overlay::before,
+html.fx-force-motion .theme-potter.mel-overlay::before,
+html.fx-force-motion .theme-potter .groups-overlay::before {
+  animation: mgRingBurst .65s cubic-bezier(.2,.8,.2,1) both; opacity: 0;
+}
+html.fx-force-motion .theme-potter.jp-overlay > .jp-modal,
+html.fx-force-motion .theme-potter.mel-overlay > .mel-modal,
+html.fx-force-motion .theme-potter .groups-overlay > .groups-modal {
+  animation: mgCondense .5s cubic-bezier(.2,.8,.2,1) both;
+}
+
+/* ═══ Шаг 5: заставка раунда — две фазы ═══
+ * `.mg-veil` — прямой ребёнок `.host-screen` (в обоих списках `:not()`,
+ * 14/15), `position:absolute` берёт `.round-intro` за containing block
+ * (там уже `position:relative`, 23-answers.css) и не участвует в его
+ * `display:grid` авто-раскладке — ни `.ri-main`, ни `.cw-layout` не
+ * сдвигаются. Фаза 1 — вспышка света рассеивается (виден заголовок и
+ * номер раунда), фаза 2 — правила проступают (задержка `1.15s` в
+ * тернарке `HostScreen.tsx`, ровно длина `mgVeilLift`). `.round-badge` не
+ * переносился — он и так поверх (z-index 30, 23-answers.css). */
+.theme-potter .mg-veil {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 42%,
+    rgba(255,244,214,.9), rgba(201,166,104,.35) 45%, rgba(10,8,19,0) 75%);
+  animation: mgVeilLift 1.15s cubic-bezier(.3,.7,.25,1) both;
+}
+@keyframes mgVeilLift {
+  0%   { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .mg-veil { animation: none; opacity: 0; }
+}
+
+/* ═══ Шаг 7: разбор ответа — латунь вместо бирюзово-зелёного, три формата ═══
+ * `--answer`/`--ok` уже перекрыты латунью в 33-magic-tokens.css, но
+ * `08-projector.css` красит `.answer-reveal`/`.choice-plate.correct`/
+ * `.choice-img.correct`/`.rebus-hot` ЗАХАРДКОЖЕННЫМ rgba(87,245,192,...)
+ * (не через переменную) — гасим точечно здесь, весом не ниже исходного. */
+.theme-potter .answer-reveal {
+  background: linear-gradient(180deg, rgba(201,166,104,.16), rgba(201,166,104,.05));
+  border-color: rgba(201,166,104,.55);
+  box-shadow: 0 0 34px rgba(201,166,104,.24), inset 0 1px 0 rgba(255,255,255,.12);
+}
+/* `.answer-main` красится через var(--answer) (уже латунь, 33-magic-
+   tokens.css), но text-shadow в 08-projector.css захардкожен зелёным на
+   ГОЛОМ `.answer-main` — задевает и одиночный текстовый ответ (формат 2,
+   .answer-block), не только модалки (.answer-reveal). Гасим для ОБОИХ
+   контекстов одним правилом. */
+.theme-potter .answer-main { text-shadow: 0 0 26px rgba(201,166,104,.45); }
+.theme-potter .rebus-hot { color: var(--mg-brass-bright);
+  text-shadow: 0 0 14px rgba(201,166,104,.6); }
+
+/* ── Формат 1: текстовые варианты (choice-plate) ──
+   Верный — тёплая заливка БЕЗ рамки-акцента (в отличие от classic, где
+   рамка держит неоновый угол) + латунная галочка (SVG, HostScreen.tsx —
+   stroke-dashoffset не дать псевдоэлементу) справа + искры на ::after
+   (свободен: classic использует ::before/::after только у СЕБЯ,
+   `.theme-classic ...`, потолок не общий). Неверные — приглушены
+   насыщенностью и лёгким сдвигом вниз, НЕ display:none (видно, что вариант
+   был, просто отклонён). */
+.theme-potter .choice-plate.correct {
+  border-color: transparent;
+  background: linear-gradient(135deg, rgba(201,166,104,.28), rgba(243,223,168,.14));
+  box-shadow: 0 0 26px rgba(201,166,104,.4), inset 0 0 0 1px rgba(243,223,168,.35);
+  animation: ruleIn .45s ease forwards;
+  padding-right: clamp(46px, 3vw, 64px);
+}
+.theme-potter .choice-plate.correct .mg-check {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--mg-brass-bright);
+  filter: drop-shadow(0 0 6px rgba(243,223,168,.8));
+}
+.theme-potter .choice-plate.correct .mg-check path {
+  stroke-dasharray: 30; stroke-dashoffset: 30;
+  animation: mgCheckDraw .5s ease-out .3s forwards;
+}
+@keyframes mgCheckDraw { to { stroke-dashoffset: 0; } }
+.theme-potter .choice-plate.correct::after {
+  content: ''; position: absolute; right: 42px; top: 50%; width: 6px; height: 6px;
+  border-radius: 50%; pointer-events: none; background: var(--mg-brass-bright);
+  box-shadow: 0 0 8px 2px rgba(243,223,168,.9),
+    -16px -9px 0 -1px rgba(243,223,168,.7), 15px 9px 0 -1px rgba(243,223,168,.6),
+    -11px 11px 0 -2px rgba(243,223,168,.5);
+  animation: mgSparkBurst .6s ease-out .35s both;
+}
+@keyframes mgSparkBurst {
+  0%   { opacity: 0; transform: translateY(-50%) scale(.3); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-50%) scale(1.7); }
+}
+.theme-potter .choice-plate.dimmed {
+  filter: saturate(.25) brightness(.8); transform: translateY(6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .choice-plate.correct { animation: none; }
+  .theme-potter .choice-plate.correct .mg-check path { animation: none; stroke-dashoffset: 0; }
+  .theme-potter .choice-plate.correct::after { animation: none; opacity: 0; }
+}
+
+/* ── Формат 3: варианты-картинки (choice-img) — БЕЗ галочки, только рамка ── */
+.theme-potter .choice-img.correct {
+  border-color: var(--mg-brass-bright);
+  box-shadow: 0 0 0 2px rgba(243,223,168,.5), 0 0 26px rgba(201,166,104,.45);
+  animation: none;
+}
+.theme-potter .choice-img.dimmed {
+  filter: saturate(.25) brightness(.8); transform: translateY(6px);
+}
+
+/* ── мелодия: ряд ставки-победителя — та же латунь, не зелёный ── */
+.theme-potter .mel-bid-row.win {
+  border-color: var(--mg-brass); background: rgba(201,166,104,.14);
+}
+
+/* ═══ Шаг 8: табло — FLIP включён для Magic (был только у classic) ═══
+ * `ScoreboardScreen` (HostScreen.tsx) двигал строки FLIP-переездом только
+ * при `pack.theme === 'classic'` — расширено до `|| 'potter'`. Без
+ * `transition: transform` на `.sb-row` инлайновый transform, который
+ * ставит JS, переключался бы БЕЗ единого кадра движения (та же ловушка,
+ * что нашли для classic — HANDOFF.md). Акцент на переезде — свой (тёплый
+ * блик), не глитч классики: `<tr>` не красим напрямую (border/box-shadow
+ * на нём ненадёжны кросс-браузерно), акцент — на `td`, как у sbRowIn. */
+.theme-potter .host-screen .sb-row {
+  transition: transform .62s cubic-bezier(.2,.9,.3,1.1);
+}
+.theme-potter .host-screen .sb-row.sb-flip > td {
+  transition: box-shadow .4s ease, background-color .4s ease;
+  box-shadow: inset 0 0 14px rgba(201,166,104,.5), inset 0 0 0 1px rgba(243,223,168,.4);
+  background-color: rgba(201,166,104,.14);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .host-screen .sb-row { transition: none; }
+  .theme-potter .host-screen .sb-row.sb-flip > td { transition: none; }
+}
+html.fx-force-motion .theme-potter .host-screen .sb-row.sb-flip > td {
+  box-shadow: inset 0 0 14px rgba(201,166,104,.5), inset 0 0 0 1px rgba(243,223,168,.4);
+  background-color: rgba(201,166,104,.14);
+}
+
+/* Блик лидера — СВОЙ бесконечный цикл (mgSweep), не одноразовый JS-класс
+ * с fill-mode:both: строка лидера видна ВСЁ время между раундами, не один
+ * раз при появлении. На `td`, не на `<tr>` (см. комментарий выше). */
+.theme-potter .score-table tr.leader td { position: relative; overflow: hidden; }
+.theme-potter .score-table tr.leader td::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 40%, rgba(243,223,168,.35) 50%, transparent 60%);
+  animation: mgSweep 3.4s ease-in-out infinite .4s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .score-table tr.leader td::after { animation: none; opacity: 0; }
+}
+
+/* ═══ Шаг 9/12: «Магический круг» — MagicCircleTimer ═══
+ * Тот же контракт размеров, что был у .snake-timer/.snake-num (шапка
+ * вопроса, .mel-count, .sprint-timer) — заменяется в шаге 12. Здесь же —
+ * увеличенный вариант для перерыва/подсчёта (шаг 9): собственных цифр
+ * там не показываем (`.mg-circle-num` скрыт) — секунды сами по себе
+ * (`left`) при пятиминутном отсчёте выглядели бы как «287» рядом с уже
+ * читаемым mm:ss `.break-timer`; кольцо — чисто атмосферный прогресс. */
+.mg-circle-timer { position: relative; width: clamp(140px, 12.5vw, 200px);
+  aspect-ratio: 1; display: grid; place-items: center; flex: 0 0 auto; }
+.mg-circle-timer svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.mg-circle-num { position: relative; z-index: 2; line-height: 1;
+  font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--mg-brass-bright); font-size: clamp(34px, 3.6vw, 58px);
+  text-shadow: 0 0 18px rgba(201,166,104,.55); }
+.mg-circle-num.danger { color: var(--mg-ember); text-shadow: 0 0 22px rgba(255,143,106,.7);
+  animation: pulse .85s ease-in-out infinite; }
+.mg-rune.fading { animation: mgRuneFlicker .6s ease-in-out infinite; }
+@keyframes mgRuneFlicker { 0%, 100% { opacity: .18; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .mg-circle-num.danger { animation: none; }
+  .mg-rune.fading { animation: none; opacity: .6; }
+}
+.mel-count .mg-circle-timer { width: clamp(84px, 7vw, 112px); }
+.mel-count .mg-circle-num { font-size: clamp(24px, 2.4vw, 38px); }
+.sprint-timer .mg-circle-timer { width: clamp(190px, 19vw, 280px); }
+.sprint-timer:has(.mg-circle-timer) { transform: none; }
+/* перерыв/подсчёт — крупный, без своих цифр (см. комментарий выше) */
+.break-screen .mg-circle-timer { width: clamp(220px, 18vw, 300px); margin-bottom: clamp(4px, 1vh, 12px); }
+.break-screen .mg-circle-timer .mg-circle-num { display: none; }
+
+/* ═══ Шаг 10: блиц ═══
+ * Атмосфера/дымка — уже общая: `.mg-scene` рендерится сиблингом
+ * `.host-screen` на ЛЮБОМ экране проектора (ThemeLayer), блиц её получает
+ * бесплатно. Здесь — латунное стекло вместо голого `color-mix` панелей,
+ * крупнее рамка+текст вопроса и заметно крупнее панель ходящей команды
+ * (масштаб, не только цвет). `--tc` (цвет команды) НЕ трогаем — реальные
+ * данные о ходе, не декор. `13-round-race.css` (`.race-*`, `.bz-*` базовые
+ * правила) НЕ трогаем — здесь только добавочные `.theme-potter` overrides. */
+.theme-potter .bz-block {
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    color-mix(in srgb, var(--tc, #888) 8%, transparent);
+  border-color: color-mix(in srgb, var(--tc, var(--mg-brass)) 45%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(201,166,104,.12);
+}
+.theme-potter .bz-block.on {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 55%, transparent),
+    0 0 46px color-mix(in srgb, var(--tc) 50%, transparent),
+    inset 0 0 0 1px rgba(243,223,168,.25);
+  z-index: 2;
+}
+.theme-potter .bz-question {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.014)),
+    color-mix(in srgb, var(--tc, var(--accent)) 7%, transparent);
+  border-color: color-mix(in srgb, var(--tc, var(--mg-brass)) 55%, transparent);
+  padding: clamp(18px, 2.8vh, 40px) clamp(22px, 2.6vw, 52px);
+  min-height: clamp(130px, 18vh, 220px);
+}
+.theme-potter .bz-qtext { font-size: clamp(26px, 3.6vw, 72px); }
+.theme-potter .bz-name { color: var(--tc, var(--mg-brass-bright)); }
+
+/* ═══ Шаг 11: маркер-огонёк на барабане мелодии ═══
+ * `.mel-board` уже `position: relative` (общий список тем в
+ * 14-theme-potter.css) — маркер позиционируется абсолютно внутри него,
+ * координаты считает `useLayoutEffect` в `MelodyRound.tsx` (центр
+ * текущей «горячей» плитки). Сам перелёт — CSS `transition: transform`,
+ * не JS-анимация кадр за кадром: дешевле и не спорит с частотой опроса. */
+.theme-potter .mg-wisp.mel-marker {
+  position: absolute; left: 0; top: 0; width: 34px; height: 34px;
+  margin: -17px 0 0 -17px; z-index: 5; pointer-events: none;
+  border-radius: 50%;
+  transition: transform .22s cubic-bezier(.3,.7,.3,1);
+  background: radial-gradient(circle at 35% 30%, #fff6df, var(--mg-brass-bright) 45%, var(--mg-brass) 80%);
+  box-shadow: 0 0 18px rgba(243,223,168,.9), 0 0 34px rgba(201,166,104,.6);
+}
+/* афтеримидж-след — размытый ореол позади, пульсирует на месте, реального
+   "хвоста" за траекторией не рисует (для этого нужен был бы JS-трейл из
+   нескольких узлов), но вместе с transition-перелётом читается как полёт. */
+.theme-potter .mg-wisp.mel-marker::after {
+  content: ''; position: absolute; inset: -70%; border-radius: 50%; z-index: -1;
+  background: radial-gradient(circle, rgba(243,223,168,.4), transparent 70%);
+  filter: blur(2px);
+  animation: mgWispFlicker 1s ease-in-out infinite;
+}
+/* вспышка в последнюю секунду барабана — трек вот-вот определится */
+.theme-potter .mg-wisp.mel-marker.flare {
+  animation: mgFlarePulse .5s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-potter .mg-wisp.mel-marker { transition: none; }
+  .theme-potter .mg-wisp.mel-marker::after { animation: none; opacity: .5; }
+  .theme-potter .mg-wisp.mel-marker.flare { animation: none; }
+}
