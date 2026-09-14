@@ -32,37 +32,24 @@ const pack = (rounds: unknown[]): LoadedPack => ({
 } as LoadedPack)
 
 describe('buildSlidePlan', () => {
-  it('раунд с пропускаемой механикой даёт ровно один слайд-заглушку', () => {
+  it('раунд с пропускаемой механикой не даёт НИ ОДНОГО слайда — как будто его нет', () => {
     const p = pack([round({ mechanic: 'jeopardy', title_lines: ['СВОЯ ИГРА'], questions: [q(), q({ id: 'q2' })] })])
     const plan = buildSlidePlan(p)
-    // титул + 1 заглушка
-    expect(plan.slides).toHaveLength(2)
-    expect(plan.slides[1]).toMatchObject({ kind: 'skip', heading: 'СВОЯ ИГРА' })
-    expect(plan.slides[1].body).toContain('пропускаем')
+    // только титульный слайд — раунд целиком пропущен, финала тоже нет (не
+    // было ни одного показанного раунда)
+    expect(plan.slides).toHaveLength(1)
+    expect(plan.slides.every(s => s.heading !== 'СВОЯ ИГРА')).toBe(true)
   })
 
-  it('все четыре пропускаемые механики дают заглушку', () => {
+  it('все четыре пропускаемые механики дают ноль слайдов на раунд', () => {
     for (const mechanic of ['jeopardy', 'melody', 'race', 'blitz']) {
-      const p = pack([round({ mechanic })])
+      const p = pack([round({ mechanic }), round({ id: 'r2', mechanic: 'standard', questions: [] })])
       const plan = buildSlidePlan(p)
-      expect(plan.slides[1].kind).toBe('skip')
+      // титул + round_intro второго раунда (без вопросов) + финал — от
+      // пропущенного раунда НИ ОДНОГО слайда
+      expect(plan.slides.some(s => s.kind === 'round_intro')).toBe(true)
+      expect(plan.slides).toHaveLength(3)
     }
-  })
-
-  it('включённая механика: заголовок раунда + вопрос/ответ на каждый не-hidden вопрос', () => {
-    const p = pack([round({
-      mechanic: 'standard',
-      questions: [q({ id: 'a' }), q({ id: 'b', hidden: true }), q({ id: 'c' })],
-    })])
-    const plan = buildSlidePlan(p)
-    // титул + заголовок раунда + (вопрос+ответ) × 2 не-hidden вопроса
-    expect(plan.slides).toHaveLength(1 + 1 + 2 * 2)
-    expect(plan.slides[1]).toMatchObject({ kind: 'round_title', heading: 'РАУНД 1' })
-    expect(plan.slides[1].lines).toEqual(['правило раз', 'правило два'])
-    expect(plan.slides[2].kind).toBe('question')
-    expect(plan.slides[3].kind).toBe('answer')
-    expect(plan.slides[4].kind).toBe('question')
-    expect(plan.slides[5].kind).toBe('answer')
   })
 
   it('порядок раундов соответствует position (порядок pack.rounds)', () => {
@@ -71,7 +58,7 @@ describe('buildSlidePlan', () => {
       round({ id: 'r2', title_lines: ['ВТОРОЙ'], questions: [] }),
     ])
     const plan = buildSlidePlan(p)
-    const headings = plan.slides.filter(s => s.kind === 'round_title').map(s => s.heading)
+    const headings = plan.slides.filter(s => s.kind === 'round_intro').map(s => s.heading)
     expect(headings).toEqual(['ПЕРВЫЙ', 'ВТОРОЙ'])
   })
 
@@ -81,7 +68,159 @@ describe('buildSlidePlan', () => {
     expect(plan.slides[0].lines?.join(' ')).toContain('без сети и без приложения')
   })
 
-  describe('содержание слайда ответа по режиму AnswerSpec', () => {
+  it('финальный слайд появляется, только если был хотя бы один непропущенный раунд', () => {
+    const withRound = buildSlidePlan(pack([round({ questions: [] })]))
+    expect(withRound.slides[withRound.slides.length - 1]).toMatchObject({ kind: 'title', heading: 'ФИНАЛ' })
+
+    const onlySkipped = buildSlidePlan(pack([round({ mechanic: 'blitz' })]))
+    expect(onlySkipped.slides.some(s => s.heading === 'ФИНАЛ')).toBe(false)
+  })
+
+  describe('порядок вопрос/ответ по answers_reveal (главный сценарий)', () => {
+    it('after_question: интерливинг Q1,A1,Q2,A2 — ровно как решает HostScreen кнопкой "Показать ответ"', () => {
+      const p = pack([round({
+        answers_reveal: 'after_question',
+        questions: [q({ id: 'a' }), q({ id: 'b' })],
+      })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).toEqual(['title', 'round_intro', 'question', 'answer', 'question', 'answer', 'title'])
+    })
+
+    it('after_round: сначала ВСЕ вопросы, потом отдельным блоком ВСЕ ответы — не question→answer→question→answer', () => {
+      const p = pack([round({
+        answers_reveal: 'after_round',
+        questions: [q({ id: 'a' }), q({ id: 'b' }), q({ id: 'c' })],
+      })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).toEqual([
+        'title', 'round_intro',
+        'question', 'question', 'question',
+        'answer_time',
+        'answer', 'answer', 'answer',
+        'title',
+      ])
+    })
+
+    it('after_round + recap_before_answers: вопросы ещё раз слайдами ПЕРЕД answer_time', () => {
+      const p = pack([round({
+        answers_reveal: 'after_round',
+        settings: { recap_before_answers: true },
+        questions: [q({ id: 'a' }), q({ id: 'b' })],
+      })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).toEqual([
+        'title', 'round_intro',
+        'question', 'question',
+        'recap', 'recap',
+        'answer_time',
+        'answer', 'answer',
+        'title',
+      ])
+    })
+
+    it('never: только вопросы, ответы на экране не появляются вообще', () => {
+      const p = pack([round({
+        answers_reveal: 'never',
+        questions: [q({ id: 'a' }), q({ id: 'b' })],
+      })])
+      const slides = buildSlidePlan(p).slides
+      expect(slides.map(s => s.kind)).toEqual(['title', 'round_intro', 'question', 'question', 'title'])
+      expect(slides.some(s => s.kind === 'answer' || s.kind === 'answer_time')).toBe(false)
+    })
+
+    it('never: верный ответ уходит в заметки последнего слайда раунда, не на сам слайд', () => {
+      const p = pack([round({
+        answers_reveal: 'never',
+        questions: [q({ id: 'a', answer: { mode: 'free_text', correct: 'да', display: 'Да, конечно' } })],
+      })])
+      const slides = buildSlidePlan(p).slides
+      const lastQuestionSlide = slides.filter(s => s.kind === 'question').at(-1)!
+      expect(lastQuestionSlide.body).toBe('Вопрос?')
+      expect(lastQuestionSlide.notes).toContain('Да, конечно')
+    })
+  })
+
+  describe('табло/перерыв после раунда', () => {
+    it('show_scoreboard_after добавляет слайд scoreboard без реальных цифр', () => {
+      const p = pack([round({ settings: { show_scoreboard_after: true }, questions: [] })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).toEqual(['title', 'round_intro', 'scoreboard', 'title'])
+    })
+
+    it('break_after_minutes добавляет слайд break с числом минут в теле', () => {
+      const p = pack([round({ settings: { break_after_minutes: 15 }, questions: [] })])
+      const plan = buildSlidePlan(p)
+      const breakSlide = plan.slides.find(s => s.kind === 'break')!
+      expect(breakSlide.body).toContain('15')
+    })
+
+    it('оба флага вместе идут табло, потом перерыв', () => {
+      const p = pack([round({
+        settings: { show_scoreboard_after: true, break_after_minutes: 10 }, questions: [],
+      })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).toEqual(['title', 'round_intro', 'scoreboard', 'break', 'title'])
+    })
+
+    it('без галочек — ни scoreboard, ни break', () => {
+      const p = pack([round({ questions: [] })])
+      const kinds = buildSlidePlan(p).slides.map(s => s.kind)
+      expect(kinds).not.toContain('scoreboard')
+      expect(kinds).not.toContain('break')
+    })
+  })
+
+  describe('содержание слайда ВОПРОСА — варианты видны ДО раскрытия, как в игре', () => {
+    const questionPlan = (answer: AnswerSpec) => {
+      const p = pack([round({ mechanic: 'standard', questions: [q({ answer })] })])
+      return buildSlidePlan(p).slides.find(s => s.kind === 'question')!
+    }
+
+    it('choice → плитки без пометки верного', () => {
+      const s = questionPlan({
+        mode: 'choice',
+        choices: [{ key: 'А', text: 'Кошка' }, { key: 'Б', text: 'Собака' }],
+        correct_choice: 'Б', display: 'Собака',
+      })
+      expect(s.choices).toEqual([{ key: 'А', text: 'Кошка' }, { key: 'Б', text: 'Собака' }])
+      expect(s.choices?.every(c => !c.correct)).toBe(true)
+    })
+
+    it('order → плитки в ИСХОДНОМ (не отсортированном) порядке, без пометки', () => {
+      const s = questionPlan({
+        mode: 'order',
+        choices: [{ key: 'А', text: 'Первое' }, { key: 'Б', text: 'Второе' }],
+        correct_order: 'БА', display: ['Второе', 'Первое'],
+      })
+      expect(s.choices).toEqual([{ key: 'А', text: 'Первое' }, { key: 'Б', text: 'Второе' }])
+    })
+
+    it('match с right_labels → список целей на слайде вопроса', () => {
+      const s = questionPlan({
+        mode: 'match',
+        left: ['Пушкин', 'Толстой'], right: ['1', '2'],
+        right_labels: ['Евгений Онегин', 'Война и мир'],
+        correct_pairs: ['Пушкин1', 'Толстой2'], display: '',
+      })
+      expect(s.choices).toEqual([{ key: '1', text: 'Евгений Онегин' }, { key: '2', text: 'Война и мир' }])
+    })
+
+    it('match без right_labels → целей на вопросе нет', () => {
+      const s = questionPlan({
+        mode: 'match', left: ['Пушкин'], right: ['1'],
+        correct_pairs: ['Пушкин1'], display: '',
+      })
+      expect(s.choices).toBeUndefined()
+    })
+
+    it('free_text/none/crossword_word → на вопросе только текст, без плиток', () => {
+      expect(questionPlan({ mode: 'free_text', correct: 'да', display: 'да' }).choices).toBeUndefined()
+      expect(questionPlan({ mode: 'none', display: 'на усмотрение' }).choices).toBeUndefined()
+      expect(questionPlan({ mode: 'crossword_word', word: 'СЛОВО' }).choices).toBeUndefined()
+    })
+  })
+
+  describe('содержание слайда ОТВЕТА по режиму AnswerSpec', () => {
     const answerPlan = (answer: AnswerSpec) => {
       const p = pack([round({ mechanic: 'standard', questions: [q({ answer })] })])
       return buildSlidePlan(p).slides.find(s => s.kind === 'answer')!
@@ -97,22 +236,28 @@ describe('buildSlidePlan', () => {
       expect(s.body).toBe('Да / Ага')
     })
 
-    it('choice → список вариантов, верный помечен', () => {
+    it('choice → те же плитки, что на вопросе, верная помечена', () => {
       const s = answerPlan({
         mode: 'choice',
         choices: [{ key: 'А', text: 'Кошка' }, { key: 'Б', text: 'Собака' }],
         correct_choice: 'Б', display: 'Собака',
       })
-      expect(s.lines).toEqual(['А) Кошка', '✔ Б) Собака'])
+      expect(s.choices).toEqual([
+        { key: 'А', text: 'Кошка', correct: false },
+        { key: 'Б', text: 'Собака', correct: true },
+      ])
     })
 
-    it('order → буквы сопоставлены с текстом варианта по correct_order', () => {
+    it('order → плитки в ПРАВИЛЬНОМ порядке, все помечены (порядок и есть ответ)', () => {
       const s = answerPlan({
         mode: 'order',
         choices: [{ key: 'А', text: 'Первое' }, { key: 'Б', text: 'Второе' }],
         correct_order: 'БА', display: ['Второе', 'Первое'],
       })
-      expect(s.lines).toEqual(['Б → Второе', 'А → Первое'])
+      expect(s.choices).toEqual([
+        { key: '1', text: 'Второе', correct: true },
+        { key: '2', text: 'Первое', correct: true },
+      ])
     })
 
     it('match → correct_pairs сопоставлены с left/right_labels', () => {
@@ -166,9 +311,11 @@ describe('buildSlidePlan', () => {
       expect(buildSlidePlan(p).mediaPaths).toEqual([])
     })
 
-    it('без дублей, если один и тот же путь встречается дважды', () => {
+    it('без дублей, если один и тот же путь встречается дважды (в т.ч. на recap)', () => {
       const p = pack([round({
         mechanic: 'standard',
+        answers_reveal: 'after_round',
+        settings: { recap_before_answers: true },
         questions: [
           q({ id: 'a', media: { question: ['shared.jpg'], answer: [] } }),
           q({ id: 'b', media: { question: ['shared.jpg'], answer: [] } }),
