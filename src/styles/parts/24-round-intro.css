@@ -92,6 +92,59 @@
   overflow: hidden; }
 .rules-frame .rule-item .idx { font-size: .7em; flex: 0 0 auto; }
 
+/* ═══ п.14: хореография заставки раунда — по мокапу, а не «всё сразу» ═══
+   До этого шага номер/заголовок/правила рендерились сразу в конечных
+   позициях — ни разу не «заставка» с точки зрения ведущего: обещали, что
+   сначала крупно по центру видны номер и название, ПОТОМ они уезжают на
+   свои места (левый угол / левая колонка), и только тогда справа
+   проступают правила. Раньше анимации перехода не было вовсе.
+
+   Реализовано БЕЗ JS-состояния и БЕЗ изменения самой сетки (`.round-intro`
+   остаётся тем же грид из 23-answers.css: колонка заголовка + колонка
+   правил, .round-badge — тот же absolute в углу) — иначe пришлось бы
+   городить отдельный компонент с useEffect/таймером ради чистой
+   анимации входа, а таких же эффектов (переход «маленький кликнутый
+   элемент → модалка на весь экран», qtGrowFromTile в 37-tile-card.css)
+   в проекте уже хватает и без нового состояния. Вместо этого — обычный
+   CSS-приём: элемент СРАЗУ стоит на своём финальном месте в разметке,
+   но входная анимация стартует с укрупнённого/смещённого `transform`
+   и оседает в `transform: none` — визуально читается как «прилетело и
+   осело», хотя физически элемент никуда не перемещался в DOM/гриде.
+   Пока `.rules-frame` невидима (opacity 0 первые ~0.85s), заголовок
+   визуально «один на экране», и укрупнение при входе читается как «было
+   крупно по центру, теперь ушло в свой размер и место» — ровно то, что
+   просили. */
+.round-intro .round-badge { transform-origin: left top;
+  animation: riBadgeSettle .9s cubic-bezier(.22,.75,.24,1) both; }
+@keyframes riBadgeSettle {
+  0% { opacity: 0; transform: translate(34vw, 26vh) scale(1.9); }
+  42% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+.round-intro > .ri-main {
+  animation: riTitleSettle 1s cubic-bezier(.22,.75,.24,1) both; }
+@keyframes riTitleSettle {
+  0% { opacity: 0; transform: scale(1.32) translateY(-3vh); }
+  45% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+/* Правила выезжают справа ПОСЛЕ того, как номер/заголовок осели (задержка
+   .85s — чуть раньше, чем заканчивается riTitleSettle/riBadgeSettle, чтобы
+   не было паузы-провисания между фазами). Собственный построчный стаггер
+   `.rule-item` (инлайн-стиль в HostScreen.tsx, там же дифференцированные
+   задержки по темам) не трогаем — он продолжает исполняться поверх, просто
+   теперь стартует от видимой панели, а не от невидимой. */
+.round-intro > .rules-frame {
+  animation: riRulesIn .6s cubic-bezier(.2,.8,.3,1) .85s both; }
+@keyframes riRulesIn {
+  0% { opacity: 0; transform: translateX(48px); }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .round-intro .round-badge, .round-intro > .ri-main, .round-intro > .rules-frame {
+    animation: none; opacity: 1; transform: none; }
+}
+
 /* подпись слога — ПОД своей картинкой, отдельной строкой грида */
 .answer-block .rebus-answer figcaption { position: static; white-space: nowrap;
   font-size: clamp(18px, 2vw, 34px); text-align: center; }

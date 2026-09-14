@@ -1,46 +1,57 @@
-// ═══ «Магический круг» — таймер темы Magic ═══
-// Восемь абстрактных рун по кругу гаснут по часовой стрелке по мере того,
-// как истекает время (left/seconds), последняя мерцает перед нулём.
-// Никакой франшизной символики — только отвлечённые метки-«деления».
-// Сигнатура — та же, что у SnakeTimer (left/seconds/low), чтобы подключаться
-// на любое место без переделки вызывающего кода.
-const RUNES = 8
+// ═══ «Магический круг» — таймер темы Magic (шаг 15: комета по орбите) ═══
+// Было: 8 рун гасли по кругу статичными скачками opacity — ни одна не
+// двигалась сама по себе, пока не истекали последние секунды (см. HANDOFF
+// §3bl). Ведущий в живой игре назвал это «безжизненно». Теперь по кольцу
+// мерцают звёзды-метки (крутятся всегда, независимо от отсчёта — «жизнь»
+// не завязана на секунды), а «комета» с хвостом из тающих точек облетает
+// круг ровно за отведённое время и гасит звёзды на своём пути — прогресс
+// читается и по положению кометы, и по числу погасших звёзд одновременно.
+// Никакой франшизной символики — только отвлечённые звёзды и свет.
+// Сигнатура — та же, что была у прежней версии/у SnakeTimer (left/seconds/
+// low), подключается на любое место без переделки вызывающего кода.
+const STARS = 16
+const TRAIL = 6
 
 export function MagicCircleTimer({ left, seconds, low }: {
   left: number; seconds: number; low: boolean
 }) {
   const total = Math.max(1, seconds)
   const elapsed = Math.max(0, Math.min(1, 1 - left / total))
-  const C = 100, R1 = 60, R2 = 78
-  const marks = Array.from({ length: RUNES }, (_, i) => {
-    const from = i / RUNES, to = (i + 1) / RUNES
-    if (elapsed <= from) return 1
-    if (elapsed >= to) return 0
-    return 1 - (elapsed - from) / (to - from)
-  })
-  // руна, которая ГАСНЕТ прямо сейчас (частично лита) — та, что мерцает
-  // в последние секунды, а не случайная
-  const fadingIndex = marks.findIndex(l => l > 0 && l < 1)
+  const angle = elapsed * 360
+  const C = 100, R = 78
+  const pos = (deg: number) => {
+    const rad = (deg - 90) * Math.PI / 180
+    return { x: C + R * Math.cos(rad), y: C + R * Math.sin(rad) }
+  }
   return (
     <div className={`mg-circle-timer${low ? ' low' : ''}`}>
+      <div className="mg-circle-glow" aria-hidden />
       <svg viewBox="0 0 200 200" aria-hidden>
-        <circle cx={C} cy={C} r={(R1 + R2) / 2} fill="none"
+        <circle cx={C} cy={C} r={R} fill="none"
           stroke="rgba(201,166,104,.22)" strokeWidth="1" strokeDasharray="2 7" />
-        {marks.map((lit, i) => {
-          const angle = (-90 + i * (360 / RUNES)) * (Math.PI / 180)
-          const x1 = C + R1 * Math.cos(angle), y1 = C + R1 * Math.sin(angle)
-          const x2 = C + R2 * Math.cos(angle), y2 = C + R2 * Math.sin(angle)
-          const dx = C + (R2 + 10) * Math.cos(angle), dy = C + (R2 + 10) * Math.sin(angle)
-          const isFading = low && i === fadingIndex
+        {Array.from({ length: STARS }, (_, i) => {
+          const a = i * (360 / STARS)
+          const { x, y } = pos(a)
+          // погасла, если комета уже прошла этот угол
+          const dim = a < angle - 0.01
           return (
-            <g key={i} className={`mg-rune${isFading ? ' fading' : ''}`}
-              style={{ opacity: Math.max(lit, 0.14) }}>
-              <line x1={x1} y1={y1} x2={x2} y2={y2} strokeLinecap="round" strokeWidth="4"
-                stroke={lit > 0 ? '#f3dfa8' : '#544a38'} />
-              <circle cx={dx} cy={dy} r="4" fill={lit > 0 ? '#f3dfa8' : '#544a38'} />
-            </g>
+            <circle key={i} cx={x} cy={y} r={dim ? 1.5 : 2.6}
+              className={`mg-star${dim ? ' dim' : ''}`}
+              style={{ animationDelay: `${-(a / 360) * 2.6}s` }} />
           )
         })}
+        <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: '100px 100px' }}>
+          {Array.from({ length: TRAIL }, (_, i) => {
+            const { x, y } = pos(-i * 5.5)
+            const t = i / TRAIL
+            return (
+              <circle key={i} cx={x} cy={y}
+                r={i === 0 ? 4.4 : Math.max(0.6, 3.4 * (1 - t))}
+                className={i === 0 ? 'mg-comet-head' : 'mg-comet-tail'}
+                style={{ opacity: i === 0 ? 1 : Math.max(0.06, 0.55 * (1 - t)) }} />
+            )
+          })}
+        </g>
       </svg>
       <span className={`mg-circle-num${low ? ' danger' : ''}`}>{left}</span>
     </div>
