@@ -40,6 +40,13 @@ export function questionFields(mech: MechanicKey): QuestionFields {
     fixedMode: true, questionMedia: true, voice: true,
     mediaLabel: 'Медиа вопроса (до 4)', mediaMax: 4,
   }
+  // «3 попытки»: ответ всегда слово в сетку (как у кроссворда — переиспользуем
+  // тот же режим, отдельный AnswerSpec не заводим), картинок 2–4, озвучки нет
+  // (вопрос — это сами картинки, ведущий не читает вслух отдельный текст).
+  if (mech === 'four_pics') return {
+    fixedMode: true, questionMedia: true, voice: false,
+    mediaLabel: 'Картинки (2–4, порядок = порядок показа)', mediaMax: 4,
+  }
   return {
     fixedMode: false, questionMedia: true, voice: true,
     mediaLabel: 'Медиа вопроса (до 4)', mediaMax: 4,

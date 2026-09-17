@@ -76,6 +76,20 @@ describe('buildSlidePlan', () => {
     expect(onlySkipped.slides.some(s => s.heading === 'ФИНАЛ')).toBe(false)
   })
 
+  it('four_pics НЕ пропускается: даёт слайды вопроса и ответа как обычный раунд', () => {
+    const p = pack([round({
+      mechanic: 'four_pics', title_lines: ['3 ПОПЫТКИ'],
+      questions: [q({ answer: { mode: 'crossword_word', word: 'СЛОВО' },
+        media: { question: ['a.jpg', 'b.jpg'], answer: [] } })],
+    })])
+    const plan = buildSlidePlan(p)
+    const kinds = plan.slides.map(s => s.kind)
+    expect(kinds).toContain('question')
+    expect(kinds).toContain('answer')
+    const answer = plan.slides.find(s => s.kind === 'answer')
+    expect(answer?.body).toBe('СЛОВО')
+  })
+
   describe('порядок вопрос/ответ по answers_reveal (главный сценарий)', () => {
     it('after_question: интерливинг Q1,A1,Q2,A2 — ровно как решает HostScreen кнопкой "Показать ответ"', () => {
       const p = pack([round({

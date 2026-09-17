@@ -44,6 +44,10 @@ export function metaLine(round: LoadedRound): string {
     const tiles = themes.reduce((s, t) => s + t.tiles.length, 0)
     return `${themes.length} ТЕМ · ${tiles} ПЛИТОК · ЦЕНА = БАЛЛЫ`
   }
+  if (round.mechanic === 'four_pics') {
+    const n = round.questions.filter(q => !q.hidden).length
+    return `${n} ВОПРОСОВ · 4 КАРТИНКИ · 2 / 1 / 0.5 БАЛЛА`
+  }
   if (round.mechanic === 'sprint') {
     const s = round.settings as { pointsPerQuestion?: number; allCorrectBonus?: number }
     const n = round.questions.filter(q => !q.hidden).length

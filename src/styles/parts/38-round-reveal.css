@@ -1,0 +1,71 @@
+/* ═══ «3 ПОПЫТКИ»: 2–4 картинки → слово (RevealRound.tsx) ═══
+   Импортирован ПОСЛЕДНИМ в global.css — специфичность селекторов ниже
+   намеренно завышена (4 класса) там, где нужно перебить общие правила
+   `.host-screen.has-media > .q-media-grid` из 22-question.css (тоже прямой
+   потомок с тем же классом) — полагаться на порядок файлов рискованно
+   (см. CLAUDE.md: «вес селектора решает больше, чем порядок файла»). */
+
+/* У этого экрана нет .q-text (текст вопроса — сами картинки), поэтому
+   сетка становится ПЕРВЫМ flex-элементом сразу после padding-top хоста.
+   На классике/киберпанке padding-top (168px, 22-question.css) рассчитан
+   впритык под кольцо таймера — буфер до сих пор давал .q-text своим
+   margin-block:auto, здесь его нет, и без собственного отступа сетка
+   на 1920+ заезжала под таймер (проверено рендером, ~9px нахлёста).
+   Вес 4 класса — сознательно выше `.host-screen.has-media > .q-media-grid`
+   (3 класса, margin-top:0) из 22-question.css. */
+.host-screen.rv-screen.has-media > .q-media-grid { margin-top: clamp(10px, 2.5vh, 40px); }
+
+/* сетка 2×2 для фазы 3 при 4 картинках — сама сетка (display/шаблон), а
+   высоту/потолок оставляем общему правилу вопроса (22-question.css) */
+.host-screen.has-media > .q-media-grid.rv-2x2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(10px, 1.2vw, 22px);
+  align-items: stretch; justify-items: stretch;
+}
+.host-screen.has-media > .q-media-grid.rv-2x2 .q-img {
+  min-width: 0; min-height: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+}
+.host-screen.has-media > .q-media-grid.rv-2x2 .q-img img {
+  width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain;
+}
+
+/* слово-загадка: буквы группами (пробел между словами ответа) */
+.rv-word-wrap {
+  flex: 0 0 auto; width: 100%; overflow: hidden;
+  height: clamp(64px, 12vh, 190px);
+  display: flex; align-items: center; justify-content: center;
+}
+.rv-word {
+  display: flex; gap: 1.4em;
+  font-size: clamp(28px, 6vw, 150px);
+  font-family: var(--font-display); line-height: 1;
+}
+.rv-group { display: flex; gap: .22em; }
+.rv-cell {
+  width: 1.1em; height: 1.35em; display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--dim); border-radius: .12em; background: var(--bg2); color: var(--muted);
+}
+.rv-cell.open {
+  border-color: var(--accent); color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* разбор ответа */
+.rv-review {
+  display: flex; flex-direction: row; align-items: baseline;
+  gap: clamp(14px, 2vw, 40px);
+  flex: 0 0 auto; width: min(94%, 1600px); margin-inline: auto;
+}
+.rv-answer { color: var(--accent); font-size: clamp(26px, 3.2vw, 72px); font-family: var(--font-display); }
+.rv-note { color: var(--fg); opacity: .8; font-size: clamp(15px, 1.5vw, 30px); flex: 1 1 auto; min-width: 0; }
+.rv-teams {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  font-family: var(--font-mono); font-size: 14px; color: var(--muted); margin-top: 10px;
+}
+
+@media (max-width: 1100px) {
+  .rv-review { flex-direction: column; }
+}

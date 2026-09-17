@@ -49,6 +49,10 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
 
   const isJeopardy = round.mechanic === 'jeopardy'
   const isBlitz = round.mechanic === 'blitz'
+  // «3 попытки»: свой таймер по фазам (RevealEditor ниже), общий «Таймер на
+  // вопрос»/показ ответов/правки/фоновая музыка вопросов ему не нужны —
+  // тот же приём, что уже исключает эти поля у блица.
+  const isFourPics = round.mechanic === 'four_pics'
   // в этих механиках контент задаётся не вопросами, а темами/треками
   const noQuestions = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
 
@@ -125,7 +129,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         {/* Остальным полям блиц не нужен: у него свой таймер на КОМАНДУ,
             свои три попытки и своя очередь ходов. Раньше они показывались
             и путали — на сам раунд не влияли, но выглядели как настройки. */}
-        {!noQuestions && !isBlitz && <>
+        {!noQuestions && !isBlitz && !isFourPics && <>
           <div className="ed-field"><label>Таймер на вопрос</label>
             <NumField
               value={round.timer_seconds}
@@ -210,7 +214,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </div>
         )}
 
-        {!isBlitz && <div className="ed-field"><label>Перед ответами</label>
+        {!isBlitz && !isFourPics && <div className="ed-field"><label>Перед ответами</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
               checked={!!(round.settings as { recap_before_answers?: boolean }).recap_before_answers}
@@ -255,6 +259,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <MelodyEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'race' &&
         <RaceEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
+      {round.mechanic === 'four_pics' &&
+        <RevealEditor round={round} locked={locked} onChanged={onChanged} />}
 
       {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}
@@ -582,6 +588,39 @@ function SprintEditor({ round, locked, onChanged }: {
       </div>
       <div className="ed-hint">Время раунда — поле «Таймер» выше. Вопросы добавляй ниже как обычно;
         все они показываются на одном слайде, разбор идёт по одному.</div>
+    </div>
+  )
+}
+
+// ── «3 попытки»: тайминги фаз (контент — обычные вопросы ниже) ──
+function RevealEditor({ round, locked, onChanged }: {
+  round: LoadedRound; locked: boolean; onChanged: () => void
+}) {
+  const s = round.settings as { p1Sec?: number; p2Sec?: number; p3Sec?: number; shortSec?: number }
+  const set = (patch: Record<string, number>) =>
+    void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
+  return (
+    <div className="ed-card"><h4>«3 попытки»</h4>
+      <div className="ed-grid2">
+        <div className="ed-field"><label>Фаза 1 (2 картинки), сек</label>
+          <NumField value={s.p1Sec ?? 30} min={5} max={120} disabled={locked}
+            onCommit={v => set({ p1Sec: v })} /></div>
+        <div className="ed-field"><label>Фаза 2 (3 картинки), сек</label>
+          <NumField value={s.p2Sec ?? 20} min={5} max={120} disabled={locked}
+            onCommit={v => set({ p2Sec: v })} /></div>
+        <div className="ed-field"><label>Фаза 3 (4 картинки), сек</label>
+          <NumField value={s.p3Sec ?? 10} min={5} max={120} disabled={locked}
+            onCommit={v => set({ p3Sec: v })} /></div>
+        <div className="ed-field"><label>Укороченная фаза, сек</label>
+          <NumField value={s.shortSec ?? 10} min={3} max={60} disabled={locked}
+            onCommit={v => set({ shortSec: v })} /></div>
+      </div>
+      <div className="ed-hint">
+        Если все команды успели ответить ещё на фазе 1, фазы 2 и 3 идут по
+        укороченному времени — ждать полный таймер незачем. Вопросы — как
+        обычно ниже: слово ответа задаёт кроссвордный тип, картинки (2–4)
+        показываются по нарастающей.
+      </div>
     </div>
   )
 }

@@ -5923,6 +5923,127 @@ cue-слайдах — поправлено, перепроверено). Сам
 `tsc --noEmit`/`eslint .`(0/32)/`vitest run`(458/47)/`vite build` —
 зелёные. Версия 9.43 → 9.44.
 
+### 3bn. Новая механика «3 попытки» (`four_pics`) — 2–4 картинки → слово
+
+Раунд из мокапов ведущего: 2 картинки на фазе 1 (верно → 2 балла), ещё
+одна открывается на фазе 2 (→ 1 балл), четвёртая на фазе 3 (→ 0.5 балла),
+затем разбор со всеми буквами открытыми. Реализован прямым клоном
+архитектуры мелодии — не системная фаза, а стадии ВНУТРИ обычной фазы
+`question`, чистые переходы отдельным модулем, состояние в общем
+jsonb-мешке `game_sessions.melody`.
+
+**Где что живёт:**
+- `types/quiz.ts`: `MechanicKey` +`'four_pics'`; `RevealState` (`qid`,
+  `phase: 1|2|3|'review'`, `startedAt`+`phaseSec` — НЕ `deadline`, тот же
+  формат, что уже понимает `Timer` в `HostScreen.tsx`) — живёт в новом
+  необязательном `MelodyState.rv`, рядом с `jp`/`race`; `RevealSettings`
+  (`p1Sec`/`p2Sec`/`p3Sec`/`shortSec`) в `MechanicSettings`;
+  `Question.service.openLetters?: number[]` — какие буквы (по плоскому
+  индексу без пробелов) открыты уже с фазы 1.
+- `lib/reveal.ts` (новый) — чистые переходы: `revealStart`/`revealNext`
+  (1→2→3→review, `short` считается ОДИН раз на переходе 1→2 по
+  `revealAllAnswered`, дальше просто переносится), `revealDeadline`/
+  `revealSwitchAt` (дедлайн + 3с запаса на «00» перед автопереходом),
+  `revealVisible` (сколько картинок показывать), `revealGroups` (слово →
+  группы букв по пробелу), `revealLetterOpen`.
+- `lib/revealActions.ts` (новый) — `saveReveal`/`clearReveal`, ЕДИНСТВЕННАЯ
+  точка записи `melody.rv`, ОБЯЗАТЕЛЬНО пишет весь мешок `{...bag, rv}`
+  целиком (в бою нет merge на уровне ключей jsonb, только в
+  local-server) — тот же приём, что у `melodyActions.ts`.
+- `lib/scoring.ts`: `revealPointsFor(phase)` (2/1/0.5/0) + `scoreReveal`.
+- `lib/totals.ts`: одинаковая ветка `four_pics` в `computeTotals` И
+  `computeRoundScores` — совпадение проверено отдельным тестом
+  (`totals-reveal.test.ts`), это отдельное правило CLAUDE.md.
+- Фаза ответа команды хранится в `answers.stake` (1/2/3) — пишется
+  ЗАНОВО при КАЖДОЙ отправке с телефона, поэтому там всегда фаза
+  последнего ответа. Проверка ответа — существующий `crossword_word` +
+  `isCrosswordWordCorrect`, отдельный `AnswerSpec` не заводился.
+- Проектор — `pages/rounds/RevealRound.tsx` (новый, `RevealBoard`),
+  подключён в `HostScreen.tsx` веткой `phase==='question' && mechanic
+  ==='four_pics'`, между `race` и `jeopardy`. Разметка — та же вложенность,
+  что у обычного экрана вопроса (`host-topbar`→сетка картинок→слово→
+  `host-actions`), чтобы сработали уже проверенные CSS-правила высот.
+  Автопереход по таймеру — СТРОГО только здесь (ref-ключ по
+  `${qid}:${phase}`, один раз на фазу); админка двигает фазу только
+  вручную кнопкой — иначе оба экрана могли бы дёрнуть переход одновременно.
+- `Timer` в `HostScreen.tsx` не экспортируется (импорт оттуда тянет весь
+  проектор в чужой чанк) — `RevealBoard` получает не готовую ноду, а
+  ФАБРИКУ `(seconds, key, chime) => ReactNode`, замыкающую `gameState`;
+  фабрика сама читает `gameState.melody?.rv?.startedAt` — таймер тут не
+  привязан к обычному `gameState.timer_started_at` вовсе.
+- `FitImg` и `mediaScaleVar` были локальными необрачиваемыми функциями в
+  `HostScreen.tsx` — вынесены (9.45): `FitImg` → `components/FitImg.tsx`,
+  `mediaScaleVar` → `lib/media.ts`, тем же приёмом, каким уже вынесены
+  `mediaUrl`/`lenClass`/`AfterRoundNav`. Использования в `HostScreen.tsx`
+  (обычный экран вопроса, `ShowAnswers`) заменены на импорт — сам код не
+  менялся ни на строку, перепроверено рендером после выноса.
+- Админка — `AdminPage.tsx`: `isInteractive` включает `four_pics`,
+  `RevealControls` — фаза/обратный отсчёт/список ответов команд с ✓/✗ и
+  кнопка «следующая фаза»/«к разбору», всё через `runAction`. Кнопка
+  «▶ ПРОЧИТАЛ» (ручной старт на бумаге) НЕ трогалась — она вне гейта
+  `isInteractive` и уже подхватывает любую механику.
+- Телефон — `PlayerPage.tsx`: `RevealPlayer` — поле ввода без лимита
+  правок (это не обычный вопрос со своим `max_edits`), `stake: rv.phase`
+  ставится на КАЖДОЙ отправке через `enqueueAnswer`.
+- Редактор: `questionFields.ts` (`fixedMode`, медиа 2–4, без озвучки),
+  `editorApi.ts:defaultModeFor` → `crossword_word`, `EditorApp.tsx`
+  (название механики), `RoundScreen.tsx` (`RevealEditor` — 4 тайминга
+  фазы, общий «Таймер на вопрос»/показ ответов/правки/музыка вопросов
+  скрыты целиком — тем же приёмом, что уже скрывает их у блица),
+  `QuestionForm.tsx` (**ловушка**: ветка `crossword_word` резала пробелы
+  на `onBlur` — для `four_pics` пробелы между словами ОБЯЗАНЫ остаться,
+  нужны для `revealGroups`; прокинут признак механики в `AnswerEditor` и
+  для `four_pics` режутся только дефисы/задвоенные пробелы; плюс новый
+  блок «Открытые буквы в фазе 1» — тап по букве toggle'ит индекс в
+  `service.openLetters`).
+- `validate.ts` (2–4 картинки, слово не пусто, индексы `openLetters` в
+  диапазоне, режим ответа обязан быть `crossword_word`, исключение из
+  проверки `timer_seconds<10` — как у `jeopardy`), `duration.ts` (своя
+  формула по фазам, не по общему таймеру), `roundMeta.ts` (своя строка
+  metaLine, не должна попасть в общую ветку — та написала бы неверно
+  «1 БАЛЛ»), `devSeed.ts` (`stake` — случайно 1/2/3, `expectedForRound`
+  — независимая формулировка ПРАВИЛАМИ, не списана с `scoring.ts`),
+  `pptxExport.ts` — механика НЕ в `SKIPPED_MECHANICS`, `crossword_word`
+  там уже поддержан, слайды строятся тем же общим путём без правок кода.
+
+**CSS** — новый `styles/parts/38-round-reveal.css`, импортирован
+ПОСЛЕДНИМ в `global.css`. **Ловушка, найденная рендером Playwright**: у
+этого экрана нет `.q-text` (текст вопроса — сами картинки), поэтому сетка
+картинок становится ПЕРВЫМ flex-элементом `.host-screen` сразу после
+`padding-top`. На классике/киберпанке этот padding (168px, 22-question.css)
+рассчитан впритык под кольцо таймера — буфер до сих пор давал `.q-text`
+своим `margin-block:auto`, а тут его нет: без собственного отступа сетка
+на 1920px+ заезжала под таймер на ~9px (замерено `getBoundingClientRect`,
+на глаз не видно). Лечится точечным `.host-screen.rv-screen.has-media >
+.q-media-grid { margin-top: clamp(...) }` — 4 класса веса, выше базового
+правила (3 класса) из `22-question.css`, независимо от порядка файлов.
+Сетка 2×2 (фаза 3, 4 картинки) — свой селектор тоже в 4 класса
+(`.host-screen.has-media > .q-media-grid.rv-2x2`), чтобы гарантированно
+перебить общий `max-height`/`min-height` без риска зависеть от порядка
+импорта. Анимаций не заводилось вовсе (проще, чем городить
+`prefers-reduced-motion`-дубль селектора).
+
+**Playwright-проверка** (headless Chromium, `/opt/pw-browsers`,
+собранный `dist/assets/*.css`, реальная вложенность разметки): 3 темы ×
+3 ширины (1366/1920/3840) × 4 варианта (фаза 1, фаза 3/2×2, разбор,
+длинное слово с пробелом «КРАСНАЯ ПЛОЩАДЬ») — топбар/сетка/слово/кнопки
+не пересекаются, `.rv-2x2` — реальный `display:grid` с 4 ячейками
+одинаковой высоты (±1px), слово помещается по ширине/высоте без
+`scrollWidth`/`scrollHeight` переполнения, `.rv-answer`/`.rv-note` в
+разборе в одну строку, `.host-actions` остаётся `position:fixed` во всех
+темах. Первый прогон нашёл overlap-баг выше, после точечного фикса —
+36/36 комбинаций чистые. Живой Supabase/реальные телефоны/реальный
+проектор не проверялись — недоступны в этой среде.
+
+**Тесты**: `reveal.test.ts` (24, все переходы/грани), `totals-reveal.test.ts`
+(9, включая обязательный тест на совпадение `computeTotals`/
+`computeRoundScores`), плюс правки `question-fields.test.ts` (+2, список
+`ALL` и «озвучка недоступна» под новую механику) и `duration.test.ts`
+(+2), `pptxExport.test.ts` (+1, `four_pics` не пропускается).
+
+`tsc --noEmit`/`eslint .`(0/32, без новых)/`vitest run`(495/49)/
+`vite build` — зелёные. Версия 9.44 → 9.45.
+
 ## 4. Подсчёт баллов
 
 Вся логика — `src/lib/totals.ts`. Две функции: `computeTotals` (сумма) и

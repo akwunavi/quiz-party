@@ -6,7 +6,7 @@ import { finalQuestionOf, scoringQuestionsOf } from './thematic'
 import { autocheck } from './autocheck'
 import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
-  scoreThematic, scoreSprint, scoreMelody, scoreRace, type ScoredAnswer,
+  scoreThematic, scoreSprint, scoreMelody, scoreRace, scoreReveal, type ScoredAnswer,
 } from './scoring'
 
 // ── «Своя игра» (jeopardy) ───────────────────────────────────────────────
@@ -113,6 +113,19 @@ export function computeTotals(
         total += scoreRace(rows)
         return
       }
+      // «3 попытки»: балл по фазе последнего ответа (stake), см. scoreReveal
+      if (round.mechanic === 'four_pics') {
+        const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
+          const a = answers.find(x => x.team_id === t.id && x.question_ref === `q-${q.id}`)
+          return {
+            questionIndex: qi,
+            isCorrect: a ? (a.is_correct ?? autocheck(q.answer, a.answer_text)) : null,
+            stake: a?.stake ?? null,
+          }
+        })
+        total += scoreReveal(rows)
+        return
+      }
       // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь
       // решает, удваивать ли раунд. Раньше он и сам приносил баллы, и потом
       // всё удваивалось — отсюда 18 очков там, где максимум 10.
@@ -206,6 +219,19 @@ export function computeRoundScores(
           .filter(x => x.team_id === t.id && x.question_ref === `q-race-${ri}`)
           .map((a, qi) => ({ questionIndex: qi, isCorrect: a.is_correct, stake: a.stake ?? null }))
         per.push(scoreRace(rows))
+        return
+      }
+      // «3 попытки»: та же формула, что в computeTotals — см. комментарий там
+      if (round.mechanic === 'four_pics') {
+        const rows: ScoredAnswer[] = round.questions.map((q, qi) => {
+          const a = answers.find(x => x.team_id === t.id && x.question_ref === `q-${q.id}`)
+          return {
+            questionIndex: qi,
+            isCorrect: a ? (a.is_correct ?? autocheck(q.answer, a.answer_text)) : null,
+            stake: a?.stake ?? null,
+          }
+        })
+        per.push(scoreReveal(rows))
         return
       }
       // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь

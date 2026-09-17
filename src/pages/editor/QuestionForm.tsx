@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
 import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
 import { mediaUrl } from '../../lib/media'
 import { questionFields } from '../../lib/questionFields'
-import type { AnswerSpec, ChoiceOption, Question } from '../../types/quiz'
+import { revealGroups } from '../../lib/reveal'
+import { useHint, Hint } from '../../components/Hint'
+import type { AnswerSpec, ChoiceOption, MechanicKey, Question } from '../../types/quiz'
 import { AiQuestionReview } from './AiReview'
 
 // ═══ Форма вопроса: контент · ответ · превью ═══
@@ -118,6 +120,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             <div className="ed-hint">Короткий комментарий: почему такой ответ. Показывается на экране под ответом</div></div>
 
           {round.mechanic === 'rebus' && <RebusService q={q} onSave={save} />}
+          {round.mechanic === 'four_pics' && <RevealOpenLetters q={q} onSave={save} />}
           {round.mechanic === 'thematic_x2' && (
             <label className="ed-check" style={{ display: 'block', marginTop: 8 }}>
               <input type="checkbox" checked={q.is_final_question}
@@ -139,7 +142,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             </select>
             <div className="ed-hint">{MODE_HINTS[q.answer.mode]}</div>
           </div>
-          <AnswerEditor spec={q.answer} onChange={setAnswer}
+          <AnswerEditor spec={q.answer} onChange={setAnswer} mechanic={mech}
             imgs={(media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))} />
 
 
@@ -168,8 +171,12 @@ function defaultAnswer(mode: AnswerSpec['mode']): AnswerSpec {
 }
 
 // ── Редакторы по типам ──
-function AnswerEditor({ spec, onChange, imgs }: {
+function AnswerEditor({ spec, onChange, imgs, mechanic }: {
   spec: AnswerSpec; onChange: (a: AnswerSpec) => void; imgs: string[]
+  /** «3 попытки» хранит пробелы между словами в ответе (нужны для разбивки
+   *  на группы букв, см. lib/reveal.ts:revealGroups) — у кроссворда их,
+   *  наоборот, убирают на onBlur. */
+  mechanic?: MechanicKey
 }) {
   switch (spec.mode) {
     case 'free_text': return (
@@ -242,17 +249,26 @@ function AnswerEditor({ spec, onChange, imgs }: {
     case 'match': return (
       <MatchEditor spec={spec} onChange={onChange} imgs={imgs} />
     )
-    case 'crossword_word': return (
-      <div>
-        <label>Слово (ответ в сетке)</label>
-        <input value={spec.word} style={{ width: '100%', padding: 6 }}
-          onChange={e => onChange({ ...spec, word: e.target.value })}
-          onBlur={e => onChange({ ...spec,
-            word: e.target.value.trim().replace(/[\s-]+/g, '') })} />
-        <div className="ed-hint">Определение — это текст вопроса слева.
-          Пробелы и дефисы убираются автоматически: «Куала-Лумпур» → «КУАЛАЛУМПУР».</div>
-      </div>
-    )
+    case 'crossword_word': {
+      // «3 попытки»: пробелы между словами ответа НУЖНЫ (разбивка на группы
+      // букв, см. lib/reveal.ts:revealGroups) — убираем только дефисы и
+      // задваивание пробелов, не сам пробел.
+      const isReveal = mechanic === 'four_pics'
+      return (
+        <div>
+          <label>Слово (ответ в сетке)</label>
+          <input value={spec.word} style={{ width: '100%', padding: 6 }}
+            onChange={e => onChange({ ...spec, word: e.target.value })}
+            onBlur={e => onChange({ ...spec,
+              word: isReveal
+                ? e.target.value.trim().replace(/-/g, '').replace(/\s+/g, ' ')
+                : e.target.value.trim().replace(/[\s-]+/g, '') })} />
+          <div className="ed-hint">{isReveal
+            ? 'Определение — это текст вопроса слева. Несколько слов — через пробел, он сохранится (нужен для разбивки на группы букв).'
+            : 'Определение — это текст вопроса слева. Пробелы и дефисы убираются автоматически: «Куала-Лумпур» → «КУАЛАЛУМПУР».'}</div>
+        </div>
+      )
+    }
     case 'none': return (
       <div>
         <label>Как показать ответ на проекторе</label>
@@ -338,6 +354,57 @@ function RebusService({ q, onSave }: { q: Question; onSave: (p: Partial<Question
           {correct ? (ok ? '✅ сходится с ответом' : `⚠ не сходится: в ответе «${correct}»`) : '(заполни ответ)'}
         </div>
       )}
+    </div>
+  )
+}
+
+/** «3 попытки»: какие буквы открыты сразу, с фазы 1 (обычно 1–2 буквы —
+ *  подсказка, чтобы зал не гадал совсем вслепую). Тап по букве — toggle её
+ *  плоского индекса в service.openLetters. Пустое слово — не серый
+ *  недоступный блок, а живая подсказка (useHint), что заполнить сначала. */
+function RevealOpenLetters({ q, onSave }: { q: Question; onSave: (p: Partial<Question>) => void }) {
+  const word = q.answer.mode === 'crossword_word' ? q.answer.word : ''
+  const groups = revealGroups(word)
+  const open = q.service.openLetters ?? []
+  const hint = useHint()
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  if (groups.length === 0) return (
+    <div style={{ marginTop: 8 }}>
+      <button type="button" className="ghost" ref={btnRef}
+        onClick={() => hint.show('Сначала впиши слово ответа справа', btnRef.current)}>
+        Открытые буквы в фазе 1
+      </button>
+      <Hint text={hint.text} />
+    </div>
+  )
+
+  let flat = -1
+  const toggle = (idx: number) => {
+    const next = open.includes(idx) ? open.filter(x => x !== idx) : [...open, idx]
+    onSave({ service: { ...q.service, openLetters: next } })
+  }
+  return (
+    <div style={{ marginTop: 8, padding: 8, border: '1px dashed #3a4a6b', borderRadius: 6 }}>
+      <b>Открытые буквы в фазе 1</b>
+      <div style={{ opacity: .6, fontSize: 13, marginBottom: 6 }}>
+        Тапни буквы, которые видны залу сразу (обычно 1–2 — небольшая подсказка).
+      </div>
+      <div className="rv-word" style={{ fontSize: 22, gap: '.8em' }}>
+        {groups.map((g, gi) => (
+          <span className="rv-group" key={gi}>
+            {g.map((ch, k) => {
+              flat++
+              const idx = flat
+              const isOpen = open.includes(idx)
+              return (
+                <button type="button" key={k} className={`rv-cell${isOpen ? ' open' : ''}`}
+                  style={{ cursor: 'pointer' }} onClick={() => toggle(idx)}>{ch}</button>
+              )
+            })}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

@@ -161,6 +161,11 @@ export async function seedRoundAnswers(
         else if (stakesPool && Math.random() < 0.4) {
           row.stake = pick(stakesPool.filter(v => v > 0))
         }
+        // «3 попытки»: балл зависит от фазы последнего ответа — сид
+        // разбрасывает случайно по всем трём, как в реальной игре
+        else if (round.mechanic === 'four_pics') {
+          row.stake = pick([1, 2, 3])
+        }
         rows.push(row)
       })
     }
@@ -237,6 +242,14 @@ function expectedForRound(
     case 'melody':
       // балл записан в stake при оценке ведущим
       return right.reduce((acc, a) => acc + Number(a.stake ?? 0), 0)
+    case 'four_pics':
+      // правило словами (независимо от scoring.ts): верный ответ даёт
+      // 2 балла при stake=1 (фаза 1), 1 балл при stake=2 (фаза 2),
+      // 0.5 при stake=3 (фаза 3); неверный или неоценённый — 0
+      return right.reduce((acc, a) => {
+        const st = Number(a.stake ?? 0)
+        return acc + (st === 1 ? 2 : st === 2 ? 1 : st === 3 ? 0.5 : 0)
+      }, 0)
     case 'crossword':
       // по баллу за каждое верно угаданное слово
       return right.length

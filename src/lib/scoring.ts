@@ -101,3 +101,17 @@ export function scoreMelody(answers: ScoredAnswer[]): number {
 export function scoreRace(answers: ScoredAnswer[]): number {
   return answers.reduce((s, a) => s + (a.isCorrect ? (a.stake ?? 0) : 0), 0)
 }
+
+/** four_pics («3 попытки»): балл зависит от фазы, в которой отправлен
+ *  ПОСЛЕДНИЙ ответ команды (лежит в stake) — 2/1/0.5 за фазу 1/2/3. */
+export function revealPointsFor(phase: number | null | undefined): number {
+  if (phase === 1) return 2
+  if (phase === 2) return 1
+  if (phase === 3) return 0.5
+  return 0
+}
+
+/** four_pics: сумма баллов по всем верным ответам раунда (обычно один). */
+export function scoreReveal(answers: ScoredAnswer[]): number {
+  return answers.reduce((s, a) => s + (a.isCorrect ? revealPointsFor(a.stake ?? null) : 0), 0)
+}
