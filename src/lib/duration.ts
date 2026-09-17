@@ -55,6 +55,16 @@ export function estimateRoundMinutes(round: DurationRound, teamCount?: number): 
     return Math.max(1, Math.round(seconds / 60))
   }
 
+  if (mechanic === 'four_pics') {
+    const rs = (round.settings ?? {}) as { p1Sec?: number; p2Sec?: number; p3Sec?: number }
+    const n = round.questions.filter(q => !q.hidden).length
+    if (n === 0) return 0
+    // фазы 1+2+3 + запас на переключение (3 сек × 3 фазы) + разбор (~20 сек)
+    const perQuestion = (rs.p1Sec ?? 30) + (rs.p2Sec ?? 20) + (rs.p3Sec ?? 10) + 3 * 3 + 20
+    const seconds = intro + n * perQuestion
+    return Math.max(1, Math.round(seconds / 60))
+  }
+
   if (mechanic === 'blitz') {
     const s = (round.settings ?? {}) as { teamSeconds?: number }
     // Число команд функция может не знать (вызов из редактора, где игры ещё

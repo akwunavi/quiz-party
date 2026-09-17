@@ -2,9 +2,11 @@
 // Состояние — в game_state.melody, единый автомат с ДЕДЛАЙНАМИ (не setTimeout),
 // поэтому проектор и телефоны всегда в одной стадии, даже после перезагрузки.
 //
-// spinning (барабан по плиткам, БЕЗ модалки) → listen (1 сек трека)
-// → bidding (ставки 2–10) → bids (показ, кто играет) → snippet (интервал играет)
-// → answering (ответ + фоновая музыка) → passed (вторая слушает трек целиком)
+// spinning (барабан по плиткам, БЕЗ модалки) → listen (1 сек трека, со
+// случайной точки m.startSec — см. lib/melody.ts:melodyPreviewCeiling)
+// → bidding (ставки 2–10) → bids (показ, кто играет) → snippet (интервал
+// играет С ТОЙ ЖЕ точки m.startSec, не с начала) → answering (ответ +
+// фоновая музыка) → passed (вторая слушает трек целиком, с начала)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
 import { playAudio, createAudio } from '../../lib/audioSource'
@@ -21,7 +23,7 @@ import { mediaUrl } from '../../lib/media'
 // разошёлся бы с проектором.
 import { saveMelody, gradeMelody, passMelody } from '../../lib/melodyActions'
 import {
-  melodySpin, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
   melodyToBoard, melodyIdle, melodyFree,
 } from '../../lib/melody'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -57,14 +59,14 @@ export function unlockAudio() {
   sharedAudio.play().catch(() => {})
   sharedAudio.pause()
 }
-function playShared(src: string): HTMLAudioElement {
+function playShared(src: string, startAt = 0): HTMLAudioElement {
   if (!sharedAudio) sharedAudio = createAudio()
   sharedAudio.pause()
   sharedAudio.loop = false
   sharedAudio.volume = 1
   // тот же запасной путь, что и в «Своей игре»: при блокировке прямого
   // запроса файл скачивается и играется из памяти
-  void playAudio(sharedAudio, src)
+  void playAudio(sharedAudio, src, startAt)
   return sharedAudio
 }
 
@@ -161,7 +163,9 @@ export function MelodyBoard({ pack, round, gameState }: {
   useEffect(() => {
     if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
     const sec = m.snippetSec ?? 5
-    const a = playShared(mediaUrl(track.audio))
+    // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
+    // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
+    const a = playShared(mediaUrl(track.audio), m.startSec ?? 0)
     audioRef.current = a
     let stop: number | undefined
     let advanced = false
@@ -213,10 +217,11 @@ export function MelodyBoard({ pack, round, gameState }: {
     }
   }, [expired, m.stage, answers])
 
-  // ── 1 секунда трека на стадии listen ──
+  // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
     if (m.stage !== 'listen' || !track?.audio || document.hidden) return
-    const a = playShared(mediaUrl(track.audio))
+    const requested = m.startSec ?? 0
+    const a = playShared(mediaUrl(track.audio), requested)
     audioRef.current = a
     let stop: number | undefined
     let advanced = false
@@ -226,11 +231,37 @@ export function MelodyBoard({ pack, round, gameState }: {
       a.pause()
       void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
     }
+    // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
+    // точка старта уже выбрана в melodySpin/melodyPick по НОМИНАЛЬНОЙ длине,
+    // а реальную браузер знает только после метаданных. Если он успел
+    // сказать — подрезаем и ЗАПОМИНАЕМ исправленное значение (снипет по
+    // ставке должен стартовать с той же, уже проверенной точки, не заново
+    // рисковать). Не успел за короткий бюджет (400мс, метаданные для уже
+    // закешированного трека приходят почти мгновенно) — играем как выбрали,
+    // не задерживаем игру ради подстраховки.
+    let metaChecked = false
+    const checkReal = () => {
+      if (metaChecked) return
+      metaChecked = true
+      const dur = a.duration
+      if (!dur || !isFinite(dur)) return
+      const safe = Math.min(requested, Math.max(0, dur - 10))
+      if (safe !== requested) {
+        try { a.currentTime = safe } catch { /* не критично — сыграет как есть */ }
+        void saveMelody({ ...m, startSec: safe })
+      }
+    }
+    a.addEventListener('loadedmetadata', checkReal, { once: true })
+    const metaGuard = window.setTimeout(checkReal, 400)
     // секунда считается от РЕАЛЬНОГО начала звука
     a.addEventListener('playing', () => { stop = window.setTimeout(advance, 1000) }, { once: true })
     // страховка: если звук так и не пошёл (нет файла) — не зависаем
     const guard = window.setTimeout(advance, 4000)
-    return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
+    return () => {
+      if (stop) clearTimeout(stop)
+      clearTimeout(guard); clearTimeout(metaGuard)
+      a.removeEventListener('loadedmetadata', checkReal)
+    }
   }, [m.stage, m.key])
 
 
@@ -271,13 +302,12 @@ export function MelodyBoard({ pack, round, gameState }: {
   /** Открыть выбранную плитку без рулетки. */
   const pickManually = (key: string) => {
     setManualPick(false)
-    void saveMelody({ ...m, key, stage: 'listen', deadline: inSec(3),
-      order: undefined, turn: 0, chooser: undefined })
+    void saveMelody(melodyPick(m, key, s.trackSec ?? 30))
   }
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
-    void saveMelody(melodySpin(m, target, freeKeys.length, s.spinSec ?? 5))
+    void saveMelody(melodySpin(m, target, freeKeys.length, s.spinSec ?? 5, s.trackSec ?? 30))
   }
 
   const currentId = m.order?.[m.turn ?? 0]

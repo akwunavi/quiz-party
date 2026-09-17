@@ -13,6 +13,7 @@ import { ThemeLayer } from '../components/ThemeLayer'
 import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme } from '../types/quiz'
+import { revealPointsFor } from '../lib/scoring'
 import { spendsEdit } from '../lib/edits'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
@@ -128,6 +129,9 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'question' && round?.mechanic === 'melody')
     return <MelodyPlayer team={team} gameState={gameState}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'four_pics')
+    return <RevealPlayer team={team} gameState={gameState} round={round}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'jeopardy')
     return <JeopardyPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -204,6 +208,85 @@ function JeopardyPlayer({ team, gameState, roundLabel, round }: {
             </div>
             {sent && <div className="pl-sent">Отправлено: {sent}</div>}
             <div className="ed-hint">Кто ответит быстрее — тот выше в списке у ведущего</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** «3 попытки» у игрока: поле ответа, доступно на всех трёх фазах без
+ *  ограничения правок (лимит max_edits тут не при чём — это отдельная
+ *  механика со своей ценой ответа по фазе, а не обычный вопрос раунда). */
+function RevealPlayer({ team, gameState, round, roundLabel }: {
+  team: Team; roundLabel: string
+  round: LoadedRound
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const q = round.questions[gameState.question_index]
+  const rawRv = gameState.melody?.rv ?? {}
+  const rv = q && rawRv.qid === q.id ? rawRv : {}
+  const [draft, setDraft] = useState('')
+  const [sent, setSent] = useState<string | null>(null)
+  // смена вопроса — сбрасываем черновик, иначе останется ответ на прошлый
+  // (та же ловушка уже чинили в JeopardyPlayer)
+  useEffect(() => { setDraft(''); setSent(null) }, [q?.id])
+
+  if (!q) return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
+
+  if (!rv.phase) return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        <div className="pl-notice acc">3 ПОПЫТКИ</div>
+        <div className="pl-card"><div className="pl-card-body" style={{ textAlign: 'center' }}>
+          <div className="pl-wait">Ждём начала</div>
+        </div></div>
+      </div>
+    </div>
+  )
+
+  const send = () => {
+    void enqueueAnswer({
+      team_id: team.id, game_id: gameState.game_id, question_ref: `q-${q.id}`,
+      round_number: gameState.round_number, answer_text: draft.trim(),
+      stake: typeof rv.phase === 'number' ? rv.phase : null,
+    })
+    setSent(draft.trim())
+  }
+
+  if (rv.phase === 'review') {
+    return (
+      <div className="pl-root">
+        <PlayerHeader team={team} round={roundLabel} />
+        <ConnectionDot />
+        <div className="pl-list">
+          <div className="pl-notice acc">3 ПОПЫТКИ · РАЗБОР</div>
+          <div className="pl-card"><div className="pl-card-body">
+            <div className="pl-sent">Ваш ответ: {sent ?? '—'}</div>
+          </div></div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        <div className="pl-notice acc">3 ПОПЫТКИ · ФАЗА {rv.phase}</div>
+        <div className="pl-card">
+          <div className="pl-qlabel">ЗА ВЕРНЫЙ ОТВЕТ — {revealPointsFor(rv.phase)} БАЛЛА</div>
+          <div className="pl-card-body">
+            <div className="pl-input-col">
+              <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Слово" />
+              <button className="pl-send" disabled={!draft.trim() || draft.trim() === sent}
+                onClick={send}>{sent ? 'Изменить ответ' : 'Отправить'}</button>
+            </div>
+            {sent && <div className="pl-sent">Отправлено: {sent}</div>}
+            <div className="ed-hint">Можно менять ответ сколько угодно раз, пока идёт вопрос</div>
           </div>
         </div>
       </div>

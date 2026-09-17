@@ -134,7 +134,7 @@ export async function deleteRound(id: string) {  // только owner (RLS)
 export type NewQuestionMode = 'free_text' | 'crossword_word' | 'choice'
 
 export function defaultModeFor(mechanic: string): NewQuestionMode {
-  if (mechanic === 'crossword') return 'crossword_word'
+  if (mechanic === 'crossword' || mechanic === 'four_pics') return 'crossword_word'
   if (mechanic === 'test_stop' || mechanic === 'stakes_unique') return 'choice'
   return 'free_text'
 }

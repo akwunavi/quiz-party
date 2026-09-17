@@ -39,7 +39,7 @@ export function validatePack(pack: LoadedPack): Problem[] {
       problems.push({ roundIdx: ri, text: 'Не заполнены правила раунда' })
     if (round.rules.some(r => !r.trim()))
       problems.push({ roundIdx: ri, text: 'Есть пустые строки правил' })
-    if (round.timer_seconds < 10 && round.mechanic !== 'jeopardy')
+    if (round.timer_seconds < 10 && round.mechanic !== 'jeopardy' && round.mechanic !== 'four_pics')
       problems.push({ roundIdx: ri, text: `Таймер ${round.timer_seconds} сек — слишком мало` })
     if (round.off_scoreboard && ri === pack.rounds.length - 1)
       problems.push({ roundIdx: ri, text: 'Последний раунд помечен «вне зачёта» — так задумано?' })
@@ -52,6 +52,7 @@ export function validatePack(pack: LoadedPack): Problem[] {
     }
     if (round.mechanic === 'crossword') validateCrossword(round, ri, problems)
     if (round.mechanic === 'jeopardy') validateJeopardy(round, ri, problems)
+    if (round.mechanic === 'four_pics') validateFourPics(round, ri, problems)
     round.questions.forEach((q, qi) => validateQuestion(round, q, ri, qi, problems))
   })
   return problems
@@ -145,6 +146,19 @@ function validateMelody(round: LoadedRound, ri: number, out: Problem[]) {
       if (!tr.audio) out.push({ roundIdx: ri, text: `Мелодия: «${t.name || ti + 1}», трек ${i + 1}: нет файла` })
       if (!tr.correct.trim()) out.push({ roundIdx: ri, text: `Мелодия: «${t.name || ti + 1}», трек ${i + 1}: нет ответа` })
     })
+  })
+}
+
+function validateFourPics(round: LoadedRound, ri: number, out: Problem[]) {
+  round.questions.forEach((q, qi) => {
+    const push = (text: string) => out.push({ roundIdx: ri, questionIdx: qi, text })
+    if (q.answer.mode !== 'crossword_word') { push('3 попытки: тип ответа должен быть «слово в сетку»'); return }
+    const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+    if (imgs.length < 2) push(`3 попытки: картинок ${imgs.length}, нужно минимум 2`)
+    if (!q.answer.word.trim()) push('3 попытки: не задано слово ответа')
+    const flatLen = q.answer.word.trim().replace(/\s+/g, '').length
+    const bad = (q.service.openLetters ?? []).some(i => i < 0 || i >= flatLen)
+    if (bad) push('3 попытки: «открытые буквы» указывают на несуществующий индекс — перевыбери после правки слова')
   })
 }
 

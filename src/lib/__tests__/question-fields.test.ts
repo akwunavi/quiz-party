@@ -8,7 +8,7 @@ import type { MechanicKey } from '../../types/quiz'
 
 const ALL: MechanicKey[] = ['standard', 'test_stop', 'rebus', 'jeopardy',
   'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword', 'sprint',
-  'melody', 'race', 'blitz']
+  'melody', 'race', 'blitz', 'four_pics']
 
 describe('поля вопроса по механикам', () => {
   it('кроссворду доступны и медиа вопроса, и озвучка', () => {
@@ -46,8 +46,15 @@ describe('поля вопроса по механикам', () => {
     for (const m of ALL) expect(questionFields(m).questionMedia).toBe(true)
   })
 
-  it('озвучка недоступна только мелодии', () => {
+  it('озвучка недоступна мелодии и «3 попыткам»', () => {
     const without = ALL.filter(m => !questionFields(m).voice)
-    expect(without).toEqual(['melody'])
+    expect(without.sort()).toEqual(['four_pics', 'melody'])
+  })
+
+  it('«3 попытки»: тип ответа задан механикой, до 4 картинок, без озвучки', () => {
+    const f = questionFields('four_pics')
+    expect(f.fixedMode).toBe(true)
+    expect(f.mediaMax).toBe(4)
+    expect(f.voice).toBe(false)
   })
 })

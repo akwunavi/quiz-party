@@ -55,8 +55,11 @@ import {
   parseLocalExport, summarizeLocalImport, summaryText, importLocalGame,
 } from '../lib/importLocalGame'
 import type {
-  Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, Team,
+  Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, RevealSettings, Team,
 } from '../types/quiz'
+import { saveReveal, clearReveal } from '../lib/revealActions'
+import { revealNext, revealAllAnswered } from '../lib/reveal'
+import { revealPointsFor } from '../lib/scoring'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
 // ВЕДУЩИЙ: шапка со ссылками → строка статуса → экран по фазе →
@@ -289,10 +292,11 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
   // «вопрос → время ответов → разбор» для них не существует
   const isBlitz = round.mechanic === 'blitz'
   const isMelody = round.mechanic === 'melody'
+  const isFourPics = round.mechanic === 'four_pics'
   // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
   // музыку и звук вопроса он запускает сам — кнопкой ниже
   const paperMode = pack.settings?.play_mode === 'paper'
-  const isInteractive = isJeopardy || isBlitz || isMelody || round.mechanic === 'race'
+  const isInteractive = isJeopardy || isBlitz || isMelody || isFourPics || round.mechanic === 'race'
   // «120 секунд»: все вопросы раунда на одном слайде (см. HostScreen.tsx),
   // а не по одному — обычный «Дальше» листал их по одному 5 раз подряд,
   // хотя на экране они и так все сразу. У раунда свой пульт: назад — на
@@ -452,6 +456,11 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
 
         {isMelody && phase === 'question' && (
           <MelodyControls round={round} gameState={gameState} onFinish={endRound} />
+        )}
+
+        {isFourPics && phase === 'question' && (
+          <RevealControls pack={pack} round={round} gameState={gameState}
+            isLast={gameState.question_index + 1 >= round.questions.length} onFinish={endRound} />
         )}
 
         {isSprint && phase === 'question' && (
@@ -620,6 +629,12 @@ function ServiceDrawer({ pack, round, gameState, offline }: {
               if (!confirm('Сбросить раунд «Угадай мелодию»: все плитки снова доступны?')) return
               await runAction('сброс плиток мелодии', () => room.patchSession(getRoomId(), { melody: {} }))
             }}>↻ СБРОСИТЬ ПЛИТКИ МЕЛОДИИ</button>
+          )}
+          {round.mechanic === 'four_pics' && (
+            <button className="adm-link" onClick={async () => {
+              if (!confirm('Сбросить текущую фазу «3 попыток»: вопрос начнётся заново с фазы 1?')) return
+              await runAction('сброс фазы «3 попыток»', () => clearReveal(gameState.melody ?? {}))
+            }}>↻ СБРОСИТЬ ФАЗУ «3 ПОПЫТКИ»</button>
           )}
           <button className="adm-link" onClick={async () => {
             if (!confirm('Сменить пакет: игра вернётся в лобби с выбором пакета. Ответы и команды останутся.')) return
@@ -1833,7 +1848,7 @@ function MelodyControls({ round, gameState, onFinish }: {
               того же действия путали бы */}
           <button className="adm-btn primary" onClick={() => {
             const target = free[Math.floor(Math.random() * free.length)]
-            void runAction('рулетка мелодии', () => saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5)))
+            void runAction('рулетка мелодии', () => saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5, s.trackSec ?? 30)))
           }}>🎲 {played.length === 0 ? 'СТАРТУЕМ!' : 'РУЛЕТКА'}</button>
         </>) : (<>
           <div className="adm-qtext" style={{ textAlign: 'center' }}>
@@ -1935,6 +1950,95 @@ function MelodyControls({ round, gameState, onFinish }: {
       </>)}
 
       {m.stage !== 'reveal' && escape}
+    </div>
+  )
+}
+
+/** Пульт «3 попытки» (9.45) — фаза/таймер/ответы команд + ручные оценки.
+ *
+ *  Переходы фаз — общие с проектором (lib/reveal.ts + revealActions.ts):
+ *  здесь фаза двигается ТОЛЬКО кнопкой, автоперехода по таймеру нет —
+ *  он есть на проекторе (RevealRound.tsx), и если бы оба экрана дёргали
+ *  переход одновременно, фаза могла бы перепрыгнуть через одну. */
+function RevealControls({ pack, round, gameState, isLast, onFinish }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  isLast: boolean
+  onFinish: () => void
+}) {
+  const s = round.settings as RevealSettings
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const q = round.questions[gameState.question_index]
+  const bag: MelodyState = gameState.melody ?? {}
+  const rawRv = bag.rv ?? {}
+  const rv = q && rawRv.qid === q.id ? rawRv : {}
+  const rows = q ? answers.filter(a => a.question_ref === `q-${q.id}`) : []
+  const [now, setNow] = useState(Date.now())
+  // хуки — все до ранних return (React #310, см. CLAUDE.md)
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 250); return () => clearInterval(t) }, [])
+
+  const grade = (a: Answer, correct: boolean) =>
+    void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: correct }))
+
+  if (!q) return <div className="adm-dim">В этом раунде нет вопросов</div>
+
+  if (rv.phase === 'review') {
+    return (
+      <div className="adm-blitz">
+        <div className="adm-dim">РАЗБОР ОТВЕТА</div>
+        <div className="adm-correct">{q.answer.mode === 'crossword_word' ? q.answer.word : '—'}</div>
+        {rows.map(a => {
+          const team = teams.find(t => t.id === a.team_id)
+          return (
+            <div key={a.id} className="adm-tile-row">
+              <span style={{ color: team?.color, fontWeight: 700 }}>{team?.name ?? '—'}</span>
+              <span className="adm-tile-ans">{a.answer_text || '—'} · фаза {a.stake ?? '—'}</span>
+              <button className={`adm-grade ok${a.is_correct === true ? ' on' : ''}`}
+                onClick={() => grade(a, true)}>✓</button>
+              <button className={`adm-grade no${a.is_correct === false ? ' on' : ''}`}
+                onClick={() => grade(a, false)}>✗</button>
+            </div>
+          )
+        })}
+        <div className="adm-row-btns">
+          {isLast
+            ? <button className="adm-btn primary" onClick={onFinish}>ЗАВЕРШИТЬ РАУНД →</button>
+            : <button className="adm-btn primary"
+                onClick={() => void runAction('следующий вопрос', () => gotoQuestion(gameState.question_index + 1))}>
+                ДАЛЬШЕ →</button>}
+        </div>
+      </div>
+    )
+  }
+
+  const phase = rv.phase ?? 1
+  const left = rv.startedAt && rv.phaseSec
+    ? Math.max(0, Math.ceil(rv.phaseSec - (now - new Date(rv.startedAt).getTime()) / 1000))
+    : (rv.phaseSec ?? 0)
+  const nextLabel = phase === 3 ? 'К РАЗБОРУ →' : 'СЛЕДУЮЩАЯ ФАЗА →'
+
+  return (
+    <div className="adm-blitz">
+      <div className="adm-dim">ФАЗА {phase} · осталось {left} сек · {revealPointsFor(phase)} балла</div>
+      {rows.length === 0 && <div className="adm-dim">ответов пока нет</div>}
+      {rows.map(a => {
+        const team = teams.find(t => t.id === a.team_id)
+        return (
+          <div key={a.id} className="adm-tally">
+            <span style={{ color: team?.color }}>{team?.name ?? '—'}</span>
+            <span className="adm-dim">ответила · фаза {a.stake ?? '—'}</span>
+          </div>
+        )
+      })}
+      <div className="adm-row-btns">
+        <button className="adm-btn primary" onClick={() => {
+          const allAnswered = phase === 1 && pack.settings?.play_mode !== 'paper'
+            && revealAllAnswered(teams.map(t => t.id), rows)
+          void runAction('следующая фаза', () => saveReveal(bag, revealNext(rv, s, allAnswered)))
+        }}>{nextLabel}</button>
+      </div>
     </div>
   )
 }

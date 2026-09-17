@@ -5,8 +5,10 @@
 // бандла по экранам это означало бы, что редактор скачивает проектор целиком
 // ради одной строки. Здесь — чистые функции без React и без Supabase.
 
+import type { CSSProperties } from 'react'
 import { readMedia } from './packCache'
 import { isLocalMode } from './transport/mode'
+import type { Question } from '../types/quiz'
 
 /** Абсолютный адрес файла в хранилище.
  *  Ссылка, начинающаяся с http, уходит как есть: так работает медиа,
@@ -83,6 +85,17 @@ export function releaseMedia(paths: string[]): void {
     const url = blobs.get(p)
     if (url) { URL.revokeObjectURL(url); blobs.delete(p) }
   }
+}
+
+/** Масштаб картинок на экране из настройки вопроса (media.scale, проценты).
+ *  Отдаём CSS-переменной, а не жёстким размером: дальше её подхватывают
+ *  правила высоты, у которых есть свои потолки — так картинка не сможет
+ *  наехать на текст или кнопки даже на максимуме. Вынесено из HostScreen.tsx
+ *  (9.45): импорт оттуда тянул бы за собой весь проектор в чужой чанк. */
+export function mediaScaleVar(q: Question): CSSProperties | undefined {
+  const s = q.media.scale
+  if (s == null || s === 100) return undefined
+  return { '--ms': Math.min(100, Math.max(50, s)) / 100 } as CSSProperties
 }
 
 /** Ступень кегля для текста вопроса: чем длиннее, тем мельче. */

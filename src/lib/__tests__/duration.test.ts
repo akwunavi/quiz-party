@@ -52,6 +52,23 @@ describe('estimateRoundMinutes — race (ставка + забег, не чис�
   })
 })
 
+describe('estimateRoundMinutes — four_pics (свои фазы, не общий таймер)', () => {
+  it('пустой раунд — ноль', () => {
+    const r = { mechanic: 'four_pics' as const, questions: [], timer_seconds: 45,
+      settings: { p1Sec: 30, p2Sec: 20, p3Sec: 10 } }
+    expect(estimateRoundMinutes(r)).toBe(0)
+  })
+
+  it('считает по фазам, не по общему таймеру', () => {
+    const r = { mechanic: 'four_pics' as const,
+      questions: [{ hidden: false }, { hidden: false }], timer_seconds: 999,
+      settings: { p1Sec: 30, p2Sec: 20, p3Sec: 10 } }
+    const m = estimateRoundMinutes(r)
+    expect(m).toBeGreaterThan(0)
+    expect(m).toBeLessThan(10)
+  })
+})
+
 describe('estimateRoundMinutes — jeopardy (по числу плиток, не round.questions)', () => {
   it('пустые questions — раунд всё равно не ноль, если есть плитки', () => {
     const r = { mechanic: 'jeopardy' as const, questions: [], timer_seconds: 45,

@@ -18,7 +18,8 @@ import {
   jeopardyOpened, openJeopardyTile, closeJeopardyTile,
 } from '../lib/jeopardyActions'
 import { saveMelody } from '../lib/melodyActions'
-import { mediaUrl, lenClass, primeMedia, releaseMedia } from '../lib/media'
+import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
+import { FitImg } from '../components/FitImg'
 import { collectUsedPaths } from '../lib/usedPaths'
 import { packStats } from '../lib/duration'
 import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -58,6 +59,7 @@ import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
+import { RevealBoard } from './rounds/RevealRound'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -378,6 +380,7 @@ function HostInner({ gameState, pack }: {
             {round.mechanic === 'jeopardy' ? 'Начать раунд →'
               : round.mechanic === 'race' ? 'К скачкам →'
               : round.mechanic === 'melody' ? 'К трекам →'
+              : round.mechanic === 'four_pics' ? 'Поехали →'
               : round.mechanic === 'sprint' ? 'Поехали →'
               : 'Первый вопрос →'}</button>
         </div>
@@ -415,6 +418,20 @@ function HostInner({ gameState, pack }: {
   // ── «Угадай мелодию» ──
   if (gameState.phase === 'question' && round.mechanic === 'melody') {
     return <MelodyBoard pack={pack} round={round} gameState={gameState} />
+  }
+
+  // ── «3 попытки»: 2–4 картинки → слово ──
+  // Timer читает startedAt/seconds из gameState.melody.rv (не из
+  // gameState.timer_started_at, который тут не используется вовсе) — сам
+  // компонент не экспортируется из HostScreen.tsx (см. HANDOFF.md: импорт
+  // оттуда тянул бы весь проектор в чужой чанк), поэтому RevealBoard
+  // получает готовую фабрику, а не саму ноду — seconds/chime меняются по
+  // фазам, а не один раз на весь вопрос.
+  if (gameState.phase === 'question' && round.mechanic === 'four_pics') {
+    return <RevealBoard pack={pack} round={round} gameState={gameState}
+      timerNode={(seconds, key, chime) => <Timer key={key}
+        startedAt={gameState.melody?.rv?.startedAt ?? null}
+        seconds={seconds} theme={pack.theme} chime={chime} />} />
   }
 
   // ── Своя игра: сетка плиток ──
@@ -929,44 +946,6 @@ function shuffleStable<T>(arr: T[], seedStr: string): T[] {
   return a
 }
 
-
-/** Масштаб картинок на экране из настройки вопроса (media.scale, проценты).
- *  Отдаём CSS-переменной, а не жёстким размером: дальше её подхватывают
- *  правила высоты, у которых есть свои потолки — так картинка не сможет
- *  наехать на текст или кнопки даже на максимуме. */
-function mediaScaleVar(q: Question): CSSProperties | undefined {
-  const s = q.media.scale
-  if (s == null || s === 100) return undefined
-  return { '--ms': Math.min(100, Math.max(50, s)) / 100 } as CSSProperties
-}
-
-/** Картинка в ряду, выравненном ПО ВЫСОТЕ.
- *
- *  Проблема: когда картинок несколько и пропорции у них разные (одна
- *  горизонтальная, другая почти квадратная), каждая вписывается в свою
- *  ячейку по-своему и ряд получается рваным по высоте. Раньше это
- *  приходилось лечить вручную во внешнем редакторе, подгоняя файлы.
- *
- *  Решение — приём «выключной ряд»: ширина ячейки задаётся ПРОПОРЦИЕЙ
- *  картинки (flex-grow = ширина/высота). Тогда при одинаковой высоте ряда
- *  каждая занимает ровно свою ширину, высоты совпадают сами собой, и
- *  ничего не обрезается. Пропорцию узнаём у самого файла при загрузке,
- *  поэтому в редакторе ничего указывать не нужно.
- *
- *  До загрузки берём 1.5 — типичная горизонтальная картинка; после onLoad
- *  значение уточняется, скачка не видно. */
-function FitImg({ src, children }: { src: string; children?: React.ReactNode }) {
-  const [ar, setAr] = useState(1.5)
-  return (
-    <figure className="q-img" style={{ flexGrow: ar, flexBasis: 0 } as CSSProperties}>
-      <img src={src} alt="" onLoad={e => {
-        const el = e.currentTarget
-        if (el.naturalWidth && el.naturalHeight) setAr(el.naturalWidth / el.naturalHeight)
-      }} />
-      {children}
-    </figure>
-  )
-}
 
 /* ── Сколько длится показ верного ответа ──────────────────────────────────
    Раньше автопроверка стояла на СВОЁМ таймере в 4200 мс, никак не связанном

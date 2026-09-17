@@ -223,6 +223,7 @@ export const MECHANIC_NAMES: Record<MechanicKey, string> = {
   melody: 'Угадай мелодию (аукцион секунд)',
   blitz: 'Блиц «100 вопросов»',
   race: 'Скачки бульдогов (финал-лотерея)',
+  four_pics: '3 попытки (картинки → слово)',
 }
 
 export function EditorApp() {

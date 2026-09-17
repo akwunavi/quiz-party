@@ -97,6 +97,7 @@ export type MechanicKey =
   | 'melody'        // «Угадай мелодию»: аукцион секунд
   | 'race'          // «Скачки бульдогов»: ставка на номер, баллы по месту
   | 'blitz'         // «100 вопросов»: ход по кругу, у каждой команды свой таймер
+  | 'four_pics'     // «3 попытки»: 2–4 картинки → слово, 2/1/0.5 балла по фазе
 
 export type AnswersReveal = 'after_question' | 'after_round' | 'never'
 
@@ -152,11 +153,20 @@ export interface MelodySettings {
   bidSec?: number               // совещание по ставке (10)
   answerSec?: number            // на ответ первой команде (30)
   passAnswerSec?: number        // на ответ второй после полного трека (10)
+  trackSec?: number             // номинальная длина треков в секундах (30) —
+                                 // для расчёта случайной точки старта отрывка,
+                                 // см. lib/melody.ts:melodyPreviewCeiling
 }
 export interface RaceSettings {
   dogs?: string[]               // клички 5 бульдогов
   betSec?: number               // окно ставок (30)
   raceSec?: number              // длительность забега (18)
+}
+export interface RevealSettings {
+  p1Sec?: number      // фаза 1 (2 картинки), дефолт 30
+  p2Sec?: number      // фаза 2 (3 картинки), дефолт 20
+  p3Sec?: number      // фаза 3 (4 картинки), дефолт 10
+  shortSec?: number   // укороченные фазы 2/3, если все ответили раньше, дефолт 10
 }
 export interface MelodyTheme {
   name: string
@@ -165,6 +175,7 @@ export interface MelodyTheme {
 export type MechanicSettings =
   | StandardSettings | TestStopSettings | StakesSettings
   | JeopardySettings | CrosswordSettings | SprintSettings | MelodySettings | RaceSettings
+  | RevealSettings
   | Record<string, never>
 
 // ── Кроссворд ──────────────────────────────────────────
@@ -241,7 +252,11 @@ export interface Question {
   media: QuestionMedia
   answer: AnswerSpec
   answer_note: string | null
-  service: { word1?: string; word2?: string; note?: string }
+  service: { word1?: string; word2?: string; note?: string
+    /** «3 попытки»: индексы открытых с фазы 1 букв в ПЛОСКОМ списке букв
+     *  ответа (пробелы между словами не индексируются, но сами сохраняются
+     *  в слове — см. lib/reveal.ts:revealGroups). */
+    openLetters?: number[] }
   is_final_question: boolean
   status: 'draft' | 'ready'
   hidden: boolean
@@ -261,6 +276,9 @@ export interface MelodyState {
   turn?: number                 // индекс текущей команды в order
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
+  startSec?: number             // случайная точка старта «сюрприз-отрывка» (0…
+                                 // melodyPreviewCeiling), выбирается ОДИН раз при
+                                 // открытии трека — listen и snippet играют с неё же
   played?: string[]             // отыгранные треки
   chooser?: string              // (не используется: выбор всегда рулеткой)
   race?: { seed?: number; stage?: 'betting' | 'running' | 'done'; startedAt?: string }
@@ -277,6 +295,20 @@ export interface MelodyState {
   jp?: { tile?: number | null; answer?: boolean; replay?: number }
   wonPts?: number               // сколько баллов забрали (для экрана результата)
   wonTeam?: string              // кто забрал
+  /** «3 попытки»: состояние текущего вопроса, живёт в том же общем
+   *  jsonb-мешке механик, что jp/race — миграция не нужна. */
+  rv?: RevealState
+}
+
+/** «3 попытки»: фаза 1 (2 картинки) → 2 (3) → 3 (4) → 'review' (разбор).
+ *  `startedAt`+`phaseSec`, а не `deadline` — тот же формат, что уже читает
+ *  Timer (startedAt/seconds), второй визуальный язык таймера не заводим. */
+export interface RevealState {
+  qid?: string
+  phase?: 1 | 2 | 3 | 'review'
+  startedAt?: string   // ISO: начало ТЕКУЩЕЙ фазы
+  phaseSec?: number    // длительность текущей фазы
+  short?: boolean      // фазы 2/3 укорочены (все ответили до конца фазы 1)
 }
 
 export interface GameState {

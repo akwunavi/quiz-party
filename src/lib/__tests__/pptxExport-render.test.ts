@@ -21,6 +21,7 @@ class FakeSlide {
   addText() { return this }
   addImage() { return this }
   addMedia() { return this }
+  addShape() { return this }
   addNotes() { return this }
 }
 class FakePptxGenJS {

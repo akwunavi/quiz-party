@@ -13,13 +13,14 @@
 import { supabase } from './supabase'
 import { savePack, readPack } from './packCache'
 import type { Pack, RoundBase, Question } from '../types/quiz'
-
-export interface LoadedRound extends RoundBase {
-  questions: Question[]
-}
-export interface LoadedPack extends Pack {
-  rounds: LoadedRound[]         // отсортированы по position; нумерация = позиция в игре
-}
+// Чистые хелперы (без сети) переехали в roundMeta.ts (9.43) — pptxExport.ts
+// (слой А, документированно «без сети») их тоже импортирует, а этот файл
+// безусловно тянет ./supabase, что в тестах роняет billing без env. Реэкспорт
+// ниже — чтобы существующие `import { metaLine } from '../lib/packLoader'`
+// (HostScreen/PlayerPage/AdminPage/RoundScreen) не трогать.
+export type { LoadedRound, LoadedPack } from './roundMeta'
+export { roundSetting, scoredRounds, metaLine, displayRoundNumber } from './roundMeta'
+import type { LoadedPack } from './roundMeta'
 
 const memCache = new Map<string, LoadedPack>()
 const LS_KEY = (id: string) => `qp-pack-${id}`
@@ -85,64 +86,4 @@ export async function listPacks(): Promise<Pack[]> {
     .order('updated_at', { ascending: false })
   if (error) throw error
   return (data ?? []) as Pack[]
-}
-
-/** Значение настройки раунда с фолбэком на общие настройки пакета. */
-export function roundSetting<T>(pack: LoadedPack, round: LoadedRound, key: string, fallback: T): T {
-  const rs = round.settings as Record<string, unknown>
-  if (rs[key] !== undefined && rs[key] !== null) return rs[key] as T
-  const ps = (pack.settings ?? {}) as Record<string, unknown>
-  if (ps[key] !== undefined && ps[key] !== null) return ps[key] as T
-  return fallback
-}
-
-/** Раунды, участвующие в зачёте (для табло/финала). */
-export function scoredRounds(pack: LoadedPack): LoadedRound[] {
-  return pack.rounds.filter(r => !r.off_scoreboard)
-}
-
-/** Автогенерация metaLine: «10 ВОПРОСОВ · 30 СЕК · 1 БАЛЛ» */
-export function metaLine(round: LoadedRound): string {
-  if (round.meta_line_override) return round.meta_line_override
-  if (round.mechanic === 'melody') {
-    const themes = (round.settings as { themes?: { tracks: unknown[] }[] }).themes ?? []
-    const tracks = themes.reduce((s, t) => s + t.tracks.length, 0)
-    return `${themes.length} ТЕМ · ${tracks} ТРЕКОВ · СТАВКА СЕКУНДАМИ`
-  }
-  if (round.mechanic === 'jeopardy') {
-    const themes = (round.settings as { themes?: { tiles: unknown[] }[] }).themes ?? []
-    const tiles = themes.reduce((s, t) => s + t.tiles.length, 0)
-    return `${themes.length} ТЕМ · ${tiles} ПЛИТОК · ЦЕНА = БАЛЛЫ`
-  }
-  if (round.mechanic === 'sprint') {
-    const s = round.settings as { pointsPerQuestion?: number; allCorrectBonus?: number }
-    const n = round.questions.filter(q => !q.hidden).length
-    return `${n} ВОПРОСОВ · ${round.timer_seconds} СЕК · ${s.pointsPerQuestion ?? 2} БАЛЛА · +${s.allCorrectBonus ?? 5} ЗА ВСЕ`
-  }
-  const n = round.questions.filter(q => !q.hidden).length
-  const parts = [`${n} ВОПРОС${n % 10 === 1 && n % 100 !== 11 ? '' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'А' : 'ОВ'}`,
-    `${round.timer_seconds} СЕК`]
-  const s = round.settings as Record<string, unknown>
-  if (round.mechanic === 'stakes_unique' || round.mechanic === 'stakes_free') {
-    const vals = (s.stakesValues as number[] | undefined) ?? []
-    parts.push(`СТАВКИ ${Math.min(...vals)}–${Math.max(...vals)}`)
-  } else if (round.mechanic === 'test_stop') {
-    parts.push('СТОП ПОСЛЕ ОШИБКИ')
-  } else if (round.mechanic === 'thematic_x2') {
-    parts.push('×2 ЗА ТЕМУ')
-  } else {
-    parts.push(`${(s.pointsPerQuestion as number | undefined) ?? 1} БАЛЛ`)
-  }
-  return parts.join(' · ')
-}
-
-/** Видимый номер раунда: зачётные нумеруются с 1, вне зачёта — 0 (разогрев).
- *  ОДНА функция для проектора, игрока и админки — иначе рассинхрон. */
-export function displayRoundNumber(pack: LoadedPack, idx: number): string {
-  const r = pack.rounds[idx]
-  if (!r) return String(idx)
-  if (r.off_scoreboard) return '0'
-  let n = 0
-  for (let i = 0; i <= idx; i++) if (!pack.rounds[i].off_scoreboard) n++
-  return String(n)
 }

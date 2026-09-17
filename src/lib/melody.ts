@@ -35,6 +35,32 @@ export function melodyFree(themes: { tracks: unknown[] }[], played: string[]): s
   return melodyKeys(themes).filter(k => !played.includes(k))
 }
 
+/** Максимальная ставка — жёстко зашита в ряд кнопок на телефоне
+ *  (PlayerPage.tsx, [2..10]). Меняешь диапазон там — поменяй и здесь. */
+const MAX_BID_SEC = 10
+
+/** До какой секунды может начаться «сюрприз-отрывок» — с запасом на
+ *  максимальную ставку, чтобы отрывок никогда не пытался сыграть за
+ *  пределами файла. `trackSec` — настройка раунда (номинальная длина
+ *  треков этого пака, ведущий сам решает 20 это или 30); `realDuration` —
+ *  секунда, если браузер её уже сообщил (см. HANDOFF: трек может быть
+ *  короче заявленного, отрывок в конце обрывался бы тишиной). Слишком
+ *  короткий trackSec (короче ставки) не роняет формулу — потолок уходит
+ *  в 0, и отрывок всегда стартует с начала, как раньше. */
+export function melodyPreviewCeiling(trackSec: number, realDuration?: number): number {
+  const len = realDuration && realDuration > 0 ? Math.min(trackSec, realDuration) : trackSec
+  return Math.max(0, len - MAX_BID_SEC)
+}
+
+/** Случайная секунда старта — выбирается ОДИН раз при открытии трека и
+ *  дальше живёт в состоянии (см. MelodyState.startSec): «слушаем 1
+ *  секунду» и отрывок по ставке победителя обязаны стартовать с одной и
+ *  той же точки, не с двух разных бросков. Дробная секунда — точность не
+ *  нужна, важно только не спрашивать её нигде на экране (не тот дух игры). */
+export function melodyRandomStart(ceiling: number): number {
+  return Math.random() * ceiling
+}
+
 /** Доска: трек не выбран (или уже закрыт) — можно крутить рулетку. */
 export function melodyIdle(m: MelodyState): boolean {
   return !m.stage || m.stage === 'idle' || m.stage === 'done'
@@ -42,12 +68,30 @@ export function melodyIdle(m: MelodyState): boolean {
 
 /** Запуск трека рулеткой. Одна свободная плитка — крутить нечего, открываем
  *  сразу (то же правило, что и на проекторе: барабан по одной плитке выглядит
- *  как зависание). `spinSec` ограничен восемью секундами — зал не ждёт дольше. */
+ *  как зависание). `spinSec` ограничен восемью секундами — зал не ждёт дольше.
+ *  `trackSec` — номинальная длина треков раунда, отсюда же считается случайная
+ *  точка старта (см. melodyPreviewCeiling) — задаётся ЗДЕСЬ, а не по месту
+ *  показа, потому что рулетку дёргают И проектор, И пульт в админке
+ *  (AdminPage.tsx) — общая точка входа не даёт им разойтись. */
 export function melodySpin(m: MelodyState, key: string, freeCount: number,
-  spinSec: number, now = Date.now()): MelodyState {
-  const base = { ...m, key, order: undefined, turn: 0, chooser: undefined }
+  spinSec: number, trackSec: number, now = Date.now()): MelodyState {
+  const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
+  const base = { ...m, key, order: undefined, turn: 0, chooser: undefined, startSec }
   if (freeCount <= 1) return { ...base, stage: 'listen', deadline: melodyDeadline(3, now) }
   return { ...base, stage: 'spinning', deadline: melodyDeadline(Math.min(spinSec, 8), now) }
+}
+
+/** Ручной выбор плитки (Р2, без рулетки) — та же логика выбора случайной
+ *  точки старта, что и у melodySpin, просто без стадии spinning. Раньше жила
+ *  инлайном прямо в обработчике кнопки на проекторе — вынесена сюда, чтобы
+ *  не плодить вторую копию формулы `melodyPreviewCeiling`. */
+export function melodyPick(m: MelodyState, key: string, trackSec: number,
+  now = Date.now()): MelodyState {
+  const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
+  return {
+    ...m, key, startSec, stage: 'listen', deadline: melodyDeadline(3, now),
+    order: undefined, turn: 0, chooser: undefined,
+  }
 }
 
 /** Ставки собраны — запускаем отрывок на выигравшую ставку. */
