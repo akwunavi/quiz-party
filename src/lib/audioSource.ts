@@ -85,12 +85,18 @@ async function toBlobUrl(url: string): Promise<string> {
 
 export type PlayResult = { ok: true } | { ok: false; reason: string }
 
-/** Воспроизвести звук, при необходимости через запасной путь. */
-export async function playAudio(el: HTMLAudioElement, url: string): Promise<PlayResult> {
+/** Воспроизвести звук, при необходимости через запасной путь.
+ *  `startAt` — секунда, с которой начать (0 — как раньше, с начала).
+ *  Ставится СРАЗУ после `el.src`, до `play()`: браузер ставит сик в очередь
+ *  и применяет его сам, как только придут метаданные — ждать их здесь не
+ *  нужно (см. lib/melody.ts:melodyPreviewCeiling — «Угадай мелодию»,
+ *  единственный вызывающий с startAt ≠ 0). */
+export async function playAudio(el: HTMLAudioElement, url: string, startAt = 0): Promise<PlayResult> {
   live.add(el)                       // чтобы его точно можно было заглушить
   // 1) как есть
   try {
     el.src = url
+    if (startAt) el.currentTime = startAt
     await el.play()
     return { ok: true }
   } catch (e) {
@@ -103,6 +109,7 @@ export async function playAudio(el: HTMLAudioElement, url: string): Promise<Play
   // 2) через скачивание в память
   try {
     el.src = await toBlobUrl(url)
+    if (startAt) el.currentTime = startAt
     await el.play()
     return { ok: true }
   } catch (e) {

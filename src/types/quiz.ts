@@ -152,6 +152,9 @@ export interface MelodySettings {
   bidSec?: number               // совещание по ставке (10)
   answerSec?: number            // на ответ первой команде (30)
   passAnswerSec?: number        // на ответ второй после полного трека (10)
+  trackSec?: number             // номинальная длина треков в секундах (30) —
+                                 // для расчёта случайной точки старта отрывка,
+                                 // см. lib/melody.ts:melodyPreviewCeiling
 }
 export interface RaceSettings {
   dogs?: string[]               // клички 5 бульдогов
@@ -261,6 +264,9 @@ export interface MelodyState {
   turn?: number                 // индекс текущей команды в order
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
+  startSec?: number             // случайная точка старта «сюрприз-отрывка» (0…
+                                 // melodyPreviewCeiling), выбирается ОДИН раз при
+                                 // открытии трека — listen и snippet играют с неё же
   played?: string[]             // отыгранные треки
   chooser?: string              // (не используется: выбор всегда рулеткой)
   race?: { seed?: number; stage?: 'betting' | 'running' | 'done'; startedAt?: string }

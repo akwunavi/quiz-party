@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
-  melodySpin, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
   melodyReveal, melodyToBoard, melodyPoints, melodyIdle, melodyFree, melodyKeys,
-  melodyDeadline,
+  melodyDeadline, melodyPreviewCeiling, melodyRandomStart,
 } from '../melody'
 import type { MelodyState } from '../../types/quiz'
 
@@ -29,28 +29,83 @@ describe('мелодия: доска', () => {
 
 describe('мелодия: рулетка', () => {
   it('несколько свободных треков — крутим барабан', () => {
-    const n = melodySpin({ played: ['0-0'] }, '1-1', 4, 5, T0)
+    const n = melodySpin({ played: ['0-0'] }, '1-1', 4, 5, 30, T0)
     expect(n.stage).toBe('spinning')
     expect(n.key).toBe('1-1')
     expect(n.deadline).toBe(melodyDeadline(5, T0))
   })
 
   it('свободна одна плитка — крутить нечего, открываем сразу', () => {
-    const n = melodySpin({}, '1-1', 1, 5, T0)
+    const n = melodySpin({}, '1-1', 1, 5, 30, T0)
     expect(n.stage).toBe('listen')
     expect(n.deadline).toBe(melodyDeadline(3, T0))
   })
 
   it('барабан не крутится дольше восьми секунд', () => {
-    const n = melodySpin({}, '0-0', 5, 30, T0)
+    const n = melodySpin({}, '0-0', 5, 30, 30, T0)
     expect(n.deadline).toBe(melodyDeadline(8, T0))
   })
 
   it('очередь прошлого трека сбрасывается', () => {
-    const n = melodySpin({ order: ['a', 'b'], turn: 1, chooser: 'a' }, '0-0', 3, 5, T0)
+    const n = melodySpin({ order: ['a', 'b'], turn: 1, chooser: 'a' }, '0-0', 3, 5, 30, T0)
     expect(n.order).toBeUndefined()
     expect(n.turn).toBe(0)
     expect(n.chooser).toBeUndefined()
+  })
+
+  it('выбирает случайную точку старта в пределах melodyPreviewCeiling(trackSec)', () => {
+    for (let i = 0; i < 50; i++) {
+      const n = melodySpin({}, '0-0', 5, 5, 30, T0)
+      expect(n.startSec).toBeGreaterThanOrEqual(0)
+      expect(n.startSec).toBeLessThanOrEqual(20) // 30 − максимальная ставка (10)
+    }
+  })
+})
+
+describe('мелодия: ручной выбор плитки (Р2)', () => {
+  it('открывает трек сразу в listen со случайной точкой старта', () => {
+    const n = melodyPick({ order: ['a'], turn: 1, chooser: 'x' }, '1-0', 30, T0)
+    expect(n.stage).toBe('listen')
+    expect(n.key).toBe('1-0')
+    expect(n.deadline).toBe(melodyDeadline(3, T0))
+    expect(n.order).toBeUndefined()
+    expect(n.turn).toBe(0)
+    expect(n.chooser).toBeUndefined()
+    expect(n.startSec).toBeGreaterThanOrEqual(0)
+    expect(n.startSec).toBeLessThanOrEqual(20)
+  })
+})
+
+describe('мелодия: окно случайного старта отрывка', () => {
+  it('номинальные 30 секунд трека → потолок 20 (запас под ставку до 10 сек)', () => {
+    expect(melodyPreviewCeiling(30)).toBe(20)
+  })
+
+  it('короче номинала (реальная длительность известна) → потолок ужимается', () => {
+    expect(melodyPreviewCeiling(30, 22)).toBe(12)
+  })
+
+  it('длиннее номинала — не даём потолку вырасти сверх настройки раунда', () => {
+    expect(melodyPreviewCeiling(30, 90)).toBe(20)
+  })
+
+  it('трек короче максимальной ставки — потолок не уходит в минус', () => {
+    expect(melodyPreviewCeiling(8)).toBe(0)
+    expect(melodyPreviewCeiling(30, 4)).toBe(0)
+  })
+
+  it('без реальной длительности (undefined/0/NaN) — доверяем номиналу', () => {
+    expect(melodyPreviewCeiling(30, 0)).toBe(20)
+    expect(melodyPreviewCeiling(30, undefined)).toBe(20)
+  })
+
+  it('melodyRandomStart не выходит за потолок и не уходит в минус', () => {
+    for (let i = 0; i < 50; i++) {
+      const r = melodyRandomStart(20)
+      expect(r).toBeGreaterThanOrEqual(0)
+      expect(r).toBeLessThan(20)
+    }
+    expect(melodyRandomStart(0)).toBe(0)
   })
 })
 

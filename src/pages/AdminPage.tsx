@@ -1833,7 +1833,7 @@ function MelodyControls({ round, gameState, onFinish }: {
               того же действия путали бы */}
           <button className="adm-btn primary" onClick={() => {
             const target = free[Math.floor(Math.random() * free.length)]
-            void runAction('рулетка мелодии', () => saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5)))
+            void runAction('рулетка мелодии', () => saveMelody(melodySpin(m, target, free.length, s.spinSec ?? 5, s.trackSec ?? 30)))
           }}>🎲 {played.length === 0 ? 'СТАРТУЕМ!' : 'РУЛЕТКА'}</button>
         </>) : (<>
           <div className="adm-qtext" style={{ textAlign: 'center' }}>

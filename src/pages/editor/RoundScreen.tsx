@@ -591,7 +591,7 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
   pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
 }) {
   const s = round.settings as { themes?: { name: string; tracks: { audio: string; correct: string }[] }[]
-    spinSec?: number; bidSec?: number; answerSec?: number; passAnswerSec?: number }
+    spinSec?: number; bidSec?: number; answerSec?: number; passAnswerSec?: number; trackSec?: number }
   const [themes, setThemes] = useState(s.themes ?? [])
   const [dirty, setDirty] = useState(false)
   const upd = (fn: (t: typeof themes) => typeof themes) => { setThemes(fn); setDirty(true) }
@@ -640,10 +640,22 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
               disabled={locked}
               onCommit={v => setNum({ passAnswerSec: v })}
               /></div>
+        <div className="ed-field"><label>Длина треков, сек</label>
+          <NumField
+              value={s.trackSec ?? 30}
+              min={15}
+              max={180}
+              disabled={locked}
+              onCommit={v => setNum({ trackSec: v })}
+              /></div>
       </div>
       <div className="ed-hint">Баллы: ставка 2–5 сек — 2 балла, 6–10 сек — 1 балл,
         вторая команда после передачи хода — 0.5. Треки загружай ПОЛНЫМИ (нужны и первая
-        секунда, и проигрывание целиком).</div>
+        секунда, и проигрывание целиком) — «длина треков» должна совпадать с тем, что
+        реально залито в этой теме: от неё считается случайная секунда сюрприз-отрывка
+        (0…длина−10, с запасом под максимальную ставку), и она же слышна и в подсказке,
+        и потом в отрывке по ставке. Короче не соврёт критично — приложение подрежет
+        случайную секунду под реальную длину файла, если браузер успеет её сообщить.</div>
 
       {themes.map((t, ti) => (
         <div key={ti} style={{ margin: '10px 0', padding: 10, background: 'var(--panel2)', borderRadius: 8 }}>
