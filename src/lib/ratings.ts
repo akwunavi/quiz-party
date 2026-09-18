@@ -20,7 +20,6 @@ export type RatingRow = {
 }
 
 export const commentRef = (roundNumber: number) => `r${roundNumber}-comment`
-export const isCommentRef = (ref: string) => /^r\d+-comment$/.test(ref)
 
 /** Поставить или изменить оценку вопроса. */
 export async function rateQuestion(args: {

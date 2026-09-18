@@ -251,7 +251,6 @@ button.ghost.dark { background: rgba(0,0,0,.45); color: var(--muted);
 .title-anim { animation: titleIn .9s cubic-bezier(.2,.9,.25,1.2) both; }
 @keyframes titleIn { from { transform: translateY(30px) scale(.92); opacity: 0; filter: blur(6px); }
   to { transform: none; opacity: 1; filter: none; } }
-.lobby-qr { width: 150px; height: 150px; border-radius: 8px; }
 .lobby-teams { flex-wrap: wrap; justify-content: center; max-width: 80vw; }
 .lobby-team { border-radius: 999px; animation: titleIn .4s both; }
 

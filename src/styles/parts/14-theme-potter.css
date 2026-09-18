@@ -64,10 +64,10 @@
    вместо topbar словит round-badge. */
 .theme-potter .host-screen:has(> .host-topbar) ~ .link-badge-corner { top: 50px; }
 /* sparkTwinkle: keyframe остался — им пользуются button:hover::after
-   (16-round-melody-tiles.css) и .answer-pulse (18-patch-745.css), сама
-   декоративная искра сцены (.pt-spark) удалена вместе со свечами/снитчем
-   в шаге 2 rollout'а (заменены .mg-dust/.mg-flare/.mg-wisp в
-   34-magic-environment.css). */
+   (16-round-melody-tiles.css) и .answer-pulse (ниже в этом файле, перенесён
+   из 18-patch-745.css в 9.48), сама декоративная искра сцены (.pt-spark)
+   удалена вместе со свечами/снитчем в шаге 2 rollout'а (заменены
+   .mg-dust/.mg-flare/.mg-wisp в 34-magic-environment.css). */
 @keyframes sparkTwinkle { 0%,100% { opacity: 0; transform: scale(.4); }
   50% { opacity: 1; transform: scale(1); } }
 /* Обычное латунное кольцо — только на answer_time (Timer variant="ring",
@@ -87,6 +87,32 @@
 .theme-potter .sprint-card { background: rgba(211,166,37,.08);
   border-color: rgba(211,166,37,.4); }
 .theme-potter .mel-theme { color: #e9c766; }
+
+/* ── 7.46: запас сверху под крупный таймер (ГП) ──
+   Таймер-змея удалена в шаге 12 rollout'а Magic-темы — заменена
+   MagicCircleTimer (шапка/.mel-count/.sprint-timer) и обычным латунным
+   кольцом .timer-wrap на answer_time (Р2, HANDOFF.md). Отступ экрана
+   остаётся, он не про конкретный визуал таймера.
+   Перенесено из 19-patch-746.css в 9.48 — было L94-131 части свалки. */
+.theme-potter .host-screen { padding-top: 150px; }
+
+/* 10: ГП — «ОТВЕЧАЙТЕ!» без кибер-кольца, вместо него волшебное сияние
+   (7.45, перенесено из 18-patch-745.css в 9.48). */
+.theme-potter .answer-pulse { animation: none; }
+.theme-potter .answer-pulse .neon-title {
+  animation: spellGlow 2.4s ease-in-out infinite; }
+@keyframes spellGlow {
+  0%, 100% { text-shadow: 0 0 16px rgba(211,166,37,.5), 0 0 34px rgba(164,93,226,.25);
+    filter: brightness(1); }
+  50% { text-shadow: 0 0 30px rgba(233,199,102,.9), 0 0 60px rgba(164,93,226,.55);
+    filter: brightness(1.15); }
+}
+.theme-potter .answer-pulse::before, .theme-potter .answer-pulse::after {
+  content: '✦'; position: absolute; color: #ffe9a8; font-size: 22px;
+  animation: sparkTwinkle 2s ease-in-out infinite; }
+.theme-potter .answer-pulse { position: relative; }
+.theme-potter .answer-pulse::before { left: -34px; top: 10%; }
+.theme-potter .answer-pulse::after { right: -34px; bottom: 10%; animation-delay: 1s; }
 
 /* Спринт: вопрос-«герой» на всю ширину над колонками (нечётное число вопросов) */
 .sprint-screen.with-hero { grid-template-rows: auto 1fr; }

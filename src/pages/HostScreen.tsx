@@ -2494,7 +2494,12 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
   // подсчёт читали ответы одинаково.
   const rows = answers
     .filter(a => jeopardyTile(a.question_ref, gameState.round_number) === tileIndex)
-    .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
+    // created_at пишется один раз при вставке и не двигается при правке
+    // ведущим (updated_at двигается при КАЖДОЙ оценке ✓/✗ — из-за этого
+    // порядок команд прыгал при каждом клике, issue #9). Фолбэк на
+    // updated_at — для старых игр до миграции 0009, где created_at может
+    // отсутствовать в ответе (см. lib/exportAnswers.ts — тот же приём).
+    .sort((x, y) => +new Date(x.created_at ?? x.updated_at) - +new Date(y.created_at ?? y.updated_at))
 
   const grade = async (id: string, correct: boolean) => {
     setLocalGrades(g => ({ ...g, [id]: correct }))

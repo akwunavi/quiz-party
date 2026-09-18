@@ -1,0 +1,32 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ВАРИАНТЫ ОТВЕТА: .choices-grid / .choice-plate / .choice-imgs
+   Вынесено из свалки 19-patch-746.css в 9.48 (часть J карты переноса).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 4: ВАРИАНТЫ ОТВЕТА — ниже и заметно крупнее (правило для всех механик) ── */
+.choices-grid { display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.4vw, 24px); width: min(1600px, 95vw); margin-inline: auto;
+  flex-shrink: 0; margin-top: auto; padding-top: clamp(20px, 5vh, 72px); }
+.choice-plate { display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
+  padding: clamp(16px, 2vh, 30px) clamp(20px, 2vw, 38px);
+  font-size: clamp(26px, 2.9vw, 52px); font-weight: 700; line-height: 1.15;
+  border-radius: 12px; }
+.choice-plate .key { font-size: 1.15em; flex: 0 0 auto; }
+/* три и более коротких варианта — в одну строку, если влезают */
+.choices-grid:has(.choice-plate:nth-child(5)) { grid-template-columns: 1fr 1fr 1fr; }
+
+/* ── 5: ИНТРИГА ПРИ ПОКАЗЕ ОТВЕТА ──
+   плитки выезжают партиями, «правильный/неправильный» подсвечивается позже,
+   и подсветка появляется плавно, без дёрганья раскладки. */
+.choice-plate.pending { opacity: 1; }
+.choice-plate.hidden-yet { visibility: hidden; animation: none; opacity: 0; }
+.choice-plate.correct, .choice-plate.dimmed,
+.choice-img.correct, .choice-img.dimmed { transition: opacity .5s ease, filter .5s ease,
+  border-color .5s ease, box-shadow .5s ease, background-color .5s ease; }
+.choice-img.hidden-yet { visibility: hidden; animation: none; opacity: 0; }
+.choice-imgs { display: grid; gap: clamp(10px, 1.2vw, 22px);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  width: min(1600px, 95vw); margin-inline: auto; }
+.choice-img img { width: 100%; height: auto; max-height: 34vh; object-fit: contain;
+  border-radius: 8px; background: rgba(0,0,0,.25); }
+.choice-img .key { font-size: clamp(18px, 1.8vw, 30px); font-weight: 700; }

@@ -7,16 +7,21 @@
    Проектором никто не прокручивает — значит всё обязано влезать. Блоки
    ужимаются шрифтом через clamp и количество колонок, а не скроллом. */
 
-.lobby-groups { width: 100%; display: flex; flex-direction: column;
-  align-items: center; gap: clamp(6px, 1vh, 14px); min-height: 0; }
+/* 9.47: было `.lobby-groups[data-count="N"] ...` — класса `.lobby-groups`
+   в разметке модалки составов нет с переезда на модалку (7.98), контейнер
+   называется `.groups-modal` (data-count там же). Из-за опечатки в имени
+   сетка `.lg-list` всегда получала базовые 2 колонки и не подстраивалась
+   под 1/3/4 по числу команд, а укрупнение шрифта при 5+ командах не
+   срабатывало — переименовано, проверено рендером на data-count 1..8
+   (см. HANDOFF §3bo). */
 .lg-list { display: grid; gap: clamp(8px, 1.2vw, 18px); width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.lobby-groups[data-count="1"] .lg-list { grid-template-columns: 1fr; }
-.lobby-groups[data-count="3"] .lg-list,
-.lobby-groups[data-count="5"] .lg-list,
-.lobby-groups[data-count="6"] .lg-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.lobby-groups[data-count="7"] .lg-list,
-.lobby-groups[data-count="8"] .lg-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.groups-modal[data-count="1"] .lg-list { grid-template-columns: 1fr; }
+.groups-modal[data-count="3"] .lg-list,
+.groups-modal[data-count="5"] .lg-list,
+.groups-modal[data-count="6"] .lg-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.groups-modal[data-count="7"] .lg-list,
+.groups-modal[data-count="8"] .lg-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 .lg-team { border: 1px solid var(--dim); border-radius: 12px;
   padding: clamp(8px, 1.2vh, 16px) clamp(10px, 1.2vw, 20px);
@@ -26,10 +31,10 @@
 .lg-players { font-size: clamp(13px, 1.25vw, 22px); line-height: 1.35;
   opacity: .9; overflow-wrap: anywhere; }
 /* много команд — мельче шрифт, но по-прежнему без прокрутки */
-.lobby-groups[data-count="5"] .lg-players,
-.lobby-groups[data-count="6"] .lg-players { font-size: clamp(12px, 1.05vw, 18px); }
-.lobby-groups[data-count="7"] .lg-players,
-.lobby-groups[data-count="8"] .lg-players { font-size: clamp(11px, .95vw, 16px); }
+.groups-modal[data-count="5"] .lg-players,
+.groups-modal[data-count="6"] .lg-players { font-size: clamp(12px, 1.05vw, 18px); }
+.groups-modal[data-count="7"] .lg-players,
+.groups-modal[data-count="8"] .lg-players { font-size: clamp(11px, .95vw, 16px); }
 
 /* QR — маленький, в левом нижнем углу, без подписей */
 .lobby-qr-corner { position: fixed; left: clamp(16px, 2vw, 34px);
@@ -40,8 +45,6 @@
 /* Подключившиеся команды: старое правило растягивало их в колонку на всю
    ширину (min-width 240 + align stretch) — плашки наезжали на составы.
    Здесь чипы в ряд по содержимому. */
-/* составы не должны сжиматься под чипами */
-.lobby-groups { flex: 0 1 auto; }
 
 /* ═══════ 7.98: фишки команд в ряд, составы — модалкой ═══════ */
 
