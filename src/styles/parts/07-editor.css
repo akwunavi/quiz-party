@@ -82,7 +82,6 @@
 
 /* Своя игра: доска плиток */
 .jp-board { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
-.jp-theme { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
 .jp-theme-name { text-transform: uppercase; }
 
 /* Сосульки заметно чаще */

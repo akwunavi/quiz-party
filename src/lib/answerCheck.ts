@@ -10,12 +10,6 @@ export function normalize(text: unknown): string {
     .trim()
 }
 
-export function isMatch(answer: string, correct: string): boolean | null {
-  const a = normalize(answer)
-  if (!a) return null                       // пусто = пропуск, не ошибка
-  return a === normalize(correct)
-}
-
 export function levenshtein(a: string, b: string): number {
   if (a === b) return 0
   const m = a.length, n = b.length
