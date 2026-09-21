@@ -8,8 +8,19 @@
   font-family: var(--font-digits); font-size: clamp(18px, 2.4vw, 36px);
   background: var(--panel); border: 1px solid var(--dim); border-radius: 10px; }
 .mel-tile.done { opacity: .2; }
+/* Раньше здесь висел общий keyframe `pulse` (01-base.css) — он задуман для
+   мелких элементов (число таймера, точка-индикатор) и в 50%-кадре даёт
+   `transform: scale(1.1)`. На `.mel-tile` это НЕ мелкий элемент, а корень
+   всей ячейки грида: скейл 1.1 у ячейки размером в сотни px раздувает её
+   на десятки px в каждую сторону — при обычном gap:10px между плитками
+   этого достаточно, чтобы «горячая» плитка на барабане наезжала на
+   соседние (проверено рендером: getBoundingClientRect соседних `.mel-tile`
+   пересекались во ВСЕХ темах, не только Magic — правило не было
+   тема-специфичным). Свечение нужно, скейл — нет: отдельный keyframe без
+   transform, специфично для плитки. */
 .mel-tile.spin { border-color: var(--accent); box-shadow: 0 0 24px var(--accent);
-  animation: pulse .35s ease-in-out infinite; }
+  animation: melTileGlow .35s ease-in-out infinite; }
+@keyframes melTileGlow { 50% { box-shadow: 0 0 36px var(--accent); } }
 .mel-overlay { position: fixed !important; inset: 0 !important; z-index: 999 !important;
   background: rgba(2,6,14,.88);
   display: flex; align-items: center; justify-content: center; padding: 24px; }
