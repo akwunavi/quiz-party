@@ -30,6 +30,7 @@ import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodySettings, MelodyState, MelodyTheme, ThemeKey } from '../../types/quiz'
+import type { PreviewCtx } from '../../lib/previewState'
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
@@ -105,14 +106,21 @@ function RevealTrack({ src }: { src: string }) {
   return <div className="mel-reveal-track">♪ играет 15 секунд</div>
 }
 
-export function MelodyBoard({ pack, round, gameState }: {
+export function MelodyBoard({ pack, round, gameState, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
+  /** Предпросмотр в редакторе: все эффекты, пишущие в игру (переходы стадий,
+   *  звук, начисление баллов), выключены — экран показывает готовую
+   *  фиктивную стадию и ничего не меняет в живой сессии (HANDOFF.md). */
+  preview?: PreviewCtx
 }) {
   const s = round.settings as MelodySettings
   const themes = s.themes ?? []
   const m: MelodyState = gameState.melody ?? {}
-  const teams = useTeams(gameState.game_id)
-  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  // Хуки вызываются БЕЗУСЛОВНО (React #310) — меняется только аргумент.
+  const liveTeams = useTeams(preview ? null : gameState.game_id)
+  const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
+  const teams = preview ? preview.teams : liveTeams
+  const answers = preview ? preview.answers : liveAnswers
   const played = m.played ?? []
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [now, setNow] = useState(Date.now())
@@ -136,7 +144,7 @@ export function MelodyBoard({ pack, round, gameState }: {
   // ставки, дошедшие ПОСЛЕ дедлайна (полинг ~2 сек), пересобирают очередь,
   // пока трек ещё не запущен кнопкой «Играем N сек»
   useEffect(() => {
-    if (m.stage !== 'bids') return
+    if (preview || m.stage !== 'bids') return
     const bidders = bids
       .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
       .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
@@ -145,23 +153,24 @@ export function MelodyBoard({ pack, round, gameState }: {
     if (JSON.stringify(order) !== JSON.stringify(m.order)) {
       void saveMelody({ ...m, order, turn: 0 })
     }
-  }, [m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
 
   // ── snippet: интервал играет от РЕАЛЬНОГО старта звука ровно bid секунд ──
   // Сторож стадии snippet. Переход был завязан ТОЛЬКО на событие окончания
   // звука: если аудио не загрузилось, вкладка была скрыта или браузер не дал
   // автовоспроизведение — экран замирал навсегда, и выйти было нельзя.
   useEffect(() => {
-    if (m.stage !== 'snippet') return
+    if (preview || m.stage !== 'snippet') return
     const sec = m.snippetSec ?? 5
     const t = window.setTimeout(() => {
       void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
     }, (sec + 10) * 1000)          // фрагмент + 10 сек запаса
     return () => clearTimeout(t)
-  }, [m.stage, m.key, m.snippetSec])
+  }, [preview, m.stage, m.key, m.snippetSec])
 
   useEffect(() => {
-    if (m.stage !== 'snippet' || !track?.audio || document.hidden) return
+    if (preview || m.stage !== 'snippet' || !track?.audio || document.hidden) return
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
     // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
@@ -182,11 +191,11 @@ export function MelodyBoard({ pack, round, gameState }: {
     }, { once: true })
     const guard = window.setTimeout(advance, (sec + 4) * 1000)
     return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
-  }, [m.stage, m.key])
+  }, [preview, m.stage, m.key])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
-    if (!expired || document.hidden) return
+    if (preview || !expired || document.hidden) return
     if (m.stage === 'spinning') {
       void saveMelody({ ...m, stage: 'listen', deadline: inSec(2) })
     } else if (m.stage === 'bidding') {
@@ -215,11 +224,11 @@ export function MelodyBoard({ pack, round, gameState }: {
         void saveMelody(melodyPass(m))
       }
     }
-  }, [expired, m.stage, answers])
+  }, [preview, expired, m.stage, answers])
 
   // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
-    if (m.stage !== 'listen' || !track?.audio || document.hidden) return
+    if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
     const a = playShared(mediaUrl(track.audio), requested)
     audioRef.current = a
@@ -262,27 +271,27 @@ export function MelodyBoard({ pack, round, gameState }: {
       clearTimeout(guard); clearTimeout(metaGuard)
       a.removeEventListener('loadedmetadata', checkReal)
     }
-  }, [m.stage, m.key])
+  }, [preview, m.stage, m.key])
 
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
     // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
-    if ((m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
+    if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
     const a = playShared(mediaUrl(bg))
     a.loop = true; a.volume = .45
     return () => { a.pause(); a.loop = false; a.volume = 1 }
-  }, [m.stage])
+  }, [preview, m.stage])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
-    if (m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
+    if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
     const a = playShared(mediaUrl(track.audio))
     audioRef.current = a
     a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
     return () => { a.pause(); a.onended = null }
-  }, [m.stage])
+  }, [preview, m.stage])
 
   // Хук стоит ВЫШЕ раннего выхода намеренно. Пока он был ниже, раунд без
   // тем рендерился с другим набором хуков — React #310 на проекторе в тот
@@ -322,12 +331,14 @@ export function MelodyBoard({ pack, round, gameState }: {
   }
 
   return (
-    <div className="host-screen grid-bg mel-screen" onPointerDown={unlockAudio}>
+    <div className="host-screen grid-bg mel-screen" onPointerDown={preview ? undefined : unlockAudio}>
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
         spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10}
-        onPick={manualPick ? pickManually : undefined} theme={pack.theme} />
+        onPick={preview ? undefined : (manualPick ? pickManually : undefined)} theme={pack.theme} />
 
-      {idle && (
+      {/* Кнопки этого блока запускают рулетку/спин — реальная запись в
+          живую сессию. В предпросмотре не рендерятся вовсе (HANDOFF.md). */}
+      {!preview && idle && (
         <div className="host-actions">
           {freeKeys.length > 0
             ? (manualPick
@@ -404,14 +415,14 @@ export function MelodyBoard({ pack, round, gameState }: {
                 })}
                 {(m.order ?? []).length === 0 && <div style={{ opacity: .6 }}>ставок нет</div>}
               </div>
-              <div className="mel-actions">
+              {!preview && <div className="mel-actions">
                 <button disabled={!currentId}
                   onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
                   Играем {bidSec || 5} сек →
                 </button>
                 <button className="ghost dark"
                   onClick={() => void saveMelody(melodyClose(m))}>Пропустить трек</button>
-              </div>
+              </div>}
             </>)}
 
             {m.stage === 'snippet' && (<>
@@ -419,10 +430,10 @@ export function MelodyBoard({ pack, round, gameState }: {
                 {currentTeam?.name} · играет {bidSec} сек
               </div>
               {/* если звук не пошёл — ведущий переводит стадию руками */}
-              <div className="mel-actions">
+              {!preview && <div className="mel-actions">
                 <button onClick={() => void saveMelody(melodyAcceptAnswer(m, s.answerSec ?? 30))}>
                   Принимаем ответ →</button>
-              </div>
+              </div>}
             </>)}
 
             {m.stage === 'reveal' && (<>
@@ -432,19 +443,22 @@ export function MelodyBoard({ pack, round, gameState }: {
               </div>
               {/* Дослушать трек: 15 секунд с начала, вместе с показом ответа.
                   Раньше музыка обрывалась в момент угадывания, и зал не
-                  успевал узнать песню. */}
-              {track?.audio && <RevealTrack src={mediaUrl(track.audio)} />}
+                  успевал узнать песню. В предпросмотре звук НЕ запускаем —
+                  play() асинхронный, «запустить и заглушить» не работает
+                  (HANDOFF.md), а надпись про 15 секунд не нужна редактору. */}
+              {!preview && track?.audio && <RevealTrack src={mediaUrl(track.audio)} />}
               <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
                 {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
               </div>
-              <div className="mel-actions">
+              {!preview && <div className="mel-actions">
                 <button onClick={() => void saveMelody(melodyToBoard(m))}>К доске →</button>
-              </div>
+              </div>}
             </>)}
             {/* Аварийный выход. Доступен на любой стадии: интернет у команд
                 отваливается, ответы не долетают, и ведущему нужен способ
-                двигаться дальше, не перезапуская игру. */}
-            {m.stage !== 'reveal' && m.stage !== 'done' && (
+                двигаться дальше, не перезапуская игру. Не рендерится в
+                предпросмотре — как и остальные кнопки, пишущие в игру. */}
+            {!preview && m.stage !== 'reveal' && m.stage !== 'done' && (
               <button className="mel-escape" onClick={async () => {
                 if (!confirm('Закрыть трек и вернуться к доске?\n\n'
                   + 'Баллы за него никто не получит.')) return
@@ -477,12 +491,12 @@ export function MelodyBoard({ pack, round, gameState }: {
                     ? ' — передайте ход второй команде' : ' — трек закрывается'}
                 </div>
               )}
-              <div className="mel-actions">
+              {!preview && <div className="mel-actions">
                 <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
                 <button className="ghost" onClick={() => void passMelody(m, ans)}>
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
                 </button>
-              </div>
+              </div>}
             </>)}
           </div>
         </div>,

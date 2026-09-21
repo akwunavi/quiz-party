@@ -26,20 +26,27 @@ import {
 } from '../../lib/reveal'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodyState, RevealSettings, RevealState } from '../../types/quiz'
+import type { PreviewCtx } from '../../lib/previewState'
 
-export function RevealBoard({ pack, round, gameState, timerNode }: {
+export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
   /** Timer живёt в HostScreen.tsx и не экспортируется (импорт оттуда тянул
    *  бы весь проектор в чужой чанк) — проектор передаёт готовую фабрику:
    *  seconds/chime меняются по фазам, поэтому нужна функция, не одна нода. */
   timerNode: (seconds: number, key: string, chime: boolean) => ReactNode
+  /** Предпросмотр в редакторе: старт фазы/автопереход/автопроверка и
+   *  cleanup-эффект (обнуляет `melody.rv` — СРАБАТЫВАЕТ ПРИ РАЗМОНТИРОВАНИИ,
+   *  то есть при простом закрытии предпросмотра) выключены (HANDOFF.md). */
+  preview?: PreviewCtx
 }) {
   const s = round.settings as RevealSettings
   const bag: MelodyState = gameState.melody ?? {}
   const q = round.questions[gameState.question_index]
   const paperMode = pack.settings?.play_mode === 'paper'
-  const teams = useTeams(gameState.game_id)
-  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const liveTeams = useTeams(preview ? null : gameState.game_id)
+  const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
+  const teams = preview ? preview.teams : liveTeams
+  const answers = preview ? preview.answers : liveAnswers
   const isLast = gameState.question_index + 1 >= round.questions.length
 
   // rv стадии ПРЕДЫДУЩЕГО вопроса иногда доживает в состоянии (например, на
@@ -57,15 +64,15 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
 
   // ── старт фазы 1 при смене вопроса (или после «▶ ПРОЧИТАЛ» на бумаге) ──
   useEffect(() => {
-    if (!q || rawRv.qid === q.id) return
+    if (preview || !q || rawRv.qid === q.id) return
     if (paperMode && !gameState.timer_started_at) return
     void saveReveal(bagRef.current, revealStart(q.id, s))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q?.id, rawRv.qid, paperMode, gameState.timer_started_at])
+  }, [preview, q?.id, rawRv.qid, paperMode, gameState.timer_started_at])
 
   // ── автопереход по таймеру: строго один раз на фазу ──
   useEffect(() => {
-    if (!q || !rv.phase || rv.phase === 'review') return
+    if (preview || !q || !rv.phase || rv.phase === 'review') return
     const key = `${rv.qid}:${rv.phase}`
     const switchAt = revealSwitchAt(rv)
     if (!switchAt) return
@@ -80,11 +87,11 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
     const t = window.setInterval(tick, 300)
     return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q?.id, rv.qid, rv.phase, rv.startedAt, rv.phaseSec])
+  }, [preview, q?.id, rv.qid, rv.phase, rv.startedAt, rv.phaseSec])
 
   // ── вход в разбор: автопроверка неоценённых ответов, один раз на вопрос ──
   useEffect(() => {
-    if (!q || rv.phase !== 'review' || checkedRef.current === q.id) return
+    if (preview || !q || rv.phase !== 'review' || checkedRef.current === q.id) return
     checkedRef.current = q.id
     rows.forEach(a => {
       if (a.is_correct != null) return
@@ -93,10 +100,13 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
       void room.patchAnswer(a.id, { is_correct: ok }).catch(() => {})
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q?.id, rv.phase, rows.length])
+  }, [preview, q?.id, rv.phase, rows.length])
 
   // ── выход из раунда: доска не должна остаться «занятой» на следующей игре ──
-  useEffect(() => () => { void clearReveal(bagRef.current) }, [])
+  // КРИТИЧНО: срабатывает при РАЗМОНТИРОВАНИИ — то есть при обычном закрытии
+  // предпросмотра в редакторе. Без гарда закрытие предпросмотра молча
+  // затирало бы melody.rv ЖИВОЙ игры на другом экране (HANDOFF.md).
+  useEffect(() => () => { if (!preview) void clearReveal(bagRef.current) }, [preview])
 
   const word = q?.answer.mode === 'crossword_word' ? q.answer.word : ''
   const groups = useFitText<HTMLDivElement>([word, rv.phase])
@@ -174,11 +184,13 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
         </div>
       )}
 
-      <div className="host-actions">
+      {/* Кнопки пишут в живую сессию (следующая фаза/следующий вопрос) —
+          в предпросмотре не рендерятся вовсе (HANDOFF.md). */}
+      {!preview && <div className="host-actions">
         {rv.phase === 'review' && isLast
           ? <AfterRoundNav pack={pack} gameState={gameState} />
           : <button onClick={manualNext}>Дальше →</button>}
-      </div>
+      </div>}
     </div>
   )
 }
