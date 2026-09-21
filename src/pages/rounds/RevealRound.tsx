@@ -21,7 +21,7 @@ import { useTeams } from '../../hooks/useTeams'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { saveReveal, clearReveal } from '../../lib/revealActions'
 import {
-  revealStart, revealNext, revealSwitchAt, revealVisible, revealGroups,
+  revealStart, revealNext, revealSwitchAt, revealVisibleIndices, revealGroups,
   revealLetterOpen, revealAllAnswered,
 } from '../../lib/reveal'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -110,7 +110,7 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
 
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const phase = rv.phase ?? 1
-  const visible = revealVisible(imgs.length, phase)
+  const shownImgs = revealVisibleIndices(imgs.length, phase).map(i => imgs[i])
   const letterGroups = revealGroups(word)
   const openLetters = q.service.openLetters
 
@@ -134,9 +134,10 @@ export function RevealBoard({ pack, round, gameState, timerNode }: {
           && timerNode(rv.phaseSec, `${rv.qid}-${rv.phase}`, rv.phase === 3)}
       </div>
 
-      <div className={visible <= 3 ? `q-media-grid n${visible} eq-row` : 'q-media-grid rv-2x2'}
+      <div className={shownImgs.length <= 3
+        ? `q-media-grid n${shownImgs.length} eq-row` : 'q-media-grid rv-2x2'}
         style={mediaScaleVar(q)}>
-        {imgs.slice(0, visible).map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+        {shownImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
       </div>
 
       <div className="rv-word-wrap">
