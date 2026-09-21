@@ -69,11 +69,18 @@ export function revealNext(
   return rv
 }
 
-/** Сколько картинок показывать на текущей фазе (максимум — сколько есть). */
-export function revealVisible(count: number, phase: 1 | 2 | 3 | 'review'): number {
-  if (phase === 1) return Math.min(2, count)
-  if (phase === 2) return Math.min(3, count)
-  return Math.min(4, count)
+/** Индексы картинок (0-based), видимые на текущей фазе. В фазах 1–3 картинки
+ *  ЗАМЕНЯЮТСЯ, а не накапливаются — на экране никогда не больше 2 сразу:
+ *  фаза 1 — [0,1], фаза 2 — [2] (первые две убраны), фаза 3 — [3] (третья
+ *  убрана). Если картинок меньше 4 — менять не на что, показываем то же,
+ *  что было. `review` — особый случай, там по-прежнему ВСЕ картинки. */
+export function revealVisibleIndices(count: number, phase: 1 | 2 | 3 | 'review'): number[] {
+  if (phase === 'review') return Array.from({ length: count }, (_, i) => i)
+  const phase1 = Array.from({ length: Math.min(2, count) }, (_, i) => i)
+  if (phase === 1) return phase1
+  if (count < 3) return phase1
+  if (phase === 2) return [2]
+  return count >= 4 ? [3] : [2]
 }
 
 /** Слово(-а) ответа → группы букв по словам (пробел разделяет группы).

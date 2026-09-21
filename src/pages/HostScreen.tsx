@@ -1,7 +1,5 @@
-import { createPortal } from 'react-dom'
 import { RoomPicker } from './RoomPicker'
 import { InfoSlideView } from '../components/InfoSlideView'
-import { TileCard } from '../components/TileCard'
 import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
 import { useBlitz } from '../lib/blitzApi'
 import {
@@ -13,11 +11,6 @@ import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
-import { jeopardyTile, jpShowAnswer, jpReplay, jpOpenTile, jpLocate, jpNextReplay } from '../lib/jeopardyRef'
-import {
-  jeopardyOpened, openJeopardyTile, closeJeopardyTile,
-} from '../lib/jeopardyActions'
-import { saveMelody } from '../lib/melodyActions'
 import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
 import { FitImg } from '../components/FitImg'
 import { collectUsedPaths } from '../lib/usedPaths'
@@ -47,19 +40,21 @@ import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid, JeopardyTheme, InfoSlide, ThemeKey } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, InfoSlide, ThemeKey } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
-import { probeMedia, createAudio, stopAllAudio, playSynced,
-  type SyncedHandle } from '../lib/audioSource'
-import { AudioGate } from '../components/AudioGate'
+import { createAudio, stopAllAudio } from '../lib/audioSource'
 import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
+import { JeopardyBoard } from './rounds/JeopardyRound'
+import { Timer } from '../components/Timer'
+import { choicesLenClass } from '../lib/questionLayout'
+import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -441,182 +436,39 @@ function HostInner({ gameState, pack }: {
 
   // ── Вопрос ──
   if (gameState.phase === 'question' && q) {
-    const media = q.media.question ?? []
-    const imgs = media.filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-    const avs = media.filter(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
-    const split = !!q.question_text.trim() && imgs.length === 1 && !q.media.hidden
-    const choices = q.answer.mode === 'choice' ? q.answer.choices
-      : q.answer.mode === 'order' ? q.answer.choices : null
-    const isNY = pack.theme === 'new_year'
     const timeLow = !!gameState.timer_started_at &&
       (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
-    // Обёртка вопроса была пустым div только в киберпанке: в НГ там сосульки,
-    // в ГП своё оформление. Даём классике рамку — разметка не меняется,
-    // добавляется только класс на уже существующий контейнер.
-    const isCyber = pack.theme === 'classic'
-    // Есть ли вообще текст вопроса: у ребусов его не бывает, и в обычных
-    // вопросах поле могут оставить пустым, когда всё говорит картинка.
-    const hasText = !!q.question_text.trim()
-    const isPotter = pack.theme === 'potter'
-    const frameCls = isPotter && round.mechanic !== 'rebus' ? 'mg-frame'
-      : isNY && round.mechanic !== 'rebus' ? `q-frame${timeLow ? ' low' : ''}`
-      : isCyber ? 'cyber-frame' : ''
-    // подписи-буквы на картинках нужны, когда картинок столько же, сколько вариантов/пар
-    const lettered = !q.media.hidden && imgs.length > 1 && (
-      (q.answer.mode === 'choice' && q.answer.choices.length === imgs.length) ||
-      (q.answer.mode === 'match' && q.answer.left.length === imgs.length))
+    // Показ ответов после каждого вопроса переопределяет настройку раунда
+    // общей настройкой пакета — та же формула, что и в QuestionScreen, нужна
+    // здесь для кнопки «Показать ответ» / «Время ответов →».
     const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
-
     return (
-      <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
-        imgs.length && !q.media.hidden ? ' has-media' : ''}${
-        (choices && !lettered) || (q.answer.mode === 'match'
-          && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
-        <AudioGate />
-        {round.mechanic !== 'jeopardy' && <>
+      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
+        timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
+        timerSlot={round.mechanic !== 'jeopardy' &&
+          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
+            theme={pack.theme} />}
+        effectsSlot={round.mechanic !== 'jeopardy' && <>
           <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
             startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
         </>}
-        <div className="host-topbar">
-          <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
-            <b>{gameState.question_index + 1}</b> / {round.questions.length}</span>
-          {round.mechanic !== 'jeopardy' &&
-            <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
-              theme={pack.theme} />}
-        </div>
-
-        {split ? (
-          /* Картинка лежит РЯДОМ с рамкой вопроса, а не внутри неё.
-             Пока она была вложена в рамку, экран выглядел так: рамка держит
-             свою высоту, картинка тянется на 68vh и вылезает за её нижний
-             край — прямо под плитки вариантов. Теперь колонки делят место
-             честно: слева рамка с текстом, справа картинка во всю
-             доступную высоту, и наезжать друг на друга им нечем. */
-          <div className="q-split">
-            <div className={frameCls}>
-              {isNY && <Icicles seed={q.id} low={timeLow} />}
-              {isCyber && <span className="cf-scan" aria-hidden="true" />}
-              {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-              <WindText key={q.id} text={q.question_text} />
-            </div>
-            <div className="q-media-grid n1" style={mediaScaleVar(q)}>
-              {imgs.map((m, i) => (
-                <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
-                  {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
-              ))}
-            </div>
+        actionsSlot={
+          <div className="host-actions">
+            <BackBtn gameState={gameState} />
+            {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
+              <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+            {gameState.question_index + 1 < round.questions.length
+              ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
+              : revealMode === 'after_round'
+                ? <button onClick={() => void startAnswerTime()}>Время ответов →</button>
+                : <AfterRoundNav pack={pack} gameState={gameState} />}
           </div>
-        ) : (
-          <>
-            {/* Пустой текст — пустая рамка. У ребусов текста нет никогда, но
-                так же бывает и в обычных вопросах, где всё сказано картинкой.
-                Раньше на экране висел пустой контейнер и съедал высоту,
-                которая нужна изображениям. */}
-            {hasText && (
-              <div className={frameCls}>
-                {isNY && <Icicles seed={q.id} low={timeLow} />}
-                {isCyber && <span className="cf-scan" aria-hidden="true" />}
-                {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-                <WindText key={q.id} text={q.question_text} />
-              </div>
-            )}
-            {!q.media.hidden && imgs.length > 0 && (
-              lettered
-                /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
-                ? <div className={`img-answers n${Math.min(imgs.length, 5)}${
-                      imgs.length > 1 ? ' eq-row' : ''}`}>
-                    {imgs.map((m, i) => (
-                      <FitAnswer key={i} src={mediaUrl(m)}
-                        badge={q.answer.mode === 'match' ? String(i + 1) : (choices?.[i]?.key ?? '')}>
-                        {q.answer.mode === 'choice' && choices?.[i]?.text &&
-                          <span className="ia-text">{choices[i].text}</span>}
-                      </FitAnswer>
-                    ))}
-                  </div>
-                : <div className={`q-media-grid n${Math.min(imgs.length, 4)}${
-                      round.mechanic === 'rebus' ? ' rebus' : ''}${
-                      // Ребус тоже идёт выключным рядом. Раньше он был из него
-                      // исключён ради равной ШИРИНЫ половин, но на экране это
-                      // читалось хуже: снимки в паре разной высоты и мельче
-                      // отведённого места. Равная высота важнее — её и просили.
-                      imgs.length > 1 ? ' eq-row' : ''}${
-                      // 4 картинки — один ряд, больше — два ряда (см. .wrap2,
-                      // 22-question.css). Сейчас недостижимо (mediaMax у
-                      // вопроса — 4), но правило универсальное.
-                      imgs.length > 4 ? ' wrap2' : ''}`}
-                    style={mediaScaleVar(q)}>
-                    {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
-                  </div>
-            )}
-          </>
-        )}
-
-        {/* Медиа вопроса ждёт озвучку: пока её читают, видео молчит.
-            Запуск привязан к таймеру — они стартуют одновременно. */}
-        {avs.map((m, i) => /\.(mp4|webm)$/i.test(m)
-          ? <QuestionVideo key={i} src={mediaUrl(m)} hidden={!!q.media.hidden}
-              waitFor={!!q.media.voice} go={!!gameState.timer_started_at} />
-          : null)}
-
-        {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && (
-          <div className={`choices-grid${
-            choicesLenClass((q.answer.right_labels ?? []) as string[])}`}>
-            {q.answer.right.map((r, i) => (
-              <div key={r} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
-                <span className="key">{r}</span>{(q.answer as { right_labels?: string[] }).right_labels?.[i] ?? ''}
-              </div>
-            ))}
-          </div>
-        )}
-        {choices && !lettered && (
-          <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}>
-            {choices.map((c, i) => (
-              <div key={c.key} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
-                <span className="key">{c.key}</span>{c.text}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && gameState.reveal && (
-          <div className="answer-reveal hud-frame">
-            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <div className="answer-main">{displayAnswer(q)}</div>
-            {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
-            {/* Раньше сюда как <img> уходило ВСЁ медиа ответа, включая mp3:
-                звук не играл, а на экране висела битая картинка. Теперь
-                картинки показываем, звук играем. */}
-            {(() => {
-              const media = q.media.answer ?? []
-              const pics = media.filter(m => !/\.(mp3|wav|m4a|ogg)$/i.test(m))
-              const sound = media.find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
-              return (<>
-                {sound && <AnswerAudio src={mediaUrl(sound)} />}
-                {pics.length > 0 && (
-                  <div className="q-media-grid" style={{ maxHeight: '26vh' }}>
-                    {pics.map((m, i) => <img key={i} src={mediaUrl(m)} alt="" />)}
-                  </div>
-                )}
-              </>)
-            })()}
-          </div>
-        )}
-
-        <div className="host-actions">
-          <BackBtn gameState={gameState} />
-          {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
-            <button onClick={() => void revealAnswer()}>Показать ответ</button>}
-          {gameState.question_index + 1 < round.questions.length
-            ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
-            : revealMode === 'after_round'
-              ? <button onClick={() => void startAnswerTime()}>Время ответов →</button>
-              : <AfterRoundNav pack={pack} gameState={gameState} />}
-        </div>
-      </div>
+        } />
     )
   }
 
@@ -672,33 +524,6 @@ function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGa
     : <button className="ghost" onClick={() => void setPhase('round_intro')}>← К титулу</button>
 }
 
-/** Ледяная рамка с сосульками (только НГ-тема). */
-function Icicles({ seed, low }: { seed: string; low: boolean }) {
-  const items = useMemo(() => {
-    let s = 0
-    for (const ch of seed) s = (s * 31 + ch.charCodeAt(0)) >>> 0
-    const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 }
-    const n = 60
-    return Array.from({ length: n }, (_, i) => ({
-      left: (i + 0.5) * (100 / n) + (rnd() - 0.5) * 2.5,
-      len: 8 + rnd() * 34,
-      delay: rnd() * 0.5,
-      sway: 3 + rnd() * 3,
-    }))
-  }, [seed])
-  return (
-    <div className="icicles">
-      {items.map((it, i) => (
-        <span key={i} className="icicle" style={{
-          left: `${it.left}%`, height: it.len, ['--len' as string]: `${it.len}px`,
-          animationDelay: `${it.delay}s, ${it.delay}s`,
-          animationDuration: `${it.sway}s, .7s`,
-        }} />
-      ))}
-    </div>
-  )
-}
-
 /** Размер пояснения к ответу — по его длине: короткое читается крупно,
  *  длинное ужимается, чтобы влезть в блок под ответом. */
 export function noteClass(text: string): string {
@@ -712,37 +537,6 @@ export function noteClass(text: string): string {
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
 
 // lenClass переехал в src/lib/media.ts — см. импорт вверху файла.
-
-/** Ступень кегля для плиток вариантов — по САМОМУ ДЛИННОМУ варианту.
- *  Раньше кегль был фиксированным: четыре развёрнутые формулировки не
- *  влезали по высоте и уезжали под кнопки «Назад / Показать ответ».
- *  Считаем по одному, самому длинному, чтобы плитки остались одного размера. */
-export function choicesLenClass(texts: (string | undefined)[]): string {
-  const n = Math.max(0, ...texts.map(t => (t ?? '').trim().length))
-  if (n <= 28) return ''
-  if (n <= 55) return ' c-m'
-  if (n <= 95) return ' c-l'
-  return ' c-xl'
-}
-
-/** Появление текста «ветром»: по словам с каскадной задержкой. */
-function WindText({ text }: { text: string }) {
-  const words = text.split(/(\s+)/)
-  let idx = 0
-  // Кегль из CSS — это подгон под ширину ЭКРАНА. Дальше текст вписывается в
-  // реально доступное место: вопрос на 440 знаков иначе наезжает на шапку,
-  // на варианты или на кнопки ведущего — на каждом экране по-своему.
-  const fit = useFitText<HTMLParagraphElement>([text])
-  return (
-    <p ref={fit} className={`q-text${lenClass(text)}`}>
-      {words.map((w, i) => {
-        if (/^\s+$/.test(w)) return w
-        const delay = 0.12 * idx++
-        return <span key={i} className="q-word" style={{ animationDelay: `${delay}s` }}>{w}</span>
-      })}
-    </p>
-  )
-}
 
 /** Заголовок: в НГ-теме буквы выпадают снегом и обрастают сугробом. */
 /** Длина самого длинного слова заголовка. Переносить длинное слово некуда,
@@ -800,125 +594,6 @@ export function stopAllMedia() {
   // кодом, и элементы из разметки
   stopAllAudio()
 
-}
-
-/** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
- *  как на кухонном/спортивном таймере. Синтезируем на месте: не нужен файл,
- *  не зависит от сети и не ломается, если медиа пакета не докачались.
- *  Прямоугольная волна выбрана намеренно — она резкая и пробивает шум бара. */
-function playChime() {
-  try {
-    const Ctx = (window.AudioContext
-      ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)
-    const ctx = new Ctx()
-    const t0 = ctx.currentTime
-    const master = ctx.createGain()
-    master.gain.value = 0.5
-    master.connect(ctx.destination)
-
-    const beep = (freq: number, at: number, len: number, type: OscillatorType, vol: number) => {
-      const o = ctx.createOscillator(), g = ctx.createGain()
-      o.type = type
-      o.frequency.setValueAtTime(freq, t0 + at)
-      g.gain.setValueAtTime(0.0001, t0 + at)
-      g.gain.linearRampToValueAtTime(vol, t0 + at + 0.008)
-      g.gain.setValueAtTime(vol, t0 + at + len - 0.05)
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + len)
-      o.connect(g); g.connect(master)
-      o.start(t0 + at); o.stop(t0 + at + len + 0.02)
-    }
-
-    // пять пиков «пи-пи-пи-пи-пи»
-    for (let i = 0; i < 5; i++) beep(1046.5, i * 0.22, 0.11, 'square', 0.30)
-    // длинный финальный тон: два голоса, чтобы звучал плотнее
-    beep(784, 1.20, 1.25, 'square', 0.26)
-    beep(392, 1.20, 1.25, 'sine', 0.30)
-
-    setTimeout(() => void ctx.close(), 3000)
-  } catch { /* звук не критичен: игра идёт дальше */ }
-}
-
-function Timer({ startedAt, seconds, theme, chime = true, variant }: {
-  startedAt: string | null; seconds: number; theme?: string; chime?: boolean
-  /** 'ring' — обычное латунное кольцо (как у classic/НГ по духу), а не
-   *  Магический круг: нужно на экране `answer_time` (Р2 решения rollout'а,
-   *  HANDOFF.md) — там таймер один на весь экран, крупный, и рулонная
-   *  «руническая» стилистика туда не просилась. */
-  variant?: 'ring'
-}) {
-  const [left, setLeft] = useState(seconds)
-  const rang = useRef(false)
-  useEffect(() => {
-    if (!startedAt) { setLeft(seconds); rang.current = false; return }
-    const tick = () => {
-      const elapsed = (Date.now() - new Date(startedAt).getTime()) / 1000
-      const l = Math.max(0, Math.ceil(seconds - elapsed))
-      setLeft(l)
-      // гонг ровно один раз на запуск таймера; в музыкальных раундах выключен,
-      // чтобы не наложиться на трек
-      if (l === 0 && chime && !rang.current) { rang.current = true; playChime() }
-    }
-    tick()
-    const t = setInterval(tick, 250)
-    return () => clearInterval(t)
-  }, [startedAt, seconds, chime])
-  const low = left <= 10
-  if (theme === 'new_year') {
-    const R = 44, C = 2 * Math.PI * R
-    const frac = Math.max(0, Math.min(1, left / seconds))
-    // Рождественский венок: хвойное кольцо + ягоды + бант; «выгорает» по кругу
-    const needles = Array.from({ length: 40 }, (_, i) => {
-      const ang = (i / 40) * Math.PI * 2
-      const len = 7 + (i % 3) * 3
-      return { x1: 55 + Math.cos(ang) * (R - 5), y1: 55 + Math.sin(ang) * (R - 5),
-        x2: 55 + Math.cos(ang) * (R + len - 5), y2: 55 + Math.sin(ang) * (R + len - 5),
-        rot: (ang * 180) / Math.PI }
-    })
-    const berries = Array.from({ length: 7 }, (_, i) => {
-      const ang = (i / 7) * Math.PI * 2 + 0.4
-      return { cx: 55 + Math.cos(ang) * R, cy: 55 + Math.sin(ang) * R }
-    })
-    return (
-      <div className={`ny-wreath${low ? ' low' : ''}`}>
-        <svg viewBox="0 0 110 110">
-          {needles.map((n, i) => (
-            <line key={i} x1={n.x1} y1={n.y1} x2={n.x2} y2={n.y2}
-              stroke={i % 4 === 0 ? '#1f6b3a' : '#2f8f4e'} strokeWidth="3" strokeLinecap="round" />
-          ))}
-          <circle className="wr-bg" cx="55" cy="55" r={R} />
-          <circle className="wr-fg" cx="55" cy="55" r={R}
-            strokeDasharray={C} strokeDashoffset={C * (1 - frac)} />
-          {berries.map((b, i) => <circle key={i} className="wr-berry" cx={b.cx} cy={b.cy} r="3.4" />)}
-          <path className="wr-bow" d="M46,99 q9,-9 18,0 q-9,5 -18,0" />
-        </svg>
-        <span className="val">{left}</span>
-      </div>
-    )
-  }
-  // Magic: обычное латунное кольцо на answer_time (Р2), Магический круг
-  // (руны) — везде ещё (шапка вопроса, .mel-count, .sprint-timer).
-  if (theme === 'potter' && variant === 'ring') return (
-    <div className={`timer-wrap${low ? ' low' : ''}`}>
-      <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
-    </div>
-  )
-  if (theme === 'potter') return <MagicCircleTimer left={left} seconds={seconds} low={low} />
-  // Киберпанк: искра бежит по кольцу. Замирает, когда таймер не идёт —
-  // либо ещё не запущен, либо уже дотикал до нуля. Это единственный
-  // элемент, по которому с дальнего конца зала видно, идёт время или нет.
-  const running = !!startedAt && left > 0
-  // «Не запущен» и «дотикал до нуля» — оба .paused (искра стоит на месте,
-  // видно, что время не идёт), но ДО старта её вообще не должно быть на
-  // экране: в этот момент нечему «стоять на месте», ведущий ещё не нажал
-  // кнопку. .not-started гасит саму искру и кольцо, .paused остаётся как
-  // был — сигнал «дотикало» никуда не делся.
-  return (
-    <div className={`timer-wrap${low ? ' low' : ''}${running ? '' : ' paused'}${
-      startedAt ? '' : ' not-started'}`}>
-      <span className="tm-orbit" aria-hidden="true"><i className="tm-spark" /></span>
-      <span className={`timer-num${low ? ' danger' : ''}`}>{left}</span>
-    </div>
-  )
 }
 
 /** Стабильное перемешивание: порядок фиксирован для конкретного вопроса. */
@@ -1017,35 +692,6 @@ function tableSize(teams: number): string {
   return ''
 }
 
-/** Звук, приложенный к ОТВЕТУ, — играет на экране разбора целиком.
- *
- *  Его никто не запускал: медиа ответа фильтровалось на картинки, а mp3 из
- *  списка просто выбрасывался. Ведущий вставлял в разбор трек или отбивку —
- *  и слышал тишину.
- *
- *  Играет ПОЛНОСТЬЮ, без таймера на 10–15 секунд: ушёл ведущий со слайда —
- *  звук глохнет вместе с экраном, остался — трек доигрывает до конца.
- *  play() асинхронный, поэтому глушим уже после реального старта: иначе
- *  pause() до его начала не делает ничего и трек заиграет поверх
- *  следующего экрана (та же гонка, что была с озвучкой вопроса). */
-function AnswerAudio({ src }: { src: string }) {
-  useEffect(() => {
-    if (document.hidden) return
-    let cancelled = false
-    const a = createAudio()
-    a.src = src
-    a.loop = false
-    a.play().then(() => {
-      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-    }).catch(() => {})
-    return () => {
-      cancelled = true
-      try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
-    }
-  }, [src])
-  return null
-}
-
 /** Боковая панель лобби в киберпанке.
  *
  *  Три элемента, все — чистый CSS, без картинок и без данных:
@@ -1104,30 +750,6 @@ function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => v
     </div>
   )
 }
-
-/** Картинка-вариант в ряду, выравненном по высоте.
- *  Та же механика, что у FitImg: ширину карточки задаёт пропорция снимка,
- *  поэтому при общей высоте ряда все варианты выглядят одинаково крупными.
- *  Раньше выравнивание было сделано только для сеток вопроса, а варианты
- *  с картинками остались рваными — недосмотр, а не решение. */
-function FitAnswer({ src, badge, children }: {
-  src: string; badge: string; children?: React.ReactNode
-}) {
-  const [ar, setAr] = useState(1.5)
-  return (
-    <div className="img-answer" style={{ flexGrow: ar, flexBasis: 0 } as CSSProperties}>
-      <span className="ia-frame">
-        <span className="ia-key">{badge}</span>
-        <img src={src} alt="" onLoad={e => {
-          const el = e.currentTarget
-          if (el.naturalWidth && el.naturalHeight) setAr(el.naturalWidth / el.naturalHeight)
-        }} />
-      </span>
-      {children}
-    </div>
-  )
-}
-
 
 /** Повтор всех вопросов раунда слайдами, перед временем на ответы.
  *
@@ -1623,42 +1245,8 @@ function BlitzScreen({ pack, round, gameState }: {
   )
 }
 
-function displayAnswer(q: Question): string {
-  const empty = '⚠ ответ не заполнен в редакторе'
-  const a = q.answer as unknown as Record<string, unknown>
-  const d = a.display
-  if (Array.isArray(d)) return d.join(' · ')
-  if (typeof d === 'string' && d) return d
-  if (typeof a.correct === 'string' && a.correct) return String(a.correct).split('/')[0].trim()
-  if (typeof a.word === 'string' && a.word) return a.word.toUpperCase()
-  if (typeof a.correct_choice === 'string' && a.correct_choice) return a.correct_choice
-  if (typeof a.correct_order === 'string' && a.correct_order) return a.correct_order
-  if (Array.isArray(a.correct_pairs) && a.correct_pairs.length)
-    return (a.correct_pairs as string[]).join('  ')
-  return empty
-}
-
-// mediaUrl переехал в src/lib/media.ts — см. импорт вверху файла.
-
-/** Видео вопроса. Если у вопроса есть озвучка — ждём её окончания
- *  (признак: пошёл таймер), иначе играем сразу. Аудио вопроса здесь НЕ
- *  рендерим: им управляет QuestionAudio, иначе трек играл бы дважды. */
-function QuestionVideo({ src, hidden, waitFor, go }: {
-  src: string; hidden: boolean; waitFor: boolean; go: boolean
-}) {
-  const ref = useRef<HTMLVideoElement | null>(null)
-  useEffect(() => {
-    if (waitFor && !go) return
-    ref.current?.play().catch(() => {})
-  }, [waitFor, go])
-  return (
-    <video ref={ref} src={src} controls={!hidden}
-      autoPlay={!waitFor}
-      style={hidden
-        ? { width: 1, height: 1, opacity: 0 }
-        : { maxHeight: '46vh', borderRadius: 14 }} />
-  )
-}
+// displayAnswer/QuestionVideo переехали в components/screens/QuestionScreen.tsx
+// (9.51) — см. импорт вверху файла. mediaUrl — в lib/media.ts.
 
 /** Озвучка → (по окончании) старт таймера → фоновая музыка (если у вопроса нет своего AV).
  *  Перенос логики старого RoundShell: музыка глушится при смене вопроса/уходе с фазы;
@@ -2253,325 +1841,6 @@ function AutoAdvance({ round, gameState, isLast }: {
     return () => clearTimeout(t)
   }, [gameState.timer_started_at, gameState.question_index, sec])
   return null
-}
-
-/** Своя игра: доска тем и плиток. Клик по плитке — играет трек, ответ по кнопке.
- *  Открытые плитки гаснут. Тем может быть любое количество (1..6). */
-function JeopardyBoard({ pack, round, gameState }: {
-  pack: LoadedPack
-  round: LoadedPack['rounds'][number]
-  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
-}) {
-  const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
-  // Открытая плитка живёт в ОБЩЕМ состоянии игры (melody.jp), а не в памяти
-  // вкладки: иначе пульт ведущего в телефоне не знает, что плитка открыта, и
-  // управлять ей оттуда нечем (8.86). Локальная копия — только на время, пока
-  // опрос (2 сек) не принёс запись обратно: без неё модалка открывалась бы с
-  // задержкой в пару секунд после клика по плитке.
-  const [tileLocal, setTileLocal] = useState<number | null | undefined>(undefined)
-  const sharedTile = jpOpenTile(gameState.melody)
-  useEffect(() => {
-    // сервер догнал локальную догадку (или ведущий переключил плитку с
-    // телефона) — локальную копию снимаем, дальше правит общее состояние
-    if (tileLocal !== undefined && sharedTile === tileLocal) setTileLocal(undefined)
-  }, [sharedTile, tileLocal])
-  const openTile = tileLocal !== undefined ? tileLocal : sharedTile
-  // Предсказанный `jp.replay` для ТОЛЬКО ЧТО открытой (ещё не подтверждённой
-  // опросом) плитки — тем же способом, что и настоящий переход (jpOpen), см.
-  // jpNextReplay. Пока опрос не догнал клик, `gameState.melody` — это ещё
-  // состояние ПРЕЖНЕЙ плитки, и его «replay» меньше того, что придёт с
-  // сервера через секунду-две. Раньше `TileModal` получал сначала это старое
-  // число, а как только опрос доносил настоящее — расценивал скачок как
-  // «нажали переслушать» и перезапускал трек с нуля (9.36).
-  const predictedReplay = useRef<number | null>(null)
-  // Координаты клика по плитке — для перехода "рост из плитки" (Р3).
-  // Известны только когда открытие пришло от клика ЗДЕСЬ, на проекторе;
-  // если плитку открыли с телефона ведущего (AdminPage), tile совпадёт,
-  // но координат нет — модалка входит старым способом (см. 37-tile-card.css).
-  const clickOrigin = useRef<{ tile: number; x: number; y: number } | null>(null)
-  const tileElRefs = useRef(new Map<number, HTMLElement>())
-  // Открытые плитки живут в СЕССИИ, а не в памяти вкладки: после
-  // перезагрузки страницы они снова становились доступны, и вопрос можно
-  // было сыграть дважды.
-  // Отдельное поле сессии. Раньше плитки лежали в completed_rounds — там же,
-  // где номера сыгранных раундов. Оно перезаписывается целиком при переходе
-  // между раундами, поэтому отметки стирались и плитки снова открывались.
-  const fromServer = jeopardyOpened(gameState)
-  // Локальная копия — страховка: если запись в базу не прошла (например,
-  // миграция не применена), плитки всё равно гаснут до конца игры, а не
-  // делают вид, что ничего не произошло.
-  const [openedLocal, setOpenedLocal] = useState<string[]>([])
-  const [saveErr, setSaveErr] = useState<string | null>(null)
-  const opened = [...new Set([...fromServer, ...openedLocal])]
-
-  const closeTile = async (tileKey: string) => {
-    setOpenedLocal([...opened, tileKey])
-    setSaveErr(await closeJeopardyTile(gameState, tileKey, opened))
-  }
-
-  // Хук — ДО раннего return ниже (иначе число хуков между рендерами
-  // «темы пустые / темы заполнены» плавало бы и падало React #310).
-  const jpTitleText = round.title_lines.join(' ') || 'СВОЯ ИГРА'
-  const jpTitleScrambled = useScrambleReveal(jpTitleText, pack.theme === 'classic')
-
-  if (themes.length === 0) return (
-    <div className="host-screen grid-bg">
-      <div className="mono-tag">СВОЯ ИГРА</div>
-      <p>Темы не заполнены — добавь их в редакторе раунда</p>
-      <div className="host-actions">
-        <button onClick={() => void setPhase('round_intro')}>← К титулу</button>
-      </div>
-    </div>
-  )
-
-  const rows = Math.max(...themes.map(t => t.tiles.length))
-  return (
-    <div className="host-screen grid-bg jp-screen">
-      <h1 className="neon-title jp-title">
-        {pack.theme === 'classic' ? jpTitleScrambled : jpTitleText}</h1>
-      <div className="jp-board" style={{
-        gridTemplateColumns: `repeat(${themes.length}, minmax(0, 1fr))`,
-        gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
-      }}>
-        {saveErr && <div className="jp-save-err">⚠ {saveErr}</div>}
-      {themes.map((t, ti) => (
-          <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
-            {t.name || `Тема ${ti + 1}`}
-            {t.hint && <span className="jp-theme-hint">{t.hint}</span>}
-          </div>
-        ))}
-        {themes.map((t, ti) => t.tiles.map((tile, i) => {
-          const done = opened.includes(`${ti}-${i}`)
-          return (
-            // data-c — номер темы для раскраски: у плиток мелодии цвет неона
-            // берётся так же. У мелодии всего 4 темы за раз, а в «Своей игре»
-            // их бывает 5+ — на 4 цветах пятая колонка повторяла первую.
-            <TileCard key={`${ti}-${i}`} kind="jeopardy" done={done} colorIndex={ti % 8}
-              flip={!done} label={done ? '·' : tile.value} backLabel={tile.value}
-              style={{ gridColumn: ti + 1, gridRow: i + 2 }}
-              elRef={el => {
-                const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
-                if (el) tileElRefs.current.set(flat, el); else tileElRefs.current.delete(flat)
-              }}
-              onClick={() => {
-                // синхронизируем номер открытой плитки с игроками:
-                // они шлют ответ по question_index, модалка читает по нему же
-                const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
-                predictedReplay.current = jpNextReplay(gameState.melody)
-                // rect берём ДО открытия модалки — плитка ещё на месте
-                const r = tileElRefs.current.get(flat)?.getBoundingClientRect()
-                clickOrigin.current = r ? { tile: flat, x: r.left + r.width / 2, y: r.top + r.height / 2 } : null
-                setTileLocal(flat)
-                void openJeopardyTile(gameState, flat)
-              }} />
-          )
-        }))}
-      </div>
-      <div className="host-actions">
-        {/* Кнопка прыгала в следующий раунд НАПРЯМУЮ и обходила общий
-            маршрут: табло и перерыв, настроенные для раунда, молча
-            пропускались. Именно поэтому после «Своей игры» и мелодии не
-            показывалось табло, хотя галочка в редакторе стояла.
-            Теперь маршрут считает тот же модуль, что и в админке. */}
-        <AfterRoundNav pack={pack} gameState={gameState} />
-      </div>
-      {openTile != null && (() => {
-        // сквозной номер → (тема, плитка): пульт в телефоне знает только его
-        const at = jpLocate(themes, openTile)
-        if (!at) return null
-        const { ti, i: rest, tile } = at
-        // Пока опрос не подтвердил клик (tileLocal ещё не сброшен) — берём
-        // ПРЕДСКАЗАННЫЙ replay, а не «gameState.melody» прежней плитки: иначе
-        // как только опрос доносит настоящее (уже увеличенное) число, эффект
-        // в TileModal видит скачок и запускает трек заново (см. коммент у
-        // predictedReplay выше).
-        const replayNonce = tileLocal !== undefined && predictedReplay.current != null
-          ? predictedReplay.current
-          : (gameState.melody?.jp?.replay ?? 0)
-        // Координаты клика — только если ЭТУ плитку открыли отсюда, кликом.
-        // Плитка, открытая с телефона ведущего, координат не несёт — рост
-        // из точки клика заменяется старым входом модалки (по теме).
-        const origin = clickOrigin.current?.tile === openTile
-          ? { x: clickOrigin.current.x, y: clickOrigin.current.y } : null
-        return (
-          <TileModal packTheme={pack.theme} round={round} gameState={gameState}
-            theme={themes[ti]} tile={tile} tileIndex={openTile}
-            showAnswer={!!gameState.melody?.jp?.answer}
-            replayNonce={replayNonce} origin={origin}
-            onShowAnswer={() => void saveMelody(jpShowAnswer(gameState.melody ?? {}))}
-            onReplay={() => void saveMelody(jpReplay(gameState.melody ?? {}))}
-            onClose={() => { setTileLocal(null); void closeTile(`${ti}-${rest}`) }} />
-        )
-      })()}
-    </div>
-  )
-}
-
-/** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
- *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
-function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme,
-  showAnswer, onShowAnswer, replayNonce, onReplay, origin }: {
-  packTheme?: string
-  round: LoadedPack['rounds'][number]
-  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
-  theme: JeopardyTheme
-  tile: { value: number; audio: string; correct: string }
-  /** сквозной номер плитки в раунде */
-  tileIndex: number
-  /** «Показать ответ» нажато. Общее состояние (melody.jp.answer): нажать
-   *  можно и с проектора, и с телефона ведущего — экран один и тот же. */
-  showAnswer: boolean
-  onShowAnswer: () => void
-  /** Счётчик «переслушать»: изменение числа = запустить трек заново. Сам
-   *  факт проигрывания состоянием не является, это событие. */
-  replayNonce: number
-  onReplay: () => void
-  onClose: () => void
-  /** Координаты клика по плитке (viewport px), если открытие пришло от
-   *  клика на проекторе — используется для входа «рост из плитки» (Р3).
-   *  null — плитку открыли с телефона ведущего, координат нет, входит по
-   *  старому (тематическая анимация без роста). */
-  origin: { x: number; y: number } | null
-}) {
-  const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
-  // одна ручка на текущий трек: она глушит и звук, и отсчёт
-  const handleRef = useRef<SyncedHandle | null>(null)
-  const modalRef = useRef<HTMLDivElement>(null)
-  // Локальные px клика ОТНОСИТЕЛЬНО модалки (не viewport) — transform-origin
-  // принимает офсеты именно в системе координат самого элемента. Меряем
-  // ПОСЛЕ монтирования (useLayoutEffect — до отрисовки кадра, без мигания).
-  const [growVars, setGrowVars] = useState<CSSProperties | undefined>(undefined)
-  useLayoutEffect(() => {
-    if (!origin || !modalRef.current) { setGrowVars(undefined); return }
-    const r = modalRef.current.getBoundingClientRect()
-    setGrowVars({
-      '--qt-ox': `${origin.x - r.left}px`,
-      '--qt-oy': `${origin.y - r.top}px`,
-    } as CSSProperties)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tileIndex])
-  const [remaining, setRemaining] = useState(clipSeconds)
-  const [playing, setPlaying] = useState(false)
-  const answers = useAnswers(gameState.game_id, gameState.round_number)
-  const teams = useTeams(gameState.game_id)
-  const [audioErr, setAudioErr] = useState<string | null>(null)
-  // Оптимистичный вердикт ✓/✗: без него кнопка «включалась» визуально
-  // только на следующем опросе useAnswers (раз в 2 сек) — с реальной игры
-  // была жалоба «часто приходилось ждать». grade() ничего не обновляет
-  // локально, а тянуть интервал опроса ниже (как у блица, 400мс) означало
-  // бы просто чаще дёргать базу и всё равно ждать; кладём вердикт в
-  // локальную карту СРАЗУ по клику, до ответа сервера, и мержим её поверх
-  // данных с сервера при рендере — сервер всё равно догонит на следующем
-  // опросе и молча подтвердит то же самое значение.
-  const [localGrades, setLocalGrades] = useState<Record<string, boolean>>({})
-  useEffect(() => { setLocalGrades({}) }, [tileIndex])
-
-  const play = () => {
-    handleRef.current?.stop()
-    if (!tile.audio) { setPlaying(false); setAudioErr('у плитки не задан трек'); return }
-    setAudioErr(null)
-    setRemaining(clipSeconds)
-    // Отсчёт запускается ПО ФАКТУ начала звука, а не по нажатию: файл может
-    // грузиться несколько секунд, и раньше таймер уходил вперёд.
-    // «Переслушать» глушит прошлый трек — наложения быть не может.
-    handleRef.current = playSynced(mediaUrl(tile.audio), clipSeconds, {
-      onStart: () => setPlaying(true),
-      onTick: left => setRemaining(left),
-      onEnd: () => setPlaying(false),
-      onError: reason => { setPlaying(false); setAudioErr(reason) },
-    })
-  }
-  // Трек запускается при открытии плитки и на каждое «переслушать» — в том
-  // числе нажатое с телефона ведущего: там меняется replayNonce, здесь это
-  // тот же перезапуск, что и от кнопки на самом проекторе.
-  useEffect(() => {
-    play()
-    return () => { handleRef.current?.stop() }
-  }, [tileIndex, replayNonce])
-
-  // Ключ ответа содержит номер раунда, но старые игры писали его без раунда —
-  // разбор обеих форм лежит в lib/jeopardyRef.ts, чтобы проектор, телефон и
-  // подсчёт читали ответы одинаково.
-  const rows = answers
-    .filter(a => jeopardyTile(a.question_ref, gameState.round_number) === tileIndex)
-    .sort((x, y) => +new Date(x.updated_at) - +new Date(y.updated_at))
-
-  const grade = async (id: string, correct: boolean) => {
-    setLocalGrades(g => ({ ...g, [id]: correct }))
-    await room.patchAnswer(id, { is_correct: correct })
-  }
-
-  return createPortal(
-    <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
-      <div ref={modalRef} className={`jp-modal hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
-        <div className="jp-modal-head">
-          <div>
-            <div className="jp-modal-theme">{theme.name}</div>
-            <div className="mono-tag">ПЛИТКА · {tile.value}</div>
-          </div>
-          <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>
-        </div>
-
-        {showAnswer && (
-          <div className="answer-reveal hud-frame" style={{ padding: '12px 18px' }}>
-            <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <div className="answer-main" style={{ fontSize: 'clamp(24px,3vw,40px)' }}>{tile.correct}</div>
-          </div>
-        )}
-
-        <div className="jp-answers">
-          <div className="mono-tag">
-            {showAnswer ? 'ОТВЕТЫ (ПО СКОРОСТИ)' : `ОТВЕТИЛИ: ${rows.length}`}
-          </div>
-          {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>ждём ответы…</div>}
-          {rows.map((a, pos) => {
-            const team = teams.find(t => t.id === a.team_id)
-            // Локальный вердикт побеждает, пока сервер не подтвердил своим
-            // опросом — им же он и заменяется, когда придут те же данные.
-            const verdict = localGrades[a.id] ?? a.is_correct
-            return (
-              <div key={a.id} className="jp-answer" style={{
-                borderLeft: `3px solid ${verdict === true ? 'var(--ok)' : verdict === false ? 'var(--danger)' : 'var(--dim)'}`,
-              }}>
-                <span className="pos">#{pos + 1}</span>
-                <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
-                {/* до нажатия «Показать ответ» видно только ФАКТ ответа:
-                    иначе зал читает чужие ответы и интрига пропадает */}
-                <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>
-                {/* оценку можно переставить: раньше кнопки блокировались
-                    навсегда, и промах мышью стоил команде баллов */}
-                {showAnswer && <>
-                  <button className={`jp-grade ok${verdict === true ? ' chosen' : ''}`}
-                    onClick={() => void grade(a.id, true)}>✓</button>
-                  <button className={`jp-grade no${verdict === false ? ' chosen' : ''}`}
-                    onClick={() => void grade(a.id, false)}>✗</button>
-                </>}
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="jp-modal-foot">
-          {!showAnswer && <button onClick={onShowAnswer}>Показать ответ</button>}
-          <button className="ghost" onClick={onReplay}>↻ Переслушать</button>
-          {audioErr && <div className="jp-audio-err">🔇 {audioErr}
-            <button className="ghost" style={{ marginLeft: 10 }}
-              onClick={() => void probeMedia(mediaUrl(tile.audio)).then(t => alert(t))}>
-              что с файлом?
-            </button>
-          </div>}
-          {/* неоценённый ответ даёт 0 баллов — предупреждаем ДО закрытия плитки */}
-          {rows.some(a => (localGrades[a.id] ?? a.is_correct) == null) && (
-            <div className="jp-ungraded">
-              ⚠ не оценено: {rows.filter(a => (localGrades[a.id] ?? a.is_correct) == null).length}
-            </div>
-          )}
-          <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
-        </div>
-      </div>
-    </div>,
-    document.body,
-  )
 }
 
 /** Сопоставление на экране ответа: картинка №N с правильной буквой (перенос MatchAnswerGrid). */

@@ -1,0 +1,73 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ЭКРАН ВОПРОСА: КАРТИНКИ — .q-media-grid И .img-answers
+   Вынесено из свалки 18/19-patch-*.css в 9.48 (части C, G, H карты
+   переноса). Порядок ВНУТРИ файла обязателен: C (базовая сетка из
+   18-patch-745.css) идёт ПЕРЕД G (переопределение той же сетки из
+   19-patch-746.css) — оба задают `.q-media-grid` одним весом, и в
+   исходном каскаде побеждал более поздний (19), это сохранено.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ═══ C: 7+8 (18-patch-745.css) — базовая сетка сопоставления ═══ */
+.q-media-grid { display: grid; gap: clamp(10px, 1.4vw, 22px);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  width: min(1200px, 92vw); margin-inline: auto; }
+.q-img { position: relative; margin: 0; }
+
+/* ═══ G: 2+7 (19-patch-746.css) — КАРТИНКИ НИКОГДА НЕ ОБРЕЗАЮТСЯ ══
+   Фиксированные vh не гарантировали, что блок влезет: при длинном вопросе
+   и вариантах снизу картинки переполняли колонку и наезжали на текст.
+   Теперь сетка забирает ВЕСЬ остаток высоты экрана (flex: 1 1 0), а картинка
+   вписывается в него по max-height:100% — без обрезки и без чёрных полей.
+   Ширина колонок задаётся количеством картинок.
+   Переопределяет C тем же весом — побеждает как более поздняя по каскаду. */
+.q-media-grid { display: grid; gap: clamp(10px, 1.2vw, 20px); margin-inline: auto;
+  flex: 1 1 0; min-height: 0; align-items: stretch; justify-items: center; }
+.q-media-grid.n1 { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); width: min(1100px, 80vw); }
+.q-media-grid.n2 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(1600px, 94vw); }
+.q-media-grid.n3 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(1680px, 96vw); }
+.q-media-grid.n4 { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(4, minmax(0, 1fr)); width: min(1720px, 97vw); }
+/* height НЕ задаём: заданная высота отменяет stretch и ячейка схлопывается */
+.q-img { position: relative; margin: 0; min-width: 0; min-height: 0;
+  display: flex; align-items: center; justify-content: center; width: 100%; }
+.q-img img { width: auto; height: auto; max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 10px; border: 2px solid var(--dim); display: block; }
+.q-img figcaption { position: absolute; top: 8px; left: 8px; z-index: 2;
+  font-family: var(--font-digits); font-size: clamp(20px, 2vw, 32px); color: var(--accent);
+  background: rgba(0,0,0,.68); border-radius: 8px; padding: 2px 12px; }
+
+/* ═══ H: 7 (19-patch-746.css) — СОПОСТАВЛЕНИЕ: все карточки в ОДИН ряд по
+   всей ширине, ответы под ними ═══ */
+.img-answers { display: grid; margin-inline: auto; gap: clamp(10px, 1.2vw, 22px);
+  flex: 1 1 0; min-height: 0; height: auto; align-content: stretch; align-items: stretch;
+  justify-items: center; grid-template-rows: minmax(0, 1fr); }
+.img-answers.n2 { grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1500px, 92vw); }
+.img-answers.n3 { grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1680px, 96vw); }
+.img-answers.n4 { grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1720px, 97vw); }
+.img-answers.n5 { grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr); width: min(1780px, 98vw); }
+.img-answer { position: relative; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end; gap: 8px;
+  min-width: 0; min-height: 0; width: 100%;
+  grid-template-columns: none; grid-template-rows: none; }
+/* рамка держит номер/букву у самой картинки и отдаёт ей весь остаток высоты */
+.ia-frame { position: relative; flex: 1 1 0; min-height: 0; max-width: 100%;
+  display: flex; align-items: flex-end; justify-content: center; line-height: 0; }
+.img-answer img { width: auto; height: auto; max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 12px; border: 2px solid rgba(255,255,255,.18);
+  display: block; }
+/* бейдж — у НИЖНЕГО края: картинки выровнены по низу, поэтому он всегда
+   прилипает к самой картинке, какой бы она ни была пропорции */
+.ia-key { position: absolute; bottom: 8px; left: 8px; top: auto; z-index: 2; width: auto;
+  font-family: var(--font-display); font-size: clamp(22px, 2.4vw, 40px);
+  color: var(--accent); background: rgba(0,0,0,.68); border-radius: 10px;
+  padding: 0 14px; line-height: 1.35; }
+.ia-text { position: static; grid-column: auto; grid-row: auto; flex: 0 0 auto;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 30px); color: var(--fg); text-align: center;
+  white-space: normal; overflow: visible; text-overflow: clip; }
+.img-answer:has(.ia-text) { grid-template-rows: none; }
+/* текст вопроса и варианты высоту не отбирают — они по содержимому */
+.host-screen > .q-text, .host-screen > .choices-grid { flex: 0 0 auto; }

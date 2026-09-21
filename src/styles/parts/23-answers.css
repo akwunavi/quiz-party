@@ -3,6 +3,77 @@
    Правки этой части интерфейса складываем СЮДА, а не в конец сборки.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* ═══ B: 7.45, перенесено из 18-patch-745.css в 9.48 ═══
+   ответы команд и разбор */
+.team-answer { font-size: clamp(15px, 1.4vw, 24px); }
+.answer-main { font-size: clamp(30px, 3.6vw, 64px); }
+
+/* ═══ M: 7.46, перенесено из 19-patch-746.css в 9.48 ═══
+   медиа на экране ответа высоту не захватывает.
+   ВАЖНО: `.answer-media` и `.q-media-grid` — ОДИН И ТОТ ЖЕ DOM-элемент
+   (HostScreen.tsx, className="q-media-grid answer-media n…") — блок
+   обязан стоять ПОСЛЕ B и ДО D, порядок значим (см. HANDOFF.md раздел 7). */
+.answer-media { flex: 0 1 auto; grid-template-rows: auto; }
+.answer-media img { max-height: 34vh; width: auto; height: auto;
+  max-width: 100%; object-fit: contain; }
+
+/* ═══ D: 7.45 (18-patch-745.css) + 7.46 (19-patch-746.css), перенесено
+   в 9.48. Порядок «сначала блок из 18, потом из 19» обязателен: оба
+   переопределяют .match-answer одним весом, и должен победить более
+   поздний (из 19) — как было в исходном каскаде. ═══ */
+
+/* экран ответа: крупная сетка сопоставления, карточки появляются по очереди */
+.match-answer { display: grid; gap: clamp(12px, 1.6vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  width: min(1200px, 92vw); margin-inline: auto; }
+.match-answer .mi { animation: matchPop .5s cubic-bezier(.2,.8,.3,1) both; }
+.match-answer .mi:nth-child(1) { animation-delay: .1s; }
+.match-answer .mi:nth-child(2) { animation-delay: .7s; }
+.match-answer .mi:nth-child(3) { animation-delay: 1.3s; }
+.match-answer .mi:nth-child(4) { animation-delay: 1.9s; }
+.match-answer .mi:nth-child(5) { animation-delay: 2.5s; }
+.match-answer .mi:nth-child(6) { animation-delay: 3.1s; }
+@keyframes matchPop { from { opacity: 0; transform: translateY(26px) scale(.9); }
+  to { opacity: 1; transform: none; } }
+.match-answer .mi-label { font-family: var(--font-digits);
+  font-size: clamp(20px, 2.2vw, 36px); color: var(--accent); margin-top: 8px; }
+/* 9: порядок — тоже крупно и по очереди */
+.order-answer { display: flex; flex-direction: column; gap: 12px;
+  width: min(1000px, 90vw); margin-inline: auto; }
+.order-answer .oi { font-size: clamp(20px, 2.2vw, 38px); padding: 14px 24px;
+  border: 2px solid var(--dim); border-radius: 10px; text-align: left;
+  animation: matchPop .5s cubic-bezier(.2,.8,.3,1) both; }
+.order-answer .oi:nth-child(1) { animation-delay: .1s; }
+.order-answer .oi:nth-child(2) { animation-delay: .7s; }
+.order-answer .oi:nth-child(3) { animation-delay: 1.3s; }
+.order-answer .oi:nth-child(4) { animation-delay: 1.9s; }
+.order-answer .oi:nth-child(5) { animation-delay: 2.5s; }
+.order-answer .oi:nth-child(6) { animation-delay: 3.1s; }
+.order-answer .oi b { color: var(--accent); margin-right: 14px; }
+
+/* Экран ответа сопоставления. ВАЖНО: блок живёт в ЛЕВОЙ колонке рядом с
+   колонкой ответов команд, поэтому ширину берём от родителя (100%), а не от
+   экрана — иначе последняя плитка уезжала под соседнюю колонку и обрезалась.
+   Раскладка — по 2 в ряд; высота картинки зависит от числа рядов. */
+.match-answer { display: grid; gap: clamp(10px, 1.2vw, 20px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%; max-width: 100%; margin-inline: 0; }
+.match-answer .mi { display: grid; grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center; gap: 6px; min-width: 0; min-height: 0; }
+.match-answer .mi img { width: auto; height: auto; max-width: 100%;
+  max-height: 100%; align-self: center; object-fit: contain; border-radius: 10px;
+  border: 2px solid var(--accent); background: rgba(0,0,0,.25); display: block; }
+/* Блок забирает остаток высоты колонки, ряды делят его поровну — плитки не
+   съезжают за нижний край при любом числе картинок. Растягиваем ТОЛЬКО рамку
+   с сопоставлением (:has), чтобы не менять вид остальных экранов ответа.
+   flex: 1 1 auto, а не 1 1 0 — при basis 0 контейнер схлопывается в ноль. */
+.answers-layout .answer-reveal:has(.match-answer) { display: flex;
+  flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.answer-reveal:has(.match-answer) .match-answer { flex: 1 1 auto; min-height: 0; }
+.match-answer.n1, .match-answer.n2 { grid-template-rows: minmax(0, 1fr); }
+.match-answer.n3, .match-answer.n4 { grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.match-answer.n5, .match-answer.n6 { grid-template-rows: repeat(3, minmax(0, 1fr)); }
+
 /* ═══ 7.55: барная игра «на листках» + разбор ответов ═══ */
 
 /* ── п.3: логотип в лобби крупнее: QR нет, место освободилось ── */
@@ -73,8 +144,13 @@
 .answers-layout .choice-plate { font-size: clamp(22px, 2.3vw, 40px); padding: 14px 20px; }
 .answers-layout .order-answer .oi { font-size: clamp(20px, 2vw, 34px); }
 
-/* ── п.2: блок ответа прижат к низу и компактнее по высоте ── */
-.answers-main { justify-content: flex-start !important; }
+/* ── п.2: блок ответа прижат к низу и компактнее по высоте ──
+   `!important` убран в 9.48: раньше держал против инлайна в JSX
+   (`style={{justifyContent:...}}`), которого больше нет — сейчас
+   инлайн на `.answers-main` в HostScreen.tsx ставит только
+   `{flex: 1.4, minHeight: 0}`, `justify-content` там не задаётся.
+   Других конкурентов по весу у `.answers-main` на это свойство нет. */
+.answers-main { justify-content: flex-start; }
 .answers-main > .q-text { margin-bottom: auto; }
 .answers-layout .answer-reveal { flex: 0 0 auto; padding: clamp(10px, 1.4vh, 20px) clamp(16px, 2vw, 30px); }
 
@@ -113,8 +189,13 @@
 
 /* ═══ п.7: вопрос ДО показа ответа — крупно ═══
    Пока ответа нет, тексту принадлежит вся колонка: нет смысла жать его
-   до размера, рассчитанного на соседство с рамкой ответа. */
-.answers-layout:not(.revealed) .answers-main { justify-content: center !important; }
+   до размера, рассчитанного на соседство с рамкой ответа.
+   `!important` убран в 9.48 ВМЕСТЕ с тем, что было на `.answers-main`
+   выше (п.2): вес этого селектора (0,3,0) и так побеждает тот (0,1,0) без
+   всяких `!important` — но убирать надо было ОБА разом. Если убрать только
+   отсюда и оставить в п.2, то п.2 неожиданно стал бы «важным» правилом и
+   перебил бы это по правилам каскада для `!important`-деклараций. */
+.answers-layout:not(.revealed) .answers-main { justify-content: center; }
 .answers-layout:not(.revealed) .q-text { font-size: clamp(26px, 6.4cqw, 78px); }
 .answers-layout:not(.revealed) .q-text.len-m { font-size: clamp(24px, 5.4cqw, 64px); }
 .answers-layout:not(.revealed) .q-text.len-l { font-size: clamp(21px, 4.4cqw, 50px); }
@@ -251,6 +332,14 @@
    невидимым навсегда. Держим единицу, а появление задаём кадрами. */
 .rule-item { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
+  /* `!important` здесь ОБЯЗАТЕЛЕН для `.rule-item` (разобрано в 9.48):
+     этот селектор весит 0,1,0, а `.theme-new_year .rule-item`
+     (03-theme-new-year.css:49, анимация iceIn) весит 0,2,0 — специфичнее
+     и без `!important` погасил бы это правило в теме НГ, несмотря на то
+     что файл 23 грузится позже (порядок файлов не спасает при более
+     высоком весе селектора). `.answer-block.reveal-in` дописан в тот же
+     список деклараций (то же значение, тот же токен) — раздельно эти два
+     селектора не развести без дублирования блока. */
   .rule-item, .answer-block.reveal-in { animation: none !important; opacity: 1 !important; }
 }
 
@@ -374,6 +463,18 @@
 @keyframes ansLabel { from { opacity: 0; letter-spacing: .6em; } to { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
+  /* `!important` здесь ОБЯЗАТЕЛЕН (разобрано в 9.48), по двум причинам сразу:
+     1) `.answer-block.reveal-in .answer-main` весит 0,3,0, а варианты выше
+        по теме — `.theme-classic .answer-block.reveal-in .answer-main`,
+        `.theme-potter …` — весят 0,4,0. Без `!important` эти правила
+        (специфичнее, хоть и написаны раньше) продолжали бы анимировать
+        в классике/киберпанке/ГП, даже когда reduced-motion включён.
+     2) Поднять вес вместо `!important` НЕЛЬЗЯ: `.answer-reveal .answer-main`
+        из этого же списка — это модалка «Своей игры» (`.jp-overlay`,
+        HostScreen.tsx), она рендерится ВНЕ `.host-screen`. Утяжелить
+        селектор префиксом `.host-screen …` для победы над темами означало
+        бы, что до модалки правило больше не дотягивается, и «Своя игра»
+        продолжила бы анимировать при включённом «уменьшить движение». */
   .theme-classic .timer-wrap::after, .cyber .timer-wrap::after,
   .theme-classic .timer-num, .cyber .timer-num,
   .theme-classic .timer-wrap.low, .cyber .timer-wrap.low,

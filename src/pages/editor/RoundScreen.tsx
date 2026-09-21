@@ -78,8 +78,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </div>
         </div>
       )}
-      {previewIdx !== null && round.questions[previewIdx] && (
-        <QuestionPreview pack={pack} round={round} q={round.questions[previewIdx]}
+      {previewIdx !== null && (noQuestions || round.questions[previewIdx]) && (
+        <QuestionPreview pack={pack} round={round} qIndex={previewIdx}
           onClose={() => setPreviewIdx(null)} />
       )}
       <div className="ed-crumb">
@@ -249,6 +249,14 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         </div>
       </div></div>
 
+      {/* Доска/тема задаётся настройками раунда целиком — своего списка
+          вопросов нет, поэтому предпросмотр открывается отдельной кнопкой,
+          а не из строки вопроса (см. QuestionPreview.tsx — маршрутизация
+          по round.mechanic, HANDOFF.md). */}
+      {noQuestions && (
+        <button className="ico" data-tip="Предпросмотр" style={{ marginBottom: 10 }}
+          onClick={() => setPreviewIdx(0)}>👁‍🗨 Предпросмотр</button>
+      )}
       {round.mechanic === 'crossword' &&
         <CrosswordEditor round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'jeopardy' &&

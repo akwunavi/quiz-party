@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  revealStart, revealNext, revealSwitchAt, revealDeadline, revealVisible,
+  revealStart, revealNext, revealSwitchAt, revealDeadline, revealVisibleIndices,
   revealGroups, revealLetterOpen, revealAllAnswered, revealPhaseSec,
   REVEAL_GRACE_MS, REVEAL_DEFAULTS,
 } from '../reveal'
@@ -96,19 +96,33 @@ describe('revealNext', () => {
   })
 })
 
-describe('revealVisible', () => {
-  it('фаза 1 — максимум 2 картинки', () => {
-    expect(revealVisible(4, 1)).toBe(2)
-    expect(revealVisible(2, 1)).toBe(2)
+describe('revealVisibleIndices', () => {
+  it('фаза 1 — первые 2 картинки (или все, если их меньше)', () => {
+    expect(revealVisibleIndices(4, 1)).toEqual([0, 1])
+    expect(revealVisibleIndices(3, 1)).toEqual([0, 1])
+    expect(revealVisibleIndices(2, 1)).toEqual([0, 1])
   })
-  it('фаза 2 — максимум 3', () => {
-    expect(revealVisible(4, 2)).toBe(3)
-    expect(revealVisible(2, 2)).toBe(2)
+  it('фаза 2 — заменяет фазу 1 третьей картинкой, если она есть', () => {
+    expect(revealVisibleIndices(4, 2)).toEqual([2])
+    expect(revealVisibleIndices(3, 2)).toEqual([2])
+    expect(revealVisibleIndices(2, 2)).toEqual([0, 1])
   })
-  it('фаза 3 и review — все картинки (максимум 4)', () => {
-    expect(revealVisible(4, 3)).toBe(4)
-    expect(revealVisible(3, 3)).toBe(3)
-    expect(revealVisible(4, 'review')).toBe(4)
+  it('фаза 3 — заменяет фазу 2 четвёртой картинкой, если она есть', () => {
+    expect(revealVisibleIndices(4, 3)).toEqual([3])
+    expect(revealVisibleIndices(3, 3)).toEqual([2])
+    expect(revealVisibleIndices(2, 3)).toEqual([0, 1])
+  })
+  it('review — все картинки, что есть у вопроса', () => {
+    expect(revealVisibleIndices(4, 'review')).toEqual([0, 1, 2, 3])
+    expect(revealVisibleIndices(3, 'review')).toEqual([0, 1, 2])
+    expect(revealVisibleIndices(2, 'review')).toEqual([0, 1])
+  })
+  it('никогда не показывает больше 2 картинок сразу в фазах 1-3', () => {
+    for (const count of [2, 3, 4]) {
+      for (const phase of [1, 2, 3] as const) {
+        expect(revealVisibleIndices(count, phase).length).toBeLessThanOrEqual(2)
+      }
+    }
   })
 })
 

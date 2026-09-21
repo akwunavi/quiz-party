@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   РАУНД «120 СЕКУНД»: ВОПРОС-ГЕРОЙ НАД ТАЙМЕРОМ
+   Вынесено из свалки 19-patch-746.css в 9.48 (часть K карты переноса).
+   НЕ поднимать в 09-round-sprint.css — между ними «sprint» встречается ещё
+   в файлах 10, 12, 14, 15, 16, порядок каскада важен.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 3: «120 СЕКУНД» — вопрос-герой вплотную над таймером ── */
+.sprint-screen.with-hero { grid-template-rows: minmax(0, auto) minmax(0, 1fr); }
+.sprint-hero { grid-column: 1 / -1; justify-self: center; align-self: end;
+  margin-top: 0; width: min(94%, 1500px); }
+.sprint-hero .sprint-text { text-align: center;
+  font-size: clamp(24px, 3vw, 56px); line-height: 1.15; }
+.sprint-hero.len-l .sprint-text { font-size: clamp(20px, 2.4vw, 42px); }
+.sprint-hero.len-xl .sprint-text { font-size: clamp(18px, 2vw, 34px); }
+/* таймер прижимается к верху своей строки — прямо под вопросом.
+   align-self обязателен: у .sprint-screen align-items:center центрировал
+   ячейку целиком, и justify-content внутри ничего не решал. */
+.sprint-screen.with-hero > .sprint-center { align-self: start; justify-content: flex-start;
+  padding-top: clamp(4px, 1vh, 14px); }
+.sprint-screen.with-hero > .sprint-col { align-self: start; }
+.sprint-screen.with-hero { padding-top: clamp(38px, 5.5vh, 62px); }
+.sprint-center { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; }
+/* карточки спринта — крупнее, адаптивно к количеству */
+.sprint-text { font-size: clamp(17px, 1.85vw, 32px); line-height: 1.25; }
+.sprint-screen.many .sprint-text { font-size: clamp(15px, 1.5vw, 25px); }
+.sprint-img { max-height: 18vh; width: auto; object-fit: contain; }

@@ -7,10 +7,14 @@ import { startTimer, gotoAnswers } from '../../lib/gameActions'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'
 import { createAudio } from '../../lib/audioSource'
+import type { PreviewCtx } from '../../lib/previewState'
 
-export function SprintBoard({ pack, round, gameState, timerNode }: {
+export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
   timerNode: React.ReactNode
+  /** Предпросмотр в редакторе: автостарт таймера/музыка/автопереход к
+   *  ответам/тикер обратного отсчёта выключены (HANDOFF.md). */
+  preview?: PreviewCtx
 }) {
   const s = round.settings as SprintSettings
   const startDelay = s.startDelaySec ?? 5
@@ -24,13 +28,13 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
   const manualStart = pack.settings?.play_mode === 'paper'
 
   useEffect(() => {
-    if (manualStart || gameState.timer_started_at || document.hidden) return
+    if (preview || manualStart || gameState.timer_started_at || document.hidden) return
     const t = setTimeout(() => { void startTimer() }, startDelay * 1000)
     return () => clearTimeout(t)
-  }, [gameState.timer_started_at, manualStart])
+  }, [preview, gameState.timer_started_at, manualStart])
 
   useEffect(() => {
-    if (!gameState.timer_started_at || !bgMusic || document.hidden) return
+    if (preview || !gameState.timer_started_at || !bgMusic || document.hidden) return
     let cancelled = false
     const a = createAudio(); a.src = mediaUrl(bgMusic)
     a.loop = true; a.volume = .6
@@ -41,22 +45,22 @@ export function SprintBoard({ pack, round, gameState, timerNode }: {
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
     }).catch(() => {})
     return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-  }, [gameState.timer_started_at, bgMusic])
+  }, [preview, gameState.timer_started_at, bgMusic])
 
   useEffect(() => {
-    if (!gameState.timer_started_at || document.hidden) return
+    if (preview || !gameState.timer_started_at || document.hidden) return
     const endsAt = new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
     const ms = endsAt - Date.now() + afterTimer * 1000
     const t = setTimeout(() => { void gotoAnswers(0) }, Math.max(0, ms))
     return () => clearTimeout(t)
-  }, [gameState.timer_started_at])
+  }, [preview, gameState.timer_started_at])
 
   const [countdown, setCountdown] = useState(startDelay)
   useEffect(() => {
-    if (manualStart || gameState.timer_started_at) return
+    if (preview || manualStart || gameState.timer_started_at) return
     const t = setInterval(() => setCountdown(c => Math.max(0, c - 1)), 1000)
     return () => clearInterval(t)
-  }, [gameState.timer_started_at, manualStart])
+  }, [preview, gameState.timer_started_at, manualStart])
 
   // нечётное число вопросов: первый — «герой» на всю ширину над таймером
   const hero = questions.length % 2 === 1 ? questions[0] : null

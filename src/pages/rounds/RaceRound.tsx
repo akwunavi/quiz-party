@@ -14,6 +14,7 @@ import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, RaceSettings } from '../../types/quiz'
 import { createAudio } from '../../lib/audioSource'
+import type { PreviewCtx } from '../../lib/previewState'
 
 const DOG_COLORS = [
   { body: '#f2e3c9', mask: '#b99a7d', name: 'кремовый' },   // Френк — как на фото
@@ -83,15 +84,21 @@ function buildRace(seed: number, raceSec: number) {
   return { progress: progressWithStops, finish: finishReal, places, pausedAt }
 }
 
-export function RaceBoard({ pack, round, gameState }: {
+export function RaceBoard({ pack, round, gameState, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
+  /** Предпросмотр в редакторе: музыка/начисление баллов/автооткрытие ставок
+   *  выключены; тикер `now` остаётся — он локальный и нужен для анимации
+   *  бега на стадии `running` (HANDOFF.md). */
+  preview?: PreviewCtx
 }) {
   const s = round.settings as RaceSettings
   const dogs = (s.dogs ?? []).length === 5 ? s.dogs! : ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета']
   const raceSec = s.raceSec ?? 18
   const race = gameState.melody?.race ?? {}
-  const teams = useTeams(gameState.game_id)
-  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const liveTeams = useTeams(preview ? null : gameState.game_id)
+  const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
+  const teams = preview ? preview.teams : liveTeams
+  const answers = preview ? preview.answers : liveAnswers
   const bets = answers.filter(a => a.question_ref === `q-race-${gameState.round_number}`)
   const graded = useRef(false)
 
@@ -100,7 +107,7 @@ export function RaceBoard({ pack, round, gameState }: {
   useEffect(() => {
     const src = (round.settings as { race_music?: string }).race_music
       ?? pack.settings?.bg_music
-    if (race.stage !== 'running' || !src || document.hidden) return
+    if (preview || race.stage !== 'running' || !src || document.hidden) return
     let cancelled = false
     const a = createAudio(); a.src = mediaUrl(src)
     a.loop = true; a.volume = .55
@@ -109,7 +116,7 @@ export function RaceBoard({ pack, round, gameState }: {
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
     }).catch(() => {})
     return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-  }, [race.stage])
+  }, [preview, race.stage])
 
   const [now, setNow] = useState(Date.now())
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 66); return () => clearInterval(t) }, [])
@@ -124,7 +131,7 @@ export function RaceBoard({ pack, round, gameState }: {
 
   // финиш: начисляем баллы (5/4/3/2/1 по месту выбранной собаки) — один раз
   useEffect(() => {
-    if (!running || !allFinished || graded.current || document.hidden) return
+    if (preview || !running || !allFinished || graded.current || document.hidden) return
     graded.current = true
     const placeOf = new Map(scenario.places.map((dog, pos) => [dog, pos]))
     void (async () => {
@@ -138,12 +145,14 @@ export function RaceBoard({ pack, round, gameState }: {
         melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
       })
     })()
-  }, [running, allFinished])
+  }, [preview, running, allFinished])
 
   // ставки открываются сразу с появлением экрана — лишний клик убран
   useEffect(() => {
-    if (!race.stage && !document.hidden) void openBets()
-  }, [race.stage])
+    if (preview || race.stage || document.hidden) return
+    void openBets()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, race.stage])
 
   // Сама запись — в lib/raceActions.ts, общая с кнопкой «Начать скачки» в
   // админке (8.62): один вызов вместо двух копий одной и той же логики.
@@ -196,10 +205,11 @@ export function RaceBoard({ pack, round, gameState }: {
             ? 'var(--answer)' : undefined }}>
             СТАВКИ СДЕЛАЛИ: {bets.length} / {teams.length}
           </div>
-          <div className="host-actions">
+          {/* Реальный запуск забега — не рендерится в предпросмотре. */}
+          {!preview && <div className="host-actions">
             <button disabled={bets.length === 0} onClick={() => void start()}>
               🏁 Старт! (ставки закрываются)</button>
-          </div>
+          </div>}
         </div>
       )}
 
@@ -209,7 +219,7 @@ export function RaceBoard({ pack, round, gameState }: {
               табло/перерыв, настроенные для раунда, молча пропускались. Та же
               ошибка уже случалась у «Своей игры» и мелодии (см. HANDOFF.md),
               лечится тем же приёмом: маршрут считает общий модуль. */}
-          <div className="host-actions"><AfterRoundNav pack={pack} gameState={gameState} /></div>
+          {!preview && <div className="host-actions"><AfterRoundNav pack={pack} gameState={gameState} /></div>}
           <div className="answer-reveal" style={{ padding: '14px 30px' }}>
             <div className="answer-label">ПОБЕДИТЕЛЬ</div>
             <div className="answer-main">№{scenario.places[0] + 1} {dogs[scenario.places[0]]}</div>
