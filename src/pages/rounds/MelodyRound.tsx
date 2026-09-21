@@ -80,6 +80,10 @@ function stopShared() {
 
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
+/** Длина трека на показе ответа — одно число на RevealTrack и на автопереход
+ *  дальше, к доске. Раньше было продублировано как магическая константа
+ *  15_000 в двух местах — не расходится, потому что теперь оно одно. */
+const REVEAL_TRACK_MS = 15_000
 
 /** Трек на показе ответа: ровно 15 секунд с начала.
  *  Длину держим фиксированной, а не «до конца файла»: полноразмерная песня
@@ -96,7 +100,7 @@ function RevealTrack({ src }: { src: string }) {
     a.play().then(() => {
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
     }).catch(() => {})
-    const t = setTimeout(() => { try { a.pause() } catch { /* уже мёртв */ } }, 15_000)
+    const t = setTimeout(() => { try { a.pause() } catch { /* уже мёртв */ } }, REVEAL_TRACK_MS)
     return () => {
       cancelled = true
       clearTimeout(t)
@@ -211,9 +215,16 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       // Время на ответ вышло. Дальше два разных случая, и раньше они были
       // склеены в один: экран просто замирал, музыка играла, а форма у
       // игрока оставалась открытой, пока ведущий что-нибудь не нажмёт.
-      const submitted = answers.some(a =>
-        a.question_ref === `q-mel-${m.key}` && a.team_id === m.order?.[m.turn ?? 0]
-        && !!a.answer_text?.trim())
+      const currentAns = answers.find(a =>
+        a.question_ref === `q-mel-${m.key}` && a.team_id === m.order?.[m.turn ?? 0])
+      // Ответ уже оценён ведущим (gradeMelody/passMelody уже отработали и
+      // сами перевели стадию) — опрос answers мог долететь РАНЬШЕ, чем
+      // опрос gameState подхватит новую стадию. Тогда m.stage тут ещё
+      // устаревший 'answering', и спред {...m} ниже затёр бы свежий
+      // 'reveal' обратно. Ничего не пишем — переход целиком на совести
+      // gradeMelody/passMelody (HANDOFF.md).
+      if (currentAns?.is_correct != null) return
+      const submitted = !!currentAns?.answer_text?.trim()
       if (submitted) {
         // Ответ есть — судит ведущий, время просто останавливаем.
         void saveMelody({ ...m, deadline: undefined })
@@ -270,6 +281,10 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       if (stop) clearTimeout(stop)
       clearTimeout(guard); clearTimeout(metaGuard)
       a.removeEventListener('loadedmetadata', checkReal)
+      // защита на будущее: штатно звук останавливает advance() ДО записи
+      // новой стадии, но если эффект размонтируется/перезапустится другим
+      // путём, трек не должен утечь в следующую стадию (bidding).
+      try { a.pause() } catch { /* уже мёртв */ }
     }
   }, [preview, m.stage, m.key])
 
@@ -292,6 +307,24 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
     return () => { a.pause(); a.onended = null }
   }, [preview, m.stage])
+
+  // ── разбор: закрыть модалку самой, когда трек доиграл (15 сек) ──
+  // Кнопка «К доске →» остаётся — ведущий может закрыть раньше (трек не
+  // воспроизвёлся, он торопится). Оба пути идемпотентны: melodyToBoard
+  // просто выставляет stage:'done', повторный вызов ничего не ломает.
+  const revealAdvancedRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (preview || m.stage !== 'reveal') return
+    const key = m.key
+    revealAdvancedRef.current = undefined
+    const t = window.setTimeout(() => {
+      if (revealAdvancedRef.current === key) return
+      revealAdvancedRef.current = key
+      void saveMelody(melodyToBoard(m))
+    }, REVEAL_TRACK_MS)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, m.stage, m.key])
 
   // Хук стоит ВЫШЕ раннего выхода намеренно. Пока он был ниже, раунд без
   // тем рендерился с другим набором хуков — React #310 на проекторе в тот
@@ -373,7 +406,10 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
           <div className="mel-modal">
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
-              {!!deadline && (
+              {/* На listen дедлайн декоративный (не синхронизирован с
+                  реальным стартом звука) — ведущий прямо попросил убрать
+                  тут таймер совсем, не пытаться сделать его точным. */}
+              {!!deadline && m.stage !== 'listen' && (
                 // те же часы, что у большого таймера: --r = доля остатка
                 <div className="mel-count">
                   {pack.theme === 'potter'
