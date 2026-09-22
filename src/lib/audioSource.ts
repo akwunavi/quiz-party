@@ -14,11 +14,23 @@
 // «Скачать пакет для офлайна», второй запасной путь вообще не идёт в сеть.
 // Разбор ответа сервера (файла нет / сеть заблокировала) не дублируем —
 // он один, в `media.ts:fetchMediaBlob`.
+//
+// 9.59 (HANDOFF §3bw): найдена настоящая первопричина гонки звука в
+// «Угадай мелодию» — она НЕ про VPN. `AbortError` из `play()` — штатный
+// сигнал спецификации HTML «воспроизведение прервали до готовности»
+// (смена src, pause() до старта, .load()). Раньше playAudio уходила на
+// запасной путь (fetch) при ЛЮБОЙ ошибке прямого play(), включая
+// AbortError — то есть на КАЖДУЮ смену трека второй игрок получал лишний
+// параллельный fetch, который потом мог догнать и запустить устаревший
+// звук. Теперь AbortError — это `SUPERSEDED`, тихо, без похода в сеть.
 
 import { readMedia } from './packCache'
 import { fetchMediaBlob } from './media'
 
-const cache = new Map<string, string>()
+export type PlayResult = { ok: true } | { ok: false; reason: string }
+
+/** Вытеснено новой операцией — не ошибка, происходит постоянно и штатно. */
+export const SUPERSEDED = { ok: false, reason: 'superseded' } as const
 
 // ═══ РЕЕСТР ЖИВЫХ ПЛЕЕРОВ ═══
 // Объекты `new Audio()` НЕ находятся в документе, поэтому
@@ -34,8 +46,22 @@ export function createAudio(): HTMLAudioElement {
   return a
 }
 
+// ═══ ХУКИ ГЛОБАЛЬНОЙ ОСТАНОВКИ ═══
+// sharedAudio.ts держит СВОЙ отдельный текущий элемент/операцию и не виден
+// отсюда напрямую (циклический импорт). Чтобы stopAllAudio() умела погасить
+// и его, он подписывается сюда одной строкой при загрузке модуля.
+const stopAllHooks = new Set<() => void>()
+
+/** Подписаться на глобальную остановку. Возвращает функцию отписки
+ *  (на практике не используется — подписка на весь модуль живёт вечно). */
+export function onStopAll(fn: () => void): () => void {
+  stopAllHooks.add(fn)
+  return () => stopAllHooks.delete(fn)
+}
+
 /** Остановить ВЕСЬ звук: и созданный кодом, и вставленный в разметку. */
 export function stopAllAudio() {
+  stopAllHooks.forEach(fn => { try { fn() } catch { /* не должен ронять остальных */ } })
   live.forEach(a => {
     try { a.pause(); a.currentTime = 0; a.src = '' } catch { /* уже мёртв */ }
   })
@@ -57,6 +83,35 @@ function pathFromUrl(url: string): string | null {
   return url.slice(prefix.length).split('/').map(decodeURIComponent).join('/')
 }
 
+// ═══ КЕШ СКАЧАННЫХ ФАЙЛОВ (blob-URL) ═══
+// Ограничен: держать все треки вечера в памяти проектора — сотни мегабайт.
+// Вытесняем САМЫЕ СТАРЫЕ (порядок вставки Map), но никогда не вытесняем
+// blob, который сейчас реально стоит в src у живого элемента — revoke на
+// играющем элементе обрывает звук.
+const cache = new Map<string, string>()
+const MAX_CACHED_BLOBS = 8
+
+function evictOldIfNeeded() {
+  if (cache.size <= MAX_CACHED_BLOBS) return
+  const inUse = new Set<string>()
+  live.forEach(a => { if (a.src) inUse.add(a.src) })
+  for (const [url, blobUrl] of cache) {
+    if (cache.size <= MAX_CACHED_BLOBS) break
+    if (inUse.has(blobUrl)) continue
+    cache.delete(url)
+    try { URL.revokeObjectURL(blobUrl) } catch { /* уже отозван */ }
+  }
+}
+
+function cacheSet(url: string, blobUrl: string) {
+  cache.set(url, blobUrl)
+  evictOldIfNeeded()
+}
+
+// Скачивания, идущие ПРЯМО СЕЙЧАС — второй запрос на тот же url переиспользует
+// первый вместо второго параллельного fetch.
+const inflight = new Map<string, Promise<string>>()
+
 /** Скачать файл и вернуть локальную ссылку на него.
  *  Сначала — офлайн-кеш (IndexedDB, `packCache`): если трек уже скачан
  *  кнопкой «Скачать пакет для офлайна», сеть вообще не нужна. Дальше —
@@ -66,44 +121,95 @@ function pathFromUrl(url: string): string | null {
 async function toBlobUrl(url: string): Promise<string> {
   const hit = cache.get(url)
   if (hit) return hit
-  const path = pathFromUrl(url)
-  if (path) {
-    try {
-      const cached = await readMedia(path)
-      if (cached) {
-        const blobUrl = URL.createObjectURL(cached)
-        cache.set(url, blobUrl)
-        return blobUrl
-      }
-    } catch { /* IndexedDB недоступен — идём в сеть, как раньше */ }
+  const running = inflight.get(url)
+  if (running) return running
+
+  const task = (async () => {
+    const path = pathFromUrl(url)
+    if (path) {
+      try {
+        const cached = await readMedia(path)
+        if (cached) {
+          const blobUrl = URL.createObjectURL(cached)
+          cacheSet(url, blobUrl)
+          return blobUrl
+        }
+      } catch { /* IndexedDB недоступен — идём в сеть, как раньше */ }
+    }
+    const blob = await fetchMediaBlob(path ?? url)
+    const blobUrl = URL.createObjectURL(blob)
+    cacheSet(url, blobUrl)
+    return blobUrl
+  })()
+
+  inflight.set(url, task)
+  try {
+    return await task
+  } finally {
+    inflight.delete(url)
   }
-  const blob = await fetchMediaBlob(path ?? url)
-  const blobUrl = URL.createObjectURL(blob)
-  cache.set(url, blobUrl)
-  return blobUrl
 }
 
-export type PlayResult = { ok: true } | { ok: false; reason: string }
+/** Прогреть кеш заранее, не дожидаясь результата. Не делает ничего для
+ *  blob-URL (уже локальный) и для того, что уже скачивается/скачано —
+ *  модуль сам гарантирует «ровно один раз на трек». Ошибку тихо глотает:
+ *  это лишь оптимизация, обязательный путь всё равно идёт через playAudio. */
+export function preloadAudio(url: string): void {
+  if (url.startsWith('blob:') || cache.has(url) || inflight.has(url)) return
+  void toBlobUrl(url).catch(() => {})
+}
+
+/** Гонка между промисом `p` и отменой по `signal`. Не отменяет саму `p`
+ *  (это делает вызывающий по месту через try/catch AbortError выше), только
+ *  позволяет НЕ ЖДАТЬ её дальше, если пришла отмена раньше. */
+function abortable<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return p
+  if (signal.aborted) return Promise.reject(new DOMException('superseded', 'AbortError'))
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new DOMException('superseded', 'AbortError'))
+    signal.addEventListener('abort', onAbort)
+    p.then(
+      v => { signal.removeEventListener('abort', onAbort); resolve(v) },
+      e => { signal.removeEventListener('abort', onAbort); reject(e) },
+    )
+  })
+}
 
 /** Воспроизвести звук, при необходимости через запасной путь.
  *  `startAt` — секунда, с которой начать (0 — как раньше, с начала).
  *  Ставится СРАЗУ после `el.src`, до `play()`: браузер ставит сик в очередь
  *  и применяет его сам, как только придут метаданные — ждать их здесь не
  *  нужно (см. lib/melody.ts:melodyPreviewCeiling — «Угадай мелодию»,
- *  единственный вызывающий с startAt ≠ 0). */
-// `isStale` — необязательная проверка «это воспроизведение ещё нужно?».
-// Скачивание запасным путём (fetch) может занять произвольное время; за это
-// время вызывающий код мог уйти в другую стадию/трек. Раньше в этом случае
-// playAudio всё равно проигрывала файл, а вызывающий сам глушил его СРАЗУ
-// после — звук успевал стартовать и тут же обрывался, а на медленной сети
-// трек мог тихо не заиграть вовсе, без объяснения. Теперь проверка — ДО
-// повторного `el.src=`/`play()`: если `isStale()` вернула true, не играем
-// совсем; если false — играем, пусть и с опозданием, а не молчим. Решение,
-// что считать «устаревшим», остаётся за вызывающим (см. lib/sharedAudio.ts).
+ *  единственный вызывающий с startAt ≠ 0).
+ *
+ *  `signal` — необязательный AbortController.signal: если операция, которой
+ *  принадлежит этот вызов, вытеснена новой (см. lib/sharedAudio.ts), сигнал
+ *  срабатывает, и playAudio возвращает SUPERSEDED, не уходя ни в fetch, ни
+ *  в повторный play(). Решение, что считать «вытесненным», остаётся за
+ *  вызывающим — здесь только механика отмены. */
 export async function playAudio(
-  el: HTMLAudioElement, url: string, startAt = 0, isStale?: () => boolean,
+  el: HTMLAudioElement, url: string, startAt = 0, signal?: AbortSignal,
 ): Promise<PlayResult> {
   live.add(el)                       // чтобы его точно можно было заглушить
+
+  // 0) уже скачан — играем сразу из памяти, без похода на прямой сетевой URL
+  if (!url.startsWith('blob:')) {
+    const hit = cache.get(url)
+    if (hit) {
+      try {
+        el.src = hit
+        if (startAt) el.currentTime = startAt
+        await el.play()
+        return { ok: true }
+      } catch (e) {
+        const name = e instanceof Error ? e.name : ''
+        if (signal?.aborted || name === 'AbortError') return SUPERSEDED
+        // запись протухла (blob отозван/битый) — забываем и идём обычным путём
+        cache.delete(url)
+      }
+    }
+  }
+
   // 1) как есть
   try {
     el.src = url
@@ -112,22 +218,27 @@ export async function playAudio(
     return { ok: true }
   } catch (e) {
     const name = e instanceof Error ? e.name : ''
+    // AbortError — воспроизведение ШТАТНО прервали (смена src/pause() до
+    // старта/чужая операция). Это не отказ загрузки — идти на fetch за тем
+    // же файлом бессмысленно и вредно (см. HANDOFF §3bw).
+    if (signal?.aborted || name === 'AbortError') return SUPERSEDED
     // запрет автозапуска запасным путём не лечится — нужен клик
     if (name === 'NotAllowedError') {
       return { ok: false, reason: 'браузер не разрешил звук — кликните по экрану' }
     }
   }
+
   // 2) через скачивание в память
   try {
-    const blobUrl = await toBlobUrl(url)
-    if (isStale?.()) {
-      return { ok: false, reason: 'stale' }
-    }
+    const blobUrl = await abortable(toBlobUrl(url), signal)
+    if (signal?.aborted) return SUPERSEDED
     el.src = blobUrl
     if (startAt) el.currentTime = startAt
     await el.play()
     return { ok: true }
   } catch (e) {
+    const name = e instanceof Error ? e.name : ''
+    if (signal?.aborted || name === 'AbortError') return SUPERSEDED
     return {
       ok: false,
       reason: e instanceof Error && /ФАЙЛА НЕТ/.test(e.message)
@@ -162,9 +273,11 @@ export async function probeMedia(url: string) {
 //
 // Решение: отсчёт стартует по событию `playing`, а каждый запуск получает
 // номер поколения. Всё, что осталось от прошлых поколений, глушится и
-// игнорируется.
+// игнорируется. (Используется «Своей игрой» — не общий мелодийный элемент,
+// поэтому AbortController здесь не нужен, свой лёгкий механизм подходит.)
 
 let generation = 0
+let genCtrl: AbortController | null = null
 
 export type SyncedHandle = { stop: () => void }
 
@@ -175,6 +288,9 @@ export function playSynced(url: string, seconds: number, cb: {
   onError?: (reason: string) => void
 }): SyncedHandle {
   const my = ++generation
+  genCtrl?.abort()                    // прошлое поколение больше не актуально
+  const ctrl = new AbortController()
+  genCtrl = ctrl
   stopAllAudio()                      // прошлые треки замолкают ДО старта нового
 
   const el = createAudio()
@@ -201,10 +317,15 @@ export function playSynced(url: string, seconds: number, cb: {
     }, 1000)
   }, { once: true })
 
-  void playAudio(el, url).then(r => {
+  void playAudio(el, url, 0, ctrl.signal).then(r => {
     if (stale()) { stop(); return }      // пока грузились, нажали «переслушать»
-    if (!r.ok) { stop(); cb.onError?.(r.reason) }
+    if (!r.ok) {
+      // superseded — вытеснили штатно (см. HANDOFF §3bw), это не ошибка
+      // звука для пользователя интерфейса «Своей игры» — молчим.
+      if (r.reason === 'superseded') { stop(); return }
+      stop(); cb.onError?.(r.reason)
+    }
   })
 
-  return { stop: () => { if (my === generation) generation++; stop() } }
+  return { stop: () => { if (my === generation) { generation++; ctrl.abort() }; stop() } }
 }

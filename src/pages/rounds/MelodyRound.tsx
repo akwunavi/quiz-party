@@ -9,7 +9,7 @@
 // фоновая музыка) → passed (вторая слушает трек целиком, с начала)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
-import { createAudio } from '../../lib/audioSource'
+import { createAudio, preloadAudio } from '../../lib/audioSource'
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
@@ -127,7 +127,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const teams = preview ? preview.teams : liveTeams
   const answers = preview ? preview.answers : liveAnswers
   const played = m.played ?? []
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
   const [now, setNow] = useState(Date.now())
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
 
@@ -203,21 +203,20 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
     // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
-    const a = playShared(mediaUrl(track.audio), m.startSec ?? 0)
-    audioRef.current = a
+    const h = playShared(mediaUrl(track.audio), { startAt: m.startSec ?? 0 })
     let stop: number | undefined
     let advanced = false
     const advance = () => {
       if (advanced) return
       advanced = true
-      stopShared()
+      h.stop()
       void (async () => {
         const r = await freshMelodyOrAbort(m.key, 'snippet', m)
         if (!r.ok) return
         await saveMelody({ ...r.base, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
       })()
     }
-    const onPlaying = () => {
+    const offPlaying = h.on('playing', () => {
       // с этого момента и тикает счётчик на экране. Тот же соседний баг:
       // если ведущий уже нажал «Принимаем ответ →» на этом же экране (или
       // «Закрыть трек»), а playing-событие только сейчас долетело — не
@@ -229,22 +228,17 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
         await saveMelody({ ...r.base, deadline: inSec(sec) })
       })()
       stop = window.setTimeout(advance, sec * 1000)
-    }
-    a.addEventListener('playing', onPlaying, { once: true })
+    })
     const guard = window.setTimeout(advance, (sec + 4) * 1000)
     return () => {
       if (stop) clearTimeout(stop)
       clearTimeout(guard)
-      // {once:true} снимает слушатель сам ТОЛЬКО когда событие реально
-      // произошло — если эффект размонтируется раньше (смена стадии кликом
-      // ведущего, размонтирование экрана), листенер остаётся висеть на
-      // элементе и может выстрелить позже, на уже другом треке/стадии.
-      // Снимаем явно. То же — stopShared(): раньше комментарий утверждал,
-      // что cleanup «уже это делает», а вызова не было вовсе — трек мог
-      // продолжить играть после ухода со стадии snippet (HANDOFF.md §3bu,
-      // F1 — исправление неполного фикса из §3bt).
-      a.removeEventListener('playing', onPlaying)
-      stopShared()
+      // Подписка привязана к ЭТОЙ операции (SharedPlayback.on) — событие от
+      // чужой/устаревшей операции сюда не долетит (см. lib/sharedAudio.ts).
+      // Явная отписка на случай, если эффект размонтируется раньше, чем
+      // событие произошло.
+      offPlaying()
+      h.stop()
     }
   }, [preview, m.stage, m.key])
 
@@ -292,8 +286,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   useEffect(() => {
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
-    const a = playShared(mediaUrl(track.audio), requested)
-    audioRef.current = a
+    const h = playShared(mediaUrl(track.audio), { startAt: requested })
     let stop: number | undefined
     let advanced = false
     // Исправленный startSec (см. checkReal ниже) копится ЗДЕСЬ, а не пишется
@@ -306,7 +299,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const advance = () => {
       if (advanced) return
       advanced = true
-      stopShared()
+      h.stop()
       void (async () => {
         const r = await freshMelodyOrAbort(m.key, 'listen', m)
         if (!r.ok) return
@@ -329,55 +322,64 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const checkReal = () => {
       if (metaChecked) return
       metaChecked = true
-      const dur = a.duration
+      if (!h.isCurrent()) return       // гонка с новой операцией — не мутируем чужой el
+      const dur = h.el.duration
       if (!dur || !isFinite(dur)) return
       const safe = Math.min(requested, Math.max(0, dur - 10))
       if (safe !== requested) {
-        try { a.currentTime = safe } catch { /* не критично — сыграет как есть */ }
+        try { h.el.currentTime = safe } catch { /* не критично — сыграет как есть */ }
         correctedStart = safe
       }
     }
-    a.addEventListener('loadedmetadata', checkReal, { once: true })
+    const offMeta = h.on('loadedmetadata', checkReal)
     const metaGuard = window.setTimeout(checkReal, 400)
     // секунда считается от РЕАЛЬНОГО начала звука
-    const onPlaying = () => { stop = window.setTimeout(advance, 1000) }
-    a.addEventListener('playing', onPlaying, { once: true })
+    const offPlaying = h.on('playing', () => { stop = window.setTimeout(advance, 1000) })
     // страховка: если звук так и не пошёл (нет файла) — не зависаем
     const guard = window.setTimeout(advance, 4000)
     return () => {
       if (stop) clearTimeout(stop)
       clearTimeout(guard); clearTimeout(metaGuard)
-      a.removeEventListener('loadedmetadata', checkReal)
-      a.removeEventListener('playing', onPlaying)
+      offMeta()
+      offPlaying()
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
-      // путём, трек не должен утечь в следующую стадию (bidding). stopShared
-      // (а не голый a.pause()) — иначе запасной путь playAudio, ещё
-      // догружающий файл в фоне, всё равно запустил бы его позже, уже в
-      // следующей стадии (критичный баг, см. HANDOFF.md).
-      stopShared()
+      // путём, трек не должен утечь в следующую стадию (bidding).
+      h.stop()
     }
   }, [preview, m.stage, m.key])
 
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
-    const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
     // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
-    if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
-    const a = playShared(mediaUrl(bg))
-    a.loop = true; a.volume = .45
-    return () => { stopShared(); a.loop = false; a.volume = 1 }
-  }, [preview, m.stage])
+    if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bgMusic || document.hidden) return
+    const h = playShared(mediaUrl(bgMusic), { loop: true, volume: .45 })
+    return () => h.stop()
+  }, [preview, m.stage, bgMusic])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
     if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
-    const a = playShared(mediaUrl(track.audio))
-    audioRef.current = a
-    a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
-    return () => { stopShared(); a.onended = null }
+    const h = playShared(mediaUrl(track.audio))
+    const off = h.on('ended', () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) }))
+    return () => { off(); h.stop() }
   }, [preview, m.stage])
+
+  // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
+  // spinning/listen — самый ранний момент, когда ключ трека уже известен, но
+  // звук ещё не запускается (spinning вообще без звука, listen — 1 секунда).
+  // audioSource.preloadAudio сам гарантирует «ровно один раз на трек».
+  useEffect(() => {
+    if (preview || (m.stage !== 'spinning' && m.stage !== 'listen') || !track?.audio) return
+    preloadAudio(mediaUrl(track.audio))
+  }, [preview, m.key, m.stage])
+
+  // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
+  useEffect(() => {
+    if (preview || !bgMusic) return
+    preloadAudio(mediaUrl(bgMusic))
+  }, [preview, bgMusic])
 
   // ── разбор: закрыть модалку самой, когда трек доиграл (15 сек) ──
   // Кнопка «К доске →» остаётся — ведущий может закрыть раньше (трек не
@@ -413,13 +415,23 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const idle = melodyIdle(m)
 
   /** Открыть выбранную плитку без рулетки. */
+  /** Аудио выбранного трека по ключу «тема-трек» — для предзагрузки ДО записи
+   *  стадии: ключ известен локально, сеть на него ждать не нужно. */
+  const preloadTrack = (key: string) => {
+    const [pti, pi] = key.split('-').map(Number)
+    const audio = themes[pti]?.tracks[pi]?.audio
+    if (audio) preloadAudio(mediaUrl(audio))
+  }
+
   const pickManually = (key: string) => {
     setManualPick(false)
+    preloadTrack(key)
     void saveMelody(melodyPick(m, key, s.trackSec ?? 30))
   }
 
   const startSpin = () => {
     const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
+    preloadTrack(target)
     void saveMelody(melodySpin(m, target, freeKeys.length, s.spinSec ?? 5, s.trackSec ?? 30))
   }
 
