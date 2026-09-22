@@ -53,6 +53,13 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
 // переиспользуется — autoplay-политика браузера больше не блокирует треки,
 // запущенные выбором с телефона (там нет жеста на проекторе).
 let sharedAudio: HTMLAudioElement | null = null
+// Счётчик поколений — тот же паттерн, что у playSynced в audioSource.ts.
+// playAudio() при блокировке прямого запроса СКАЧИВАЕТ файл через fetch
+// (может занять несколько секунд) и уже ПОСЛЕ этого сама вызывает play()
+// второй раз. Без счётчика это воспроизведение стартовало без предупреждения
+// в уже другой стадии — трек играл сам, во время bidding, без клика
+// ведущего (см. HANDOFF.md, критичный баг после 9.54).
+let sharedGen = 0
 export function unlockAudio() {
   if (sharedAudio) return
   sharedAudio = createAudio()
@@ -62,18 +69,31 @@ export function unlockAudio() {
 }
 function playShared(src: string, startAt = 0): HTMLAudioElement {
   if (!sharedAudio) sharedAudio = createAudio()
-  sharedAudio.pause()
-  sharedAudio.loop = false
-  sharedAudio.volume = 1
+  const el = sharedAudio
+  sharedGen++
+  const my = sharedGen
+  el.pause()
+  el.loop = false
+  el.volume = 1
   // тот же запасной путь, что и в «Своей игре»: при блокировке прямого
   // запроса файл скачивается и играется из памяти
-  void playAudio(sharedAudio, src, startAt)
-  return sharedAudio
+  void playAudio(el, src, startAt).then(() => {
+    // Пока грузился запасной путь (fetch), могли уже уйти в другую стадию
+    // (guard-таймер принудительно перевёл дальше). Если это воспроизведение
+    // больше не «текущее» — глушим немедленно, не дожидаясь, пока оно само
+    // кому-то помешает.
+    if (my !== sharedGen) { try { el.pause() } catch { /* уже мёртв */ } }
+  })
+  return el
 }
 
 /** Заглушить общий трек. Нужен, когда ход уходит дальше сам: иначе музыка
- *  продолжает играть уже над следующей командой. */
+ *  продолжает играть уже над следующей командой. Бампает поколение ДАЖЕ
+ *  если ничего нового не запускается следом — иначе воспроизведение,
+ *  которое ещё догружается в фоне (см. playShared), всё равно стартует
+ *  после этой «остановки». */
 function stopShared() {
+  sharedGen++
   if (!sharedAudio) return
   try { sharedAudio.pause(); sharedAudio.currentTime = 0 } catch { /* уже мёртв */ }
 }
@@ -185,7 +205,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const advance = () => {
       if (advanced) return
       advanced = true
-      a.pause()
+      stopShared()
       void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
     }
     a.addEventListener('playing', () => {
@@ -248,7 +268,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const advance = () => {
       if (advanced) return
       advanced = true
-      a.pause()
+      stopShared()
       void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
     }
     // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
@@ -283,8 +303,11 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       a.removeEventListener('loadedmetadata', checkReal)
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
-      // путём, трек не должен утечь в следующую стадию (bidding).
-      try { a.pause() } catch { /* уже мёртв */ }
+      // путём, трек не должен утечь в следующую стадию (bidding). stopShared
+      // (а не голый a.pause()) — иначе запасной путь playAudio, ещё
+      // догружающий файл в фоне, всё равно запустил бы его позже, уже в
+      // следующей стадии (критичный баг, см. HANDOFF.md).
+      stopShared()
     }
   }, [preview, m.stage, m.key])
 
@@ -296,7 +319,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
     const a = playShared(mediaUrl(bg))
     a.loop = true; a.volume = .45
-    return () => { a.pause(); a.loop = false; a.volume = 1 }
+    return () => { stopShared(); a.loop = false; a.volume = 1 }
   }, [preview, m.stage])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
@@ -305,7 +328,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const a = playShared(mediaUrl(track.audio))
     audioRef.current = a
     a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
-    return () => { a.pause(); a.onended = null }
+    return () => { stopShared(); a.onended = null }
   }, [preview, m.stage])
 
   // ── разбор: закрыть модалку самой, когда трек доиграл (15 сек) ──
