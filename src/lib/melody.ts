@@ -244,9 +244,17 @@ export function melodyPlaySnippetIfFresh(
  *  именно «закрыть немедленно, что бы сейчас ни происходило» — HANDOFF
  *  §3bx, находка 5). Экспортирована отдельно (а не заинлайнена в
  *  MelodyRound.tsx/AdminPage.tsx), чтобы тест на это условие проверял
- *  РЕАЛЬНЫЙ боевой код, а не свою копию. */
+ *  РЕАЛЬНЫЙ боевой код, а не свою копию.
+ *
+ *  Стадия `reveal` исключена нарочно (ревью, HANDOFF §3bx): `melodyIdle`
+ *  не считает её неактивной, а на `reveal` уже показан победитель и
+ *  начислены очки — «закрыть» здесь стёрло бы экран разбора и не тронуло
+ *  бы уже записанные баллы, то есть ведущий думал бы, что отменил трек,
+ *  а на самом деле только скрыл его результат. */
 export function melodyEmergencyClose(
   key: string | undefined,
 ): (cur: MelodyState) => MelodyState | null {
-  return cur => (cur.key === key && !melodyIdle(cur) ? melodyClose(cur) : null)
+  return cur => (
+    cur.key === key && !melodyIdle(cur) && cur.stage !== 'reveal' ? melodyClose(cur) : null
+  )
 }

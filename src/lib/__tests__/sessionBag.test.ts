@@ -98,6 +98,33 @@ describe('sessionBag: updateMelodyBag', () => {
     }
   })
 
+  // S1b (ревью финального прогона, HANDOFF §3bx, новая находка после
+  // фикса находки 5): аварийное «закрыть» на проекторе висит в confirm(),
+  // пока пульт успевает засчитать «✓ Верно» — стадия уходит в reveal,
+  // баллы уже записаны. melodyIdle() не считает reveal неактивной стадией,
+  // поэтому голое «cur.key===key && !melodyIdle(cur)» СНОСИЛО БЫ reveal
+  // обратно на done — зал не увидит экран разбора, хотя очки останутся.
+  // melodyEmergencyClose обязана НЕ трогать reveal.
+  it('S1b: аварийное "закрыть" не сносит уже показанный reveal', async () => {
+    const { updateMelodyBag } = await import('../sessionBag')
+    const { melodyEmergencyClose } = await import('../melody')
+    fakeRoom.setSnapshot({
+      id: 1, game_id: 'g1', pack_id: null, phase: 'question', round_number: 1,
+      question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [],
+      updated_at: 't0',
+      melody: { key: '0-0', stage: 'reveal', wonPts: 2, wonTeam: 'a' },
+      state_rev: 0,
+    })
+    const base = await fakeRoom.readSession()
+
+    const result = await updateMelodyBag(base, melodyEmergencyClose('0-0'))
+
+    expect(result.status).toBe('skipped')
+    const final = fakeRoom.getSnapshot()
+    expect(final.melody?.stage).toBe('reveal')
+    expect(final.melody?.wonPts).toBe(2)
+  })
+
   // S2: пересборка order из опоздавших ставок (эффект на любом экране)
   // ПРОТИВ клика «Играем N сек» — не важно, с проектора или с пульта:
   // стадия никогда не должна откатиться snippet → bids.
