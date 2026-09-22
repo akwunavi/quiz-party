@@ -48,6 +48,8 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `lib/jeopardyActions.ts` | открыть/закрыть плитку — общее для проектора и пульта |
 | `lib/melody.ts` + `melodyActions.ts` | стадии мелодии: чистые переходы и запись |
 | `lib/reveal.ts` + `revealActions.ts` | «3 попытки»: фазы 1→2→3→разбор, чистые переходы и запись — HANDOFF §3bn |
+| `lib/sharedAudio.ts` | общий аудио-элемент «Угадай мелодии» (`sharedAudio`/`sharedGen`/`unlockAudio`/`playShared`/`stopShared`) — вынесен из `MelodyRound.tsx` в 9.57, чтобы regression-тест гонки импортировал реальный код, а не копию (HANDOFF §3bu) |
+| `components/LobbyMusic.tsx` | фоновая музыка экрана лобби — вынесена из `HostScreen.tsx` в 9.57 вместе с фиксом гонки `play()`/cleanup (HANDOFF §3bu) |
 | `components/FitImg.tsx` | картинка в выключном ряду (flex-grow по пропорции) — общая для всех экранов вопроса, вынесена из `HostScreen.tsx` в 9.45 |
 | `lib/media.ts` | `mediaUrl`, `lenClass`, `mediaScaleVar` — общие для всех экранов |
 | `lib/questionFields.ts` | какие поля вопроса показывать для механики |
@@ -124,13 +126,19 @@ npx vite build
 ```
 
 Тесты проверяй не только по цвету, но и **по числу**: сейчас должно быть
-**516 тестов в 52 файлах** (было 458/47, потом 495/49 при 9.45, 497/49 при
-9.49–9.51, 513/51 при 9.52 — объединение предпросмотра с боевым экраном
-добавило `previewState.test.ts`/`preview-no-copy.test.ts`, см. HANDOFF.md
-§3bq, 516/52 при 9.55 — гонка звука в «Угадай мелодию» добавила
-`melody-shared-audio-race.test.ts`, см. HANDOFF.md §3bt — сверяй
-актуальное число перед правкой этого абзаца через сам `npx vitest run`,
-а не доверяй тексту), меньше — что-то отвалилось. Раньше vitest брал
+**521 пройденный тест + 4 todo (525 всего) в 57 файлах** (было 458/47,
+потом 495/49 при 9.45, 497/49 при 9.49–9.51, 513/51 при 9.52 —
+объединение предпросмотра с боевым экраном добавило
+`previewState.test.ts`/`preview-no-copy.test.ts`, см. HANDOFF.md §3bq,
+516/52 при 9.55 — гонка звука в «Угадай мелодию» добавила
+`melody-shared-audio-race.test.ts`, см. HANDOFF.md §3bt, 521 пройденный +
+4 todo/57 при 9.57 — тот тест удалён как проверявший копию, а не реальный
+код (см. HANDOFF.md §3bu), вместо него `sharedAudio.race.test.ts` +
+`playAudio.race.test.ts` + `answerQueue.race.test.ts` (реальный код,
+проверено откатом фикса), плюс три файла-заглушки с `it.todo` для гонок,
+требующих render-стенда, которого пока нет — сверяй актуальное число
+перед правкой этого абзаца через сам `npx vitest run`, а не доверяй
+тексту), меньше — что-то отвалилось. Раньше vitest брал
 только файлы вида `*.test.ts`, и файл, названный `totals-melody_test.ts`,
 молча не запускался; с 8.38 маска в `vite.config.ts` шире и такую опечатку
 подхватывает.
@@ -280,6 +288,16 @@ npx vite build
 пометить родителя `container-type: size` и брать `cqmin` на обе оси —
 тогда квадрат гарантирован под ОБЕ стороны ячейки разом, как `object-fit:
 contain` у `<img>`. Разбор — `HANDOFF.md`, раздел 3bs.
+
+**`document.hidden` в jsdom по умолчанию `true`.** Несколько экранов
+(`MelodyRound`, `RaceRound`, `SprintRound`, `RevealRound`, `HostScreen`)
+проверяют `document.hidden` внутри условий эффектов, чтобы не крутить
+звук/таймеры на свёрнутой вкладке. Любой render-тест на jsdom, который не
+выставит явно `Object.defineProperty(document, 'hidden', { value: false,
+configurable: true })` ДО монтирования, тихо получит другое поведение, чем
+в реальном браузере — эффект просто не сработает, будто вкладка свёрнута,
+и тест либо ложно зелёный, либо необъяснимо красный. Разбор — HANDOFF.md,
+раздел 3bu.
 
 **Сетевой вызов, от которого зависит `loading`-гейт, обязан быть в
 try/catch с `setLoading(false)` в `finally`.** `supabase.auth.getUser()` —

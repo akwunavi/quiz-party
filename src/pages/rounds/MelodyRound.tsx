@@ -9,7 +9,8 @@
 // фоновая музыка) → passed (вторая слушает трек целиком, с начала)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
-import { playAudio, createAudio } from '../../lib/audioSource'
+import { createAudio } from '../../lib/audioSource'
+import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
@@ -49,54 +50,9 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   })
 }
 
-// Единый аудио-элемент: «разблокируется» первым кликом по проектору и дальше
-// переиспользуется — autoplay-политика браузера больше не блокирует треки,
-// запущенные выбором с телефона (там нет жеста на проекторе).
-let sharedAudio: HTMLAudioElement | null = null
-// Счётчик поколений — тот же паттерн, что у playSynced в audioSource.ts.
-// playAudio() при блокировке прямого запроса СКАЧИВАЕТ файл через fetch
-// (может занять несколько секунд) и уже ПОСЛЕ этого сама вызывает play()
-// второй раз. Без счётчика это воспроизведение стартовало без предупреждения
-// в уже другой стадии — трек играл сам, во время bidding, без клика
-// ведущего (см. HANDOFF.md, критичный баг после 9.54).
-let sharedGen = 0
-export function unlockAudio() {
-  if (sharedAudio) return
-  sharedAudio = createAudio()
-  // тихий пинок, чтобы браузер пометил элемент как «разрешённый жестом»
-  sharedAudio.play().catch(() => {})
-  sharedAudio.pause()
-}
-function playShared(src: string, startAt = 0): HTMLAudioElement {
-  if (!sharedAudio) sharedAudio = createAudio()
-  const el = sharedAudio
-  sharedGen++
-  const my = sharedGen
-  el.pause()
-  el.loop = false
-  el.volume = 1
-  // тот же запасной путь, что и в «Своей игре»: при блокировке прямого
-  // запроса файл скачивается и играется из памяти
-  void playAudio(el, src, startAt).then(() => {
-    // Пока грузился запасной путь (fetch), могли уже уйти в другую стадию
-    // (guard-таймер принудительно перевёл дальше). Если это воспроизведение
-    // больше не «текущее» — глушим немедленно, не дожидаясь, пока оно само
-    // кому-то помешает.
-    if (my !== sharedGen) { try { el.pause() } catch { /* уже мёртв */ } }
-  })
-  return el
-}
-
-/** Заглушить общий трек. Нужен, когда ход уходит дальше сам: иначе музыка
- *  продолжает играть уже над следующей командой. Бампает поколение ДАЖЕ
- *  если ничего нового не запускается следом — иначе воспроизведение,
- *  которое ещё догружается в фоне (см. playShared), всё равно стартует
- *  после этой «остановки». */
-function stopShared() {
-  sharedGen++
-  if (!sharedAudio) return
-  try { sharedAudio.pause(); sharedAudio.currentTime = 0 } catch { /* уже мёртв */ }
-}
+// Единый аудио-элемент и его поколение — вынесены в lib/sharedAudio.ts
+// (HANDOFF.md §3bu), чтобы regression-тест гонки импортировал РЕАЛЬНЫЙ код,
+// а не копию.
 
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
@@ -165,10 +121,21 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const ansRef = `q-mel-${m.key}`
   const bids = answers.filter(a => a.question_ref === bidRef)
 
+  // F10 (HANDOFF.md §3bu): клик «Играем N сек» переводит стадию bids→snippet.
+  // Эффект ниже пересобирает order из ещё летящих по сети ставок, пока трек
+  // не запущен — но если ЕГО запись (стадия 'bids' в устаревшем замыкании)
+  // долетит ПОСЛЕ записи клика (стадия уже 'snippet'), она откатит стадию
+  // назад. Ref-guard: клик на ПРОЕКТОРЕ блокирует эффект немедленно, не
+  // дожидаясь следующего цикла поллинга gameState. Эквивалент на пульте
+  // ведущего (админка) этим не покрыт — свой независимый экран, свой клик;
+  // см. it.todo в src/pages/rounds/__tests__/melody.race.test.tsx.
+  const bidsAdvancingRef = useRef(false)
+  useEffect(() => { bidsAdvancingRef.current = false }, [m.key])
+
   // ставки, дошедшие ПОСЛЕ дедлайна (полинг ~2 сек), пересобирают очередь,
   // пока трек ещё не запущен кнопкой «Играем N сек»
   useEffect(() => {
-    if (preview || m.stage !== 'bids') return
+    if (preview || m.stage !== 'bids' || bidsAdvancingRef.current) return
     const bidders = bids
       .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
       .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
@@ -208,13 +175,27 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       stopShared()
       void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
     }
-    a.addEventListener('playing', () => {
+    const onPlaying = () => {
       // с этого момента и тикает счётчик на экране
       void saveMelody({ ...m, deadline: inSec(sec) })
       stop = window.setTimeout(advance, sec * 1000)
-    }, { once: true })
+    }
+    a.addEventListener('playing', onPlaying, { once: true })
     const guard = window.setTimeout(advance, (sec + 4) * 1000)
-    return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
+    return () => {
+      if (stop) clearTimeout(stop)
+      clearTimeout(guard)
+      // {once:true} снимает слушатель сам ТОЛЬКО когда событие реально
+      // произошло — если эффект размонтируется раньше (смена стадии кликом
+      // ведущего, размонтирование экрана), листенер остаётся висеть на
+      // элементе и может выстрелить позже, на уже другом треке/стадии.
+      // Снимаем явно. То же — stopShared(): раньше комментарий утверждал,
+      // что cleanup «уже это делает», а вызова не было вовсе — трек мог
+      // продолжить играть после ухода со стадии snippet (HANDOFF.md §3bu,
+      // F1 — исправление неполного фикса из §3bt).
+      a.removeEventListener('playing', onPlaying)
+      stopShared()
+    }
   }, [preview, m.stage, m.key])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
@@ -265,11 +246,22 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     audioRef.current = a
     let stop: number | undefined
     let advanced = false
+    // Исправленный startSec (см. checkReal ниже) копится ЗДЕСЬ, а не пишется
+    // отдельным saveMelody — раньше это был самостоятельный сетевой вызов,
+    // который мог долететь ПОСЛЕ записи advance() (стадия уже 'bidding') и
+    // затереть её обратно на 'listen' своим устаревшим спредом {...m}
+    // (HANDOFF.md §3bu, F9). Теперь коррекция просто подмешивается в тот же
+    // save, что делает advance().
+    let correctedStart: number | undefined
     const advance = () => {
       if (advanced) return
       advanced = true
       stopShared()
-      void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
+      void saveMelody({
+        ...m,
+        ...(correctedStart != null ? { startSec: correctedStart } : {}),
+        stage: 'bidding', deadline: inSec(s.bidSec ?? 10),
+      })
     }
     // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
     // точка старта уже выбрана в melodySpin/melodyPick по НОМИНАЛЬНОЙ длине,
@@ -288,19 +280,21 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       const safe = Math.min(requested, Math.max(0, dur - 10))
       if (safe !== requested) {
         try { a.currentTime = safe } catch { /* не критично — сыграет как есть */ }
-        void saveMelody({ ...m, startSec: safe })
+        correctedStart = safe
       }
     }
     a.addEventListener('loadedmetadata', checkReal, { once: true })
     const metaGuard = window.setTimeout(checkReal, 400)
     // секунда считается от РЕАЛЬНОГО начала звука
-    a.addEventListener('playing', () => { stop = window.setTimeout(advance, 1000) }, { once: true })
+    const onPlaying = () => { stop = window.setTimeout(advance, 1000) }
+    a.addEventListener('playing', onPlaying, { once: true })
     // страховка: если звук так и не пошёл (нет файла) — не зависаем
     const guard = window.setTimeout(advance, 4000)
     return () => {
       if (stop) clearTimeout(stop)
       clearTimeout(guard); clearTimeout(metaGuard)
       a.removeEventListener('loadedmetadata', checkReal)
+      a.removeEventListener('playing', onPlaying)
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
       // путём, трек не должен утечь в следующую стадию (bidding). stopShared
@@ -476,7 +470,13 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               </div>
               {!preview && <div className="mel-actions">
                 <button disabled={!currentId}
-                  onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
+                  onClick={() => {
+                    // F10: блокируем эффект пересборки order ДО записи —
+                    // иначе устаревшая ставка, долетевшая следующим поллом,
+                    // может откатить стадию обратно в 'bids'.
+                    bidsAdvancingRef.current = true
+                    void saveMelody(melodyPlaySnippet(m, bidSec))
+                  }}>
                   Играем {bidSec || 5} сек →
                 </button>
                 <button className="ghost dark"

@@ -91,7 +91,18 @@ export type PlayResult = { ok: true } | { ok: false; reason: string }
  *  и применяет его сам, как только придут метаданные — ждать их здесь не
  *  нужно (см. lib/melody.ts:melodyPreviewCeiling — «Угадай мелодию»,
  *  единственный вызывающий с startAt ≠ 0). */
-export async function playAudio(el: HTMLAudioElement, url: string, startAt = 0): Promise<PlayResult> {
+// `isStale` — необязательная проверка «это воспроизведение ещё нужно?».
+// Скачивание запасным путём (fetch) может занять произвольное время; за это
+// время вызывающий код мог уйти в другую стадию/трек. Раньше в этом случае
+// playAudio всё равно проигрывала файл, а вызывающий сам глушил его СРАЗУ
+// после — звук успевал стартовать и тут же обрывался, а на медленной сети
+// трек мог тихо не заиграть вовсе, без объяснения. Теперь проверка — ДО
+// повторного `el.src=`/`play()`: если `isStale()` вернула true, не играем
+// совсем; если false — играем, пусть и с опозданием, а не молчим. Решение,
+// что считать «устаревшим», остаётся за вызывающим (см. lib/sharedAudio.ts).
+export async function playAudio(
+  el: HTMLAudioElement, url: string, startAt = 0, isStale?: () => boolean,
+): Promise<PlayResult> {
   live.add(el)                       // чтобы его точно можно было заглушить
   // 1) как есть
   try {
@@ -108,7 +119,11 @@ export async function playAudio(el: HTMLAudioElement, url: string, startAt = 0):
   }
   // 2) через скачивание в память
   try {
-    el.src = await toBlobUrl(url)
+    const blobUrl = await toBlobUrl(url)
+    if (isStale?.()) {
+      return { ok: false, reason: 'stale' }
+    }
+    el.src = blobUrl
     if (startAt) el.currentTime = startAt
     await el.play()
     return { ok: true }

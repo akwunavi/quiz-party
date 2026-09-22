@@ -1,4 +1,5 @@
 import { RoomPicker } from './RoomPicker'
+import { LobbyMusic } from '../components/LobbyMusic'
 import { InfoSlideView } from '../components/InfoSlideView'
 import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
 import { useBlitz } from '../lib/blitzApi'
@@ -841,47 +842,6 @@ function RecapSlides({ pack, round, gameState }: {
       </div>
     </div>
   )
-}
-
-/** Фоновая музыка на экране ожидания.
- *
- *  Лобби висит дольше любого другого экрана, и до сих пор оно молчало.
- *  По умолчанию берём ту же фоновую музыку, что задана для пакета
- *  (`settings.bg_music`); если для лобби задана своя — `settings.lobby_music`
- *  перебивает её.
- *
- *  Про автозапуск: браузер не даёт играть звуку, пока по странице не
- *  кликнули. Поэтому при отказе мы не молчим, а ждём первого клика по
- *  экрану и стартуем тогда — ведущий всё равно нажимает кнопки.
- *  Громкость ниже, чем у музыки вопросов: под лобби разговаривают. */
-function LobbyMusic({ pack }: { pack: LoadedPack | null }) {
-  useEffect(() => {
-    const src = pack?.settings?.lobby_music ?? pack?.settings?.bg_music
-    if (!src) return
-    const a = createAudio()
-    a.src = mediaUrl(src)
-    a.loop = true
-    a.volume = 0.45
-    let unlocked = false
-    const start = () => {
-      if (unlocked) return
-      unlocked = true
-      a.play().catch(() => {})
-      window.removeEventListener('pointerdown', start)
-      window.removeEventListener('keydown', start)
-    }
-    a.play().then(() => { unlocked = true }).catch(() => {
-      // автозапуск заблокирован — ждём первого касания
-      window.addEventListener('pointerdown', start)
-      window.addEventListener('keydown', start)
-    })
-    return () => {
-      window.removeEventListener('pointerdown', start)
-      window.removeEventListener('keydown', start)
-      try { a.pause() } catch { /* уже остановлено */ }
-    }
-  }, [pack?.settings?.lobby_music, pack?.settings?.bg_music])
-  return null
 }
 
 /** Предзагрузка медиа СЛЕДУЮЩЕГО вопроса.

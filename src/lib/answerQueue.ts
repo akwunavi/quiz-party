@@ -55,8 +55,23 @@ export async function flush() {
       } catch {
         notify(true); return   // сеть/БД легли — повторим при следующем flush
       }
-      q = q.slice(1)
-      write(q)
+      // Раньше здесь было `q = q.slice(1); write(q)` — снимало первый элемент
+      // из СНИМКА `q`, прочитанного ДО отправки. Пока запрос летел по сети,
+      // enqueueAnswer() мог дописать в localStorage что-то новое (игрок
+      // поменял ставку 2→4 прямо во время отправки) — слепой `.slice(1)`
+      // затирал эту новую запись обратно устаревшим снимком. Теперь после
+      // успешной отправки ПЕРЕЧИТЫВАЕМ localStorage и снимаем только ту
+      // запись, что совпадает и по ключу (team_id+question_ref), и по
+      // содержимому (answer_text/stake) — если её успели переписать заново,
+      // она останется в очереди и уйдёт следующим проходом.
+      const fresh = read()
+      const same = (x: PendingAnswer) =>
+        x.team_id === a.team_id && x.question_ref === a.question_ref
+        && x.answer_text === a.answer_text && (x.stake ?? null) === (a.stake ?? null)
+      const idx = fresh.findIndex(same)
+      if (idx !== -1) fresh.splice(idx, 1)
+      write(fresh)
+      q = fresh
       notify(false)
     }
   } finally {
