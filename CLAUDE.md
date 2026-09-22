@@ -46,9 +46,10 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `lib/devSeed.ts` | режим репетиции (`?dev=1`) и сверка начислений |
 | `lib/jeopardyRef.ts` | ключ ответа на плитку «Своей игры» (оба формата) + состояние открытой плитки |
 | `lib/jeopardyActions.ts` | открыть/закрыть плитку — общее для проектора и пульта |
-| `lib/melody.ts` + `melodyActions.ts` | стадии мелодии: чистые переходы и запись |
-| `lib/reveal.ts` + `revealActions.ts` | «3 попытки»: фазы 1→2→3→разбор, чистые переходы и запись — HANDOFF §3bn |
-| `lib/sharedAudio.ts` | общий аудио-элемент «Угадай мелодии» (`sharedAudio`/`sharedGen`/`unlockAudio`/`playShared`/`stopShared`) — вынесен из `MelodyRound.tsx` в 9.57, чтобы regression-тест гонки импортировал реальный код, а не копию (HANDOFF §3bu) |
+| `lib/melody.ts` + `melodyActions.ts` | стадии мелодии: чистые переходы + условия (`guardMelody`/`melodyMatches`) и запись (`updateMelody`/`melodyClick` — CAS через `sessionBag.ts`, `saveMelody` — только для «Своей игры» и осознанного жёсткого сброса, HANDOFF §3bw) |
+| `lib/sessionBag.ts` | защищённая (CAS) запись мешка `melody`: read-modify-CAS-retry через `state_rev` + триггер БД (миграция 0014), запасной путь на слепой `patchSession`, если миграция ещё не прогнана — `updateMelodyBag`/`casEnabled` (9.61, HANDOFF §3bw) |
+| `lib/reveal.ts` + `revealActions.ts` | «3 попытки»: фазы 1→2→3→разбор, чистые переходы и запись — HANDOFF §3bn (на CAS ещё не переведено — бэклог P2b) |
+| `lib/sharedAudio.ts` | общий аудио-элемент «Угадай мелодии»: контроллер вытеснения (`playShared`/`stopShared`/`unlockAudio`, `SharedPlayback` с `isCurrent()/stop()/on()/result`) поверх `AbortController`, а не счётчик поколений — переписан в 9.59 (HANDOFF §3bw) после того, как нашлась настоящая причина гонки (не VPN — `AbortError` из `play()` штатно значит «прервали») |
 | `components/LobbyMusic.tsx` | фоновая музыка экрана лобби — вынесена из `HostScreen.tsx` в 9.57 вместе с фиксом гонки `play()`/cleanup (HANDOFF §3bu) |
 | `components/FitImg.tsx` | картинка в выключном ряду (flex-grow по пропорции) — общая для всех экранов вопроса, вынесена из `HostScreen.tsx` в 9.45 |
 | `lib/media.ts` | `mediaUrl`, `lenClass`, `mediaScaleVar` — общие для всех экранов |
@@ -58,6 +59,7 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `lib/packRights.ts` | кто что правит в редакторе (совпадает с политиками БД) |
 | `lib/pptxExport.ts` | резервная презентация .pptx редактора — план слайдов (чистый, порядок по `answers_reveal`) + рендер (сеть + `pptxgenjs` динамическим импортом) — HANDOFF §3au, редизайн §3bm |
 | `lib/roundMeta.ts` | чистые (без сети) хелперы по раунду/пакету — `metaLine`/`displayRoundNumber`/`roundSetting`/`scoredRounds`, вынесены из `packLoader.ts` в 9.43 — HANDOFF §3bm |
+| `src/test/fakeMedia.ts` | `SpecAudio` — подставка `<audio>` для тестов гонок звука, поведение СВЕРЕНО с реальным headless Chromium (`scripts/media-calibration.mjs` → `src/test/media/chromium-semantics.json`, `fakeMedia.calibration.test.ts`), 9.59 |
 | `styles/parts/*.css` | 27 частей, порядок задан в `global.css` |
 
 Механики раундов: `standard`, `test_stop`, `rebus`, `jeopardy`,
@@ -126,7 +128,16 @@ npx vite build
 ```
 
 Тесты проверяй не только по цвету, но и **по числу**: сейчас должно быть
-**521 пройденный тест + 7 todo (528 всего) в 57 файлах** (было 458/47,
+**562 пройденных теста + 7 todo (569 всего) в 60 файлах** (было 521+7/57 при
+9.58, 535+7/59 при 9.59 — настоящий фикс гонки звука через `AbortController`
+добавил `src/test/fakeMedia.ts`/`fakeMedia.calibration.test.ts`/
+`audioPreload.test.ts`, переписал `sharedAudio.race.test.ts`/
+`playAudio.race.test.ts` на реальную семантику браузера (HANDOFF.md §3bw),
+547+7/59 при 9.60 — миграция 0014 (`state_rev`+триггер) и `casSession` в
+обоих транспортах добавили тесты в `contract.test.ts`/
+`localTransport.test.ts`/`server.test.mjs`, 562+7/60 при 9.61 — CAS-запись
+мелодии добавила `sessionBag.test.ts` + расширила `melody-actions.test.ts`
+(было 458/47,
 потом 495/49 при 9.45, 497/49 при 9.49–9.51, 513/51 при 9.52 —
 объединение предпросмотра с боевым экраном добавило
 `previewState.test.ts`/`preview-no-copy.test.ts`, см. HANDOFF.md §3bq,
@@ -311,6 +322,35 @@ try/catch с `setLoading(false)` в `finally`.** `supabase.auth.getUser()` —
 незавёрнутого `getUser()`: `paper`-игра встала, хотя вообще не должна
 зависеть от сети. Разбор — `HANDOFF.md`, раздел 3al.
 
+**`AbortError` из `play()` значит «прервали», а не «отказ» — никогда не
+должен уводить на запасной сетевой путь.** Это штатный сигнал спецификации
+HTML (смена `src`/`pause()` до старта/чужая операция вытеснила), не
+свидетельство того, что файл недоступен. Настоящий отказ загрузки браузер
+называет иначе (`NotSupportedError` на 404 — подтверждено калибровкой
+headless Chromium, `scripts/media-calibration.mjs`). Раньше `playAudio()`
+уходил в `fetch` на ЛЮБУЮ ошибку прямого `play()`, включая `AbortError` —
+и это, а НЕ VPN/прокси (как считалось три предыдущих захода подряд, HANDOFF
+§3bt/§3bu/§3bv), было настоящей причиной гонки звука в «Угадай мелодию»
+(HANDOFF §3bw, 9.59).
+
+**Общий `<audio>` мелодии трогать только через `sharedAudio.ts`/
+`SharedPlayback`.** В cleanup эффекта — `h.stop()` КОНКРЕТНОЙ операции
+(`SharedPlayback`, возвращённой ИМЕННО этим вызовом `playShared()`), а не
+глобальный `stopShared()` — иначе можно оборвать чужую, уже актуальную
+операцию, запущенную другим эффектом позже. Исключение — места, которые
+ОСОЗНАННО должны заглушить вообще всё (переход «ответа нет → ход дальше
+сам» в `MelodyRound.tsx`).
+
+**Мешок `melody` пишется только через `updateMelodyBag`/`melodyClick`
+(`lib/sessionBag.ts`) с условием (`lib/melody.ts:guardMelody`).** Условие
+обязано делать переход идемпотентным: повторный вызов на состоянии, где
+запись уже применилась, должен вернуть `null` (нечего писать) или тот же
+результат — не откатывать и не задваивать эффект. Слепая запись
+(`patchSession`/`saveMelody`) — только для осознанного полного сброса
+между раундами (триггер БД поднимет версию сам, устаревшие CAS-попытки,
+летящие в этот момент, корректно не пройдут после сброса) или для
+механик, ещё не переведённых на CAS («Своя игра» — HANDOFF §7, P2a).
+
 ---
 
 ## 6. Вёрстка
@@ -353,8 +393,11 @@ try/catch с `setLoading(false)` в `finally`.** `supabase.auth.getUser()` —
   разрешающие перекрывают строгие. `pack_questions` читается кем угодно —
   весь пак с ответами вытаскивается из консоли до игры. Плановые работы
   после 06.09.2026;
-- **уход от VPN**: облако Supabase не доезжает до гостей без VPN, разбор
-  вариантов в `АНАЛИЗ-ПЕРЕЕЗД.md`, тем же заходом;
+- **переезд на self-host сделан**: единственная живая база теперь
+  self-hosted Supabase на `ivan-quiz-party.ru` (разбор вариантов —
+  `АНАЛИЗ-ПЕРЕЕЗД.md`, для истории). Прежний пункт «уход от VPN» отсюда
+  убран — ведущий уехал из России насовсем, VPN у него больше нет вовсе,
+  а self-host открывается без VPN и без блокировок с любой точки;
 - **редактор вопросов** — отдельной веткой, после того как содержимое
   пакетов будет доделано.
 
