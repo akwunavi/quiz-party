@@ -39,31 +39,54 @@ export async function melodyClick(gs: GameState | null, fn: BagFn): Promise<void
 }
 
 /** Вердикт по ответу на трек. Один вызов на проектор и на пульт ведущего:
- *  очки считает melodyPoints, стадию — melodyReveal, копий формулы нет. */
+ *  очки считает melodyPoints, стадию — melodyReveal, копий формулы нет.
+ *
+ *  9.62 (HANDOFF §3bx, находка 3): порядок операций ОБЯЗАН быть «сначала
+ *  CAS-переход, потом patchAnswer» — раньше было наоборот, и устаревшая
+ *  кнопка (ход уже ушёл другой команде на другом экране) успевала
+ *  необратимо испортить чужой ответ ДО того, как CAS отклонял саму
+ *  попытку. Очки считаются ВНУТРИ условия — на том же `cur`, на котором
+ *  реально прошла запись, а не на устаревшем внешнем снимке `gs`. */
 export async function gradeMelody(gs: GameState, ans: Answer, correct: boolean,
   bidSec: number): Promise<void> {
   const m = gs.melody ?? {}
-  const pts = correct ? melodyPoints(bidSec, (m.turn ?? 0) === 0) : 0
-  await room.patchAnswer(ans.id, { is_correct: correct, stake: pts })
-  // верно — показываем результат и кто забрал; неверно — просто снимаем
-  // время и ждём, пока ведущий передаст ход
-  await melodyClick(gs, cur => (
-    (cur.key === m.key && (cur.stage === 'answering' || cur.stage === 'passed') && (cur.turn ?? 0) === (m.turn ?? 0))
-      ? (correct ? melodyReveal(cur, pts, ans.team_id) : { ...cur, deadline: undefined })
-      : null
-  ))
+  let appliedPts = 0
+  const r = await updateMelodyBag(gs, cur => {
+    if (!(cur.key === m.key && (cur.stage === 'answering' || cur.stage === 'passed')
+      && (cur.turn ?? 0) === (m.turn ?? 0))) return null
+    const pts = correct ? melodyPoints(bidSec, (cur.turn ?? 0) === 0) : 0
+    appliedPts = pts
+    // верно — показываем результат и кто забрал; неверно — просто снимаем
+    // время и ждём, пока ведущий передаст ход
+    return correct ? melodyReveal(cur, pts, ans.team_id) : { ...cur, deadline: undefined }
+  })
+  if (r.status === 'skipped' || r.status === 'conflict') {
+    throw new Error('Экран уже перешёл дальше — кнопка устарела')
+  }
+  await room.patchAnswer(ans.id, { is_correct: correct, stake: appliedPts })
 }
 
 /** «Не угадали» и «дальше» — одно действие: отметить промах (если ведущий не
- *  отметил его сам) и передать ход второй команде либо закрыть трек. */
+ *  отметил его сам) и передать ход второй команде либо закрыть трек.
+ *
+ *  9.62 (HANDOFF §3bx, находка 3): тот же порядок, что и в gradeMelody —
+ *  СНАЧАЛА CAS-переход, и только если он реально прошёл — отметка промаха
+ *  в `answers`. Раньше `patchAnswer(false, 0)` уходил ДО проверки условия
+ *  и мог затереть уже верный ответ, оценённый параллельно вторым экраном
+ *  (стадия там уже ушла в 'reveal', здесь ещё казалось, что 'answering'). */
 export async function passMelody(gs: GameState, ans?: Answer): Promise<void> {
-  if (ans && ans.is_correct == null) {
+  const m = gs.melody ?? {}
+  let markWrong = false
+  const r = await updateMelodyBag(gs, cur => {
+    if (!(cur.key === m.key && (cur.stage === 'answering' || cur.stage === 'passed')
+      && (cur.turn ?? 0) === (m.turn ?? 0))) return null
+    markWrong = !!ans && ans.is_correct == null
+    return melodyPass(cur)
+  })
+  if (r.status === 'skipped' || r.status === 'conflict') {
+    throw new Error('Экран уже перешёл дальше — кнопка устарела')
+  }
+  if (markWrong && ans) {
     await room.patchAnswer(ans.id, { is_correct: false, stake: 0 })
   }
-  const m = gs.melody ?? {}
-  await melodyClick(gs, cur => (
-    (cur.key === m.key && (cur.stage === 'answering' || cur.stage === 'passed') && (cur.turn ?? 0) === (m.turn ?? 0))
-      ? melodyPass(cur)
-      : null
-  ))
 }

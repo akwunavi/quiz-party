@@ -204,7 +204,12 @@ export async function playAudio(
       } catch (e) {
         const name = e instanceof Error ? e.name : ''
         if (signal?.aborted || name === 'AbortError') return SUPERSEDED
-        // запись протухла (blob отозван/битый) — забываем и идём обычным путём
+        // запись протухла (blob отозван/битый) — забываем и идём обычным
+        // путём. 9.62 (HANDOFF §3bx, находка 8): раньше запись просто
+        // удалялась из cache БЕЗ revokeObjectURL — сам blob-URL утекал
+        // (никогда не освобождался), и предзагруженный трек пришлось бы
+        // качать заново после клика «разблокировать звук».
+        try { URL.revokeObjectURL(hit) } catch { /* уже отозван */ }
         cache.delete(url)
       }
     }

@@ -57,8 +57,17 @@ describe('sessionBag: updateMelodyBag', () => {
   // S1: проектор уходит из listen в bidding по дедлайну, пульт ОДНОВРЕМЕННО
   // жмёт аварийное «закрыть» — оба прочитали ОДНУ версию до записи. Ни в
   // каком порядке применения закрытие не должно теряться/откатываться.
+  //
+  // 9.62 (ревью, HANDOFF §3bx, находка 5): раньше здесь была своя копия
+  // условия «закрыть», проверявшая НЕ ТО, что реально стоит в боевом коде
+  // (MelodyRound.tsx/AdminPage.tsx требовали точного совпадения СТАДИИ на
+  // момент клика, а не просто «любая активная стадия того же трека») —
+  // тест проходил, хотя реальный код упал бы на этом же сценарии.
+  // Импортируем melodyEmergencyClose напрямую из lib/melody.ts, чтобы
+  // тест проверял РЕАЛЬНУЮ функцию условия, а не свою копию.
   it('S1: "закрыть" ведущего никогда не откатывается автопереходом — оба порядка', async () => {
     const { updateMelodyBag } = await import('../sessionBag')
+    const { melodyEmergencyClose } = await import('../melody')
 
     for (const order of ['close-then-advance', 'advance-then-close'] as const) {
       fakeRoom.setSnapshot({
@@ -68,11 +77,7 @@ describe('sessionBag: updateMelodyBag', () => {
       })
       const base = await fakeRoom.readSession() // оба экрана читают ОДНУ версию
 
-      const closeFn = (cur: MelodyState) => (
-        cur.key === '0-0' && cur.stage !== 'idle' && cur.stage !== 'done'
-          ? { ...cur, stage: 'done' as const, played: ['0-0'] }
-          : null
-      )
+      const closeFn = melodyEmergencyClose('0-0')
       const advanceFn = (cur: MelodyState) => (
         cur.key === '0-0' && cur.stage === 'listen'
           ? { ...cur, stage: 'bidding' as const }
@@ -175,6 +180,39 @@ describe('sessionBag: updateMelodyBag', () => {
     expect(r.status).toBe('conflict')
     expect(calls).toBe(3)
     spy.mockRestore()
+  })
+
+  // S6 (ревью 9.62, HANDOFF §3bx, находка 2): без state_rev (миграция не
+  // прогнана) — устаревший `base` НЕ используется напрямую, ПЕРЕД записью
+  // перечитывается свежая сессия. Раньше `fn` считалась на голом `base` —
+  // снимке из замыкания эффекта, который мог отстать от реальности сколь
+  // угодно (пока эффект ждал сети/таймера), и решение принималось по
+  // устаревшим данным, как будто CAS вообще нет.
+  it('S6 (без CAS): перечитывает СВЕЖУЮ сессию перед записью, не доверяет устаревшему base', async () => {
+    const { updateMelodyBag } = await import('../sessionBag')
+    // реальное (свежее) состояние в базе: ведущий уже закрыл трек
+    fakeRoom.setSnapshot({
+      id: 1, game_id: 'g1', pack_id: null, phase: 'question', round_number: 1,
+      question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [],
+      updated_at: 't1', melody: { key: '0-0', stage: 'done' },
+      // без state_rev — миграция не прогнана
+    })
+    // устаревший base — снимок из давнего замыкания эффекта на клиенте,
+    // ещё думающий, что трек в стадии listen
+    const staleBase = {
+      id: 1, game_id: 'g1', pack_id: null, phase: 'question', round_number: 1,
+      question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [],
+      updated_at: 't0', melody: { key: '0-0', stage: 'listen' },
+    } as GameState
+
+    const r = await updateMelodyBag(staleBase, cur => (
+      cur.stage === 'listen' ? { ...cur, stage: 'bidding' as const } : null
+    ))
+
+    // на СВЕЖЕМ состоянии (stage: 'done') условие не совпадает — не пишем
+    expect(r.status).toBe('skipped')
+    // и уж точно не откатываем закрытый трек обратно в bidding
+    expect(fakeRoom.getSnapshot().melody?.stage).toBe('done')
   })
 
   it('melodyClick при skipped/conflict бросает понятную ошибку (Р2)', async () => {

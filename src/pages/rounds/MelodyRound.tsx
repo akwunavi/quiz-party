@@ -24,8 +24,9 @@ import { mediaUrl } from '../../lib/media'
 // разошёлся бы с проектором.
 import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/melodyActions'
 import {
-  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyClose, melodyPass,
   melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
+  melodyEmergencyClose,
 } from '../../lib/melody'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
@@ -519,10 +520,13 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                     пересборки order прилетел ПОСЛЕ клика» на ОБОИХ экранах
                     (проектор и пульт) — отдельный ref-guard (F10, §3bv)
                     больше не нужен, пересчёт секунд — по СВЕЖИМ bids/cur
-                    в момент записи (Р3). */}
+                    в момент записи (Р3). 9.62 (находка 4): melodyPlaySnippetIfFresh
+                    ДОПОЛНИТЕЛЬНО не пишет вовсе, если ЛОКАЛЬНЫЕ bids этого
+                    экрана ещё не знают лидера свежего cur.order — секунды
+                    иначе посчитались бы по чужой/устаревшей ставке. */}
                 <button disabled={!currentId}
                   onClick={() => click(() => melodyClick(gameState, guardMelody(
-                    { key: m.key, stage: 'bids' }, cur => melodyPlaySnippet(cur, melodyBidSec(bids, cur)),
+                    { key: m.key, stage: 'bids' }, cur => melodyPlaySnippetIfFresh(cur, bids),
                   )))}>
                   Играем {bidSec || 5} сек →
                 </button>
@@ -572,14 +576,14 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               <button className="mel-escape" onClick={async () => {
                 if (!confirm('Закрыть трек и вернуться к доске?\n\n'
                   + 'Баллы за него никто не получит.')) return
-                const keyNow = m.key, stageNow = m.stage
-                click(() => melodyClick(gameState, cur => (
-                  // условие как отрицание: любая стадия, кроме idle/done/
-                  // reveal — тот же ключ и та же стадия, что читал ведущий
-                  cur.key === keyNow && cur.stage === stageNow
-                    && cur.stage !== 'idle' && cur.stage !== 'done' && cur.stage !== 'reveal'
-                    ? melodyClose(cur) : null
-                )))
+                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
+                // трека, не конкретно та, что была на момент клика. confirm()
+                // может провисеть несколько секунд, за которые короткая
+                // цепочка автостадий (spinning→listen→bidding) переключится
+                // сама — проверка «та же стадия» после этого никогда бы не
+                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
+                const keyNow = m.key
+                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
               }}>Закрыть</button>
             )}
 
@@ -608,9 +612,14 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                     ? ' — передайте ход второй команде' : ' — трек закрывается'}
                 </div>
               )}
+              {/* 9.62 (находка 6): grade/passMelody теперь тоже могут бросить
+                  «кнопка устарела» (Р2, updateMelodyBag) — обёрнуты через
+                  click(), как остальные кнопки на этом экране, а не голым
+                  void, иначе двойной тап/гонка с пультом дают необработанное
+                  отклонение промиса в консоли браузера. */}
               {!preview && <div className="mel-actions">
-                <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
-                <button className="ghost" onClick={() => void passMelody(gameState, ans)}>
+                <button disabled={!ans} onClick={() => click(() => grade(true))}>✓ Верно</button>
+                <button className="ghost" onClick={() => click(() => passMelody(gameState, ans))}>
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
                 </button>
               </div>}

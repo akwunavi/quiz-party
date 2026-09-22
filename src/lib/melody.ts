@@ -216,3 +216,37 @@ export function melodyBidSec(
   const currentId = cur.order?.[cur.turn ?? 0]
   return Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
 }
+
+/** «Играем N сек»: пишет переход, ТОЛЬКО если локальный список `bids`
+ *  (независимый REST-поллер вызывающего экрана — у пульта в админке и
+ *  у проектора это ДВЕ разные подписки) уже знает лидера свежего
+ *  `cur.order`, прочитанного прямо перед CAS-записью. Если лидера в
+ *  локальных `bids` нет — они точно устарели относительно `cur.order`
+ *  (кто-то пересобрал очередь по опоздавшей ставке между опросами этого
+ *  экрана), и секунды посчитались бы по чужой/старой ставке. Возвращает
+ *  `null` (не пишем, идемпотентно) — ведущий нажмёт ещё раз, к этому
+ *  моменту `bids` уже подтянутся опросом (HANDOFF §3bx, находка 4). */
+export function melodyPlaySnippetIfFresh(
+  cur: MelodyState, bids: { team_id: string; answer_text: string }[],
+): MelodyState | null {
+  const leader = cur.order?.[cur.turn ?? 0]
+  if (leader && !bids.some(b => b.team_id === leader)) return null
+  return melodyPlaySnippet(cur, melodyBidSec(bids, cur))
+}
+
+/** Аварийное «Закрыть»: действует на ЛЮБОЙ активной стадии ТОГО ЖЕ
+ *  трека, а не только на стадии, что была на момент клика. Пульт
+ *  открывает `confirm()`, который может провисеть несколько секунд, пока
+ *  ведущий решает нажимать «ОК» — за это время короткая цепочка
+ *  автостадий (spinning→listen→bidding) успевает переключиться сама, без
+ *  участия ведущего, и проверка «та же стадия» после этого никогда не
+ *  совпадала бы (кнопка молчала бы «устарела», хотя смысл этой кнопки
+ *  именно «закрыть немедленно, что бы сейчас ни происходило» — HANDOFF
+ *  §3bx, находка 5). Экспортирована отдельно (а не заинлайнена в
+ *  MelodyRound.tsx/AdminPage.tsx), чтобы тест на это условие проверял
+ *  РЕАЛЬНЫЙ боевой код, а не свою копию. */
+export function melodyEmergencyClose(
+  key: string | undefined,
+): (cur: MelodyState) => MelodyState | null {
+  return cur => (cur.key === key && !melodyIdle(cur) ? melodyClose(cur) : null)
+}

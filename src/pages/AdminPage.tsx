@@ -43,8 +43,8 @@ import { startRace } from '../lib/raceActions'
 import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
 import { casEnabled } from '../lib/sessionBag'
 import {
-  melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippet,
-  melodyClose, melodyToBoard, guardMelody, melodyBidSec,
+  melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippetIfFresh,
+  melodyClose, melodyToBoard, guardMelody, melodyBidSec, melodyEmergencyClose,
 } from '../lib/melody'
 import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
 import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
@@ -1839,15 +1839,16 @@ function MelodyControls({ round, gameState, onFinish }: {
   // ведущему нужен способ двигаться дальше, не перезапуская игру.
   // 9.61 (HANDOFF §3bw): переведено на CAS (melodyClick) — раньше пульт
   // ничем не был защищён от отката против автопереходов проектора.
-  const keyNow = m.key, stageNow = m.stage
+  // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ трека, не
+  // конкретно та, что была на момент клика — на телефоне confirm() может
+  // провисеть несколько секунд, за которые автостадия сменится сама.
+  // melodyEmergencyClose — общая функция условия с проектором (её же
+  // проверяет тест sessionBag.test.ts, не копия).
+  const keyNow = m.key
   const escape = (
     <button className="adm-btn" onClick={() => {
       if (!confirm('Закрыть трек и вернуться к доске?\n\nБаллы за него никто не получит.')) return
-      void runAction('закрыть трек мелодии', () => melodyClick(gameState, cur => (
-        cur.key === keyNow && cur.stage === stageNow
-          && cur.stage !== 'idle' && cur.stage !== 'done' && cur.stage !== 'reveal'
-          ? melodyClose(cur) : null
-      )))
+      void runAction('закрыть трек мелодии', () => melodyClick(gameState, melodyEmergencyClose(keyNow)))
     }}>ЗАКРЫТЬ</button>
   )
 
@@ -1925,10 +1926,15 @@ function MelodyControls({ round, gameState, onFinish }: {
         <div className="adm-row-btns">
           {/* 9.61: секунды считаются ПО СВЕЖИМ bids/cur в момент записи
               (Р3) — опоздавшая ставка, поменявшая порядок, учитывается,
-              даже если пульт уже отправил клик со старым bidSec. */}
+              даже если пульт уже отправил клик со старым bidSec. 9.62
+              (находка 4): melodyPlaySnippetIfFresh ДОПОЛНИТЕЛЬНО не пишет
+              вовсе, если ЛОКАЛЬНЫЕ bids этого пульта (независимый
+              REST-поллер useAnswers) ещё не знают лидера свежего
+              cur.order — иначе секунды посчитались бы по чужой/старой
+              ставке. */}
           <button className="adm-btn primary" disabled={!currentId}
             onClick={() => void runAction('играем отрывок', () => melodyClick(gameState,
-              guardMelody({ key: m.key, stage: 'bids' }, cur => melodyPlaySnippet(cur, melodyBidSec(bids, cur)))))}>
+              guardMelody({ key: m.key, stage: 'bids' }, cur => melodyPlaySnippetIfFresh(cur, bids))))}>
             ИГРАЕМ {bidSec || 5} СЕК →
           </button>
           <button className="adm-btn"

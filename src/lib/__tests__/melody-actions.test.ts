@@ -4,6 +4,7 @@ import {
   melodyReveal, melodyToBoard, melodyPoints, melodyIdle, melodyFree, melodyKeys,
   melodyDeadline, melodyPreviewCeiling, melodyRandomStart,
   melodyMatches, guardMelody, melodyOrderFromBids, melodyBidSec,
+  melodyPlaySnippetIfFresh, melodyEmergencyClose,
 } from '../melody'
 import type { MelodyState } from '../../types/quiz'
 
@@ -255,5 +256,59 @@ describe('мелодия: melodyBidSec — секунды по ставке ТЕ
 
   it('нет ставки/нет текущей команды — 0', () => {
     expect(melodyBidSec([], { order: [], turn: 0 })).toBe(0)
+  })
+})
+
+// ═══ 9.62 (ревью, HANDOFF §3bx, находка 4): «Играем N сек» — не писать по
+// ЯВНО устаревшим локальным bids ═══
+describe('мелодия: melodyPlaySnippetIfFresh — защита от устаревших ЛОКАЛЬНЫХ bids (находка 4)', () => {
+  it('лидер свежего order есть в локальных bids — считает секунды и пишет как обычно', () => {
+    const bids = [{ team_id: 'a', answer_text: '7' }, { team_id: 'b', answer_text: '4' }]
+    const cur = { order: ['b', 'a'], turn: 0 }
+    const n = melodyPlaySnippetIfFresh(cur, bids)
+    expect(n).not.toBeNull()
+    expect(n!.stage).toBe('snippet')
+    expect(n!.snippetSec).toBe(4) // ставка команды 'b' — лидера очереди
+  })
+
+  // Сценарий из находки 4: команда меняет ставку 7→3 ПОСЛЕ дедлайна,
+  // проектор пересобирает order по СВЕЖИМ данным, но ПУЛЬТ (независимый
+  // REST-поллер) ещё не увидел нового лидера в своих локальных bids —
+  // жмёт "Играем N сек" по старым данным. Раньше секунды считались бы по
+  // случайно найденной/нулевой ставке; теперь запись просто не проходит.
+  it('лидера свежего order НЕТ в локальных bids (устарели) — не пишет вовсе', () => {
+    const staleBids = [{ team_id: 'a', answer_text: '7' }] // команда 'b' ещё не видна пульту
+    const cur = { order: ['b', 'a'], turn: 0 } // но свежий order уже знает про 'b'
+    expect(melodyPlaySnippetIfFresh(cur, staleBids)).toBeNull()
+  })
+
+  it('нет лидера (order пуст) — не падает, ведёт себя как melodyBidSec(0)', () => {
+    const n = melodyPlaySnippetIfFresh({ order: [], turn: 0 }, [])
+    expect(n).not.toBeNull()
+    expect(n!.snippetSec).toBe(5) // дефолт без ставки
+  })
+})
+
+// ═══ 9.62 (ревью, HANDOFF §3bx, находка 5): аварийное «Закрыть» — любая
+// активная стадия ТОГО ЖЕ трека, не конкретно та, что была на клике ═══
+describe('мелодия: melodyEmergencyClose — закрывает при ЛЮБОЙ активной стадии (находка 5)', () => {
+  it('закрывает трек на стадии, отличной от той, что читал ведущий на клике', () => {
+    const close = melodyEmergencyClose('0-0')
+    // ведущий кликнул на 'listen', confirm() провис — стадия уже 'bidding'
+    const n = close({ key: '0-0', stage: 'bidding' })
+    expect(n).not.toBeNull()
+    expect(n!.stage).toBe('done')
+  })
+
+  it('не закрывает чужой трек (другой key)', () => {
+    const close = melodyEmergencyClose('0-0')
+    expect(close({ key: '1-1', stage: 'bidding' })).toBeNull()
+  })
+
+  it('не пишет на idle/done — нечего закрывать', () => {
+    const close = melodyEmergencyClose('0-0')
+    expect(close({ key: '0-0', stage: 'idle' })).toBeNull()
+    expect(close({ key: '0-0', stage: 'done' })).toBeNull()
+    expect(close({ key: '0-0' })).toBeNull()
   })
 })

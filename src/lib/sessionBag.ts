@@ -36,21 +36,32 @@ export async function updateMelodyBag(
   const roomId = getRoomId()
   let snap = base ?? await room.readSession(roomId)
 
+  // Миграция 0014 не прогнана — деградация до старого поведения (слепая
+  // запись), НО ПЕРЕД записью перечитываем сессию, а не доверяем `base`:
+  // он часто приходит из замыкания ЭФФЕКТА (например `gameState` в
+  // MelodyRound.tsx), которое могло быть захвачено сколько угодно давно,
+  // пока эффект ждал сети/таймера — само по себе оно ничем не свежее
+  // старого допотопного `patchSession`. Без этого перечитывания защита
+  // без миграции была бы СЛАБЕЕ, чем в 9.58 (freshMelodyOrAbort/
+  // bidsAdvancingRef, удалены в 9.61) — см. HANDOFF §3bx, находка 2.
+  if (!casEnabled(snap)) {
+    if (!warnedNoCas) {
+      warnedNoCas = true
+      console.warn(
+        'защита от гонки записи не активна — прогоните миграцию 0014 в SQL Editor '
+        + '(supabase/migrations/0014_session_state_rev.sql)',
+      )
+    }
+    const fresh = await room.readSession(roomId)
+    const next = fn(fresh?.melody ?? {})
+    if (next === null) return { status: 'skipped' }
+    await room.patchSession(roomId, { melody: next })
+    return { status: 'written', next }
+  }
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const next = fn(snap?.melody ?? {})
     if (next === null) return { status: 'skipped' }
-
-    if (!casEnabled(snap)) {
-      if (!warnedNoCas) {
-        warnedNoCas = true
-        console.warn(
-          'защита от гонки записи не активна — прогоните миграцию 0014 в SQL Editor '
-          + '(supabase/migrations/0014_session_state_rev.sql)',
-        )
-      }
-      await room.patchSession(roomId, { melody: next })
-      return { status: 'written', next }
-    }
 
     const r = await room.casSession(roomId, snap!.state_rev as number, { melody: next })
     if (r.ok) return { status: 'written', next }
