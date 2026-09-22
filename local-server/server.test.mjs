@@ -107,13 +107,62 @@ describe('локальный сервер: игровые данные (armed)',
     expect(list.body[0].game_id).toBe('g2')
   })
 
-  it('PATCH /api/session с melody мержит по ключам, не затирает соседние', async () => {
+  // 9.60 (миграция 0014, HANDOFF §3bw): melody заменяется ЦЕЛИКОМ, как в
+  // облаке (Р1) — раньше здесь был merge по ключам верхнего уровня, и
+  // этот тест был другим (проверял, что второй патч ДОПОЛНЯЕТ первый).
+  // Смена поведения осознанная: merge по ключам не давал раунду мелодии
+  // реально ОЧИСТИТЬ мешок между треками (`melody: {}` не срабатывал —
+  // см. следующий тест, он ловил этот баг).
+  it('PATCH /api/session: melody заменяется ЦЕЛИКОМ — второй патч стирает поля первого', async () => {
     await api('session', { method: 'PATCH', body: JSON.stringify({ melody: { stage: 'idle', turn: 0 } }) })
     await api('session', { method: 'PATCH', body: JSON.stringify({ melody: { jp: { tile: 3, answer: false } } }) })
     const session = await api('session?since=-1')
-    expect(session.body.melody.stage).toBe('idle')
-    expect(session.body.melody.turn).toBe(0)
-    expect(session.body.melody.jp).toEqual({ tile: 3, answer: false })
+    expect(session.body.melody).toEqual({ jp: { tile: 3, answer: false } })
+  })
+
+  it('PATCH /api/session: melody:{} реально очищает предыдущий мешок (found by review, HANDOFF §3bw)', async () => {
+    await api('session', {
+      method: 'PATCH',
+      body: JSON.stringify({ melody: { stage: 'snippet', key: '0-1', played: ['0-0'], deadline: 't1' } }),
+    })
+    await api('session', { method: 'PATCH', body: JSON.stringify({ melody: {} }) })
+    const session = await api('session?since=-1')
+    expect(session.body.melody).toEqual({})
+    // поле deadline из старого мешка не должно "просочиться" обратно
+    expect(session.body.melody.deadline).toBeUndefined()
+  })
+
+  it('PATCH /api/session?ifStateRev=<rev>: успешная CAS-запись растит state_rev', async () => {
+    const before = await api('session?since=-1')
+    const rev0 = before.body.state_rev ?? 0
+    const r = await api(`session?ifStateRev=${rev0}`, { method: 'PATCH', body: JSON.stringify({ phase: 'question' }) })
+    expect(r.status).toBe(200)
+    expect(r.body.state_rev).toBe(rev0 + 1)
+  })
+
+  it('PATCH /api/session?ifStateRev=<rev>: несовпадение версии — 412 с session в теле, патч НЕ применяется', async () => {
+    const before = await api('session?since=-1')
+    const rev0 = before.body.state_rev ?? 0
+    await api(`session?ifStateRev=${rev0}`, { method: 'PATCH', body: JSON.stringify({ phase: 'question' }) })
+    // та же (уже устаревшая) версия ещё раз
+    const conflict = await api(`session?ifStateRev=${rev0}`, { method: 'PATCH', body: JSON.stringify({ phase: 'show_answers' }) })
+    expect(conflict.status).toBe(412)
+    expect(conflict.body.error).toBe('conflict')
+    expect(conflict.body.session.phase).toBe('question')  // патч НЕ применился
+  })
+
+  it('повторный ИДЕНТИЧНЫЙ патч не растит state_rev', async () => {
+    await api('session', { method: 'PATCH', body: JSON.stringify({ phase: 'question' }) })
+    const after1 = (await api('session?since=-1')).body.state_rev
+    await api('session', { method: 'PATCH', body: JSON.stringify({ phase: 'question' }) })
+    const after2 = (await api('session?since=-1')).body.state_rev
+    expect(after2).toBe(after1)
+  })
+
+  it('клиент не может подделать state_rev телом запроса', async () => {
+    await api('session', { method: 'PATCH', body: JSON.stringify({ phase: 'question', state_rev: 999 }) })
+    const session = await api('session?since=-1')
+    expect(session.body.state_rev).not.toBe(999)
   })
 
   it('?since=<rev> отдаёт 204, когда rev не изменился', async () => {
@@ -164,6 +213,40 @@ describe('локальный сервер: игровые данные (armed)',
     expect(dump.body).toHaveProperty('session')
     expect(dump.body).toHaveProperty('answers')
     expect(dump.body).toHaveProperty('blitz')
+  })
+})
+
+// 9.60 (миграция 0014, HANDOFF §3bw): старый state.json (записанный до этого
+// коммита) не знает про state_rev — сервер должен грузиться, трактуя
+// отсутствующее поле как версию 0, а не падать/терять данные.
+describe('локальный сервер: старый state.json без state_rev', () => {
+  it('грузится нормально, state_rev трактуется как 0', async () => {
+    await new Promise(resolve => server.close(resolve))
+    const oldState = {
+      gameId: 'old-game', armed: true, rev: 3,
+      session: {
+        id: 1, game_id: 'old-game', pack_id: null, phase: 'lobby', round_number: 0,
+        question_index: 0, timer_started_at: null, reveal: false,
+        completed_rounds: [], melody: {}, updated_at: new Date().toISOString(),
+        // НЕТ state_rev — как в файлах, записанных до 9.60
+      },
+      teams: [], answers: [], blitz: {}, packs: {},
+    }
+    fs.writeFileSync(path.join(dataDir, 'state.json'), JSON.stringify(oldState))
+
+    const created = createServer({ dataDir, appDir })
+    server = created.server
+    await new Promise(resolve => server.listen(0, resolve))
+    baseUrl = `http://127.0.0.1:${server.address().port}`
+
+    const session = await api('session?since=-1')
+    expect(session.status).toBe(200)
+    expect(session.body.state_rev).toBe(0)
+
+    // и CAS с версией 0 должен нормально сработать дальше
+    const r = await api('session?ifStateRev=0', { method: 'PATCH', body: JSON.stringify({ phase: 'question' }) })
+    expect(r.status).toBe(200)
+    expect(r.body.state_rev).toBe(1)
   })
 })
 

@@ -14,13 +14,17 @@ type Row = Record<string, unknown>
 function makeFakeSupabase() {
   const db: Record<string, Row[]> = {
     teams: [], answers: [],
-    game_sessions: [{ id: 'room1', game_id: 'g1', pack_id: null, phase: 'lobby', melody: {} }],
+    game_sessions: [{ id: 'room1', game_id: 'g1', pack_id: null, phase: 'lobby', melody: {}, state_rev: 0 }],
     blitz_state: [], question_shown: [], packs: [{ id: 'pack1', status: 'ready' }],
   }
   // Таблицы, для которых следующий select должен вернуть {data:null,
   // error:{...}} — имитация временного сетевого сбоя (не «строки нет»,
   // а «Supabase ответил ошибкой»), см. тест на readSession/readBlitz ниже.
   const forceErrorOnce = new Set<string>()
+  // Эмуляция молчаливого отказа RLS: update физически не находит строк,
+  // хотя запись должна была пройти по данным — тот же наблюдаемый эффект,
+  // что у настоящей политики доступа Supabase (она не отвечает ошибкой).
+  const forceRlsDenyOnce = new Set<string>()
   let idCounter = 1
 
   function builder(table: string) {
@@ -31,10 +35,12 @@ function makeFakeSupabase() {
     let maybeSingle = false
     let onConflict: string | undefined
     let countOpt: 'exact' | undefined
+    let selectAfterWrite = false
 
     const api = {
       select(_cols?: string, opts?: { count?: 'exact' }) {
         if (opts?.count) countOpt = opts.count
+        if (op === 'update') selectAfterWrite = true
         return api
       },
       eq(col: string, val: unknown) { filters.push(r => r[col] === val); return api },
@@ -73,8 +79,22 @@ function makeFakeSupabase() {
             return resolve({ data: matched, error: null })
           }
           if (op === 'update') {
-            const matched = rows.filter(r => filters.every(f => f(r)))
-            matched.forEach(r => Object.assign(r, payload[0]))
+            const matched = forceRlsDenyOnce.has(table)
+              ? (forceRlsDenyOnce.delete(table), [] as Row[])
+              : rows.filter(r => filters.every(f => f(r)))
+            // Эмуляция триггера game_sessions_bump_state_rev (миграция 0014):
+            // версия растёт только если строка РЕАЛЬНО изменилась.
+            matched.forEach(r => {
+              if (table === 'game_sessions') {
+                const before = JSON.stringify({ ...r, state_rev: undefined })
+                Object.assign(r, payload[0])
+                const after = JSON.stringify({ ...r, state_rev: undefined })
+                if (after !== before) r.state_rev = (Number(r.state_rev) || 0) + 1
+              } else {
+                Object.assign(r, payload[0])
+              }
+            })
+            if (selectAfterWrite) return resolve({ data: matched, error: null })
             return resolve({ data: null, error: null })
           }
           if (op === 'upsert') {
@@ -103,7 +123,7 @@ function makeFakeSupabase() {
     return api
   }
 
-  return { db, client: { from: (table: string) => builder(table) }, forceErrorOnce }
+  return { db, client: { from: (table: string) => builder(table) }, forceErrorOnce, forceRlsDenyOnce }
 }
 
 const fake = makeFakeSupabase()
@@ -115,7 +135,7 @@ describe('supabaseTransport: контракт', () => {
   beforeEach(() => {
     fake.db.teams = []
     fake.db.answers = []
-    fake.db.game_sessions = [{ id: 'room1', game_id: 'g1', pack_id: null, phase: 'lobby', melody: {} }]
+    fake.db.game_sessions = [{ id: 'room1', game_id: 'g1', pack_id: null, phase: 'lobby', melody: {}, state_rev: 0 }]
     fake.db.blitz_state = []
     fake.db.question_shown = []
     fake.db.packs = [{ id: 'pack1', status: 'ready' }]
@@ -223,5 +243,41 @@ describe('supabaseTransport: контракт', () => {
   it('readBlitz: ошибка сети бросается наружу, а не превращается в null', async () => {
     fake.forceErrorOnce.add('blitz_state')
     await expect(supabaseTransport.readBlitz('g1', 2)).rejects.toBeTruthy()
+  })
+
+  // ═══ casSession (9.60, миграция 0014) ═══
+  describe('casSession', () => {
+    it('успешная запись — версия растёт на 1', async () => {
+      const r = await supabaseTransport.casSession('room1', 0, { phase: 'question' })
+      expect(r).toEqual({ ok: true, stateRev: 1 })
+      expect(fake.db.game_sessions[0].phase).toBe('question')
+    })
+
+    it('несовпадение версии — {ok:false} со свежим current', async () => {
+      await supabaseTransport.casSession('room1', 0, { phase: 'question' }) // версия теперь 1
+      const r = await supabaseTransport.casSession('room1', 0, { phase: 'show_answers' })
+      expect(r.ok).toBe(false)
+      if (!r.ok) {
+        expect(r.current?.phase).toBe('question')
+        expect(r.current?.state_rev).toBe(1)
+      }
+    })
+
+    it('0 строк при СОВПАДАЮЩЕЙ версии (эмуляция молчаливого отказа RLS) — бросает ошибку', async () => {
+      fake.forceRlsDenyOnce.add('game_sessions')
+      await expect(supabaseTransport.casSession('room1', 0, { phase: 'x' }))
+        .rejects.toThrow(/прав на комнату/)
+    })
+
+    it('повторная запись ТЕХ ЖЕ данных melody не поднимает версию', async () => {
+      await supabaseTransport.casSession('room1', 0, { melody: { stage: 'bidding' } })
+      const afterFirst = fake.db.game_sessions[0].state_rev
+      // тот же контент — но CAS требует АКТУАЛЬНУЮ версию, а не "любую"
+      const r = await supabaseTransport.casSession('room1', afterFirst as number, { melody: { stage: 'bidding' } })
+      // is distinct from не даёт версии вырасти — но CAS-условие state_rev=X
+      // всё ещё совпадает (та же старая версия), 1 строка находится и
+      // обновляется без изменений => сервер возвращает ту же версию
+      expect(r).toEqual({ ok: true, stateRev: afterFirst })
+    })
   })
 })

@@ -6,6 +6,7 @@
 import { getRoomId } from '../../lib/room'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
+import type { AnswerUpsert } from '../../lib/transport'
 import { openRaceBets, startRace } from '../../lib/raceActions'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { mediaUrl } from '../../lib/media'
@@ -101,6 +102,22 @@ export function RaceBoard({ pack, round, gameState, preview }: {
   const answers = preview ? preview.answers : liveAnswers
   const bets = answers.filter(a => a.question_ref === `q-race-${gameState.round_number}`)
   const graded = useRef(false)
+  const [retryTick, setRetryTick] = useState(0)
+  // Флаг «хотя бы один опрос useAnswers реально вернулся». useAnswers стартует
+  // с пустым массивом ДО первого сетевого ответа (hooks/useAnswers.ts) — если
+  // страница проектора перезагружается, когда гонка уже логически завершилась
+  // (allFinished=true), а stage в БД всё ещё 'running' (сеть оборвала запись
+  // done — тот самый случай, который чинит retry-цикл ниже), эффект начисления
+  // мог сработать на ПЕРВОМ рендере с bets=[] и записать stage:'done' без
+  // единого upsert очков — команды навсегда получали 0 (HANDOFF §3bv). Ссылка
+  // на исходный (ещё не заполненный) массив фиксируется один раз при монтаже;
+  // как только useAnswers подставит НОВЫЙ массив (первый успешный опрос, даже
+  // если ответов реально 0), считаем данные загруженными.
+  const initialAnswersRef = useRef(answers)
+  const answersLoadedRef = useRef(false)
+  useEffect(() => {
+    if (answers !== initialAnswersRef.current) answersLoadedRef.current = true
+  }, [answers])
 
   // музыка забега: своя (настройка раунда) или общая фоновая пакета.
   // Жест уже был (клик «Старт!»), поэтому обычный Audio играет без плясок.
@@ -129,23 +146,60 @@ export function RaceBoard({ pack, round, gameState, preview }: {
   const done = race.stage === 'done'
   const allFinished = scenario && t >= Math.max(...scenario.finish) + 1
 
-  // финиш: начисляем баллы (5/4/3/2/1 по месту выбранной собаки) — один раз
+  // финиш: начисляем баллы (5/4/3/2/1 по месту выбранной собаки) — один раз.
+  // Раньше это был цикл ПОСЛЕДОВАТЕЛЬНЫХ await room.patchAnswer на каждую
+  // команду без try/catch: единственный сетевой сбой обрывал `for` молча
+  // (async-функция без обработки ошибок), оставшиеся команды не получали
+  // очков, а stage:'done' не писался вовсе — раунд замирал (F3, HANDOFF.md
+  // §3bu). Теперь одна пачка одним upsert (CLAUDE.md: «пачку пиши одним
+  // upsert») плюс retry по сбою — вместо N параллельных/последовательных
+  // сетевых вызовов, ни один из которых не подстрахован.
   useEffect(() => {
-    if (preview || !running || !allFinished || graded.current || document.hidden) return
+    if (preview || !running || !allFinished || graded.current || document.hidden
+      || !answersLoadedRef.current) return
     graded.current = true
+    // Опоздавшая запись из СТАРОГО цикла ретраев не должна затирать состояние
+    // раунда, в который ведущий уже переключился с пульта, пока мы ждали
+    // между попытками (jsonb `melody` заменяется целиком при записи — HANDOFF
+    // §3bv/CLAUDE.md). cancelled выставляется в cleanup эффекта.
+    let cancelled = false
     const placeOf = new Map(scenario.places.map((dog, pos) => [dog, pos]))
-    void (async () => {
-      for (const b of bets) {
-        const dog = Number(b.answer_text) - 1
-        const pos = placeOf.get(dog)
-        const pts = pos != null ? 5 - pos : 0
-        await room.patchAnswer(b.id, { is_correct: true, stake: pts })
+    const rows: AnswerUpsert[] = bets.map(b => {
+      const dog = Number(b.answer_text) - 1
+      const pos = placeOf.get(dog)
+      const pts = pos != null ? 5 - pos : 0
+      return {
+        team_id: b.team_id, game_id: b.game_id, question_ref: b.question_ref,
+        round_number: b.round_number, answer_text: b.answer_text,
+        stake: pts, is_correct: true, updated_at: new Date().toISOString(),
       }
-      await room.patchSession(getRoomId(), {
-        melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
-      })
+    })
+    void (async () => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (cancelled) return
+        try {
+          if (rows.length > 0) await room.upsertAnswers(rows)
+          if (cancelled) return
+          await room.patchSession(getRoomId(), {
+            melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
+          })
+          return
+        } catch {
+          if (attempt === 2) {
+            // 3 попытки подряд не помогли (сеть легла надолго) — сбрасываем
+            // флаг и планируем ещё один заход через 2 сек, обновив зависимость
+            // эффекта: без этого `graded.current = false` никого не разбудит,
+            // deps (`running`/`allFinished`) сами по себе больше не изменятся.
+            graded.current = false
+            if (!cancelled) setTimeout(() => setRetryTick(x => x + 1), 2000)
+            return
+          }
+          await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+        }
+      }
     })()
-  }, [preview, running, allFinished])
+    return () => { cancelled = true }
+  }, [preview, running, allFinished, retryTick])
 
   // ставки открываются сразу с появлением экрана — лишний клик убран
   useEffect(() => {

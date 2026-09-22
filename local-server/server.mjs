@@ -60,7 +60,7 @@ function defaultState() {
     session: {
       id: 1, game_id: '', pack_id: null, phase: 'lobby', round_number: 0,
       question_index: 0, timer_started_at: null, reveal: false,
-      completed_rounds: [], melody: {}, updated_at: now,
+      completed_rounds: [], melody: {}, updated_at: now, state_rev: 0,
     },
     teams: [],
     answers: [],
@@ -78,6 +78,11 @@ export function createStore(dataDir) {
   let state
   try {
     state = JSON.parse(fs.readFileSync(statePath, 'utf8'))
+    // старый state.json (до 9.60/миграции 0014) не знает про state_rev —
+    // трактуем как версию 0, а не роняем загрузку.
+    if (typeof state.session?.state_rev !== 'number') {
+      state.session.state_rev = 0
+    }
   } catch {
     state = defaultState()
   }
@@ -312,23 +317,38 @@ function createApiHandler(store) {
         }
         if (method === 'PATCH') {
           const patch = await readJsonBody(req)
+          // 9.60 (миграция 0014, HANDOFF §3bw): CAS через ?ifStateRev=<rev> —
+          // облачный аналог триггера state_rev. Сравнение и применение
+          // патча — в ОДНОМ синхронном блоке (Node однопоточный, между ними
+          // нет await), иначе гонка возможна и здесь.
+          const ifStateRevRaw = url.searchParams.get('ifStateRev')
+          const ifStateRev = ifStateRevRaw == null ? null : Number(ifStateRevRaw)
+          if (ifStateRev != null && ifStateRev !== st.session.state_rev) {
+            sendJson(res, 412, { error: 'conflict', session: st.session })
+            return
+          }
+
+          const strip = s => { const { updated_at, state_rev, ...rest } = s; return JSON.stringify(rest) }
+          const before = strip(st.session)
           store.mutate('session.patch', patch, () => {
             for (const [k, v] of Object.entries(patch ?? {})) {
               // `melody` — общий jsonb-мешок состояний механик (плитка «Своей
-              // игры», скачки). Полная замена объекта затирает то, что успел
-              // записать другой экран (проектор/телефон ведущего), почти
-              // одновременно дёрнувший другое поле мешка — мержим по ключам
-              // верхнего уровня. В облаке (supabaseTransport) этот дефект
-              // ЕСТЬ и сегодня, не тронут этим шагом (см. HANDOFF).
-              if (k === 'melody' && v && typeof v === 'object' && !Array.isArray(v)) {
-                st.session.melody = { ...(st.session.melody ?? {}), ...v }
-              } else {
-                st.session[k] = v
-              }
+              // игры», скачки, мелодия). ПОЛНАЯ ЗАМЕНА объекта — как и в
+              // облаке (supabaseTransport) — не слияние по ключам: прошлый
+              // merge-по-ключам не давал раунду мелодии реально ОЧИЩАТЬ
+              // предыдущий мешок между треками/раундами (см. HANDOFF §3bw,
+              // найдено ревью коммита B — старое поведение было багом, не
+              // фичей: сброс `melody: {}` не работал на локальном сервере).
+              // `state_rev` из тела запроса клиента ИГНОРИРУЕТСЯ — версией
+              // управляет только сервер (ниже).
+              if (k === 'state_rev') continue
+              st.session[k] = v
             }
             st.session.updated_at = new Date().toISOString()
+            const after = strip(st.session)
+            if (after !== before) st.session.state_rev = (st.session.state_rev ?? 0) + 1
           })
-          sendJson(res, 200, { ok: true, rev: st.rev })
+          sendJson(res, 200, { ok: true, rev: st.rev, state_rev: st.session.state_rev })
           return
         }
       }

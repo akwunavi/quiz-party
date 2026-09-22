@@ -21,7 +21,8 @@
 import type { Answer, GameState, Team } from '../../types/quiz'
 import type { BlitzState } from '../blitzState'
 import type {
-  AnswerPatch, AnswerUpsert, DeleteAnswersBy, RoomTransport, SessionPatch, TeamPatch, TeamUpsert,
+  AnswerPatch, AnswerUpsert, CasResult, DeleteAnswersBy, RoomTransport, SessionPatch, TeamPatch,
+  TeamUpsert,
 } from './types'
 
 const TIMEOUT_MS = 1500
@@ -97,6 +98,22 @@ export const localTransport: RoomTransport = {
 
   async patchSession(_roomId, patch: SessionPatch) {
     await requestJson('/api/session', { method: 'PATCH', body: JSON.stringify(patch) })
+  },
+
+  // 9.60 (миграция 0014/server.mjs, HANDOFF §3bw): защищённая запись.
+  // 412 (Precondition Failed) — версия на сервере уже другая, 409 занят
+  // существующим смыслом «локальный режим не включён», поэтому не трогаем.
+  async casSession(_roomId, expectedRev, patch: SessionPatch): Promise<CasResult> {
+    const res = await request(`/api/session?ifStateRev=${expectedRev}`, {
+      method: 'PATCH', body: JSON.stringify(patch),
+    })
+    if (res.status === 412) {
+      const body = await res.json().catch(() => ({})) as { session?: GameState }
+      return { ok: false, current: body.session ?? null }
+    }
+    if (!res.ok) throw new Error(await errorMessage(res))
+    const body = await res.json().catch(() => ({})) as { state_rev?: number }
+    return { ok: true, stateRev: body.state_rev ?? expectedRev + 1 }
   },
 
   async listTeams(_gameId) {

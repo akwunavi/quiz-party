@@ -1,0 +1,6 @@
+{
+  "case1": "AbortError",
+  "case2": "AbortError",
+  "case3": "NotSupportedError",
+  "case4": "AbortError"
+}

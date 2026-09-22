@@ -324,6 +324,12 @@ export interface GameState {
   reveal: boolean
   completed_rounds: number[]
   updated_at: string
+  /** Версия строки, растёт триггером БД на каждое РЕАЛЬНОЕ изменение
+   *  (миграция 0014, HANDOFF §3bw). Отсутствие поля означает, что миграция
+   *  ещё не прогнана на этой базе — код должен работать по-старому (без
+   *  защиты от гонки записи), это деградация, а не ошибка (см.
+   *  lib/sessionBag.ts:casEnabled). */
+  state_rev?: number
 }
 
 export interface Team {

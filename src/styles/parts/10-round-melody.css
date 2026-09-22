@@ -1,8 +1,18 @@
 /* ═══ УГАДАЙ МЕЛОДИЮ ═══ */
 .mel-screen { justify-content: flex-start; gap: 12px; padding: 20px 34px 92px; }
 .mel-board { display: grid; gap: 10px; width: 100%; flex: 1; min-height: 0; }
+/* Заголовки тем — просьба ведущего вживую: «сделай заголовки тем для
+   проектора больше и пожирнее. сейчас не видно даже на ноуте, на
+   компе ещё хуже будет». Причина — потолок clamp был 22px: на любом
+   экране шире ~1467px (1.5vw уже превышает 22px) текст залипал на
+   потолке и не рос дальше — что на 1920, что на 3840 одна и та же
+   мелкая цифра, отсюда «на компе ещё хуже» (экран больше, шрифт нет).
+   Потолок поднят до 34px, вес добавлен (700, раньше не было вообще —
+   наследовался обычный). Проверено рендером на 1366/1920/3840 (три
+   темы) — подпись не обрезается в рамке `.mel-theme`, высота строки
+   грида (auto) растёт вместе с текстом, соседние колонки не задеты. */
 .mel-theme { display: flex; align-items: center; justify-content: center; text-align: center;
-  font-family: var(--font-display); font-size: clamp(13px, 1.5vw, 22px); color: var(--accent);
+  font-family: var(--font-display); font-size: clamp(16px, 2.2vw, 34px); font-weight: 700; color: var(--accent);
   padding: 8px; border: 1px solid var(--dim); background: rgba(255,255,255,.05); border-radius: 8px; }
 .mel-tile {
   font-family: var(--font-digits); font-size: clamp(18px, 2.4vw, 36px);

@@ -150,3 +150,111 @@ export function melodyPoints(bidSec: number, first: boolean): number {
   if (!first) return 0.5
   return bidSec <= 5 ? 2 : 1
 }
+
+// ═══ 9.61 (HANDOFF §3bw): условные переходы для CAS-записи (lib/sessionBag.ts) ═══
+//
+// Раньше защита от «клик ведущего против устаревшего автоперехода» была
+// россыпью inline-проверок (freshMelodyOrAbort, bidsAdvancingRef —
+// MelodyRound.tsx, HANDOFF §3bu/§3bv) — и работала ТОЛЬКО на проекторе,
+// пульт в админке был не защищён вовсе. guardMelody — тот же приём (не
+// писать, если условие, на котором принималось решение, уже неактуально),
+// но как ЧИСТАЯ функция условие→переход, годная для CAS: sessionBag
+// повторяет попытку на свежем состоянии сам, если условие держится.
+//
+// ПРАВИЛО: функция-переход (то, что передают в guardMelody вторым
+// аргументом) ОБЯЗАНА быть идемпотентной — повторный вызов на состоянии,
+// где наша запись уже применилась, должен вернуть `null` (нечего писать)
+// или тот же результат, а не откатить/задвоить эффект.
+export type MelodyStage = NonNullable<MelodyState['stage']>
+
+export type MelodyExpect = {
+  key: string | undefined
+  stage: MelodyStage | MelodyStage[]
+  turn?: number
+}
+
+/** Условие «состояние всё ещё то, на котором мы решили действовать». */
+export function melodyMatches(cur: MelodyState, e: MelodyExpect): boolean {
+  if (cur.key !== e.key) return false
+  const stages = Array.isArray(e.stage) ? e.stage : [e.stage]
+  if (!cur.stage || !stages.includes(cur.stage)) return false
+  if (e.turn !== undefined && (cur.turn ?? 0) !== e.turn) return false
+  return true
+}
+
+/** Обернуть чистый переход условием: пишем, только если состояние всё ещё
+ *  соответствует ожиданию — иначе `null` (не пишем, кто-то уже увёл игру
+ *  дальше). Готовая `BagFn` для lib/sessionBag.ts:updateMelodyBag. */
+export function guardMelody(
+  e: MelodyExpect, f: (cur: MelodyState) => MelodyState | null,
+): (cur: MelodyState) => MelodyState | null {
+  return cur => (melodyMatches(cur, e) ? f(cur) : null)
+}
+
+/** Очередь команд по ставкам: кто поставил меньше секунд — играет раньше;
+ *  при равенстве секунд — кто поставил раньше (`updated_at`); команды без
+ *  ставки — в конец очереди (если первая не угадает, ход всё равно есть
+ *  кому передать). Общая для проектора и пульта — раньше была продублирована
+ *  инлайном в обоих местах (см. MelodyRound.tsx до 9.61). */
+export function melodyOrderFromBids(
+  bids: { team_id: string; answer_text: string; updated_at: string }[],
+  teamIds: string[],
+): string[] {
+  const bidders = bids
+    .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
+    .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
+    .map(b => b.id)
+  return [...bidders, ...teamIds.filter(id => !bidders.includes(id))]
+}
+
+/** Секунд по ставке победителя очереди — пересчитывается на СВЕЖИХ `bids`/
+ *  `cur` в момент вызова (Р3: опоздавшая ставка, поменявшая порядок,
+ *  учитывается, даже если ведущий уже нажал «Играем N сек»). */
+export function melodyBidSec(
+  bids: { team_id: string; answer_text: string }[], cur: MelodyState,
+): number {
+  const currentId = cur.order?.[cur.turn ?? 0]
+  return Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
+}
+
+/** «Играем N сек»: пишет переход, ТОЛЬКО если локальный список `bids`
+ *  (независимый REST-поллер вызывающего экрана — у пульта в админке и
+ *  у проектора это ДВЕ разные подписки) уже знает лидера свежего
+ *  `cur.order`, прочитанного прямо перед CAS-записью. Если лидера в
+ *  локальных `bids` нет — они точно устарели относительно `cur.order`
+ *  (кто-то пересобрал очередь по опоздавшей ставке между опросами этого
+ *  экрана), и секунды посчитались бы по чужой/старой ставке. Возвращает
+ *  `null` (не пишем, идемпотентно) — ведущий нажмёт ещё раз, к этому
+ *  моменту `bids` уже подтянутся опросом (HANDOFF §3bx, находка 4). */
+export function melodyPlaySnippetIfFresh(
+  cur: MelodyState, bids: { team_id: string; answer_text: string }[],
+): MelodyState | null {
+  const leader = cur.order?.[cur.turn ?? 0]
+  if (leader && !bids.some(b => b.team_id === leader)) return null
+  return melodyPlaySnippet(cur, melodyBidSec(bids, cur))
+}
+
+/** Аварийное «Закрыть»: действует на ЛЮБОЙ активной стадии ТОГО ЖЕ
+ *  трека, а не только на стадии, что была на момент клика. Пульт
+ *  открывает `confirm()`, который может провисеть несколько секунд, пока
+ *  ведущий решает нажимать «ОК» — за это время короткая цепочка
+ *  автостадий (spinning→listen→bidding) успевает переключиться сама, без
+ *  участия ведущего, и проверка «та же стадия» после этого никогда не
+ *  совпадала бы (кнопка молчала бы «устарела», хотя смысл этой кнопки
+ *  именно «закрыть немедленно, что бы сейчас ни происходило» — HANDOFF
+ *  §3bx, находка 5). Экспортирована отдельно (а не заинлайнена в
+ *  MelodyRound.tsx/AdminPage.tsx), чтобы тест на это условие проверял
+ *  РЕАЛЬНЫЙ боевой код, а не свою копию.
+ *
+ *  Стадия `reveal` исключена нарочно (ревью, HANDOFF §3bx): `melodyIdle`
+ *  не считает её неактивной, а на `reveal` уже показан победитель и
+ *  начислены очки — «закрыть» здесь стёрло бы экран разбора и не тронуло
+ *  бы уже записанные баллы, то есть ведущий думал бы, что отменил трек,
+ *  а на самом деле только скрыл его результат. */
+export function melodyEmergencyClose(
+  key: string | undefined,
+): (cur: MelodyState) => MelodyState | null {
+  return cur => (
+    cur.key === key && !melodyIdle(cur) && cur.stage !== 'reveal' ? melodyClose(cur) : null
+  )
+}

@@ -9,7 +9,8 @@
 // фоновая музыка) → passed (вторая слушает трек целиком, с начала)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
-import { playAudio, createAudio } from '../../lib/audioSource'
+import { createAudio, preloadAudio } from '../../lib/audioSource'
+import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
@@ -21,10 +22,11 @@ import { mediaUrl } from '../../lib/media'
 // Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
 // здесь inline; пульт писал бы свои копии тех же объектов и рано или поздно
 // разошёлся бы с проектором.
-import { saveMelody, gradeMelody, passMelody } from '../../lib/melodyActions'
+import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/melodyActions'
 import {
-  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
-  melodyToBoard, melodyIdle, melodyFree,
+  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
+  melodyEmergencyClose,
 } from '../../lib/melody'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
@@ -49,34 +51,9 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
   })
 }
 
-// Единый аудио-элемент: «разблокируется» первым кликом по проектору и дальше
-// переиспользуется — autoplay-политика браузера больше не блокирует треки,
-// запущенные выбором с телефона (там нет жеста на проекторе).
-let sharedAudio: HTMLAudioElement | null = null
-export function unlockAudio() {
-  if (sharedAudio) return
-  sharedAudio = createAudio()
-  // тихий пинок, чтобы браузер пометил элемент как «разрешённый жестом»
-  sharedAudio.play().catch(() => {})
-  sharedAudio.pause()
-}
-function playShared(src: string, startAt = 0): HTMLAudioElement {
-  if (!sharedAudio) sharedAudio = createAudio()
-  sharedAudio.pause()
-  sharedAudio.loop = false
-  sharedAudio.volume = 1
-  // тот же запасной путь, что и в «Своей игре»: при блокировке прямого
-  // запроса файл скачивается и играется из памяти
-  void playAudio(sharedAudio, src, startAt)
-  return sharedAudio
-}
-
-/** Заглушить общий трек. Нужен, когда ход уходит дальше сам: иначе музыка
- *  продолжает играть уже над следующей командой. */
-function stopShared() {
-  if (!sharedAudio) return
-  try { sharedAudio.pause(); sharedAudio.currentTime = 0 } catch { /* уже мёртв */ }
-}
+// Единый аудио-элемент и его поколение — вынесены в lib/sharedAudio.ts
+// (HANDOFF.md §3bu), чтобы regression-тест гонки импортировал РЕАЛЬНЫЙ код,
+// а не копию.
 
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
@@ -126,7 +103,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const teams = preview ? preview.teams : liveTeams
   const answers = preview ? preview.answers : liveAnswers
   const played = m.played ?? []
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
   const [now, setNow] = useState(Date.now())
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
 
@@ -146,17 +123,21 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const bids = answers.filter(a => a.question_ref === bidRef)
 
   // ставки, дошедшие ПОСЛЕ дедлайна (полинг ~2 сек), пересобирают очередь,
-  // пока трек ещё не запущен кнопкой «Играем N сек»
+  // пока трек ещё не запущен кнопкой «Играем N сек».
+  // 9.61 (HANDOFF §3bw): раньше защиту от отката «клик уже перевёл в
+  // snippet, а устаревшая пересборка order прилетела следом» держал
+  // ref-guard, работавший ТОЛЬКО на проекторе (пульт в админке не был
+  // защищён вовсе). Теперь условие проверяется CAS-записью на СВЕЖЕМ
+  // состоянии (guardMelody) — работает одинаково для обоих экранов,
+  // отдельный ref не нужен.
   useEffect(() => {
     if (preview || m.stage !== 'bids') return
-    const bidders = bids
-      .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
-      .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
-      .map(b => b.id)
-    const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
-    if (JSON.stringify(order) !== JSON.stringify(m.order)) {
-      void saveMelody({ ...m, order, turn: 0 })
-    }
+    const order = melodyOrderFromBids(bids, teams.map(t => t.id))
+    if (JSON.stringify(order) === JSON.stringify(m.order)) return
+    void updateMelody(gameState, guardMelody(
+      { key: m.key, stage: 'bids' },
+      cur => (JSON.stringify(cur.order) === JSON.stringify(order) ? null : { ...cur, order, turn: 0 }),
+    ))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
 
@@ -168,7 +149,10 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     if (preview || m.stage !== 'snippet') return
     const sec = m.snippetSec ?? 5
     const t = window.setTimeout(() => {
-      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'snippet' },
+        cur => melodyAcceptAnswer(cur, s.answerSec ?? 30),
+      ))
     }, (sec + 10) * 1000)          // фрагмент + 10 сек запаса
     return () => clearTimeout(t)
   }, [preview, m.stage, m.key, m.snippetSec])
@@ -178,39 +162,59 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
     // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
-    const a = playShared(mediaUrl(track.audio), m.startSec ?? 0)
-    audioRef.current = a
+    const h = playShared(mediaUrl(track.audio), { startAt: m.startSec ?? 0 })
     let stop: number | undefined
     let advanced = false
     const advance = () => {
       if (advanced) return
       advanced = true
-      a.pause()
-      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+      h.stop()
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'snippet' },
+        cur => melodyAcceptAnswer(cur, s.answerSec ?? 30),
+      ))
     }
-    a.addEventListener('playing', () => {
-      // с этого момента и тикает счётчик на экране
-      void saveMelody({ ...m, deadline: inSec(sec) })
+    const offPlaying = h.on('playing', () => {
+      // с этого момента и тикает счётчик на экране. Тот же соседний баг:
+      // если ведущий уже нажал «Принимаем ответ →» на этом же экране (или
+      // «Закрыть трек»), а playing-событие только сейчас долетело — не
+      // затираем стадию 'answering'/'done' обратно в 'snippet' устаревшим
+      // спредом {...m}. guardMelody + доп. проверка "дедлайн ещё не стоит"
+      // делает запись идемпотентной, если событие всё же долетит повторно.
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'snippet' },
+        cur => (cur.deadline ? null : { ...cur, deadline: inSec(sec) }),
+      ))
       stop = window.setTimeout(advance, sec * 1000)
-    }, { once: true })
+    })
     const guard = window.setTimeout(advance, (sec + 4) * 1000)
-    return () => { if (stop) clearTimeout(stop); clearTimeout(guard) }
+    return () => {
+      if (stop) clearTimeout(stop)
+      clearTimeout(guard)
+      // Подписка привязана к ЭТОЙ операции (SharedPlayback.on) — событие от
+      // чужой/устаревшей операции сюда не долетит (см. lib/sharedAudio.ts).
+      // Явная отписка на случай, если эффект размонтируется раньше, чем
+      // событие произошло.
+      offPlaying()
+      h.stop()
+    }
   }, [preview, m.stage, m.key])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
     if (preview || !expired || document.hidden) return
     if (m.stage === 'spinning') {
-      void saveMelody({ ...m, stage: 'listen', deadline: inSec(2) })
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'spinning' }, cur => ({ ...cur, stage: 'listen', deadline: inSec(2) }),
+      ))
     } else if (m.stage === 'bidding') {
-      const bidders = bids
-        .map(a => ({ id: a.team_id, sec: Number(a.answer_text) || 99, at: a.updated_at }))
-        .sort((x, y) => x.sec - y.sec || +new Date(x.at) - +new Date(y.at))
-        .map(b => b.id)
-      // команды без ставки — в конец очереди: если первая не угадает,
-      // ход всё равно есть кому передать
-      const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
-      void saveMelody({ ...m, stage: 'bids', order, turn: 0, deadline: undefined })
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'bidding' },
+        cur => ({
+          ...cur, stage: 'bids', order: melodyOrderFromBids(bids, teams.map(t => t.id)),
+          turn: 0, deadline: undefined,
+        }),
+      ))
     } else if (m.stage === 'answering' || m.stage === 'passed') {
       // Время на ответ вышло. Дальше два разных случая, и раньше они были
       // склеены в один: экран просто замирал, музыка играла, а форма у
@@ -219,20 +223,25 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
         a.question_ref === `q-mel-${m.key}` && a.team_id === m.order?.[m.turn ?? 0])
       // Ответ уже оценён ведущим (gradeMelody/passMelody уже отработали и
       // сами перевели стадию) — опрос answers мог долететь РАНЬШЕ, чем
-      // опрос gameState подхватит новую стадию. Тогда m.stage тут ещё
-      // устаревший 'answering', и спред {...m} ниже затёр бы свежий
-      // 'reveal' обратно. Ничего не пишем — переход целиком на совести
-      // gradeMelody/passMelody (HANDOFF.md).
+      // опрос gameState подхватит новую стадию. Ничего не пишем — переход
+      // целиком на совести gradeMelody/passMelody (HANDOFF.md).
       if (currentAns?.is_correct != null) return
       const submitted = !!currentAns?.answer_text?.trim()
+      const stageNow = m.stage, turnNow = m.turn ?? 0, deadlineNow = m.deadline
       if (submitted) {
-        // Ответ есть — судит ведущий, время просто останавливаем.
-        void saveMelody({ ...m, deadline: undefined })
+        // Ответ есть — судит ведущий, время просто останавливаем. Доп.
+        // проверка "тот же дедлайн" — идемпотентность на повтор эффекта.
+        void updateMelody(gameState, guardMelody(
+          { key: m.key, stage: stageNow, turn: turnNow },
+          cur => (cur.deadline === deadlineNow ? { ...cur, deadline: undefined } : null),
+        ))
       } else {
         // Ответа нет — ход уходит дальше сам. Музыку глушим: иначе трек
         // продолжает играть уже над следующей командой.
         stopShared()
-        void saveMelody(melodyPass(m))
+        void updateMelody(gameState, guardMelody(
+          { key: m.key, stage: stageNow, turn: turnNow }, cur => melodyPass(cur),
+        ))
       }
     }
   }, [preview, expired, m.stage, answers])
@@ -241,15 +250,28 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   useEffect(() => {
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
-    const a = playShared(mediaUrl(track.audio), requested)
-    audioRef.current = a
+    const h = playShared(mediaUrl(track.audio), { startAt: requested })
     let stop: number | undefined
     let advanced = false
+    // Исправленный startSec (см. checkReal ниже) копится ЗДЕСЬ, а не пишется
+    // отдельным saveMelody — раньше это был самостоятельный сетевой вызов,
+    // который мог долететь ПОСЛЕ записи advance() (стадия уже 'bidding') и
+    // затереть её обратно на 'listen' своим устаревшим спредом {...m}
+    // (HANDOFF.md §3bu, F9). Теперь коррекция просто подмешивается в тот же
+    // save, что делает advance().
+    let correctedStart: number | undefined
     const advance = () => {
       if (advanced) return
       advanced = true
-      a.pause()
-      void saveMelody({ ...m, stage: 'bidding', deadline: inSec(s.bidSec ?? 10) })
+      h.stop()
+      void updateMelody(gameState, guardMelody(
+        { key: m.key, stage: 'listen' },
+        cur => ({
+          ...cur,
+          ...(correctedStart != null ? { startSec: correctedStart } : {}),
+          stage: 'bidding', deadline: inSec(s.bidSec ?? 10),
+        }),
+      ))
     }
     // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
     // точка старта уже выбрана в melodySpin/melodyPick по НОМИНАЛЬНОЙ длине,
@@ -263,50 +285,66 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const checkReal = () => {
       if (metaChecked) return
       metaChecked = true
-      const dur = a.duration
+      if (!h.isCurrent()) return       // гонка с новой операцией — не мутируем чужой el
+      const dur = h.el.duration
       if (!dur || !isFinite(dur)) return
       const safe = Math.min(requested, Math.max(0, dur - 10))
       if (safe !== requested) {
-        try { a.currentTime = safe } catch { /* не критично — сыграет как есть */ }
-        void saveMelody({ ...m, startSec: safe })
+        try { h.el.currentTime = safe } catch { /* не критично — сыграет как есть */ }
+        correctedStart = safe
       }
     }
-    a.addEventListener('loadedmetadata', checkReal, { once: true })
+    const offMeta = h.on('loadedmetadata', checkReal)
     const metaGuard = window.setTimeout(checkReal, 400)
     // секунда считается от РЕАЛЬНОГО начала звука
-    a.addEventListener('playing', () => { stop = window.setTimeout(advance, 1000) }, { once: true })
+    const offPlaying = h.on('playing', () => { stop = window.setTimeout(advance, 1000) })
     // страховка: если звук так и не пошёл (нет файла) — не зависаем
     const guard = window.setTimeout(advance, 4000)
     return () => {
       if (stop) clearTimeout(stop)
       clearTimeout(guard); clearTimeout(metaGuard)
-      a.removeEventListener('loadedmetadata', checkReal)
+      offMeta()
+      offPlaying()
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
       // путём, трек не должен утечь в следующую стадию (bidding).
-      try { a.pause() } catch { /* уже мёртв */ }
+      h.stop()
     }
   }, [preview, m.stage, m.key])
 
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
-    const bg = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
     // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
-    if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bg || document.hidden) return
-    const a = playShared(mediaUrl(bg))
-    a.loop = true; a.volume = .45
-    return () => { a.pause(); a.loop = false; a.volume = 1 }
-  }, [preview, m.stage])
+    if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bgMusic || document.hidden) return
+    const h = playShared(mediaUrl(bgMusic), { loop: true, volume: .45 })
+    return () => h.stop()
+  }, [preview, m.stage, bgMusic])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
     if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
-    const a = playShared(mediaUrl(track.audio))
-    audioRef.current = a
-    a.onended = () => void saveMelody({ ...m, deadline: inSec(s.passAnswerSec ?? 10) })
-    return () => { a.pause(); a.onended = null }
+    const h = playShared(mediaUrl(track.audio))
+    const off = h.on('ended', () => void updateMelody(gameState, guardMelody(
+      { key: m.key, stage: 'passed' }, cur => (cur.deadline ? null : { ...cur, deadline: inSec(s.passAnswerSec ?? 10) }),
+    )))
+    return () => { off(); h.stop() }
   }, [preview, m.stage])
+
+  // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
+  // spinning/listen — самый ранний момент, когда ключ трека уже известен, но
+  // звук ещё не запускается (spinning вообще без звука, listen — 1 секунда).
+  // audioSource.preloadAudio сам гарантирует «ровно один раз на трек».
+  useEffect(() => {
+    if (preview || (m.stage !== 'spinning' && m.stage !== 'listen') || !track?.audio) return
+    preloadAudio(mediaUrl(track.audio))
+  }, [preview, m.key, m.stage])
+
+  // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
+  useEffect(() => {
+    if (preview || !bgMusic) return
+    preloadAudio(mediaUrl(bgMusic))
+  }, [preview, bgMusic])
 
   // ── разбор: закрыть модалку самой, когда трек доиграл (15 сек) ──
   // Кнопка «К доске →» остаётся — ведущий может закрыть раньше (трек не
@@ -320,7 +358,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const t = window.setTimeout(() => {
       if (revealAdvancedRef.current === key) return
       revealAdvancedRef.current = key
-      void saveMelody(melodyToBoard(m))
+      void updateMelody(gameState, guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur)))
     }, REVEAL_TRACK_MS)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -341,26 +379,52 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   const freeKeys = melodyFree(themes, played)
   const idle = melodyIdle(m)
 
+  /** Аудио выбранного трека по ключу «тема-трек» — для предзагрузки ДО записи
+   *  стадии: ключ известен локально, сеть на него ждать не нужно. */
+  const preloadTrack = (key: string) => {
+    const [pti, pi] = key.split('-').map(Number)
+    const audio = themes[pti]?.tracks[pi]?.audio
+    if (audio) preloadAudio(mediaUrl(audio))
+  }
+
+  // Клик ведущего (Р2, HANDOFF §3bw): устаревшая кнопка не молчит. На
+  // проекторе нет отдельного статус-бара (в отличие от AdminPage/runAction),
+  // поэтому здесь — предупреждение в консоль; сама кнопка не виснет.
+  const click = (fn: () => Promise<void>) => { void fn().catch(err => console.warn(err instanceof Error ? err.message : err)) }
+
   /** Открыть выбранную плитку без рулетки. */
   const pickManually = (key: string) => {
     setManualPick(false)
-    void saveMelody(melodyPick(m, key, s.trackSec ?? 30))
+    preloadTrack(key)
+    click(() => melodyClick(gameState, cur => (
+      melodyIdle(cur) && !(cur.played ?? []).includes(key) ? melodyPick(cur, key, s.trackSec ?? 30) : null
+    )))
   }
 
   const startSpin = () => {
-    const target = freeKeys[Math.floor(Math.random() * freeKeys.length)]
-    void saveMelody(melodySpin(m, target, freeKeys.length, s.spinSec ?? 5, s.trackSec ?? 30))
+    const initialTarget = freeKeys[Math.floor(Math.random() * freeKeys.length)]
+    preloadTrack(initialTarget)
+    click(() => melodyClick(gameState, cur => {
+      if (!melodyIdle(cur)) return null
+      // пересчитать свободные плитки на момент реальной записи — если
+      // изначально выбранная уже занята (гонка с другим экраном), взять
+      // случайную из АКТУАЛЬНО свободных, не с устаревшего снимка.
+      const free = melodyFree(themes, cur.played ?? [])
+      const target = free.includes(initialTarget) ? initialTarget : free[Math.floor(Math.random() * free.length)]
+      if (!target) return null
+      return melodySpin(cur, target, free.length, s.spinSec ?? 5, s.trackSec ?? 30)
+    }))
   }
 
   const currentId = m.order?.[m.turn ?? 0]
   const currentTeam = teams.find(t => t.id === currentId)
-  const bidSec = Number(bids.find(b => b.team_id === currentId)?.answer_text) || 0
+  const bidSec = melodyBidSec(bids, m)
   const ans = answers.find(a => a.question_ref === ansRef && a.team_id === currentId)
 
   // не закрываем модалку: показываем результат, закрытие — кнопкой
   const grade = async (correct: boolean) => {
     if (!ans) return
-    await gradeMelody(m, ans, correct, bidSec)
+    await gradeMelody(gameState, ans, correct, bidSec)
   }
 
   return (
@@ -452,12 +516,23 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                 {(m.order ?? []).length === 0 && <div style={{ opacity: .6 }}>ставок нет</div>}
               </div>
               {!preview && <div className="mel-actions">
+                {/* 9.61: CAS + guardMelody защищает от отката «эффект
+                    пересборки order прилетел ПОСЛЕ клика» на ОБОИХ экранах
+                    (проектор и пульт) — отдельный ref-guard (F10, §3bv)
+                    больше не нужен, пересчёт секунд — по СВЕЖИМ bids/cur
+                    в момент записи (Р3). 9.62 (находка 4): melodyPlaySnippetIfFresh
+                    ДОПОЛНИТЕЛЬНО не пишет вовсе, если ЛОКАЛЬНЫЕ bids этого
+                    экрана ещё не знают лидера свежего cur.order — секунды
+                    иначе посчитались бы по чужой/устаревшей ставке. */}
                 <button disabled={!currentId}
-                  onClick={() => void saveMelody(melodyPlaySnippet(m, bidSec))}>
+                  onClick={() => click(() => melodyClick(gameState, guardMelody(
+                    { key: m.key, stage: 'bids' }, cur => melodyPlaySnippetIfFresh(cur, bids),
+                  )))}>
                   Играем {bidSec || 5} сек →
                 </button>
                 <button className="ghost dark"
-                  onClick={() => void saveMelody(melodyClose(m))}>Пропустить трек</button>
+                  onClick={() => click(() => melodyClick(gameState,
+                    guardMelody({ key: m.key, stage: 'bids' }, cur => melodyClose(cur))))}>Пропустить трек</button>
               </div>}
             </>)}
 
@@ -467,7 +542,9 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               </div>
               {/* если звук не пошёл — ведущий переводит стадию руками */}
               {!preview && <div className="mel-actions">
-                <button onClick={() => void saveMelody(melodyAcceptAnswer(m, s.answerSec ?? 30))}>
+                <button onClick={() => click(() => melodyClick(gameState, guardMelody(
+                  { key: m.key, stage: 'snippet' }, cur => melodyAcceptAnswer(cur, s.answerSec ?? 30),
+                )))}>
                   Принимаем ответ →</button>
               </div>}
             </>)}
@@ -487,7 +564,8 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                 {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
               </div>
               {!preview && <div className="mel-actions">
-                <button onClick={() => void saveMelody(melodyToBoard(m))}>К доске →</button>
+                <button onClick={() => click(() => melodyClick(gameState,
+                  guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur))))}>К доске →</button>
               </div>}
             </>)}
             {/* Аварийный выход. Доступен на любой стадии: интернет у команд
@@ -498,7 +576,14 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               <button className="mel-escape" onClick={async () => {
                 if (!confirm('Закрыть трек и вернуться к доске?\n\n'
                   + 'Баллы за него никто не получит.')) return
-                await saveMelody(melodyClose(m))
+                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
+                // трека, не конкретно та, что была на момент клика. confirm()
+                // может провисеть несколько секунд, за которые короткая
+                // цепочка автостадий (spinning→listen→bidding) переключится
+                // сама — проверка «та же стадия» после этого никогда бы не
+                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
+                const keyNow = m.key
+                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
               }}>Закрыть</button>
             )}
 
@@ -527,9 +612,14 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                     ? ' — передайте ход второй команде' : ' — трек закрывается'}
                 </div>
               )}
+              {/* 9.62 (находка 6): grade/passMelody теперь тоже могут бросить
+                  «кнопка устарела» (Р2, updateMelodyBag) — обёрнуты через
+                  click(), как остальные кнопки на этом экране, а не голым
+                  void, иначе двойной тап/гонка с пультом дают необработанное
+                  отклонение промиса в консоли браузера. */}
               {!preview && <div className="mel-actions">
-                <button disabled={!ans} onClick={() => void grade(true)}>✓ Верно</button>
-                <button className="ghost" onClick={() => void passMelody(m, ans)}>
+                <button disabled={!ans} onClick={() => click(() => grade(true))}>✓ Верно</button>
+                <button className="ghost" onClick={() => click(() => passMelody(gameState, ans))}>
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
                 </button>
               </div>}
