@@ -172,7 +172,9 @@ export async function importLocalGame(data: LocalExport): Promise<void> {
 
   // id — идентичность строки game_sessions в облаке (роль/номер комнаты),
   // не переносим его с локального сервера; updated_at обновит сам транспорт.
-  const { id: _id, updated_at: _updatedAt, ...sessionPatch } = data.session
-  void _id; void _updatedAt
+  // state_rev (9.60, миграция 0014) — версия ОБЛАЧНОЙ строки, управляется
+  // триггером БД; чужая версия с локального сервера сюда не переносится.
+  const { id: _id, updated_at: _updatedAt, state_rev: _stateRev, ...sessionPatch } = data.session
+  void _id; void _updatedAt; void _stateRev
   await room.patchSession(getRoomId(), { ...sessionPatch, game_id: gameId })
 }

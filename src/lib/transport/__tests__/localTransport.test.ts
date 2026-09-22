@@ -14,12 +14,13 @@ type Row = Record<string, unknown>
  *  since) — достаточно для проверки клиента, не дублируя весь server.mjs. */
 function makeFakeServer() {
   let rev = 0
-  let session: Row = { id: 1, phase: 'lobby', melody: {} }
+  let session: Row = { id: 1, phase: 'lobby', melody: {}, state_rev: 0 }
   let teams: Row[] = []
   let answers: Row[] = []
   let idCounter = 1
 
   function bump() { rev++ }
+  function stripForDiff(s: Row) { const { updated_at, state_rev, ...rest } = s; return JSON.stringify(rest) }
 
   async function handle(url: string, init?: RequestInit): Promise<Response> {
     const u = new URL(url, 'http://local')
@@ -32,12 +33,20 @@ function makeFakeServer() {
       return new Response(JSON.stringify(session), { status: 200, headers: { 'X-Rev': String(rev) } })
     }
     if (u.pathname === '/api/session' && method === 'PATCH') {
-      for (const [k, v] of Object.entries(body ?? {})) {
-        if (k === 'melody') session.melody = { ...(session.melody as Row ?? {}), ...(v as Row) }
-        else session[k] = v
+      const ifStateRevRaw = u.searchParams.get('ifStateRev')
+      const ifStateRev = ifStateRevRaw == null ? null : Number(ifStateRevRaw)
+      if (ifStateRev != null && ifStateRev !== session.state_rev) {
+        return new Response(JSON.stringify({ error: 'conflict', session }), { status: 412 })
       }
+      const before = stripForDiff(session)
+      for (const [k, v] of Object.entries(body ?? {})) {
+        if (k === 'state_rev') continue
+        session[k] = v      // полная замена — тот же контракт, что у облака (9.60)
+      }
+      session.updated_at = new Date().toISOString()
+      if (stripForDiff(session) !== before) session.state_rev = (Number(session.state_rev) || 0) + 1
       bump()
-      return new Response(JSON.stringify({ ok: true }), { status: 200 })
+      return new Response(JSON.stringify({ ok: true, state_rev: session.state_rev }), { status: 200 })
     }
     if (u.pathname === '/api/teams' && method === 'GET') {
       return new Response(JSON.stringify(teams), { status: 200 })
@@ -78,7 +87,7 @@ function makeFakeServer() {
 
   return {
     handle,
-    reset() { rev = 0; session = { id: 1, phase: 'lobby', melody: {} }; teams = []; answers = [] },
+    reset() { rev = 0; session = { id: 1, phase: 'lobby', melody: {}, state_rev: 0 }; teams = []; answers = [] },
   }
 }
 
@@ -123,13 +132,25 @@ describe('localTransport: контракт', () => {
     expect(await localTransport.listTeams('g1')).toHaveLength(1)
   })
 
-  it('PATCH session с melody мержит по ключам верхнего уровня', async () => {
+  it('PATCH session: melody заменяется ЦЕЛИКОМ (Р1, 9.60) — второй патч стирает первый', async () => {
     await localTransport.patchSession('room1', { melody: { stage: 'idle', turn: 0 } })
     await localTransport.patchSession('room1', { melody: { jp: { tile: 3 } } })
     const session = await localTransport.readSession('room1')
-    expect((session as unknown as { melody: Record<string, unknown> }).melody).toEqual({
-      stage: 'idle', turn: 0, jp: { tile: 3 },
-    })
+    expect((session as unknown as { melody: Record<string, unknown> }).melody).toEqual({ jp: { tile: 3 } })
+  })
+})
+
+describe('localTransport: casSession (9.60)', () => {
+  it('успешная запись растит state_rev', async () => {
+    const r = await localTransport.casSession('room1', 0, { phase: 'question' })
+    expect(r).toEqual({ ok: true, stateRev: 1 })
+  })
+
+  it('несовпадение версии — {ok:false} с текущей сессией из тела 412', async () => {
+    await localTransport.casSession('room1', 0, { phase: 'question' })
+    const r = await localTransport.casSession('room1', 0, { phase: 'show_answers' })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect((r.current as unknown as { phase: string })?.phase).toBe('question')
   })
 })
 

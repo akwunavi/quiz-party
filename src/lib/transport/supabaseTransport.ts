@@ -23,7 +23,8 @@ import { withNetResilience } from './net'
 import type { Answer, GameState, Team } from '../../types/quiz'
 import type { BlitzState } from '../blitzState'
 import type {
-  AnswerPatch, AnswerUpsert, DeleteAnswersBy, RoomTransport, SessionPatch, TeamPatch, TeamUpsert,
+  AnswerPatch, AnswerUpsert, CasResult, DeleteAnswersBy, RoomTransport, SessionPatch, TeamPatch,
+  TeamUpsert,
 } from './types'
 
 export const supabaseTransport: RoomTransport = {
@@ -47,6 +48,36 @@ export const supabaseTransport: RoomTransport = {
       const { error } = await supabase.from('game_sessions')
         .update(patch as never).eq('id', roomId).abortSignal(signal)
       if (error) throw error
+    })
+  },
+
+  // 9.60 (миграция 0014, HANDOFF §3bw): защищённая запись через триггер
+  // state_rev. Ретрай внутри withNetResilience безопасен здесь: если
+  // первый запрос физически прошёл на сервере, а ответ потерялся в
+  // пути, повторный запрос увидит конфликт версии (0 строк, current уже
+  // на новой версии) — вызывающий (updateMelodyBag) корректно поймёт это
+  // как «уже применено» и не продублирует запись.
+  async casSession(roomId, expectedRev, patch: SessionPatch): Promise<CasResult> {
+    return await withNetResilience(async signal => {
+      const { data, error } = await supabase.from('game_sessions')
+        .update(patch as never).eq('id', roomId).eq('state_rev', expectedRev)
+        .abortSignal(signal).select('state_rev')
+      if (error) throw error
+      const rows = (data as { state_rev: number }[] | null) ?? []
+      if (rows.length > 0) return { ok: true, stateRev: rows[0].state_rev }
+
+      // 0 строк: либо версия реально другая (обычный конфликт CAS), либо
+      // RLS молча не пустил запись под условием доступа (Supabase на это
+      // не отвечает ошибкой — просто не находит строк). Отличаем по тому,
+      // совпадает ли версия у СВЕЖЕ прочитанной строки с той, что мы ждали.
+      const { data: cur, error: readErr } = await supabase.from('game_sessions')
+        .select('*').eq('id', roomId).abortSignal(signal).maybeSingle()
+      if (readErr) throw readErr
+      const current = (cur as GameState) ?? null
+      if (current?.state_rev === expectedRev) {
+        throw new Error('запись состояния не прошла: у этого входа нет прав на комнату — войдите заново')
+      }
+      return { ok: false, current }
     })
   },
 

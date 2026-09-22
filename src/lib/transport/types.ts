@@ -7,9 +7,8 @@
 // вызывающий код. Сегодня это НЕ меняет поведение приложения — сюда просто
 // перенесён сегодняшний код без изменений (см. supabaseTransport.ts).
 //
-// Список операций (13, а не 8 — архитектор специально пересчитал, чтобы
-// адаптер не оказался дырявым):
-//   readSession, patchSession — game_sessions одной комнаты
+// Список операций (14, а не 13 — 9.60 добавила casSession, миграция 0014):
+//   readSession, patchSession, casSession — game_sessions одной комнаты
 //   listTeams, upsertTeam, patchTeam, deleteTeam — teams
 //   listAnswers, upsertAnswers, patchAnswer, deleteAnswers — answers
 //   readBlitz, writeBlitz — blitz_state
@@ -36,6 +35,15 @@ import type { BlitzState } from '../blitzState'
  *  Патч транспорта такой же «дырявый» намеренно, чтобы не плодить каскад
  *  правок типов в этом страховочном шаге. */
 export type SessionPatch = Partial<GameState> & Record<string, unknown>
+
+/** Результат защищённой (compare-and-swap) записи состояния сессии —
+ *  9.60, миграция 0014 (HANDOFF §3bw). `ok:true` — запись прошла, вернулась
+ *  новая версия. `ok:false` — версия на сервере уже другая (кто-то
+ *  записал раньше нас); `current` — свежее состояние, если удалось его
+ *  прочитать, чтобы вызывающий мог пересчитать и попробовать снова. */
+export type CasResult =
+  | { ok: true; stateRev: number }
+  | { ok: false; current: GameState | null }
 
 export type TeamUpsert = {
   name: string
@@ -70,6 +78,13 @@ export type DeleteAnswersBy =
 export interface RoomTransport {
   readSession(roomId: string | null): Promise<GameState | null>
   patchSession(roomId: string | null, patch: SessionPatch): Promise<void>
+  /** Защищённая запись: применяется, только если версия на сервере всё ещё
+   *  `expectedRev` (иначе кто-то уже записал новее — см. lib/sessionBag.ts).
+   *  `patch` НИКОГДА не должен содержать `state_rev` — версией управляет
+   *  триггер БД, клиент не имеет права её подделать. Поле `melody` в
+   *  `patch` заменяет мешок ЦЕЛИКОМ на ОБОИХ транспортах (облако и
+   *  локальный сервер — см. server.mjs, 9.60), не сливается по ключам. */
+  casSession(roomId: string | null, expectedRev: number, patch: SessionPatch): Promise<CasResult>
 
   listTeams(gameId: string): Promise<Team[]>
   upsertTeam(row: TeamUpsert): Promise<Team>
