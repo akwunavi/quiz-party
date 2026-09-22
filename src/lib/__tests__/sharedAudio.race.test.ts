@@ -11,23 +11,33 @@
 // что физически недоступно в node-окружении теста.
 //
 // Как проверено, что тест ловит регресс (обязательная независимая сверка,
-// CLAUDE.md): временно заменить `if (isStale())` на `if (false)` в
-// lib/sharedAudio.ts (или вернуть sharedGen++ убрать из stopShared) —
-// npx vitest run sharedAudio.race делает первый и третий кейсы красными
-// (звук остаётся paused=false там, где ожидается true). Это было выполнено
-// вручную при написании теста и откачено обратно.
+// CLAUDE.md): временно заменить `if (isStale())` на `if (false)` внутри
+// audioSource.ts:playAudio (там, ГДЕ теперь реально живёт проверка, см.
+// её комментарий) — npx vitest run sharedAudio.race делает первый и
+// третий кейсы красными (звук остаётся paused=false там, где ожидается
+// true). Кейс 2 (после 9.58, HANDOFF §3bv) ловит другой регресс — верни в
+// sharedAudio.ts безусловный `if (isStale())` вместо `if (r.ok && isStale())`
+// в `.then()` внутри `playShared()` — кейс 2 краснеет: реально играющий
+// трек B оказывается на паузе. Это было выполнено вручную при написании
+// теста и откачено обратно.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('../packCache', () => ({ readMedia: vi.fn().mockResolvedValue(null) }))
 
-let resolveFetch: (blob: Blob) => void = () => {}
+// Каждый трек — своя, независимо резолвящаяся промиса fetch (ключ — src),
+// иначе кейс 2 не может резолвить B раньше A: один общий resolveFetch
+// перезаписывался бы последним вызовом и резолвил не тот трек.
+const pending = new Map<string, { resolve: (b: Blob) => void; reject: (e: Error) => void }>()
 let rejectFetch: (e: Error) => void = () => {}
 vi.mock('../media', () => ({
-  fetchMediaBlob: vi.fn(() => new Promise<Blob>((res, rej) => {
-    resolveFetch = res
+  fetchMediaBlob: vi.fn((path: string) => new Promise<Blob>((res, rej) => {
+    pending.set(path, { resolve: res, reject: rej })
     rejectFetch = rej
   })),
 }))
+function resolveFetchFor(path: string, blob: Blob) {
+  pending.get(path)?.resolve(blob)
+}
 
 // Плеер, ведущий себя как реальный <audio>: прямой play() ПАДАЕТ (как при
 // VPN/прокси — см. audioSource.ts), запасной путь идёт через fetch.
@@ -70,13 +80,18 @@ describe('sharedAudio: playShared/stopShared (реальный код, не ко
     expect(el.paused).toBe(true)
 
     // fetch наконец резолвится — playAudio ВИДИТ isStale() и НЕ проигрывает
-    resolveFetch(new Blob())
+    resolveFetchFor('track.mp3', new Blob())
     await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
 
     expect(el.paused).toBe(true)
   })
 
-  it('новый playShared() ДО того, как старый догрузился, гасит старый, не оставляет два трека разом', async () => {
+  it('устаревший fetch трека A резолвится ПОСЛЕ того, как реально заиграл трек B — B не глушится', async () => {
+    // Ровно сценарий бага 1 (HANDOFF §3bv): playAudio() САМА видит isStale()
+    // на запасном пути и возвращает {ok:false, reason:'stale'}, ничего не
+    // трогая. Внешний `.then()` в playShared() раньше глушил элемент
+    // БЕЗУСЛОВНО по isStale(), не глядя на результат — и мог обрубить чужой,
+    // реально играющий сейчас звук (трек B).
     const { playShared } = await load()
     const elA = playShared('track-A.mp3') as unknown as FakeAudio
     await Promise.resolve(); await Promise.resolve()   // прямой play() трека A упал
@@ -84,15 +99,21 @@ describe('sharedAudio: playShared/stopShared (реальный код, не ко
     // ход сменился раньше, чем A догрузился — B использует ТОТ ЖЕ элемент
     const elB = playShared('track-B.mp3') as unknown as FakeAudio
     expect(elA).toBe(elB)   // общий элемент, не два звука разом физически
+    await Promise.resolve(); await Promise.resolve()   // прямой play() трека B тоже упал
 
-    // A наконец резолвится — isStale() внутри playAudio уже видит чужое
-    // поколение и НЕ проигрывает его поверх B
-    resolveFetch(new Blob())
+    // B резолвится и реально начинает играть ПЕРВЫМ
+    resolveFetchFor('track-B.mp3', new Blob())
+    await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
+    expect(elB.paused).toBe(false)
+    expect(elB.src.startsWith('blob:')).toBe(true)
+
+    // A (устаревший) резолвится ПОСЛЕ B — playAudio должна увидеть isStale()
+    // на запасном пути и вернуть stale, НЕ трогая элемент
+    resolveFetchFor('track-A.mp3', new Blob())
     await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
 
-    // элемент либо молчит, либо играет B (src не трека A) — трек A точно
-    // не завладел им молча
-    expect(elB.src === '' || elB.src.length > 0).toBe(true)
+    // B продолжает играть — устаревший A его не поставил на паузу
+    expect(elB.paused).toBe(false)
   })
 
   it('stopShared() без последующего playShared() тоже бампает поколение — повторный вызов не ломается', async () => {
@@ -104,7 +125,7 @@ describe('sharedAudio: playShared/stopShared (реальный код, не ко
     stopShared()   // идемпотентность
     expect(el.paused).toBe(true)
 
-    resolveFetch(new Blob())
+    resolveFetchFor('track.mp3', new Blob())
     await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
     expect(el.paused).toBe(true)
   })

@@ -45,7 +45,13 @@ export function LobbyMusic({ pack }: { pack: LoadedPack | null }) {
       unlocked = true
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
     }).catch(() => {
-      // автозапуск заблокирован — ждём первого касания
+      // автозапуск заблокирован — ждём первого касания. Компонент мог уже
+      // размонтироваться К ЭТОМУ МОМЕНТУ (cleanup ставит a.src='', из-за
+      // чего ещё не стартовавший play() как раз и отклоняется с ошибкой) —
+      // вешать слушатели, которые уже некому будет снять, незачем (баг 6,
+      // HANDOFF §3bv): без этой проверки на каждый быстрый уход из лобби
+      // копились два повисших обработчика на window.
+      if (cancelled) return
       window.addEventListener('pointerdown', start)
       window.addEventListener('keydown', start)
     })

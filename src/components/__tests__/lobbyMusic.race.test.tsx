@@ -6,6 +6,7 @@
 // `a.src = ''` в cleanup — см. src/components/LobbyMusic.tsx.
 import { describe, it } from 'vitest'
 
-describe('LobbyMusic: гонки, требующие render-стенда (не построен в этой сессии)', () => {
+describe('LobbyMusic: гонки, требующие render-стенда (не построен ни в этой, ни в прошлых сессиях)', () => {
   it.todo('F4: смена трека/размонтирование ДО резолва play() не оставляет старый трек играющим и не продолжает его грузить')
+  it.todo('после 9.58: размонтирование ДО того, как отклонённый play() дошёл до .catch(), не оставляет висящих pointerdown/keydown на window (баг 6, HANDOFF §3bv)')
 })

@@ -56,6 +56,31 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
 
 const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
 
+// ═══ «Соседний баг» F1/F10 (HANDOFF §3bv, ревью 9.57) ═══
+// Несколько мест ниже пишут `{...m, stage: '…'}`, где `m` — снимок на момент
+// ЗАПУСКА эффекта (`onPlaying`/guard-таймер/пересборка order из устаревших
+// ставок). Если ведущий жмёт кнопку НА ПУЛЬТЕ (закрыть трек, «Играем N сек»,
+// принять ответ) в тот момент, когда сетевая запись отсюда уже готовится или
+// летит, а этот экран ещё не подхватил новую стадию своим опросом, спред
+// {...m} затирает СВЕЖЕЕ состояние устаревшим целиком (jsonb-поле `melody`
+// заменяется полностью, не полями — CLAUDE.md). Читаем сессию ЗАНОВО прямо
+// перед записью и пишем ТОЛЬКО если стадия/трек всё ещё те, что мы ждали —
+// если нет, кто-то (пульт или другой экран) уже увёл ход дальше, наша запись
+// не нужна и вредна. Сеть легла на самой проверке — не зависаем, пишем как
+// знали (лучше устаревший, но не пустой ход).
+async function freshMelodyOrAbort(
+  expectedKey: string | undefined, expectedStage: MelodyState['stage'], fallback: MelodyState,
+): Promise<{ ok: true; base: MelodyState } | { ok: false }> {
+  try {
+    const fresh = await room.readSession(getRoomId())
+    const fm = fresh?.melody
+    if (!fm || fm.key !== expectedKey || fm.stage !== expectedStage) return { ok: false }
+    return { ok: true, base: fm }
+  } catch {
+    return { ok: true, base: fallback }
+  }
+}
+
 /** Длина трека на показе ответа — одно число на RevealTrack и на автопереход
  *  дальше, к доске. Раньше было продублировано как магическая константа
  *  15_000 в двух местах — не расходится, потому что теперь оно одно. */
@@ -125,10 +150,13 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   // Эффект ниже пересобирает order из ещё летящих по сети ставок, пока трек
   // не запущен — но если ЕГО запись (стадия 'bids' в устаревшем замыкании)
   // долетит ПОСЛЕ записи клика (стадия уже 'snippet'), она откатит стадию
-  // назад. Ref-guard: клик на ПРОЕКТОРЕ блокирует эффект немедленно, не
-  // дожидаясь следующего цикла поллинга gameState. Эквивалент на пульте
-  // ведущего (админка) этим не покрыт — свой независимый экран, свой клик;
-  // см. it.todo в src/pages/rounds/__tests__/melody.race.test.tsx.
+  // назад. Ref-guard блокирует НОВЫЕ запуски эффекта немедленно после клика,
+  // не дожидаясь следующего цикла поллинга gameState; уже готовящуюся запись
+  // страхует отдельно freshMelodyOrAbort прямо перед отправкой (§3bv, ревью
+  // 9.57 — ref-guard один не ловил запись, которая уже стартовала ДО клика).
+  // Эквивалент на пульте ведущего (админка) этим ref-guard'ом не покрыт —
+  // свой независимый экран, свой клик, оставлено намеренно; см. it.todo в
+  // src/pages/rounds/__tests__/melody.race.test.tsx.
   const bidsAdvancingRef = useRef(false)
   useEffect(() => { bidsAdvancingRef.current = false }, [m.key])
 
@@ -142,7 +170,17 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       .map(b => b.id)
     const order = [...bidders, ...teams.map(t => t.id).filter(id => !bidders.includes(id))]
     if (JSON.stringify(order) !== JSON.stringify(m.order)) {
-      void saveMelody({ ...m, order, turn: 0 })
+      void (async () => {
+        // Между стартом этого эффекта и завершением сетевой записи клик
+        // «Играем N сек» мог уже уйти вперёд — bidsAdvancingRef ловит НОВЫЕ
+        // запуски эффекта, но не эту, уже готовящуюся запись. Перечитываем
+        // сессию перед самой отправкой: если стадия уже не 'bids' (или трек
+        // сменился), не отправляем устаревшую пересборку поверх чужого хода.
+        if (bidsAdvancingRef.current) return
+        const r = await freshMelodyOrAbort(m.key, 'bids', m)
+        if (!r.ok || bidsAdvancingRef.current) return
+        await saveMelody({ ...r.base, order, turn: 0 })
+      })()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, m.stage, bids.map(b => `${b.team_id}:${b.answer_text}`).join('|')])
@@ -173,11 +211,23 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       if (advanced) return
       advanced = true
       stopShared()
-      void saveMelody({ ...m, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+      void (async () => {
+        const r = await freshMelodyOrAbort(m.key, 'snippet', m)
+        if (!r.ok) return
+        await saveMelody({ ...r.base, stage: 'answering', deadline: inSec(s.answerSec ?? 30) })
+      })()
     }
     const onPlaying = () => {
-      // с этого момента и тикает счётчик на экране
-      void saveMelody({ ...m, deadline: inSec(sec) })
+      // с этого момента и тикает счётчик на экране. Тот же соседний баг:
+      // если ведущий уже нажал «Принимаем ответ →» на этом же экране (или
+      // «Закрыть трек»), а playing-событие только сейчас долетело — не
+      // затираем стадию 'answering'/'done' обратно в 'snippet' устаревшим
+      // спредом {...m}.
+      void (async () => {
+        const r = await freshMelodyOrAbort(m.key, 'snippet', m)
+        if (!r.ok) return
+        await saveMelody({ ...r.base, deadline: inSec(sec) })
+      })()
       stop = window.setTimeout(advance, sec * 1000)
     }
     a.addEventListener('playing', onPlaying, { once: true })
@@ -257,11 +307,15 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       if (advanced) return
       advanced = true
       stopShared()
-      void saveMelody({
-        ...m,
-        ...(correctedStart != null ? { startSec: correctedStart } : {}),
-        stage: 'bidding', deadline: inSec(s.bidSec ?? 10),
-      })
+      void (async () => {
+        const r = await freshMelodyOrAbort(m.key, 'listen', m)
+        if (!r.ok) return
+        await saveMelody({
+          ...r.base,
+          ...(correctedStart != null ? { startSec: correctedStart } : {}),
+          stage: 'bidding', deadline: inSec(s.bidSec ?? 10),
+        })
+      })()
     }
     // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
     // точка старта уже выбрана в melodySpin/melodyPick по НОМИНАЛЬНОЙ длине,
@@ -473,9 +527,14 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                   onClick={() => {
                     // F10: блокируем эффект пересборки order ДО записи —
                     // иначе устаревшая ставка, долетевшая следующим поллом,
-                    // может откатить стадию обратно в 'bids'.
+                    // может откатить стадию обратно в 'bids'. Если сама запись
+                    // клика упадёт по сети, флаг снимаем: иначе он держался бы
+                    // до смены m.key и молча отключал легитимную пересборку
+                    // опоздавших ставок для ЭТОГО ЖЕ трека насовсем (§3bv).
                     bidsAdvancingRef.current = true
-                    void saveMelody(melodyPlaySnippet(m, bidSec))
+                    void saveMelody(melodyPlaySnippet(m, bidSec)).catch(() => {
+                      bidsAdvancingRef.current = false
+                    })
                   }}>
                   Играем {bidSec || 5} сек →
                 </button>
