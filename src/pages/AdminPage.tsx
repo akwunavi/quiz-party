@@ -134,10 +134,18 @@ export function AdminPage() {
 
       {!gameState.pack_id && <PackPicker />}
 
+      {/* «Команды» и «Служебное» раньше жили только внутри RoundView — на
+          лобби (до старта первого раунда) их не было видно вообще, и
+          единственный путь их увидеть — сначала уйти вперёд («К первому
+          раунду →»), а назад в лобби вернуться можно было только через
+          «Служебное → Смена пакета/Новая игра», то есть через тот же
+          недоступный из лобби ящик. Тупик, живой баг с 22.09.2026. */}
       {gameState.pack_id && phase === 'lobby' && pack && (
         <div className="adm-pad">
           <TeamRandomizer />
           <RoundPicker pack={pack} current={gameState.round_number} />
+          <ResultsPanel pack={pack} gameState={gameState} teams={teams} />
+          {round && <ServiceDrawer pack={pack} round={round} gameState={gameState} offline={offline} />}
         </div>
       )}
 
