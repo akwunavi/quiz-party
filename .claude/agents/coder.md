@@ -1,7 +1,7 @@
 ---
 name: coder
 description: Implements a concrete plan or well-scoped task in the quiz-party codebase — writes and edits code, runs the project's check suite, bumps the version, updates HANDOFF.md. Use after the architect agent has produced a plan, or directly for a task small enough not to need one.
-model: sonnet
+model: claude-opus-5-5
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 

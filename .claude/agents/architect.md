@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Use for substantial or cross-cutting quiz-party work — a new round mechanic, RLS/security changes, bundle or migration decisions, anything touching more than one screen (projector/admin/player/editor). Produces a step-by-step implementation plan for the coder agent; writes no code. Do NOT use for a single-file CSS fix or an isolated one-line bug — that's slower and more expensive than just fixing it directly.
-model: opus
+model: claude-fable-5-1
 tools: Read, Grep, Glob, Bash
 ---
 
