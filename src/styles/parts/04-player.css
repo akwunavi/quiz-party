@@ -171,3 +171,40 @@
   border: 1px dashed rgba(255,255,255,.25); }
 .pl-bz-skip:disabled { opacity: .5; }
 .pl-bz-send:disabled { opacity: .45; }
+
+/* ═══ «Скрэмбл» у игрока (PlayerPage.tsx:AnagramPlayer) ═══
+   Кнопки плиток/клеток — селекторы в 2 класса: общий `button` (01) задаёт
+   padding 12px 28px и 17px, `.theme-potter button` (16) — вес 0,1,1;
+   ниже вес 0,2,0 их перебивает. position у кнопок не трогаем (ГП ставит
+   relative всем кнопкам — нам и не нужно иное). Ховеры — только под
+   (hover:hover) and (pointer:fine), иначе залипают после тапа (§3t). */
+.pl-an-clue { font-size: 14px; line-height: 1.4; color: var(--muted); text-align: center; }
+.pl-an-state { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em;
+  color: var(--accent); text-align: center; text-transform: uppercase; }
+.pl-an-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.pl-an-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 16px; }
+.pl-an-word { display: flex; gap: 4px; }
+.pl-an-tiles .pl-an-tile, .pl-an-word .pl-an-cell {
+  width: clamp(30px, 8.5vw, 44px); height: calc(clamp(30px, 8.5vw, 44px) * 1.25);
+  padding: 0; clip-path: none; border-radius: 7px; box-sizing: border-box;
+  font-family: var(--font-display); font-size: clamp(17px, 5vw, 24px); line-height: 1;
+  text-transform: uppercase; letter-spacing: 0;
+}
+.pl-an-tiles .pl-an-tile { background: var(--bg2); color: var(--fg); border: 1px solid var(--accent); }
+/* переход только по рамке: общий `button { transition: all }` тянул бы и
+   visibility — «уехавшая» плитка оставалась видимой ещё долю секунды
+   (поймано скриншотом, замер в классике: visible/opacity .93) */
+.pl-an-tiles .pl-an-tile, .pl-an-word .pl-an-cell { transition: border-color .15s; }
+.pl-an-tiles .pl-an-tile.used { visibility: hidden; }
+.pl-an-word .pl-an-cell { background: rgba(255,255,255,.04); color: var(--fg); border: 1px solid var(--dim); }
+.pl-an-word .pl-an-cell.filled { border-color: var(--accent); color: var(--fg); }
+.pl-an-word .pl-an-cell.hint { border-color: var(--accent2); color: var(--accent2); }
+.pl-an-word .pl-an-cell.fixed { display: inline-flex; align-items: center; justify-content: center;
+  width: auto; min-width: 12px; border: none; background: none; }
+.pl-an-result { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.pl-an-verdict { font-family: var(--font-display); font-size: 20px; letter-spacing: .06em; }
+.pl-an-verdict.ok { color: var(--ok); }
+.pl-an-verdict.err { color: var(--danger); }
+@media (hover: hover) and (pointer: fine) {
+  .pl-an-tiles .pl-an-tile:hover { border-color: var(--accent2); }
+}
