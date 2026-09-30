@@ -33,6 +33,8 @@ export function displayAnswer(q: Question): string {
   if (typeof d === 'string' && d) return d
   if (typeof a.correct === 'string' && a.correct) return String(a.correct).split('/')[0].trim()
   if (typeof a.word === 'string' && a.word) return a.word.toUpperCase()
+  // «Скрэмбл» — на случай, если экран разбора откроют старой кнопкой
+  if (typeof a.phrase === 'string' && a.phrase) return a.phrase.toUpperCase()
   if (typeof a.correct_choice === 'string' && a.correct_choice) return a.correct_choice
   if (typeof a.correct_order === 'string' && a.correct_order) return a.correct_order
   if (Array.isArray(a.correct_pairs) && a.correct_pairs.length)

@@ -52,6 +52,7 @@ import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
+import { AnagramBoard } from './rounds/AnagramRound'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { choicesLenClass } from '../lib/questionLayout'
@@ -433,6 +434,39 @@ function HostInner({ gameState, pack }: {
   // ── Своя игра: сетка плиток ──
   if (gameState.phase === 'question' && round.mechanic === 'jeopardy') {
     return <JeopardyBoard pack={pack} round={round} gameState={gameState} />
+  }
+
+  // ── «Скрэмбл»: доска плиток ──
+  // Обычный раунд со своей доской (HANDOFF §3ca): показ ответа ВСЕГДА после
+  // каждого вопроса — AutoReveal по концу таймера включён безусловно, «Время
+  // ответов →» здесь нет. Звук/автопролистывание/кнопки — те же, что у
+  // обычного вопроса, приходят слотами (из HostScreen.tsx ничего не
+  // экспортируется — чанки, HANDOFF §1a). key по вопросу — перелёты плиток
+  // не должны переживать смену вопроса.
+  if (gameState.phase === 'question' && round.mechanic === 'anagram' && q) {
+    const isLast = gameState.question_index + 1 >= round.questions.length
+    return (
+      <AnagramBoard key={q.id} pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
+        gameState={gameState}
+        timerSlot={<Timer key={q.id} startedAt={gameState.timer_started_at}
+          seconds={round.timer_seconds} theme={pack.theme} />}
+        effectsSlot={<>
+          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
+          <AutoAdvance round={round} gameState={gameState} isLast={isLast} />
+          <AutoReveal enabled={!gameState.reveal}
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+        </>}
+        actionsSlot={
+          <div className="host-actions">
+            <BackBtn gameState={gameState} />
+            {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+            {!isLast
+              ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
+              : <AfterRoundNav pack={pack} gameState={gameState} />}
+          </div>
+        } />
+    )
   }
 
   // ── Вопрос ──

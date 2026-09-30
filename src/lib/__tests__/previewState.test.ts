@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { previewGameState, previewStages, previewTeams } from '../previewState'
+import { previewAnswers, previewGameState, previewStages, previewTeams } from '../previewState'
+import { anagramHintsOpen, anagramWinner, anagramElapsedMs } from '../anagram'
 import type { LoadedPack, LoadedRound } from '../packLoader'
 import type { MechanicKey } from '../../types/quiz'
 
 const ALL_MECHANICS: MechanicKey[] = [
   'standard', 'test_stop', 'rebus', 'jeopardy', 'stakes_unique', 'stakes_free',
-  'thematic_x2', 'crossword', 'sprint', 'melody', 'race', 'blitz', 'four_pics',
+  'thematic_x2', 'crossword', 'sprint', 'melody', 'race', 'blitz', 'four_pics', 'anagram',
 ]
 
 function fakeRound(mechanic: MechanicKey, over: Partial<LoadedRound> = {}): LoadedRound {
@@ -40,7 +41,7 @@ describe('previewStages', () => {
   })
 
   it('MechanicKey из типов не разъехался со списком в тесте (сверка на будущее)', () => {
-    expect(ALL_MECHANICS.length).toBe(13)
+    expect(ALL_MECHANICS.length).toBe(14)
   })
 })
 
@@ -75,5 +76,34 @@ describe('previewGameState: jeopardy', () => {
 describe('previewTeams', () => {
   it('ровно 4 команды по умолчанию (Р2 — без переключателя числа команд)', () => {
     expect(previewTeams()).toHaveLength(4)
+  })
+})
+
+describe('предпросмотр «Скрэмбла»', () => {
+  const q = { id: 'q1', answer: { mode: 'anagram', phrase: 'ПРИВЕТ', order: [1, 0, 3, 2, 5, 4] } }
+  const round = fakeRound('anagram', { timer_seconds: 30, settings: { hintIntervalSec: 10 } as never,
+    questions: [q] as never })
+  const pack = fakePack([round])
+
+  it('стадии: вопрос / подсказки / ответ; на «подсказках» открыты ровно 2 буквы', () => {
+    expect(previewStages('anagram').map(x => x.key)).toEqual(['question', 'hints', 'answer'])
+    expect(previewGameState(pack, round, 0, 0, 'question').timer_started_at).toBeNull()
+    const gs = previewGameState(pack, round, 0, 0, 'hints')
+    expect(gs.game_id).toBe('')
+    expect(gs.reveal).toBe(false)
+    expect(anagramHintsOpen({ nowMs: Date.now(), startedAtIso: gs.timer_started_at,
+      intervalSec: 10, timerSec: 30, maxHints: 4 })).toBe(2)
+  })
+
+  it('на «ответе» — reveal, таймер истёк, победитель гонки — первая команда за 00:07.482', () => {
+    const gs = previewGameState(pack, round, 0, 0, 'answer')
+    expect(gs.reveal).toBe(true)
+    expect(Date.now() - Date.parse(gs.timer_started_at!)).toBeGreaterThan(30_000)
+    const teams = previewTeams()
+    const answers = previewAnswers(round, 0, 'answer', teams)
+    expect(anagramWinner(answers, 'ПРИВЕТ')).toBe(teams[0].id)
+    const w = answers.find(a => a.team_id === teams[0].id)!
+    expect(Math.round(anagramElapsedMs(w, gs.timer_started_at))).toBeGreaterThanOrEqual(7470)
+    expect(Math.round(anagramElapsedMs(w, gs.timer_started_at))).toBeLessThanOrEqual(7500)
   })
 })
