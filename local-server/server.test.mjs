@@ -107,6 +107,40 @@ describe('локальный сервер: игровые данные (armed)',
     expect(list.body[0].game_id).toBe('g2')
   })
 
+  // 9.67 (миграция 0015, HANDOFF §3ca): accepted_at — зеркало триггера
+  // облака. Двигается только сменой текста, клиентское значение игнорируется.
+  it('accepted_at: повторный upsert того же текста не двигает, другой текст — двигает, клиентское значение игнорируется', async () => {
+    const post = (text, extra = {}) => api('answers', {
+      method: 'POST',
+      body: JSON.stringify([{ team_id: 't1', game_id: 'g1', question_ref: 'q-1', round_number: 0, answer_text: text, updated_at: 'x', ...extra }]),
+    })
+    await post('кот', { accepted_at: '2000-01-01T00:00:00.000Z' })
+    const a1 = (await api('answers')).body[0].accepted_at
+    expect(a1).not.toBe('2000-01-01T00:00:00.000Z')
+    expect(Date.parse(a1)).toBeGreaterThan(Date.parse('2020-01-01'))
+    await new Promise(r => setTimeout(r, 5))
+    await post('кот', { accepted_at: '2000-01-01T00:00:00.000Z' })
+    expect((await api('answers')).body[0].accepted_at).toBe(a1)
+    await new Promise(r => setTimeout(r, 5))
+    await post('ток')
+    const a3 = (await api('answers')).body[0].accepted_at
+    expect(Date.parse(a3)).toBeGreaterThan(Date.parse(a1))
+  })
+
+  it('accepted_at: PATCH is_correct не трогает и не принимает его из тела', async () => {
+    await api('answers', {
+      method: 'POST',
+      body: JSON.stringify([{ team_id: 't1', game_id: 'g1', question_ref: 'q-1', round_number: 0, answer_text: 'кот', updated_at: 'x' }]),
+    })
+    const row = (await api('answers')).body[0]
+    await new Promise(r => setTimeout(r, 5))
+    const patched = await api(`answers/${row.id}`, {
+      method: 'PATCH', body: JSON.stringify({ is_correct: true, accepted_at: '2000-01-01T00:00:00.000Z' }),
+    })
+    expect(patched.body.is_correct).toBe(true)
+    expect(patched.body.accepted_at).toBe(row.accepted_at)
+  })
+
   // 9.60 (миграция 0014, HANDOFF §3bw): melody заменяется ЦЕЛИКОМ, как в
   // облаке (Р1) — раньше здесь был merge по ключам верхнего уровня, и
   // этот тест был другим (проверял, что второй патч ДОПОЛНЯЕТ первый).

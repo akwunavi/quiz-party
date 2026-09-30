@@ -83,6 +83,11 @@ export function createStore(dataDir) {
     if (typeof state.session?.state_rev !== 'number') {
       state.session.state_rev = 0
     }
+    // старый state.json (до 9.67/миграции 0015) не знает про accepted_at —
+    // зеркало бэкфилла миграции: момент последней отправки = updated_at.
+    for (const a of state.answers ?? []) {
+      if (a.accepted_at == null) a.accepted_at = a.updated_at ?? a.created_at ?? null
+    }
   } catch {
     state = defaultState()
   }
@@ -410,10 +415,21 @@ function createApiHandler(store) {
               // onConflict как в supabaseTransport: team_id+question_ref, БЕЗ
               // game_id (см. types.ts/HANDOFF §5 — иначе бумажные баллы
               // задваиваются).
+              // accepted_at — зеркало триггера 0015: серверный момент
+              // ПОСЛЕДНЕЙ СМЕНЫ ТЕКСТА. Значение из тела клиента выкидываем
+              // всегда (иначе Object.assign затёр бы его клиентским).
+              const { accepted_at: _ignored, ...clean } = row
               const existing = st.answers.find(a => a.team_id === row.team_id && a.question_ref === row.question_ref)
-              if (existing) Object.assign(existing, row)
-              else st.answers.push({ id: crypto.randomUUID(), is_correct: null, stake: null,
-                created_at: new Date().toISOString(), ...row })
+              if (existing) {
+                if (clean.answer_text !== undefined && clean.answer_text !== existing.answer_text) {
+                  existing.accepted_at = new Date().toISOString()
+                }
+                Object.assign(existing, clean)
+              } else {
+                const now = new Date().toISOString()
+                st.answers.push({ id: crypto.randomUUID(), is_correct: null, stake: null,
+                  created_at: now, ...clean, accepted_at: now })
+              }
             }
           })
           sendJson(res, 200, { ok: true, count: rows.length })
@@ -426,7 +442,15 @@ function createApiHandler(store) {
           const patch = await readJsonBody(req)
           const found = st.answers.find(a => a.id === id)
           if (!found) { sendError(res, 404, 'ответ не найден'); return }
-          store.mutate('answers.patch', { id, patch }, () => { Object.assign(found, patch) })
+          // accepted_at ставит только сервер (зеркало триггера 0015); смена
+          // текста через PATCH двигает его так же, как upsert.
+          const { accepted_at: _ignored, ...cleanPatch } = patch ?? {}
+          store.mutate('answers.patch', { id, patch: cleanPatch }, () => {
+            if (cleanPatch.answer_text !== undefined && cleanPatch.answer_text !== found.answer_text) {
+              found.accepted_at = new Date().toISOString()
+            }
+            Object.assign(found, cleanPatch)
+          })
           sendJson(res, 200, found)
           return
         }

@@ -26,6 +26,22 @@ function makeFakeSupabase() {
   // что у настоящей политики доступа Supabase (она не отвечает ошибкой).
   const forceRlsDenyOnce = new Set<string>()
   let idCounter = 1
+  // «Часы сервера» для эмуляции триггеров 0015 — строго растущие, чтобы
+  // «сдвинулось/не сдвинулось» проверялось без sleep.
+  let serverTick = 0
+  const serverNow = () => new Date(Date.UTC(2026, 8, 30, 20, 0, 0) + ++serverTick).toISOString()
+  // Эмуляция триггеров миграции 0015: answers_set_accepted_at и
+  // question_shown_server_time. Клиентское значение игнорируется ВСЕГДА.
+  function beforeWrite(tbl: string, existing: Row | undefined, incoming: Row): Row {
+    if (tbl === 'answers') {
+      const { accepted_at: _ignored, ...clean } = incoming
+      const textChanged = !existing
+        || ('answer_text' in clean && clean.answer_text !== existing.answer_text)
+      return { ...clean, accepted_at: textChanged ? serverNow() : existing!.accepted_at }
+    }
+    if (tbl === 'question_shown') return { ...incoming, shown_at: serverNow() }
+    return incoming
+  }
 
   function builder(table: string) {
     const filters: Array<(row: Row) => boolean> = []
@@ -91,7 +107,7 @@ function makeFakeSupabase() {
                 const after = JSON.stringify({ ...r, state_rev: undefined })
                 if (after !== before) r.state_rev = (Number(r.state_rev) || 0) + 1
               } else {
-                Object.assign(r, payload[0])
+                Object.assign(r, beforeWrite(table, r, payload[0]))
               }
             })
             if (selectAfterWrite) return resolve({ data: matched, error: null })
@@ -102,8 +118,8 @@ function makeFakeSupabase() {
             let last: Row | undefined
             for (const row of payload) {
               const existing = rows.find(r => keys.every(k => r[k] === row[k]))
-              if (existing) { Object.assign(existing, row); last = existing } else {
-                const created = { id: `id-${idCounter++}`, ...row }
+              if (existing) { Object.assign(existing, beforeWrite(table, existing, row)); last = existing } else {
+                const created = { id: `id-${idCounter++}`, ...beforeWrite(table, undefined, row) }
                 rows.push(created); last = created
               }
             }
@@ -194,6 +210,51 @@ describe('supabaseTransport: контракт', () => {
     ])
     expect(fake.db.answers).toHaveLength(1)
     expect(fake.db.answers[0].answer_text).toBe('b')
+  })
+
+  // 9.67 (миграция 0015, HANDOFF §3ca): серверное время ответа. Эти тесты
+  // держат КОНТРАКТ: транспорт не должен сам слать accepted_at, а тип
+  // AnswerPatch не должен его пропускать (иначе оценка ведущего «двигала»
+  // бы время гонки).
+  it('accepted_at: повторный upsert того же текста не двигает, другой текст — двигает', async () => {
+    const up = (text: string) => supabaseTransport.upsertAnswers([
+      { team_id: 't1', game_id: 'g1', question_ref: 'q-1', round_number: 0, answer_text: text, updated_at: 'x' },
+    ])
+    await up('кот')
+    const a1 = fake.db.answers[0].accepted_at
+    expect(typeof a1).toBe('string')
+    await up('кот')
+    expect(fake.db.answers[0].accepted_at).toBe(a1)
+    await up('ток')
+    expect(String(fake.db.answers[0].accepted_at) > String(a1)).toBe(true)
+  })
+
+  it('accepted_at: patchAnswer(is_correct) не двигает; поле в AnswerPatch запрещено типами', async () => {
+    await supabaseTransport.upsertAnswers([
+      { team_id: 't1', game_id: 'g1', question_ref: 'q-1', round_number: 0, answer_text: 'кот', updated_at: 'x' },
+    ])
+    const row = fake.db.answers[0]
+    const a1 = row.accepted_at
+    await supabaseTransport.patchAnswer(String(row.id), { is_correct: true })
+    expect(fake.db.answers[0].accepted_at).toBe(a1)
+    expect(fake.db.answers[0].is_correct).toBe(true)
+    // @ts-expect-error — accepted_at ставит только сервер (Omit в AnswerPatch)
+    await supabaseTransport.patchAnswer(String(row.id), { accepted_at: '2000-01-01T00:00:00Z' })
+    expect(fake.db.answers[0].accepted_at).toBe(a1)
+  })
+
+  it('markQuestionShown: shown_at — время сервера, а не присланное клиентом', async () => {
+    await supabaseTransport.markQuestionShown({
+      gameId: 'g1', roundNumber: 0, questionRef: 'q-1', shownAt: '2000-01-01T00:00:00Z',
+    })
+    const s1 = fake.db.question_shown[0].shown_at
+    expect(s1).not.toBe('2000-01-01T00:00:00Z')
+    // повтор вопроса (↻) — upsert того же ключа сдвигает старт
+    await supabaseTransport.markQuestionShown({
+      gameId: 'g1', roundNumber: 0, questionRef: 'q-1', shownAt: '2000-01-01T00:00:00Z',
+    })
+    expect(fake.db.question_shown).toHaveLength(1)
+    expect(String(fake.db.question_shown[0].shown_at) > String(s1)).toBe(true)
   })
 
   it('writeBlitz/readBlitz: onConflict "game_id,round_number"', async () => {
