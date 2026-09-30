@@ -297,3 +297,21 @@
   .theme-classic .timer-num, .cyber .timer-num { font-size: clamp(38px, 3.6vw, 150px); }
   .theme-classic .timer-wrap, .cyber .timer-wrap { width: clamp(118px, 10vw, 380px); }
 }
+
+/* ═══ «Скрэмбл»: пульт ответов (AdminPage.tsx:AnagramControls) ═══
+   Имя команды длинное (до 17 знаков) режем многоточием, время и кнопки
+   не сжимаются — ряд кнопок ✓/✗ не ломается ни на 390, ни на 1920. */
+.adm-an { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.adm-an-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.adm-an-row { background: #0d1626; border: 1px solid #1c2740; border-left: 4px solid var(--dim);
+  border-radius: 8px; padding: 8px 10px; display: grid; gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "top btns" "text btns"; align-items: center; }
+.adm-an-row.win { box-shadow: 0 0 0 1px var(--ok) inset; }
+.adm-an-top { grid-area: top; display: flex; justify-content: space-between; gap: 10px; min-width: 0; }
+.adm-an-team { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-an-time { flex: 0 0 auto; font-family: var(--font-mono); color: var(--accent2); }
+.adm-an-text { grid-area: text; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 14px; }
+.adm-an-win { color: var(--ok); }
+.adm-an-btns { grid-area: btns; display: flex; gap: 6px; }
+.adm-an-btns .adm-grade { flex: 0 0 auto; width: 48px; padding: 10px 0; font-size: 16px; }
+.adm-an-warn { color: var(--danger); font-size: 12px; }
