@@ -6,6 +6,7 @@ import {
   formatRaceTime, anagramElapsedMs, anagramAcceptedAt, anagramStartIso, hashStr, isoMicros,
   anagramQuestion, anagramFlightPlan, anagramAdvance, anagramBack, readAnagramLocal,
   persistAnagramLocal, anagramLocalKey, anagramPlayerVerdict, ANAGRAM_REVEAL_GUARD_MS,
+  anagramFirst, anagramWasRun,
 } from '../anagram'
 import type { Answer } from '../../types/quiz'
 
@@ -283,10 +284,10 @@ describe('навигация ведущего (ревью 9.74)', () => {
     expect(anagramAdvance({ ...base, nowMs: t0 + ANAGRAM_REVEAL_GUARD_MS }).kind).toBe('reveal')
   })
   it('после показа — следующий, на последнем — после раунда', () => {
-    expect(anagramAdvance({ ...base, reveal: true })).toEqual({ kind: 'next', index: 1 })
+    expect(anagramAdvance({ ...base, reveal: true })).toEqual({ kind: 'next', index: 1, shown: false })
     expect(anagramAdvance({ ...base, reveal: true, index: 2 })).toEqual({ kind: 'afterRound' })
     // возвращённый (показанный, без таймера) вопрос — просто дальше
-    expect(anagramAdvance({ ...base, reveal: true, timerStartedAt: null })).toEqual({ kind: 'next', index: 1 })
+    expect(anagramAdvance({ ...base, reveal: true, timerStartedAt: null })).toEqual({ kind: 'next', index: 1, shown: false })
   })
   it('назад — к ПОКАЗАННОМУ предыдущему, с первого — на заставку', () => {
     expect(anagramBack(2)).toEqual({ kind: 'shown', index: 1 })
@@ -299,9 +300,9 @@ describe('черновик доски на телефоне (ревью 9.74, б
     const store = new Map<string, string>()
     const kN = anagramLocalKey('g', 'q1'), kN1 = anagramLocalKey('g', 'q2')
     const st = { ...readAnagramLocal(k => store.get(k) ?? null, kN, 3), cells: [0, 1, 2], edits: 2, sent: 'КОТ' }
-    expect(persistAnagramLocal((k, v) => store.set(k, v), kN, st)).toBe(true)
+    expect(persistAnagramLocal((k, v) => store.set(k, v), kN, st, 3)).toBe(true)
     // рендер уже с новым вопросом, состояние ещё старое — запись запрещена
-    expect(persistAnagramLocal((k, v) => store.set(k, v), kN1, st)).toBe(false)
+    expect(persistAnagramLocal((k, v) => store.set(k, v), kN1, st, 3)).toBe(false)
     expect(store.has(kN1)).toBe(false)
     const fresh = readAnagramLocal(k => store.get(k) ?? null, kN1, 4)
     expect(fresh).toEqual({ key: kN1, cells: [null, null, null, null], edits: 0, sent: null })
@@ -322,6 +323,33 @@ describe('вердикт на телефоне (ревью 9.74)', () => {
     expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: true, phrase, row: undefined })).toBe('lost')
     expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: false, phrase, row: undefined })).toBe('checking')
     expect(anagramPlayerVerdict({ sent: null, loaded: true, phrase, row: undefined })).toBeNull()
+  })
+})
+
+describe('вперёд на уже сыгранный вопрос (ревью 9.75)', () => {
+  const qs = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+  const wasRun = anagramWasRun(new Map([['q-a', 'S'], ['q-b', 'S']]), qs)
+  const base = { reveal: true, timerStartedAt: null, count: 3, nowMs: 0, wasRun }
+  it('«Назад», потом «Дальше» — следующий уже запускался → открыть показанным', () => {
+    expect(anagramAdvance({ ...base, index: 0 })).toEqual({ kind: 'next', index: 1, shown: true })
+    expect(anagramAdvance({ ...base, index: 1 })).toEqual({ kind: 'next', index: 2, shown: false })
+  })
+  it('с заставки: первый уже запускался → показанным; нет записи — обычный старт', () => {
+    expect(anagramFirst(wasRun)).toEqual({ index: 0, shown: true })
+    expect(anagramFirst(anagramWasRun(new Map(), qs))).toEqual({ index: 0, shown: false })
+    expect(anagramFirst()).toEqual({ index: 0, shown: false })
+  })
+})
+
+describe('черновик: тот же ключ, другая длина (ревью 9.75)', () => {
+  it('не пишется поверх, перечитывается пустым', () => {
+    const store = new Map<string, string>()
+    const k = anagramLocalKey('g', 'q1')
+    const old = { key: k, cells: [0, 1, 2], edits: 1, sent: 'КОТ' }
+    expect(persistAnagramLocal((kk, v) => store.set(kk, v), k, old, 4)).toBe(false)
+    expect(store.has(k)).toBe(false)
+    store.set(k, JSON.stringify(old))
+    expect(readAnagramLocal(kk => store.get(kk) ?? null, k, 4).cells).toEqual([null, null, null, null])
   })
 })
 

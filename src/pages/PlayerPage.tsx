@@ -346,11 +346,14 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   const [stRaw, setSt] = useState<AnagramLocal>(read)
   const st: AnagramLocal = stRaw.key === storageKey && stRaw.cells.length === letters.length ? stRaw : read()
   useEffect(() => {
-    try { persistAnagramLocal((k, v) => localStorage.setItem(k, v), storageKey, stRaw) } catch { /* приватный режим */ }
-  }, [stRaw, storageKey])
+    try { persistAnagramLocal((k, v) => localStorage.setItem(k, v), storageKey, stRaw, letters.length) } catch { /* приватный режим */ }
+  }, [stRaw, storageKey, letters.length])
   // смена вопроса без размонтирования — перечитать под новый ключ
+  // тот же ключ, но другая длина (фразу поправили посреди игры) — тоже перечитать
+  useEffect(() => {
+    if (stRaw.key !== storageKey || stRaw.cells.length !== letters.length) setSt(read())
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (stRaw.key !== storageKey) setSt(read()) }, [storageKey, letters.length])
+  }, [storageKey, letters.length])
 
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -480,7 +483,7 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
                 <div className="pl-sent">Ваш ответ: {myRow?.answer_text || st.sent || '—'}</div>
                 {verdict === 'ok' && <div className="pl-an-verdict ok">✓ ВЕРНО</div>}
                 {verdict === 'wrong' && <div className="pl-an-verdict err">✗ НЕВЕРНО</div>}
-                {verdict === 'lost' && <div className="pl-an-verdict err">ответ не дошёл до сервера</div>}
+                {verdict === 'lost' && <div className="pl-an-verdict err">ответ ещё не дошёл до сервера</div>}
                 {verdict === 'checking' && <div className="pl-sent">проверяем…</div>}
               </div>
             ) : (

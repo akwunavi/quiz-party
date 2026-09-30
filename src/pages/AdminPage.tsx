@@ -65,6 +65,7 @@ import { revealPointsFor } from '../lib/scoring'
 import {
   anagramQuestion, anagramHintsOpen, anagramMaxHints, anagramWinner, anagramStartIso,
   anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack,
+  anagramFirst, anagramWasRun,
 } from '../lib/anagram'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
@@ -314,6 +315,9 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   const isAnagram = round.mechanic === 'anagram'
   // подсказка к «ДАЛЬШЕ» у «Скрэмбла» (ранний/двойной тап — объяснить, §3d)
   const navHint = useHint()
+  // «вопрос уже запускался» — по question_shown; опрос только у «Скрэмбла»
+  const shownMap = useQuestionShown(isAnagram ? gameState.game_id : null)
+  const wasRun = anagramWasRun(shownMap, round.questions)
   // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
   // музыку и звук вопроса он запускает сам — кнопкой ниже
   const paperMode = pack.settings?.play_mode === 'paper'
@@ -346,7 +350,13 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   }
 
   const advance = () => {
-    if (phase === 'round_intro') { void runAction('следующий вопрос', () => gotoQuestion(0)); return }
+    if (phase === 'round_intro') {
+      // «Скрэмбл»: вернулись «← К титулу» — первый вопрос уже сыгран,
+      // открываем его показанным, а не заново вживую (ревью 9.75)
+      if (isAnagram && anagramFirst(wasRun).shown)
+        return void runAction('первый вопрос', () => gotoQuestionShown(0))
+      void runAction('следующий вопрос', () => gotoQuestion(0)); return
+    }
     if (phase === 'question') {
       // «Скрэмбл»: вопрос → показ ответа → следующий; «время ответов» и
       // разбор в конце раунда у этой механики не существуют. reveal — из
@@ -355,10 +365,11 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
       if (isAnagram) {
         // то же решение, что у кнопки «Дальше →» на проекторе (lib/anagram.ts)
         const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-          index: step, count: round.questions.length, nowMs: Date.now() })
+          index: step, count: round.questions.length, nowMs: Date.now(), wasRun })
         if (st.kind === 'wait') return navHint.show(st.text)
         if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer())
-        if (st.kind === 'next') return void runAction('следующий вопрос', () => gotoQuestion(st.index))
+        if (st.kind === 'next') return void runAction('следующий вопрос',
+          () => st.shown ? gotoQuestionShown(st.index) : gotoQuestion(st.index))
         return runAfterRound()
       }
       if (step + 1 < round.questions.length) {
@@ -525,7 +536,11 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             {(phase === 'question' || phase === 'answer_time') && (
-              <button className="adm-btn" onClick={() => void runAction('повтор вопроса', () => startTimer(
+              <button className="adm-btn" onClick={() => isAnagram && phase === 'question' && gameState.reveal
+                // «Скрэмбл»: после показа ответа повтор ломает гонку (таймер
+                // при показанном ответе, сдвиг shown_at) — объяснить, не писать
+                ? navHint.show('Ответ уже показан — повтор этого вопроса невозможен')
+                : void runAction('повтор вопроса', () => startTimer(
                 phase === 'question' ? {
                   gameId: gameState.game_id, roundNumber: gameState.round_number,
                   questionRef: `q-${round.questions[step].id}`,

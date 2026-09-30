@@ -384,7 +384,7 @@ export const ANAGRAM_REVEAL_GUARD_MS = 3000
 
 export type AnagramStep =
   | { kind: 'reveal' }
-  | { kind: 'next'; index: number }
+  | { kind: 'next'; index: number; shown: boolean }
   | { kind: 'afterRound' }
   | { kind: 'wait'; text: string }
 
@@ -393,6 +393,11 @@ export type AnagramStep =
  *  AdminPage — раньше проектор уходил дальше без показа (ревью 9.74). */
 export function anagramAdvance(p: {
   reveal: boolean; timerStartedAt: string | null; index: number; count: number; nowMs: number
+  /** Уже запускался ли вопрос с этим индексом в этой игре (есть запись в
+   *  question_shown). Такой вопрос открывается ПОКАЗАННЫМ (gotoQuestionShown),
+   *  а не заново вживую — ревью 9.75: «Назад», затем «Дальше» перезапускал
+   *  уже сыгранный вопрос. Не передан — считается «не запускался». */
+  wasRun?: (index: number) => boolean
 }): AnagramStep {
   if (!p.reveal) {
     const start = p.timerStartedAt ? Date.parse(p.timerStartedAt) : NaN
@@ -401,7 +406,19 @@ export function anagramAdvance(p: {
       return { kind: 'wait', text: 'Вопрос только что открыт — нажми ещё раз через пару секунд, чтобы показать ответ' }
     return { kind: 'reveal' }
   }
-  return p.index + 1 < p.count ? { kind: 'next', index: p.index + 1 } : { kind: 'afterRound' }
+  if (p.index + 1 >= p.count) return { kind: 'afterRound' }
+  return { kind: 'next', index: p.index + 1, shown: !!p.wasRun?.(p.index + 1) }
+}
+
+/** С заставки раунда — на первый вопрос: показанным, если он уже
+ *  запускался (вернулись «← К титулу»), иначе обычным стартом. */
+export function anagramFirst(wasRun?: (index: number) => boolean): { index: 0; shown: boolean } {
+  return { index: 0, shown: !!wasRun?.(0) }
+}
+
+/** Признак «вопрос уже запускался» по карте question_shown. */
+export function anagramWasRun(shown: ReadonlyMap<string, string>, questions: readonly { id: string }[]) {
+  return (i: number) => { const q = questions[i]; return !!q && shown.has('q-' + q.id) }
 }
 
 /** «← Назад» с вопроса «Скрэмбла»: к ПОКАЗАННОМУ предыдущему вопросу (не
@@ -432,8 +449,11 @@ export function readAnagramLocal(get: (k: string) => string | null, key: string,
 /** Записать черновик, ТОЛЬКО если он загружен под этим же ключом. Иначе
  *  на переходе вопрос N→N+1 доска (и потраченные правки) вопроса N
  *  записывалась под ключ N+1 — ревью 9.74, блокер. */
-export function persistAnagramLocal(set: (k: string, v: string) => void, key: string, st: AnagramLocal): boolean {
-  if (st.key !== key) return false
+export function persistAnagramLocal(set: (k: string, v: string) => void, key: string, st: AnagramLocal,
+  n: number): boolean {
+  // тот же ключ, но другая длина (фразу поправили в редакторе посреди
+  // игры) — не писать старую доску поверх (ревью 9.75)
+  if (st.key !== key || st.cells.length !== n) return false
   set(key, JSON.stringify(st))
   return true
 }
