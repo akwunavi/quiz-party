@@ -1,5 +1,5 @@
 import { RoomPicker } from './RoomPicker'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
 import { registerTeam, heartbeat } from '../lib/gameActions'
@@ -17,9 +17,10 @@ import { revealPointsFor } from '../lib/scoring'
 import { spendsEdit } from '../lib/edits'
 import {
   anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramMaxHints, applyHints, placeTile,
-  clearCell, clearBoard, boardText, boardComplete, emptyBoard, isAnagramCorrect, hashStr,
-  type AnagramBoardState,
+  clearCell, clearBoard, boardText, boardComplete, hashStr, anagramLocalKey, readAnagramLocal,
+  persistAnagramLocal, anagramPlayerVerdict, type AnagramBoardState, type AnagramLocal,
 } from '../lib/anagram'
+import { useAnswers } from '../hooks/useAnswers'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
@@ -138,7 +139,10 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
     return <RevealPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'anagram')
-    return <AnagramPlayer team={team} gameState={gameState} round={round}
+    // key по вопросу: состояние доски не должно переживать смену вопроса
+    // (ревью 9.74, блокер); вторая линия — ключ внутри самого состояния
+    return <AnagramPlayer key={`${gameState.game_id}-${round.questions[gameState.question_index]?.id ?? 'none'}`}
+      team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   // «Скрэмбл» фазы «время ответов» не использует (ответ показывается после
   // каждого вопроса) — общий AnswerForm сюда пускать нельзя
@@ -313,7 +317,6 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
  *  локально (решение ведущего 30.09.2026): в гонке команда иначе потеряла
  *  бы уже принятое сервером время. До показа ответа — ни «верно», ни
  *  «неверно» (правило 8.59). HANDOFF §3ca. */
-interface AnagramLocal { cells: (number | null)[]; edits: number; sent: string | null }
 export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   team: Team; roundLabel: string
   round: LoadedRound
@@ -334,21 +337,20 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   const startedAt = gameState.timer_started_at
   const endMs = startedAt ? Date.parse(startedAt) + round.timer_seconds * 1000 : NaN
 
-  // префикс qp-answers- — его подчищает forgetPlayerData при смене игры
-  const storageKey = `qp-answers-anagram-${gameState.game_id}-${q?.id ?? 'none'}`
-  const fresh = (): AnagramLocal => ({ cells: emptyBoard(letters.length).cells, edits: 0, sent: null })
-  const read = (): AnagramLocal => {
-    try {
-      const v = JSON.parse(localStorage.getItem(storageKey) ?? '') as AnagramLocal
-      return Array.isArray(v.cells) && v.cells.length === letters.length ? v : fresh()
-    } catch { return fresh() }
-  }
-  const [st, setSt] = useState<AnagramLocal>(read)
-  useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(st)) }, [st, storageKey])
-  // смена вопроса — перечитать под новый ключ (useState-инициализатор
-  // срабатывает только при монтировании; та же ловушка, что у AnswerForm)
+  // Черновик хранит ключ, под которым загружен: пишем ТОЛЬКО под тот же
+  // ключ (persistAnagramLocal), а на рендере с чужим ключом показываем
+  // чистую доску, пока эффект не перечитал — доска и потраченные правки
+  // вопроса N не переезжают на N+1 (ревью 9.74, блокер).
+  const storageKey = anagramLocalKey(gameState.game_id, q?.id ?? 'none')
+  const read = () => readAnagramLocal(k => localStorage.getItem(k), storageKey, letters.length)
+  const [stRaw, setSt] = useState<AnagramLocal>(read)
+  const st: AnagramLocal = stRaw.key === storageKey && stRaw.cells.length === letters.length ? stRaw : read()
+  useEffect(() => {
+    try { persistAnagramLocal((k, v) => localStorage.setItem(k, v), storageKey, stRaw) } catch { /* приватный режим */ }
+  }, [stRaw, storageKey])
+  // смена вопроса без размонтирования — перечитать под новый ключ
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setSt(read()) }, [storageKey, letters.length])
+  useEffect(() => { if (stRaw.key !== storageKey) setSt(read()) }, [storageKey, letters.length])
 
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -369,13 +371,20 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   const hinted = useMemo(() => hintOrder.slice(0, open), [hintOrder, open])
   useEffect(() => {
     if (!hinted.length) return
-    setSt(prev => {
+    setSt(raw => {
+      const prev = raw.key === storageKey ? raw : read()
       const next = applyHints({ cells: prev.cells }, letters, order, hinted)
       return next.cells === prev.cells ? prev : { ...prev, cells: next.cells }
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hinted, storageKey])
   const hint = useHint()
+  // Вердикт — из строки в базе (как в totals), не из локального «отправлено».
+  // Опрос ответов включается ТОЛЬКО после показа ответа — в игре телефону
+  // он не нужен (лишний трафик у гостей).
+  const liveAnswers = useAnswers(gameState.reveal ? gameState.game_id : null, gameState.round_number)
+  const firstAnswers = useRef(liveAnswers)
+  const answersLoaded = liveAnswers !== firstAnswers.current
   // показ ответа — старая подсказка («Заполни все клетки») больше не про то
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (gameState.reveal) hint.clear() }, [gameState.reveal])
@@ -392,19 +401,24 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   const text = boardText(board, template, letters, order)
   const editsLeft = maxEdits < 0 ? Infinity : maxEdits - st.edits
 
+  // все обновления — от состояния ПОД ТЕКУЩИМ ключом
+  const upd = (fn: (p: AnagramLocal) => AnagramLocal) =>
+    setSt(raw => fn(raw.key === storageKey ? raw : read()))
+  // вне игры кнопки не молчат, а объясняют (§3d)
+  const notPlayable = () => hint.show(notStarted && !gameState.reveal
+    ? 'Ждём старта: буквы можно ставить, когда пойдёт таймер' : 'Время вышло')
   const tapTile = (p: number) => {
-    if (notStarted) return hint.show('Ждём старта: буквы можно ставить, когда пойдёт таймер')
-    if (over) return hint.show('Время вышло')
-    setSt(prev => ({ ...prev, cells: placeTile({ cells: prev.cells }, p, template, hintSet).cells }))
+    if (!playable) return notPlayable()
+    upd(prev => ({ ...prev, cells: placeTile({ cells: prev.cells }, p, template, hintSet).cells }))
   }
   const tapCell = (i: number) => {
-    if (!playable) return
+    if (!playable) return notPlayable()
     if (hintSet.has(i)) return hint.show('Это подсказка — её не убрать')
-    setSt(prev => ({ ...prev, cells: clearCell({ cells: prev.cells }, i, hintSet).cells }))
+    upd(prev => ({ ...prev, cells: clearCell({ cells: prev.cells }, i, hintSet).cells }))
   }
   const erase = () => {
-    if (!playable) return
-    setSt(prev => ({ ...prev, cells: clearBoard({ cells: prev.cells }, hintSet).cells }))
+    if (!playable) return notPlayable()
+    upd(prev => ({ ...prev, cells: clearBoard({ cells: prev.cells }, hintSet).cells }))
   }
   const send = () => {
     if (notStarted) return hint.show('Ждём старта')
@@ -417,10 +431,12 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
       team_id: team.id, game_id: gameState.game_id, question_ref: `q-${q.id}`,
       round_number: gameState.round_number, answer_text: text, stake: null,
     })
-    setSt(prev => ({ ...prev, sent: text, edits: prev.edits + (spend ? 1 : 0) }))
+    upd(prev => ({ ...prev, sent: text, edits: prev.edits + (spend ? 1 : 0) }))
   }
 
-  const verdict = gameState.reveal && st.sent ? isAnagramCorrect(st.sent, phrase) : null
+  const myRow = liveAnswers.find(a => a.team_id === team.id && a.question_ref === `q-${q.id}`)
+  const verdict = gameState.reveal
+    ? anagramPlayerVerdict({ sent: st.sent, loaded: answersLoaded, row: myRow, phrase }) : null
 
   return (
     <div className="pl-root">
@@ -431,7 +447,7 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
         <div className="pl-card">
           <div className="pl-card-body">
             {q.question_text.trim() && <div className="pl-an-clue">{q.question_text}</div>}
-            {notStarted && <div className="pl-an-state">Ждём старта</div>}
+            {notStarted && !gameState.reveal && <div className="pl-an-state">Ждём старта</div>}
             {over && !gameState.reveal && <div className="pl-an-state">Время вышло — смотри на экран</div>}
             {!gameState.reveal && (
               <div className="pl-an-tiles">
@@ -461,9 +477,11 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
             <Hint text={hint.text} />
             {gameState.reveal ? (
               <div className="pl-an-result">
-                <div className="pl-sent">Ваш ответ: {st.sent ?? '—'}</div>
-                {verdict === true && <div className="pl-an-verdict ok">✓ ВЕРНО</div>}
-                {verdict === false && <div className="pl-an-verdict err">✗ НЕВЕРНО</div>}
+                <div className="pl-sent">Ваш ответ: {myRow?.answer_text || st.sent || '—'}</div>
+                {verdict === 'ok' && <div className="pl-an-verdict ok">✓ ВЕРНО</div>}
+                {verdict === 'wrong' && <div className="pl-an-verdict err">✗ НЕВЕРНО</div>}
+                {verdict === 'lost' && <div className="pl-an-verdict err">ответ не дошёл до сервера</div>}
+                {verdict === 'checking' && <div className="pl-sent">проверяем…</div>}
               </div>
             ) : (
               <div className="pl-row-bottom">

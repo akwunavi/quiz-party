@@ -15,6 +15,7 @@ import {
   gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
+  gotoQuestionShown,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { runAction } from '../lib/actionStatus'
@@ -63,7 +64,7 @@ import { revealNext, revealAllAnswered } from '../lib/reveal'
 import { revealPointsFor } from '../lib/scoring'
 import {
   anagramQuestion, anagramHintsOpen, anagramMaxHints, anagramWinner, anagramStartIso,
-  anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime,
+  anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack,
 } from '../lib/anagram'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
@@ -311,6 +312,8 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   // Своё — только маршрут вопроса (показ ответа после КАЖДОГО вопроса,
   // HANDOFF §3ca) и пульт ответов с временем (AnagramControls).
   const isAnagram = round.mechanic === 'anagram'
+  // подсказка к «ДАЛЬШЕ» у «Скрэмбла» (ранний/двойной тап — объяснить, §3d)
+  const navHint = useHint()
   // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
   // музыку и звук вопроса он запускает сам — кнопкой ниже
   const paperMode = pack.settings?.play_mode === 'paper'
@@ -350,8 +353,12 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
       // свежего снимка сессии (поллинг), повторный клик по уже показанному
       // ответу ведёт дальше, а не пишет reveal второй раз.
       if (isAnagram) {
-        if (!gameState.reveal) return void runAction('показ ответа', () => revealAnswer())
-        if (step + 1 < round.questions.length) return void runAction('следующий вопрос', () => gotoQuestion(step + 1))
+        // то же решение, что у кнопки «Дальше →» на проекторе (lib/anagram.ts)
+        const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+          index: step, count: round.questions.length, nowMs: Date.now() })
+        if (st.kind === 'wait') return navHint.show(st.text)
+        if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer())
+        if (st.kind === 'next') return void runAction('следующий вопрос', () => gotoQuestion(st.index))
         return runAfterRound()
       }
       if (step + 1 < round.questions.length) {
@@ -393,10 +400,16 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
     // своя раскладка только у самой фазы вопроса
     if (isInteractive) void runAction('назад к раунду', () => gotoQuestion(0))
     // у «Скрэмбла» разбора по вопросам нет — назад к последнему вопросу
-    else if (isAnagram) void runAction('назад к раунду', () => gotoQuestion(round.questions.length - 1))
+    // к ПОКАЗАННОМУ последнему вопросу, не перезапуская его (ревью 9.74)
+    else if (isAnagram) void runAction('назад к раунду', () => gotoQuestionShown(round.questions.length - 1))
     else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true))
   }
   const goBack = () => {
+    if (phase === 'question' && isAnagram) {
+      const b = anagramBack(step)
+      if (b.kind === 'shown') return void runAction('предыдущий вопрос', () => gotoQuestionShown(b.index))
+      return void runAction('назад к раунду', () => setPhase('round_intro'))
+    }
     if (phase === 'question' && step > 0) void runAction('предыдущий вопрос', () => gotoQuestion(step - 1))
     else if (phase === 'question') void runAction('назад к раунду', () => setPhase('round_intro'))
     else if (phase === 'recap') {
@@ -522,8 +535,10 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
             {/* На бумаге вопрос читает ведущий вслух — «Дальше» неактивна,
                 пока не нажата «▶ ПРОЧИТАЛ» ниже: иначе можно проскочить
                 вопрос, ни разу не пустив по нему время. */}
+            {/* показанный вопрос «Скрэмбла» (в т.ч. возвращённый «Назад») на
+                бумаге таймера не имеет — «Дальше» не блокируем */}
             <button className="adm-btn primary" disabled={paperMode && phase === 'question'
-              && !gameState.timer_started_at} onClick={advance}>
+              && !gameState.timer_started_at && !(isAnagram && gameState.reveal)} onClick={advance}>
               {phase === 'answer_time' ? 'К ОТВЕТАМ →'
                 : isAnagram && phase === 'question' && !gameState.reveal ? 'ПОКАЗАТЬ ОТВЕТ →' : 'ДАЛЬШЕ →'}
             </button>
@@ -584,7 +599,9 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
             есть своё аудио/видео — оно само «читает» вопрос залу, кнопка не
             нужна вовсе: таймер и трек стартуют сами (HostScreen.tsx:
             QuestionAudio), как в обычном режиме. */}
+        {isAnagram && phase === 'question' && <Hint text={navHint.text} />}
         {paperMode && phase === 'question' && !gameState.timer_started_at
+          && !(isAnagram && gameState.reveal)
           && !(round.questions[step]?.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m)) && (
           <button className="adm-btn primary adm-start-question"
             onClick={() => void runAction('запуск таймера', () => startTimer({

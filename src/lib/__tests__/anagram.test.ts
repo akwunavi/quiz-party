@@ -4,7 +4,8 @@ import {
   anagramMaxHints, anagramHintsOpen, anagramHintTile, emptyBoard, placeTile, clearCell,
   clearBoard, applyHints, boardText, boardComplete, isAnagramCorrect, anagramWinner,
   formatRaceTime, anagramElapsedMs, anagramAcceptedAt, anagramStartIso, hashStr, isoMicros,
-  anagramQuestion,
+  anagramQuestion, anagramFlightPlan, anagramAdvance, anagramBack, readAnagramLocal,
+  persistAnagramLocal, anagramLocalKey, anagramPlayerVerdict, ANAGRAM_REVEAL_GUARD_MS,
 } from '../anagram'
 import type { Answer } from '../../types/quiz'
 
@@ -91,6 +92,13 @@ describe('подсказки', () => {
   })
   it('потолок maxHints', () => {
     expect(anagramHintsOpen({ ...base, timerSec: 600, nowMs: t0 + 500000 })).toBe(4)
+  })
+  it('подсказка открывается строго ДО конца таймера: 30 с / 10 с — максимум 2 (ревью 9.74)', () => {
+    const t = { ...base, timerSec: 30, maxHints: 10 }
+    expect(anagramHintsOpen({ ...t, nowMs: t0 + 29999 })).toBe(2)
+    expect(anagramHintsOpen({ ...t, nowMs: t0 + 30000 })).toBe(2)
+    expect(anagramHintsOpen({ ...t, nowMs: t0 + 90000 })).toBe(2)
+    expect(anagramHintsOpen({ ...t, timerSec: 31, nowMs: t0 + 30000 })).toBe(3)
   })
   it('после конца таймера замирает', () => {
     const t = { ...base, timerSec: 25 }
@@ -242,3 +250,78 @@ describe('гонка', () => {
     expect(anagramStartIso(new Map(), '1', null)).toEqual({ iso: null, approx: false })
   })
 })
+
+describe('план перелётов (ревью 9.74)', () => {
+  const M = (e: [number, number][]) => new Map(e)
+  it('полёт к той же клетке не перезапускается', () => {
+    expect(anagramFlightPlan(M([[3, 5]]), new Set(), M([[3, 5]]))).toEqual({ cancel: [], start: [] })
+  })
+  it('показ ответа посреди полёта подсказки: летящую не трогаем, остальные стартуют', () => {
+    expect(anagramFlightPlan(M([[3, 5], [0, 1], [1, 0]]), new Set(), M([[3, 5]])))
+      .toEqual({ cancel: [], start: [0, 1] })
+  })
+  it('цель исчезла (↻ повтор / смена стадии) — полёт отменяется', () => {
+    expect(anagramFlightPlan(M([]), new Set(), M([[3, 5]]))).toEqual({ cancel: [3], start: [] })
+  })
+  it('клетка сменилась — отмена и новый старт', () => {
+    expect(anagramFlightPlan(M([[3, 2]]), new Set(), M([[3, 5]]))).toEqual({ cancel: [3], start: [3] })
+  })
+  it('севшие не стартуют повторно', () => {
+    expect(anagramFlightPlan(M([[3, 5]]), new Set([3]), M([]))).toEqual({ cancel: [], start: [] })
+  })
+})
+
+describe('навигация ведущего (ревью 9.74)', () => {
+  const start = '2026-09-30T20:00:00.000Z', t0 = Date.parse(start)
+  const base = { reveal: false, timerStartedAt: start, index: 0, count: 3, nowMs: t0 + 10000 }
+  it('без показа — сначала показ ответа (и на проекторе тоже)', () => {
+    expect(anagramAdvance(base)).toEqual({ kind: 'reveal' })
+  })
+  it('двойной тап: таймер не пошёл или пошёл < 3 с назад — не показывать, а объяснить', () => {
+    expect(anagramAdvance({ ...base, timerStartedAt: null }).kind).toBe('wait')
+    expect(anagramAdvance({ ...base, nowMs: t0 + ANAGRAM_REVEAL_GUARD_MS - 1 }).kind).toBe('wait')
+    expect(anagramAdvance({ ...base, nowMs: t0 + ANAGRAM_REVEAL_GUARD_MS }).kind).toBe('reveal')
+  })
+  it('после показа — следующий, на последнем — после раунда', () => {
+    expect(anagramAdvance({ ...base, reveal: true })).toEqual({ kind: 'next', index: 1 })
+    expect(anagramAdvance({ ...base, reveal: true, index: 2 })).toEqual({ kind: 'afterRound' })
+    // возвращённый (показанный, без таймера) вопрос — просто дальше
+    expect(anagramAdvance({ ...base, reveal: true, timerStartedAt: null })).toEqual({ kind: 'next', index: 1 })
+  })
+  it('назад — к ПОКАЗАННОМУ предыдущему, с первого — на заставку', () => {
+    expect(anagramBack(2)).toEqual({ kind: 'shown', index: 1 })
+    expect(anagramBack(0)).toEqual({ kind: 'intro' })
+  })
+})
+
+describe('черновик доски на телефоне (ревью 9.74, блокер)', () => {
+  it('доска вопроса N не записывается под ключ вопроса N+1', () => {
+    const store = new Map<string, string>()
+    const kN = anagramLocalKey('g', 'q1'), kN1 = anagramLocalKey('g', 'q2')
+    const st = { ...readAnagramLocal(k => store.get(k) ?? null, kN, 3), cells: [0, 1, 2], edits: 2, sent: 'КОТ' }
+    expect(persistAnagramLocal((k, v) => store.set(k, v), kN, st)).toBe(true)
+    // рендер уже с новым вопросом, состояние ещё старое — запись запрещена
+    expect(persistAnagramLocal((k, v) => store.set(k, v), kN1, st)).toBe(false)
+    expect(store.has(kN1)).toBe(false)
+    const fresh = readAnagramLocal(k => store.get(k) ?? null, kN1, 4)
+    expect(fresh).toEqual({ key: kN1, cells: [null, null, null, null], edits: 0, sent: null })
+    expect(readAnagramLocal(k => store.get(k) ?? null, kN, 3).edits).toBe(2)
+  })
+  it('ключ с префиксом qp-answers- (его чистит forgetPlayerData)', () => {
+    expect(anagramLocalKey('g', 'q').startsWith('qp-answers-')).toBe(true)
+  })
+})
+
+describe('вердикт на телефоне (ревью 9.74)', () => {
+  const phrase = 'КОТ'
+  it('из строки в базе: ручной ✗ ведущего перебивает локальное «отправлено»', () => {
+    expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: true, phrase, row: { answer_text: 'КОТ', is_correct: false } })).toBe('wrong')
+    expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: true, phrase, row: { answer_text: 'КОТ', is_correct: null } })).toBe('ok')
+  })
+  it('строки нет — «не дошёл», а не «✓ ВЕРНО»; пока ответы не загружены — «проверяем»', () => {
+    expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: true, phrase, row: undefined })).toBe('lost')
+    expect(anagramPlayerVerdict({ sent: 'КОТ', loaded: false, phrase, row: undefined })).toBe('checking')
+    expect(anagramPlayerVerdict({ sent: null, loaded: true, phrase, row: undefined })).toBeNull()
+  })
+})
+

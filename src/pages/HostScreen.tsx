@@ -21,6 +21,7 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
+  gotoQuestionShown,
   startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
   startCounting, startIntro,
 } from '../lib/gameActions'
@@ -53,6 +54,8 @@ import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
+import { anagramAdvance, anagramBack } from '../lib/anagram'
+import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { choicesLenClass } from '../lib/questionLayout'
@@ -449,23 +452,22 @@ function HostInner({ gameState, pack }: {
       <AnagramBoard key={q.id} pack={pack} round={round} roundIdx={gameState.round_number}
         q={q} qIndex={gameState.question_index} qCount={round.questions.length}
         gameState={gameState}
-        timerSlot={<Timer key={q.id} startedAt={gameState.timer_started_at}
-          seconds={round.timer_seconds} theme={pack.theme} />}
+        // возвращённый показанный вопрос (gotoQuestionShown): таймер не
+        // запущен и не должен — кольцо «30 и стоит» только путало бы
+        timerSlot={gameState.reveal && !gameState.timer_started_at ? null
+          : <Timer key={q.id} startedAt={gameState.timer_started_at}
+            seconds={round.timer_seconds} theme={pack.theme} />}
         effectsSlot={<>
-          <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
+          {/* После показа ответа звук вопроса не нужен, а на возвращённом
+              показанном вопросе QuestionAudio запустил бы таймер/озвучку
+              заново (ревью 9.74) — не монтируем. */}
+          {!gameState.reveal &&
+            <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />}
           <AutoAdvance round={round} gameState={gameState} isLast={isLast} />
           <AutoReveal enabled={!gameState.reveal}
             startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
         </>}
-        actionsSlot={
-          <div className="host-actions">
-            <BackBtn gameState={gameState} />
-            {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
-            {!isLast
-              ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
-              : <AfterRoundNav pack={pack} gameState={gameState} />}
-          </div>
-        } />
+        actionsSlot={<AnagramNav pack={pack} round={round} gameState={gameState} />} />
     )
   }
 
@@ -553,6 +555,42 @@ function HostInner({ gameState, pack }: {
 }
 
 /** «Назад»: предыдущий вопрос или титул раунда; между раундами не ходит (п.12). */
+/** Кнопки ведущего на вопросе «Скрэмбла». Решение «что делает Дальше/Назад»
+ *  — общие anagramAdvance/anagramBack (lib/anagram.ts), те же, что на пульте:
+ *  «Дальше» без показанного ответа сначала показывает ответ (раньше
+ *  проектор уходил дальше без показа), «Назад» — к ПОКАЗАННОМУ вопросу, не
+ *  перезапуская его (ревью 9.74). */
+function AnagramNav({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const hint = useHint()
+  const step = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+    index: gameState.question_index, count: round.questions.length, nowMs: Date.now() })
+  const back = () => {
+    const b = anagramBack(gameState.question_index)
+    void (b.kind === 'shown' ? gotoQuestionShown(b.index) : setPhase('round_intro'))
+  }
+  const next = () => {
+    const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+      index: gameState.question_index, count: round.questions.length, nowMs: Date.now() })
+    if (st.kind === 'wait') return hint.show(st.text)
+    if (st.kind === 'reveal') return void revealAnswer()
+    if (st.kind === 'next') return void gotoQuestion(st.index)
+  }
+  return (
+    <div className="host-actions">
+      <Hint text={hint.text} />
+      <button className="ghost" onClick={back}>{gameState.question_index > 0 ? '← Назад' : '← К титулу'}</button>
+      {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+      {step.kind === 'afterRound'
+        ? <AfterRoundNav pack={pack} gameState={gameState} />
+        : <button onClick={next}>Дальше →</button>}
+    </div>
+  )
+}
+
 function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGameState>['gameState']> }) {
   return gameState.question_index > 0
     ? <button className="ghost" onClick={() => void gotoQuestion(gameState.question_index - 1)}>← Назад</button>

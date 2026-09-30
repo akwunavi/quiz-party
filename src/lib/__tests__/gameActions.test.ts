@@ -14,6 +14,7 @@ const roomMock = {
   patchSession: vi.fn().mockResolvedValue(undefined),
   setPackStatus: vi.fn().mockResolvedValue(undefined),
   readSession: vi.fn().mockResolvedValue({ game_id: 'g1' }),
+  markQuestionShown: vi.fn().mockResolvedValue(undefined),
 }
 
 let localMode = false
@@ -24,7 +25,7 @@ vi.mock('../room', () => ({ getRoomId: () => 'room-1' }))
 const fromMock = vi.fn()
 vi.mock('../supabase', () => ({ supabase: { from: (...args: unknown[]) => fromMock(...args) } }))
 
-const { resetGame, finishGame } = await import('../gameActions')
+const { resetGame, finishGame, gotoQuestionShown } = await import('../gameActions')
 
 function chainable() {
   const chain = {
@@ -72,3 +73,15 @@ describe('resetGame', () => {
     expect(roomMock.patchSession).toHaveBeenCalled()
   })
 })
+
+describe('gotoQuestionShown («Скрэмбл»: назад к показанному вопросу, ревью 9.74)', () => {
+  it('ответ остаётся показанным, таймер не запускается, question_shown не трогается', async () => {
+    await gotoQuestionShown(2)
+    expect(roomMock.patchSession).toHaveBeenCalledTimes(1)
+    expect(roomMock.patchSession).toHaveBeenCalledWith('room-1', {
+      phase: 'question', question_index: 2, timer_started_at: null, reveal: true,
+    })
+    expect(roomMock.markQuestionShown).not.toHaveBeenCalled()
+  })
+})
+

@@ -22,6 +22,7 @@ import { mediaScaleVar, mediaUrl } from '../../lib/media'
 import {
   anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramHintTile, anagramMaxHints,
   anagramWinner, anagramStartIso, anagramElapsedMs, formatRaceTime, isAnagramCorrect, hashStr,
+  anagramFlightPlan,
 } from '../../lib/anagram'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { AnagramSettings, GameState, Question } from '../../types/quiz'
@@ -129,7 +130,13 @@ export function AnagramBoard({
   const allLanded = reveal && tiles.every((_, p) => landed.has(p))
   const boardRef = useFitText<HTMLDivElement>([q.id, reveal, letters.length, allLanded])
   const firstRun = useRef(true)
-  const timers = useRef(new Map<number, number>())
+  // Реестр ТЕКУЩИХ полётов: плитка → клетка назначения + отмена (снять
+  // .fly/transform, слушатели, страховочный таймер). Раньше очистка эффекта
+  // отменяла только rAF, а таймеры посадки и слушатели жили дальше: ↻ повтор
+  // или смена стадии посреди полёта «сажали» плитку в клетку без подсказки,
+  // а показ ответа посреди полёта подсказки перезамерял плитку в полёте и
+  // уводил мимо клетки (ревью 9.74).
+  const flights = useRef(new Map<number, { cell: number; cancel: () => void }>())
 
   // ── FLIP-перелёт плитки в клетку ──
   // Только transform (раскладку не трогает — useFitText не сбивается).
@@ -137,15 +144,21 @@ export function AnagramBoard({
   // и reduced-motion — без полёта, сразу конечное состояние.
   useLayoutEffect(() => {
     const board = boardRef.current
-    const want = new Set(targets)
+    const want = new Map(targets.map(p => [p, order[p]] as [number, number]))
     const instant = firstRun.current || motionReduced() || !board
     firstRun.current = false
-    // плитки, которые больше не цель (повтор вопроса сбросил старт), —
-    // обратно в пул
+    const flyingCells = new Map([...flights.current].map(([p, f]) => [p, f.cell] as [number, number]))
+    const plan = anagramFlightPlan(want, landed, flyingCells)
+    // полёты, чья цель исчезла или сменилась, — отменить (плитка в пул)
+    for (const p of instant ? [...flights.current.keys()] : plan.cancel) {
+      flights.current.get(p)?.cancel()
+      flights.current.delete(p)
+    }
+    // стоящие плитки, которые больше не цель, — обратно в пул
     if (board) {
       board.querySelectorAll<HTMLElement>('.an-tile').forEach(el => {
         const p = Number(el.dataset.p)
-        if (!want.has(p)) { el.style.transform = ''; el.classList.remove('fly') }
+        if (!want.has(p) && !flights.current.has(p)) { el.style.transform = ''; el.classList.remove('fly') }
       })
     }
     setLanded(prev => {
@@ -153,14 +166,14 @@ export function AnagramBoard({
       if (instant) targets.forEach(p => kept.add(p))
       return kept.size === prev.size && [...kept].every(p => prev.has(p)) ? prev : kept
     })
-    if (instant || !board) return
-    const pending = targets.filter(p => !landed.has(p))
-    if (!pending.length) return
+    if (instant || !board || !plan.start.length) return
     // после useFitText (он тоже в rAF) — меряем уже подогнанную раскладку
     const raf = requestAnimationFrame(() => {
-      for (const p of pending) {
+      for (const p of plan.start) {
+        if (flights.current.has(p)) continue
+        const cellIdx = order[p]
         const tile = board.querySelector<HTMLElement>(`.an-tile[data-p="${p}"]`)
-        const cell = board.querySelector<HTMLElement>(`.an-cell[data-i="${order[p]}"]`)
+        const cell = board.querySelector<HTMLElement>(`.an-cell[data-i="${cellIdx}"]`)
         if (!tile || !cell) { setLanded(prev => new Set(prev).add(p)); continue }
         const a = tile.getBoundingClientRect(), b = cell.getBoundingClientRect()
         const dx = (b.left + b.width / 2) - (a.left + a.width / 2)
@@ -170,24 +183,29 @@ export function AnagramBoard({
         tile.classList.add('fly')
         tile.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
         const durMs = transitionMs(tile)
-        let done = false
-        const arm = (ms: number) => {
-          clearTimeout(timers.current.get(p))
-          timers.current.set(p, window.setTimeout(land, ms))
-        }
-        const land = () => {
-          if (done) return
-          done = true
-          clearTimeout(timers.current.get(p))
-          timers.current.delete(p)
+        let timer = 0
+        const detach = () => {
+          clearTimeout(timer)
           tile.removeEventListener('transitionend', onEnd)
           tile.removeEventListener('transitionstart', onStart)
+        }
+        const land = () => {
+          if (flights.current.get(p)?.cancel !== cancel) return
+          detach()
+          flights.current.delete(p)
           setLanded(prev => (prev.has(p) ? prev : new Set(prev).add(p)))
         }
+        const cancel = () => {
+          detach()
+          tile.classList.remove('fly')   // без перехода — сразу в пул
+          tile.style.transform = ''
+        }
+        const arm = (ms: number) => { clearTimeout(timer); timer = window.setTimeout(land, ms) }
         const onEnd = (e: TransitionEvent) => { if (e.propertyName === 'transform') land() }
         const onStart = (e: TransitionEvent) => {
           if (e.propertyName === 'transform') arm(durMs + LAND_AFTER_START_MS)
         }
+        flights.current.set(p, { cell: cellIdx, cancel })
         tile.addEventListener('transitionend', onEnd)
         tile.addEventListener('transitionstart', onStart)
         // перехода нет вовсе (длительность 0) — садимся сразу
@@ -198,9 +216,10 @@ export function AnagramBoard({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetsKey, q.id])
 
+  // размонтирование — отменить все полёты (таймеры и слушатели)
   useEffect(() => {
-    const t = timers.current
-    return () => { t.forEach(id => clearTimeout(id)); t.clear() }
+    const f = flights.current
+    return () => { f.forEach(x => x.cancel()); f.clear() }
   }, [])
 
   // ── вычисления для разметки (без хуков) ──

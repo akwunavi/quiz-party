@@ -133,7 +133,10 @@ export function anagramMaxHints(n: number): number {
 }
 
 /** Сколько подсказок открыто к моменту `nowMs`. Считается одинаково на
- *  всех экранах от общего старта таймера; после конца таймера замирает. */
+ *  всех экранах от общего старта таймера. Подсказка открывается СТРОГО ДО
+ *  конца таймера: при 30 с / 10 с — максимум 2, а не 3 (третья пришлась бы
+ *  ровно на момент автопоказа ответа и полетела бы одновременно с ним —
+ *  ревью 9.74, HANDOFF §3ca). После конца таймера число замирает. */
 export function anagramHintsOpen(p: {
   nowMs: number
   startedAtIso: string | null | undefined
@@ -145,8 +148,8 @@ export function anagramHintsOpen(p: {
   const start = Date.parse(p.startedAtIso)
   if (!Number.isFinite(start)) return 0
   const elapsed = Math.max(0, p.nowMs - start)
-  const capped = Math.min(elapsed, Math.max(0, p.timerSec) * 1000)
-  return Math.max(0, Math.min(p.maxHints, Math.floor(capped / (p.intervalSec * 1000))))
+  const beforeEnd = Math.max(0, Math.ceil(Math.max(0, p.timerSec) / p.intervalSec) - 1)
+  return Math.max(0, Math.min(p.maxHints, beforeEnd, Math.floor(elapsed / (p.intervalSec * 1000))))
 }
 
 /** Плитка, которая на проекторе «уходит» в клетку-подсказку `letterIdx`. */
@@ -350,4 +353,101 @@ export function anagramQuestion(phrase: string, order: number[]) {
   const letters = template.letters
   const ord = isPermutation(order, letters.length) ? order : letters.map((_, i) => i)
   return { template, letters, order: ord, tiles: anagramTiles(letters, ord) }
+}
+
+// ── Перелёты плиток на проекторе (план, без DOM) ───────
+
+/** Что делать с перелётами при смене целей: `want` — плитка → клетка, куда
+ *  она ДОЛЖНА сесть; `flying` — плитка → клетка текущего полёта. Полёт к
+ *  той же клетке НЕ перезапускается (повторный замер посреди полёта уводил
+ *  плитку мимо — ревью 9.74); полёт, цель которого исчезла или сменилась
+ *  (↻ повтор, смена стадии предпросмотра), отменяется. */
+export function anagramFlightPlan(want: ReadonlyMap<number, number>, landed: ReadonlySet<number>,
+  flying: ReadonlyMap<number, number>): { cancel: number[]; start: number[] } {
+  const cancel: number[] = []
+  for (const [p, cell] of flying) if (want.get(p) !== cell) cancel.push(p)
+  const start: number[] = []
+  for (const [p, cell] of want) {
+    if (landed.has(p)) continue
+    if (flying.get(p) === cell) continue
+    start.push(p)
+  }
+  return { cancel, start }
+}
+
+// ── Навигация ведущего (одно решение для проектора и пульта) ──
+
+/** Сколько секунд после старта таймера «Дальше» ещё не показывает ответ:
+ *  защита от двойного тапа (первый тап открыл вопрос, второй тут же
+ *  показал бы ответ). */
+export const ANAGRAM_REVEAL_GUARD_MS = 3000
+
+export type AnagramStep =
+  | { kind: 'reveal' }
+  | { kind: 'next'; index: number }
+  | { kind: 'afterRound' }
+  | { kind: 'wait'; text: string }
+
+/** «Дальше →» на вопросе «Скрэмбла»: сначала показ ответа, потом следующий
+ *  вопрос, на последнем — маршрут после раунда. Общая для HostScreen и
+ *  AdminPage — раньше проектор уходил дальше без показа (ревью 9.74). */
+export function anagramAdvance(p: {
+  reveal: boolean; timerStartedAt: string | null; index: number; count: number; nowMs: number
+}): AnagramStep {
+  if (!p.reveal) {
+    const start = p.timerStartedAt ? Date.parse(p.timerStartedAt) : NaN
+    if (!Number.isFinite(start)) return { kind: 'wait', text: 'Время по вопросу ещё не пошло — ответ показывать рано' }
+    if (p.nowMs - start < ANAGRAM_REVEAL_GUARD_MS)
+      return { kind: 'wait', text: 'Вопрос только что открыт — нажми ещё раз через пару секунд, чтобы показать ответ' }
+    return { kind: 'reveal' }
+  }
+  return p.index + 1 < p.count ? { kind: 'next', index: p.index + 1 } : { kind: 'afterRound' }
+}
+
+/** «← Назад» с вопроса «Скрэмбла»: к ПОКАЗАННОМУ предыдущему вопросу (не
+ *  перезапуская его вживую — gotoQuestionShown), с первого — на заставку. */
+export function anagramBack(index: number): { kind: 'shown'; index: number } | { kind: 'intro' } {
+  return index > 0 ? { kind: 'shown', index: index - 1 } : { kind: 'intro' }
+}
+
+// ── Черновик доски на телефоне ─────────────────────────
+
+export interface AnagramLocal { key: string; cells: (number | null)[]; edits: number; sent: string | null }
+
+export function anagramLocalKey(gameId: string, qid: string): string {
+  // префикс qp-answers- подчищает forgetPlayerData при смене игры
+  return `qp-answers-anagram-${gameId}-${qid}`
+}
+
+/** Прочитать черновик под ключом; битый/чужой длины — пустой. */
+export function readAnagramLocal(get: (k: string) => string | null, key: string, n: number): AnagramLocal {
+  try {
+    const v = JSON.parse(get(key) ?? '') as Partial<AnagramLocal>
+    if (Array.isArray(v.cells) && v.cells.length === n)
+      return { key, cells: v.cells, edits: Number(v.edits) || 0, sent: v.sent ?? null }
+  } catch { /* пусто */ }
+  return { key, cells: Array.from({ length: n }, () => null), edits: 0, sent: null }
+}
+
+/** Записать черновик, ТОЛЬКО если он загружен под этим же ключом. Иначе
+ *  на переходе вопрос N→N+1 доска (и потраченные правки) вопроса N
+ *  записывалась под ключ N+1 — ревью 9.74, блокер. */
+export function persistAnagramLocal(set: (k: string, v: string) => void, key: string, st: AnagramLocal): boolean {
+  if (st.key !== key) return false
+  set(key, JSON.stringify(st))
+  return true
+}
+
+/** Вердикт на телефоне после показа ответа — из строки в базе, как в
+ *  totals (`is_correct ?? точная проверка`), а не из локального «отправлено»:
+ *  ведущий мог поставить ✗, ответ мог не доехать. */
+export function anagramPlayerVerdict(p: {
+  sent: string | null; loaded: boolean
+  row: Pick<Answer, 'answer_text' | 'is_correct'> | undefined; phrase: string
+}): 'ok' | 'wrong' | 'lost' | 'checking' | null {
+  if (p.row && p.row.answer_text) {
+    return (p.row.is_correct ?? isAnagramCorrect(p.row.answer_text, p.phrase)) === true ? 'ok' : 'wrong'
+  }
+  if (!p.sent) return null
+  return p.loaded ? 'lost' : 'checking'
 }
