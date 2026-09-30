@@ -98,6 +98,7 @@ export type MechanicKey =
   | 'race'          // «Скачки бульдогов»: ставка на номер, баллы по месту
   | 'blitz'         // «100 вопросов»: ход по кругу, у каждой команды свой таймер
   | 'four_pics'     // «3 попытки»: 2–4 картинки → слово, 2/1/0.5 балла по фазе
+  | 'anagram'       // «Скрэмбл»: буквы фразы перемешаны, собрать обратно; режим standard/race
 
 export type AnswersReveal = 'after_question' | 'after_round' | 'never'
 
@@ -168,6 +169,14 @@ export interface RevealSettings {
   p3Sec?: number      // фаза 3 (4 картинки), дефолт 10
   shortSec?: number   // укороченные фазы 2/3, если все ответили раньше, дефолт 10
 }
+/** «Скрэмбл» (`anagram`). Таймер — общий `round.timer_seconds`, показ
+ *  ответа всегда `after_question` (HANDOFF §3ca). */
+export interface AnagramSettings {
+  mode?: 'standard' | 'race'    // дефолт standard; race — балл первому верному
+  pointsPerQuestion?: number    // дефолт 1
+  hintIntervalSec?: number      // дефолт 10; 0 — подсказок нет
+  maxEdits?: number             // лимит правок ответа (общий редактор раунда)
+}
 export interface MelodyTheme {
   name: string
   tracks: { audio: string; correct: string }[]
@@ -175,7 +184,7 @@ export interface MelodyTheme {
 export type MechanicSettings =
   | StandardSettings | TestStopSettings | StakesSettings
   | JeopardySettings | CrosswordSettings | SprintSettings | MelodySettings | RaceSettings
-  | RevealSettings
+  | RevealSettings | AnagramSettings
   | Record<string, never>
 
 // ── Кроссворд ──────────────────────────────────────────
@@ -207,7 +216,7 @@ export interface QuestionMedia {
 
 export type AnswerSpec =
   | FreeTextAnswer | ChoiceAnswer | OrderAnswer
-  | MatchAnswer | CrosswordAnswer | ManualAnswer
+  | MatchAnswer | CrosswordAnswer | ManualAnswer | AnagramAnswer
 
 export interface FreeTextAnswer {
   mode: 'free_text'
@@ -238,6 +247,17 @@ export interface MatchAnswer {
 export interface CrosswordAnswer {
   mode: 'crossword_word'
   word: string                  // проверка по буквам, регистр/ё не важны
+}
+/** «Скрэмбл»: фраза-ответ + сохранённое перемешивание (генерируется и
+ *  правится в редакторе, на игре не меняется — lib/anagram.ts). */
+export interface AnagramAnswer {
+  mode: 'anagram'
+  /** фраза-ответ как её вписал редактор (регистр сохраняется, на экраны
+   *  уходит upperCase; Ё показывается как Ё, проверка считает Ё=Е) */
+  phrase: string
+  /** order[p] = индекс буквы в anagramTemplate(phrase).letters, стоящей
+   *  на плитке p. Перестановка длины letters.length. */
+  order: number[]
 }
 export interface ManualAnswer {
   mode: 'none'
@@ -364,4 +384,10 @@ export interface Answer {
   // правке ответа командой, и при оценке ведущего. На старых играх (до
   // миграции) может отсутствовать в ответе базы.
   created_at?: string
+  /** Серверный момент ПОСЛЕДНЕЙ смены answer_text (миграция 0015, триггер
+   *  answers_set_accepted_at, clock_timestamp()). Оценка ведущего его не
+   *  двигает. Нет поля — миграция не прогнана, фолбэк на updated_at
+   *  (часы телефона) — lib/anagram.ts:anagramAcceptedAt. Клиент его НЕ
+   *  пишет никогда (AnswerPatch его исключает). */
+  accepted_at?: string
 }

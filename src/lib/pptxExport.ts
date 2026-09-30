@@ -164,6 +164,8 @@ function answerContent(a: AnswerSpec): { body?: string; lines?: string[]; choice
       return { body: a.word }
     case 'none':
       return { body: a.display }
+    case 'anagram':
+      return { body: a.phrase.toUpperCase() }
   }
 }
 
@@ -180,6 +182,7 @@ function answerPlainText(a: AnswerSpec): string {
     case 'match': return answerContent(a).lines?.join('; ') ?? ''
     case 'crossword_word': return a.word
     case 'none': return a.display
+    case 'anagram': return a.phrase.toUpperCase()
   }
 }
 

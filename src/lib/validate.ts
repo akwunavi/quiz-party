@@ -115,6 +115,8 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
       break
     case 'none':
       break
+    case 'anagram':
+      break   // правила «Скрэмбла» — validateAnagram (коммит редактора)
   }
 
   if (round.mechanic === 'rebus') {

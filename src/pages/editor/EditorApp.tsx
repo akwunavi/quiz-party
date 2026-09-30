@@ -224,6 +224,7 @@ export const MECHANIC_NAMES: Record<MechanicKey, string> = {
   blitz: 'Блиц «100 вопросов»',
   race: 'Скачки бульдогов (финал-лотерея)',
   four_pics: '3 попытки (картинки → слово)',
+  anagram: 'Скрэмбл (анаграммы)',
 }
 
 export function EditorApp() {

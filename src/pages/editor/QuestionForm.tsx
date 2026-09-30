@@ -20,6 +20,7 @@ const MODE_NAMES: Record<AnswerSpec['mode'], string> = {
   match: 'Сопоставление',
   crossword_word: 'Кроссворд',
   none: 'Ручная проверка',
+  anagram: 'Скрэмбл',
 }
 
 const MODE_HINTS: Record<AnswerSpec['mode'], string> = {
@@ -29,6 +30,7 @@ const MODE_HINTS: Record<AnswerSpec['mode'], string> = {
   match: 'Игрок соединяет номера (картинки/треки на экране) с буквами вариантов.',
   crossword_word: 'Слово вписывается в общую сетку кроссворда. Текст вопроса = определение.',
   none: 'Автопроверки нет: ответ показывается на экране, а верность каждой команды ты отмечаешь вручную в админке. Для вопросов, где ответ нельзя сверить машинально.',
+  anagram: 'Фраза-ответ, буквы перемешиваются; проверка точная (без допуска на опечатки).',
 }
 
 export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }: {
@@ -137,7 +139,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             <label>Тип вопроса</label>
             <select value={q.answer.mode}
               onChange={e => setAnswer(defaultAnswer(e.target.value as AnswerSpec['mode']))}>
-              {(Object.keys(MODE_NAMES) as AnswerSpec['mode'][]).map(m =>
+              {/* «Скрэмбл» живёт только в своём раунде (там тип фиксирован) —
+                  в обычном вопросе проектор его не нарисует */}
+              {(Object.keys(MODE_NAMES) as AnswerSpec['mode'][]).filter(m => m !== 'anagram').map(m =>
                 <option key={m} value={m}>{MODE_NAMES[m]}</option>)}
             </select>
             <div className="ed-hint">{MODE_HINTS[q.answer.mode]}</div>
@@ -167,6 +171,7 @@ function defaultAnswer(mode: AnswerSpec['mode']): AnswerSpec {
     case 'match': return { mode, left: ['1', '2', '3', '4'], right: ['А', 'Б', 'В', 'Г'], correct_pairs: [], display: '' }
     case 'crossword_word': return { mode, word: '' }
     case 'none': return { mode, display: '' }
+    case 'anagram': return { mode, phrase: '', order: [] }
   }
 }
 
@@ -276,6 +281,7 @@ function AnswerEditor({ spec, onChange, imgs, mechanic }: {
           onChange={e => onChange({ ...spec, display: e.target.value })} />
       </div>
     )
+    case 'anagram': return null   // редактор фразы — коммит редактора «Скрэмбла»
   }
 }
 
@@ -527,6 +533,7 @@ function questionErrors(q: Question): string[] {
     case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
     case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
     case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
+    case 'anagram': break
   }
   return errs
 }
