@@ -4,6 +4,8 @@ import type { Answer, Team, JeopardyTheme } from '../types/quiz'
 import type { LoadedPack } from './packLoader'
 import { finalQuestionOf, scoringQuestionsOf } from './thematic'
 import { autocheck } from './autocheck'
+import { anagramWinner, isAnagramCorrect } from './anagram'
+import type { AnagramSettings } from '../types/quiz'
 import {
   scoreStandard, scoreTestStop, scoreStakesUnique, scoreStakesFree,
   scoreThematic, scoreSprint, scoreMelody, scoreRace, scoreReveal, type ScoredAnswer,
@@ -38,6 +40,37 @@ function scoreJeopardyRound(
     const tile = jeopardyTile(a.question_ref, ri)
     if (tile == null) continue
     total += values[tile] ?? 0
+  }
+  return total
+}
+
+// ── «Скрэмбл» (anagram) ──────────────────────────────────────────────────
+// Обычный режим: pointsPerQuestion за каждый верный ответ (ручная оценка
+// ведущего перебивает точную автопроверку). Гонка: балл по вопросу получает
+// ОДНА команда — чей верный ответ сервер принял раньше (anagramWinner,
+// accepted_at; без миграции 0015 — updated_at). На бумаге гонка
+// невозможна (времени на бланке нет) — считается как обычный. Одна функция
+// на обе итоговые таблицы — computeTotals и computeRoundScores не могут
+// разойтись (HANDOFF §3ca). Скрытые вопросы не фильтруются — как во всех
+// остальных ветках.
+function scoreAnagramRound(
+  pack: LoadedPack, round: LoadedPack['rounds'][number], teamId: string, answers: Answer[],
+): number {
+  const s = (round.settings ?? {}) as AnagramSettings
+  const pts = s.pointsPerQuestion ?? 1
+  const race = (s.mode ?? 'standard') === 'race' && pack.settings?.play_mode !== 'paper'
+  let total = 0
+  for (const q of round.questions) {
+    if (q.answer.mode !== 'anagram') continue
+    const phrase = q.answer.phrase
+    const ref = `q-${q.id}`
+    if (race) {
+      const rows = answers.filter(x => x.question_ref === ref)
+      if (anagramWinner(rows, phrase) === teamId) total += pts
+    } else {
+      const a = answers.find(x => x.team_id === teamId && x.question_ref === ref)
+      if (a && (a.is_correct ?? isAnagramCorrect(a.answer_text, phrase)) === true) total += pts
+    }
   }
   return total
 }
@@ -124,6 +157,11 @@ export function computeTotals(
           }
         })
         total += scoreReveal(rows)
+        return
+      }
+      // «Скрэмбл»: обычный/гонка, см. scoreAnagramRound
+      if (round.mechanic === 'anagram') {
+        total += scoreAnagramRound(pack, round, t.id, answers)
         return
       }
       // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь
@@ -232,6 +270,11 @@ export function computeRoundScores(
           }
         })
         per.push(scoreReveal(rows))
+        return
+      }
+      // «Скрэмбл»: та же функция, что в computeTotals
+      if (round.mechanic === 'anagram') {
+        per.push(scoreAnagramRound(pack, round, t.id, answers))
         return
       }
       // Финальный вопрос тематического раунда — НЕ обычный вопрос: он лишь

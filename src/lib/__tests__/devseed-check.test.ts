@@ -137,4 +137,43 @@ describe('сверка: кроссворд и тематический с удв
     expect(actual).toBe(expectedThematic(answers, 'q-fin'))
     expect(actual).toBe(2)
   })
+
+  // «Скрэмбл»: правила словами — обычный: балл за каждый верный; гонка: по
+  // вопросу балл одной команде — чей верный ответ сервер принял раньше.
+  const anQ = [{ id: 'a', hidden: false, answer: { mode: 'anagram', phrase: 'кот', order: [2, 0, 1] },
+    media: {}, question_text: '' }, { id: 'b', hidden: false,
+    answer: { mode: 'anagram', phrase: 'лес', order: [1, 2, 0] }, media: {}, question_text: '' }]
+  const anAnswers = [
+    ans({ team_id: 't1', question_ref: 'q-a', answer_text: 'кот', is_correct: true, accepted_at: '2026-01-01T00:00:05Z' }),
+    ans({ team_id: 't2', question_ref: 'q-a', answer_text: 'кот', is_correct: true, accepted_at: '2026-01-01T00:00:03Z' }),
+    ans({ team_id: 't1', question_ref: 'q-b', answer_text: 'лес', is_correct: true, accepted_at: '2026-01-01T00:00:09Z' }),
+    ans({ team_id: 't2', question_ref: 'q-b', answer_text: 'сел', is_correct: false, accepted_at: '2026-01-01T00:00:01Z' }),
+  ]
+  function expectedAnagramRace(answers: Answer[], teamId: string): number {
+    let won = 0
+    for (const q of anQ) {
+      const first = answers.filter(a => a.question_ref === `q-${q.id}` && a.is_correct === true)
+        .sort((x, y) => Date.parse(x.accepted_at ?? x.updated_at) - Date.parse(y.accepted_at ?? y.updated_at))[0]
+      if (first?.team_id === teamId) won++
+    }
+    return won
+  }
+
+  it('скрэмбл, обычный: балл за каждый верный', () => {
+    const pack = { rounds: [{ id: 'r', mechanic: 'anagram', off_scoreboard: false,
+      settings: { mode: 'standard' }, questions: anQ }] } as unknown as LoadedPack
+    const tot = computeTotals(pack, [team('t1'), team('t2')], anAnswers)
+    expect(tot.get('t1')).toBe(anAnswers.filter(a => a.team_id === 't1' && a.is_correct).length)
+    expect(tot.get('t2')).toBe(1)
+  })
+
+  it('скрэмбл, гонка: балл первому верному по серверному времени', () => {
+    const pack = { rounds: [{ id: 'r', mechanic: 'anagram', off_scoreboard: false,
+      settings: { mode: 'race' }, questions: anQ }] } as unknown as LoadedPack
+    const tot = computeTotals(pack, [team('t1'), team('t2')], anAnswers)
+    expect(tot.get('t1')).toBe(expectedAnagramRace(anAnswers, 't1'))
+    expect(tot.get('t2')).toBe(expectedAnagramRace(anAnswers, 't2'))
+    expect([tot.get('t1'), tot.get('t2')]).toEqual([1, 1])
+  })
 })
+
