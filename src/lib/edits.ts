@@ -6,11 +6,16 @@
 // Правило: правка засчитывается ТОЛЬКО за смену уже готового ответа на
 // другой готовый. Набор первого ответа бесплатен, сколько бы тапов он ни занял.
 import type { AnswerSpec } from '../types/quiz'
+import { anagramLetterCount, anagramTemplate } from './anagram'
 
 export function isComplete(spec: AnswerSpec, text: string): boolean {
   if (!text) return false
   if (spec.mode === 'match') return text.split(',').filter(Boolean).length >= spec.left.length
   if (spec.mode === 'order') return text.length >= spec.choices.length
+  // «Скрэмбл»: готов, когда собраны ВСЕ буквы (иначе частичная отправка была
+  // бы бесплатной правкой). Считаем именно буквы: цифры/знаки фразы стоят на
+  // месте сами и попадают в текст даже при пустых клетках.
+  if (spec.mode === 'anagram') return anagramLetterCount(text) >= anagramTemplate(spec.phrase).letters.length
   return true
 }
 

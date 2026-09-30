@@ -2,6 +2,8 @@ import { jeopardyRef } from './jeopardyRef'
 import { room } from './transport'
 import { registerTeam } from './gameActions'
 import { computeTotals } from './totals'
+// только генерация ответов сида; сверка ниже считает гонку своим кодом
+import { anagramTemplate, anagramTiles } from './anagram'
 import type { LoadedPack } from './packLoader'
 import type { Answer, Question, JeopardyTheme } from '../types/quiz'
 
@@ -91,6 +93,10 @@ function genAnswer(q: Question, correct: boolean): string {
       return shuffle(a.correct_pairs).join(',')
     case 'crossword_word':
       return correct ? a.word : shuffle(a.word.split('')).join('')
+    case 'anagram':
+      // неверно — буквы как лежат на плитках (перемешивание заведомо не
+      // совпадает с фразой, это проверяет редактор)
+      return correct ? a.phrase : anagramTiles(anagramTemplate(a.phrase).letters, a.order).join('')
     case 'free_text': {
       const first = (a.correct ?? '').split(' / ')[0]?.trim()
       if (correct && first && first !== '—') return first
@@ -189,7 +195,7 @@ export type CheckRow = {
 /** Ожидаемые баллы команды за раунд, посчитанные «руками». */
 function expectedForRound(
   round: LoadedPack['rounds'][number], roundNumber: number,
-  teamId: string, answers: Answer[],
+  teamId: string, answers: Answer[], playMode?: string,
 ): number {
   if (round.off_scoreboard) return 0
   const mine = answers.filter(a => a.team_id === teamId && a.round_number === roundNumber)
@@ -253,6 +259,35 @@ function expectedForRound(
     case 'crossword':
       // по баллу за каждое верно угаданное слово
       return right.length
+    case 'anagram': {
+      // «Скрэмбл», правила словами (независимо от totals.ts/anagram.ts):
+      // обычный — pointsPerQuestion (1) за каждый ответ, отмеченный верным;
+      // гонка — по каждому вопросу балл получает ровно одна команда: та, чей
+      // верный ответ пришёл на сервер раньше (accepted_at, без него —
+      // updated_at; при равенстве — меньший updated_at, затем меньший id
+      // команды). На бумаге гонки нет — считается как обычный.
+      const pts = (round.settings as { pointsPerQuestion?: number }).pointsPerQuestion ?? 1
+      const raceMode = (round.settings as { mode?: string }).mode === 'race' && playMode !== 'paper'
+      if (!raceMode) return right.length * pts
+      // время сравниваем с микросекундами: у Postgres их 6 знаков
+      const micros = (iso?: string) => {
+        if (!iso) return Infinity
+        const frac = /\.(\d{4,6})/.exec(iso)?.[1] ?? ''
+        return Date.parse(iso) * 1000 + Number((frac.slice(3) + '000').slice(0, 3))
+      }
+      let won = 0
+      for (const q of round.questions) {
+        const ref = `q-${q.id}`
+        const firstRight = answers
+          .filter(a => a.question_ref === ref && a.round_number === roundNumber && a.is_correct === true)
+          .sort((x, y) =>
+            (micros(x.accepted_at ?? x.updated_at) - micros(y.accepted_at ?? y.updated_at))
+            || (micros(x.updated_at) - micros(y.updated_at))
+            || (x.team_id < y.team_id ? -1 : x.team_id > y.team_id ? 1 : 0))[0]
+        if (firstRight?.team_id === teamId) won += pts
+      }
+      return won
+    }
     case 'thematic_x2': {
       // Финальный вопрос помечен флагом is_final_question в редакторе —
       // «последний по счёту» тут НЕ подходит. Своих баллов он не приносит,
@@ -290,7 +325,7 @@ export async function checkRoundScoring(
   const actual = computeTotals(onePack, teams, oneRoundAnswers)
 
   return teams.map(t => {
-    const expected = expectedForRound(round, roundNumber, t.id, answers)
+    const expected = expectedForRound(round, roundNumber, t.id, answers, pack.settings?.play_mode)
     const got = actual.get(t.id) ?? 0
     return { team: t.name, expected, actual: got, diff: +(got - expected).toFixed(2) }
   })

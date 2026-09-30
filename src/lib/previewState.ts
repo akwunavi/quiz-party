@@ -67,6 +67,12 @@ export function previewStages(mech: MechanicKey): { key: string; label: string }
         { key: 'answering', label: 'Ответ' },
         { key: 'reveal', label: 'Разбор' },
       ]
+    case 'anagram':
+      return [
+        { key: 'question', label: 'Вопрос' },
+        { key: 'hints', label: 'Подсказки' },
+        { key: 'answer', label: 'Ответ' },
+      ]
     case 'race':
       return [
         { key: 'betting', label: 'Ставки' },
@@ -98,6 +104,20 @@ export function previewAnswers(round: LoadedRound, qIndex: number, stage: string
   if (round.mechanic === 'race') {
     return teams.map((_, i) => mk(`q-race-${round.position}`, String((i % 5) + 1), i))
   }
+  // «Скрэмбл», разбор: две команды с верной фразой (разное время — чтобы
+  // было видно победителя гонки и «ЗА 00:07.482»), одна с неверной.
+  if (round.mechanic === 'anagram' && stage === 'answer') {
+    const q = round.questions[qIndex]
+    const phrase = q?.answer.mode === 'anagram' ? q.answer.phrase : ''
+    const at = (msAgo: number) => new Date(Date.now() - msAgo).toISOString()
+    const ref = `q-${q?.id ?? 'pv'}`
+    const start = anagramPreviewElapsed(round)
+    return [
+      { ...mk(ref, phrase, 0), accepted_at: at(start - 7482), updated_at: at(start - 7482) },
+      { ...mk(ref, phrase, 1), accepted_at: at(start - 9100), updated_at: at(start - 9100) },
+      { ...mk(ref, 'ПРЕДПРОСМОТР', 2), accepted_at: at(start - 5000), updated_at: at(start - 5000) },
+    ]
+  }
   return []
 }
 
@@ -105,6 +125,28 @@ export function previewAnswers(round: LoadedRound, qIndex: number, stage: string
  *  Контракт «мешка механик» (melody) — по таблице из плана объединения
  *  предпросмотра (HANDOFF.md): каждая ветка задаёт РОВНО то поле, которое
  *  читает соответствующий Board-компонент, остальное не трогает. */
+/** «Скрэмбл», стадия «Ответ»: сколько мс назад «стартовал» таймер. Общая
+ *  константа для previewGameState и previewAnswers, чтобы «ЗА 00:07.482»
+ *  в разборе считалось от того же старта. */
+const PREVIEW_ANAGRAM_ELAPSED_MS = 60_000
+/** Стадия «Ответ» — таймер уже истёк (не меньше минуты назад и не меньше
+ *  длины таймера + 1 с). */
+function anagramPreviewElapsed(round: LoadedRound): number {
+  return Math.max(PREVIEW_ANAGRAM_ELAPSED_MS, round.timer_seconds * 1000 + 1000)
+}
+
+/** «Скрэмбл» — ЕДИНСТВЕННОЕ исключение из «таймер не запущен»: подсказки
+ *  вычисляются от старта таймера, без него стадию «Подсказки» не показать.
+ *  Ничего не пишется — это синтетическое значение в памяти предпросмотра;
+ *  гонг таймера в предпросмотре выключен (QuestionPreview: chime={false}). */
+function previewTimerStart(round: LoadedRound, stage?: string): string | null {
+  if (round.mechanic !== 'anagram') return null
+  const interval = (round.settings as { hintIntervalSec?: number }).hintIntervalSec ?? 10
+  if (stage === 'hints') return new Date(Date.now() - (2 * Math.max(1, interval) + 0.5) * 1000).toISOString()
+  if (stage === 'answer') return new Date(Date.now() - anagramPreviewElapsed(round)).toISOString()
+  return null
+}
+
 export function previewGameState(
   pack: LoadedPack, round: LoadedRound, roundIdx: number, qIndex: number, stage?: string,
 ): GameState {
@@ -117,7 +159,7 @@ export function previewGameState(
     phase: 'question',
     round_number: roundIdx,
     question_index: qIndex,
-    timer_started_at: null,
+    timer_started_at: previewTimerStart(round, stage),
     reveal: stage === 'answer',
     completed_rounds: [],
     updated_at: new Date().toISOString(),

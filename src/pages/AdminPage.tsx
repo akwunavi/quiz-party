@@ -15,6 +15,7 @@ import {
   gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
+  gotoQuestionShown,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { runAction } from '../lib/actionStatus'
@@ -61,6 +62,11 @@ import type {
 import { saveReveal, clearReveal } from '../lib/revealActions'
 import { revealNext, revealAllAnswered } from '../lib/reveal'
 import { revealPointsFor } from '../lib/scoring'
+import {
+  anagramQuestion, anagramHintsOpen, anagramMaxHints, anagramWinner, anagramStartIso,
+  anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack,
+  anagramFirst, anagramWasRun,
+} from '../lib/anagram'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
 // ВЕДУЩИЙ: шапка со ссылками → строка статуса → экран по фазе →
@@ -287,7 +293,7 @@ function RoundPicker({ pack, current }: { pack: LoadedPack; current: number }) {
 }
 
 // ── Экран раунда ──
-function RoundView({ pack, round, gameState, teams, answers, offline }: {
+export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   pack: LoadedPack
   round: LoadedPack['rounds'][number]
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
@@ -302,6 +308,16 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
   const isBlitz = round.mechanic === 'blitz'
   const isMelody = round.mechanic === 'melody'
   const isFourPics = round.mechanic === 'four_pics'
+  // «Скрэмбл» — НЕ интерактивная: обычный ряд Назад/Повтор/Дальше,
+  // шпаргалка, счётчик ответов и «▶ ПРОЧИТАЛ» на бумаге ей подходят.
+  // Своё — только маршрут вопроса (показ ответа после КАЖДОГО вопроса,
+  // HANDOFF §3ca) и пульт ответов с временем (AnagramControls).
+  const isAnagram = round.mechanic === 'anagram'
+  // подсказка к «ДАЛЬШЕ» у «Скрэмбла» (ранний/двойной тап — объяснить, §3d)
+  const navHint = useHint()
+  // «вопрос уже запускался» — по question_shown; опрос только у «Скрэмбла»
+  const shownMap = useQuestionShown(isAnagram ? gameState.game_id : null)
+  const wasRun = anagramWasRun(shownMap, round.questions)
   // игра на бумаге (бар): вопрос читает ведущий вслух, поэтому таймер,
   // музыку и звук вопроса он запускает сам — кнопкой ниже
   const paperMode = pack.settings?.play_mode === 'paper'
@@ -334,8 +350,28 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
   }
 
   const advance = () => {
-    if (phase === 'round_intro') { void runAction('следующий вопрос', () => gotoQuestion(0)); return }
+    if (phase === 'round_intro') {
+      // «Скрэмбл»: вернулись «← К титулу» — первый вопрос уже сыгран,
+      // открываем его показанным, а не заново вживую (ревью 9.75)
+      if (isAnagram && anagramFirst(wasRun).shown)
+        return void runAction('первый вопрос', () => gotoQuestionShown(0))
+      void runAction('следующий вопрос', () => gotoQuestion(0)); return
+    }
     if (phase === 'question') {
+      // «Скрэмбл»: вопрос → показ ответа → следующий; «время ответов» и
+      // разбор в конце раунда у этой механики не существуют. reveal — из
+      // свежего снимка сессии (поллинг), повторный клик по уже показанному
+      // ответу ведёт дальше, а не пишет reveal второй раз.
+      if (isAnagram) {
+        // то же решение, что у кнопки «Дальше →» на проекторе (lib/anagram.ts)
+        const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+          index: step, count: round.questions.length, nowMs: Date.now(), wasRun })
+        if (st.kind === 'wait') return navHint.show(st.text)
+        if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer())
+        if (st.kind === 'next') return void runAction('следующий вопрос',
+          () => st.shown ? gotoQuestionShown(st.index) : gotoQuestion(st.index))
+        return runAfterRound()
+      }
       if (step + 1 < round.questions.length) {
         void runAction('следующий вопрос', () => gotoQuestion(step + 1)); return
       }
@@ -374,9 +410,17 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
     // «120 секунд» сюда не относится: у него разбор по вопросам обычный,
     // своя раскладка только у самой фазы вопроса
     if (isInteractive) void runAction('назад к раунду', () => gotoQuestion(0))
+    // у «Скрэмбла» разбора по вопросам нет — назад к последнему вопросу
+    // к ПОКАЗАННОМУ последнему вопросу, не перезапуская его (ревью 9.74)
+    else if (isAnagram) void runAction('назад к раунду', () => gotoQuestionShown(round.questions.length - 1))
     else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true))
   }
   const goBack = () => {
+    if (phase === 'question' && isAnagram) {
+      const b = anagramBack(step)
+      if (b.kind === 'shown') return void runAction('предыдущий вопрос', () => gotoQuestionShown(b.index))
+      return void runAction('назад к раунду', () => setPhase('round_intro'))
+    }
     if (phase === 'question' && step > 0) void runAction('предыдущий вопрос', () => gotoQuestion(step - 1))
     else if (phase === 'question') void runAction('назад к раунду', () => setPhase('round_intro'))
     else if (phase === 'recap') {
@@ -455,6 +499,11 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
           <RaceControls gameState={gameState} />
         )}
 
+        {isAnagram && phase === 'question' && (
+          <AnagramControls pack={pack} round={round} gameState={gameState}
+            teams={teams} answers={answers} />
+        )}
+
         {/* Пульты «Своей игры» и мелодии (8.86): раньше у обеих механик в
             телефоне была ровно одна кнопка «ЗАВЕРШИТЬ РАУНД» и надпись
             «управляется с проектора» — вести раунд с телефона было нельзя. */}
@@ -487,7 +536,11 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             {(phase === 'question' || phase === 'answer_time') && (
-              <button className="adm-btn" onClick={() => void runAction('повтор вопроса', () => startTimer(
+              <button className="adm-btn" onClick={() => isAnagram && phase === 'question' && gameState.reveal
+                // «Скрэмбл»: после показа ответа повтор ломает гонку (таймер
+                // при показанном ответе, сдвиг shown_at) — объяснить, не писать
+                ? navHint.show('Ответ уже показан — повтор этого вопроса невозможен')
+                : void runAction('повтор вопроса', () => startTimer(
                 phase === 'question' ? {
                   gameId: gameState.game_id, roundNumber: gameState.round_number,
                   questionRef: `q-${round.questions[step].id}`,
@@ -497,9 +550,12 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
             {/* На бумаге вопрос читает ведущий вслух — «Дальше» неактивна,
                 пока не нажата «▶ ПРОЧИТАЛ» ниже: иначе можно проскочить
                 вопрос, ни разу не пустив по нему время. */}
+            {/* показанный вопрос «Скрэмбла» (в т.ч. возвращённый «Назад») на
+                бумаге таймера не имеет — «Дальше» не блокируем */}
             <button className="adm-btn primary" disabled={paperMode && phase === 'question'
-              && !gameState.timer_started_at} onClick={advance}>
-              {phase === 'answer_time' ? 'К ОТВЕТАМ →' : 'ДАЛЬШЕ →'}
+              && !gameState.timer_started_at && !(isAnagram && gameState.reveal)} onClick={advance}>
+              {phase === 'answer_time' ? 'К ОТВЕТАМ →'
+                : isAnagram && phase === 'question' && !gameState.reveal ? 'ПОКАЗАТЬ ОТВЕТ →' : 'ДАЛЬШЕ →'}
             </button>
           </div>
         )}
@@ -558,7 +614,9 @@ function RoundView({ pack, round, gameState, teams, answers, offline }: {
             есть своё аудио/видео — оно само «читает» вопрос залу, кнопка не
             нужна вовсе: таймер и трек стартуют сами (HostScreen.tsx:
             QuestionAudio), как в обычном режиме. */}
+        {isAnagram && phase === 'question' && <Hint text={navHint.text} />}
         {paperMode && phase === 'question' && !gameState.timer_started_at
+          && !(isAnagram && gameState.reveal)
           && !(round.questions[step]?.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m)) && (
           <button className="adm-btn primary adm-start-question"
             onClick={() => void runAction('запуск таймера', () => startTimer({
@@ -843,7 +901,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
 
 function correctOf(q: LoadedPack['rounds'][number]['questions'][number]): string {
   const a = q.answer as unknown as Record<string, unknown>
-  const d = a.display ?? a.correct ?? a.word ?? a.correct_choice ?? a.correct_order ??
+  const d = a.display ?? a.correct ?? a.word ?? a.phrase ?? a.correct_choice ?? a.correct_order ??
     (Array.isArray(a.correct_pairs) ? (a.correct_pairs as string[]).join(' ') : '—')
   return Array.isArray(d) ? d.join(' · ') : String(d)
 }
@@ -1674,6 +1732,93 @@ function RatingsBody({ pack, gameState }: {
  *  тем же значением по факту. Пока забег идёт — ставить нечего, статус
  *  без кнопок; итог и переход дальше уже даёт общий блок «ЗАВЕРШИТЬ РАУНД»
  *  ниже (isInteractive в RoundView) — второй такой кнопки здесь не нужно. */
+/** «Скрэмбл»: пульт ответов текущего вопроса — кто, что, за сколько, вердикт.
+ *  Победитель гонки — ТА ЖЕ anagramWinner, что в totals.ts (не копия), время
+ *  старта — та же anagramStartIso, что на проекторе. Единственная запись —
+ *  оценка ведущего (patchAnswer), она же «последнее слово». */
+function AnagramControls({ pack, round, gameState, teams, answers }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  teams: Team[]; answers: Answer[]
+}) {
+  // ── хуки — до раннего return ──
+  const shown = useQuestionShown(gameState.game_id)
+  const startedAt = gameState.timer_started_at
+  const endMs = startedAt ? Date.parse(startedAt) + round.timer_seconds * 1000 : NaN
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    setNow(Date.now())
+    if (!startedAt || gameState.reveal || !(Date.now() < endMs)) return
+    const t = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      if (n >= endMs) clearInterval(t)
+    }, 1000)
+    return () => clearInterval(t)
+  }, [startedAt, gameState.reveal, endMs])
+
+  const q = round.questions[gameState.question_index]
+  if (!q || q.answer.mode !== 'anagram') return null
+  const s = round.settings as { mode?: string; hintIntervalSec?: number }
+  const paperMode = pack.settings?.play_mode === 'paper'
+  const raceSet = s.mode === 'race'
+  const race = raceSet && !paperMode
+  const phrase = q.answer.phrase
+  const { letters } = anagramQuestion(phrase, q.answer.order)
+  const maxHints = anagramMaxHints(letters.length)
+  const open = anagramHintsOpen({ nowMs: now, startedAtIso: startedAt,
+    intervalSec: s.hintIntervalSec ?? 10, timerSec: round.timer_seconds, maxHints })
+  const start = anagramStartIso(shown, q.id, startedAt)
+  const rows = answers.filter(a => a.question_ref === `q-${q.id}` && a.answer_text)
+    .sort((x, y) => (isoMicros(anagramAcceptedAt(x)) - isoMicros(anagramAcceptedAt(y)))
+      || (x.team_id < y.team_id ? -1 : 1))
+  const winner = race ? anagramWinner(rows, phrase) : null
+  const noServerTime = rows.some(a => !a.accepted_at)
+
+  return (
+    <div className="adm-an">
+      <div className="adm-an-head">
+        <span className="adm-brand">СКРЭМБЛ · {race ? 'ГОНКА' : 'ОБЫЧНЫЙ'}</span>
+        <span className="adm-dim">подсказок открыто {open} / {maxHints}</span>
+      </div>
+      {raceSet && paperMode &&
+        <div className="adm-dim">гонка на бумаге недоступна — раунд считается как обычный</div>}
+      {paperMode
+        ? <div className="adm-empty">команды пишут на бланк — ответов здесь нет</div>
+        : rows.length === 0
+          ? <div className="adm-empty">ответов пока нет</div>
+          : rows.map(a => {
+              const team = teams.find(t => t.id === a.team_id)
+              const verdict = a.is_correct ?? autocheck(q.answer, a.answer_text)
+              const ms = anagramElapsedMs(a, start.iso)
+              return (
+                <div key={a.id} className={`adm-an-row${winner === a.team_id ? ' win' : ''}`}
+                  style={{ borderLeftColor: team?.color ?? 'var(--dim)' }}>
+                  <div className="adm-an-top">
+                    <span className="adm-an-team" style={{ color: team?.color }}>
+                      {team?.icon && <span className="pl-team-icon">{team.icon}</span>}{team?.name ?? '—'}</span>
+                    <span className="adm-an-time">{start.approx && Number.isFinite(ms) && ms >= 0 ? '≈ ' : ''}{formatRaceTime(ms)}</span>
+                  </div>
+                  <div className="adm-an-text">{a.answer_text}
+                    {winner === a.team_id && <b className="adm-an-win"> ← балл</b>}</div>
+                  <div className="adm-an-btns">
+                    <button className={`adm-grade ok${verdict === true ? ' on' : ''}`}
+                      onClick={() => void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: true }))}>✓</button>
+                    <button className={`adm-grade no${verdict === false ? ' on' : ''}`}
+                      onClick={() => void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: false }))}>✗</button>
+                  </div>
+                </div>
+              )
+            })}
+      {!paperMode && noServerTime && rows.length > 0 &&
+        <div className="adm-an-warn">⚠ время по часам телефонов — миграция 0015 не прогнана</div>}
+      {race && gameState.reveal && winner &&
+        <div className="adm-dim">смена оценки после показа поменяет победителя на табло</div>}
+    </div>
+  )
+}
+
 function RaceControls({ gameState }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
@@ -2311,8 +2456,8 @@ function UsedQuestions({ round, used }: {
 /** Текст верного ответа для пульта: у блица вопросы простые, но формат
  *  ответа общий для всего проекта. */
 function displayAnswerText(q?: { answer: unknown }): string {
-  const a = q?.answer as { display?: string | string[]; correct?: string } | undefined
+  const a = q?.answer as { display?: string | string[]; correct?: string; phrase?: string } | undefined
   if (!a) return '—'
   if (Array.isArray(a.display)) return a.display.join(' / ')
-  return a.display ?? a.correct ?? '—'
+  return a.display ?? a.correct ?? a.phrase ?? '—'
 }

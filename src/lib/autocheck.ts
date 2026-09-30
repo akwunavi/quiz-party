@@ -3,6 +3,7 @@
 // Финальное слово всегда за админом (is_correct в answers).
 import type { AnswerSpec } from '../types/quiz'
 import { isFuzzyMatch, letterEq, normalize, isCrosswordWordCorrect } from './answerCheck'
+import { isAnagramCorrect } from './anagram'
 
 export function autocheck(spec: AnswerSpec, answerText: string): boolean | null {
   const text = answerText ?? ''
@@ -28,6 +29,9 @@ export function autocheck(spec: AnswerSpec, answerText: string): boolean | null 
     }
     case 'crossword_word':
       return isCrosswordWordCorrect(text, spec.word)
+    case 'anagram':
+      // точная проверка — опечатки не прощаются (не isFuzzyMatch)
+      return isAnagramCorrect(text, spec.phrase)
     case 'none':
       return null
   }

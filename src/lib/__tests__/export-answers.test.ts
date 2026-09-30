@@ -86,4 +86,18 @@ describe('выгрузка ответов по раундам (апелляци�
       [ans({ team_id: 't1', question_ref: 'q-a' })])
     expect(csv).not.toContain('NaN')
   })
+
+  it('колонка «Принят сервером» — accepted_at (0015), пусто без миграции', () => {
+    const csv = exportAnswersCsv(pack, teams, [
+      ans({ team_id: 't1', question_ref: 'q-a', accepted_at: '2026-01-01T00:00:05.123456+00:00' }),
+      ans({ team_id: 't2', question_ref: 'q-a' }),
+    ])
+    const lines = csv.replace(/^\uFEFF/, '').split('\r\n')
+    const head = lines[0].split(';')
+    const col = head.indexOf('"Принят сервером"')
+    expect(col).toBeGreaterThan(head.indexOf('"Ответ отправлен"'))
+    expect(lines[1].split(';')[col]).toBe('"2026-01-01T00:00:05.123456+00:00"')
+    expect(lines[2].split(';')[col]).toBe('""')
+  })
 })
+

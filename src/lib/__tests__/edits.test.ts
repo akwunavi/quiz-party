@@ -49,4 +49,17 @@ describe('учёт правок', () => {
     expect(isComplete(match, '1А,2Б')).toBe(false)
     expect(isComplete(order, 'АБ')).toBe(false)
   })
+
+  it('СКРЭМБЛ: частичная сборка не готова — набор бесплатен, правка только между полными', () => {
+    const an = { mode: 'anagram', phrase: 'Формула-1', order: [] } as unknown as AnswerSpec
+    // цифра стоит на месте сама — «-1» при пустых клетках не делает ответ готовым
+    expect(isComplete(an, 'ФОРМ-1')).toBe(false)
+    expect(isComplete(an, 'ФОРМУЛА-1')).toBe(true)
+    expect(spendsEdit(an, 'ФОР-1', 'ФОРМУЛА-1')).toBe(false)
+  })
+
+  it('СКРЭМБЛ: смена одной полной сборки на другую — правка', () => {
+    const an = { mode: 'anagram', phrase: 'кот', order: [] } as unknown as AnswerSpec
+    expect(spendsEdit(an, 'КОТ', 'ТОК')).toBe(true)
+  })
 })

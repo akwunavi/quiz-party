@@ -43,6 +43,7 @@ function answerText(q: Q): string {
   }
   // режим называется free_text; из-за 'free' ИИ получал JSON вместо ответа
   if (a.mode === 'free_text') return `ответ: ${String(a.correct ?? '')}`
+  if (a.mode === 'anagram') return `анаграмма, фраза-ответ: ${String(a.phrase ?? '')} (точная проверка)`
   return `режим ${String(a.mode)}: ${JSON.stringify(a).slice(0, 300)}`
 }
 

@@ -8,7 +8,7 @@ import type { MechanicKey } from '../../types/quiz'
 
 const ALL: MechanicKey[] = ['standard', 'test_stop', 'rebus', 'jeopardy',
   'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword', 'sprint',
-  'melody', 'race', 'blitz', 'four_pics']
+  'melody', 'race', 'blitz', 'four_pics', 'anagram']
 
 describe('поля вопроса по механикам', () => {
   it('кроссворду доступны и медиа вопроса, и озвучка', () => {
@@ -56,5 +56,12 @@ describe('поля вопроса по механикам', () => {
     expect(f.fixedMode).toBe(true)
     expect(f.mediaMax).toBe(4)
     expect(f.voice).toBe(false)
+  })
+
+  it('«Скрэмбл»: тип ответа задан механикой, одна картинка, озвучка есть', () => {
+    const f = questionFields('anagram')
+    expect(f.fixedMode).toBe(true)
+    expect(f.mediaMax).toBe(1)
+    expect(f.voice).toBe(true)
   })
 })

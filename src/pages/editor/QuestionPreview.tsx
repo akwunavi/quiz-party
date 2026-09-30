@@ -19,6 +19,7 @@ import { JeopardyBoard } from '../rounds/JeopardyRound'
 import { MelodyBoard } from '../rounds/MelodyRound'
 import { RaceBoard } from '../rounds/RaceRound'
 import { BlitzBoard } from '../rounds/BlitzRound'
+import { AnagramBoard } from '../rounds/AnagramRound'
 import { initBlitz, showQuestion } from '../../lib/blitzState'
 import { previewTeams, previewAnswers, previewGameState, previewStages } from '../../lib/previewState'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -73,6 +74,21 @@ export function QuestionPreview({ pack, round, qIndex, onClose }: {
               return <RaceBoard pack={pack} round={round} gameState={gameState} preview={preview} />
             case 'blitz':
               return <BlitzPreview round={round} teams={teams} />
+            case 'anagram':
+              if (!q) return (
+                <div className="host-screen grid-bg">
+                  <p style={{ opacity: .7 }}>В этом раунде нет вопросов — добавь их в редакторе</p>
+                </div>
+              )
+              // ТОТ ЖЕ компонент, что на проекторе; гонг таймера выключен —
+              // в предпросмотре звук не запускается ни в одной механике
+              return <AnagramBoard key={q.id} pack={pack} round={round} roundIdx={roundIdx}
+                q={q} qIndex={qIndex} qCount={round.questions.length}
+                gameState={gameState} preview={preview}
+                timerSlot={<Timer startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
+                  theme={pack.theme} chime={false} />}
+                effectsSlot={null}
+                actionsSlot={<PreviewActions pack={pack} round={round} gameState={gameState} />} />
             default:
               if (!q) return (
                 <div className="host-screen grid-bg">

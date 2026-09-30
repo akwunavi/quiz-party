@@ -1,5 +1,5 @@
 import { RoomPicker } from './RoomPicker'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
 import { registerTeam, heartbeat } from '../lib/gameActions'
@@ -15,6 +15,12 @@ import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme } from '../types/quiz'
 import { revealPointsFor } from '../lib/scoring'
 import { spendsEdit } from '../lib/edits'
+import {
+  anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramMaxHints, applyHints, placeTile,
+  clearCell, clearBoard, boardText, boardComplete, hashStr, anagramLocalKey, readAnagramLocal,
+  persistAnagramLocal, anagramPlayerVerdict, type AnagramBoardState, type AnagramLocal,
+} from '../lib/anagram'
+import { useAnswers } from '../hooks/useAnswers'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
@@ -132,6 +138,16 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
   if (phase === 'question' && round?.mechanic === 'four_pics')
     return <RevealPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
+  if (phase === 'question' && round?.mechanic === 'anagram')
+    // key по вопросу: состояние доски не должно переживать смену вопроса
+    // (ревью 9.74, блокер); вторая линия — ключ внутри самого состояния
+    return <AnagramPlayer key={`${gameState.game_id}-${round.questions[gameState.question_index]?.id ?? 'none'}`}
+      team={team} gameState={gameState} round={round}
+      roundLabel={displayRoundNumber(pack, gameState.round_number)} />
+  // «Скрэмбл» фазы «время ответов» не использует (ответ показывается после
+  // каждого вопроса) — общий AnswerForm сюда пускать нельзя
+  if (phase === 'answer_time' && round?.mechanic === 'anagram')
+    return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
   if (phase === 'question' && round?.mechanic === 'jeopardy')
     return <JeopardyPlayer team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
@@ -287,6 +303,198 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
             </div>
             {sent && <div className="pl-sent">Отправлено: {sent}</div>}
             <div className="ed-hint">Можно менять ответ сколько угодно раз, пока идёт вопрос</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** «Скрэмбл» у игрока: плитки и клетки. Тап по плитке — в первую пустую
+ *  клетку, тап по заполненной клетке — плитка обратно в пул (остальные не
+ *  сдвигаются). Подсказки открываются сами по таймеру (та же функция, что
+ *  на проекторе) и в клетке-подсказке не трогаются. «Стереть» — ТОЛЬКО
+ *  локально (решение ведущего 30.09.2026): в гонке команда иначе потеряла
+ *  бы уже принятое сервером время. До показа ответа — ни «верно», ни
+ *  «неверно» (правило 8.59). HANDOFF §3ca. */
+export function AnagramPlayer({ team, gameState, round, roundLabel }: {
+  team: Team; roundLabel: string
+  round: LoadedRound
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  // ── все хуки — до любого раннего return (React #310) ──
+  const q = round.questions[gameState.question_index]
+  const spec = q?.answer.mode === 'anagram' ? q.answer : null
+  const phrase = spec?.phrase ?? ''
+  const orderKey = (spec?.order ?? []).join(',')
+  const { template, letters, order, tiles } = useMemo(
+    () => anagramQuestion(phrase, spec?.order ?? []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [phrase, orderKey])
+  const hintOrder = useMemo(() => anagramHintOrder(letters, hashStr(q?.id ?? '')), [letters, q?.id])
+  const s = round.settings as { hintIntervalSec?: number; maxEdits?: number }
+  const maxEdits = s.maxEdits ?? 2
+  const startedAt = gameState.timer_started_at
+  const endMs = startedAt ? Date.parse(startedAt) + round.timer_seconds * 1000 : NaN
+
+  // Черновик хранит ключ, под которым загружен: пишем ТОЛЬКО под тот же
+  // ключ (persistAnagramLocal), а на рендере с чужим ключом показываем
+  // чистую доску, пока эффект не перечитал — доска и потраченные правки
+  // вопроса N не переезжают на N+1 (ревью 9.74, блокер).
+  const storageKey = anagramLocalKey(gameState.game_id, q?.id ?? 'none')
+  const read = () => readAnagramLocal(k => localStorage.getItem(k), storageKey, letters.length)
+  const [stRaw, setSt] = useState<AnagramLocal>(read)
+  const st: AnagramLocal = stRaw.key === storageKey && stRaw.cells.length === letters.length ? stRaw : read()
+  useEffect(() => {
+    try { persistAnagramLocal((k, v) => localStorage.setItem(k, v), storageKey, stRaw, letters.length) } catch { /* приватный режим */ }
+  }, [stRaw, storageKey, letters.length])
+  // смена вопроса без размонтирования — перечитать под новый ключ
+  // тот же ключ, но другая длина (фразу поправили посреди игры) — тоже перечитать
+  useEffect(() => {
+    if (stRaw.key !== storageKey || stRaw.cells.length !== letters.length) setSt(read())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, letters.length])
+
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    setNow(Date.now())
+    if (!startedAt || gameState.reveal || !(Date.now() < endMs)) return
+    const t = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      if (n >= endMs) clearInterval(t)
+    }, 500)
+    return () => clearInterval(t)
+  }, [startedAt, gameState.reveal, endMs])
+
+  const open = anagramHintsOpen({
+    nowMs: now, startedAtIso: startedAt, intervalSec: (s.hintIntervalSec ?? 10),
+    timerSec: round.timer_seconds, maxHints: anagramMaxHints(letters.length),
+  })
+  const hinted = useMemo(() => hintOrder.slice(0, open), [hintOrder, open])
+  useEffect(() => {
+    if (!hinted.length) return
+    setSt(raw => {
+      const prev = raw.key === storageKey ? raw : read()
+      const next = applyHints({ cells: prev.cells }, letters, order, hinted)
+      return next.cells === prev.cells ? prev : { ...prev, cells: next.cells }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hinted, storageKey])
+  const hint = useHint()
+  // Вердикт — из строки в базе (как в totals), не из локального «отправлено».
+  // Опрос ответов включается ТОЛЬКО после показа ответа — в игре телефону
+  // он не нужен (лишний трафик у гостей).
+  const liveAnswers = useAnswers(gameState.reveal ? gameState.game_id : null, gameState.round_number)
+  const firstAnswers = useRef(liveAnswers)
+  const answersLoaded = liveAnswers !== firstAnswers.current
+  // показ ответа — старая подсказка («Заполни все клетки») больше не про то
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (gameState.reveal) hint.clear() }, [gameState.reveal])
+
+  // ── ранние выходы — только после хуков ──
+  if (!q || !spec) return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
+
+  const board: AnagramBoardState = { cells: st.cells }
+  const hintSet = new Set(hinted)
+  const notStarted = !startedAt
+  const over = gameState.reveal || (Number.isFinite(endMs) && now >= endMs)
+  const playable = !notStarted && !over
+  const onBoard = new Set(st.cells.filter((c): c is number => c != null))
+  const text = boardText(board, template, letters, order)
+  const editsLeft = maxEdits < 0 ? Infinity : maxEdits - st.edits
+
+  // все обновления — от состояния ПОД ТЕКУЩИМ ключом
+  const upd = (fn: (p: AnagramLocal) => AnagramLocal) =>
+    setSt(raw => fn(raw.key === storageKey ? raw : read()))
+  // вне игры кнопки не молчат, а объясняют (§3d)
+  const notPlayable = () => hint.show(notStarted && !gameState.reveal
+    ? 'Ждём старта: буквы можно ставить, когда пойдёт таймер' : 'Время вышло')
+  const tapTile = (p: number) => {
+    if (!playable) return notPlayable()
+    upd(prev => ({ ...prev, cells: placeTile({ cells: prev.cells }, p, template, hintSet).cells }))
+  }
+  const tapCell = (i: number) => {
+    if (!playable) return notPlayable()
+    if (hintSet.has(i)) return hint.show('Это подсказка — её не убрать')
+    upd(prev => ({ ...prev, cells: clearCell({ cells: prev.cells }, i, hintSet).cells }))
+  }
+  const erase = () => {
+    if (!playable) return notPlayable()
+    upd(prev => ({ ...prev, cells: clearBoard({ cells: prev.cells }, hintSet).cells }))
+  }
+  const send = () => {
+    if (notStarted) return hint.show('Ждём старта')
+    if (over) return hint.show('Время вышло — ответ уже не принимается')
+    if (!boardComplete(board, template)) return hint.show('Заполни все клетки')
+    if (text === st.sent) return hint.show('Этот ответ уже отправлен')
+    const spend = spendsEdit(spec, st.sent ?? '', text)
+    if (spend && editsLeft <= 0) return hint.show('Правок больше нет')
+    void enqueueAnswer({
+      team_id: team.id, game_id: gameState.game_id, question_ref: `q-${q.id}`,
+      round_number: gameState.round_number, answer_text: text, stake: null,
+    })
+    upd(prev => ({ ...prev, sent: text, edits: prev.edits + (spend ? 1 : 0) }))
+  }
+
+  const myRow = liveAnswers.find(a => a.team_id === team.id && a.question_ref === `q-${q.id}`)
+  const verdict = gameState.reveal
+    ? anagramPlayerVerdict({ sent: st.sent, loaded: answersLoaded, row: myRow, phrase }) : null
+
+  return (
+    <div className="pl-root">
+      <PlayerHeader team={team} round={roundLabel} />
+      <ConnectionDot />
+      <div className="pl-list">
+        <div className="pl-notice acc">СКРЭМБЛ · ВОПРОС {gameState.question_index + 1}</div>
+        <div className="pl-card">
+          <div className="pl-card-body">
+            {q.question_text.trim() && <div className="pl-an-clue">{q.question_text}</div>}
+            {notStarted && !gameState.reveal && <div className="pl-an-state">Ждём старта</div>}
+            {over && !gameState.reveal && <div className="pl-an-state">Время вышло — смотри на экран</div>}
+            {!gameState.reveal && (
+              <div className="pl-an-tiles">
+                {tiles.map((ch, p) => (
+                  <button key={p} type="button"
+                    className={`pl-an-tile${onBoard.has(p) ? ' used' : ''}`}
+                    disabled={onBoard.has(p)}
+                    onClick={() => tapTile(p)}>{ch}</button>
+                ))}
+              </div>
+            )}
+            <div className="pl-an-words">
+              {template.words.map((w, wi) => (
+                <span className="pl-an-word" key={wi}>
+                  {w.map((c, ci) => {
+                    if (c.kind === 'fixed') return <span key={ci} className="pl-an-cell fixed">{c.ch}</span>
+                    const p = st.cells[c.idx]
+                    const isHint = hintSet.has(c.idx) && p != null
+                    const ch = gameState.reveal ? letters[c.idx] : p != null ? letters[order[p]] : ''
+                    return <button key={ci} type="button"
+                      className={`pl-an-cell${isHint ? ' hint' : ''}${p != null && !isHint ? ' filled' : ''}`}
+                      onClick={() => tapCell(c.idx)}>{ch}</button>
+                  })}
+                </span>
+              ))}
+            </div>
+            <Hint text={hint.text} />
+            {gameState.reveal ? (
+              <div className="pl-an-result">
+                <div className="pl-sent">Ваш ответ: {myRow?.answer_text || st.sent || '—'}</div>
+                {verdict === 'ok' && <div className="pl-an-verdict ok">✓ ВЕРНО</div>}
+                {verdict === 'wrong' && <div className="pl-an-verdict err">✗ НЕВЕРНО</div>}
+                {verdict === 'lost' && <div className="pl-an-verdict err">ответ ещё не дошёл до сервера</div>}
+                {verdict === 'checking' && <div className="pl-sent">проверяем…</div>}
+              </div>
+            ) : (
+              <div className="pl-row-bottom">
+                <button type="button" className="pl-send" onClick={send}>
+                  {st.sent ? 'Изменить ответ' : 'Отправить'}</button>
+                <button type="button" className="pl-erase" onClick={erase}>Стереть</button>
+                {st.sent && <span className="pl-sent">Отправлено: {st.sent}</span>}
+                {maxEdits >= 0 && <span className="pl-sent">правок: {st.edits}/{maxEdits}</span>}
+              </div>
+            )}
           </div>
         </div>
       </div>

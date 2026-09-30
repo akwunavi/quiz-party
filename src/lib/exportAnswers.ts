@@ -16,7 +16,7 @@ import type { Answer, Team } from '../types/quiz'
 
 function correctAnswerText(q: LoadedPack['rounds'][number]['questions'][number]): string {
   const a = q.answer as unknown as Record<string, unknown>
-  const d = a.display ?? a.correct ?? a.word ?? a.correct_choice ?? a.correct_order
+  const d = a.display ?? a.correct ?? a.word ?? a.phrase ?? a.correct_choice ?? a.correct_order
     ?? (Array.isArray(a.correct_pairs) ? (a.correct_pairs as string[]).join(' ') : '—')
   return Array.isArray(d) ? d.join(' · ') : String(d)
 }
@@ -71,7 +71,7 @@ export function exportAnswersCsv(
   const rows: string[][] = [[
     '№ раунда', 'Раунд', 'Команда', 'Вопрос', 'Ответ команды',
     'Правильный ответ', 'Ставка', 'Вердикт', 'Обновлено',
-    'Вопрос показан', 'Ответ отправлен', 'Скорость ответа (сек)',
+    'Вопрос показан', 'Ответ отправлен', 'Принят сервером', 'Скорость ответа (сек)',
   ]]
   for (const a of sorted) {
     const q = questionByRef.get(a.question_ref)
@@ -91,6 +91,9 @@ export function exportAnswersCsv(
       verdictText(a.is_correct),
       a.updated_at ?? '',
       shown ?? '', a.created_at ?? '',
+      // серверный момент ПОСЛЕДНЕЙ смены текста (миграция 0015) — по нему
+      // считается гонка «Скрэмбла»; пусто, если миграция не прогнана
+      a.accepted_at ?? '',
       elapsed != null && elapsed >= 0 ? String(elapsed) : '',
     ])
   }

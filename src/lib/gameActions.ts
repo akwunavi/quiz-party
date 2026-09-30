@@ -72,6 +72,21 @@ export async function gotoQuestion(question_index: number) {
   })
 }
 
+/** Вернуться к УЖЕ ПОКАЗАННОМУ вопросу «Скрэмбла» (кнопка «Назад» на
+ *  пульте и проекторе, возврат с табло). gotoQuestion сбросил бы reveal и
+ *  старт — вопрос перезапустился бы вживую: команды отвечали бы на уже
+ *  виденную фразу, а старт в question_shown сдвинулся бы. Здесь ответ
+ *  остаётся показанным, таймер не запущен (timer_started_at: null —
+ *  тогда и AutoAdvance, считающий от старта, не уведёт с вопроса сам), и
+ *  startTimer/markQuestionShown НЕ вызываются. HANDOFF §3ca, ревью 9.74. */
+export async function gotoQuestionShown(question_index: number) {
+  hushLocal()
+  await room.patchSession(getRoomId(), {
+    phase: 'question', question_index,
+    timer_started_at: null, reveal: true,
+  })
+}
+
 /** Старт таймера (вызывается хостом после озвучки вопроса).
  *  Момент старта — это и есть «вопрос показан залу» для тайминга ответов
  *  (см. миграцию 0009): до этого момента отвечать формально можно, но

@@ -66,7 +66,10 @@ export type AnswerUpsert = {
   updated_at: string
 }
 
-export type AnswerPatch = Partial<Omit<Answer, 'id' | 'team_id' | 'game_id'>>
+/** accepted_at исключён намеренно: его ставит ТОЛЬКО сервер (триггер 0015,
+ *  время гонки «Скрэмбла»). Не «чинить» — contract.test.ts держит это
+ *  ожидаемой ошибкой типов (ts-expect-error). */
+export type AnswerPatch = Partial<Omit<Answer, 'id' | 'team_id' | 'game_id' | 'accepted_at'>>
 
 /** Критерии удаления ответов — оба места, где это сегодня нужно:
  *  полная очистка игры (по game_id) и очистка сида-репетиции (по списку

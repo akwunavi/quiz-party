@@ -21,6 +21,7 @@ import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
   selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
+  gotoQuestionShown,
   startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
   startCounting, startIntro,
 } from '../lib/gameActions'
@@ -52,6 +53,10 @@ import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
+import { AnagramBoard } from './rounds/AnagramRound'
+import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
+import { useQuestionShown } from '../hooks/useQuestionShown'
+import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { choicesLenClass } from '../lib/questionLayout'
@@ -372,13 +377,14 @@ function HostInner({ gameState, pack }: {
           )}
         </>)}
         <div className="host-actions">
+          {round.mechanic === 'anagram' ? <AnagramFirstBtn round={round} gameState={gameState} /> :
           <button onClick={() => void gotoQuestion(0)}>
             {round.mechanic === 'jeopardy' ? 'Начать раунд →'
               : round.mechanic === 'race' ? 'К скачкам →'
               : round.mechanic === 'melody' ? 'К трекам →'
               : round.mechanic === 'four_pics' ? 'Поехали →'
               : round.mechanic === 'sprint' ? 'Поехали →'
-              : 'Первый вопрос →'}</button>
+              : 'Первый вопрос →'}</button>}
         </div>
       </div>
     )
@@ -433,6 +439,40 @@ function HostInner({ gameState, pack }: {
   // ── Своя игра: сетка плиток ──
   if (gameState.phase === 'question' && round.mechanic === 'jeopardy') {
     return <JeopardyBoard pack={pack} round={round} gameState={gameState} />
+  }
+
+  // ── «Скрэмбл»: доска плиток ──
+  // Обычный раунд со своей доской (HANDOFF §3ca): показ ответа ВСЕГДА после
+  // каждого вопроса — AutoReveal по концу таймера включён безусловно, «Время
+  // ответов →» здесь нет. Звук/автопролистывание/кнопки — те же, что у
+  // обычного вопроса, приходят слотами (из HostScreen.tsx ничего не
+  // экспортируется — чанки, HANDOFF §1a). key по вопросу — перелёты плиток
+  // не должны переживать смену вопроса.
+  if (gameState.phase === 'question' && round.mechanic === 'anagram' && q) {
+    const isLast = gameState.question_index + 1 >= round.questions.length
+    return (
+      <AnagramBoard key={q.id} pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
+        gameState={gameState}
+        // возвращённый показанный вопрос (gotoQuestionShown): таймер не
+        // запущен и не должен — кольцо «30 и стоит» только путало бы
+        timerSlot={gameState.reveal && !gameState.timer_started_at ? null
+          : <Timer key={q.id} startedAt={gameState.timer_started_at}
+            seconds={round.timer_seconds} theme={pack.theme} />}
+        effectsSlot={<>
+          {/* На возвращённом показанном вопросе (reveal без таймера —
+              gotoQuestionShown) QuestionAudio запустил бы таймер/озвучку
+              заново — не монтируем (ревью 9.74). В обычном ходе после показа
+              ответа он остаётся, как у стандартных вопросов: музыка не
+              обрывается на показе (ревью 9.75). */}
+          {!(gameState.reveal && !gameState.timer_started_at) &&
+            <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />}
+          <AutoAdvance round={round} gameState={gameState} isLast={isLast} />
+          <AutoReveal enabled={!gameState.reveal}
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+        </>}
+        actionsSlot={<AnagramNav pack={pack} round={round} gameState={gameState} />} />
+    )
   }
 
   // ── Вопрос ──
@@ -519,6 +559,57 @@ function HostInner({ gameState, pack }: {
 }
 
 /** «Назад»: предыдущий вопрос или титул раунда; между раундами не ходит (п.12). */
+/** Кнопки ведущего на вопросе «Скрэмбла». Решение «что делает Дальше/Назад»
+ *  — общие anagramAdvance/anagramBack (lib/anagram.ts), те же, что на пульте:
+ *  «Дальше» без показанного ответа сначала показывает ответ (раньше
+ *  проектор уходил дальше без показа), «Назад» — к ПОКАЗАННОМУ вопросу, не
+ *  перезапуская его (ревью 9.74). */
+function AnagramNav({ pack, round, gameState }: {
+  pack: LoadedPack
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const hint = useHint()
+  const shownMap = useQuestionShown(gameState.game_id)
+  const wasRun = anagramWasRun(shownMap, round.questions)
+  const step = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+    index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+  const back = () => {
+    const b = anagramBack(gameState.question_index)
+    void (b.kind === 'shown' ? gotoQuestionShown(b.index) : setPhase('round_intro'))
+  }
+  const next = () => {
+    const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
+      index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+    if (st.kind === 'wait') return hint.show(st.text)
+    if (st.kind === 'reveal') return void revealAnswer()
+    // уже сыгранный вопрос (вернулись «Назад») — показанным, не вживую
+    if (st.kind === 'next') return void (st.shown ? gotoQuestionShown(st.index) : gotoQuestion(st.index))
+  }
+  return (
+    <div className="host-actions">
+      <Hint text={hint.text} />
+      <button className="ghost" onClick={back}>{gameState.question_index > 0 ? '← Назад' : '← К титулу'}</button>
+      {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+      {step.kind === 'afterRound'
+        ? <AfterRoundNav pack={pack} gameState={gameState} />
+        : <button onClick={next}>Дальше →</button>}
+    </div>
+  )
+}
+
+/** «Первый вопрос →» с заставки раунда «Скрэмбла»: если первый вопрос уже
+ *  запускался (вернулись «← К титулу»), он открывается показанным, а не
+ *  перезапускается вживую (ревью 9.75). */
+function AnagramFirstBtn({ round, gameState }: {
+  round: LoadedPack['rounds'][number]
+  gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+}) {
+  const shownMap = useQuestionShown(gameState.game_id)
+  const first = anagramFirst(anagramWasRun(shownMap, round.questions))
+  return <button onClick={() => void (first.shown ? gotoQuestionShown(0) : gotoQuestion(0))}>Первый вопрос →</button>
+}
+
 function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGameState>['gameState']> }) {
   return gameState.question_index > 0
     ? <button className="ghost" onClick={() => void gotoQuestion(gameState.question_index - 1)}>← Назад</button>

@@ -1,0 +1,137 @@
+/* ═══ «СКРЭМБЛ» (anagram): доска плиток на проекторе (AnagramRound.tsx) ═══
+   Импортирован ПОСЛЕДНИМ в global.css. Где нужно перебить общие правила
+   экрана вопроса (22-question.css, `.host-screen.has-media > .q-media-grid`
+   — 3 класса), селектор держим в 4 класса: порядок файлов не спасает при
+   равном весе с другой стороны каскада (CLAUDE.md §5).
+
+   Прямые дети .an-screen — все статические (position из общего сброса
+   .host-screen > *:not(...) / .grid-bg > *:not(...), 14/15), ни одного
+   fixed/absolute — в списки :not() ничего добавлять не нужно.
+
+   Размеры доски — в em от .an-board: кегль задаёт CSS (потолок фактически
+   снят — на 3840 плитки растут), длинную фразу ужимает useFitText
+   (ограниченная рамка .an-board-wrap + замер, §8.46). Ширины — в %, не vw.
+   Цвета — только переменные темы; цвет команды — инлайн из базы. */
+
+/* ── отступ под кольцо таймера ──
+   У экрана нет .q-text, первый поток — подсказка/картинка/доска сразу
+   после padding-top, рассчитанного впритык (та же ловушка, что у
+   .rv-screen, HANDOFF §3bn). */
+.host-screen.an-screen > .an-clue,
+.host-screen.an-screen.no-clue.has-media > .q-media-grid,
+.host-screen.an-screen.no-clue:not(.has-media) > .an-board-wrap { margin-top: clamp(10px, 2.5vh, 40px); }
+
+/* подсказка к фразе — мелко, над доской */
+.host-screen.an-screen > .an-clue {
+  flex: 0 0 auto; max-width: 92%;
+  font-family: var(--font-display); color: var(--muted);
+  font-size: clamp(18px, 1.9vw, 999px); line-height: 1.2;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+
+/* одна картинка — с потолком, чтобы не отнимать высоту у доски;
+   высота ОПРЕДЕЛЁННАЯ (не auto) — иначе max-height:100% у <img> не
+   разрешается и снимок уходит в натуральный размер */
+.host-screen.an-screen.has-media > .q-media-grid {
+  flex: 0 0 auto; margin-top: 0;
+  height: min(34vh, calc(26vh * var(--ms, 1)));
+  max-height: min(34vh, calc(26vh * var(--ms, 1)));
+  min-height: 0;
+}
+
+/* ── доска ── */
+.an-board-wrap {
+  flex: 1 1 0; min-height: 0; overflow: hidden; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+/* измеряемый элемент: без min-height:0/overflow:hidden (ловушка 8.52) */
+.an-board {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: .55em;
+  font-family: var(--font-display); line-height: 1;
+  font-size: clamp(26px, 4.2vw, 999px);
+}
+.an-tiles, .an-words { display: flex; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.an-tiles { gap: .18em; }
+.an-words { gap: .3em .8em; }
+.an-word { display: inline-flex; gap: .12em; white-space: nowrap; }
+
+.an-tile, .an-cell {
+  width: 1.1em; height: 1.35em; flex: 0 0 auto; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: .12em;
+}
+.an-tile {
+  border: .05em solid var(--accent); background: var(--bg2); color: var(--fg);
+  box-shadow: var(--glow);
+}
+/* плитка «уехала» в клетку: место в пуле сохраняется (visibility, не
+   display) — остальные плитки не прыгают */
+.an-tile.used { visibility: hidden; }
+/* ответ показан и ВСЕ плитки сели — пустой пул больше не нужен: убираем
+   из раскладки, чтобы клетки с ответом встали по центру и крупнее
+   (useFitText пересчитывает кегль по флагу allLanded) */
+.an-board.done > .an-tiles { display: none; }
+.an-tile.fly { position: relative; z-index: 3; transition: transform .7s ease; }
+
+.an-cell {
+  border: .05em solid var(--dim); color: var(--fg);
+  background: color-mix(in srgb, var(--bg2) 70%, transparent);
+}
+.an-cell.fixed { width: auto; min-width: .45em; border-color: transparent; background: none; }
+.an-cell.hint { border-color: var(--accent2); color: var(--accent2); box-shadow: var(--glow2, var(--glow)); }
+.an-cell.filled { border-color: var(--accent); color: var(--accent); }
+
+/* ── перелёт по темам: только transform, никаких steps() (урок 9.18) ── */
+.theme-classic .host-screen .an-tile.fly {
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+  filter: drop-shadow(0 0 10px var(--accent2));
+}
+.theme-potter .host-screen .an-tile.fly {
+  transition: transform .9s cubic-bezier(.16,.84,.44,1);
+  filter: drop-shadow(0 0 12px var(--mg-brass-bright, var(--accent)));
+}
+.theme-new_year .host-screen .an-tile.fly {
+  transition: transform .8s cubic-bezier(.2,.9,.3,1.2);
+}
+/* Magic: латунь вместо общего акцента */
+.theme-potter .host-screen .an-tile { border-color: var(--mg-brass, var(--accent)); }
+.theme-potter .host-screen .an-cell.filled { border-color: var(--mg-brass, var(--accent));
+  color: var(--mg-brass-bright, var(--accent)); }
+
+/* reduced-motion: селекторы ДОСЛОВНО как у базовых правил (§3h — медиазапрос
+   веса не добавляет). JS при этом тоже не запускает перелёт. */
+@media (prefers-reduced-motion: reduce) {
+  .an-tile.fly { transition: none; }
+  .theme-classic .host-screen .an-tile.fly { transition: none; }
+  .theme-potter .host-screen .an-tile.fly { transition: none; }
+  .theme-new_year .host-screen .an-tile.fly { transition: none; }
+}
+/* классика: кнопка «эффекты» (ScreenFx) возвращает движение даже при
+   reduced-motion — зеркало, как в 32-cyber-motion.css (вес 0,4,1) */
+html.fx-force-motion .theme-classic .host-screen .an-tile.fly {
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ── результат после показа ответа ── */
+.host-screen.an-screen > .an-result {
+  flex: 0 0 auto; width: 94%;
+  display: flex; flex-direction: column; align-items: center; gap: .3em;
+}
+.an-res-line {
+  display: flex; align-items: baseline; justify-content: center; gap: .5em;
+  max-width: 100%; min-width: 0;
+  font-family: var(--font-display); font-size: clamp(22px, 2.6vw, 999px);
+  white-space: nowrap; line-height: 1.15;
+}
+.an-res-line.wrap { flex-wrap: wrap; white-space: normal; row-gap: .3em; }
+.an-res-label { flex: 0 0 auto; color: var(--muted); font-size: .68em; letter-spacing: .12em; }
+/* имена команд до 17 знаков (§3g), но режем многоточием на всякий случай */
+.an-res-team { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.an-res-time { flex: 0 0 auto; color: var(--accent2); font-family: var(--font-digits); font-size: .72em; }
+.an-res-chip {
+  flex: 0 1 auto; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  border: .06em solid currentColor; border-radius: .4em; padding: .06em .45em;
+  font-size: .72em; white-space: nowrap;
+}
+.an-res-note { color: var(--fg); opacity: .8; font-size: clamp(15px, 1.4vw, 999px); max-width: 100%; }
