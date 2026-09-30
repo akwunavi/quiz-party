@@ -35,6 +35,7 @@
 
 import { fetchMediaBlob } from './media'
 import { metaLine, displayRoundNumber } from './roundMeta'
+import { anagramQuestion } from './anagram'
 import type { LoadedPack, LoadedRound } from './roundMeta'
 import type { AnswerSpec, ChoiceOption, MechanicKey, Question, ThemeKey } from '../types/quiz'
 
@@ -186,11 +187,21 @@ function answerPlainText(a: AnswerSpec): string {
   }
 }
 
+/** «Скрэмбл» на слайде вопроса: подсказка-текст, плитки (перемешанные буквы)
+ *  и маска клеток по словам — фразу-ответ НЕ показываем. */
+function anagramQuestionBody(q: Question): string | undefined {
+  if (q.answer.mode !== 'anagram') return q.question_text || undefined
+  const { template, tiles } = anagramQuestion(q.answer.phrase, q.answer.order)
+  const mask = template.words
+    .map(w => w.map(c => c.kind === 'fixed' ? c.ch : '_').join(' ')).join('     ')
+  return [q.question_text, tiles.join(' '), mask].filter(Boolean).join('\n')
+}
+
 function questionSlide(q: Question, heading: string, meta: string, timerSeconds: number,
   addMedia: (p?: string | null) => void): SlidePlan {
   return {
     kind: 'question', heading, meta,
-    body: q.question_text || undefined,
+    body: anagramQuestionBody(q),
     choices: questionChoices(q.answer),
     media: questionMedia(q, addMedia),
     timerSeconds,

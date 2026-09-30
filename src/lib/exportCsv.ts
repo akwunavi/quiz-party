@@ -65,6 +65,7 @@ export function exportPackCsv(
     // режим называется free_text; из-за 'free' ответ выгружался пустым
     if (a.mode === 'free_text') return String(a.correct ?? '')
     if (a.mode === 'crossword_word') return String(a.word ?? '')
+    if (a.mode === 'anagram') return String(a.phrase ?? '')
     return JSON.stringify(a)
   }
 

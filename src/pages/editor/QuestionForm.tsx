@@ -6,6 +6,7 @@ import { rebusExpected } from '../../lib/answerCheck'
 import { mediaUrl } from '../../lib/media'
 import { questionFields } from '../../lib/questionFields'
 import { revealGroups } from '../../lib/reveal'
+import { anagramTemplate, anagramShuffle, anagramOrderValid, anagramTiles, hashStr } from '../../lib/anagram'
 import { useHint, Hint } from '../../components/Hint'
 import type { AnswerSpec, ChoiceOption, MechanicKey, Question } from '../../types/quiz'
 import { AiQuestionReview } from './AiReview'
@@ -89,7 +90,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
         <div>
           {/* Что показывать — зависит от механики. Поля, которые в ней
               не работают, скрыты: они путают и создают иллюзию настройки. */}
-          <div className="ed-field"><label>Текст вопроса</label>
+          <div className="ed-field"><label>{mech === 'anagram' ? 'Подсказка к фразе (необязательно)' : 'Текст вопроса'}</label>
           <textarea value={q.question_text} rows={5} style={{ width: '100%', padding: 8 }}
             onChange={e => save({ question_text: e.target.value })} /></div>
 
@@ -281,8 +282,89 @@ function AnswerEditor({ spec, onChange, imgs, mechanic }: {
           onChange={e => onChange({ ...spec, display: e.target.value })} />
       </div>
     )
-    case 'anagram': return null   // редактор фразы — коммит редактора «Скрэмбла»
+    case 'anagram': return <AnagramAnswerEditor spec={spec} onChange={onChange} />
   }
+}
+
+// ── «Скрэмбл»: фраза-ответ + перемешивание ──
+// Перемешивание хранится в самом вопросе (order), а не генерируется на игре:
+// ведущий видит заранее, что увидит зал, и может поправить руками — тап по
+// двум плиткам меняет их местами.
+function AnagramAnswerEditor({ spec, onChange }: {
+  spec: Extract<AnswerSpec, { mode: 'anagram' }>; onChange: (a: AnswerSpec) => void
+}) {
+  const [sel, setSel] = useState<number | null>(null)
+  const template = anagramTemplate(spec.phrase)
+  const letters = template.letters
+  const orderOk = spec.order.length === letters.length
+  const tiles = orderOk ? anagramTiles(letters, spec.order) : []
+  const valid = anagramOrderValid(spec.order, letters)
+
+  const setPhrase = (phrase: string) => {
+    const next = anagramTemplate(phrase).letters
+    // набор букв поменялся — перемешиваем заново (сид от фразы: одна и та же
+    // фраза даёт одно и то же перемешивание, пока его не тронули руками)
+    const order = next.join('') === letters.join('') && orderOk
+      ? spec.order : anagramShuffle(next, hashStr(phrase))
+    setSel(null)
+    onChange({ ...spec, phrase, order })
+  }
+  const reshuffle = () => {
+    setSel(null)
+    onChange({ ...spec, order: anagramShuffle(letters, (Date.now() ^ hashStr(spec.phrase)) >>> 0) })
+  }
+  const tapTile = (p: number) => {
+    if (sel === null) { setSel(p); return }
+    if (sel === p) { setSel(null); return }
+    const order = spec.order.slice()
+    ;[order[sel], order[p]] = [order[p], order[sel]]
+    setSel(null)
+    onChange({ ...spec, order })
+  }
+  const reason = letters.length < 3 ? 'Нужно минимум 3 буквы.'
+    : !orderOk ? 'Перемешивание устарело — нажми «Перемешать заново».'
+    : valid ? null
+    : tiles.join('') === letters.join('') ? 'Плитки стоят в исходном порядке — перемешай.'
+    : 'Первая буква фразы стоит первой — перемешай.'
+
+  return (
+    <div className="ed-an">
+      <label>Фраза-ответ</label>
+      <input value={spec.phrase} style={{ width: '100%', padding: 6 }}
+        onChange={e => setPhrase(e.target.value)}
+        onBlur={e => setPhrase(e.target.value.trim().replace(/\s+/g, ' '))} />
+      <div className="ed-hint">
+        Буквы перемешиваются на плитках. Цифры, дефисы и знаки стоят на своих
+        местах и не перемешиваются. Ё на экране остаётся Ё, в проверке Ё = Е.
+        Проверка точная: опечатка = неверный ответ.
+      </div>
+      {letters.length > 0 && <>
+        <div className="ed-an-row">
+          <span className="ed-an-cap">Плитки ({letters.length})</span>
+          <button type="button" className="ghost" onClick={reshuffle}>Перемешать заново</button>
+        </div>
+        <div className="ed-an-tiles">
+          {tiles.map((ch, p) => (
+            <button type="button" key={p}
+              className={`ed-an-tile${sel === p ? ' sel' : ''}`}
+              onClick={() => tapTile(p)}>{ch}</button>
+          ))}
+        </div>
+        <div className="ed-hint">Тапни две плитки, чтобы поменять их местами.</div>
+        {reason && <div className="ed-an-bad">{reason}</div>}
+        <div className="ed-an-cap">Клетки на экране</div>
+        <div className="ed-an-words">
+          {template.words.map((w, wi) => (
+            <span className="ed-an-word" key={wi}>
+              {w.map((c, ci) => c.kind === 'fixed'
+                ? <span className="ed-an-cell fixed" key={ci}>{c.ch}</span>
+                : <span className="ed-an-cell" key={ci} />)}
+            </span>
+          ))}
+        </div>
+      </>}
+    </div>
+  )
 }
 
 function MatchEditor({ spec, onChange, imgs }: {
@@ -522,7 +604,8 @@ function questionErrors(q: Question): string[] {
   const errs: string[] = []
   const a = q.answer
   const hasMedia = (q.media.question ?? []).length > 0
-  if (!q.question_text.trim() && !hasMedia) errs.push('текст вопроса (или медиа)')
+  // у «Скрэмбла» вопрос — сама фраза на плитках, подсказка-текст необязательна
+  if (!q.question_text.trim() && !hasMedia && a.mode !== 'anagram') errs.push('текст вопроса (или медиа)')
   switch (a.mode) {
     case 'free_text': if (!a.correct.trim()) errs.push('правильный ответ'); break
     case 'choice':
@@ -533,7 +616,12 @@ function questionErrors(q: Question): string[] {
     case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
     case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
     case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
-    case 'anagram': break
+    case 'anagram': {
+      const letters = anagramTemplate(a.phrase).letters
+      if (letters.length < 3) errs.push('фраза-ответ (минимум 3 буквы)')
+      else if (!anagramOrderValid(a.order, letters)) errs.push('перемешивание (нажми «Перемешать заново»)')
+      break
+    }
   }
   return errs
 }

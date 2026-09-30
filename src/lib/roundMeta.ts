@@ -48,6 +48,16 @@ export function metaLine(round: LoadedRound): string {
     const n = round.questions.filter(q => !q.hidden).length
     return `${n} ВОПРОСОВ · 4 КАРТИНКИ · 2 / 1 / 0.5 БАЛЛА`
   }
+  if (round.mechanic === 'anagram') {
+    const s = round.settings as { mode?: string; pointsPerQuestion?: number; hintIntervalSec?: number }
+    const n = round.questions.filter(q => !q.hidden).length
+    const hint = s.hintIntervalSec ?? 10
+    const word = n % 10 === 1 && n % 100 !== 11 ? 'ВОПРОС'
+      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'ВОПРОСА' : 'ВОПРОСОВ'
+    return `${n} ${word} · ${round.timer_seconds} СЕК · `
+      + (s.mode === 'race' ? 'БАЛЛ ПЕРВОМУ' : `${s.pointsPerQuestion ?? 1} БАЛЛ`)
+      + (hint > 0 ? ` · ПОДСКАЗКА КАЖДЫЕ ${hint} СЕК` : '')
+  }
   if (round.mechanic === 'sprint') {
     const s = round.settings as { pointsPerQuestion?: number; allCorrectBonus?: number }
     const n = round.questions.filter(q => !q.hidden).length

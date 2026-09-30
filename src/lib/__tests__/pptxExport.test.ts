@@ -90,6 +90,28 @@ describe('buildSlidePlan', () => {
     expect(answer?.body).toBe('СЛОВО')
   })
 
+  it('anagram НЕ пропускается: на вопросе плитки и маска, фразы нет; на ответе — фраза', () => {
+    const p = pack([round({
+      mechanic: 'anagram', title_lines: ['СКРЭМБЛ'],
+      questions: [q({ question_text: 'Животное', answer: { mode: 'anagram', phrase: 'Кот-2', order: [2, 0, 1] } })],
+    })])
+    const plan = buildSlidePlan(p)
+    const qs = plan.slides.find(s => s.kind === 'question')!
+    const ans = plan.slides.find(s => s.kind === 'answer')!
+    expect(qs.body).toBe('Животное\nТ К О\n_ _ _ - 2')
+    expect(qs.body).not.toContain('КОТ')
+    expect(ans.body).toBe('КОТ-2')
+  })
+
+  it('anagram: несколько слов — маска разделена по словам', () => {
+    const p = pack([round({
+      mechanic: 'anagram',
+      questions: [q({ question_text: '', answer: { mode: 'anagram', phrase: 'ab cd', order: [1, 0, 3, 2] } })],
+    })])
+    const qs = buildSlidePlan(p).slides.find(s => s.kind === 'question')!
+    expect(qs.body).toBe('B A D C\n_ _     _ _')
+  })
+
   describe('порядок вопрос/ответ по answers_reveal (главный сценарий)', () => {
     it('after_question: интерливинг Q1,A1,Q2,A2 — ровно как решает HostScreen кнопкой "Показать ответ"', () => {
       const p = pack([round({

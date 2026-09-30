@@ -2,6 +2,7 @@
 import type { Question } from '../types/quiz'
 import type { LoadedPack, LoadedRound } from './packLoader'
 import { rebusRuleHolds } from './answerCheck'
+import { anagramTemplate, anagramOrderValid } from './anagram'
 
 export interface Problem {
   roundIdx: number
@@ -53,6 +54,7 @@ export function validatePack(pack: LoadedPack): Problem[] {
     if (round.mechanic === 'crossword') validateCrossword(round, ri, problems)
     if (round.mechanic === 'jeopardy') validateJeopardy(round, ri, problems)
     if (round.mechanic === 'four_pics') validateFourPics(round, ri, problems)
+    if (round.mechanic === 'anagram') validateAnagram(round, ri, pack, problems)
     round.questions.forEach((q, qi) => validateQuestion(round, q, ri, qi, problems))
   })
   return problems
@@ -63,7 +65,8 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
   const a = q.answer
   const hasMedia = (q.media.question ?? []).length > 0
   const text = q.question_text
-  if (!text.trim() && !hasMedia) push('Пустой вопрос (нет ни текста, ни медиа)')
+  // у «Скрэмбла» вопрос — сама перемешанная фраза, текст необязателен
+  if (!text.trim() && !hasMedia && a.mode !== 'anagram') push('Пустой вопрос (нет ни текста, ни медиа)')
 
   // ── опечатки и типовые огрехи ──
   // Лишние и двойные пробелы НЕ проверяем: на игру они не влияют,
@@ -73,7 +76,8 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
   if (/\b([а-яa-z]{3,})\s+\1\b/i.test(text)) push('Похоже, слово повторяется дважды')
 
   const answerText = a.mode === 'free_text' ? a.correct
-    : a.mode === 'crossword_word' ? a.word : ''
+    : a.mode === 'crossword_word' ? a.word
+    : a.mode === 'anagram' ? a.phrase : ''
   if (answerText) {
     if (answerText.length > 60) push('Правильный ответ подозрительно длинный (>60 символов)')
   }
@@ -161,6 +165,24 @@ function validateFourPics(round: LoadedRound, ri: number, out: Problem[]) {
     const flatLen = q.answer.word.trim().replace(/\s+/g, '').length
     const bad = (q.service.openLetters ?? []).some(i => i < 0 || i >= flatLen)
     if (bad) push('3 попытки: «открытые буквы» указывают на несуществующий индекс — перевыбери после правки слова')
+  })
+}
+
+function validateAnagram(round: LoadedRound, ri: number, pack: LoadedPack, out: Problem[]) {
+  const s = round.settings as { mode?: string }
+  if (s.mode === 'race' && pack.settings?.play_mode === 'paper')
+    out.push({ roundIdx: ri, text: 'Скрэмбл: гонка недоступна на бумаге — будет считаться как обычный' })
+  round.questions.forEach((q, qi) => {
+    const push = (text: string) => out.push({ roundIdx: ri, questionIdx: qi, text })
+    if (q.answer.mode !== 'anagram') { push('Скрэмбл: тип ответа должен быть «Скрэмбл» (фраза)'); return }
+    const letters = anagramTemplate(q.answer.phrase).letters
+    if (letters.length < 3) { push('Скрэмбл: во фразе меньше 3 букв'); return }
+    if (letters.length > 40)
+      push(`Скрэмбл: ${letters.length} букв — на проекторе плитки станут мелкими, лучше до 40`)
+    if (q.answer.order.length !== letters.length)
+      push('Скрэмбл: перемешивание не совпадает с фразой — нажми «Перемешать заново»')
+    else if (!anagramOrderValid(q.answer.order, letters))
+      push('Скрэмбл: перемешивание невалидно (совпадает с фразой или первая буква на месте) — нажми «Перемешать заново»')
   })
 }
 

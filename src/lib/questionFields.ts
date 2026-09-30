@@ -47,6 +47,13 @@ export function questionFields(mech: MechanicKey): QuestionFields {
     fixedMode: true, questionMedia: true, voice: false,
     mediaLabel: 'Картинки (2–4, порядок = порядок показа)', mediaMax: 4,
   }
+  // «Скрэмбл»: тип ответа задан (фраза + перемешивание), текст вопроса —
+  // необязательная подсказка мелко над доской, картинка — одна, чтобы не
+  // отнимать высоту у доски плиток; озвучка работает как у обычного вопроса.
+  if (mech === 'anagram') return {
+    fixedMode: true, questionMedia: true, voice: true,
+    mediaLabel: 'Картинка к вопросу (необязательно)', mediaMax: 1,
+  }
   return {
     fixedMode: false, questionMedia: true, voice: true,
     mediaLabel: 'Медиа вопроса (до 4)', mediaMax: 4,

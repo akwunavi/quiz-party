@@ -15,6 +15,7 @@ import { NumField } from './NumField'
 import { BankPicker, BankSend } from './BankPicker'
 import { AiRoundReview } from './AiReview'
 import { estimateRoundMinutes } from '../../lib/duration'
+import { useHint, Hint } from '../../components/Hint'
 
 // ═══ Экран раунда: настройки механики + вопросы ═══
 
@@ -26,6 +27,7 @@ export function answerSnippet(q: { answer: { mode: string } }): string {
     case 'order': return String(a.correct_order ?? '')
     case 'match': return Array.isArray(a.correct_pairs) ? (a.correct_pairs as string[]).join(' ') : ''
     case 'crossword_word': return String(a.word ?? '')
+    case 'anagram': return String(a.phrase ?? '').toUpperCase()
     default: return ''
   }
 }
@@ -53,6 +55,10 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
   // вопрос»/показ ответов/правки/фоновая музыка вопросов ему не нужны —
   // тот же приём, что уже исключает эти поля у блица.
   const isFourPics = round.mechanic === 'four_pics'
+  // «Скрэмбл»: ответ показывается ВСЕГДА сразу после вопроса (HANDOFF §3ca) —
+  // «Показ ответов» и «Перед ответами» (повтор слайдами работает только при
+  // показе в конце раунда) ему не нужны; таймер/правки/музыка — нужны.
+  const isAnagram = round.mechanic === 'anagram'
   // в этих механиках контент задаётся не вопросами, а темами/треками
   const noQuestions = isJeopardy || round.mechanic === 'melody' || round.mechanic === 'race'
 
@@ -140,7 +146,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               />
             <div className="ed-hint">Секунды, можно ввести с клавиатуры</div>
           </div>
-          <div className="ed-field"><label>Показ ответов</label>
+          {!isAnagram && <div className="ed-field"><label>Показ ответов</label>
             <select value={round.answers_reveal} disabled={locked}
               onChange={e => void patch({ answers_reveal: e.target.value as LoadedRound['answers_reveal'] })}>
               <option value="after_question">сразу после вопроса</option>
@@ -148,7 +154,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
               <option value="never">не показывать</option>
             </select>
             <div className="ed-hint">Переопределяет настройку пакета для этого раунда</div>
-          </div>
+          </div>}
           <div className="ed-field"><label>Правок ответа</label>
             <select value={(round.settings as { maxEdits?: number }).maxEdits ?? 2} disabled={locked}
               onChange={e => void patch({ settings: { ...round.settings, maxEdits: Number(e.target.value) } as never })}>
@@ -214,7 +220,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
           </div>
         )}
 
-        {!isBlitz && !isFourPics && <div className="ed-field"><label>Перед ответами</label>
+        {!isBlitz && !isFourPics && !isAnagram && <div className="ed-field"><label>Перед ответами</label>
           <label className="ed-check" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14 }}>
             <input type="checkbox" disabled={locked}
               checked={!!(round.settings as { recap_before_answers?: boolean }).recap_before_answers}
@@ -269,6 +275,8 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
         <RaceEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
       {round.mechanic === 'four_pics' &&
         <RevealEditor round={round} locked={locked} onChanged={onChanged} />}
+      {isAnagram &&
+        <AnagramEditor pack={pack} round={round} locked={locked} onChanged={onChanged} />}
 
       {!noQuestions && <>
         <div className="ed-card"><h4>Вопросы · {round.questions.filter(q => !q.hidden).length}
@@ -628,6 +636,63 @@ function RevealEditor({ round, locked, onChanged }: {
         укороченному времени — ждать полный таймер незачем. Вопросы — как
         обычно ниже: слово ответа задаёт кроссвордный тип, картинки (2–4)
         показываются по нарастающей.
+      </div>
+    </div>
+  )
+}
+
+// ── «Скрэмбл»: режим, баллы, подсказки ──
+function AnagramEditor({ pack, round, locked, onChanged }: {
+  pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
+}) {
+  const hint = useHint()
+  const raceRef = useRef<HTMLButtonElement>(null)
+  const s = round.settings as { mode?: 'standard' | 'race'; pointsPerQuestion?: number; hintIntervalSec?: number }
+  const mode = s.mode ?? 'standard'
+  const paper = pack.settings?.play_mode === 'paper'
+  const set = (patch: Record<string, unknown>) =>
+    void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
+  const pickMode = (m: 'standard' | 'race') => {
+    if (locked) return
+    // кнопка живая (правило §3d): на бумаге гонку не сохраняем, а объясняем
+    if (m === 'race' && paper) {
+      hint.show('На бумаге гонка недоступна: ответы приходят с телефонов, на бланках времени нет', raceRef.current)
+      return
+    }
+    if (m !== mode) set({ mode: m })
+  }
+  return (
+    <div className="ed-card"><h4>«Скрэмбл»</h4>
+      <div className="ed-grid2">
+        <div className="ed-field"><label>Режим</label>
+          <div className="ed-an-modes">
+            <button type="button" className={`ed-an-mode${mode === 'standard' ? ' on' : ''}`}
+              disabled={locked} onClick={() => pickMode('standard')}>обычный</button>
+            <button type="button" ref={raceRef} className={`ed-an-mode${mode === 'race' ? ' on' : ''}`}
+              disabled={locked} onClick={() => pickMode('race')}>гонка</button>
+          </div>
+          <Hint text={hint.text} />
+          <div className="ed-hint">{mode === 'race'
+            ? 'Балл получает только команда, чей верный ответ сервер принял первым. Время — серверное.'
+            : 'Балл получает каждая команда с верным ответом.'}
+            {mode === 'race' && paper && ' Пакет сейчас в режиме «бумага» — раунд посчитается как обычный.'}</div>
+        </div>
+        <div className="ed-field"><label>Баллов за вопрос</label>
+          <NumField value={s.pointsPerQuestion ?? 1} min={1} max={10} disabled={locked}
+            onCommit={v => set({ pointsPerQuestion: v || 1 })} /></div>
+        <div className="ed-field"><label>Подсказка каждые, сек</label>
+          <NumField value={s.hintIntervalSec ?? 10} min={0} max={60} disabled={locked}
+            onCommit={v => set({ hintIntervalSec: v })} />
+          <div className="ed-hint">0 — без подсказок. Открывается случайная буква (не первая),
+            две буквы остаются закрытыми до конца.</div>
+        </div>
+      </div>
+      <div className="ed-hint">
+        Ответ показывается сразу после каждого вопроса: сам по концу таймера или
+        кнопкой ведущего. Автопролистывание ставь не меньше 5 секунд — иначе
+        результат гонки уйдёт с экрана раньше, чем его прочитают. Если поменять
+        оценку ответа после показа, на табло окажется другой победитель, чем
+        видел зал.
       </div>
     </div>
   )

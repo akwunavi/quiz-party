@@ -224,3 +224,35 @@
   background: color-mix(in srgb, var(--muted) 12%, transparent); }
 .ed-note-live { border-left-color: var(--ok);
   background: color-mix(in srgb, var(--ok) 12%, transparent); }
+
+/* ═══ «Скрэмбл»: фраза-ответ, плитки, маска клеток (QuestionForm/RoundScreen) ═══
+   Свои .ed-an-*, а не проекторные .an-* (те в em-масштабе под доску).
+   Кнопки — с префиксом .cyber: иначе `.cyber button` (02, вес 0,1,1)
+   перебивает кегль/паддинг (замерено: 14px вместо 20px). */
+.ed-an { display: flex; flex-direction: column; gap: 8px; }
+.ed-an-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.ed-an-cap { font-size: 12px; font-weight: 600; letter-spacing: .1em; color: #9fb6d9; text-transform: uppercase; }
+.cyber .ed-an-tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.cyber .ed-an-tile { width: 34px; height: 40px; padding: 0; border-radius: 6px;
+  border: 1px solid var(--ed-line); background: #16233d; color: var(--fg);
+  font-family: var(--font-display); font-size: 20px; line-height: 1; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .15s; }
+.cyber .ed-an-tile.sel { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,229,255,.45); transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .cyber .ed-an-tile:hover { border-color: var(--neon); }
+}
+.ed-an-bad { color: var(--danger); font-size: 13px; font-weight: 600; }
+.ed-an-words { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.ed-an-word { display: inline-flex; gap: 3px; }
+.ed-an-cell { width: 22px; height: 28px; border-bottom: 2px solid var(--muted);
+  display: inline-flex; align-items: flex-end; justify-content: center;
+  font-family: var(--font-display); font-size: 16px; color: var(--fg); }
+.ed-an-cell.fixed { border-bottom-color: transparent; }
+.cyber .ed-an-modes { display: flex; gap: 6px; }
+.cyber .ed-an-mode { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--ed-line);
+  background: #16233d; color: #cfe0f7; cursor: pointer; font-weight: 600; letter-spacing: .06em; }
+.cyber .ed-an-mode.on { border-color: var(--neon); color: var(--neon); box-shadow: 0 0 10px rgba(0,229,255,.3); }
+@media (prefers-reduced-motion: reduce) {
+  .cyber .ed-an-tile { transition: none; }
+  .cyber .ed-an-tile.sel { transform: none; }
+}

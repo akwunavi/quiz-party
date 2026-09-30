@@ -100,12 +100,16 @@ export async function createRound(pack_id: string, _position: number, mechanic: 
       ? { themes: [], spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
     : mechanic === 'blitz'
       ? { teamSeconds: 60, timeoutPenalty: 10 }
+    : mechanic === 'anagram'
+      ? { mode: 'standard', pointsPerQuestion: 1, hintIntervalSec: 10, maxEdits: 2 }
     : {}
   const { data, error } = await supabase.from('pack_rounds').insert({
     pack_id, position, mechanic, title_lines: [title.toUpperCase()],
     rules: [], settings: defaults,
     timer_seconds: mechanic === 'sprint' ? 120 : 30,
-    answers_reveal: 'after_round',
+    // «Скрэмбл» показывает ответ ВСЕГДА сразу после вопроса (HANDOFF §3ca):
+    // результат гонки — «кто первый», его объявляют сразу, не в конце раунда
+    answers_reveal: mechanic === 'anagram' ? 'after_question' : 'after_round',
   }).select().single()
   if (error) throw error
   void log('round', data.id, 'create', { mechanic })
@@ -131,9 +135,10 @@ export async function deleteRound(id: string) {  // только owner (RLS)
 }
 
 // ── Вопросы ──
-export type NewQuestionMode = 'free_text' | 'crossword_word' | 'choice'
+export type NewQuestionMode = 'free_text' | 'crossword_word' | 'choice' | 'anagram'
 
 export function defaultModeFor(mechanic: string): NewQuestionMode {
+  if (mechanic === 'anagram') return 'anagram'
   if (mechanic === 'crossword' || mechanic === 'four_pics') return 'crossword_word'
   if (mechanic === 'test_stop' || mechanic === 'stakes_unique') return 'choice'
   return 'free_text'
@@ -147,6 +152,8 @@ export async function createQuestion(round_id: string, mode: NewQuestionMode = '
   const position = (maxRow?.position ?? -1) + 1
   const answer = mode === 'crossword_word'
     ? { mode, word: '' }
+    : mode === 'anagram'
+      ? { mode, phrase: '', order: [] }
     : mode === 'choice'
       ? { mode, choices: ['А', 'Б', 'В', 'Г'].map(k => ({ key: k, text: '' })), correct_choice: '', display: '' }
       : { mode, correct: '', display: '' }
