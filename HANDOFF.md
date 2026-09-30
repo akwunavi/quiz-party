@@ -249,7 +249,7 @@ variables → Actions. Вшиваются в бандл на этапе сбор
 ## 3. Тесты
 
 Запуск: `npx vitest run`. Число тестов росло весь этот файл (см. `Проверено:`
-в конце каждой секции `3*`) — актуальное на 18.09.2026: **495 тестов в 49
+в конце каждой секции `3*`) — актуальное на 30.09.2026 (9.73): **639 пройденных + 7 todo в 63
 файлах** (сверено самим `npx vitest run`, см. CLAUDE.md §4). Не доверяй
 старой цифре в этом абзаце — она устаревает быстрее, чем её кто-то правит;
 проверяй командой.
@@ -7842,6 +7842,37 @@ Reduced-motion (эмуляция): `transition-duration: 0s` во всех тр�
 на бумаге строк ответов нет. Цвет вердиктов проверен пикселями скриншота.
 
 Тесты 9.72 не добавлялись — **639 + 7 todo (646) в 63 файлах**.
+
+**9.73 — итог захода.** Шесть подключений выполнены: тип (9.66),
+проектор (9.70), админка (9.72), телефон (9.71), подсчёт (9.68), редактор
++ предпросмотр (9.69/9.70). Места, где перечислены механики (чек-лист на
+следующую механику): `types/quiz.ts`, `EditorApp.tsx:MECHANIC_NAMES`,
+`editorApi.ts` (`createRound`/`defaultModeFor`/`createQuestion`),
+`questionFields.ts`, `previewState.ts` (стадии/состояние/ответы),
+`QuestionPreview.tsx`, `RoundScreen.tsx` (скрытие полей, карточка
+настроек, `answerSnippet`), `QuestionForm.tsx` (`MODE_*`, `defaultAnswer`,
+`questionErrors`, `AnswerEditor`), `validate.ts`, `roundMeta.ts:metaLine`,
+`devSeed.ts` (`genAnswer`/`expectedForRound`), `totals.ts` (обе функции),
+`autocheck.ts`, `edits.ts:isComplete`, `pptxExport.ts`, `HostScreen.tsx`,
+`AdminPage.tsx` (`advance`/`backToRound`/пульт/`correctOf`/
+`displayAnswerText`), `PlayerPage.tsx:PlayerInner`,
+`QuestionScreen.displayAnswer`, `exportCsv.ts`, `exportAnswers.ts`,
+`aiReview.ts`, тесты `question-fields`/`previewState`. `flow.ts`,
+`duration.ts`, `SKIPPED_MECHANICS` правок не потребовали.
+
+**ВЕДУЩЕМУ РУКАМИ:** прогнать `supabase/migrations/0015_answer_accepted_at.sql`
+в SQL Editor `ivan-quiz-party.ru` (отдельным запуском, целиком), затем по
+желанию — `0015_answer_accepted_at_verify.sql` ОТДЕЛЬНЫМ запуском. Без
+миграции механика работает, но гонка решается часами телефонов (пульт
+покажет предупреждение). Перед деплоем — `reviewer` на весь дифф
+9.66–9.73 (CLAUDE.md §9).
+
+**Не проверено в этой среде:** живой Supabase (триггеры 0015 исполняются
+только на базе ведущего — поэтому проверочный SQL), реальные телефоны и
+проектор (только эмуляция в headless Chromium; перелёт на слабом ТВ стоит
+посмотреть глазами на репетиции), локальный режим бара целиком (там
+`question_shown` не читается — бэкфилл в разделе 7), поведение с
+реальной очередью ответов при обрыве сети (очередь не менялась).
 
 ---
 
