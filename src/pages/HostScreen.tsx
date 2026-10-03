@@ -10,6 +10,7 @@ import {
 } from '../lib/blitzState'
 import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
+import { installAudioKeepAlive } from '../lib/audioKeepAlive'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
@@ -83,6 +84,10 @@ export function HostScreen() {
     if (gameState?.pack_id) void loadPack(gameState.pack_id, true).then(setPack).catch(() => {})
     else setPack(null)
   }, [gameState?.pack_id, gameState?.round_number])
+  // 9.76: колонки/ТВ не засыпают в паузах — иначе съедается начало озвучки
+  // и секундный отрывок мелодии (lib/audioKeepAlive.ts). Поток не
+  // останавливаем при размонтировании: проектор живёт весь вечер.
+  useEffect(() => installAudioKeepAlive(), [])
   if (!gsLoading && !roomId) return <RoomPicker route="/" />
   const theme = pack?.theme ?? 'classic'
   // Ключ вспышки перехода: финал и рекап листают свои слайды САМИ каждые

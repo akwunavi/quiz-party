@@ -51,6 +51,7 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `lib/anagram.ts` | «Скрэмбл» целиком без сети: шаблон клеток, перемешивание, подсказки по таймеру, доска игрока, точная проверка (Ё=Е, опечатки не прощаются), победитель гонки по серверному `accepted_at` — одна логика для проектора (`pages/rounds/AnagramRound.tsx`), пульта, телефона, `totals.ts` и редактора (HANDOFF §3ca) |
 | `lib/reveal.ts` + `revealActions.ts` | «3 попытки»: фазы 1→2→3→разбор, чистые переходы и запись — HANDOFF §3bn (на CAS ещё не переведено — бэклог P2b) |
 | `lib/sharedAudio.ts` | общий аудио-элемент «Угадай мелодии»: контроллер вытеснения (`playShared`/`stopShared`/`unlockAudio`, `SharedPlayback` с `isCurrent()/stop()/on()/result`) поверх `AbortController`, а не счётчик поколений — переписан в 9.59 (HANDOFF §3bw) после того, как нашлась настоящая причина гонки (не VPN — `AbortError` из `play()` штатно значит «прервали») |
+| `lib/audioKeepAlive.ts` | держит звуковой выход проектора открытым тихим шумом (≈ −80 дБ), чтобы ТВ/колонки не засыпали в паузах и не съедали начало озвучки и секундный отрывок мелодии (9.76, HANDOFF §3cb) |
 | `components/LobbyMusic.tsx` | фоновая музыка экрана лобби — вынесена из `HostScreen.tsx` в 9.57 вместе с фиксом гонки `play()`/cleanup (HANDOFF §3bu) |
 | `components/FitImg.tsx` | картинка в выключном ряду (flex-grow по пропорции) — общая для всех экранов вопроса, вынесена из `HostScreen.tsx` в 9.45 |
 | `lib/media.ts` | `mediaUrl`, `lenClass`, `mediaScaleVar` — общие для всех экранов |
@@ -131,10 +132,13 @@ npx vite build
 ```
 
 Тесты проверяй не только по цвету, но и **по числу**: сейчас должно быть
-**657 пройденных тестов + 7 todo (664 всего) в 63 файлах** (итоговая
-строка `npx vitest run`: «Test Files 60 passed | 3 skipped (63)» — три
+**667 пройденных тестов + 7 todo (674 всего) в 64 файлах** (итоговая
+строка `npx vitest run`: «Test Files 61 passed | 3 skipped (64)» — три
 файла это `it.todo`-заглушки для гонок без render-стенда (§3bu), целиком
-«skipped», отсюда 60, а не 63, в счётчике «passed»). 639→654→657 при 9.74/9.75 —
+«skipped», отсюда 61, а не 64, в счётчике «passed»). 657→667 при 9.76 —
+правки с живой игры (HANDOFF §3cb: `audioKeepAlive.test.ts`, мелодия без
+победителя и барабан в `melody-actions.test.ts`, 2–6 пар в
+`question-fields.test.ts`). 639→654→657 при 9.74/9.75 —
 ревью «Скрэмбла» (HANDOFF §3ca). 574→639 при
 9.66–9.72 — механика «Скрэмбл» (HANDOFF §3ca: `anagram.test.ts`,
 `totals-anagram.test.ts` + расширения contract/server/export/devseed/

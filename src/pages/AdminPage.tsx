@@ -45,7 +45,7 @@ import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyA
 import { casEnabled } from '../lib/sessionBag'
 import {
   melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippetIfFresh,
-  melodyClose, melodyToBoard, guardMelody, melodyBidSec, melodyEmergencyClose,
+  melodyRevealMiss, melodyToBoard, guardMelody, melodyBidSec, melodyEmergencyClose,
 } from '../lib/melody'
 import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
 import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
@@ -2092,7 +2092,7 @@ function MelodyControls({ round, gameState, onFinish }: {
           </button>
           <button className="adm-btn"
             onClick={() => void runAction('пропустить трек', () => melodyClick(gameState,
-              guardMelody({ key: m.key, stage: 'bids' }, cur => melodyClose(cur))))}>ПРОПУСТИТЬ ТРЕК</button>
+              guardMelody({ key: m.key, stage: 'bids' }, cur => melodyRevealMiss(cur))))}>ПРОПУСТИТЬ ТРЕК</button>
         </div>
       </>)}
 
@@ -2126,11 +2126,12 @@ function MelodyControls({ round, gameState, onFinish }: {
 
       {m.stage === 'reveal' && (<>
         <div className="adm-correct" style={{ textAlign: 'center' }}>
-          ✓ Верно · +{m.wonPts ?? 0}
+          {m.wonTeam ? `✓ Верно · +${m.wonPts ?? 0}` : 'Ответ на экране'}
         </div>
         <div className="adm-qtext" style={{ textAlign: 'center',
           color: teams.find(t => t.id === m.wonTeam)?.color }}>
-          {teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы
+          {m.wonTeam ? `${teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы`
+            : 'Никто не угадал'}
         </div>
         <button className="adm-btn primary"
           onClick={() => void runAction('к доске мелодии', () => melodyClick(gameState,

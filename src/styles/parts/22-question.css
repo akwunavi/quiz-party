@@ -268,7 +268,8 @@
 .host-screen > .img-answers.n2,
 .host-screen > .img-answers.n3,
 .host-screen > .img-answers.n4,
-.host-screen > .img-answers.n5 { max-width: 100%; }
+.host-screen > .img-answers.n5,
+.host-screen > .img-answers.n6 { max-width: 100%; }
 .host-screen > .q-media-grid,
 .host-screen > .q-media-grid.n1,
 .host-screen > .q-media-grid.n2,
@@ -287,6 +288,15 @@
   align-items: center; justify-content: center; overflow: hidden; }
 .img-answers.eq-row .ia-frame img { width: 100%; height: 100%;
   max-width: 100%; max-height: 100%; object-fit: contain; }
+/* 9.76: сопоставление на 6 пар без подписей — два ряда по три (с
+   подписями высоту забирает сетка вариантов, и картинкам выгоднее один ряд). В один ряд шесть
+   карточек выходили узкими полосками (230px на 1920), а два ряда отдают
+   картинкам вдвое больше ширины при той же высоте экрана. flex-basis с
+   !important — FitAnswer ставит flex-grow инлайном по пропорции картинки. */
+.host-screen:not(.has-choices) > .img-answers.eq-row.n6 { flex-wrap: wrap; align-content: stretch; row-gap: clamp(8px, 1vw, 18px); }
+.host-screen:not(.has-choices) > .img-answers.eq-row.n6 .img-answer {
+  flex: 0 0 calc((100% - 2 * clamp(10px, 1.2vw, 22px)) / 3) !important;
+  height: calc(50% - clamp(4px, .5vw, 9px)); }
 @media (max-width: 900px) {
   .img-answers.eq-row { flex-wrap: wrap; }
   .img-answers.eq-row .img-answer { flex-basis: 40% !important; }
@@ -605,3 +615,20 @@
 .host-screen > .q-frame > .q-text,
 .host-screen > .mg-frame > .q-text,
 .host-screen .q-split > div:first-child > .q-text { margin-block: 0; max-width: 100%; }
+
+/* 9.76: пять-шесть вариантов (сопоставление до 6 пар, выбор из 6) на
+   невысоком экране (1366×768) — два ряда плиток по три не помещались над
+   кнопками «Назад/Дальше» (наезд 26–39px в ГП и НГ, замер рендером).
+   Плитки ниже и кегль меньше; картинки уступают высоту. Вес не ниже
+   темы ГП (0,4,0 в 14-theme-potter, тот же медиазапрос по высоте). */
+@media (max-height: 900px) {
+  .host-screen.has-choices > .choices-grid:has(.choice-plate:nth-child(5)) {
+    padding-top: clamp(8px, 1.5vh, 16px); }
+  .theme-potter .host-screen.has-choices > .choices-grid:has(.choice-plate:nth-child(5)) .choice-plate,
+  .host-screen.has-choices > .choices-grid:has(.choice-plate:nth-child(5)) .choice-plate {
+    padding: clamp(6px, 1vh, 12px) clamp(12px, 1.2vw, 22px);
+    font-size: clamp(15px, 1.6vw, 26px); }
+  .host-screen.has-media.has-choices > .img-answers.n5,
+  .host-screen.has-media.has-choices > .img-answers.n6 { min-height: min(16vh, 140px); }
+}
+

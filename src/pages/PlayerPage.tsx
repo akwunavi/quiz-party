@@ -541,7 +541,9 @@ function MelodyPlayer({ team, gameState, roundLabel }: {
           {(stage === 'idle' || stage === 'done') && <Wait text="ЖДИТЕ СЛЕДУЮЩЕГО ТРЕКА" />}
           {stage === 'reveal' && (m.wonTeam === team.id
             ? <Wait text={`ВЫ УГАДАЛИ! +${m.wonPts ?? 0}`} sub="Баллы ваши — смотрите на экран" />
-            : <Wait text="ТРЕК УГАДАН" sub="Увы, не вами. Ждите следующего" />)}
+            : m.wonTeam
+              ? <Wait text="ТРЕК УГАДАН" sub="Увы, не вами. Ждите следующего" />
+              : <Wait text="НИКТО НЕ УГАДАЛ" sub="Ответ — на экране" />)}
           {stage === 'spinning' && <Wait text="ВЫБИРАЕМ ТРЕК" sub="Смотрите на экран" />}
           {stage === 'listen' && <Wait text="СЛУШАЕМ 1 СЕКУНДУ" sub="Приготовьтесь к ставке" />}
 

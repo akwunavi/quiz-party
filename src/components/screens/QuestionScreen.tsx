@@ -186,7 +186,7 @@ export function QuestionScreen({
           {!q.media.hidden && imgs.length > 0 && (
             lettered
               /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
-              ? <div className={`img-answers n${Math.min(imgs.length, 5)}${
+              ? <div className={`img-answers n${Math.min(imgs.length, 6)}${
                     imgs.length > 1 ? ' eq-row' : ''}`}>
                   {imgs.map((m, i) => (
                     <FitAnswer key={i} src={mediaUrl(m)}

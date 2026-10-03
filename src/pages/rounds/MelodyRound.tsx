@@ -24,7 +24,7 @@ import { mediaUrl } from '../../lib/media'
 // разошёлся бы с проектором.
 import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/melodyActions'
 import {
-  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyRevealMiss, melodyPass, melodySpinSchedule, melodySpinIndex,
   melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
   melodyEmergencyClose,
 } from '../../lib/melody'
@@ -430,7 +430,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   return (
     <div className="host-screen grid-bg mel-screen" onPointerDown={preview ? undefined : unlockAudio}>
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
-        spinKey={m.key} spinLeft={left} spinTotal={s.spinSec ?? 10}
+        spinKey={m.key} spinDeadline={deadline} spinTotalMs={Math.min(s.spinSec ?? 5, 8) * 1000}
         onPick={preview ? undefined : (manualPick ? pickManually : undefined)} theme={pack.theme} />
 
       {/* Кнопки этого блока запускают рулетку/спин — реальная запись в
@@ -532,7 +532,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                 </button>
                 <button className="ghost dark"
                   onClick={() => click(() => melodyClick(gameState,
-                    guardMelody({ key: m.key, stage: 'bids' }, cur => melodyClose(cur))))}>Пропустить трек</button>
+                    guardMelody({ key: m.key, stage: 'bids' }, cur => melodyRevealMiss(cur))))}>Пропустить трек</button>
               </div>}
             </>)}
 
@@ -551,7 +551,8 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
 
             {m.stage === 'reveal' && (<>
               <div className="answer-reveal" style={{ padding: '18px 28px' }}>
-                <div className="answer-label">ВЕРНО ✓ · +{m.wonPts ?? 0}</div>
+                {/* 9.76: никто не угадал — ответ всё равно показываем */}
+                <div className="answer-label">{m.wonTeam ? `ВЕРНО ✓ · +${m.wonPts ?? 0}` : 'ПРАВИЛЬНЫЙ ОТВЕТ'}</div>
                 <div className="answer-main">{track?.correct}</div>
               </div>
               {/* Дослушать трек: 15 секунд с начала, вместе с показом ответа.
@@ -561,7 +562,8 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
                   (HANDOFF.md), а надпись про 15 секунд не нужна редактору. */}
               {!preview && track?.audio && <RevealTrack src={mediaUrl(track.audio)} />}
               <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
-                {teams.find(t => t.id === m.wonTeam)?.name} забирает баллы
+                {m.wonTeam ? `${teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы`
+                  : 'Никто не угадал'}
               </div>
               {!preview && <div className="mel-actions">
                 <button onClick={() => click(() => melodyClick(gameState,
@@ -632,45 +634,55 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   )
 }
 
-/** Барабан: подсветка бежит по плиткам и замедляется к концу. */
-function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, onPick, theme }: {
+/** Барабан: подсветка бежит по свободным плиткам ПО ПОРЯДКУ (слева
+ *  направо, сверху вниз), плавно замедляется и останавливается ровно на
+ *  выбранном треке (9.76). Расписание шагов — чистая melodySpinSchedule,
+ *  считается от дедлайна стадии, поэтому длительность совпадает с тем, что
+ *  записал melodySpin (раньше барабан думал, что крутится 10 с, а стадия
+ *  длилась 5 — замедление не успевало, и в последнюю секунду подсветка
+ *  перескакивала на выбранную плитку из случайного места). */
+function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotalMs, onPick, theme }: {
   themes: MelodyTheme[]; played: string[]
-  spinning: boolean; spinKey?: string; spinLeft: number; spinTotal: number
+  spinning: boolean; spinKey?: string
+  /** конец стадии spinning (мс), 0 — неизвестен */
+  spinDeadline: number
+  /** полная длительность барабана, мс — та же, что заложил melodySpin */
+  spinTotalMs: number
   /** Ручной выбор плитки. Не задан — плитки не кликабельны. */
   onPick?: (key: string) => void
   /** Только для маркера-огонька Magic (шаг 11) — остальным темам не нужен. */
   theme?: ThemeKey
 }) {
   const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
-  const free = keys.filter(k => !played.includes(k))
-  const [cursor, setCursor] = useState(0)
+  // порядок обхода — как читают зал: строка за строкой, слева направо
+  const free = keys.filter(k => !played.includes(k)).sort((x, y) => {
+    const [xt, xi] = x.split('-').map(Number), [yt, yi] = y.split('-').map(Number)
+    return xi - yi || xt - yt
+  })
+  const [cursor, setCursor] = useState(-1)
 
-  // один управляющий цикл на всю анимацию: ритм считаем из ref, чтобы не плодить таймеры
-  const leftRef = useRef(spinLeft)
-  leftRef.current = spinLeft
+  // Один цикл на весь барабан. Старт — дедлайн минус полная длительность:
+  // экран, открытый посреди вращения, подхватит его с нужного места.
+  const freeSig = free.join(',')
   useEffect(() => {
-    if (!spinning || free.length === 0 || spinLeft <= 0) return
-    let stop = false
-    let timer: number | undefined
-    const step = () => {
-      if (stop) return
-      setCursor(c => {
-        // прыгаем в случайную, но не в ту же самую
-        let n = Math.floor(Math.random() * free.length)
-        if (free.length > 1 && n === c) n = (n + 1) % free.length
-        return n
-      })
-      const p = 1 - Math.max(0, leftRef.current) / Math.max(1, spinTotal)
-      // 180мс в начале → ~900мс в конце: видно каждую плитку, без мельтешения
-      timer = window.setTimeout(step, 180 + p * p * 720)
+    if (!spinning || !spinKey || free.length === 0) { setCursor(-1); return }
+    const target = free.indexOf(spinKey)
+    if (target < 0) { setCursor(-1); return }
+    const end = spinDeadline || Date.now() + spinTotalMs
+    const start = end - spinTotalMs
+    const schedule = melodySpinSchedule(free.length, target, spinTotalMs)
+    let raf = 0
+    const tick = () => {
+      const elapsed = Date.now() - start
+      setCursor(schedule.length ? melodySpinIndex(schedule, free.length, elapsed) : target)
+      if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
     }
-    timer = window.setTimeout(step, 180)
-    return () => { stop = true; if (timer) clearTimeout(timer) }
-  }, [spinning])
+    tick()
+    return () => cancelAnimationFrame(raf)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spinning, spinKey, spinDeadline, spinTotalMs, freeSig])
 
-  const highlighted = spinning
-    ? (spinLeft <= 1 ? spinKey : free[cursor % Math.max(1, free.length)])
-    : undefined
+  const highlighted = spinning && cursor >= 0 ? free[cursor] : undefined
 
   // ── Magic: блуждающий огонёк, физически перелетающий на "горячую"
   // плитку барабана. Карта key→элемент — обычный ref (не state): позиции
@@ -688,7 +700,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinLeft, spinTotal, on
     const x = t.left - b.left + t.width / 2, y = t.top - b.top + t.height / 2
     marker.style.transform = `translate(${x}px, ${y}px)`
   }, [theme, spinning, highlighted])
-  const nearEnd = spinning && spinLeft <= 1
+  const nearEnd = spinning && !!spinDeadline && Date.now() >= spinDeadline - 1000
 
   return (
     <div className={`mel-board${spinning ? ' spinning' : ''}`} ref={boardRef} style={{
