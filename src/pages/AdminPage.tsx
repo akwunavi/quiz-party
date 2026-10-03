@@ -43,6 +43,7 @@ import { startRace } from '../lib/raceActions'
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
 import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
 import { navFrom } from '../lib/navGuard'
+import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { casEnabled } from '../lib/sessionBag'
 import {
   melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippetIfFresh,
@@ -2295,6 +2296,11 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
           // вызовах теряет команды (см. HANDOFF §5 и коммент у функции).
           await saveBlitzResults(gameState.game_id, gameState.round_number,
             blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
+          // 9.80 (ревью): итог пишет тот, кто нажал — значит и банк блица
+          // обновляет он же (досрочное «прервать» жмут именно здесь).
+          // В фоне: ошибка банка не должна выглядеть как сбой хода блица.
+          void afterBlitzFinished(round.id, blitzShownIds(state, next)).catch(err =>
+            console.warn('банк блица: не обновился —', err instanceof Error ? err.message : err))
         }
       })
     } finally { setBusy(false) }

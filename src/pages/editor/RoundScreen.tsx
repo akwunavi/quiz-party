@@ -13,7 +13,7 @@ import type { CrosswordGrid, JeopardyTheme } from '../../types/quiz'
 import { swapQuestions } from '../../lib/editorApi'
 import { NumField } from './NumField'
 import { BankPicker, BankSend } from './BankPicker'
-import { returnUnplayedBlitz, takeBlitzFromBank, blitzBankCount } from '../../lib/blitzPool'
+import { returnUnplayedBlitz, takeBlitzFromBank, blitzBankCount, blitzPlayedCount } from '../../lib/blitzPool'
 import { AiRoundReview } from './AiReview'
 import { estimateRoundMinutes } from '../../lib/duration'
 import { useHint, Hint } from '../../components/Hint'
@@ -353,7 +353,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <button onClick={() => setBankOpen(true)}>📚 Взять из банка</button>
           </div>
         )}
-        {isBlitz && <BlitzPoolCard roundId={round.id} locked={locked} onChanged={onChanged} />}
+        {isBlitz && pack.status !== 'bank' && <BlitzPoolCard roundId={round.id} locked={locked} onChanged={onChanged} />}
         {bankOpen && <BankPicker targetRoundId={round.id}
           onClose={() => setBankOpen(false)} onAdded={onChanged} />}
         {sendIdx !== null && round.questions[sendIdx] &&
@@ -878,6 +878,15 @@ function BlitzPoolCard({ roundId, locked, onChanged }: {
   const run = async (what: 'take' | 'return') => {
     if (locked) return hint.show('Пакет закрыт для правок — вопросы не перенести')
     if (busy) return
+    if (what === 'return') {
+      // Отметки «показан» нет ни у одного вопроса: либо блиц ещё не играли,
+      // либо игра шла без связи с облаком (локальный режим) — тогда отметки
+      // не записались, и в банк ушли бы и уже сыгранные вопросы
+      const pc = await blitzPlayedCount(roundId).catch(() => null)
+      if (pc && pc.played === 0 && pc.total > 0 && !confirm(
+        `Ни один вопрос этого блица не отмечен сыгранным. Блиц ещё не играли или игра шла без интернета?\n\n`
+        + `Вернуть в банк все ${pc.total}? Если какие-то уже звучали в зале — они приедут в следующий квиз.`)) return
+    }
     setBusy(true); setMsg('')
     try {
       const n = what === 'take' ? await takeBlitzFromBank(roundId) : await returnUnplayedBlitz(roundId)

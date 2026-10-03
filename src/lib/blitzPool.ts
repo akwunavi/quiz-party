@@ -17,6 +17,7 @@
 // вызывать сколько угодно раз (проектор + кнопка) — результат тот же.
 import { supabase } from './supabase'
 import { getOrCreateBank } from './editorApi'
+import { isDevMode } from './devSeed'
 import type { Question } from '../types/quiz'
 
 type QRow = Pick<Question, 'id' | 'question_text' | 'media' | 'answer' | 'answer_note' | 'hidden'> & {
@@ -44,9 +45,11 @@ export function blitzToReturn(round: QRow[], bank: QRow[], usedInGame: string[] 
   })
 }
 
-/** Что забрать из банка в раунд: не скрытые и которых в раунде ещё нет. */
+/** Что забрать из банка в раунд: не скрытые и которых в раунде ещё нет
+ *  (среди ВИДИМЫХ вопросов раунда — скрытый двойник в раунде не повод
+ *  удалить вопрос из банка, не скопировав его). */
 export function blitzToTake(bank: QRow[], round: QRow[]): QRow[] {
-  const inRound = new Set(round.map(blitzKey))
+  const inRound = new Set(round.filter(q => !q.hidden).map(blitzKey))
   const seen = new Set<string>()
   return bank.filter(q => {
     if (q.hidden) return false
@@ -55,6 +58,17 @@ export function blitzToTake(bank: QRow[], round: QRow[]): QRow[] {
     seen.add(k)
     return true
   })
+}
+
+/** Рубрика «БЛИЦ» в банке, если она уже есть (без создания — просто
+ *  открыть раунд в редакторе не должно ничего записывать). */
+export async function findBlitzRubric(): Promise<string | null> {
+  const { data: bank } = await supabase.from('packs').select('id')
+    .eq('status', 'bank').limit(1).maybeSingle()
+  if (!bank) return null
+  const { data: found } = await supabase.from('pack_rounds').select('id')
+    .eq('pack_id', (bank as { id: string }).id).eq('mechanic', 'blitz').order('position').limit(1).maybeSingle()
+  return found ? (found as { id: string }).id : null
 }
 
 /** Рубрика «БЛИЦ» в банке — найти или завести. */
@@ -117,25 +131,72 @@ export async function takeBlitzFromBank(roundId: string): Promise<number> {
   await insertCopies(roundId, rows)
   // из банка убираем ВСЁ, что теперь лежит в раунде, — и только что
   // скопированное, и то, что там уже было (дубликат)
-  const inRound = new Set([...round, ...rows].map(blitzKey))
+  const inRound = new Set([...round.filter(q => !q.hidden), ...rows].map(blitzKey))
   const gone = bank.filter(q => !q.hidden && inRound.has(blitzKey(q))).map(q => q.id)
-  if (gone.length) {
-    // удаление — только владельцу (RLS), и отказ RLS приходит НЕ ошибкой,
-    // а пустым результатом: сверяем, что реально удалилось, остальное
-    // прячем (как BankSend у редактора без права удаления)
-    const { data: del } = await supabase.from('pack_questions').delete().in('id', gone).select('id')
-    const deleted = new Set(((del ?? []) as { id: string }[]).map(r => r.id))
-    const left = gone.filter(id => !deleted.has(id))
-    if (left.length) {
-      const { error: e2 } = await supabase.from('pack_questions').update({ hidden: true }).in('id', left)
-      if (e2) throw e2
-    }
+  const stuck = await removeFromBank(gone)
+  if (stuck > 0) {
+    throw new Error(`скопировано ${rows.length}, но ${stuck} не удалось убрать из банка — нет прав на банк (они остались там, и следующий квиз заберёт их снова)`)
   }
   return rows.length
 }
 
-/** Сколько вопросов сейчас ждёт в банке блица (для подписи кнопки). */
-export async function blitzBankCount(): Promise<number> {
+/** Убрать вопросы из банка: удалить, а где удалить нельзя — скрыть.
+ *  Отказ RLS приходит НЕ ошибкой, а пустым результатом, поэтому сверяем,
+ *  что реально изменилось. Возвращает, сколько так и остались видимыми. */
+async function removeFromBank(ids: string[]): Promise<number> {
+  if (ids.length === 0) return 0
+  const { data: del } = await supabase.from('pack_questions').delete().in('id', ids).select('id')
+  const deleted = new Set(((del ?? []) as { id: string }[]).map(r => r.id))
+  const left = ids.filter(id => !deleted.has(id))
+  if (left.length === 0) return 0
+  const { data: upd, error } = await supabase.from('pack_questions')
+    .update({ hidden: true }).in('id', left).select('id')
+  if (error) throw error
+  const hidden = new Set(((upd ?? []) as { id: string }[]).map(r => r.id))
+  return left.filter(id => !hidden.has(id)).length
+}
+
+/** Блиц закончился (кто бы ни записал итог — проектор или пульт):
+ *  1) копии ПОКАЗАННЫХ вопросов, лежащие в банке (например, вернулись туда
+ *     после репетиции или прошлой игры этого пакета), убираются — сыгранное
+ *     не должно приехать в следующий квиз;
+ *  2) непоказанное возвращается в банк.
+ *  В режиме репетиции (`?dev=1`) ничего не делает: репетиция не игра, её
+ *  «непоказанное» — это весь пакет. Ошибки — вызывающему (в консоль). */
+export async function afterBlitzFinished(roundId: string, shownIds: string[]): Promise<void> {
+  if (isDevMode()) return
   const rubric = await getOrCreateBlitzRubric()
+  if (rubric === roundId) return
+  const [round, bank] = await Promise.all([listQuestions(roundId), listQuestions(rubric)])
+  const shownKeys = new Set(round.filter(q => shownIds.includes(q.id)).map(blitzKey))
+  await removeFromBank(bank.filter(q => !q.hidden && shownKeys.has(blitzKey(q))).map(q => q.id))
+  const fresh = bank.filter(q => !shownKeys.has(blitzKey(q)))
+  await insertCopies(rubric, blitzToReturn(round, fresh, shownIds))
+}
+
+/** Сколько вопросов сейчас ждёт в банке блица (для подписи кнопки).
+ *  Ничего не создаёт — рубрики нет, значит 0. */
+export async function blitzBankCount(): Promise<number> {
+  const rubric = await findBlitzRubric()
+  if (!rubric) return 0
   return (await listQuestions(rubric)).filter(q => !q.hidden).length
+}
+
+/** Сколько вопросов раунда отмечены показанными — для предупреждения перед
+ *  ручным «Вернуть» (0 — блиц, похоже, не играли или отметки не дошли). */
+export async function blitzPlayedCount(roundId: string): Promise<{ played: number; total: number }> {
+  const qs = (await listQuestions(roundId)).filter(q => !q.hidden)
+  return { played: qs.filter(q => q.played_at).length, total: qs.length }
+}
+
+/** Какие вопросы зал видел к концу блица: сгоревшие + тот, что был на
+ *  экране в момент конца (время команды вышло / ведущий прервал). Одна
+ *  формула для проектора и пульта — итог блица пишет тот, кто нажал. */
+export function blitzShownIds(
+  prev: { current?: { questionId: string } | null } | null | undefined,
+  next: { used: string[]; current?: { questionId: string } | null },
+): string[] {
+  return [...new Set([...next.used,
+    ...(prev?.current ? [prev.current.questionId] : []),
+    ...(next.current ? [next.current.questionId] : [])])]
 }

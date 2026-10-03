@@ -6,7 +6,8 @@
 import { describe, it, expect, vi } from 'vitest'
 vi.mock('../supabase', () => ({ supabase: {} }))
 vi.mock('../editorApi', () => ({ getOrCreateBank: vi.fn() }))
-const { blitzToReturn, blitzToTake, blitzKey } = await import('../blitzPool')
+vi.mock('../devSeed', () => ({ isDevMode: () => false }))
+const { blitzToReturn, blitzToTake, blitzKey, blitzShownIds } = await import('../blitzPool')
 
 const q = (id: string, text: string, extra: Record<string, unknown> = {}) => ({
   id, question_text: text, media: { question: [] as string[] },
@@ -46,5 +47,19 @@ describe('банк блица: забрать в новый квиз', () => {
       .toBe(blitzKey({ ...(b as object), answer: { mode: 'free_text', correct: 'X' } } as never))
     expect(blitzKey({ ...(a as object), answer: { mode: 'free_text', correct: 'X' } } as never))
       .not.toBe(blitzKey({ ...(b as object), answer: { mode: 'free_text', correct: 'Y' } } as never))
+  })
+})
+
+describe('банк блица: ревью 9.80', () => {
+  it('скрытый двойник в раунде не мешает забрать вопрос из банка (иначе он удалился бы, не скопировавшись)', () => {
+    const bank = [q('x', 'Цвет неба')]
+    const round = [q('r', 'Цвет неба', { hidden: true })]
+    expect(blitzToTake(bank, round).map((x: { id: string }) => x.id)).toEqual(['x'])
+  })
+
+  it('показанные к концу блица: сгоревшие + вопрос на экране в момент конца, без повторов', () => {
+    expect(blitzShownIds({ current: { questionId: 'c' } }, { used: ['a', 'b', 'c'], current: null }).sort())
+      .toEqual(['a', 'b', 'c'])
+    expect(blitzShownIds(null, { used: ['a'], current: { questionId: 'd' } }).sort()).toEqual(['a', 'd'])
   })
 })
