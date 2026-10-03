@@ -1,5 +1,5 @@
 import { canEditPack, whyReadOnly } from '../../lib/packRights'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { metaLine } from '../../lib/packLoader'
 import { updateRound, createQuestion, hideQuestion, deleteQuestion, defaultModeFor } from '../../lib/editorApi'
@@ -13,6 +13,7 @@ import type { CrosswordGrid, JeopardyTheme } from '../../types/quiz'
 import { swapQuestions } from '../../lib/editorApi'
 import { NumField } from './NumField'
 import { BankPicker, BankSend } from './BankPicker'
+import { returnUnplayedBlitz, takeBlitzFromBank, blitzBankCount } from '../../lib/blitzPool'
 import { AiRoundReview } from './AiReview'
 import { estimateRoundMinutes } from '../../lib/duration'
 import { useHint, Hint } from '../../components/Hint'
@@ -352,6 +353,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
             <button onClick={() => setBankOpen(true)}>📚 Взять из банка</button>
           </div>
         )}
+        {isBlitz && <BlitzPoolCard roundId={round.id} locked={locked} onChanged={onChanged} />}
         {bankOpen && <BankPicker targetRoundId={round.id}
           onClose={() => setBankOpen(false)} onAdded={onChanged} />}
         {sendIdx !== null && round.questions[sendIdx] &&
@@ -856,3 +858,51 @@ function RaceEditor({ pack, round, locked, onChanged }: {
     </div>
   )
 }
+
+/** Банк блица (9.80): неотыгранные вопросы переезжают между квизами.
+ *  «Забрать» — все вопросы из банка в этот раунд (из банка они уходят);
+ *  «Вернуть» — неотыгранные отсюда обратно в банк (обычно это делает сам
+ *  проектор в конце блица — кнопка на случай, если не смог). */
+function BlitzPoolCard({ roundId, locked, onChanged }: {
+  roundId: string; locked: boolean; onChanged: () => void
+}) {
+  const [inBank, setInBank] = useState<number | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  const hint = useHint()
+  useEffect(() => {
+    let alive = true
+    void blitzBankCount().then(n => { if (alive) setInBank(n) }).catch(() => { if (alive) setInBank(null) })
+    return () => { alive = false }
+  }, [roundId])
+  const run = async (what: 'take' | 'return') => {
+    if (locked) return hint.show('Пакет закрыт для правок — вопросы не перенести')
+    if (busy) return
+    setBusy(true); setMsg('')
+    try {
+      const n = what === 'take' ? await takeBlitzFromBank(roundId) : await returnUnplayedBlitz(roundId)
+      setMsg(what === 'take'
+        ? (n ? `Забрано из банка: ${n}` : 'В банке блица нет новых вопросов')
+        : (n ? `Вернулось в банк: ${n}` : 'Возвращать нечего — всё отыграно или уже в банке'))
+      setInBank(await blitzBankCount().catch(() => null))
+      onChanged()
+    } catch (e) {
+      setMsg(`Не получилось: ${e instanceof Error ? e.message : String(e)}`)
+    } finally { setBusy(false) }
+  }
+  return (
+    <div className="ed-blitz-pool">
+      <div className="ed-blitz-pool-head">Банк блица{inBank != null && <b> · ждут {inBank}</b>}</div>
+      <div className="ed-hint">Неотыгранные вопросы блица переезжают из квиза в квиз: в конце
+        блица проектор сам возвращает в банк всё, что не успели показать, а сюда их можно забрать
+        одной кнопкой. Повторно одно и то же не задвоится.</div>
+      <div className="ed-addrow">
+        <button onClick={() => void run('take')} disabled={busy}>📥 Забрать все из банка блица</button>
+        <button className="ghost" onClick={() => void run('return')} disabled={busy}>📤 Вернуть неотыгранные в банк</button>
+        <Hint text={hint.text} />
+      </div>
+      {msg && <div className="ed-blitz-pool-msg">{msg}</div>}
+    </div>
+  )
+}
+
