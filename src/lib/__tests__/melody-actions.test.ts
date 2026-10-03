@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass,
+  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass, melodyRevealMiss, melodySpinSchedule, melodySpinIndex,
   melodyReveal, melodyToBoard, melodyPoints, melodyIdle, melodyFree, melodyKeys,
   melodyDeadline, melodyPreviewCeiling, melodyRandomStart,
   melodyMatches, guardMelody, melodyOrderFromBids, melodyBidSec,
@@ -46,6 +46,11 @@ describe('мелодия: рулетка', () => {
   it('барабан не крутится дольше восьми секунд', () => {
     const n = melodySpin({}, '0-0', 5, 30, 30, T0)
     expect(n.deadline).toBe(melodyDeadline(8, T0))
+  })
+
+  it('длительность барабана пишется в состояние — все экраны крутят одинаково (9.76)', () => {
+    expect(melodySpin({}, '0-0', 5, 30, 30, T0).spinMs).toBe(8000)
+    expect(melodySpin({}, '0-0', 5, 5, 30, T0).spinMs).toBe(5000)
   })
 
   it('очередь прошлого трека сбрасывается', () => {
@@ -151,15 +156,63 @@ describe('мелодия: передача хода', () => {
     expect(n.turn).toBe(1)
   })
 
-  it('промахнулась вторая — трек закрывается', () => {
+  // 9.76: никто не угадал — ответ всё равно показывается залу (стадия
+  // reveal без победителя), а не трек закрывается молча
+  it('промахнулась вторая — показываем ответ без победителя', () => {
     const n = melodyPass({ key: '0-1', stage: 'passed', order: ['a', 'b'], turn: 1 })
-    expect(n.stage).toBe('done')
+    expect(n.stage).toBe('reveal')
+    expect(n.wonTeam).toBeUndefined()
+    expect(n.wonPts).toBe(0)
     expect(n.played).toEqual(['0-1'])
   })
 
-  it('передавать некому (одна команда) — трек закрывается', () => {
+  it('передавать некому (одна команда) — показываем ответ без победителя', () => {
     const n = melodyPass({ key: '0-1', stage: 'answering', order: ['a'], turn: 0 })
-    expect(n.stage).toBe('done')
+    expect(n.stage).toBe('reveal')
+    expect(n.wonTeam).toBeUndefined()
+  })
+
+  it('ставок нет / трек пропущен — тоже показываем ответ', () => {
+    const n = melodyRevealMiss({ key: '0-3', stage: 'bids', order: [], played: ['0-0'], deadline: 'x' })
+    expect(n.stage).toBe('reveal')
+    expect(n.wonTeam).toBeUndefined()
+    expect(n.deadline).toBeUndefined()
+    expect(n.played).toEqual(['0-0', '0-3'])
+  })
+
+  it('аварийное «Закрыть» по-прежнему закрывает сразу, без экрана ответа', () => {
+    const n = melodyEmergencyClose('0-1')({ key: '0-1', stage: 'answering', order: ['a'] })
+    expect(n?.stage).toBe('done')
+  })
+})
+
+describe('мелодия: барабан рулетки (9.76)', () => {
+  it('останавливается ровно на выбранной плитке при любом размере доски', () => {
+    for (const len of [2, 3, 5, 12, 30]) {
+      for (let target = 0; target < len; target++) {
+        for (const ms of [2000, 5000, 8000]) {
+          const sch = melodySpinSchedule(len, target, ms)
+          expect(melodySpinIndex(sch, len, ms)).toBe(target)
+          expect(melodySpinIndex(sch, len, 1e9)).toBe(target)
+        }
+      }
+    }
+  })
+
+  it('идёт по порядку (каждый шаг — соседняя плитка) и замедляется к концу', () => {
+    const sch = melodySpinSchedule(12, 7, 5000)
+    for (let i = 1; i < sch.length; i++) expect(sch[i]).toBeGreaterThan(sch[i - 1])
+    const first = sch[1] - sch[0], last = sch[sch.length - 1] - sch[sch.length - 2]
+    expect(last).toBeGreaterThan(first * 3)
+    // последний шаг — заметно до конца: зал видит остановку
+    expect(sch[sch.length - 1]).toBeLessThanOrEqual(5000 - 500)
+    // не меньше одного полного круга
+    expect(sch.length).toBeGreaterThanOrEqual(12)
+  })
+
+  it('до старта подсвечена первая плитка, одна плитка — крутить нечего', () => {
+    expect(melodySpinIndex(melodySpinSchedule(5, 3, 5000), 5, 0)).toBe(0)
+    expect(melodySpinSchedule(1, 0, 5000)).toEqual([])
   })
 })
 

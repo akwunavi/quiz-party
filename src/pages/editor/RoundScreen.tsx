@@ -722,9 +722,9 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
       <div className="ed-grid2">
         <div className="ed-field"><label>Анимация выбора, сек</label>
           <NumField
-              value={s.spinSec ?? 10}
+              value={s.spinSec ?? 5}
               min={2}
-              max={30}
+              max={8}
               disabled={locked}
               onCommit={v => setNum({ spinSec: v })}
               /></div>

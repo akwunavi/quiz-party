@@ -107,3 +107,13 @@ describe('предпросмотр «Скрэмбла»', () => {
     expect(Math.round(anagramElapsedMs(w, gs.timer_started_at))).toBeLessThanOrEqual(7500)
   })
 })
+
+describe('предпросмотр мелодии: разбор без победителя (9.76)', () => {
+  it('стадия «Никто не угадал» — экран reveal без команды и без очков', () => {
+    expect(previewStages('melody').some(s => s.key === 'reveal-miss')).toBe(true)
+    const round = fakeRound('melody', { questions: [{ id: 'q1' } as LoadedRound['questions'][number]] })
+    const gs = previewGameState(fakePack([round]), round, 0, 0, 'reveal-miss')
+    expect(gs.melody?.stage).toBe('reveal')
+    expect(gs.melody?.wonTeam).toBeUndefined()
+  })
+})

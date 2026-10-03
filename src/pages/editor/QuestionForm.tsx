@@ -4,7 +4,7 @@ import { updateQuestion } from '../../lib/editorApi'
 import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
 import { mediaUrl } from '../../lib/media'
-import { questionFields } from '../../lib/questionFields'
+import { questionFields, resizeMatch, MATCH_MIN_PAIRS, MATCH_MAX_PAIRS } from '../../lib/questionFields'
 import { revealGroups } from '../../lib/reveal'
 import { anagramTemplate, anagramShuffle, anagramOrderValid, anagramTiles, hashStr } from '../../lib/anagram'
 import { useHint, Hint } from '../../components/Hint'
@@ -69,7 +69,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
   // Иначе редактор заполняет его и удивляется, что на игре ничего не изменилось.
   const mech = round.mechanic
   const { fixedMode, questionMedia, voice: showVoice,
-          mediaLabel, mediaMax, mediaAccept } = questionFields(mech)
+          mediaLabel, mediaMax, mediaAccept } = questionFields(mech, q.answer.mode)
 
   return (
     <div>
@@ -372,8 +372,24 @@ function MatchEditor({ spec, onChange, imgs }: {
 }) {
   const [selLeft, setSelLeft] = useState<string | null>(null)
   const pairOf = (l: string) => spec.correct_pairs.find(p => p.startsWith(l))?.slice(l.length)
+  const n = spec.left.length
+  const hint = useHint()
+  const resize = (next: number) => {
+    if (next < MATCH_MIN_PAIRS) return hint.show(`Меньше ${MATCH_MIN_PAIRS} пар — это уже не сопоставление`)
+    if (next > MATCH_MAX_PAIRS) return hint.show(`Больше ${MATCH_MAX_PAIRS} пар не влезет на экран`)
+    setSelLeft(null)
+    onChange(resizeMatch(spec, next))
+  }
   return (
     <div>
+      <div className="ed-match-count">
+        <span>Пар:</span>
+        <button type="button" onClick={() => resize(n - 1)} aria-label="меньше пар">−</button>
+        <b>{n}</b>
+        <button type="button" onClick={() => resize(n + 1)} aria-label="больше пар">+</button>
+        <span className="ed-hint">от {MATCH_MIN_PAIRS} до {MATCH_MAX_PAIRS}; картинок — столько же, по одной на пару</span>
+        <Hint text={hint.text} />
+      </div>
       <div style={{ opacity: .6, fontSize: 13 }}>
         Связи: тапни слева (1), потом справа (Б) — пара «1Б» соберётся сама.
         Левые = номера медиа/треков, правые = буквы вариантов из текста вопроса.
@@ -613,7 +629,13 @@ function questionErrors(q: Question): string[] {
       if (!a.correct_choice) errs.push('верный вариант')
       break
     case 'order': if (a.correct_order.length !== a.choices.length) errs.push('полный правильный порядок'); break
-    case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
+    case 'match': {
+      if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления')
+      const mImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+      if (mImgs.length > 0 && mImgs.length !== a.left.length)
+        errs.push(`число пар под картинки (картинок ${mImgs.length}, пар ${a.left.length})`)
+      break
+    }
     case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
     case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
     case 'anagram': {

@@ -4,6 +4,14 @@ import { room } from './transport'
 import { isLocalMode } from './transport/mode'
 import { supabase } from './supabase'
 import { uuid } from './uuid'
+import { patchSessionFrom, type NavFrom } from './navGuard'
+import type { SessionPatch } from './transport/types'
+
+/** Переход по игре: с `from` — только если игра всё ещё там, откуда жали
+ *  (lib/navGuard.ts, 9.78); без — как раньше, слепо. */
+function nav(patch: SessionPatch, from?: NavFrom): Promise<void> {
+  return from ? patchSessionFrom(from, patch) : room.patchSession(getRoomId(), patch)
+}
 
 export async function selectPackAndStart(packId: string) {
   const game_id = uuid()
@@ -18,21 +26,21 @@ export async function selectPackAndStart(packId: string) {
   return game_id
 }
 
-export async function setPhase(phase: string) {
-  await room.patchSession(getRoomId(), { phase })
+export async function setPhase(phase: string, from?: NavFrom) {
+  await nav({ phase }, from)
 }
 
 /** Перейти к раунду.
  *  Если на это место в игре назначен слайд-брифинг, сначала показываем его:
  *  ведущему не надо помнить про кнопку, слайд выходит сам там, где задуман.
  *  Индекс слайда кладём в question_index — как на экране финала. */
-export async function gotoRound(round_number: number, slideIndex?: number) {
-  await room.patchSession(getRoomId(), {
+export async function gotoRound(round_number: number, slideIndex?: number, from?: NavFrom) {
+  await nav({
     phase: slideIndex == null ? 'round_intro' : 'info',
     round_number,
     question_index: slideIndex ?? 0,
     timer_started_at: null, reveal: false,
-  })
+  }, from)
 }
 
 // Правила размещения слайдов живут в отдельном модуле без клиента базы —
@@ -49,8 +57,8 @@ export async function startIntro() {
 }
 
 /** Показать слайд-брифинг, не трогая номер раунда. */
-export async function showSlide(slideIndex: number) {
-  await room.patchSession(getRoomId(), { phase: 'info', question_index: slideIndex, reveal: false })
+export async function showSlide(slideIndex: number, from?: NavFrom) {
+  await nav({ phase: 'info', question_index: slideIndex, reveal: false }, from)
 }
 
 /** Останавливает звук на ЭТОЙ вкладке. На проекторе то же делает
@@ -63,13 +71,16 @@ function hushLocal() {
   })
 }
 
-export async function gotoQuestion(question_index: number) {
-  hushLocal()
+export async function gotoQuestion(question_index: number, from?: NavFrom) {
+  // с `from` тишина — ПОСЛЕ проверки: отклонённый устаревший переход не
+  // должен глушить звук текущего экрана (ревью 9.78)
+  if (!from) hushLocal()
   // Таймер НЕ стартует здесь: хост запустит его после окончания озвучки
-  await room.patchSession(getRoomId(), {
+  await nav({
     phase: 'question', question_index,
     timer_started_at: null, reveal: false,
-  })
+  }, from)
+  if (from) hushLocal()
 }
 
 /** Вернуться к УЖЕ ПОКАЗАННОМУ вопросу «Скрэмбла» (кнопка «Назад» на
@@ -79,12 +90,13 @@ export async function gotoQuestion(question_index: number) {
  *  остаётся показанным, таймер не запущен (timer_started_at: null —
  *  тогда и AutoAdvance, считающий от старта, не уведёт с вопроса сам), и
  *  startTimer/markQuestionShown НЕ вызываются. HANDOFF §3ca, ревью 9.74. */
-export async function gotoQuestionShown(question_index: number) {
-  hushLocal()
-  await room.patchSession(getRoomId(), {
+export async function gotoQuestionShown(question_index: number, from?: NavFrom) {
+  if (!from) hushLocal()
+  await nav({
     phase: 'question', question_index,
     timer_started_at: null, reveal: true,
-  })
+  }, from)
+  if (from) hushLocal()
 }
 
 /** Старт таймера (вызывается хостом после озвучки вопроса).
@@ -111,31 +123,31 @@ export async function startTimer(question?: {
 }
 
 /** «Время ответов»: минута на подумать перед разбором (как в старом проекте). */
-export async function startAnswerTime() {
-  await room.patchSession(getRoomId(), {
+export async function startAnswerTime(from?: NavFrom) {
+  await nav({
     phase: 'answer_time', timer_started_at: new Date().toISOString(), reveal: false,
-  })
+  }, from)
 }
 
 /** Фаза показа ответов раунда: по одному, как в старом проекте. */
-export async function gotoAnswers(question_index: number, revealed = false) {
-  await room.patchSession(getRoomId(), {
+export async function gotoAnswers(question_index: number, revealed = false, from?: NavFrom) {
+  await nav({
     phase: 'show_answers', question_index, reveal: revealed, timer_started_at: null,
-  })
+  }, from)
 }
 
-export async function showScoreboard() {
-  await room.patchSession(getRoomId(), { phase: 'scoreboard' })
+export async function showScoreboard(from?: NavFrom) {
+  await nav({ phase: 'scoreboard' }, from)
 }
 
-export async function startBreak() {
-  await room.patchSession(getRoomId(), {
+export async function startBreak(from?: NavFrom) {
+  await nav({
     phase: 'break', timer_started_at: new Date().toISOString(),
-  })
+  }, from)
 }
 
-export async function revealAnswer() {
-  await room.patchSession(getRoomId(), { reveal: true })
+export async function revealAnswer(from?: NavFrom) {
+  await nav({ reveal: true }, from)
 }
 
 export async function markRoundCompleted(completed: number[]) {
@@ -147,10 +159,10 @@ export async function markRoundCompleted(completed: number[]) {
  *  честно говорит, чего ждать, и не оставляет тишину на пять минут. Отдельная
  *  фаза, а не перерыв: из перерыва маршрут ведёт в следующий раунд, а отсюда —
  *  только к итогам, и уводит с неё ведущий, когда закончит считать. */
-export async function startCounting() {
-  await room.patchSession(getRoomId(), {
+export async function startCounting(from?: NavFrom) {
+  await nav({
     phase: 'counting', timer_started_at: new Date().toISOString(), reveal: false,
-  })
+  }, from)
 }
 
 /** @param bar Сценарий финала: true — сразу «награждение» (ручной, по
@@ -158,9 +170,9 @@ export async function startCounting() {
  *  всегда нужен ручной — ведущий стоит с микрофоном и вручает места сам,
  *  выбирать «шоу» там просто нет смысла, поэтому вызовы из бара передают
  *  bar: true явно, а не оставляют ведущему выбор перед каждой игрой. */
-export async function finishGame(packId: string | null, bar = false) {
+export async function finishGame(packId: string | null, bar = false, from?: NavFrom) {
   // финал всегда начинается с нулевого шага, иначе подхватится индекс вопроса
-  await room.patchSession(getRoomId(), { phase: 'finale', question_index: 0, reveal: bar })
+  await nav({ phase: 'finale', question_index: 0, reveal: bar }, from)
   if (packId) {
     await room.setPackStatus(packId, 'played')
     // last_game_id — для выгрузки статистики из редактора (issue #3): там

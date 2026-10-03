@@ -108,6 +108,12 @@ function validateQuestion(round: LoadedRound, q: Question, ri: number, qi: numbe
       break
     case 'match': {
       if (a.left.length < 2) push('Меньше 2 пар для сопоставления')
+      if (a.left.length > 6) push('Больше 6 пар для сопоставления — не поместятся на экран')
+      // номера на картинках и кнопки на телефоне берутся из числа пар:
+      // картинок больше/меньше — команды не смогут ответить про лишние (9.76)
+      const mImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+      if (mImgs.length > 0 && mImgs.length !== a.left.length)
+        push(`Картинок ${mImgs.length}, а пар ${a.left.length} — поменяй число пар («Пар: − +»)`)
       if (a.correct_pairs.length !== a.left.length)
         push('Правильные пары заданы не полностью')
       break

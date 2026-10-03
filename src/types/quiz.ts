@@ -295,6 +295,8 @@ export interface MelodyState {
   order?: string[]              // очередь команд по ставкам (id)
   turn?: number                 // индекс текущей команды в order
   deadline?: string             // ISO: когда стадия истекает (общий для всех экранов)
+  spinMs?: number               // длительность барабана, записанная melodySpin (9.76) —
+                                 // все экраны крутят ровно столько, сколько заложил нажавший
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)
   startSec?: number             // случайная точка старта «сюрприз-отрывка» (0…
                                  // melodyPreviewCeiling), выбирается ОДИН раз при

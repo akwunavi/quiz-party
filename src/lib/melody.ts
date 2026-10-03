@@ -78,7 +78,8 @@ export function melodySpin(m: MelodyState, key: string, freeCount: number,
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   const base = { ...m, key, order: undefined, turn: 0, chooser: undefined, startSec }
   if (freeCount <= 1) return { ...base, stage: 'listen', deadline: melodyDeadline(3, now) }
-  return { ...base, stage: 'spinning', deadline: melodyDeadline(Math.min(spinSec, 8), now) }
+  const sec = Math.min(spinSec, 8)
+  return { ...base, stage: 'spinning', spinMs: sec * 1000, deadline: melodyDeadline(sec, now) }
 }
 
 /** Ручной выбор плитки (Р2, без рулетки) — та же логика выбора случайной
@@ -118,12 +119,24 @@ export function melodyClose(m: MelodyState): MelodyState {
 }
 
 /** Первая команда не угадала. Есть кому передать — ход уходит второй
- *  (она слушает трек ЦЕЛИКОМ), некому — трек закрывается. */
+ *  (она слушает трек ЦЕЛИКОМ), некому — показываем правильный ответ без
+ *  победителя (9.76: раньше трек закрывался молча, и зал так и не узнавал,
+ *  что это была за песня). */
 export function melodyPass(m: MelodyState): MelodyState {
   const first = (m.turn ?? 0) === 0
   const hasSecond = (m.order?.length ?? 0) > 1
   if (first && hasSecond) return { ...m, stage: 'passed', turn: 1, deadline: undefined }
-  return melodyClose(m)
+  return melodyRevealMiss(m)
+}
+
+/** Никто не угадал (обе команды промахнулись, ответа не было, ведущий
+ *  пропустил трек на ставках) — экран ответа всё равно показывается: та же
+ *  стадия `reveal`, что и при угадывании, но без команды и с нулём баллов.
+ *  Трек уходит в отыгранные внутри melodyReveal. Аварийное «Закрыть»
+ *  (melodyEmergencyClose) сюда НЕ ведёт — это выход «немедленно», а не ход
+ *  игры. */
+export function melodyRevealMiss(m: MelodyState): MelodyState {
+  return melodyReveal(m, 0, undefined)
 }
 
 /** Угадали: показываем ответ и кто забрал баллы. Трек уходит в отыгранные
@@ -137,6 +150,42 @@ export function melodyReveal(m: MelodyState, pts: number, teamId?: string): Melo
     chooser: undefined,
     played: key && !played.includes(key) ? [...played, key] : played,
   }
+}
+
+/** Барабан рулетки (9.76). Подсветка идёт ПО ПОРЯДКУ свободных плиток
+ *  (`len` штук, слева направо, сверху вниз) от первой, замедляется к концу
+ *  и останавливается ровно на `target`, не прыгая туда в последний момент.
+ *  Возвращает моменты шагов в мс от старта (по возрастанию); последний шаг
+ *  — на `target`, за `restMs` до конца, чтобы зал успел увидеть остановку.
+ *  Раньше подсветка прыгала по случайным плиткам, а в последнюю секунду
+ *  перескакивала на выбранную — выглядело как глюк, а не как рулетка. */
+export function melodySpinSchedule(len: number, target: number, durationMs: number,
+  restMs = 700): number[] {
+  if (len <= 1 || durationMs <= 0) return []
+  const t = ((target % len) + len) % len
+  const D = Math.max(400, durationMs - restMs)
+  const a = 55, b = 600                            // шаг в начале и в конце, мс
+  const avg = a + (b - a) / 4                       // среднее для кубического замедления
+  const want = Math.max(len + t, Math.round(D / avg))
+  // число шагов ≡ t (mod len): после N шагов от плитки 0 стоим на target
+  let n = want - ((want - t) % len + len) % len
+  if (n < Math.max(1, t)) n += len
+  const delays: number[] = []
+  for (let j = 1; j <= n; j++) delays.push(a + (b - a) * (j / n) ** 3)
+  const sum = delays.reduce((x, y) => x + y, 0)
+  const k = D / sum
+  const out: number[] = []
+  let acc = 0
+  for (const d of delays) { acc += d * k; out.push(Math.round(acc)) }
+  return out
+}
+
+/** Индекс подсвеченной плитки через `elapsedMs` от старта барабана. */
+export function melodySpinIndex(schedule: number[], len: number, elapsedMs: number): number {
+  if (len <= 0) return 0
+  let steps = 0
+  while (steps < schedule.length && schedule[steps] <= elapsedMs) steps++
+  return steps % len
 }
 
 /** С экрана результата — обратно к доске. */

@@ -256,3 +256,8 @@
   .cyber .ed-an-tile { transition: none; }
   .cyber .ed-an-tile.sel { transform: none; }
 }
+
+/* 9.76: число пар сопоставления (2–6) */
+.ed-match-count { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+.ed-match-count button { min-width: 34px; padding: 4px 10px; font-weight: 700; }
+.ed-match-count b { min-width: 1.5em; text-align: center; font-size: 16px; color: var(--accent); }

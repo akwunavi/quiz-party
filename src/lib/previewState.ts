@@ -66,6 +66,7 @@ export function previewStages(mech: MechanicKey): { key: string; label: string }
         { key: 'snippet', label: 'Отрывок' },
         { key: 'answering', label: 'Ответ' },
         { key: 'reveal', label: 'Разбор' },
+        { key: 'reveal-miss', label: 'Никто не угадал' },
       ]
     case 'anagram':
       return [
@@ -187,10 +188,12 @@ function previewMelody(round: LoadedRound, qid: string | undefined, stage?: stri
   if (round.mechanic === 'melody' && stage && stage !== 'board') {
     const teams = previewTeams()
     return {
-      key: '0-0', stage: stage as MelodyState['stage'],
+      key: '0-0', stage: (stage === 'reveal-miss' ? 'reveal' : stage) as MelodyState['stage'],
       order: [teams[0].id, teams[1].id], turn: 0, snippetSec: 5, startSec: 0, played: [],
       deadline: new Date(Date.now() + 10_000).toISOString(),
       ...(stage === 'reveal' ? { wonPts: 2, wonTeam: teams[0].id } : {}),
+      // 9.76: разбор без победителя — тот же экран, «Никто не угадал»
+      ...(stage === 'reveal-miss' ? { wonPts: 0, deadline: undefined } : {}),
     }
   }
   return {}

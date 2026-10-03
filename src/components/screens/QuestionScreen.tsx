@@ -186,7 +186,7 @@ export function QuestionScreen({
           {!q.media.hidden && imgs.length > 0 && (
             lettered
               /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
-              ? <div className={`img-answers n${Math.min(imgs.length, 5)}${
+              ? <div className={`img-answers n${Math.min(imgs.length, 6)}${
                     imgs.length > 1 ? ' eq-row' : ''}`}>
                   {imgs.map((m, i) => (
                     <FitAnswer key={i} src={mediaUrl(m)}
@@ -203,9 +203,9 @@ export function QuestionScreen({
                     // читалось хуже: снимки в паре разной высоты и мельче
                     // отведённого места. Равная высота важнее — её и просили.
                     imgs.length > 1 ? ' eq-row' : ''}${
-                    // 4 картинки — один ряд, больше — два ряда (см. .wrap2,
-                    // 22-question.css). Сейчас недостижимо (mediaMax у
-                    // вопроса — 4), но правило универсальное.
+                    // 4 картинки — один ряд, 5–6 — два ряда по три (.wrap2,
+                    // 22-question.css). С 9.76 достижимо: у сопоставления
+                    // до 6 картинок; проверено рендером.
                     imgs.length > 4 ? ' wrap2' : ''}`}
                   style={mediaScaleVar(q)}>
                   {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
