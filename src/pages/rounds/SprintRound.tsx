@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { mediaUrl, lenClass } from '../../lib/media'
 import { startTimer, gotoAnswers } from '../../lib/gameActions'
+import { navFrom, quietStale } from '../../lib/navGuard'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'
 import { createAudio } from '../../lib/audioSource'
@@ -51,7 +52,9 @@ export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
     if (preview || !gameState.timer_started_at || document.hidden) return
     const endsAt = new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
     const ms = endsAt - Date.now() + afterTimer * 1000
-    const t = setTimeout(() => { void gotoAnswers(0) }, Math.max(0, ms))
+    // 9.78: только если игра всё ещё на спринте — таймер мог пережить уход с пульта
+    const from = navFrom(gameState)
+    const t = setTimeout(() => { void gotoAnswers(0, false, from).catch(quietStale) }, Math.max(0, ms))
     return () => clearTimeout(t)
   }, [preview, gameState.timer_started_at])
 

@@ -12,6 +12,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { room } from '../../lib/transport'
 import { autocheck } from '../../lib/autocheck'
 import { gotoQuestion } from '../../lib/gameActions'
+import { navFrom, quietStale } from '../../lib/navGuard'
 import { mediaScaleVar, mediaUrl } from '../../lib/media'
 import { FitImg } from '../../components/FitImg'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
@@ -126,7 +127,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
 
   const manualNext = () => {
     if (rv.phase === 'review') {
-      if (!isLast) void gotoQuestion(gameState.question_index + 1)
+      if (!isLast) void gotoQuestion(gameState.question_index + 1, navFrom(gameState)).catch(quietStale)
       return
     }
     void saveReveal(bag, revealNext(rv, s, false))

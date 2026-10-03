@@ -4,6 +4,14 @@ import { room } from './transport'
 import { isLocalMode } from './transport/mode'
 import { supabase } from './supabase'
 import { uuid } from './uuid'
+import { patchSessionFrom, type NavFrom } from './navGuard'
+import type { SessionPatch } from './transport/types'
+
+/** Переход по игре: с `from` — только если игра всё ещё там, откуда жали
+ *  (lib/navGuard.ts, 9.78); без — как раньше, слепо. */
+function nav(patch: SessionPatch, from?: NavFrom): Promise<void> {
+  return from ? patchSessionFrom(from, patch) : room.patchSession(getRoomId(), patch)
+}
 
 export async function selectPackAndStart(packId: string) {
   const game_id = uuid()
@@ -18,8 +26,8 @@ export async function selectPackAndStart(packId: string) {
   return game_id
 }
 
-export async function setPhase(phase: string) {
-  await room.patchSession(getRoomId(), { phase })
+export async function setPhase(phase: string, from?: NavFrom) {
+  await nav({ phase }, from)
 }
 
 /** Перейти к раунду.
@@ -63,13 +71,13 @@ function hushLocal() {
   })
 }
 
-export async function gotoQuestion(question_index: number) {
+export async function gotoQuestion(question_index: number, from?: NavFrom) {
   hushLocal()
   // Таймер НЕ стартует здесь: хост запустит его после окончания озвучки
-  await room.patchSession(getRoomId(), {
+  await nav({
     phase: 'question', question_index,
     timer_started_at: null, reveal: false,
-  })
+  }, from)
 }
 
 /** Вернуться к УЖЕ ПОКАЗАННОМУ вопросу «Скрэмбла» (кнопка «Назад» на
@@ -79,12 +87,12 @@ export async function gotoQuestion(question_index: number) {
  *  остаётся показанным, таймер не запущен (timer_started_at: null —
  *  тогда и AutoAdvance, считающий от старта, не уведёт с вопроса сам), и
  *  startTimer/markQuestionShown НЕ вызываются. HANDOFF §3ca, ревью 9.74. */
-export async function gotoQuestionShown(question_index: number) {
+export async function gotoQuestionShown(question_index: number, from?: NavFrom) {
   hushLocal()
-  await room.patchSession(getRoomId(), {
+  await nav({
     phase: 'question', question_index,
     timer_started_at: null, reveal: true,
-  })
+  }, from)
 }
 
 /** Старт таймера (вызывается хостом после озвучки вопроса).
@@ -111,17 +119,17 @@ export async function startTimer(question?: {
 }
 
 /** «Время ответов»: минута на подумать перед разбором (как в старом проекте). */
-export async function startAnswerTime() {
-  await room.patchSession(getRoomId(), {
+export async function startAnswerTime(from?: NavFrom) {
+  await nav({
     phase: 'answer_time', timer_started_at: new Date().toISOString(), reveal: false,
-  })
+  }, from)
 }
 
 /** Фаза показа ответов раунда: по одному, как в старом проекте. */
-export async function gotoAnswers(question_index: number, revealed = false) {
-  await room.patchSession(getRoomId(), {
+export async function gotoAnswers(question_index: number, revealed = false, from?: NavFrom) {
+  await nav({
     phase: 'show_answers', question_index, reveal: revealed, timer_started_at: null,
-  })
+  }, from)
 }
 
 export async function showScoreboard() {

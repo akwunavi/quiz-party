@@ -11,6 +11,7 @@ import {
 import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { installAudioKeepAlive } from '../lib/audioKeepAlive'
+import { navFrom, quietStale } from '../lib/navGuard'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
@@ -509,9 +510,9 @@ function HostInner({ gameState, pack }: {
             {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
               <button onClick={() => void revealAnswer()}>Показать ответ</button>}
             {gameState.question_index + 1 < round.questions.length
-              ? <button onClick={() => void gotoQuestion(gameState.question_index + 1)}>Дальше →</button>
+              ? <button onClick={() => void gotoQuestion(gameState.question_index + 1, navFrom(gameState)).catch(quietStale)}>Дальше →</button>
               : revealMode === 'after_round'
-                ? <button onClick={() => void startAnswerTime()}>Время ответов →</button>
+                ? <button onClick={() => void startAnswerTime(navFrom(gameState)).catch(quietStale)}>Время ответов →</button>
                 : <AfterRoundNav pack={pack} gameState={gameState} />}
           </div>
         } />
@@ -617,8 +618,8 @@ function AnagramFirstBtn({ round, gameState }: {
 
 function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGameState>['gameState']> }) {
   return gameState.question_index > 0
-    ? <button className="ghost" onClick={() => void gotoQuestion(gameState.question_index - 1)}>← Назад</button>
-    : <button className="ghost" onClick={() => void setPhase('round_intro')}>← К титулу</button>
+    ? <button className="ghost" onClick={() => void gotoQuestion(gameState.question_index - 1, navFrom(gameState)).catch(quietStale)}>← Назад</button>
+    : <button className="ghost" onClick={() => void setPhase('round_intro', navFrom(gameState)).catch(quietStale)}>← К титулу</button>
 }
 
 /** Размер пояснения к ответу — по его длине: короткое читается крупно,
@@ -867,7 +868,8 @@ function RecapSlides({ pack, round, gameState }: {
   const [i, setI] = useState(0)
   const q = questions[i]
   const last = i + 1 >= questions.length
-  const toAnswers = () => void startAnswerTime()
+  // только из повтора: если ведущий уже увёл игру с пульта, слайды не тянут её назад
+  const toAnswers = () => void startAnswerTime({ phase: 'recap', round_number: gameState.round_number }).catch(quietStale)
   const next = () => { if (last) toAnswers(); else setI(n => n + 1) }
 
   // Слайд живёт максимум из двух: 5 секунд и длительность озвучки.
@@ -1562,8 +1564,8 @@ function AnswerTime({ pack, round, gameState }: {
         </div>
       )}
       <div className="host-actions">
-        <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1)}>← Назад</button>
-        <button onClick={() => void gotoAnswers(0)}>К ответам →</button>
+        <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1, navFrom(gameState)).catch(quietStale)}>← Назад</button>
+        <button onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
       </div>
     </div>
   )
@@ -1775,11 +1777,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
         </div>}
       </div>
       <div className="host-actions">
-        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true)}>← Назад</button>}
+        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
         {!revealed
           ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
           : step < total - 1
-            ? <button onClick={() => void gotoAnswers(step + 1)}>Следующий вопрос →</button>
+            ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
             : <AfterRoundNav pack={pack} gameState={gameState} />}
       </div>
     </div>
@@ -1893,7 +1895,10 @@ function AutoAdvance({ round, gameState, isLast }: {
     // если время уже вышло (вернулись на вопрос), листаем почти сразу,
     // а не молчим — раньше при ms <= 0 эффект просто выходил
     const ms = Math.max(500, fireAt - Date.now())
-    const t = setTimeout(() => { void gotoQuestion(gameState.question_index + 1) }, ms)
+    // 9.78: таймер мог сработать на устаревшем снимке (ведущий уже ушёл
+    // дальше с пульта) — листаем, только если игра всё ещё на ЭТОМ вопросе
+    const from = navFrom(gameState)
+    const t = setTimeout(() => { void gotoQuestion(gameState.question_index + 1, from).catch(quietStale) }, ms)
     return () => clearTimeout(t)
   }, [gameState.timer_started_at, gameState.question_index, sec])
   return null

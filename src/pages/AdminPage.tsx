@@ -42,6 +42,7 @@ import { startRace } from '../lib/raceActions'
 // проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
 import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
+import { navFrom } from '../lib/navGuard'
 import { casEnabled } from '../lib/sessionBag'
 import {
   melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippetIfFresh,
@@ -350,12 +351,15 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   }
 
   const advance = () => {
+    // 9.78: переход пишется, только если игра всё ещё там, где её видит
+    // пульт (lib/navGuard.ts) — замороженный в кармане телефон не откатит раунд
+    const from = navFrom(gameState)
     if (phase === 'round_intro') {
       // «Скрэмбл»: вернулись «← К титулу» — первый вопрос уже сыгран,
       // открываем его показанным, а не заново вживую (ревью 9.75)
       if (isAnagram && anagramFirst(wasRun).shown)
-        return void runAction('первый вопрос', () => gotoQuestionShown(0))
-      void runAction('следующий вопрос', () => gotoQuestion(0)); return
+        return void runAction('первый вопрос', () => gotoQuestionShown(0, from))
+      void runAction('следующий вопрос', () => gotoQuestion(0, from)); return
     }
     if (phase === 'question') {
       // «Скрэмбл»: вопрос → показ ответа → следующий; «время ответов» и
@@ -369,23 +373,23 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         if (st.kind === 'wait') return navHint.show(st.text)
         if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer())
         if (st.kind === 'next') return void runAction('следующий вопрос',
-          () => st.shown ? gotoQuestionShown(st.index) : gotoQuestion(st.index))
+          () => st.shown ? gotoQuestionShown(st.index, from) : gotoQuestion(st.index, from))
         return runAfterRound()
       }
       if (step + 1 < round.questions.length) {
-        void runAction('следующий вопрос', () => gotoQuestion(step + 1)); return
+        void runAction('следующий вопрос', () => gotoQuestion(step + 1, from)); return
       }
       // Повтор вопросов слайдами — если включён в редакторе. Идёт ПЕРЕД
       // временем на ответы: зал ещё раз видит все вопросы, потом отвечает.
       if (recapOn && round.answers_reveal === 'after_round') {
-        void runAction('повтор вопросов', () => setPhase('recap')); return
+        void runAction('повтор вопросов', () => setPhase('recap', from)); return
       }
-      if (round.answers_reveal === 'after_round') void runAction('время на ответы', () => startAnswerTime())
-      else void runAction('переход к разбору ответов', () => gotoAnswers(0))
+      if (round.answers_reveal === 'after_round') void runAction('время на ответы', () => startAnswerTime(from))
+      else void runAction('переход к разбору ответов', () => gotoAnswers(0, false, from))
       return
     }
-    if (phase === 'recap') { void runAction('время на ответы', () => startAnswerTime()); return }
-    if (phase === 'answer_time') { void runAction('переход к разбору ответов', () => gotoAnswers(0)); return }
+    if (phase === 'recap') { void runAction('время на ответы', () => startAnswerTime(from)); return }
+    if (phase === 'answer_time') { void runAction('переход к разбору ответов', () => gotoAnswers(0, false, from)); return }
     // с табло и из перерыва идём по общему маршруту: с табло может быть
     // ещё перерыв, а вот из перерыва — только вперёд
     if (phase === 'scoreboard' || phase === 'break') runAfterRound()
@@ -401,7 +405,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
       if (sl?.show_at === 'finale') {
         return void runAction('переход к финалу', () => finishGame(gameState.pack_id, paperMode))
       }
-      return void runAction('возврат к раунду', () => setPhase('round_intro'))
+      return void runAction('возврат к раунду', () => setPhase('round_intro', from))
     }
   }
   /** Куда возвращает «Назад» с табло/перерыва: у обычного раунда — на разбор
@@ -416,19 +420,22 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
     else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true))
   }
   const goBack = () => {
+    // 9.78: переход пишется, только если игра всё ещё там, где её видит
+    // пульт (lib/navGuard.ts) — замороженный в кармане телефон не откатит раунд
+    const from = navFrom(gameState)
     if (phase === 'question' && isAnagram) {
       const b = anagramBack(step)
-      if (b.kind === 'shown') return void runAction('предыдущий вопрос', () => gotoQuestionShown(b.index))
-      return void runAction('назад к раунду', () => setPhase('round_intro'))
+      if (b.kind === 'shown') return void runAction('предыдущий вопрос', () => gotoQuestionShown(b.index, from))
+      return void runAction('назад к раунду', () => setPhase('round_intro', from))
     }
-    if (phase === 'question' && step > 0) void runAction('предыдущий вопрос', () => gotoQuestion(step - 1))
-    else if (phase === 'question') void runAction('назад к раунду', () => setPhase('round_intro'))
+    if (phase === 'question' && step > 0) void runAction('предыдущий вопрос', () => gotoQuestion(step - 1, from))
+    else if (phase === 'question') void runAction('назад к раунду', () => setPhase('round_intro', from))
     else if (phase === 'recap') {
-      void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1))
+      void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1, from))
     }
     else if (phase === 'answer_time') {
-      if (recapOn) void runAction('назад к повтору вопросов', () => setPhase('recap'))
-      else void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1))
+      if (recapOn) void runAction('назад к повтору вопросов', () => setPhase('recap', from))
+      else void runAction('назад к вопросам', () => gotoQuestion(round.questions.length - 1, from))
     }
     // «Табло»/«Перерыв» раньше не входили в goBack вообще — кнопка «Назад»
     // была на экране, но клик не делал ничего. Возврат тем же путём, каким
@@ -872,12 +879,16 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
             во «время ответов» или к повтору вопросов было некуда, хотя
             маршрут туда есть (см. RoundView.goBack). */}
         <button className="adm-btn" onClick={() => {
-          if (step > 0) { void gotoAnswers(step - 1, true); return }
-          if (recapOn) void setPhase('recap')
-          else void startAnswerTime()
+          // 9.78: только если разбор всё ещё на этом вопросе (lib/navGuard.ts)
+          const from = navFrom(gameState)
+          if (step > 0) { void runAction('предыдущий ответ', () => gotoAnswers(step - 1, true, from)); return }
+          if (recapOn) void runAction('назад к повтору вопросов', () => setPhase('recap', from))
+          else void runAction('назад ко времени ответов', () => startAnswerTime(from))
         }}>← НАЗАД</button>
         <button className="adm-btn primary" onClick={() => {
-          if (step < total - 1) { void gotoAnswers(step + 1); return }
+          if (step < total - 1) {
+            void runAction('следующий ответ', () => gotoAnswers(step + 1, false, navFrom(gameState))); return
+          }
           // настройка раунда «показать табло» раньше игнорировалась здесь:
           // после разбора сразу уходили в финал или в табло независимо от неё
           if (showSb) { void showScoreboard(); return }
@@ -2195,7 +2206,7 @@ function RevealControls({ pack, round, gameState, isLast, onFinish }: {
           {isLast
             ? <button className="adm-btn primary" onClick={onFinish}>ЗАВЕРШИТЬ РАУНД →</button>
             : <button className="adm-btn primary"
-                onClick={() => void runAction('следующий вопрос', () => gotoQuestion(gameState.question_index + 1))}>
+                onClick={() => void runAction('следующий вопрос', () => gotoQuestion(gameState.question_index + 1, navFrom(gameState)))}>
                 ДАЛЬШЕ →</button>}
         </div>
       </div>
