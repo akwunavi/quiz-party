@@ -203,13 +203,17 @@
 
 /* 4 картинки — один ряд (см. .eq-row выше), 5 и больше — два ряда: ряд
    из пяти-шести в ширину нечитаем даже на большом экране (8.71, прямая
-   просьба ведущего). Сейчас недостижимо на практике — mediaMax у медиа
-   вопроса и ответа зафиксирован на 4 (questionFields.ts/QuestionForm.tsx),
-   поднимать его тут не решали. Правило универсальное на будущее, но НЕ
-   проверено рендером на реальных данных — проверить, если лимит когда-
-   нибудь поднимут. */
-.q-media-grid.eq-row.wrap2 { flex-wrap: wrap; align-content: center; }
-.q-media-grid.eq-row.wrap2 .q-img { flex-basis: 46%; }
+   просьба ведущего). С 9.76 достижимо (сопоставление до 6 картинок) и
+   проверено рендером на экране вопроса: 3 темы × 1366/1920/3840. */
+.q-media-grid.eq-row.wrap2 { flex-wrap: wrap; align-content: stretch; }
+/* 9.76: лимит подняли (сопоставление до 6 картинок) — пять-шесть кладём
+   по три в ряд (два ряда), а не по два (три узких ряда в колонке экрана
+   ответов). */
+/* !important — FitImg ставит flexBasis: 0 инлайном (выключной ряд); без
+   него перенос не срабатывал вовсе и все 5–6 стояли в один ряд (замер
+   рендером 9.76). Высота строки — половина ряда. */
+.q-media-grid.eq-row.wrap2 .q-img { flex-basis: 31% !important; flex-grow: 1 !important;
+  max-width: 33%; height: calc(50% - clamp(5px, .6vw, 11px)); }
 
 /* ═══════ 7.97: пустой вопрос, баланс «текст ↔ картинки» ═══════ */
 
@@ -626,7 +630,11 @@
     padding-top: clamp(8px, 1.5vh, 16px); }
   .theme-potter .host-screen.has-choices > .choices-grid:has(.choice-plate:nth-child(5)) .choice-plate,
   .host-screen.has-choices > .choices-grid:has(.choice-plate:nth-child(5)) .choice-plate {
-    padding: clamp(6px, 1vh, 12px) clamp(12px, 1.2vw, 22px);
+    padding: clamp(6px, 1vh, 12px) clamp(12px, 1.2vw, 22px); }
+  /* кегль уменьшаем только коротким вариантам: у длинных (.c-l/.c-xl) своя
+     ступень мельче — её не перебиваем, иначе текст стал бы КРУПНЕЕ */
+  .theme-potter .host-screen.has-choices > .choices-grid:not(.c-l):not(.c-xl):has(.choice-plate:nth-child(5)) .choice-plate,
+  .host-screen.has-choices > .choices-grid:not(.c-l):not(.c-xl):has(.choice-plate:nth-child(5)) .choice-plate {
     font-size: clamp(15px, 1.6vw, 26px); }
   .host-screen.has-media.has-choices > .img-answers.n5,
   .host-screen.has-media.has-choices > .img-answers.n6 { min-height: min(16vh, 140px); }

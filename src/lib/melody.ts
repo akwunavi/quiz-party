@@ -78,7 +78,8 @@ export function melodySpin(m: MelodyState, key: string, freeCount: number,
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   const base = { ...m, key, order: undefined, turn: 0, chooser: undefined, startSec }
   if (freeCount <= 1) return { ...base, stage: 'listen', deadline: melodyDeadline(3, now) }
-  return { ...base, stage: 'spinning', deadline: melodyDeadline(Math.min(spinSec, 8), now) }
+  const sec = Math.min(spinSec, 8)
+  return { ...base, stage: 'spinning', spinMs: sec * 1000, deadline: melodyDeadline(sec, now) }
 }
 
 /** Ручной выбор плитки (Р2, без рулетки) — та же логика выбора случайной

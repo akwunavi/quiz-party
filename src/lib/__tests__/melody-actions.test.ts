@@ -48,6 +48,11 @@ describe('мелодия: рулетка', () => {
     expect(n.deadline).toBe(melodyDeadline(8, T0))
   })
 
+  it('длительность барабана пишется в состояние — все экраны крутят одинаково (9.76)', () => {
+    expect(melodySpin({}, '0-0', 5, 30, 30, T0).spinMs).toBe(8000)
+    expect(melodySpin({}, '0-0', 5, 5, 30, T0).spinMs).toBe(5000)
+  })
+
   it('очередь прошлого трека сбрасывается', () => {
     const n = melodySpin({ order: ['a', 'b'], turn: 1, chooser: 'a' }, '0-0', 3, 5, 30, T0)
     expect(n.order).toBeUndefined()

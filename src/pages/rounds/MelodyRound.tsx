@@ -430,7 +430,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   return (
     <div className="host-screen grid-bg mel-screen" onPointerDown={preview ? undefined : unlockAudio}>
       <MelodyGrid themes={themes} played={played} spinning={m.stage === 'spinning'}
-        spinKey={m.key} spinDeadline={deadline} spinTotalMs={Math.min(s.spinSec ?? 5, 8) * 1000}
+        spinKey={m.key} spinDeadline={deadline} spinTotalMs={m.spinMs ?? Math.min(s.spinSec ?? 5, 8) * 1000}
         onPick={preview ? undefined : (manualPick ? pickManually : undefined)} theme={pack.theme} />
 
       {/* Кнопки этого блока запускают рулетку/спин — реальная запись в
@@ -609,9 +609,9 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               )}
               {ans?.is_correct === false && (
                 <div className="mel-wrong">
-                  ✗ НЕВЕРНО · ответ не раскрываем
                   {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
-                    ? ' — передайте ход второй команде' : ' — трек закрывается'}
+                    ? '✗ НЕВЕРНО · ответ не раскрываем — передайте ход второй команде'
+                    : '✗ НЕВЕРНО · дальше — правильный ответ'}
                 </div>
               )}
               {/* 9.62 (находка 6): grade/passMelody теперь тоже могут бросить
@@ -622,7 +622,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
               {!preview && <div className="mel-actions">
                 <button disabled={!ans} onClick={() => click(() => grade(true))}>✓ Верно</button>
                 <button className="ghost" onClick={() => click(() => passMelody(gameState, ans))}>
-                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Закрыть трек'}
+                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Показать ответ →'}
                 </button>
               </div>}
             </>)}

@@ -2119,7 +2119,7 @@ function MelodyControls({ round, gameState, onFinish }: {
           <button className="adm-btn primary" disabled={!ans}
             onClick={() => ans && void runAction('оценка ответа', () => gradeMelody(gameState, ans, true, bidSec))}>✓ ВЕРНО</button>
           <button className="adm-btn" onClick={() => void runAction('передать ход', () => passMelody(gameState, ans))}>
-            {first && hasSecond ? '✗ ПЕРЕДАТЬ ХОД' : '✗ ЗАКРЫТЬ ТРЕК'}
+            {first && hasSecond ? '✗ ПЕРЕДАТЬ ХОД' : '✗ ПОКАЗАТЬ ОТВЕТ'}
           </button>
         </div>
       </>)}

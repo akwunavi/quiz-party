@@ -629,7 +629,13 @@ function questionErrors(q: Question): string[] {
       if (!a.correct_choice) errs.push('верный вариант')
       break
     case 'order': if (a.correct_order.length !== a.choices.length) errs.push('полный правильный порядок'); break
-    case 'match': if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления'); break
+    case 'match': {
+      if (a.correct_pairs.length !== a.left.length) errs.push('все пары сопоставления')
+      const mImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+      if (mImgs.length > 0 && mImgs.length !== a.left.length)
+        errs.push(`число пар под картинки (картинок ${mImgs.length}, пар ${a.left.length})`)
+      break
+    }
     case 'crossword_word': if (!a.word.trim()) errs.push('слово кроссворда'); break
     case 'none': if (!a.display.trim()) errs.push('текст правильного ответа'); break
     case 'anagram': {

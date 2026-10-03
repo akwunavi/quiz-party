@@ -53,13 +53,11 @@ export function startAudioKeepAlive(): void {
 /** Подключить на экране проектора: пробует сразу и на каждом жесте, пока
  *  поток не запущен. Возвращает отписку. */
 export function installAudioKeepAlive(): () => void {
-  const onGesture = () => {
-    startAudioKeepAlive()
-    if (ctx?.state === 'running') {
-      window.removeEventListener('pointerdown', onGesture)
-      window.removeEventListener('keydown', onGesture)
-    }
-  }
+  // Слушатели НЕ снимаем после первого успеха: браузер может позже сам
+  // приостановить контекст (смена аудиоустройства, сон ноутбука), и тогда
+  // любой следующий клик ведущего его поднимет. Вызов дешёвый — при
+  // работающем потоке он ничего не делает.
+  const onGesture = () => startAudioKeepAlive()
   startAudioKeepAlive()
   window.addEventListener('pointerdown', onGesture)
   window.addEventListener('keydown', onGesture)
