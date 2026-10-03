@@ -3,7 +3,7 @@ import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
 import { uploadMedia } from '../../lib/mediaUpload'
 import { rebusExpected } from '../../lib/answerCheck'
-import { mediaUrl } from '../../lib/media'
+import { mediaUrl, normalizeMediaLink } from '../../lib/media'
 import { questionFields, resizeMatch, MATCH_MIN_PAIRS, MATCH_MAX_PAIRS } from '../../lib/questionFields'
 import { revealGroups } from '../../lib/reveal'
 import { anagramTemplate, anagramShuffle, anagramOrderValid, anagramTiles, hashStr } from '../../lib/anagram'
@@ -591,22 +591,43 @@ export function MediaSlot({ label, packId, paths, max, accept, onChange }: {
 function MediaLink({ onAdd }: { onAdd: (url: string) => void }) {
   const [open, setOpen] = useState(false)
   const [val, setVal] = useState('')
-  const ok = /^https?:\/\/\S+$/.test(val.trim())
+  const [checking, setChecking] = useState(false)
+  const hint = useHint()
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  // 9.81: путь писать не надо — хватает имени файла из папки public/
+  // (main.mp3), полный адрес достраивается сам (lib/media.ts)
+  const url = normalizeMediaLink(val)
   if (!open) {
     return (
       <button className="ghost media-link-toggle" style={{ fontSize: 12, padding: '2px 8px' }}
-        onClick={() => setOpen(true)}>+ вставить ссылку</button>
+        onClick={() => setOpen(true)}>+ файл с сайта (имя или ссылка)</button>
     )
   }
+  const add = async () => {
+    if (!url) return hint.show('Впиши имя файла, например main.mp3', inputRef.current)
+    setChecking(true)
+    try {
+      // проверяем, что файл правда есть: опечатка в имени иначе всплыла бы
+      // только на игре тишиной. Нет связи/не дали проверить — добавляем.
+      const r = await fetch(url, { method: 'HEAD', cache: 'no-store' }).catch(() => null)
+      if (r && r.status === 404) {
+        return hint.show(`Такого файла на сайте нет: ${decodeURIComponent(url.slice(url.lastIndexOf('/') + 1))} — проверь имя (и что файл уже задеплоен)`, inputRef.current)
+      }
+    } finally { setChecking(false) }
+    onAdd(url); setVal(''); setOpen(false)
+  }
   return (
-    <div className="media-link" style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-      <input value={val} placeholder="https://akwunavi.github.io/quiz-party/main.mp3"
-        style={{ flex: '1 1 auto', minWidth: 0, fontSize: 12 }}
-        onChange={e => setVal(e.target.value)} />
-      <button disabled={!ok} onClick={() => { onAdd(val.trim()); setVal(''); setOpen(false) }}>
-        Добавить
-      </button>
-      <button className="ghost" onClick={() => { setVal(''); setOpen(false) }}>✕</button>
+    <div className="media-link" style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
+      <div style={{ display: 'flex', gap: 6 }}>
+        <input ref={inputRef} value={val} placeholder="main.mp3"
+          style={{ flex: '1 1 auto', minWidth: 0, fontSize: 12 }}
+          onKeyDown={e => { if (e.key === 'Enter') void add() }}
+          onChange={e => setVal(e.target.value)} />
+        <button onClick={() => void add()}>{checking ? 'проверяю…' : 'Добавить'}</button>
+        <button className="ghost" onClick={() => { setVal(''); setOpen(false) }}>✕</button>
+      </div>
+      {url && <div className="ed-hint" style={{ wordBreak: 'break-all' }}>будет: {url}</div>}
+      <Hint text={hint.text} />
     </div>
   )
 }
