@@ -332,17 +332,20 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   // шаг после раунда берём из общего модуля: раньше здесь была своя копия
   // логики, которая игнорировала перерыв и расходилась с проектором
   const runAfterRound = () => {
+    // 9.78: номер раунда — из снимка пульта; со старого снимка «дальше»
+    // откатило бы уже идущий раунд на заставку (lib/navGuard.ts)
+    const from = navFrom(gameState)
     const st = afterRoundStep(pack, gameState.round_number, gameState.phase)
-    if (st.kind === 'scoreboard') return void runAction('показ табло', () => showScoreboard())
-    if (st.kind === 'break') return void runAction('начало перерыва', () => startBreak())
+    if (st.kind === 'scoreboard') return void runAction('показ табло', () => showScoreboard(from))
+    if (st.kind === 'break') return void runAction('начало перерыва', () => startBreak(from))
     if (st.kind === 'finale') {
       const sl = slideBeforeFinale(pack.settings?.info_slides)
       return sl == null
-        ? void runAction('переход к финалу', () => finishGame(gameState.pack_id, paperMode))
-        : void runAction('показ слайда', () => showSlide(sl))
+        ? void runAction('переход к финалу', () => finishGame(gameState.pack_id, paperMode, from))
+        : void runAction('показ слайда', () => showSlide(sl, from))
     }
     return void runAction('переход к раунду', () => gotoRound(gameState.round_number + 1,
-      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined))
+      slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined, from))
   }
   const endRound = runAfterRound
 
@@ -371,7 +374,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
           index: step, count: round.questions.length, nowMs: Date.now(), wasRun })
         if (st.kind === 'wait') return navHint.show(st.text)
-        if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer())
+        if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer(from))
         if (st.kind === 'next') return void runAction('следующий вопрос',
           () => st.shown ? gotoQuestionShown(st.index, from) : gotoQuestion(st.index, from))
         return runAfterRound()
@@ -413,11 +416,12 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
   const backToRound = () => {
     // «120 секунд» сюда не относится: у него разбор по вопросам обычный,
     // своя раскладка только у самой фазы вопроса
-    if (isInteractive) void runAction('назад к раунду', () => gotoQuestion(0))
+    const from = navFrom(gameState)
+    if (isInteractive) void runAction('назад к раунду', () => gotoQuestion(0, from))
     // у «Скрэмбла» разбора по вопросам нет — назад к последнему вопросу
     // к ПОКАЗАННОМУ последнему вопросу, не перезапуская его (ревью 9.74)
-    else if (isAnagram) void runAction('назад к раунду', () => gotoQuestionShown(round.questions.length - 1))
-    else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true))
+    else if (isAnagram) void runAction('назад к раунду', () => gotoQuestionShown(round.questions.length - 1, from))
+    else void runAction('назад к раунду', () => gotoAnswers(round.questions.length - 1, true, from))
   }
   const goBack = () => {
     // 9.78: переход пишется, только если игра всё ещё там, где её видит
@@ -531,7 +535,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         {isSprint && phase === 'question' && (
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="adm-btn" onClick={() => void runAction('назад к раунду', () => setPhase('round_intro'))}>← НАЗАД</button>
-            <button className="adm-btn primary" onClick={() => void runAction('переход к разбору ответов', () => gotoAnswers(0))}>К ОТВЕТАМ →</button>
+            <button className="adm-btn primary" onClick={() => void runAction('переход к разбору ответов', () => gotoAnswers(0, false, navFrom(gameState)))}>К ОТВЕТАМ →</button>
           </div>
         )}
         {/* Назад / Повтор вопроса / Дальше — теперь один ряд, а не два разных
@@ -579,7 +583,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         )}
         {isInteractive && phase === 'round_intro' && (
           <button className="adm-btn primary"
-            onClick={() => void runAction('начало раунда', () => gotoQuestion(0))}>НАЧАТЬ РАУНД →</button>
+            onClick={() => void runAction('начало раунда', () => gotoQuestion(0, navFrom(gameState)))}>НАЧАТЬ РАУНД →</button>
         )}
         {/* У блица своя кнопка «дальше» — внутри BlitzControls, только когда
             раунд реально завершён (state.finished). Раньше этот блок рисовался
@@ -891,18 +895,19 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           }
           // настройка раунда «показать табло» раньше игнорировалась здесь:
           // после разбора сразу уходили в финал или в табло независимо от неё
-          if (showSb) { void showScoreboard(); return }
+          const from = navFrom(gameState)
+          if (showSb) { void runAction('показ табло', () => showScoreboard(from)); return }
           // на бумаге между последним раундом и итогами всегда есть пауза:
           // ведущий сводит бланки. Ведём зал на заставку подсчёта, а не в финал
           if (last) {
             // слайд «перед итогами», если он назначен, идёт первым
             const sl = slideBeforeFinale(pack.settings?.info_slides)
-            if (sl != null) { void showSlide(sl); return }
-            if (paperMode) { void startCounting(); return }
-            void finishGame(gameState.pack_id); return
+            if (sl != null) { void runAction('показ слайда', () => showSlide(sl, from)); return }
+            if (paperMode) { void runAction('подсчёт', () => startCounting(from)); return }
+            void runAction('переход к финалу', () => finishGame(gameState.pack_id, false, from)); return
           }
-          else void gotoRound(gameState.round_number + 1,
-            slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined)
+          else void runAction('переход к раунду', () => gotoRound(gameState.round_number + 1,
+            slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined, from))
         }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'
           : showSb ? 'К ТАБЛО →' : last ? (paperMode ? 'К ПОДСЧЁТУ →' : 'ФИНАЛ →') : 'СЛЕД. РАУНД →'}</button>
       </div>

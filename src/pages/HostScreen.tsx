@@ -384,7 +384,7 @@ function HostInner({ gameState, pack }: {
         </>)}
         <div className="host-actions">
           {round.mechanic === 'anagram' ? <AnagramFirstBtn round={round} gameState={gameState} /> :
-          <button onClick={() => void gotoQuestion(0)}>
+          <button onClick={() => void gotoQuestion(0, navFrom(gameState)).catch(quietStale)}>
             {round.mechanic === 'jeopardy' ? 'Начать раунд →'
               : round.mechanic === 'race' ? 'К скачкам →'
               : round.mechanic === 'melody' ? 'К трекам →'
@@ -404,7 +404,7 @@ function HostInner({ gameState, pack }: {
           timerNode={<Timer startedAt={gameState.timer_started_at}
             seconds={round.timer_seconds} theme={pack.theme} />} />
         <div className="host-actions">
-          <button className="ghost dark" onClick={() => void gotoAnswers(0)}>К ответам →</button>
+          <button className="ghost dark" onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
         </div>
       </div>
     )
@@ -582,15 +582,17 @@ function AnagramNav({ pack, round, gameState }: {
     index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
   const back = () => {
     const b = anagramBack(gameState.question_index)
-    void (b.kind === 'shown' ? gotoQuestionShown(b.index) : setPhase('round_intro'))
+    const from = navFrom(gameState)
+    void (b.kind === 'shown' ? gotoQuestionShown(b.index, from) : setPhase('round_intro', from)).catch(quietStale)
   }
   const next = () => {
     const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
       index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
     if (st.kind === 'wait') return hint.show(st.text)
-    if (st.kind === 'reveal') return void revealAnswer()
+    const from = navFrom(gameState)
+    if (st.kind === 'reveal') return void revealAnswer(from).catch(quietStale)
     // уже сыгранный вопрос (вернулись «Назад») — показанным, не вживую
-    if (st.kind === 'next') return void (st.shown ? gotoQuestionShown(st.index) : gotoQuestion(st.index))
+    if (st.kind === 'next') return void (st.shown ? gotoQuestionShown(st.index, from) : gotoQuestion(st.index, from)).catch(quietStale)
   }
   return (
     <div className="host-actions">
@@ -613,7 +615,7 @@ function AnagramFirstBtn({ round, gameState }: {
 }) {
   const shownMap = useQuestionShown(gameState.game_id)
   const first = anagramFirst(anagramWasRun(shownMap, round.questions))
-  return <button onClick={() => void (first.shown ? gotoQuestionShown(0) : gotoQuestion(0))}>Первый вопрос →</button>
+  return <button onClick={() => void (first.shown ? gotoQuestionShown(0, navFrom(gameState)) : gotoQuestion(0, navFrom(gameState))).catch(quietStale)}>Первый вопрос →</button>
 }
 
 function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGameState>['gameState']> }) {

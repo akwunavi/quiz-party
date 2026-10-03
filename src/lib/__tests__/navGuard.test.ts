@@ -29,7 +29,7 @@ const fakeRoom = {
 }
 vi.mock('../transport', () => ({ get room() { return fakeRoom } }))
 
-const { gotoQuestion, startAnswerTime } = await import('../gameActions')
+const { gotoQuestion, startAnswerTime, gotoRound } = await import('../gameActions')
 const { StaleNavError, navFrom } = await import('../navGuard')
 
 const base = (over: Partial<GameState> = {}): GameState => ({
@@ -77,5 +77,28 @@ describe('переходы «откуда жали» (9.78)', () => {
     await expect(gotoQuestion(6, navFrom(base({ question_index: 5 })))).rejects.toBeInstanceOf(StaleNavError)
     await gotoQuestion(0, navFrom(base()))
     expect(session.question_index).toBe(0)
+  })
+
+  // ревью 9.78, находка 1: переход, который УЖЕ прошёл, — не ошибка
+  it('двойной тап «Далее»: второй клик видит игру уже на цели — успех, без ошибки и без перескока', async () => {
+    const snap = navFrom(base({ question_index: 5 }))
+    session = base({ question_index: 5 })
+    await gotoQuestion(6, snap)
+    await expect(gotoQuestion(6, snap)).resolves.toBeUndefined()
+    expect(session.question_index).toBe(6)
+  })
+
+  it('ответ на запись потерялся, повтор видит конфликт — но цель уже достигнута, ошибки нет', async () => {
+    beforeCas = () => apply({ phase: 'answer_time', timer_started_at: 'z', reveal: false })
+    await expect(startAnswerTime(navFrom(base()))).resolves.toBeUndefined()
+    expect(session.phase).toBe('answer_time')
+  })
+
+  it('пульт замёрз на табло 2-го раунда, игра уже в 3-м — «Дальше» не откатывает раунд на заставку', async () => {
+    session = base({ phase: 'question', round_number: 3, question_index: 4 })
+    await expect(gotoRound(3, undefined, { phase: 'scoreboard', round_number: 2, question_index: 8 }))
+      .rejects.toBeInstanceOf(StaleNavError)
+    expect(session.round_number).toBe(3)
+    expect(session.question_index).toBe(4)
   })
 })

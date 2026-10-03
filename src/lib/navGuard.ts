@@ -43,9 +43,18 @@ export function navFrom(gs: Pick<GameState, 'phase' | 'round_number' | 'question
   return { phase: gs.phase, round_number: gs.round_number, question_index: gs.question_index }
 }
 
+/** Свежее состояние уже совпадает с целью перехода. Время старта таймера
+ *  не сравниваем — оно у каждого вызова своё. */
+export function targetReached(cur: GameState, patch: SessionPatch): boolean {
+  const keys = Object.keys(patch).filter(k => k !== 'timer_started_at' && k !== 'updated_at')
+  if (!keys.includes('phase') && !keys.includes('reveal')) return false
+  const c = cur as unknown as Record<string, unknown>
+  return keys.every(k => JSON.stringify(c[k] ?? null) === JSON.stringify(patch[k] ?? null))
+}
+
 export class StaleNavError extends Error {
   constructor() {
-    super('экран уже ушёл дальше — пульт обновится за пару секунд, проверь и нажми ещё раз')
+    super('экран уже ушёл дальше — подожди пару секунд, пока пульт обновится, и проверь, где игра')
     this.name = 'StaleNavError'
   }
 }
@@ -56,6 +65,12 @@ export async function patchSessionFrom(from: NavFrom, patch: SessionPatch, maxAt
   const roomId = getRoomId()
   let cur = await room.readSession(roomId)
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Игра уже ровно там, куда ведёт этот переход, — значит, он уже прошёл:
+    // повтор после потерянного ответа (слабый Wi-Fi, ретрай по таймауту)
+    // или второй тап той же кнопки. Это успех, а не «экран ушёл дальше»:
+    // иначе ведущий, поверив надписи, нажал бы ещё раз и перескочил
+    // вопрос (ревью 9.78, находка 1).
+    if (cur && targetReached(cur, patch)) return
     if (!cur || !navMatches(cur, from)) throw new StaleNavError()
     if (typeof cur.state_rev !== 'number') {        // миграция 0014 не прогнана
       await room.patchSession(roomId, patch)
