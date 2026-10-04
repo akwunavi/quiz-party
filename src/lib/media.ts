@@ -106,3 +106,29 @@ export function lenClass(text: string): string {
   if (n <= 240) return ' len-l'
   return ' len-xl'
 }
+
+/** Адрес сайта на GitHub Pages: файлы из папки public/ репозитория лежат
+ *  прямо под ним (например .../quiz-party/main.mp3). */
+export const SITE_BASE = 'https://akwunavi.github.io/quiz-party/'
+
+/** Ссылка на медиа «как удобно ведущему» → полный адрес (9.81).
+ *  Ведущий не должен помнить, как правильно писать путь: годится просто
+ *  имя файла (`main.mp3`), с папкой (`public/main.mp3`, `/quiz-party/
+ *  main.mp3`, `akwunavi.github.io/quiz-party/main.mp3`) или полный адрес
+ *  (он остаётся как есть). Кавычки по краям и обратные слэши из Windows
+ *  убираются. Пусто — null. */
+export function normalizeMediaLink(input: string, siteBase = SITE_BASE): string | null {
+  let v = input.trim().replace(/^["'«“]+|["'»”]+$/g, '').trim()
+  if (!v) return null
+  if (/^https?:\/\//i.test(v)) return v.replace(/\s/g, '%20')
+  v = v.replace(/\\/g, '/').replace(/^\.?\/+/, '')
+    .replace(/^akwunavi\.github\.io\//i, '')
+    .replace(/^quiz-party\//i, '')
+    .replace(/^(public|docs)\//i, '')
+  if (!v) return null
+  return siteBase + v.split('/').filter(Boolean).map(seg => encodeURIComponent(decodeSafe(seg))).join('/')
+}
+
+function decodeSafe(s: string): string {
+  try { return decodeURIComponent(s) } catch { return s }
+}

@@ -182,8 +182,21 @@
 .pl-an-state { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em;
   color: var(--accent); text-align: center; text-transform: uppercase; }
 .pl-an-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-.pl-an-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 16px; }
-.pl-an-word { display: flex; gap: 4px; }
+.pl-an-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 16px;
+  /* 9.84: слова переносятся ЦЕЛИКОМ (внутри слова строку не рвём), а если
+     самое длинное слово (--an-n клеток, ставит PlayerPage) не влезает в
+     ширину — клетки ужимаются под него. cqw — ширина этого блока. */
+  container-type: inline-size; width: 100%; }
+.pl-an-word { display: flex; flex-wrap: nowrap; gap: var(--an-g, 4px); }
+/* длинное слово: промежуток 2px вместо 4px (ставит PlayerPage при 11+
+   клетках), скругление и кегль — от размера клетки, чтобы мелкая клетка не
+   превращалась в кружок, а буква оставалась максимально крупной */
+.pl-an-words .pl-an-word .pl-an-cell {
+  --cw: min(clamp(30px, 8.5vw, 44px),
+    calc((100cqw - (var(--an-n, 1) - 1) * var(--an-g, 4px)) / var(--an-n, 1)));
+  width: var(--cw); height: calc(var(--cw) * 1.3);
+  font-size: max(9px, calc(var(--cw) * .62)); border-radius: calc(var(--cw) * .16); }
+.pl-an-words .pl-an-word .pl-an-cell.fixed { width: auto; min-width: calc(var(--cw) * .3); }
 .pl-an-tiles .pl-an-tile, .pl-an-word .pl-an-cell {
   width: clamp(30px, 8.5vw, 44px); height: calc(clamp(30px, 8.5vw, 44px) * 1.25);
   padding: 0; clip-path: none; border-radius: 7px; box-sizing: border-box;

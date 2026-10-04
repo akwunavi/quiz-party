@@ -37,7 +37,9 @@ export function melodyFree(themes: { tracks: unknown[] }[], played: string[]): s
 
 /** Максимальная ставка — жёстко зашита в ряд кнопок на телефоне
  *  (PlayerPage.tsx, [2..10]). Меняешь диапазон там — поменяй и здесь. */
-const MAX_BID_SEC = 10
+/** Самая длинная ставка — столько секунд должно остаться после точки старта. */
+export const MELODY_MAX_BID_SEC = 10
+const MAX_BID_SEC = MELODY_MAX_BID_SEC
 
 /** До какой секунды может начаться «сюрприз-отрывок» — с запасом на
  *  максимальную ставку, чтобы отрывок никогда не пытался сыграть за
@@ -152,40 +154,70 @@ export function melodyReveal(m: MelodyState, pts: number, teamId?: string): Melo
   }
 }
 
-/** Барабан рулетки (9.76). Подсветка идёт ПО ПОРЯДКУ свободных плиток
- *  (`len` штук, слева направо, сверху вниз) от первой, замедляется к концу
- *  и останавливается ровно на `target`, не прыгая туда в последний момент.
- *  Возвращает моменты шагов в мс от старта (по возрастанию); последний шаг
- *  — на `target`, за `restMs` до конца, чтобы зал успел увидеть остановку.
- *  Раньше подсветка прыгала по случайным плиткам, а в последнюю секунду
- *  перескакивала на выбранную — выглядело как глюк, а не как рулетка. */
-export function melodySpinSchedule(len: number, target: number, durationMs: number,
-  restMs = 700): number[] {
-  if (len <= 1 || durationMs <= 0) return []
+/** Барабан рулетки. Подсветка ПРЫГАЕТ по случайным свободным плиткам
+ *  (как и было задумано — 9.76 по ошибке сделала обход по порядку, 9.83
+ *  вернула случайность), без повтора одной плитки два раза подряд,
+ *  кубически замедляется и ПОСЛЕДНИМ прыжком встаёт на `target` за
+ *  `restMs` до конца — без скачка в последнюю секунду. Случайность
+ *  детерминирована `seed` (ключ трека + дедлайн), поэтому два экрана,
+ *  открытые одновременно, показывают один и тот же путь.
+ *  `times[j]` — момент j-го прыжка (мс от старта), `path[j]` — индекс
+ *  плитки после него; до первого прыжка подсвечена `path0`. */
+export function melodySpinPath(len: number, target: number, durationMs: number,
+  seed: number, restMs = 700): { path0: number; times: number[]; path: number[] } {
   const t = ((target % len) + len) % len
+  if (len <= 1 || durationMs <= 0) return { path0: t, times: [], path: [] }
   const D = Math.max(400, durationMs - restMs)
-  const a = 55, b = 600                            // шаг в начале и в конце, мс
-  const avg = a + (b - a) / 4                       // среднее для кубического замедления
-  const want = Math.max(len + t, Math.round(D / avg))
-  // число шагов ≡ t (mod len): после N шагов от плитки 0 стоим на target
-  let n = want - ((want - t) % len + len) % len
-  if (n < Math.max(1, t)) n += len
+  const a = 70, b = 620                              // прыжок в начале и в конце, мс
+  let n = Math.max(6, Math.round(D / (a + (b - a) / 4)))
+  // две плитки — прыжки только чередуются: с не-цели на цель попадаем за
+  // НЕЧЁТНОЕ число прыжков, иначе перед финалом подсветка стояла бы на месте
+  if (len === 2 && n % 2 === 0) n += 1
   const delays: number[] = []
   for (let j = 1; j <= n; j++) delays.push(a + (b - a) * (j / n) ** 3)
-  const sum = delays.reduce((x, y) => x + y, 0)
-  const k = D / sum
-  const out: number[] = []
+  const k = D / delays.reduce((x, y) => x + y, 0)
+  const times: number[] = []
   let acc = 0
-  for (const d of delays) { acc += d * k; out.push(Math.round(acc)) }
-  return out
+  for (const d of delays) { acc += d * k; times.push(Math.round(acc)) }
+  // mulberry32 — тот же генератор, что в lib/anagram.ts
+  let st = seed >>> 0
+  const rnd = () => {
+    st = (st + 0x6D2B79F5) >>> 0
+    let x = st
+    x = Math.imul(x ^ (x >>> 15), x | 1)
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61)
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296
+  }
+  const pick = (avoid: number[]) => {
+    const pool = Array.from({ length: len }, (_, i) => i).filter(i => !avoid.includes(i))
+    return pool.length ? pool[Math.floor(rnd() * pool.length)] : avoid[0]
+  }
+  const path0 = pick([t])
+  const path: number[] = []
+  let prev = path0
+  for (let j = 0; j < n; j++) {
+    const last = j === n - 1
+    // предпоследний прыжок не на цель — иначе последний был бы «на месте»
+    const next = last ? t : pick(j === n - 2 ? [prev, t] : [prev])
+    path.push(next)
+    prev = next
+  }
+  return { path0, times, path }
 }
 
-/** Индекс подсвеченной плитки через `elapsedMs` от старта барабана. */
-export function melodySpinIndex(schedule: number[], len: number, elapsedMs: number): number {
-  if (len <= 0) return 0
-  let steps = 0
-  while (steps < schedule.length && schedule[steps] <= elapsedMs) steps++
-  return steps % len
+/** Какая плитка подсвечена через `elapsedMs` от старта барабана. */
+export function melodySpinAt(spin: { path0: number; times: number[]; path: number[] },
+  elapsedMs: number): number {
+  let i = -1
+  while (i + 1 < spin.times.length && spin.times[i + 1] <= elapsedMs) i++
+  return i < 0 ? spin.path0 : spin.path[i]
+}
+
+/** Число-«зерно» из строки (ключ трека + дедлайн) — одно на все экраны. */
+export function melodySpinSeed(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) }
+  return h >>> 0
 }
 
 /** С экрана результата — обратно к доске. */

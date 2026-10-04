@@ -27,7 +27,9 @@
 import { readMedia } from './packCache'
 import { fetchMediaBlob } from './media'
 
-export type PlayResult = { ok: true } | { ok: false; reason: string }
+/** `startAt` в ok — секунда, с которой РЕАЛЬНО пошёл звук (после подрезки
+ *  по настоящей длине файла, см. seekSafely). */
+export type PlayResult = { ok: true; startAt?: number } | { ok: false; reason: string }
 
 /** Вытеснено новой операцией — не ошибка, происходит постоянно и штатно. */
 export const SUPERSEDED = { ok: false, reason: 'superseded' } as const
@@ -89,7 +91,11 @@ function pathFromUrl(url: string): string | null {
 // blob, который сейчас реально стоит в src у живого элемента — revoke на
 // играющем элементе обрывает звук.
 const cache = new Map<string, string>()
-const MAX_CACHED_BLOBS = 8
+// 9.85: 8 → 40 — раунд «Угадай мелодию» качает ВСЕ свои треки при входе на
+// доску (preloadAudioAll), 16–30 файлов; при 8 первые вытеснялись бы раньше,
+// чем до них дойдёт рулетка. 40 треков по 3–5 МБ — 120–200 МБ памяти
+// проектора, для ноутбука терпимо.
+const MAX_CACHED_BLOBS = 40
 
 function evictOldIfNeeded() {
   if (cache.size <= MAX_CACHED_BLOBS) return
@@ -159,6 +165,27 @@ export function preloadAudio(url: string): void {
   void toBlobUrl(url).catch(() => {})
 }
 
+/** Скачать в память ВСЕ треки (раунд «Угадай мелодию», 9.85) — по два
+ *  одновременно, чтобы не забить канал бара, — сообщая прогресс.
+ *  Уже скачанные засчитываются сразу. Ошибка одного файла не останавливает
+ *  остальные (он доиграет потом сетевым путём). Возвращает функцию отмены. */
+export function preloadAudioAll(urls: string[],
+  onProgress: (p: { done: number; failed: number; total: number }) => void): () => void {
+  const list = [...new Set(urls.filter(u => u && !u.startsWith('blob:')))]
+  let done = 0, failed = 0, next = 0, cancelled = false
+  const report = () => { if (!cancelled) onProgress({ done, failed, total: list.length }) }
+  const worker = async () => {
+    while (!cancelled && next < list.length) {
+      const url = list[next++]
+      try { await toBlobUrl(url); done++ } catch { failed++ }
+      report()
+    }
+  }
+  report()
+  void Promise.all([worker(), worker()])
+  return () => { cancelled = true }
+}
+
 /** Гонка между промисом `p` и отменой по `signal`. Не отменяет саму `p`
  *  (это делает вызывающий по месту через try/catch AbortError выше), только
  *  позволяет НЕ ЖДАТЬ её дальше, если пришла отмена раньше. */
@@ -175,12 +202,58 @@ function abortable<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
   })
 }
 
+/** Дождаться метаданных (длины файла) — с отменой и потолком ожидания.
+ *  Ошибка загрузки не бросает: дальше её честно покажет play(). */
+function waitMetadata(el: HTMLAudioElement, signal?: AbortSignal, maxMs = 6000): Promise<void> {
+  if (el.readyState >= 1 && Number.isFinite(el.duration)) return Promise.resolve()
+  return new Promise((resolve, reject) => {
+    const done = () => { cleanup(); resolve() }
+    const onAbort = () => { cleanup(); reject(new DOMException('superseded', 'AbortError')) }
+    const t = setTimeout(done, maxMs)
+    function cleanup() {
+      clearTimeout(t)
+      el.removeEventListener('loadedmetadata', done)
+      el.removeEventListener('error', done)
+      signal?.removeEventListener('abort', onAbort)
+    }
+    el.addEventListener('loadedmetadata', done)
+    el.addEventListener('error', done)
+    signal?.addEventListener('abort', onAbort)
+  })
+}
+
+/** Чистая формула: с какой секунды стартовать, чтобы после старта осталось
+ *  не меньше `keepTail` секунд звука. Длина неизвестна — как просили. */
+export function safeStart(startAt: number, duration: number, keepTail: number): number {
+  if (!(startAt > 0)) return 0
+  if (!Number.isFinite(duration) || duration <= 0) return startAt
+  return Math.min(startAt, Math.max(0, duration - Math.max(keepTail, 1)))
+}
+
+/** Перемотка на `startAt` ДО запуска звука, по РЕАЛЬНОЙ длине файла (9.83).
+ *  Корень «секунда мелодии иногда не звучит»: точку старта выбирали по
+ *  номинальной длине трека из настроек раунда, и если файл короче, браузер
+ *  прыгал в конец — `playing` и сразу `ended`, тишина. Подрезка «потом»
+ *  (через 400 мс) перематывала уже остановленный элемент — звук так и не
+ *  шёл. Проверено в headless Chromium: файл 12 с, старт 15/18 → 0,00 с
+ *  звука (HANDOFF §3cf). Теперь сначала метаданные, потом безопасная
+ *  точка, потом play(). */
+async function seekSafely(el: HTMLAudioElement, startAt: number, keepTail: number,
+  signal?: AbortSignal): Promise<number> {
+  if (!(startAt > 0)) return 0
+  await waitMetadata(el, signal)
+  const at = safeStart(startAt, el.duration, keepTail)
+  el.currentTime = at
+  return at
+}
+
 /** Воспроизвести звук, при необходимости через запасной путь.
- *  `startAt` — секунда, с которой начать (0 — как раньше, с начала).
- *  Ставится СРАЗУ после `el.src`, до `play()`: браузер ставит сик в очередь
- *  и применяет его сам, как только придут метаданные — ждать их здесь не
- *  нужно (см. lib/melody.ts:melodyPreviewCeiling — «Угадай мелодию»,
- *  единственный вызывающий с startAt ≠ 0).
+ *  `startAt` — секунда, с которой начать (0 — с начала, без ожидания).
+ *  При `startAt > 0` сначала ждём метаданные и подрезаем точку по РЕАЛЬНОЙ
+ *  длине файла (`seekSafely`, оставляя `keepTail` секунд звука), и только
+ *  потом `play()` — иначе за концом файла браузер сразу останавливается
+ *  (9.83, HANDOFF §3cf). Реальная точка возвращается в `PlayResult.startAt`.
+ *  Единственный вызывающий с startAt ≠ 0 — «Угадай мелодию».
  *
  *  `signal` — необязательный AbortController.signal: если операция, которой
  *  принадлежит этот вызов, вытеснена новой (см. lib/sharedAudio.ts), сигнал
@@ -189,6 +262,8 @@ function abortable<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
  *  вызывающим — здесь только механика отмены. */
 export async function playAudio(
   el: HTMLAudioElement, url: string, startAt = 0, signal?: AbortSignal,
+  /** сколько секунд звука должно остаться после точки старта */
+  keepTail = 1,
 ): Promise<PlayResult> {
   live.add(el)                       // чтобы его точно можно было заглушить
 
@@ -198,12 +273,19 @@ export async function playAudio(
     if (hit) {
       try {
         el.src = hit
-        if (startAt) el.currentTime = startAt
+        const at = await seekSafely(el, startAt, keepTail, signal)
         await el.play()
-        return { ok: true }
+        return { ok: true, startAt: at }
       } catch (e) {
         const name = e instanceof Error ? e.name : ''
         if (signal?.aborted || name === 'AbortError') return SUPERSEDED
+        // запрет автозапуска — с файлом всё в порядке, НЕ выбрасываем его из
+        // памяти (ревью 9.85: после F5 проектора без клика первый же
+        // play() выкидывал заранее скачанный трек, а индикатор врал «все
+        // загружены»). Запасной путь тут тоже не поможет — нужен клик.
+        if (name === 'NotAllowedError') {
+          return { ok: false, reason: 'браузер не разрешил звук — кликните по экрану' }
+        }
         // запись протухла (blob отозван/битый) — забываем и идём обычным
         // путём. 9.62 (HANDOFF §3bx, находка 8): раньше запись просто
         // удалялась из cache БЕЗ revokeObjectURL — сам blob-URL утекал
@@ -218,9 +300,9 @@ export async function playAudio(
   // 1) как есть
   try {
     el.src = url
-    if (startAt) el.currentTime = startAt
+    const at = await seekSafely(el, startAt, keepTail, signal)
     await el.play()
-    return { ok: true }
+    return { ok: true, startAt: at }
   } catch (e) {
     const name = e instanceof Error ? e.name : ''
     // AbortError — воспроизведение ШТАТНО прервали (смена src/pause() до
@@ -238,9 +320,9 @@ export async function playAudio(
     const blobUrl = await abortable(toBlobUrl(url), signal)
     if (signal?.aborted) return SUPERSEDED
     el.src = blobUrl
-    if (startAt) el.currentTime = startAt
+    const at = await seekSafely(el, startAt, keepTail, signal)
     await el.play()
-    return { ok: true }
+    return { ok: true, startAt: at }
   } catch (e) {
     const name = e instanceof Error ? e.name : ''
     if (signal?.aborted || name === 'AbortError') return SUPERSEDED

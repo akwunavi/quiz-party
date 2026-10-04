@@ -10,6 +10,7 @@ import {
 } from '../lib/blitzState'
 import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
+import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { installAudioKeepAlive } from '../lib/audioKeepAlive'
 import { navFrom, quietStale } from '../lib/navGuard'
 import { blitzResults } from '../lib/blitz'
@@ -1130,6 +1131,12 @@ function BlitzScreen({ pack, round, gameState }: {
         // Одним запросом, не через очередь ответов — см. saveBlitzResults.
         await saveBlitzResults(gameState.game_id, gameState.round_number,
           blitzResults(toResults(next), settings.timeoutPenalty ?? 10))
+        // 9.80: всё, что не успели показать, — обратно в банк блица для
+        // следующих квизов (lib/blitzPool.ts). В фоне и без ошибок на экран:
+        // без входа редактора на проекторе запись не пройдёт — тогда это
+        // делается кнопкой в редакторе; повтор ничего не задвоит.
+        void afterBlitzFinished(round.id, blitzShownIds(state, next)).catch(err =>
+          console.warn('банк блица: неотыгранные не вернулись —', err instanceof Error ? err.message : err))
       }
     } finally { busy.current = false }
   }

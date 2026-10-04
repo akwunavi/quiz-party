@@ -59,7 +59,7 @@ describe('preloadAudio', () => {
     const live = createAudio() as unknown as { src: string }
 
     const firstBlobUrl = 'blob:x-0'
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 42; i++) {
       preloadAudio(`track${i}.mp3`)
       await Promise.resolve(); await Promise.resolve()
       resolvers[i]?.(new Blob())
@@ -71,5 +71,25 @@ describe('preloadAudio', () => {
     }
 
     expect(revoke).not.toHaveBeenCalledWith(firstBlobUrl)
+  })
+  it('запрет автозапуска (NotAllowedError) не выбрасывает скачанный трек из памяти', async () => {
+    const revoke = vi.fn()
+    vi.stubGlobal('URL', { createObjectURL: () => 'blob:t1', revokeObjectURL: revoke })
+    const { preloadAudio, playAudio } = await import('../audioSource')
+    preloadAudio('t1.mp3')
+    await Promise.resolve(); await Promise.resolve()
+    resolvers[0](new Blob())
+    await Promise.resolve(); await Promise.resolve()
+
+    const denied = Object.assign(new Error('denied'), { name: 'NotAllowedError' })
+    const el = { src: '', play: vi.fn().mockRejectedValue(denied) } as unknown as HTMLAudioElement
+    const r = await playAudio(el, 't1.mp3')
+    expect(r.ok).toBe(false)
+    expect(revoke).not.toHaveBeenCalled()
+    // после клика тот же трек снова берётся из памяти, без сети
+    const el2 = { src: '', play: vi.fn().mockResolvedValue(undefined) } as unknown as HTMLAudioElement
+    expect(await playAudio(el2, 't1.mp3')).toMatchObject({ ok: true })
+    expect(el2.src).toBe('blob:t1')
+    expect(fetchMediaBlob).toHaveBeenCalledTimes(1)
   })
 })

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass, melodyRevealMiss, melodySpinSchedule, melodySpinIndex,
+  melodySpin, melodyPick, melodyPlaySnippet, melodyAcceptAnswer, melodyClose, melodyPass, melodyRevealMiss, melodySpinPath, melodySpinAt, melodySpinSeed,
   melodyReveal, melodyToBoard, melodyPoints, melodyIdle, melodyFree, melodyKeys,
   melodyDeadline, melodyPreviewCeiling, melodyRandomStart,
   melodyMatches, guardMelody, melodyOrderFromBids, melodyBidSec,
@@ -186,33 +186,44 @@ describe('мелодия: передача хода', () => {
   })
 })
 
-describe('мелодия: барабан рулетки (9.76)', () => {
+describe('мелодия: барабан рулетки (9.83 — случайные прыжки)', () => {
   it('останавливается ровно на выбранной плитке при любом размере доски', () => {
     for (const len of [2, 3, 5, 12, 30]) {
       for (let target = 0; target < len; target++) {
         for (const ms of [2000, 5000, 8000]) {
-          const sch = melodySpinSchedule(len, target, ms)
-          expect(melodySpinIndex(sch, len, ms)).toBe(target)
-          expect(melodySpinIndex(sch, len, 1e9)).toBe(target)
+          const sp = melodySpinPath(len, target, ms, melodySpinSeed(`${len}-${target}-${ms}`))
+          expect(melodySpinAt(sp, ms)).toBe(target)
+          expect(melodySpinAt(sp, 1e9)).toBe(target)
         }
       }
     }
   })
 
-  it('идёт по порядку (каждый шаг — соседняя плитка) и замедляется к концу', () => {
-    const sch = melodySpinSchedule(12, 7, 5000)
-    for (let i = 1; i < sch.length; i++) expect(sch[i]).toBeGreaterThan(sch[i - 1])
-    const first = sch[1] - sch[0], last = sch[sch.length - 1] - sch[sch.length - 2]
-    expect(last).toBeGreaterThan(first * 3)
-    // последний шаг — заметно до конца: зал видит остановку
-    expect(sch[sch.length - 1]).toBeLessThanOrEqual(5000 - 500)
-    // не меньше одного полного круга
-    expect(sch.length).toBeGreaterThanOrEqual(12)
+  it('прыжки случайные, а не по порядку: одна плитка не горит два раза подряд', () => {
+    const sp = melodySpinPath(12, 7, 5000, melodySpinSeed('a'))
+    const seq = [sp.path0, ...sp.path]
+    for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1])
+    // «по порядку» дал бы шаг +1 почти всегда — у случайного пути таких мало
+    const consecutive = seq.slice(1).filter((v, i) => v === (seq[i] + 1) % 12).length
+    expect(consecutive).toBeLessThan(seq.length / 2)
   })
 
-  it('до старта подсвечена первая плитка, одна плитка — крутить нечего', () => {
-    expect(melodySpinIndex(melodySpinSchedule(5, 3, 5000), 5, 0)).toBe(0)
-    expect(melodySpinSchedule(1, 0, 5000)).toEqual([])
+  it('замедляется к концу, финал — заметно до конца стадии', () => {
+    const { times } = melodySpinPath(12, 7, 5000, 1)
+    for (let i = 1; i < times.length; i++) expect(times[i]).toBeGreaterThan(times[i - 1])
+    expect(times[times.length - 1] - times[times.length - 2]).toBeGreaterThan((times[1] - times[0]) * 3)
+    expect(times[times.length - 1]).toBeLessThanOrEqual(5000 - 500)
+  })
+
+  it('одно зерно — один путь на всех экранах', () => {
+    const s = melodySpinSeed('1-2|1759500000000')
+    expect(melodySpinPath(9, 4, 5000, s)).toEqual(melodySpinPath(9, 4, 5000, s))
+  })
+
+  it('до старта подсвечена не цель, одна плитка — крутить нечего', () => {
+    const sp = melodySpinPath(5, 3, 5000, 7)
+    expect(melodySpinAt(sp, 0)).not.toBe(3)
+    expect(melodySpinPath(1, 0, 5000, 7).times).toEqual([])
   })
 })
 
@@ -363,5 +374,18 @@ describe('мелодия: melodyEmergencyClose — закрывает при Л�
     expect(close({ key: '0-0', stage: 'idle' })).toBeNull()
     expect(close({ key: '0-0', stage: 'done' })).toBeNull()
     expect(close({ key: '0-0' })).toBeNull()
+  })
+})
+
+describe('мелодия: рулетка на двух свободных плитках (ревью 9.83)', () => {
+  it('подсветка не стоит на месте перед финалом ни при какой длительности', () => {
+    for (const ms of [2000, 3000, 4000, 5000, 6000, 8000]) {
+      for (const t of [0, 1]) {
+        const sp = melodySpinPath(2, t, ms, melodySpinSeed(`${ms}-${t}`))
+        const seq = [sp.path0, ...sp.path]
+        for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1])
+        expect(melodySpinAt(sp, ms)).toBe(t)
+      }
+    }
   })
 })

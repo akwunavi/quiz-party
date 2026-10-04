@@ -261,3 +261,10 @@
 .ed-match-count { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
 .ed-match-count button { min-width: 34px; padding: 4px 10px; font-weight: 700; }
 .ed-match-count b { min-width: 1.5em; text-align: center; font-size: 16px; color: var(--accent); }
+
+/* 9.80: банк блица в редакторе раунда */
+.ed-blitz-pool { margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--accent);
+  border-radius: 10px; display: flex; flex-direction: column; gap: 6px; }
+.ed-blitz-pool-head { font-weight: 700; }
+.ed-blitz-pool-head b { color: var(--accent); }
+.ed-blitz-pool-msg { font-size: 13px; color: var(--accent2); }
