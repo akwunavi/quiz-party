@@ -169,7 +169,10 @@ export function melodySpinPath(len: number, target: number, durationMs: number,
   if (len <= 1 || durationMs <= 0) return { path0: t, times: [], path: [] }
   const D = Math.max(400, durationMs - restMs)
   const a = 70, b = 620                              // прыжок в начале и в конце, мс
-  const n = Math.max(6, Math.round(D / (a + (b - a) / 4)))
+  let n = Math.max(6, Math.round(D / (a + (b - a) / 4)))
+  // две плитки — прыжки только чередуются: с не-цели на цель попадаем за
+  // НЕЧЁТНОЕ число прыжков, иначе перед финалом подсветка стояла бы на месте
+  if (len === 2 && n % 2 === 0) n += 1
   const delays: number[] = []
   for (let j = 1; j <= n; j++) delays.push(a + (b - a) * (j / n) ** 3)
   const k = D / delays.reduce((x, y) => x + y, 0)

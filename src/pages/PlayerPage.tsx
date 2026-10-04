@@ -1,5 +1,5 @@
 import { RoomPicker } from './RoomPicker'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { loadPack, displayRoundNumber, type LoadedPack, type LoadedRound } from '../lib/packLoader'
 import { registerTeam, heartbeat } from '../lib/gameActions'
@@ -438,6 +438,8 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   }
 
   const myRow = liveAnswers.find(a => a.team_id === team.id && a.question_ref === `q-${q.id}`)
+  // самое длинное слово фразы, в клетках — по нему ужимаются клетки (9.84)
+  const anLongest = Math.max(1, ...template.words.map(w => w.length))
   const verdict = gameState.reveal
     ? anagramPlayerVerdict({ sent: st.sent, loaded: answersLoaded, row: myRow, phrase }) : null
 
@@ -462,7 +464,11 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
                 ))}
               </div>
             )}
-            <div className="pl-an-words">
+            {/* --an-n — самое длинное слово (в клетках): по нему клетки
+                ужимаются, чтобы слово целиком влезло в ширину телефона
+                (переносим по словам, внутри слова не рвём — 9.84) */}
+            <div className="pl-an-words"
+              style={{ '--an-n': anLongest, '--an-g': anLongest >= 11 ? '2px' : '4px' } as CSSProperties}>
               {template.words.map((w, wi) => (
                 <span className="pl-an-word" key={wi}>
                   {w.map((c, ci) => {

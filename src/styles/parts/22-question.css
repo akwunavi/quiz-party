@@ -690,3 +690,14 @@
    Отступ — под подпись с зазором; только экранам с рамкой вопроса. */
 .theme-new_year .host-screen:has(> .q-frame),
 .theme-new_year .host-screen:has(> .q-split > .q-frame) { padding-top: 160px; }
+/* Ревью 9.83: рамка вопроса больше не сжимается, значит на невысоком экране
+   (1366×768) высоту при длинном вопросе + 3–4 картинках + вариантах обязаны
+   отдать картинки — их «пол» снижен (замер: НГ, 1366, длинный вопрос —
+   картинки заезжали на кнопки и шапку). Картинки остаются выключным рядом,
+   просто ниже. */
+@media (max-height: 900px) {
+  .host-screen.has-media.has-choices > .q-media-grid,
+  .host-screen.has-media.has-choices > .img-answers { min-height: min(12vh, 110px); }
+  .host-screen.has-media:not(.has-choices) > .q-media-grid,
+  .host-screen.has-media:not(.has-choices) > .img-answers { min-height: min(20vh, 180px); }
+}

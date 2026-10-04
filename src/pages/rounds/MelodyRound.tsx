@@ -187,7 +187,9 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
       ))
       stop = window.setTimeout(advance, sec * 1000)
     })
-    const guard = window.setTimeout(advance, (sec + 4) * 1000)
+    // метаданные файла ждутся до 6 с (audioSource.seekSafely) — страховка
+    // с запасом на них, как у «слушаем 1 секунду» (ревью 9.83)
+    const guard = window.setTimeout(advance, (sec + 8) * 1000)
     return () => {
       if (stop) clearTimeout(stop)
       clearTimeout(guard)

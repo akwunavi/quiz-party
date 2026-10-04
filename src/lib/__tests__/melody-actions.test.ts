@@ -376,3 +376,16 @@ describe('мелодия: melodyEmergencyClose — закрывает при Л�
     expect(close({ key: '0-0' })).toBeNull()
   })
 })
+
+describe('мелодия: рулетка на двух свободных плитках (ревью 9.83)', () => {
+  it('подсветка не стоит на месте перед финалом ни при какой длительности', () => {
+    for (const ms of [2000, 3000, 4000, 5000, 6000, 8000]) {
+      for (const t of [0, 1]) {
+        const sp = melodySpinPath(2, t, ms, melodySpinSeed(`${ms}-${t}`))
+        const seq = [sp.path0, ...sp.path]
+        for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1])
+        expect(melodySpinAt(sp, ms)).toBe(t)
+      }
+    }
+  })
+})
