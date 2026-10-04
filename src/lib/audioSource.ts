@@ -279,6 +279,13 @@ export async function playAudio(
       } catch (e) {
         const name = e instanceof Error ? e.name : ''
         if (signal?.aborted || name === 'AbortError') return SUPERSEDED
+        // запрет автозапуска — с файлом всё в порядке, НЕ выбрасываем его из
+        // памяти (ревью 9.85: после F5 проектора без клика первый же
+        // play() выкидывал заранее скачанный трек, а индикатор врал «все
+        // загружены»). Запасной путь тут тоже не поможет — нужен клик.
+        if (name === 'NotAllowedError') {
+          return { ok: false, reason: 'браузер не разрешил звук — кликните по экрану' }
+        }
         // запись протухла (blob отозван/битый) — забываем и идём обычным
         // путём. 9.62 (HANDOFF §3bx, находка 8): раньше запись просто
         // удалялась из cache БЕЗ revokeObjectURL — сам blob-URL утекал

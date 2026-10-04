@@ -186,6 +186,10 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
         cur => (cur.deadline ? null : { ...cur, deadline: inSec(sec) }),
       ))
       stop = window.setTimeout(advance, sec * 1000)
+      // звук пошёл — дальше отрывок закрывает обычный таймер на sec секунд;
+      // страховка нужна только на «так и не заиграло», иначе при долгой
+      // буферизации (>8 с) она обрезала бы отрывок посередине (ревью 9.85)
+      clearTimeout(guard)
     })
     // метаданные файла ждутся до 6 с (audioSource.seekSafely) — страховка
     // с запасом на них, как у «слушаем 1 секунду» (ревью 9.83)

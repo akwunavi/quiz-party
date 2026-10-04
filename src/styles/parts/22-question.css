@@ -698,6 +698,13 @@
 @media (max-height: 900px) {
   .host-screen.has-media.has-choices > .q-media-grid,
   .host-screen.has-media.has-choices > .img-answers { min-height: min(12vh, 110px); }
-  .host-screen.has-media:not(.has-choices) > .q-media-grid,
-  .host-screen.has-media:not(.has-choices) > .img-answers { min-height: min(20vh, 180px); }
+  /* :not(.no-qtext) — экран БЕЗ текста вопроса отдаёт картинкам всю высоту
+     (пол 66vh выше, 7.97); его тут не трогаем: вес :not() считается, и без
+     этой оговорки правило перебивало тот пол (ревью 9.85) */
+  .host-screen.has-media:not(.has-choices):not(.no-qtext) > .q-media-grid,
+  .host-screen.has-media:not(.has-choices):not(.no-qtext) > .img-answers { min-height: min(20vh, 180px); }
+  /* 5–6 картинок-ответов при вариантах: прежний пол 16vh (вес 0,4,0) этот
+     блок не перебивал — опускаем и его */
+  .host-screen.has-media.has-choices:not(.no-qtext) > .img-answers.n5,
+  .host-screen.has-media.has-choices:not(.no-qtext) > .img-answers.n6 { min-height: min(12vh, 110px); }
 }
