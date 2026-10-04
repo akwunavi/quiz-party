@@ -113,7 +113,13 @@ export function QuestionScreen({
   const media = q.media.question ?? []
   const imgs = media.filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const avs = media.filter(m => /\.(mp3|mp4|webm|wav)$/i.test(m))
-  const split = !!q.question_text.trim() && imgs.length === 1 && !q.media.hidden
+  // Сплит «текст слева — картинки справа»: для одной картинки и (9.83) для
+  // ДВУХ, если они не картинки-варианты с буквами. Раньше две картинки шли
+  // рядом под рамкой во всю ширину, и рамке оставалась полоска: кегль
+  // вопроса падал до 30px на 1920 и 11px на 1366 (замер рендером).
+  const splitN = q.answer.mode === 'match' || (q.answer.mode === 'choice'
+    && q.answer.choices.length === imgs.length) ? 1 : 2
+  const split = !!q.question_text.trim() && imgs.length >= 1 && imgs.length <= splitN && !q.media.hidden
   const choices = q.answer.mode === 'choice' ? q.answer.choices
     : q.answer.mode === 'order' ? q.answer.choices : null
   const isNY = pack.theme === 'new_year'
@@ -162,12 +168,17 @@ export function QuestionScreen({
             {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
             <WindText key={q.id} text={q.question_text} />
           </div>
-          <div className="q-media-grid n1" style={mediaScaleVar(q)}>
-            {imgs.map((m, i) => (
-              <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
-                {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
-            ))}
-          </div>
+          {imgs.length === 1
+            ? <div className="q-media-grid n1" style={mediaScaleVar(q)}>
+                {imgs.map((m, i) => (
+                  <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
+                    {q.answer.mode === 'match' && <figcaption>{i + 1}</figcaption>}</figure>
+                ))}
+              </div>
+            /* две картинки — выключным рядом в правой колонке, по высоте ряда */
+            : <div className="q-media-grid n2 eq-row split-pair" style={mediaScaleVar(q)}>
+                {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+              </div>}
         </div>
       ) : (
         <>

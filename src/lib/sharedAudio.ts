@@ -25,7 +25,10 @@
 // запущенные выбором с телефона (там нет жеста на проекторе).
 import { playAudio, createAudio, onStopAll, SUPERSEDED, type PlayResult } from './audioSource'
 
-export type SharedPlayOpts = { startAt?: number; loop?: boolean; volume?: number }
+export type SharedPlayOpts = { startAt?: number; loop?: boolean; volume?: number
+  /** сколько секунд звука должно остаться после startAt — точка старта
+   *  подрезается по РЕАЛЬНОЙ длине файла до запуска (audioSource.seekSafely) */
+  keepTail?: number }
 
 type Ev = 'playing' | 'ended' | 'loadedmetadata'
 
@@ -90,7 +93,7 @@ function run(op: Op, src: string, opts: SharedPlayOpts | undefined): Promise<Pla
   // ПРЕДЫДУЩЕЙ операции, уже стоящее в очереди задач браузера, может
   // долететь до новой операции (F1, HANDOFF §3bu/§3bw).
   op.subs.forEach(s => { if (!s.attached) attachSub(op, s) })
-  return playAudio(e, src, opts?.startAt ?? 0, op.ctrl.signal)
+  return playAudio(e, src, opts?.startAt ?? 0, op.ctrl.signal, opts?.keepTail ?? 1)
 }
 
 export function playShared(src: string, opts?: SharedPlayOpts): SharedPlayback {

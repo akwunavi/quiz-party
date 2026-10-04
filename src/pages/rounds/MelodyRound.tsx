@@ -24,9 +24,9 @@ import { mediaUrl } from '../../lib/media'
 // разошёлся бы с проектором.
 import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/melodyActions'
 import {
-  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyRevealMiss, melodyPass, melodySpinSchedule, melodySpinIndex,
+  melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyRevealMiss, melodyPass, melodySpinPath, melodySpinAt, melodySpinSeed,
   melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
-  melodyEmergencyClose,
+  melodyEmergencyClose, MELODY_MAX_BID_SEC,
 } from '../../lib/melody'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
@@ -162,7 +162,7 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
     // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
-    const h = playShared(mediaUrl(track.audio), { startAt: m.startSec ?? 0 })
+    const h = playShared(mediaUrl(track.audio), { startAt: m.startSec ?? 0, keepTail: sec })
     let stop: number | undefined
     let advanced = false
     const advance = () => {
@@ -250,16 +250,23 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   useEffect(() => {
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
-    const h = playShared(mediaUrl(track.audio), { startAt: requested })
+    // keepTail: после точки старта должно остаться место под самый длинный
+    // отрывок по ставке. Точка подрезается по РЕАЛЬНОЙ длине файла ДО
+    // запуска звука (audioSource.seekSafely, 9.83): раньше подрезка шла
+    // через 400 мс после старта — если файл короче номинальной длины,
+    // браузер успевал прыгнуть в конец и остановиться, и «1 секунда»
+    // проходила в тишине (HANDOFF §3cf).
+    const h = playShared(mediaUrl(track.audio), { startAt: requested, keepTail: MELODY_MAX_BID_SEC })
     let stop: number | undefined
     let advanced = false
-    // Исправленный startSec (см. checkReal ниже) копится ЗДЕСЬ, а не пишется
-    // отдельным saveMelody — раньше это был самостоятельный сетевой вызов,
-    // который мог долететь ПОСЛЕ записи advance() (стадия уже 'bidding') и
-    // затереть её обратно на 'listen' своим устаревшим спредом {...m}
-    // (HANDOFF.md §3bu, F9). Теперь коррекция просто подмешивается в тот же
-    // save, что делает advance().
+    let started = false
+    // Исправленная точка копится ЗДЕСЬ и уходит в ту же запись, что и
+    // переход стадии (HANDOFF §3bu, F9) — отрывок по ставке стартует
+    // с той же, уже проверенной точки.
     let correctedStart: number | undefined
+    void h.result.then(r => {
+      if (r.ok && r.startAt != null && Math.abs(r.startAt - requested) > 0.01) correctedStart = r.startAt
+    })
     const advance = () => {
       if (advanced) return
       advanced = true
@@ -273,37 +280,19 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
         }),
       ))
     }
-    // Страховка на файл КОРОЧЕ заявленной длины (round.settings.trackSec):
-    // точка старта уже выбрана в melodySpin/melodyPick по НОМИНАЛЬНОЙ длине,
-    // а реальную браузер знает только после метаданных. Если он успел
-    // сказать — подрезаем и ЗАПОМИНАЕМ исправленное значение (снипет по
-    // ставке должен стартовать с той же, уже проверенной точки, не заново
-    // рисковать). Не успел за короткий бюджет (400мс, метаданные для уже
-    // закешированного трека приходят почти мгновенно) — играем как выбрали,
-    // не задерживаем игру ради подстраховки.
-    let metaChecked = false
-    const checkReal = () => {
-      if (metaChecked) return
-      metaChecked = true
-      if (!h.isCurrent()) return       // гонка с новой операцией — не мутируем чужой el
-      const dur = h.el.duration
-      if (!dur || !isFinite(dur)) return
-      const safe = Math.min(requested, Math.max(0, dur - 10))
-      if (safe !== requested) {
-        try { h.el.currentTime = safe } catch { /* не критично — сыграет как есть */ }
-        correctedStart = safe
-      }
-    }
-    const offMeta = h.on('loadedmetadata', checkReal)
-    const metaGuard = window.setTimeout(checkReal, 400)
-    // секунда считается от РЕАЛЬНОГО начала звука
-    const offPlaying = h.on('playing', () => { stop = window.setTimeout(advance, 1000) })
-    // страховка: если звук так и не пошёл (нет файла) — не зависаем
-    const guard = window.setTimeout(advance, 4000)
+    // секунда считается от РЕАЛЬНОГО начала звука; повторный `playing`
+    // (докачка посреди) отсчёт не перезапускает
+    const offPlaying = h.on('playing', () => {
+      if (started) return
+      started = true
+      stop = window.setTimeout(advance, 1000)
+    })
+    // страховка: если звук так и не пошёл (нет файла) — не зависаем.
+    // Метаданные ждём до 6 с (seekSafely), поэтому и потолок чуть больше
+    const guard = window.setTimeout(advance, 8000)
     return () => {
       if (stop) clearTimeout(stop)
-      clearTimeout(guard); clearTimeout(metaGuard)
-      offMeta()
+      clearTimeout(guard)
       offPlaying()
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
@@ -634,13 +623,12 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   )
 }
 
-/** Барабан: подсветка бежит по свободным плиткам ПО ПОРЯДКУ (слева
- *  направо, сверху вниз), плавно замедляется и останавливается ровно на
- *  выбранном треке (9.76). Расписание шагов — чистая melodySpinSchedule,
- *  считается от дедлайна стадии, поэтому длительность совпадает с тем, что
- *  записал melodySpin (раньше барабан думал, что крутится 10 с, а стадия
- *  длилась 5 — замедление не успевало, и в последнюю секунду подсветка
- *  перескакивала на выбранную плитку из случайного места). */
+/** Барабан: подсветка прыгает по случайным свободным плиткам, плавно
+ *  замедляется и последним прыжком встаёт на выбранный трек. Путь — чистая
+ *  melodySpinPath с зерном из ключа трека и дедлайна (одинаковый на всех
+ *  экранах), время — от дедлайна стадии, длительность — та, что записал
+ *  melodySpin (`spinMs`), поэтому экран, открытый посреди вращения,
+ *  подхватывает его с нужного места. */
 function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotalMs, onPick, theme }: {
   themes: MelodyTheme[]; played: string[]
   spinning: boolean; spinKey?: string
@@ -654,15 +642,9 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
   theme?: ThemeKey
 }) {
   const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
-  // порядок обхода — как читают зал: строка за строкой, слева направо
-  const free = keys.filter(k => !played.includes(k)).sort((x, y) => {
-    const [xt, xi] = x.split('-').map(Number), [yt, yi] = y.split('-').map(Number)
-    return xi - yi || xt - yt
-  })
+  const free = keys.filter(k => !played.includes(k))
   const [cursor, setCursor] = useState(-1)
 
-  // Один цикл на весь барабан. Старт — дедлайн минус полная длительность:
-  // экран, открытый посреди вращения, подхватит его с нужного места.
   const freeSig = free.join(',')
   useEffect(() => {
     if (!spinning || !spinKey || free.length === 0) { setCursor(-1); return }
@@ -670,11 +652,11 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
     if (target < 0) { setCursor(-1); return }
     const end = spinDeadline || Date.now() + spinTotalMs
     const start = end - spinTotalMs
-    const schedule = melodySpinSchedule(free.length, target, spinTotalMs)
+    const spin = melodySpinPath(free.length, target, spinTotalMs, melodySpinSeed(`${spinKey}|${end}`))
     let raf = 0
     const tick = () => {
       const elapsed = Date.now() - start
-      setCursor(schedule.length ? melodySpinIndex(schedule, free.length, elapsed) : target)
+      setCursor(melodySpinAt(spin, elapsed))
       if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
     }
     tick()

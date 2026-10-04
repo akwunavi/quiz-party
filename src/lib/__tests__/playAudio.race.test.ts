@@ -73,7 +73,7 @@ describe('playAudio: AbortSignal вместо isStale', () => {
     // прямой путь на el2 должен упасть (не blob), но playAudio должна сначала
     // проверить кеш ДО прямого запроса — el2.play() не должен звать 'cached.mp3' напрямую
     const r2 = await playAudio(el2, 'cached.mp3')
-    expect(r2).toEqual({ ok: true })
+    expect(r2).toMatchObject({ ok: true })
     expect(fetchMediaBlob).toHaveBeenCalledTimes(1)
   })
 
@@ -86,7 +86,7 @@ describe('playAudio: AbortSignal вместо isStale', () => {
 
     resolveFetch(new Blob())
     const r = await p
-    expect(r).toEqual({ ok: true })
+    expect(r).toMatchObject({ ok: true })
   })
 })
 

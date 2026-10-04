@@ -640,3 +640,53 @@
   .host-screen.has-media.has-choices > .img-answers.n6 { min-height: min(16vh, 140px); }
 }
 
+
+/* ═══ 9.83: ДИЗАЙН-ПРОХОД ЭКРАНА «КАРТИНКИ + ВАРИАНТЫ» ═══
+   Жалоба ведущего: «слишком большие кнопки и слишком маленькие картинки,
+   заголовок не читается издалека». Замер до правки (1920×1080, классика):
+   плитки вариантов 114px высотой при кегле 52px и пустоте в половину
+   ширины, картинки 408px, а вопрос рядом с двумя картинками — 30px
+   (на 1366 — 11px: рамка ужималась flex-shrink'ом в полоску).
+   Иерархия для зала: (1) картинки — главное, их разглядывают; (2) вопрос
+   — читается с задних столов; (3) варианты — подписи, их нужно прочесть,
+   но не кричать ими. Поэтому:
+   – рамка вопроса рядом с картинками больше НЕ сжимается (flex-shrink: 0)
+     — высоту отдают картинки, а не текст;
+   – плитки вариантов компактнее: кегль ~2vw вместо 2.9vw, поля меньше;
+   – две картинки встают в сплит справа от текста (QuestionScreen). */
+.host-screen.has-media > .cyber-frame,
+.host-screen.has-media > .q-frame,
+.host-screen.has-media > .mg-frame { flex-shrink: 0; }
+.host-screen.has-media.has-choices > .choices-grid { gap: clamp(8px, 1vw, 22px);
+  padding-top: clamp(8px, 1.4vh, 26px); }
+.theme-potter .host-screen.has-media.has-choices > .choices-grid .choice-plate,
+.host-screen.has-media.has-choices > .choices-grid .choice-plate {
+  padding: clamp(8px, 1.1vh, 22px) clamp(14px, 1.4vw, 34px); }
+.theme-potter .host-screen.has-media.has-choices > .choices-grid:not(.c-l):not(.c-xl) .choice-plate,
+.host-screen.has-media.has-choices > .choices-grid:not(.c-l):not(.c-xl) .choice-plate {
+  font-size: clamp(19px, 2vw, 76px); }
+/* две картинки в сплите: ряд во всю высоту колонки */
+.host-screen .q-split > .q-media-grid.split-pair { height: 100%; width: 100%; min-height: 0;
+  min-width: 0; margin: 0; align-items: center; }
+/* Заголовок над картинками и вариантами — читается с задних столов.
+   Было: потолок 35–40px (len-l 26px) — на 1920 вопрос выходил 30px, мельче
+   подписей вариантов. Теперь вопрос крупнее вариантов на любой ширине.
+   Только для рамки во всю ширину (прямой ребёнок экрана): в сплите кегль
+   считается от ширины колонки (cqw) своими правилами выше. */
+.host-screen.has-media.has-choices > :is(.cyber-frame, .q-frame, .mg-frame) .q-text {
+  font-size: clamp(22px, 2.6vw, 100px); }
+.host-screen.has-media.has-choices > :is(.cyber-frame, .q-frame, .mg-frame) .q-text.len-m {
+  font-size: clamp(21px, 2.4vw, 92px); }
+.host-screen.has-media.has-choices > :is(.cyber-frame, .q-frame, .mg-frame) .q-text.len-l {
+  font-size: clamp(20px, 2.15vw, 82px); }
+.host-screen.has-media.has-choices > :is(.cyber-frame, .q-frame, .mg-frame) .q-text.len-xl {
+  font-size: clamp(18px, 1.85vw, 70px); }
+/* две картинки в сплите: им ширины больше, чем одной — текст колонку
+   уступает (его кегль от ширины колонки, он ужмётся сам) */
+.host-screen .q-split:has(> .split-pair) { grid-template-columns: 0.85fr 1.15fr; }
+/* НГ: подпись «Р1 · ВОПРОС N» висит до y≈147, а отступ экрана темы —
+   128px (11-projector-media.css): рамка вопроса на ВСЕХ экранах вопроса НГ
+   заходила верхней кромкой на подпись (замер рендером 9.83, было и раньше).
+   Отступ — под подпись с зазором; только экранам с рамкой вопроса. */
+.theme-new_year .host-screen:has(> .q-frame),
+.theme-new_year .host-screen:has(> .q-split > .q-frame) { padding-top: 160px; }

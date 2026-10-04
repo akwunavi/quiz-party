@@ -27,7 +27,9 @@
 import { readMedia } from './packCache'
 import { fetchMediaBlob } from './media'
 
-export type PlayResult = { ok: true } | { ok: false; reason: string }
+/** `startAt` в ok — секунда, с которой РЕАЛЬНО пошёл звук (после подрезки
+ *  по настоящей длине файла, см. seekSafely). */
+export type PlayResult = { ok: true; startAt?: number } | { ok: false; reason: string }
 
 /** Вытеснено новой операцией — не ошибка, происходит постоянно и штатно. */
 export const SUPERSEDED = { ok: false, reason: 'superseded' } as const
@@ -175,6 +177,51 @@ function abortable<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
   })
 }
 
+/** Дождаться метаданных (длины файла) — с отменой и потолком ожидания.
+ *  Ошибка загрузки не бросает: дальше её честно покажет play(). */
+function waitMetadata(el: HTMLAudioElement, signal?: AbortSignal, maxMs = 6000): Promise<void> {
+  if (el.readyState >= 1 && Number.isFinite(el.duration)) return Promise.resolve()
+  return new Promise((resolve, reject) => {
+    const done = () => { cleanup(); resolve() }
+    const onAbort = () => { cleanup(); reject(new DOMException('superseded', 'AbortError')) }
+    const t = setTimeout(done, maxMs)
+    function cleanup() {
+      clearTimeout(t)
+      el.removeEventListener('loadedmetadata', done)
+      el.removeEventListener('error', done)
+      signal?.removeEventListener('abort', onAbort)
+    }
+    el.addEventListener('loadedmetadata', done)
+    el.addEventListener('error', done)
+    signal?.addEventListener('abort', onAbort)
+  })
+}
+
+/** Чистая формула: с какой секунды стартовать, чтобы после старта осталось
+ *  не меньше `keepTail` секунд звука. Длина неизвестна — как просили. */
+export function safeStart(startAt: number, duration: number, keepTail: number): number {
+  if (!(startAt > 0)) return 0
+  if (!Number.isFinite(duration) || duration <= 0) return startAt
+  return Math.min(startAt, Math.max(0, duration - Math.max(keepTail, 1)))
+}
+
+/** Перемотка на `startAt` ДО запуска звука, по РЕАЛЬНОЙ длине файла (9.83).
+ *  Корень «секунда мелодии иногда не звучит»: точку старта выбирали по
+ *  номинальной длине трека из настроек раунда, и если файл короче, браузер
+ *  прыгал в конец — `playing` и сразу `ended`, тишина. Подрезка «потом»
+ *  (через 400 мс) перематывала уже остановленный элемент — звук так и не
+ *  шёл. Проверено в headless Chromium: файл 12 с, старт 15/18 → 0,00 с
+ *  звука (HANDOFF §3cf). Теперь сначала метаданные, потом безопасная
+ *  точка, потом play(). */
+async function seekSafely(el: HTMLAudioElement, startAt: number, keepTail: number,
+  signal?: AbortSignal): Promise<number> {
+  if (!(startAt > 0)) return 0
+  await waitMetadata(el, signal)
+  const at = safeStart(startAt, el.duration, keepTail)
+  el.currentTime = at
+  return at
+}
+
 /** Воспроизвести звук, при необходимости через запасной путь.
  *  `startAt` — секунда, с которой начать (0 — как раньше, с начала).
  *  Ставится СРАЗУ после `el.src`, до `play()`: браузер ставит сик в очередь
@@ -189,6 +236,8 @@ function abortable<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
  *  вызывающим — здесь только механика отмены. */
 export async function playAudio(
   el: HTMLAudioElement, url: string, startAt = 0, signal?: AbortSignal,
+  /** сколько секунд звука должно остаться после точки старта */
+  keepTail = 1,
 ): Promise<PlayResult> {
   live.add(el)                       // чтобы его точно можно было заглушить
 
@@ -198,9 +247,9 @@ export async function playAudio(
     if (hit) {
       try {
         el.src = hit
-        if (startAt) el.currentTime = startAt
+        const at = await seekSafely(el, startAt, keepTail, signal)
         await el.play()
-        return { ok: true }
+        return { ok: true, startAt: at }
       } catch (e) {
         const name = e instanceof Error ? e.name : ''
         if (signal?.aborted || name === 'AbortError') return SUPERSEDED
@@ -218,9 +267,9 @@ export async function playAudio(
   // 1) как есть
   try {
     el.src = url
-    if (startAt) el.currentTime = startAt
+    const at = await seekSafely(el, startAt, keepTail, signal)
     await el.play()
-    return { ok: true }
+    return { ok: true, startAt: at }
   } catch (e) {
     const name = e instanceof Error ? e.name : ''
     // AbortError — воспроизведение ШТАТНО прервали (смена src/pause() до
@@ -238,9 +287,9 @@ export async function playAudio(
     const blobUrl = await abortable(toBlobUrl(url), signal)
     if (signal?.aborted) return SUPERSEDED
     el.src = blobUrl
-    if (startAt) el.currentTime = startAt
+    const at = await seekSafely(el, startAt, keepTail, signal)
     await el.play()
-    return { ok: true }
+    return { ok: true, startAt: at }
   } catch (e) {
     const name = e instanceof Error ? e.name : ''
     if (signal?.aborted || name === 'AbortError') return SUPERSEDED

@@ -41,6 +41,17 @@ export type UseFitTextOpts = {
  * Вписывает текст в родительский блок.
  * @param deps пересчитать при смене этих значений (обычно id вопроса)
  */
+/** Ширина текста элемента без декора: прямоугольник Range по его
+ *  содержимому (псевдоэлементы и абсолютно спозиционированный декор сюда
+ *  не входят). Нет Range (не браузер) — прежний scrollWidth. */
+function textWidth(el: HTMLElement): number {
+  if (typeof document === 'undefined' || !document.createRange) return el.scrollWidth
+  const r = document.createRange()
+  r.selectNodeContents(el)
+  const w = r.getBoundingClientRect().width
+  return w > 0 ? w : el.scrollWidth
+}
+
 export function useFitText<T extends HTMLElement>(
   deps: unknown[] = [], opts: UseFitTextOpts = {},
 ) {
@@ -78,7 +89,16 @@ export function useFitText<T extends HTMLElement>(
         const cs = getComputedStyle(box)
         const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
         const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-        return el.scrollHeight <= availH + 1 && el.scrollWidth <= availW + 1
+        // Мерим САМ ТЕКСТ, а не scroll-размеры: scrollWidth/scrollHeight
+        // включают декор (псевдоэлементы, свечения, трансформы анимаций).
+        // У заголовка темы ГП свечение ::before в 3 раза шире текста —
+        // scrollWidth 2483 при тексте 815: любая подгонка (например после
+        // исчезновения плашки «звук заблокирован») ужимала вопрос до
+        // минимума, 49px → 22px (9.83, замер рендером). Высота — по
+        // раскладке блока (offsetHeight: трансформы и абсолютный декор
+        // её не раздувают), ширина — по границам текста (Range), чтобы
+        // длинное неразрывное слово всё равно ловилось.
+        return el.offsetHeight <= availH + 1 && textWidth(el) <= availW + 1
       }
       if (fits()) return
 
