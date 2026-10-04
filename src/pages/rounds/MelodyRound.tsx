@@ -9,7 +9,7 @@
 // фоновая музыка) → passed (вторая слушает трек целиком, с начала)
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
-import { createAudio, preloadAudio } from '../../lib/audioSource'
+import { createAudio, preloadAudio, preloadAudioAll } from '../../lib/audioSource'
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
@@ -331,6 +331,19 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     preloadAudio(mediaUrl(track.audio))
   }, [preview, m.key, m.stage])
 
+  // ── ВСЕ треки раунда — в память при первом входе на доску (9.85) ──
+  // Раньше трек качался только когда рулетка его выбрала: за 5 секунд
+  // вращения на слабом Wi-Fi бара он мог не успеть. Теперь ведущий видит
+  // прогресс «♪ треки 12/20» и может потянуть время, пока не скачается всё.
+  const [loadState, setLoadState] = useState<{ done: number; failed: number; total: number } | null>(null)
+  const trackUrls = themes.flatMap(t => t.tracks.map(tr => tr.audio)).filter(Boolean).map(a => mediaUrl(a))
+  const trackSig = trackUrls.join('|')
+  useEffect(() => {
+    if (preview || trackUrls.length === 0) return
+    return preloadAudioAll(trackUrls, setLoadState)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, trackSig])
+
   // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
   useEffect(() => {
     if (preview || !bgMusic) return
@@ -428,6 +441,17 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
           живую сессию. В предпросмотре не рендерятся вовсе (HANDOFF.md). */}
       {!preview && idle && (
         <div className="host-actions">
+          {/* прогресс скачивания треков раунда (9.85): пока не 100% — можно
+              потянуть время; ошибки — трек доиграет сетью, но предупреждаем */}
+          {loadState && loadState.total > 0 && (
+            <span className={`mel-load${loadState.done + loadState.failed >= loadState.total ? ' ready' : ''}${loadState.failed ? ' warn' : ''}`}>
+              {loadState.done + loadState.failed < loadState.total
+                ? `♪ треки ${loadState.done}/${loadState.total}…`
+                : loadState.failed
+                  ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}`
+                  : '♪ все треки загружены'}
+            </span>
+          )}
           {freeKeys.length > 0
             ? (manualPick
                 ? <>

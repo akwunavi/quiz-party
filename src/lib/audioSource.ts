@@ -91,7 +91,11 @@ function pathFromUrl(url: string): string | null {
 // blob, который сейчас реально стоит в src у живого элемента — revoke на
 // играющем элементе обрывает звук.
 const cache = new Map<string, string>()
-const MAX_CACHED_BLOBS = 8
+// 9.85: 8 → 40 — раунд «Угадай мелодию» качает ВСЕ свои треки при входе на
+// доску (preloadAudioAll), 16–30 файлов; при 8 первые вытеснялись бы раньше,
+// чем до них дойдёт рулетка. 40 треков по 3–5 МБ — 120–200 МБ памяти
+// проектора, для ноутбука терпимо.
+const MAX_CACHED_BLOBS = 40
 
 function evictOldIfNeeded() {
   if (cache.size <= MAX_CACHED_BLOBS) return
@@ -159,6 +163,27 @@ async function toBlobUrl(url: string): Promise<string> {
 export function preloadAudio(url: string): void {
   if (url.startsWith('blob:') || cache.has(url) || inflight.has(url)) return
   void toBlobUrl(url).catch(() => {})
+}
+
+/** Скачать в память ВСЕ треки (раунд «Угадай мелодию», 9.85) — по два
+ *  одновременно, чтобы не забить канал бара, — сообщая прогресс.
+ *  Уже скачанные засчитываются сразу. Ошибка одного файла не останавливает
+ *  остальные (он доиграет потом сетевым путём). Возвращает функцию отмены. */
+export function preloadAudioAll(urls: string[],
+  onProgress: (p: { done: number; failed: number; total: number }) => void): () => void {
+  const list = [...new Set(urls.filter(u => u && !u.startsWith('blob:')))]
+  let done = 0, failed = 0, next = 0, cancelled = false
+  const report = () => { if (!cancelled) onProgress({ done, failed, total: list.length }) }
+  const worker = async () => {
+    while (!cancelled && next < list.length) {
+      const url = list[next++]
+      try { await toBlobUrl(url); done++ } catch { failed++ }
+      report()
+    }
+  }
+  report()
+  void Promise.all([worker(), worker()])
+  return () => { cancelled = true }
 }
 
 /** Гонка между промисом `p` и отменой по `signal`. Не отменяет саму `p`
