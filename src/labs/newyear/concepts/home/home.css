@@ -1,0 +1,281 @@
+/* ═══ CONCEPT 4 · ТЁПЛЫЙ ДОМ ═══
+   Комната 2400×1350 «в декорациях», камера — transform всего набора.
+   Палитра: бутылочно-зелёные обои, тёплое дерево, янтарный свет, рубин,
+   голубой свет кинескопа. Шрифты: Cormorant Garamond (заставки, как в
+   титрах старого ТВ) + Lora (текст на экране). */
+.nyl-c4 {
+  --h-wall: #1d3b38; --h-wood: #6a3a1e; --h-amber: #ffc46b; --h-ruby: #c8323a; --h-cream: #fff4dc; --h-crt: #0b1735;
+  --h-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --h-body: 'Lora', Georgia, serif;
+}
+.h-scene { position: absolute; inset: 0; overflow: hidden; background: #120c08; color: var(--h-cream); font-family: var(--h-body); }
+
+/* ── камера ── */
+.h-set { position: absolute; left: 0; top: 0; width: 2400px; height: 1350px; transform-origin: 0 0; transform: var(--to);
+  animation: h-cam var(--dur) cubic-bezier(.55, .05, .25, 1) var(--delay) both; }
+@keyframes h-cam { from { transform: var(--from); } to { transform: var(--to); } }
+.h-set > * { position: absolute; }
+
+/* ── стены, пол, окно ── */
+.h-wall { left: 0; top: 0; width: 2400px; height: 985px; transition: filter 2s ease;
+  background:
+    radial-gradient(ellipse 34% 46% at 83% 62%, rgba(255, 180, 90, 0.26), rgba(255, 180, 90, 0) 70%),
+    radial-gradient(ellipse 20% 30% at 53% 52%, rgba(140, 180, 255, 0.16), rgba(140, 180, 255, 0) 70%),
+    radial-gradient(ellipse 60% 70% at 50% 40%, rgba(255, 210, 150, 0.12), rgba(0, 0, 0, 0) 80%),
+    radial-gradient(circle at 50% 50%, rgba(255, 228, 180, 0.06) 0 9px, rgba(0, 0, 0, 0) 10px) 0 0 / 84px 84px,
+    radial-gradient(ellipse 12px 26px at 50% 50%, rgba(255, 228, 180, 0.05) 0 100%, rgba(0, 0, 0, 0) 101%) 42px 42px / 84px 84px,
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.07) 0 3px, rgba(0, 0, 0, 0) 3px 126px),
+    linear-gradient(180deg, #13292a 0%, #1d3b38 40%, #1a3532 100%); }
+.h-set.is-midnight .h-wall { filter: brightness(0.6) saturate(0.9); }
+.h-cornice { left: 0; top: 0; width: 2400px; height: 46px; background: linear-gradient(180deg, #d8ccb4, #b8a888 70%, #6d6250); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35); }
+.h-floor { left: 0; top: 985px; width: 2400px; height: 365px; overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 40%),
+    repeating-linear-gradient(45deg, #5b311a 0 34px, #6e3c20 34px 68px),
+    #5b311a; }
+.h-floor::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.14) 0 2px, rgba(0, 0, 0, 0) 2px 96px); }
+.h-rug { position: absolute; left: 860px; top: 60px; width: 900px; height: 250px; border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, #c13a2e 0 22%, #e2b24e 23% 25%, #7a1a1c 26% 46%, #e2b24e 47% 49%, #2c4a6a 50% 64%, #e2b24e 65% 67%, #8a1f1f 68% 98%, rgba(0, 0, 0, 0) 99%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); opacity: 0.92; }
+.h-baseboard { left: 0; top: 965px; width: 2400px; height: 26px; background: linear-gradient(180deg, #3d2012, #24120a); }
+.h-window { border-radius: 6px; background: #ebe3d3; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 0 0 3px #cfc4ad; }
+.h-night { position: absolute; left: 24px; top: 24px; right: 24px; bottom: 24px; overflow: hidden;
+  background: linear-gradient(180deg, #071226 0%, #11264a 55%, #2a4772 82%, #c9d8ea 83%, #e9f0f8 100%); }
+.h-houses { position: absolute; left: -20px; right: -20px; bottom: 90px; height: 170px;
+  background:
+    radial-gradient(circle, #ffd27a 0 3px, rgba(0, 0, 0, 0) 4px) 12px 30px / 34px 30px,
+    linear-gradient(180deg, #0c1830, #0a1428);
+  clip-path: polygon(0 40%, 18% 40%, 18% 10%, 36% 10%, 36% 30%, 52% 30%, 52% 0, 70% 0, 70% 26%, 86% 26%, 86% 46%, 100% 46%, 100% 100%, 0 100%);
+  opacity: 0.95; }
+.h-lamp { position: absolute; left: 270px; bottom: 90px; width: 6px; height: 190px; background: #0c1428; }
+.h-lamp span { position: absolute; left: -60px; top: -40px; width: 126px; height: 126px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 140, 0.95) 0 6%, rgba(255, 190, 110, 0.35) 18%, rgba(255, 190, 110, 0) 60%); }
+.h-mullion-v { position: absolute; left: 50%; top: 24px; bottom: 24px; width: 18px; margin-left: -9px; background: #ebe3d3; box-shadow: 0 0 0 1px #cfc4ad; }
+.h-mullion-h { position: absolute; left: 24px; right: 24px; top: 34%; height: 18px; background: #ebe3d3; box-shadow: 0 0 0 1px #cfc4ad; }
+.h-tulle { position: absolute; top: -10px; bottom: -40px; width: 120px; opacity: 0.55;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 6px, rgba(255, 255, 255, 0.15) 6px 14px); }
+.h-tulle-l { left: -30px; } .h-tulle-r { right: -30px; }
+.h-snowwrap { left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; z-index: 1; }
+.h-fw { position: absolute; width: 0; height: 0; }
+.h-fw i { position: absolute; left: -2px; top: -2px; width: 5px; height: 5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c);
+  animation: h-fw 2.7s cubic-bezier(.2, .8, .3, 1) var(--d) infinite both; }
+/* салют за окном: искры разлетаются и гаснут, следующий залп — с паузой */
+@keyframes h-fw {
+  0% { transform: rotate(var(--a)) translateY(0); opacity: 0; }
+  6% { opacity: 1; }
+  45% { transform: rotate(var(--a)) translateY(-70px); opacity: 0.9; }
+  70%, 100% { transform: rotate(var(--a)) translateY(-84px) translateX(6px); opacity: 0; }
+}
+
+/* ── фольговые буквы ── */
+.h-banner { left: 600px; top: 60px; height: 200px; }
+.h-banner-string { position: absolute; left: 0; top: 0; }
+.h-foil { position: absolute; width: 74px; height: 92px; margin-left: -37px; display: grid; place-items: center; transform-origin: 50% -4px;
+  font: 700 66px/1 var(--h-display); color: transparent;
+  background: linear-gradient(135deg, #fff7da 0%, #e9c46a 30%, #b7832e 52%, #f8e7a8 70%, #c08a35 100%);
+  -webkit-background-clip: text; background-clip: text; filter: hue-rotate(var(--hue)) saturate(1.4) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4));
+  animation: h-foil 3.6s ease-in-out var(--ph) infinite alternate both; }
+.h-foil.is-gap { visibility: hidden; }
+/* тёплый воздух от батареи: буквы на нитке чуть поворачиваются и бликуют */
+@keyframes h-foil { from { transform: rotate(-4deg) rotateY(-24deg); } to { transform: rotate(4deg) rotateY(24deg); } }
+
+/* ── часы с маятником ── */
+.h-clock { left: 1185px; top: 205px; width: 170px; height: 300px; border-radius: 80px 80px 10px 10px;
+  background: linear-gradient(90deg, #4a2412, #7a4222 45%, #4a2412); box-shadow: 0 20px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 4px #2e160b; }
+.h-clock-face { position: absolute; left: 20px; top: 20px; width: 130px; height: 130px; border-radius: 50%;
+  background: radial-gradient(circle, #fff4dc 0 60%, #e8d3a6 61% 64%, #fff4dc 65%); box-shadow: inset 0 0 0 4px #c9a050; }
+.h-hand { position: absolute; left: 50%; bottom: 50%; width: 5px; margin-left: -2.5px; background: #2a1a12; border-radius: 3px; transform-origin: 50% 100%; }
+.h-hand-h { height: 34px; transform: rotate(-10deg); } .h-hand-m { height: 52px; transform: rotate(-4deg); }
+.h-clock-pend { position: absolute; left: 30px; right: 30px; top: 162px; bottom: 16px; border-radius: 8px; background: rgba(20, 10, 4, 0.7); box-shadow: inset 0 0 0 3px #c9a050; overflow: hidden; }
+.h-clock-pend span { position: absolute; left: 50%; top: -6px; width: 4px; height: 120px; margin-left: -2px; background: #c9a050; transform-origin: 50% 0;
+  animation: h-pend 1s ease-in-out infinite alternate both; }
+.h-clock-pend span::after { content: ''; position: absolute; left: -16px; bottom: -14px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff1c2, #c9a050 60%, #7a5520); }
+/* маятник — единственный «метроном» комнаты */
+@keyframes h-pend { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+
+/* ── мебель ── */
+.h-sideboard { left: 600px; top: 640px; width: 400px; height: 330px; border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #7b4426, #5a2e18); box-shadow: 0 24px 40px rgba(0, 0, 0, 0.5), inset 0 3px 0 rgba(255, 220, 180, 0.18); }
+.h-sideboard span { position: absolute; top: 40px; bottom: 30px; width: 168px; border-radius: 4px; border: 3px solid rgba(40, 18, 8, 0.6); background: linear-gradient(135deg, rgba(255, 230, 200, 0.08), rgba(0, 0, 0, 0.08)); }
+.h-sideboard span:first-child { left: 20px; } .h-sideboard span:last-child { right: 20px; }
+.h-mandarins { left: 905px; top: 590px; width: 90px; height: 55px; }
+.h-mandarins i { position: absolute; width: 38px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffd08a, #f08a1c 55%, #b85a0c); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); }
+.h-mandarins i:nth-child(1) { left: 0; top: 18px; } .h-mandarins i:nth-child(2) { left: 30px; top: 20px; } .h-mandarins i:nth-child(3) { left: 52px; top: 16px; } .h-mandarins i:nth-child(4) { left: 24px; top: 0; }
+
+/* ── телевизор ── */
+.h-tvglow { left: 880px; top: 420px; width: 760px; height: 640px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(140, 180, 255, 0.22), rgba(140, 180, 255, 0) 65%); animation: h-tvglow 3.2s ease-in-out infinite alternate both; }
+/* свечение кинескопа на обоях «дышит» вместе с картинкой */
+@keyframes h-tvglow { from { opacity: 0.8; } to { opacity: 1; } }
+.h-tv { left: 1040px; top: 520px; width: 460px; height: 460px; }
+.h-tv-legs { position: absolute; left: 40px; right: 40px; top: 370px; height: 90px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0 20px, #3a1e0e 20px 34px, rgba(0, 0, 0, 0) 34px calc(100% - 34px), #3a1e0e calc(100% - 34px) calc(100% - 20px), rgba(0, 0, 0, 0) calc(100% - 20px)); }
+.h-tv-cab { position: absolute; left: 0; top: 0; width: 460px; height: 380px; border-radius: 22px;
+  background: repeating-linear-gradient(92deg, rgba(0, 0, 0, 0.05) 0 3px, rgba(255, 255, 255, 0.03) 3px 7px), linear-gradient(180deg, #8a4e2a, #5e3118);
+  box-shadow: 0 30px 50px rgba(0, 0, 0, 0.55), inset 0 2px 0 rgba(255, 220, 180, 0.3), inset 0 0 0 6px #4a2412; }
+.h-tv-panel { position: absolute; right: 18px; top: 34px; width: 64px; bottom: 34px; border-radius: 10px; background: repeating-linear-gradient(0deg, #3a1d0e 0 3px, #5a3018 3px 6px); }
+.h-tv-panel i, .h-tv-panel b { position: absolute; left: 50%; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f3e6cc, #a8936a 60%, #5d4a2a); box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5); }
+.h-tv-panel i:nth-child(1) { top: 18px; } .h-tv-panel i:nth-child(2) { top: 74px; }
+.h-tv-panel b { top: auto; bottom: 20px; width: 14px; height: 14px; margin-left: -7px; background: radial-gradient(circle, #ff8a6a, #c8323a); box-shadow: 0 0 8px #ff6a4a; }
+
+/* кинескоп: родные 1156×914, в комнате — 0.268 */
+.h-crt { position: absolute; left: 35px; top: 35px; width: 1156px; height: 914px; transform: scale(0.268); transform-origin: 0 0;
+  border-radius: 120px / 140px; overflow: hidden; background: radial-gradient(ellipse at 50% 45%, #13305c, #081633 70%, #030a18);
+  box-shadow: inset 0 0 0 10px #1a0d06, inset 0 0 120px rgba(0, 0, 0, 0.8); }
+.h-crt-content { position: absolute; inset: 0; color: #eaf1ff; text-shadow: 0 0 14px rgba(160, 200, 255, 0.45); }
+.h-crt::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 2px, rgba(0, 0, 0, 0) 2px 5px),
+              radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.55) 100%); }
+.h-crt-glass { position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(ellipse 60% 40% at 28% 18%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 70%); }
+.h-crt-static { position: absolute; inset: 0; opacity: 0; pointer-events: none; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* переключение канала: рябь, строки бегут */
+.h-crt.is-flick .h-crt-static { opacity: 1; animation: h-static 0.12s steps(3) infinite; }
+.h-crt.is-flick .h-crt-content { filter: blur(2px) brightness(1.6); transform: translateY(-8%); }
+@keyframes h-static { 0% { background-position: 0 0; } 33% { background-position: -60px 40px; } 66% { background-position: 50px -80px; } 100% { background-position: 0 0; } }
+/* включение кинескопа: из горизонтальной полосы — в кадр, со вспышкой */
+.h-crt.is-poweron .h-crt-content { animation: h-poweron 0.7s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes h-poweron { 0% { transform: scale(1.1, 0.008); filter: brightness(4); } 45% { transform: scale(1, 0.02); filter: brightness(3); } 100% { transform: none; filter: none; } }
+
+/* ── ель, звезда, подарки ── */
+.h-tree { z-index: 2; }
+.h-star { position: absolute; left: -36px; top: -78px; width: 72px; height: 72px;
+  background: radial-gradient(circle at 50% 45%, #ff8f84, #d0202c 55%, #8a0f16);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  filter: drop-shadow(0 0 14px rgba(255, 80, 70, 0.9)); animation: h-star 2.4s ease-in-out infinite alternate both; }
+/* рубиновая звезда подсвечена лампочкой изнутри — лампа чуть мерцает */
+@keyframes h-star { from { filter: drop-shadow(0 0 8px rgba(255, 80, 70, 0.7)) brightness(0.95); } to { filter: drop-shadow(0 0 22px rgba(255, 90, 80, 1)) brightness(1.15); } }
+.h-gifts { left: 1780px; top: 930px; width: 420px; height: 100px; z-index: 3; }
+.h-gifts i { position: absolute; bottom: 0; border-radius: 3px; box-shadow: inset -12px 0 18px rgba(0, 0, 0, 0.35), 0 10px 16px rgba(0, 0, 0, 0.5); }
+.h-gifts i:nth-child(1) { left: 20px; width: 120px; height: 90px; background: linear-gradient(90deg, rgba(0, 0, 0, 0) 52px, #e0b13c 52px 66px, rgba(0, 0, 0, 0) 66px), #b5803e; }
+.h-gifts i:nth-child(2) { left: 160px; width: 96px; height: 70px; background: linear-gradient(90deg, rgba(0, 0, 0, 0) 40px, #f4efe6 40px 54px, rgba(0, 0, 0, 0) 54px), #c8323a; }
+.h-gifts i:nth-child(3) { left: 270px; width: 120px; height: 58px; background: linear-gradient(90deg, rgba(0, 0, 0, 0) 52px, #c8323a 52px 66px, rgba(0, 0, 0, 0) 66px), #2f6f5f; }
+
+/* ── передний план: огоньки гирлянды вне фокуса ── */
+.h-bokeh { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.h-bokeh span { position: absolute; border-radius: 50%; margin: -40px 0 0 -40px; filter: blur(12px); opacity: 0.55;
+  background: radial-gradient(circle, var(--c), rgba(0, 0, 0, 0) 68%); animation: h-bokeh 2.8s ease-in-out var(--d) infinite alternate both; }
+@keyframes h-bokeh { from { opacity: 0.3; } to { opacity: 0.7; } }
+
+/* ── LOBBY ── */
+.h-postcard { left: 630px; top: 236px; width: 340px; height: 350px; transform: rotate(-3deg); padding: 18px; display: grid; justify-items: center; align-content: center; gap: 8px;
+  background: linear-gradient(160deg, #fff8ea, #f1e2c2); border-radius: 6px; box-shadow: 0 18px 30px rgba(0, 0, 0, 0.5); color: #2a1a12; text-align: center; }
+.h-postcard::before { content: ''; position: absolute; left: 50%; top: -10px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a7a, #c8323a); box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4); }
+.h-postcard-k { font: italic 700 26px/1 var(--h-display); color: var(--h-ruby); }
+.h-postcard-code { font: 700 66px/1 var(--h-display); letter-spacing: 0.04em; }
+.h-postcard-code span { display: block; font: 600 12px/1 var(--h-body); letter-spacing: 0.3em; text-transform: uppercase; color: #8a6a4a; margin-bottom: 2px; }
+.h-postcard-url { font: italic 500 15px/1 var(--h-body); color: #6a4a32; }
+.h-guests { position: absolute; left: 60px; right: 60px; bottom: 34px; z-index: 22; display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: baseline;
+  font: italic 500 28px/1.3 var(--h-body); color: var(--h-cream); text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9); }
+.h-guests b { font: 700 18px/1 var(--h-body); font-style: normal; letter-spacing: 0.28em; text-transform: uppercase; color: var(--h-amber); }
+
+/* ── экран ТВ: заставки ── */
+.h-tv-sparkles { position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 2px, rgba(0, 0, 0, 0) 3px) 30px 40px / 140px 120px,
+              radial-gradient(circle, rgba(180, 210, 255, 0.7) 0 1.5px, rgba(0, 0, 0, 0) 2.5px) 90px 10px / 110px 150px;
+  animation: h-sparkle 2.4s steps(4) infinite; opacity: 0.6; }
+@keyframes h-sparkle { 50% { opacity: 0.25; } }
+.h-tv-logo, .h-tv-round { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 18px; }
+.h-tv-logo-k, .h-tv-kicker { font: 600 40px/1 var(--h-body); letter-spacing: 0.3em; text-transform: uppercase; color: #ffd98a; }
+.h-tv-logo-t { font: italic 700 210px/0.95 var(--h-display); color: #fff3d6; text-shadow: 0 0 30px rgba(255, 200, 120, 0.6); }
+.h-tv-logo-d { font: 500 48px/1 var(--h-body); color: #cfe0ff; }
+.h-tv-roundnum { font: italic 700 260px/0.85 var(--h-display); color: #ffd98a; text-shadow: 0 0 40px rgba(255, 200, 120, 0.6); }
+.h-tv-title { font: 700 100px/1.02 var(--h-display); color: #fff3d6; padding: 0 60px; text-wrap: balance; }
+.h-tv-rules { font: 500 42px/1.2 var(--h-body); color: #cfe0ff; }
+.h-tv-q { position: absolute; inset: 0; padding: 90px 110px; display: flex; flex-direction: column; gap: 30px; }
+.h-tv-label { font: 600 34px/1 var(--h-body); letter-spacing: 0.26em; text-transform: uppercase; color: #ffd98a; }
+.h-tv-qtext { font: 600 66px/1.18 var(--h-body); color: #ffffff; text-wrap: balance; }
+.h-tv-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: auto; }
+.h-tv-opt { height: 128px; display: flex; align-items: center; gap: 22px; padding: 0 28px; border-radius: 20px; border: 3px solid rgba(255, 217, 138, 0.55); background: rgba(10, 24, 60, 0.6);
+  animation: h-scanin 0.6s steps(6) var(--t) both; }
+/* вариант «прорисовывается» строками, как на старом кинескопе */
+@keyframes h-scanin { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.h-tv-opt b { flex: none; width: 76px; height: 76px; border-radius: 14px; display: grid; place-items: center; background: #ffd98a; color: #1b1030; font: italic 700 54px/1 var(--h-display); text-shadow: none; }
+.h-tv-opt span { font: 600 42px/1.05 var(--h-body); color: #ffffff; min-width: 0; }
+
+/* ── циферблат-таймер ── */
+.h-tv-timer { position: absolute; inset: 0; padding: 60px 90px; }
+.h-tv-timer-q { font: 600 42px/1.2 var(--h-body); color: #ffffff; text-align: center; text-wrap: balance; }
+.h-dial { position: absolute; left: 110px; top: 230px; width: 620px; height: 620px; filter: drop-shadow(0 0 24px rgba(255, 200, 120, 0.25)); }
+.h-dial-sector { fill: rgba(255, 90, 70, 0.32); }
+.h-dial-num { font: 700 64px var(--h-display); fill: #f6dc9c; text-anchor: middle; }
+.h-dial-hand { stroke: #ffe6a8; stroke-width: 10; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(255, 220, 150, 0.9)); }
+.h-tv-timer-num { position: absolute; left: 720px; right: 40px; top: 360px; text-align: center; font: italic 700 330px/1 var(--h-display); color: #fff3d6;
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 40px rgba(255, 200, 120, 0.6); animation: h-tick 0.45s ease-out both; }
+.h-tv-timer.is-done .h-tv-timer-num { font-size: 150px; top: 460px; color: #ff9a7a; }
+/* секунда «падает» на место, как цифра на табло ЦТ */
+@keyframes h-tick { from { transform: translateY(-14px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+.is-warn .h-dial-sector { fill: rgba(255, 70, 60, 0.6); }
+
+/* ── ответ ── */
+.h-tv-ans { position: absolute; inset: 0; padding: 70px 90px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; }
+.h-tv-anskey { width: 100px; height: 100px; border-radius: 22px; display: grid; place-items: center; background: #ffd98a; color: #1b1030; font: italic 700 72px/1 var(--h-display); text-shadow: none; }
+.h-tv-anstext { font: italic 700 116px/1 var(--h-display); color: #fff3d6; text-wrap: balance; text-shadow: 0 0 30px rgba(255, 200, 120, 0.6); }
+.h-tv-ansfact { font: 500 40px/1.25 var(--h-body); color: #cfe0ff; }
+
+/* ── табло в эфире ── */
+.h-tv-score { position: absolute; inset: 0; padding: 70px 110px; }
+.h-tv-score-h { margin: 14px 0 22px; font: italic 700 84px/1 var(--h-display); color: #fff3d6; }
+.h-tv-score ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.h-tv-score li { display: grid; grid-template-columns: 70px minmax(0, 1fr) 90px 120px; align-items: center; height: 70px; padding: 0 20px; border-radius: 12px;
+  font: 600 44px/1 var(--h-body); animation: h-scanin 0.5s steps(5) var(--t) both; }
+.h-tv-score li:nth-child(odd) { background: rgba(255, 255, 255, 0.05); }
+.h-tv-score li b { font: italic 700 52px/1 var(--h-display); color: #ffd98a; }
+.h-tv-score li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
+.h-tv-score li em { font: 600 34px/1 var(--h-body); font-style: normal; color: #9fe0b0; justify-self: center; }
+.h-tv-score li strong { justify-self: end; font: 700 60px/1 var(--h-display); color: #fff3d6; font-variant-numeric: tabular-nums; }
+.h-tv-score li.is-lead { background: rgba(255, 217, 138, 0.18); box-shadow: inset 0 0 0 3px rgba(255, 217, 138, 0.6); }
+
+/* ── «Угадай мелодию»: конверты пластинок на стене, проигрыватель ── */
+.h-melody { left: 560px; top: 250px; width: 470px; height: 270px; }
+.h-melody-head { position: absolute; left: 0; right: 0; top: -14px; text-align: center; font: italic 700 30px/1 var(--h-display); color: var(--h-amber); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); }
+.h-sleeve { position: absolute; top: 28px; width: 140px; }
+.h-sleeve-0 { left: 0; } .h-sleeve-1 { left: 165px; } .h-sleeve-2 { left: 330px; }
+.h-sleeve-cover { height: 140px; border-radius: 3px; display: flex; align-items: flex-end; padding: 8px; box-shadow: 0 10px 18px rgba(0, 0, 0, 0.5);
+  font: 700 16px/1.1 var(--h-body); color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.h-sleeve-0 .h-sleeve-cover { background: radial-gradient(circle at 70% 30%, #ffcf6a 0 18%, rgba(0, 0, 0, 0) 19%), linear-gradient(135deg, #d8432f, #8a1f1f); }
+.h-sleeve-1 .h-sleeve-cover { background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.12) 0 10px, rgba(0, 0, 0, 0) 10px 20px), linear-gradient(135deg, #3a7bd5, #1d3f7a); }
+.h-sleeve-2 .h-sleeve-cover { background: radial-gradient(circle at 30% 40%, rgba(0, 0, 0, 0) 0 30%, rgba(0, 0, 0, 0.25) 31% 34%, rgba(0, 0, 0, 0) 35%), linear-gradient(135deg, #e0b13c, #9a6a20); }
+.h-tracks { display: flex; justify-content: space-between; margin-top: 10px; }
+.h-tracks i { width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle, #e8d3a6 0 18%, #111 20% 100%);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5); transition: box-shadow 0.08s, transform 0.08s; }
+.h-tracks i.is-played { opacity: 0.25; }
+.h-tracks i.is-hot { box-shadow: 0 0 0 3px #ffe6a8, 0 0 18px #ffd27a; transform: scale(1.12); }
+.h-tracks i.is-picked { box-shadow: 0 0 0 3px #ffe6a8, 0 0 26px #ffd27a; transform: scale(1.2); animation: h-picked 0.9s ease-out both; }
+@keyframes h-picked { 0% { transform: scale(1.5); } 100% { transform: scale(1.2); } }
+.h-nowplaying { position: absolute; left: 0; right: 0; top: 232px; text-align: center; font: italic 600 20px/1 var(--h-body); color: var(--h-cream); opacity: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); transition: opacity 0.6s; }
+.h-nowplaying.is-on { opacity: 1; }
+.h-turntable { left: 630px; top: 540px; width: 270px; height: 100px; }
+.h-tt-base { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; border-radius: 4px; background: linear-gradient(180deg, #d9cdb4, #a99a7c); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5); }
+.h-platter { position: absolute; left: 30px; top: 0; width: 150px; height: 150px; transform: rotateX(72deg); transform-origin: 50% 20%; perspective: 500px; }
+.h-disc { position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle, var(--lb) 0 17%, #1a1a1a 18% 20%, rgba(0, 0, 0, 0) 21%), repeating-radial-gradient(circle, #151515 0 2px, #262626 2px 4px); }
+.h-disc i { position: absolute; left: 50%; top: 14%; width: 6px; height: 22%; margin-left: -3px; background: rgba(255, 255, 255, 0.5); border-radius: 3px; }
+.h-turntable.is-spin .h-disc { animation: h-spin 1.8s linear infinite; }
+/* 33⅓ оборота в минуту — пластинка не торопится */
+@keyframes h-spin { to { transform: rotate(360deg); } }
+.h-disc-shine { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 20deg, rgba(255, 255, 255, 0) 0 10%, rgba(255, 255, 255, 0.14) 14%, rgba(255, 255, 255, 0) 20% 60%, rgba(255, 255, 255, 0.1) 64%, rgba(255, 255, 255, 0) 70%); }
+.h-arm { position: absolute; left: 190px; top: 0; width: 6px; height: 64px; background: #cfc7b3; transform-origin: 50% 0; transform: rotate(32deg); border-radius: 3px; box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5); }
+
+/* ── FINALE: полночь ── */
+.h-tv-midnight { position: absolute; inset: 0; display: grid; place-items: center; }
+.h-tv-midnight .h-dial { position: static; width: 560px; height: 560px; }
+.h-tv-midnight-t { position: absolute; bottom: 60px; font: 700 70px/1 var(--h-display); letter-spacing: 0.2em; color: #ffd98a; animation: h-blink 1s steps(2) infinite; }
+@keyframes h-blink { 50% { opacity: 0.4; } }
+.h-sparkler { position: absolute; z-index: 25; width: 6px; height: 210px; background: linear-gradient(180deg, #4a3a2a 0 12%, #8a8a8a 12% 100%); border-radius: 3px; opacity: 0; transition: opacity 0.4s 1.4s; }
+.h-sparkler-l { left: 298px; top: 862px; transform: rotate(-14deg); transform-origin: 50% 0; }
+.h-sparkler-r { left: 1638px; top: 872px; transform: rotate(16deg); transform-origin: 50% 0; }
+.h-finale.is-midnight .h-sparkler { opacity: 1; }
+.h-win { position: absolute; left: 0; right: 0; bottom: 0; z-index: 24; text-align: center; opacity: 0; padding: 80px 80px 44px;
+  background: linear-gradient(180deg, rgba(10, 6, 4, 0), rgba(10, 6, 4, 0.82) 38%, rgba(10, 6, 4, 0.92)); }
+.h-finale.is-midnight .h-win { animation: h-winin 1.2s ease-out 2.2s both; }
+@keyframes h-winin { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: none; } }
+.h-win-k { font: 700 26px/1 var(--h-body); letter-spacing: 0.3em; text-transform: uppercase; color: var(--h-amber); text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); }
+.h-win-name { margin-top: 12px; font: italic 700 116px/1 var(--h-display); color: transparent;
+  background: linear-gradient(180deg, #fff7da 0%, #f0cd78 45%, #b7832e 100%); -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 4px 0 rgba(40, 16, 4, 0.7)); }
+.h-win-s { margin-top: 16px; font: italic 600 32px/1.3 var(--h-body); color: var(--h-cream); }
+.h-win-s b { font-style: normal; color: var(--h-amber); }

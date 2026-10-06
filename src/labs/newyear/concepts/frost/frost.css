@@ -1,0 +1,214 @@
+/* ═══ CONCEPT 3 · ИНЕЙ ═══
+   Синий час, лёд, серебро и одна тёплая нота — шампань. Шрифты: Unbounded
+   тонких начертаний (современный, «гравировка на стекле») + Manrope.
+   Слои: небо 0 · дальний лес 1 · земля 2 · ели 3 · ветка у стекла 6 ·
+   снег 8 · иней 12 · блик 13 · стеклянные панели 15–16 · частицы 30. */
+.nyl-c3 {
+  --f-night: #071426; --f-blue: #12325a; --f-ice: #e8f6ff; --f-ice2: #bfe3ff; --f-silver: #b9cbe0; --f-champ: #e9d3a0;
+  --f-display: 'Unbounded', 'Arial', sans-serif;
+  --f-body: 'Manrope', system-ui, sans-serif;
+}
+@property --clear { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+.f-scene { position: absolute; inset: 0; overflow: hidden; background: var(--f-night); color: var(--f-ice); font-family: var(--f-body); }
+
+/* ── мир за стеклом ── */
+.f-world { position: absolute; inset: 0; }
+.f-sky { position: absolute; inset: 0; z-index: 0; transition: filter 3s ease;
+  background: linear-gradient(180deg, #06111f 0%, #0b2240 40%, #174270 74%, #2a5d8c 100%); }
+.f-moon { position: absolute; left: 1752px; top: 70px; width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #ffffff, #dcecff 60%, #b8d4f2);
+  box-shadow: 0 0 40px 10px rgba(190, 220, 255, 0.35), 0 0 160px 60px rgba(120, 170, 230, 0.18); }
+.f-sunrise { position: absolute; inset: 0; opacity: 0; transition: opacity 3.2s ease;
+  background:
+    radial-gradient(ellipse 70% 62% at 74% 100%, rgba(255, 205, 130, 1), rgba(255, 168, 110, 0.55) 38%, rgba(255, 150, 110, 0) 74%),
+    linear-gradient(180deg, rgba(255, 170, 120, 0) 40%, rgba(255, 180, 130, 0.35) 100%); }
+.f-world.is-warm .f-sunrise { opacity: 1; }
+.f-world.is-warm .f-sky { filter: brightness(1.25) saturate(1.15) hue-rotate(-8deg); }
+.f-far { position: absolute; inset: 0; z-index: 1; filter: blur(1.6px); }
+.f-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 200px; z-index: 2;
+  background: linear-gradient(180deg, #4f75a0 0%, #6f93ba 30%, #87a8cb 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30px); mask-image: linear-gradient(180deg, transparent, #000 30px); }
+.f-mid { position: absolute; inset: 0; z-index: 3; transition: filter 1.4s ease; }
+.f-fg { position: absolute; inset: 0; z-index: 6; pointer-events: none; transition: filter 1.4s ease; }
+.f-bough { position: absolute !important; transform-origin: 50% 50%; }
+.f-bough-a { left: -1000px; top: -1175px; transform: rotate(135deg); }
+.f-bough-b { left: 1595px; top: 731px; transform: rotate(-45deg); }
+.f-world.is-mid .f-fg { filter: blur(11px) brightness(0.85); }
+.f-world.is-bg .f-fg { filter: blur(15px) brightness(0.5); }
+.f-world.is-bg .f-mid { filter: blur(5px) brightness(0.62) saturate(0.8); }
+.f-world.is-dim .f-far { filter: blur(3px) brightness(0.7); }
+.f-world.is-warm .f-mid { filter: sepia(0.22) brightness(1.12); }
+/* фокус-пулл: камера сначала видит ветку у стекла, потом — лес */
+.f-lobby .f-fg { animation: f-rack-fg 2.6s cubic-bezier(.4, 0, .2, 1) 0.2s both; }
+.f-lobby .f-mid { animation: f-rack-mid 2.6s cubic-bezier(.4, 0, .2, 1) 0.2s both; }
+@keyframes f-rack-fg { from { filter: blur(0) brightness(1); } to { filter: blur(11px) brightness(0.85); } }
+@keyframes f-rack-mid { from { filter: blur(9px) brightness(0.8); } to { filter: blur(0) brightness(1); } }
+
+/* ── стекло и иней ── */
+.f-frost { position: absolute; inset: 0; z-index: 12; pointer-events: none; --clear: 100%;
+  -webkit-mask-image: radial-gradient(ellipse 80% 82% at 50% 50%, transparent var(--clear), #000 calc(var(--clear) + 24%));
+  mask-image: radial-gradient(ellipse 80% 82% at 50% 50%, transparent var(--clear), #000 calc(var(--clear) + 24%));
+  transition: --clear 1s linear; }
+.f-frost > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.f-milk { position: absolute; inset: 0; background: rgba(214, 233, 252, 0.2); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+/* иней садится на кромки стекла */
+.f-frost-edge { animation: f-edge 2.6s cubic-bezier(.2, .6, .2, 1) 0.1s both; }
+@keyframes f-edge { from { --clear: 100%; } to { --clear: 76%; } }
+.f-frost-cover { animation: f-cover 1.4s cubic-bezier(.35, .05, .25, 1) 0.1s both; }
+.f-frost-cover .f-milk { background: rgba(214, 233, 252, 0.42); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+/* смена раунда: стекло замерзает целиком, от углов к центру */
+@keyframes f-cover { from { --clear: 100%; } to { --clear: -30%; } }
+.f-frost-timer .f-milk { background: rgba(214, 233, 252, 0.3); }
+.f-frost-melt { --clear: -30%; animation: f-melt 3.4s cubic-bezier(.5, 0, .3, 1) 1.2s both; }
+.f-frost-melt .f-milk { background: rgba(214, 233, 252, 0.38); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* финал: тепло растапливает иней от центра */
+@keyframes f-melt { from { --clear: -30%; } to { --clear: 96%; } }
+.f-glare { position: absolute; inset: 0; z-index: 13; pointer-events: none;
+  background: linear-gradient(112deg, rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0.055) 40%, rgba(255, 255, 255, 0) 52%); }
+
+.f-glass { background: linear-gradient(140deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.05) 60%, rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(20px) saturate(1.25); -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  border: 1px solid rgba(220, 240, 255, 0.38); border-radius: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 30px 70px rgba(0, 12, 30, 0.45); }
+/* панель «конденсируется»: из размытого пятна — в чёткое стекло */
+.f-condense { animation: f-condense 1.1s cubic-bezier(.2, .7, .2, 1) var(--t, 0s) both; }
+@keyframes f-condense { from { opacity: 0; filter: blur(18px); transform: scale(1.03); } to { opacity: 1; filter: none; transform: none; } }
+/* надпись проступает, как гравировка на стекле */
+.f-etch { animation: f-etch 1.2s ease-out var(--t, 0s) both; }
+@keyframes f-etch { from { opacity: 0; filter: blur(12px); } to { opacity: 1; filter: none; } }
+
+/* ── LOBBY ── */
+.f-lobby-copy { position: absolute; left: 140px; top: 200px; z-index: 15; width: 920px; }
+.f-kicker { font: 600 22px/1 var(--f-body); letter-spacing: 0.4em; text-transform: uppercase; color: var(--f-ice2); }
+.f-logo { margin: 20px 0 0; font: 200 172px/0.92 var(--f-display); letter-spacing: -0.02em; color: #f4fbff;
+  text-shadow: 0 0 44px rgba(170, 215, 255, 0.35); }
+.f-date { margin-top: 26px; font: 500 30px/1.2 var(--f-body); color: #d6ebff; letter-spacing: 0.05em; }
+.f-join { margin-top: 46px; display: inline-flex; gap: 28px; align-items: center; padding: 18px 36px 18px 18px; }
+.f-join svg { border-radius: 12px; }
+.f-join-label { font: 600 16px/1 var(--f-body); letter-spacing: 0.32em; text-transform: uppercase; color: var(--f-ice2); }
+.f-join-code { font: 300 84px/1 var(--f-display); color: #f4fbff; margin: 10px 0 8px; font-variant-numeric: tabular-nums; }
+.f-join-url { font: 500 22px/1 var(--f-body); color: #d6ebff; }
+.f-teams { position: absolute; left: 140px; right: 640px; bottom: 40px; z-index: 15; display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: baseline;
+  font: 500 28px/1.3 var(--f-body); color: #eef7ff; text-shadow: 0 1px 12px rgba(5, 15, 30, 0.7); }
+.f-teams span { font-weight: 700; font-size: 16px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--f-ice2); }
+.f-teams em { font-style: normal; }
+
+/* ── ROUND INTRO: написано пальцем по инею ── */
+.f-finger { position: absolute; inset: 0; z-index: 14; display: grid; place-content: center; text-align: center; gap: 6px;
+  color: rgba(6, 20, 42, 0.82); text-shadow: 0 0 2px rgba(6, 20, 42, 0.6), 0 0 14px rgba(225, 240, 255, 0.85); }
+.f-finger > * { clip-path: inset(-20% 100% -20% 0); animation: f-write 1s cubic-bezier(.5, .1, .4, 1) both; }
+/* палец ведёт слева направо — надпись открывается вслед за ним */
+@keyframes f-write { to { clip-path: inset(-20% -2% -20% 0); } }
+.f-finger-num { font: 300 380px/0.86 var(--f-display); animation-delay: 1.5s !important; animation-duration: 0.9s !important; }
+.f-finger-kicker { font: 700 26px/1 var(--f-body); letter-spacing: 0.4em; text-transform: uppercase; animation-delay: 2.3s !important; margin-top: 10px; }
+.f-finger-title { font: 400 84px/1.1 var(--f-display); animation-delay: 2.5s !important; animation-duration: 1.3s !important; margin-top: 14px; }
+.f-finger-rules { font: 600 30px/1.2 var(--f-body); animation-delay: 3.5s !important; margin-top: 18px; }
+
+/* ── QUESTION ── */
+.f-qpanel { position: absolute; left: 140px; right: 140px; top: 116px; height: 404px; z-index: 15; padding: 54px 76px;
+  display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+.f-qpanel.is-compact { top: 84px; height: 236px; padding: 30px 70px; gap: 14px; }
+.f-qlabel { font: 600 22px/1 var(--f-body); letter-spacing: 0.32em; text-transform: uppercase; color: var(--f-ice2); }
+.f-qtext { font: 400 58px/1.2 var(--f-display); color: #f6fbff; text-wrap: balance; letter-spacing: -0.01em; }
+.f-qpanel.is-compact .f-qtext { font-size: 40px; }
+.f-options { position: absolute; left: 140px; right: 140px; top: 556px; z-index: 15; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.f-opt { height: 150px; display: flex; align-items: center; gap: 28px; padding: 0 38px; }
+.f-opt-key { flex: none; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid rgba(220, 240, 255, 0.7);
+  font: 400 34px/1 var(--f-display); color: #f4fbff; }
+.f-opt-text { font: 300 42px/1.1 var(--f-display); color: #f4fbff; }
+.f-mini { position: absolute; right: 172px; top: 146px; z-index: 16; font: 300 22px/1 var(--f-display); color: var(--f-ice2); letter-spacing: 0.1em; }
+.f-mini b { font-weight: 300; font-size: 56px; color: #f4fbff; margin-right: 8px; }
+.f-answered { position: absolute; left: 0; right: 0; bottom: 52px; text-align: center; z-index: 15; font: 600 22px/1 var(--f-body); letter-spacing: 0.32em; text-transform: uppercase; color: #eef7ff; }
+
+/* ── TIMER: кольцо замерзает, стекло затягивает от кромок ── */
+.f-clock { position: absolute; left: 50%; top: 360px; width: 560px; height: 560px; margin-left: -280px; z-index: 15; }
+/* тёмное стекло под цифрой: на замёрзшем светлом фоне белая цифра иначе теряется */
+.f-clock::before { content: ''; position: absolute; left: 60px; top: 60px; width: 440px; height: 440px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(6, 20, 42, 0.72), rgba(6, 20, 42, 0.5) 70%, rgba(6, 20, 42, 0.3));
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.f-clock svg { position: absolute; inset: 0; overflow: visible; }
+.f-clock-track { fill: rgba(10, 30, 60, 0.35); stroke: rgba(220, 240, 255, 0.18); stroke-width: 10; }
+.f-clock-ice { fill: none; stroke: #eef8ff; stroke-width: 10; stroke-linecap: round; transition: stroke-dasharray 0.25s linear;
+  filter: drop-shadow(0 0 10px rgba(190, 225, 255, 0.85)); }
+.f-clock line { stroke: rgba(220, 240, 255, 0.18); stroke-width: 3; stroke-linecap: round; transition: stroke 0.8s; }
+.f-clock line.is-on { stroke: rgba(235, 247, 255, 0.85); }
+.f-clock-num { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font: 300 230px/1 var(--f-display); color: #ffffff;
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 24px rgba(170, 215, 255, 0.45); animation: f-num 0.5s ease-out both; }
+/* новая цифра проступает из инея */
+@keyframes f-num { from { opacity: 0.35; } to { opacity: 1; } }
+.f-clock-cap { position: absolute; left: 0; right: 0; bottom: 150px; text-align: center; font: 600 22px/1 var(--f-body); letter-spacing: 0.4em; text-transform: uppercase; color: var(--f-ice2); }
+.f-timer.is-warn .f-clock-ice { stroke: #ffffff; stroke-width: 14; }
+.f-timer.is-done .f-clock-num { color: rgba(240, 248, 255, 0.55); filter: blur(1.5px); }
+
+/* ── ANSWER ── */
+.f-options.is-answer .is-wrong { animation: f-frostover 1s ease-in calc(0.35s + var(--i) * 0.1s) both; }
+@keyframes f-frostover { to { filter: blur(7px) saturate(0.4) brightness(1.5); opacity: 0.32; } }
+.f-options.is-answer .is-correct { animation: f-hold 0.8s ease-out 0.5s both; }
+@keyframes f-hold { to { border-color: var(--f-champ); box-shadow: 0 0 0 2px rgba(233, 211, 160, 0.6), 0 0 60px rgba(233, 211, 160, 0.35); } }
+.f-options.is-answer { animation: f-away 0.8s ease-in 1.55s both; }
+@keyframes f-away { to { opacity: 0; filter: blur(14px); transform: scale(0.98); } }
+.f-reveal { position: absolute; left: 230px; right: 230px; top: 520px; height: 380px; z-index: 16; overflow: hidden; padding: 40px 80px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 18px;
+  animation: f-condense 1.1s cubic-bezier(.2, .7, .2, 1) 1.65s both; border-color: rgba(233, 211, 160, 0.55); }
+.f-reveal-key { width: 70px; height: 70px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--f-champ); color: var(--f-champ); font: 400 34px/1 var(--f-display); }
+.f-reveal-text { font: 400 64px/1.12 var(--f-display); color: #fff9ec; text-wrap: balance; }
+.f-reveal-fact { font: 500 26px/1.3 var(--f-body); color: #d6ebff; }
+.f-caustic { position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(105deg, rgba(255, 240, 205, 0) 35%, rgba(255, 240, 205, 0.3) 47%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 240, 205, 0.3) 53%, rgba(255, 240, 205, 0) 65%) no-repeat;
+  background-size: 260% 100%; background-position: 160% 0; animation: f-caustic 1.7s ease-in-out 2.4s both; }
+/* шампанский блик пробегает по стеклу — как свет, прошедший через бокал */
+@keyframes f-caustic { to { background-position: -60% 0; } }
+
+/* ── SCOREBOARD: строки конденсируются, полоска счёта замерзает до своей длины ── */
+.f-score-head, .f-blitz-head { position: absolute; top: 80px; left: 0; right: 0; text-align: center; z-index: 15; }
+.f-score-head h2, .f-blitz-head h2 { margin: 14px 0 0; font: 300 68px/1 var(--f-display); color: #f4fbff; }
+.f-blitz-head p { margin: 14px 0 0; font: 500 26px/1.2 var(--f-body); color: #d6ebff; }
+.f-rows { position: absolute; left: 300px; right: 300px; top: 236px; margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; z-index: 15; }
+.f-row { position: relative; overflow: hidden; height: 78px; display: grid; grid-template-columns: 70px minmax(0, 1fr) 90px 120px; align-items: center; padding: 0 34px; border-radius: 16px;
+  animation: f-condense 1s cubic-bezier(.2, .7, .2, 1) var(--t) both; }
+.f-row > span { position: relative; }
+.f-row .f-row-bar { position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(190, 225, 255, 0), rgba(190, 225, 255, 0.18)); border-right: 2px solid rgba(225, 242, 255, 0.55);
+  animation: f-freeze 1.2s cubic-bezier(.3, .1, .2, 1) calc(var(--t) + 0.3s) both; }
+@keyframes f-freeze { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.f-row-place { font: 300 38px/1 var(--f-display); color: var(--f-ice2); }
+.f-row-name { font: 600 34px/1 var(--f-body); color: #f4fbff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-row-delta { justify-self: center; font: 600 24px/1 var(--f-body); color: var(--f-ice2); }
+.f-row-score { justify-self: end; font: 400 50px/1 var(--f-display); color: #ffffff; font-variant-numeric: tabular-nums; }
+.f-row.is-lead { border-color: rgba(233, 211, 160, 0.7); }
+.f-row.is-lead .f-row-score, .f-row.is-lead .f-row-place { color: var(--f-champ); }
+.f-row.is-lead .f-caustic { animation-delay: 3s; }
+
+/* ── SPECIAL: «Блиц» ── */
+.f-cards { position: absolute; left: 360px; right: 360px; top: 300px; height: 520px; z-index: 15; }
+.f-card { position: absolute; inset: 0; padding: 56px 80px; display: flex; flex-direction: column; justify-content: center; gap: 28px; overflow: hidden;
+  animation: f-card-in 0.95s cubic-bezier(.2, .8, .2, 1) var(--in) both, f-card-out 0.5s ease-in var(--out) both; }
+.f-card:last-child { animation: f-card-in 0.95s cubic-bezier(.2, .8, .2, 1) var(--in) both; }
+/* следующая карточка выплывает из глубины в фокус, отыгранная уходит мимо камеры */
+@keyframes f-card-in { from { opacity: 0; transform: scale(0.7) translateY(-30px); filter: blur(16px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes f-card-out { to { opacity: 0; transform: scale(1.22); filter: blur(18px); } }
+.f-card-count { font: 600 22px/1 var(--f-body); letter-spacing: 0.32em; text-transform: uppercase; color: var(--f-ice2); }
+.f-card-q { font: 400 60px/1.15 var(--f-display); color: #f6fbff; text-wrap: balance; }
+.f-card-a { font: 300 46px/1.1 var(--f-display); color: var(--f-champ); animation: f-etch 0.7s ease-out calc(var(--in) + 2.7s) both; }
+.f-card-a::before { content: '→ '; color: rgba(233, 211, 160, 0.6); }
+.f-card-bar { position: absolute; left: 44px; right: 44px; bottom: 30px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); }
+.f-card-bar::after { content: ''; position: absolute; inset: 0; border-radius: 3px; background: #eef8ff; box-shadow: 0 0 12px rgba(190, 225, 255, 0.8);
+  transform-origin: 0 50%; animation: f-bar 2.5s linear calc(var(--in) + 0.2s) both; }
+@keyframes f-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ── FINALE: тёплый свет за елями, иней тает ── */
+.f-finale-copy { position: absolute; left: 0; right: 0; top: 150px; text-align: center; z-index: 15; animation: f-etch 1.4s ease-out 2.2s both;
+  text-shadow: 0 2px 30px rgba(5, 15, 30, 0.85); }
+.f-winner { margin-top: 18px; font: 400 112px/1.04 var(--f-display); color: #fff7e6; letter-spacing: -0.01em; }
+.f-winner-score { margin-top: 14px; font: 600 32px/1 var(--f-body); letter-spacing: 0.1em; color: #ffe9c4; }
+.f-finale .f-kicker { color: var(--f-champ); }
+.f-podium { position: absolute; left: 0; right: 0; bottom: 120px; display: flex; justify-content: center; align-items: flex-end; gap: 26px; z-index: 15; }
+.f-pod { width: 470px; height: 156px; display: grid; grid-template-columns: 60px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 0 30px;
+  animation: f-condense 1.1s cubic-bezier(.2, .7, .2, 1) var(--t) both; }
+.f-pod-1 { height: 196px; border-color: rgba(233, 211, 160, 0.75); }
+.f-pod-place { font: 300 64px/1 var(--f-display); color: var(--f-champ); }
+.f-pod-name { font: 600 30px/1.15 var(--f-body); color: #fff9ec; text-wrap: balance; }
+.f-pod-score { font: 400 44px/1 var(--f-display); color: #ffffff; }
+.f-greeting { position: absolute; left: 0; right: 0; top: 452px; text-align: center; z-index: 15; font: 200 104px/1 var(--f-display); letter-spacing: 0.04em;
+  color: #fff3dc; text-shadow: 0 0 40px rgba(255, 210, 150, 0.6), 0 2px 26px rgba(5, 15, 30, 0.7); animation: f-etch 1.6s ease-out 4.2s both; }
+.f-world.is-bg .f-moon { opacity: 0; }

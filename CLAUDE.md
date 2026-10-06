@@ -65,6 +65,7 @@ React + TypeScript + Vite, Supabase (**только REST-поллинг, без
 | `lib/roundMeta.ts` | чистые (без сети) хелперы по раунду/пакету — `metaLine`/`displayRoundNumber`/`roundSetting`/`scoredRounds`, вынесены из `packLoader.ts` в 9.43 — HANDOFF §3bm |
 | `src/test/fakeMedia.ts` | `SpecAudio` — подставка `<audio>` для тестов гонок звука, поведение СВЕРЕНО с реальным headless Chromium (`scripts/media-calibration.mjs` → `src/test/media/chromium-semantics.json`, `fakeMedia.calibration.test.ts`), 9.59 |
 | `styles/parts/*.css` | 27 частей, порядок задан в `global.css` |
+| `src/labs/newyear/*` | New Year Mockup Lab — пять миров новой новогодней темы × восемь экранов; изолирован: игровой движок не импортирует, в `vite build` не входит (`npm run lab`, `npm run lab:build`) — HANDOFF §3ci |
 
 Механики раундов: `standard`, `test_stop`, `rebus`, `jeopardy`,
 `stakes_unique`, `stakes_free`, `thematic_x2`, `crossword`, `sprint`,
@@ -134,10 +135,11 @@ npx vite build
 ```
 
 Тесты проверяй не только по цвету, но и **по числу**: сейчас должно быть
-**711 пройденных тестов + 7 todo (718 всего) в 70 файлах** (итоговая
-строка `npx vitest run`: «Test Files 67 passed | 3 skipped (70)» — три
+**718 пройденных тестов + 7 todo (725 всего) в 71 файле** (итоговая
+строка `npx vitest run`: «Test Files 68 passed | 3 skipped (71)» — три
 файла это `it.todo`-заглушки для гонок без render-стенда (§3bu), целиком
-«skipped», отсюда 67, а не 70, в счётчике «passed»). 710→711 при 9.86 —
+«skipped», отсюда 68, а не 71, в счётчике «passed»). 711→718 при 9.87 —
+`src/labs/newyear/__tests__/lab.test.ts` (New Year Mockup Lab, HANDOFF §3ci). 710→711 при 9.86 —
 ревью 9.85 (запрет автозапуска не выкидывает трек из памяти, HANDOFF §3ch). 709→710 при 9.85 —
 `preloadAll.test.ts` (все треки мелодии при входе на доску, HANDOFF §3ch). 708→709 при 9.84 —
 рулетка на двух плитках (HANDOFF §3cg). 702→708 при 9.83 —

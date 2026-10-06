@@ -1,0 +1,232 @@
+/* ═══ CONCEPT 5 · ТАЙГА ═══
+   Ночь, сияние, снег с голубыми тенями, тёплые фонари. Шрифты: Forum
+   (сказочная антиква, как титры фильма) + Manrope. Планы глубины:
+   небо · p4 сияние · p3 дальний лес · p2 поляна, тропа, фонари ·
+   p1 ели у тропы · p0 огромные ели у камеры · снег 20 · текст 30. */
+.nyl-c5 {
+  --t-night: #050b1a; --t-teal: #2fe0c8; --t-green: #5dffb0; --t-violet: #9b7bff; --t-snow: #dfe9f5; --t-amber: #ffb85c;
+  --t-display: 'Forum', 'Times New Roman', Georgia, serif;
+  --t-body: 'Manrope', system-ui, sans-serif;
+}
+.t-scene { position: absolute; inset: 0; overflow: hidden; background: var(--t-night); color: #f2f7ff; font-family: var(--t-body); }
+.t-world { position: absolute; inset: 0; }
+.t-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #030814 0%, #071530 34%, #0d2a48 60%, #1c4466 74%, #2a5274 100%); }
+.t-stars { position: absolute; left: 0; right: 0; top: 0; height: 66%;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, rgba(0, 0, 0, 0) 1.7px), radial-gradient(circle, rgba(200, 220, 255, 0.75) 0 0.9px, rgba(0, 0, 0, 0) 1.5px);
+  background-size: 137px 113px, 89px 157px; background-position: 0 0, 40px 60px;
+  animation: t-twinkle 3.4s ease-in-out infinite alternate both; }
+.t-stars-2 { background-size: 211px 173px, 163px 97px; background-position: 70px 20px, 10px 90px; animation-delay: -1.7s; }
+@keyframes t-twinkle { from { opacity: 0.5; } to { opacity: 1; } }
+.t-plane { position: absolute; inset: 0; transform-origin: 960px 700px; }
+.t-p4 { z-index: 1; } .t-p3 { z-index: 2; } .t-p2 { z-index: 3; } .t-p1 { z-index: 4; } .t-p0 { z-index: 5; }
+.t-aurora { position: absolute; left: 0; top: 0; width: 1920px; height: 620px; filter: blur(3px); mix-blend-mode: screen; }
+.t-world.is-dim .t-p3, .t-world.is-dim .t-p2 { filter: brightness(0.72); }
+.t-ridge { position: absolute; left: 0; right: 0; top: 600px; height: 140px;
+  background: linear-gradient(180deg, #172f4e, #1b3757);
+  clip-path: polygon(0 60%, 8% 42%, 17% 52%, 27% 30%, 38% 48%, 50% 38%, 61% 50%, 72% 28%, 83% 46%, 92% 36%, 100% 50%, 100% 100%, 0 100%); }
+.t-ridge::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(120, 160, 210, 0) 30%, rgba(120, 160, 210, 0.35)); }
+.t-snowfield { position: absolute; left: 0; right: 0; top: 690px; bottom: 0;
+  background:
+    radial-gradient(ellipse 30% 14% at 22% 60%, rgba(60, 90, 140, 0.35), rgba(60, 90, 140, 0) 70%),
+    radial-gradient(ellipse 26% 12% at 80% 70%, rgba(60, 90, 140, 0.32), rgba(60, 90, 140, 0) 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, rgba(0, 0, 0, 0) 1.6px) 0 0 / 61px 47px,
+    linear-gradient(180deg, #3b5d86 0%, #6d8fb8 22%, #9fb9d8 60%, #c4d6ea 100%); }
+.t-path { position: absolute; left: 0; top: 0; filter: blur(2px); }
+.t-path path { fill: rgba(225, 236, 248, 0.55); }
+
+/* ── фонари на тропе ── */
+.t-lantern { position: absolute; width: 0; height: 0; transform: scale(var(--s)); transform-origin: 0 0; }
+.t-lantern i { position: absolute; left: -4px; top: -150px; width: 8px; height: 150px; background: linear-gradient(90deg, #1a120c, #3a2a1c, #1a120c); }
+.t-lantern b { position: absolute; left: -19px; top: -196px; width: 38px; height: 48px; border-radius: 8px 8px 4px 4px;
+  background: radial-gradient(circle at 50% 60%, #fff3c4 0 18%, #ffb85c 45%, #a8561c 100%);
+  box-shadow: 0 0 26px 10px rgba(255, 176, 90, 0.55), 0 0 90px 30px rgba(255, 150, 70, 0.22), inset 0 0 0 3px #2a1a10;
+  animation: t-flame 1.9s ease-in-out var(--d) infinite alternate both; transition: background 0.8s, box-shadow 0.8s; }
+/* пламя за стеклом дрожит — у каждого фонаря свой ритм */
+@keyframes t-flame { 0% { filter: brightness(0.9); } 40% { filter: brightness(1.12); } 70% { filter: brightness(0.96); } 100% { filter: brightness(1.06); } }
+.t-lantern span { position: absolute; left: -110px; top: -24px; width: 220px; height: 48px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 190, 110, 0.45), rgba(255, 190, 110, 0) 70%); transition: opacity 0.8s; }
+.t-lantern.is-out b { background: radial-gradient(circle at 50% 60%, #3a3f4a, #1c2230); box-shadow: inset 0 0 0 3px #2a1a10; animation: t-die 0.9s ease-out both; }
+.t-lantern.is-out span { opacity: 0; }
+/* фонарь гаснет не сразу: вспыхивает, захлёбывается и тухнет */
+@keyframes t-die { 0% { filter: brightness(1.6); } 30% { filter: brightness(0.5); } 50% { filter: brightness(1.1); } 100% { filter: brightness(1); } }
+
+/* ── ветер ── */
+.t-sway { transform-origin: 50% 100%; animation: t-sway 5.5s ease-in-out infinite alternate both; }
+.t-sway-slow { animation-duration: 8s; animation-delay: -3s; }
+/* ветер качает только ближние ели — дальние неподвижны (так и выглядит глубина) */
+@keyframes t-sway { from { transform: rotate(-0.5deg); } to { transform: rotate(0.6deg); } }
+.t-world.is-gust .t-sway { animation: t-gust 1.8s cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes t-gust { 0% { transform: rotate(0deg); } 25% { transform: rotate(2.6deg); } 55% { transform: rotate(-0.9deg); } 100% { transform: rotate(0.2deg); } }
+
+/* ── камера ── */
+.t-world.is-rest .t-p3 { animation: t-drift3 14s ease-in-out both; }
+.t-world.is-rest .t-p2 { animation: t-drift2 14s ease-in-out both; }
+.t-world.is-rest .t-p1 { animation: t-drift1 14s ease-in-out both; }
+.t-world.is-rest .t-p0 { animation: t-drift0 14s ease-in-out both; }
+/* медленный наезд: ближние планы приближаются быстрее дальних */
+@keyframes t-drift3 { from { transform: scale(1); } to { transform: scale(1.01); } }
+@keyframes t-drift2 { from { transform: scale(1); } to { transform: scale(1.025); } }
+@keyframes t-drift1 { from { transform: scale(1); } to { transform: scale(1.05); } }
+@keyframes t-drift0 { from { transform: scale(1); } to { transform: scale(1.08); } }
+/* пролёт сквозь лес: ели у камеры проносятся мимо, поляна приближается */
+.t-world.is-fly .t-p0 { animation: t-fly0 2.4s cubic-bezier(.5, 0, .3, 1) 0.1s both; }
+.t-world.is-fly .t-p1 { animation: t-fly1 2.4s cubic-bezier(.5, 0, .3, 1) 0.1s both; }
+.t-world.is-fly .t-p2 { animation: t-fly2 2.4s cubic-bezier(.5, 0, .3, 1) 0.1s both; }
+.t-world.is-fly .t-p3 { animation: t-fly3 2.4s cubic-bezier(.5, 0, .3, 1) 0.1s both; }
+@keyframes t-fly0 { from { transform: scale(1); opacity: 1; filter: blur(0); } 70% { opacity: 1; } to { transform: scale(4.6); opacity: 0; filter: blur(14px); } }
+@keyframes t-fly1 { from { transform: scale(1); opacity: 1; } 75% { opacity: 1; } to { transform: scale(2.7); opacity: 0; } }
+@keyframes t-fly2 { from { transform: scale(1); } to { transform: scale(1.38); } }
+@keyframes t-fly3 { from { transform: scale(1); } to { transform: scale(1.12); } }
+/* финал: камера поднимается к небу */
+.t-world.is-rise .t-p0 { animation: t-rise0 6s cubic-bezier(.45, 0, .2, 1) 0.2s both; }
+.t-world.is-rise .t-p1 { animation: t-rise1 6s cubic-bezier(.45, 0, .2, 1) 0.2s both; }
+.t-world.is-rise .t-p2 { animation: t-rise2 6s cubic-bezier(.45, 0, .2, 1) 0.2s both; }
+.t-world.is-rise .t-p3 { animation: t-rise3 6s cubic-bezier(.45, 0, .2, 1) 0.2s both; }
+.t-world.is-rise .t-p4 { animation: t-rise4 6s cubic-bezier(.45, 0, .2, 1) 0.2s both; }
+@keyframes t-rise0 { to { transform: translateY(520px); } }
+@keyframes t-rise1 { to { transform: translateY(380px); } }
+@keyframes t-rise2 { to { transform: translateY(260px); } }
+@keyframes t-rise3 { to { transform: translateY(200px); } }
+@keyframes t-rise4 { to { transform: translateY(70px); } }
+
+/* ── общая типографика ── */
+.t-kicker { font: 600 22px/1 var(--t-body); letter-spacing: 0.4em; text-transform: uppercase; color: var(--t-teal); }
+.t-in { animation: t-in 1.3s ease-out var(--t, 0s) both; }
+/* текст проявляется, как свет в морозном воздухе */
+@keyframes t-in { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: none; } }
+.t-glowtext, .t-act-num, .t-ans-text, .t-fin-greet {
+  background: linear-gradient(180deg, #ffffff 0%, #c9fff0 40%, #7ef5c8 70%, #9b8cff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 22px rgba(90, 255, 190, 0.35)); }
+
+/* ── LOBBY ── */
+.t-lobby-copy { position: absolute; left: 0; right: 0; top: 96px; text-align: center; z-index: 30; }
+.t-logo { margin: 18px 0 0; font: 400 150px/1 var(--t-display); letter-spacing: 0.14em; text-transform: uppercase; color: #f3f8ff;
+  text-shadow: 0 0 34px rgba(110, 255, 200, 0.35), 0 4px 30px rgba(0, 0, 0, 0.6); }
+.t-date { margin-top: 16px; font: 500 30px/1 var(--t-body); letter-spacing: 0.08em; color: #d8e8ff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8); }
+.t-join { position: absolute; left: 50%; top: 390px; transform: translateX(-50%); z-index: 30; display: flex; gap: 26px; align-items: center; padding: 16px 34px 16px 16px;
+  border-radius: 14px; background: rgba(5, 12, 26, 0.66); border: 1px solid rgba(255, 184, 92, 0.45); box-shadow: 0 0 40px rgba(255, 170, 80, 0.12); }
+.t-join.t-in { animation-name: t-in-x; }
+@keyframes t-in-x { from { opacity: 0; filter: blur(10px); transform: translateX(-50%); } to { opacity: 1; filter: none; transform: translateX(-50%); } }
+.t-join svg { border-radius: 8px; }
+.t-join-label { font: 600 16px/1 var(--t-body); letter-spacing: 0.32em; text-transform: uppercase; color: var(--t-amber); }
+.t-join-code { font: 400 84px/1 var(--t-display); letter-spacing: 0.08em; color: #ffffff; margin: 8px 0 6px; }
+.t-join-url { font: 500 22px/1 var(--t-body); color: #cfe0f5; }
+.t-teams { position: absolute; left: 520px; right: 520px; top: 600px; z-index: 30; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px;
+  font: 600 26px/1.35 var(--t-body); color: #f2f7ff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+.t-teams span { width: 100%; text-align: center; font-size: 16px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--t-amber); }
+.t-teams em { font-style: normal; }
+
+/* ── ROUND INTRO ── */
+.t-act { position: absolute; left: 0; right: 0; top: 110px; text-align: center; z-index: 30; }
+.t-act > * { animation: t-in 1.4s ease-out both; }
+.t-act-k { font: 600 24px/1 var(--t-body); letter-spacing: 0.4em; text-transform: uppercase; color: var(--t-teal); animation-delay: 2.1s; }
+.t-act-num { font: 400 320px/0.95 var(--t-display); animation-delay: 2.3s; }
+.t-act-title { font: 400 96px/1.05 var(--t-display); letter-spacing: 0.04em; color: #f3f8ff; text-shadow: 0 0 30px rgba(110, 255, 200, 0.35), 0 4px 24px rgba(0, 0, 0, 0.7); animation-delay: 2.6s; }
+.t-act-rules { margin-top: 18px; font: 500 30px/1.2 var(--t-body); color: #d8e8ff; animation-delay: 3s; }
+
+/* ── QUESTION ── */
+.t-q { position: absolute; left: 200px; right: 200px; top: 104px; text-align: center; z-index: 30; }
+.t-q-label { font: 600 22px/1 var(--t-body); letter-spacing: 0.36em; text-transform: uppercase; color: var(--t-teal); }
+.t-q-text { margin-top: 26px; font: 700 66px/1.16 var(--t-body); color: #ffffff; text-wrap: balance; text-shadow: 0 0 26px rgba(120, 220, 255, 0.25), 0 4px 30px rgba(0, 0, 0, 0.7); }
+.t-q.is-compact { top: 70px; }
+.t-q.is-compact .t-q-text { margin-top: 16px; font-size: 42px; }
+.t-cards { position: absolute; left: 200px; right: 200px; top: 700px; z-index: 30; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.t-card { position: relative; height: 170px; display: flex; align-items: center; gap: 16px; padding: 30px 24px 14px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(10, 20, 38, 0.86), rgba(6, 12, 26, 0.94)); border: 1px solid rgba(255, 184, 92, 0.4);
+  box-shadow: 0 -20px 50px rgba(255, 170, 80, 0.12), 0 20px 40px rgba(0, 0, 0, 0.5); transition: opacity 0.6s, transform 0.6s; }
+.t-card-lamp { position: absolute; left: 50%; top: -22px; width: 30px; height: 38px; margin-left: -15px; border-radius: 7px 7px 4px 4px;
+  background: radial-gradient(circle at 50% 60%, #fff3c4 0 18%, #ffb85c 45%, #a8561c 100%); box-shadow: 0 0 22px 8px rgba(255, 176, 90, 0.55), inset 0 0 0 3px #2a1a10; }
+.t-card-key { flex: none; font: 400 54px/1 var(--t-display); color: var(--t-amber); width: 46px; text-align: center; }
+.t-card-text { font: 700 32px/1.1 var(--t-body); color: #ffffff; min-width: 0; }
+/* карточку зажигает её фонарь: сначала искра, потом ровный свет */
+.t-light { animation: t-cardlit 1.1s ease-out var(--t) both; }
+.t-light .t-card-lamp { animation: t-ignite 1.1s steps(1) var(--t) both; }
+@keyframes t-cardlit { from { opacity: 0.15; filter: brightness(0.4); } 40% { opacity: 0.7; } to { opacity: 1; filter: none; } }
+@keyframes t-ignite { 0% { filter: brightness(0.2); } 20% { filter: brightness(1.4); } 35% { filter: brightness(0.3); } 55% { filter: brightness(1.2); } 100% { filter: none; } }
+.t-answered { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; z-index: 30; font: 600 24px/1 var(--t-body); letter-spacing: 0.2em; color: #f2f7ff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+
+/* ── TIMER ── */
+.t-timer { position: absolute; left: 0; right: 0; top: 280px; text-align: center; z-index: 30; }
+.t-timer-num { font: 400 330px/0.9 var(--t-display); color: #ffffff; font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 40px rgba(110, 255, 200, 0.5), 0 6px 40px rgba(0, 0, 0, 0.6); animation: t-in 0.6s ease-out both; }
+.t-timer-cap { margin-top: 10px; font: 600 24px/1 var(--t-body); letter-spacing: 0.3em; text-transform: uppercase; color: var(--t-amber); text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+.is-warn .t-timer-num { color: #ffd7a8; text-shadow: 0 0 40px rgba(255, 170, 80, 0.6); }
+
+/* ── ANSWER ── */
+.t-cards.is-answer .is-wrong { opacity: 0.32; filter: saturate(0.4); }
+.t-cards.is-answer .is-wrong .t-card-lamp { background: radial-gradient(circle at 50% 60%, #3a3f4a, #1c2230); box-shadow: inset 0 0 0 3px #2a1a10; transition: all 0.6s 0.7s; }
+.t-cards.is-answer .is-wrong { transition: opacity 0.7s 0.7s, filter 0.7s 0.7s; }
+.t-cards.is-answer .is-correct { animation: t-flare 1.2s ease-out 0.8s both; }
+@keyframes t-flare { 0% { transform: none; } 30% { box-shadow: 0 0 80px rgba(255, 190, 110, 0.6); } 100% { transform: translateY(-12px); border-color: var(--t-amber); box-shadow: 0 0 50px rgba(255, 190, 110, 0.4), 0 20px 40px rgba(0, 0, 0, 0.5); } }
+.t-ans { position: absolute; left: 160px; right: 160px; top: 320px; text-align: center; z-index: 30; }
+.t-ans-text { font: 400 104px/1.02 var(--t-display); text-wrap: balance; animation: t-in 1.4s ease-out 1.1s both; }
+.t-ans-fact { margin-top: 18px; font: 500 30px/1.3 var(--t-body); color: #d8e8ff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); animation: t-in 1s ease-out 1.8s both; }
+
+/* ── SCOREBOARD: строки зажигаются, как фонари ── */
+.t-score-head, .t-race-head { position: absolute; left: 0; right: 0; top: 70px; text-align: center; z-index: 30; }
+.t-score-head h2, .t-race-head h2 { margin: 14px 0 0; font: 400 76px/1 var(--t-display); letter-spacing: 0.06em; color: #f3f8ff; text-shadow: 0 0 26px rgba(110, 255, 200, 0.35); }
+.t-race-head p { margin: 12px 0 0; font: 500 26px/1.2 var(--t-body); color: #d8e8ff; }
+.t-rows { position: absolute; left: 400px; right: 400px; top: 222px; margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; z-index: 30; }
+.t-row { display: grid; grid-template-columns: 40px 70px minmax(0, 1fr) 90px 120px; align-items: center; height: 82px; padding: 0 30px 0 22px; border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 16, 32, 0.9), rgba(6, 12, 26, 0.82)); border: 1px solid rgba(160, 220, 255, 0.18);
+  animation: t-cardlit 1s ease-out var(--t) both; }
+.t-row-lamp { width: 16px; height: 22px; border-radius: 4px; background: radial-gradient(circle at 50% 60%, #fff3c4 0 18%, #ffb85c 45%, #a8561c 100%);
+  box-shadow: 0 0 16px 6px rgba(255, 176, 90, 0.5); animation: t-ignite 1s steps(1) var(--t) both; }
+.t-row-place { font: 400 46px/1 var(--t-display); color: var(--t-amber); }
+.t-row-name { font: 700 36px/1 var(--t-body); color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-row-delta { justify-self: center; font: 600 24px/1 var(--t-body); color: var(--t-green); }
+.t-row-score { justify-self: end; font: 400 58px/1 var(--t-display); color: #ffffff; font-variant-numeric: tabular-nums; }
+.t-row.is-lead { border-color: rgba(255, 184, 92, 0.7); box-shadow: 0 0 40px rgba(255, 170, 80, 0.25); }
+
+/* ── SPECIAL: «Скачки бульдогов» ── */
+.t-track { position: absolute; left: 240px; right: 240px; top: 300px; height: 560px; z-index: 30; }
+.t-finish { position: absolute; left: 87%; top: -10px; bottom: -10px; width: 6px;
+  background: repeating-linear-gradient(180deg, var(--t-amber) 0 14px, rgba(0, 0, 0, 0) 14px 24px); box-shadow: 0 0 20px rgba(255, 184, 92, 0.6); }
+.t-finish span { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); font: 600 18px/1 var(--t-body); letter-spacing: 0.3em; text-transform: uppercase; color: var(--t-amber); white-space: nowrap; }
+.t-lane { position: absolute; left: 0; right: 0; top: calc(var(--i) * 108px); height: 98px; border-radius: 49px;
+  background: linear-gradient(180deg, rgba(225, 236, 248, 0.16), rgba(225, 236, 248, 0.3)); box-shadow: inset 0 -4px 10px rgba(30, 50, 90, 0.35); }
+.t-lane-name { position: absolute; left: -200px; top: 50%; width: 180px; transform: translateY(-50%); text-align: right; font: 700 30px/1 var(--t-body); color: #ffffff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); }
+.t-runner { position: absolute; top: 8px; width: 132px; height: 88px; }
+.t-dog { position: absolute; left: 0; top: 0; width: 132px; height: 88px; animation: t-gallop 0.3s ease-in-out infinite alternate both; overflow: visible; }
+/* галоп: тело подпрыгивает, лапы работают попарно */
+@keyframes t-gallop { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-9px) rotate(3deg); } }
+.t-leg { transform-box: fill-box; transform-origin: 50% 0; }
+.t-leg-a { animation: t-leg 0.3s ease-in-out infinite alternate both; }
+.t-leg-b { animation: t-leg 0.3s ease-in-out -0.3s infinite alternate both; }
+@keyframes t-leg { from { transform: rotate(-26deg); } to { transform: rotate(26deg); } }
+.t-scarf { transform-box: fill-box; transform-origin: 0 50%; animation: t-leg 0.24s ease-in-out infinite alternate both; }
+.t-kick { position: absolute; left: -36px; top: 56px; width: 56px; height: 30px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 70%); animation: t-kick 0.3s ease-out infinite both; }
+/* лапы взбивают снег */
+@keyframes t-kick { from { transform: scale(0.4); opacity: 0.9; } to { transform: scale(1.4) translateX(-16px); opacity: 0; } }
+.t-race.is-done .t-dog, .t-race.is-done .t-leg, .t-race.is-done .t-kick { animation-play-state: paused; }
+.t-lane.is-win { background: linear-gradient(180deg, rgba(255, 200, 120, 0.25), rgba(255, 200, 120, 0.42)); box-shadow: 0 0 40px rgba(255, 184, 92, 0.45); }
+.t-race-win { position: absolute; left: 0; right: 0; bottom: 64px; text-align: center; z-index: 30; font: 400 60px/1 var(--t-display); color: #fff3dc; opacity: 0;
+  text-shadow: 0 0 26px rgba(255, 190, 110, 0.6), 0 4px 20px rgba(0, 0, 0, 0.8); transition: opacity 0.8s; }
+.t-race.is-done .t-race-win { opacity: 1; }
+
+/* ── FINALE: небесные фонарики над тайгой ── */
+.t-skylanterns { position: absolute; inset: 0; z-index: 22; pointer-events: none; }
+.t-skylanterns span { position: absolute; bottom: -90px; width: calc(40px * var(--s)); height: calc(54px * var(--s)); border-radius: 40% 40% 18% 18%;
+  background: radial-gradient(ellipse at 50% 80%, #fff1c8 0 15%, #ffb45a 45%, #d06a20 80%);
+  box-shadow: 0 0 calc(30px * var(--s)) calc(10px * var(--s)) rgba(255, 170, 80, 0.5);
+  animation: t-skyrise var(--dur) cubic-bezier(.3, .1, .6, 1) var(--d) infinite both; }
+/* бумажный фонарик поднимается тёплым воздухом и уходит вглубь неба */
+@keyframes t-skyrise {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  8% { opacity: 1; }
+  50% { transform: translate(calc(var(--sw) * 0.6), -620px) scale(0.7); }
+  90% { opacity: 0.8; }
+  100% { transform: translate(var(--sw), -1250px) scale(0.35); opacity: 0; }
+}
+.t-fin { position: absolute; left: 0; right: 0; top: 130px; text-align: center; z-index: 30; animation: t-in 1.6s ease-out 2.2s both; }
+.t-fin-name { margin-top: 18px; font: 400 128px/1.02 var(--t-display); color: #fff6e2; text-shadow: 0 0 40px rgba(255, 200, 130, 0.55), 0 6px 30px rgba(0, 0, 0, 0.6); }
+.t-fin-score { margin-top: 10px; font: 600 34px/1 var(--t-body); letter-spacing: 0.12em; color: var(--t-amber); }
+.t-fin-rest { margin-top: 22px; font: 600 28px/1.3 var(--t-body); color: #e3eeff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); }
+.t-fin-rest i { display: inline-block; width: 1px; height: 22px; margin: 0 22px; background: rgba(255, 255, 255, 0.4); vertical-align: middle; }
+.t-fin-greet { position: absolute; left: 0; right: 0; top: 560px; text-align: center; z-index: 30; font: 400 110px/1 var(--t-display); letter-spacing: 0.06em;
+  animation: t-in 1.8s ease-out 4.2s both; }
+/* светящийся текст: проявляется и остаётся со свечением сияния */
+.t-act .t-act-num, .t-ans-text, .t-fin-greet { animation-name: t-in-glow; }
+@keyframes t-in-glow { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: drop-shadow(0 0 22px rgba(90, 255, 190, 0.35)); } }

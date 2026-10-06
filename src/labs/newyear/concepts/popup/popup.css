@@ -1,0 +1,286 @@
+/* ═══ CONCEPT 2 · КНИГА-РАСКЛАДУШКА ═══
+   Палитра бумаги: слоновая кость, клюквенный, горчичный, хвойный, синий
+   «чернильный». Шрифты: Ruslan Display (заголовки — как на советской
+   открытке), PT Serif (книжный набор). Глубина — тенями слоёв, не свечением. */
+.nyl-c2 {
+  --p-ivory: #f3ead8; --p-card: #fbf6ea; --p-red: #b3263a; --p-mustard: #d9a441; --p-pine: #1f4a3a;
+  --p-ink: #1d2b4a; --p-brown: #5a3b22;
+  --p-display: 'Ruslan Display', 'Arial Black', Impact, sans-serif;
+  --p-serif: 'PT Serif', Georgia, 'Times New Roman', serif;
+}
+.p-scene { position: absolute; inset: 0; overflow: hidden; font-family: var(--p-serif); color: var(--p-ink); }
+.p-table { position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 2px, rgba(0, 0, 0, 0) 2px 5px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0 2px, rgba(0, 0, 0, 0) 2px 5px),
+    radial-gradient(ellipse at 50% 38%, #24345a, #121b2f 70%, #0a101c); }
+.p-book { position: absolute; perspective: 2600px; perspective-origin: 50% 8%; }
+.p-cover { position: absolute; inset: -16px -18px -20px; border-radius: 12px;
+  background: linear-gradient(180deg, #8a1f30, #6b1525); box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(255, 220, 200, 0.12); }
+.p-page { position: absolute; top: 0; bottom: 0; width: 50%; }
+.p-page-l { left: 0; border-radius: 4px 0 0 4px; background: linear-gradient(90deg, #f6eedd 0%, #f2e8d3 78%, #ddcdaf 100%);
+  box-shadow: -2px 3px 0 #e6dac2, -4px 6px 0 #d8caae, -6px 9px 0 #cdbd9f; }
+.p-page-r { right: 0; border-radius: 0 4px 4px 0; background: linear-gradient(270deg, #f6eedd 0%, #f2e8d3 78%, #ddcdaf 100%);
+  box-shadow: 2px 3px 0 #e6dac2, 4px 6px 0 #d8caae, 6px 9px 0 #cdbd9f; }
+.p-gutter { position: absolute; top: 0; bottom: 0; left: 50%; width: 90px; margin-left: -45px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, rgba(110, 80, 40, 0), rgba(110, 80, 40, 0.2) 42%, rgba(70, 48, 20, 0.36) 50%, rgba(110, 80, 40, 0.2) 58%, rgba(110, 80, 40, 0)); }
+.p-grain { position: absolute; inset: 0; pointer-events: none; z-index: 60; mix-blend-mode: multiply; opacity: 0.42;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.33 0 0 0 0 0.18 0 0 0 0.45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* ── подъём на сгибе: слой лежал на странице, встаёт, чуть перебирает и оседает ── */
+.p-pop { position: absolute; inset: 0; pointer-events: none; animation: p-up 1.15s cubic-bezier(.25, .8, .3, 1) var(--t) both; }
+.p-pop.is-settled { animation: none; }
+@keyframes p-up {
+  0% { transform: rotateX(84deg); opacity: 0; }
+  10% { opacity: 1; }
+  62% { transform: rotateX(-8deg); }
+  82% { transform: rotateX(2.5deg); }
+  100% { transform: none; opacity: 1; }
+}
+.p-shadowed > * { filter: drop-shadow(0 12px 9px rgba(70, 40, 10, 0.26)) drop-shadow(0 2px 2px rgba(70, 40, 10, 0.25)); }
+.p-fade { animation: p-ink 0.9s ease-out var(--t, 0s) both; }
+/* текст «проступает», как напечатанный: без сдвигов */
+@keyframes p-ink { from { opacity: 0; filter: blur(3px); } to { opacity: 1; filter: none; } }
+
+/* ── флажки на бечёвке ── */
+.p-bunting { position: absolute; inset: 0; z-index: 8; pointer-events: none; animation: p-drop 1.2s cubic-bezier(.3, 1.35, .5, 1) var(--t) both; }
+@keyframes p-drop { from { transform: translateY(-240px); } to { transform: none; } }
+.p-twine { position: absolute; left: 0; top: 0; }
+.p-flag { position: absolute; width: 58px; height: 70px; margin-left: -29px; transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.12)), var(--c);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  animation: p-flag 3.4s ease-in-out var(--ph) infinite alternate both; }
+/* сквозняк: флажки качаются вокруг бечёвки, каждый со своей фазой */
+@keyframes p-flag { from { transform: rotate(var(--ang)) rotate(-5deg); } to { transform: rotate(var(--ang)) rotate(6deg); } }
+
+/* ── домик: стены, крыша со снегом, окна из кальки ── */
+.p-house { position: absolute; width: 260px; height: 250px; }
+.p-walls { position: absolute; left: 20px; right: 20px; bottom: 0; height: 150px; background: linear-gradient(180deg, #c33246, #a3202f); }
+.p-roof { position: absolute; left: 0; right: 0; top: 0; height: 112px; background: #2c4a7a; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.p-roof-snow { position: absolute; left: -6px; right: -6px; top: -4px; height: 70px; background: #fbf6ea;
+  clip-path: polygon(50% 0, 82% 46%, 76% 52%, 68% 44%, 58% 56%, 46% 46%, 36% 58%, 26% 46%, 18% 50%); }
+.p-chimney { position: absolute; left: 172px; top: 18px; width: 30px; height: 52px; background: #8a1d2c; }
+.p-win, .p-door { position: absolute; bottom: 52px; width: 46px; height: 48px; background: #ffd27a;
+  box-shadow: 0 0 22px rgba(255, 196, 90, 0.85), inset 0 0 0 4px #7a1424; animation: p-candle 2.6s ease-in-out infinite alternate both; }
+.p-win:nth-child(1) { left: 22px; } .p-win:nth-child(2) { right: 22px; animation-delay: -1.1s; }
+.p-door { left: 50%; margin-left: -22px; bottom: 0; height: 74px; background: #4a1018; box-shadow: none; animation: none; }
+/* за калькой горит свеча — чуть дышит */
+@keyframes p-candle { from { filter: brightness(0.92); } to { filter: brightness(1.12); } }
+.p-drifts { position: absolute; left: 0; }
+
+/* ── лента-заголовок разворачивается из рулона ── */
+.p-ribbon { position: absolute; left: 50%; z-index: 12; animation: p-unfurl 1.1s cubic-bezier(.3, .85, .3, 1) var(--t) both; transform-origin: 50% 50%; }
+@keyframes p-unfurl { from { transform: scaleX(0.04); opacity: 0; } 20% { opacity: 1; } to { transform: none; opacity: 1; } }
+.p-ribbon-face { position: relative; padding: 18px 40px 22px; text-align: center; color: #fbf3e2;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.14)), var(--rb);
+  box-shadow: 0 14px 18px rgba(60, 20, 10, 0.3); }
+.p-ribbon-tail { position: absolute; top: 26px; width: 120px; height: 100%; background: var(--rb); filter: brightness(0.7);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 26% 50%); }
+.p-ribbon-tail-l { left: -84px; } .p-ribbon-tail-r { right: -84px; transform: scaleX(-1); }
+.p-logo { font: 400 116px/1 var(--p-display); letter-spacing: 0.04em; text-shadow: 3px 4px 0 rgba(80, 10, 20, 0.45); }
+.p-sub { position: absolute; top: 318px; left: 0; right: 0; text-align: center; z-index: 12; font: italic 400 36px/1.2 var(--p-serif); color: var(--p-brown); }
+
+/* ── бирка-билет с QR ── */
+.p-tag { position: absolute; left: 1150px; top: 610px; z-index: 20; display: flex; gap: 20px; align-items: center; padding: 20px 30px 20px 62px;
+  background: var(--p-card); clip-path: polygon(12% 0, 100% 0, 100% 100%, 12% 100%, 0 50%);
+  filter: drop-shadow(0 14px 12px rgba(60, 30, 10, 0.3)); transform-origin: 0 50%;
+  animation: p-swing-in 1.8s cubic-bezier(.3, .7, .3, 1) var(--t) both; }
+/* бирку подвешивают: она прилетает и раскачивается на нитке до покоя */
+@keyframes p-swing-in {
+  0% { transform: translateY(-420px) rotate(-30deg); opacity: 0; }
+  20% { opacity: 1; }
+  45% { transform: translateY(0) rotate(9deg); }
+  65% { transform: rotate(-6deg); }
+  82% { transform: rotate(2.5deg); }
+  100% { transform: rotate(-2deg); opacity: 1; }
+}
+.p-tag-hole { position: absolute; left: 22px; top: 50%; width: 18px; height: 18px; margin-top: -9px; border-radius: 50%; background: #c9b896; box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3); }
+.p-tag-label { font: 700 18px/1 var(--p-serif); letter-spacing: 0.22em; text-transform: uppercase; color: var(--p-red); }
+.p-tag-code { font: 400 74px/1 var(--p-display); color: var(--p-ink); margin: 8px 0 6px; }
+.p-tag-url { font: italic 400 22px/1 var(--p-serif); color: var(--p-brown); }
+.p-card { position: absolute; z-index: 20; background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 64px, rgba(179, 38, 58, 0.45) 64px 66px, rgba(0, 0, 0, 0) 66px),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 33px, rgba(44, 74, 122, 0.2) 33px 34px),
+    var(--p-card);
+  box-shadow: 0 14px 18px rgba(60, 30, 10, 0.28); }
+.p-joined { left: 230px; top: 620px; width: 440px; padding: 22px 26px 22px 84px; transform: rotate(-2deg); animation: p-slide-card 1s cubic-bezier(.2, .8, .3, 1) var(--t) both; }
+@keyframes p-slide-card { from { transform: translateY(80px) rotate(4deg); opacity: 0; } to { transform: rotate(-2deg); opacity: 1; } }
+.p-card-title { font: 700 26px/1.3 var(--p-serif); color: var(--p-red); margin-bottom: 4px; }
+.p-joined ul { margin: 0; padding: 0; list-style: none; font: italic 400 24px/34px var(--p-serif); color: var(--p-ink); }
+
+/* ── ROUND INTRO: перелистывание ── */
+.p-act { position: absolute; inset: 0; z-index: 3; }
+.p-num { position: absolute; left: 448px; top: 470px; width: 0; height: 0; transform-origin: 0 380px; animation: p-up 1.2s cubic-bezier(.25, .8, .3, 1) 2.05s both; }
+.p-num span { position: absolute; left: 0; top: 0; transform: translate(-50%, -54%); font: 400 560px/1 var(--p-display); }
+.p-num-l3 { color: #e9d9b7; margin: 22px 0 0 22px; }
+.p-num-l2 { color: var(--p-mustard); margin: 11px 0 0 11px; filter: drop-shadow(0 6px 4px rgba(70, 40, 10, 0.3)); }
+.p-num-l1 { color: var(--p-red); filter: drop-shadow(0 8px 6px rgba(70, 40, 10, 0.35)); }
+.p-act-copy { position: absolute; left: 1000px; top: 250px; width: 700px; }
+.p-act-copy > * { animation: p-ink 0.9s ease-out both; }
+.p-act-copy > :nth-child(1) { animation-delay: 2.3s; } .p-act-copy > :nth-child(2) { animation-delay: 2.5s; } .p-act-copy > :nth-child(3) { animation-delay: 2.8s; }
+.p-kicker { font: 700 22px/1 var(--p-serif); letter-spacing: 0.28em; text-transform: uppercase; color: var(--p-red); }
+.p-act-title { margin: 18px 0 20px; font: 400 80px/1.05 var(--p-display); color: var(--p-ink); text-wrap: balance; }
+.p-act-rules { font: italic 400 32px/1.3 var(--p-serif); color: var(--p-brown); }
+.p-oldleft { position: absolute; left: 0; top: 0; width: 896px; height: 990px; z-index: 4; display: grid; place-content: center; text-align: center;
+  background: linear-gradient(90deg, #f6eedd 0%, #f2e8d3 78%, #ddcdaf 100%); animation: p-hide 0.01s linear 1.95s both; }
+@keyframes p-hide { to { visibility: hidden; } }
+.p-oldleft-num { font: 400 300px/1 var(--p-display); color: #e2d2b0; }
+.p-oldleft-cap { font: italic 400 30px/1 var(--p-serif); color: #a99476; }
+.p-leaf { position: absolute; left: 896px; top: 0; width: 896px; height: 990px; z-index: 30; transform-origin: 0 50%; transform-style: preserve-3d;
+  animation: p-turn 1.5s cubic-bezier(.55, 0, .25, 1) 0.5s both, p-hide 0.01s linear 1.98s both; }
+/* лист поднимается за край и ложится на левую страницу; по нему бежит тень */
+@keyframes p-turn { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
+.p-leaf-front, .p-leaf-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 0 4px 4px 0; }
+.p-leaf-front { background: linear-gradient(270deg, #f6eedd 0%, #f2e8d3 78%, #ddcdaf 100%); animation: p-leaf-shade 1.5s ease-in 0.5s both; }
+.p-leaf-back { transform: rotateY(180deg); border-radius: 4px 0 0 4px; background: linear-gradient(90deg, #f6eedd 0%, #f2e8d3 78%, #ddcdaf 100%); animation: p-leaf-light 1.5s ease-out 0.5s both; }
+@keyframes p-leaf-shade { from { filter: brightness(1); } to { filter: brightness(0.7); } }
+@keyframes p-leaf-light { from { filter: brightness(0.75); } to { filter: brightness(1); } }
+.p-leaf-art { position: absolute; inset: 0; overflow: hidden; }
+.p-leaf-moon { position: absolute; right: 180px; top: 150px; width: 170px; height: 170px; border-radius: 50%; background: var(--p-mustard); box-shadow: 0 10px 12px rgba(70, 40, 10, 0.25); }
+.p-leaf-hill { position: absolute; left: -60px; right: -60px; bottom: -160px; height: 420px; border-radius: 50% 50% 0 0; background: #3f6e57; }
+
+/* ── QUESTION: карточка поднимается со сгиба, язычки-варианты выдвигаются ── */
+.p-qcard { position: absolute; left: 236px; width: 1320px; top: 118px; height: 560px; padding: 60px 96px; display: flex; flex-direction: column; justify-content: center; gap: 26px;
+  background: var(--p-card); border: 1px solid #e3d6bb; border-radius: 4px; }
+.p-qcard.is-compact { height: 250px; padding: 30px 90px; gap: 14px; }
+.p-qcard-tab { position: absolute; top: -14px; width: 70px; height: 30px; background: var(--p-red); clip-path: polygon(0 100%, 12% 0, 88% 0, 100% 100%); }
+.p-qcard-tab-l { left: 70px; } .p-qcard-tab-r { right: 70px; }
+.p-qcard-label { font: 700 24px/1 var(--p-serif); letter-spacing: 0.24em; text-transform: uppercase; color: var(--p-red); }
+.p-qcard-text { font: 700 70px/1.12 var(--p-serif); color: var(--p-ink); text-wrap: balance; }
+.p-qcard.is-compact .p-qcard-text { font-size: 46px; }
+.p-tabs { position: absolute; left: 236px; width: 1320px; top: 688px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; z-index: 9; }
+.p-pull { height: 128px; display: flex; align-items: center; gap: 16px; padding: 18px 22px 10px; color: #fbf3e2; border-radius: 0 0 16px 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 22%), var(--c);
+  box-shadow: 0 12px 14px rgba(60, 30, 10, 0.3); animation: p-pull 0.85s cubic-bezier(.2, .9, .3, 1.15) var(--t) both; }
+/* язычок вытягивают из-под карточки */
+@keyframes p-pull { from { transform: translateY(-120px); } to { transform: none; } }
+.p-pull-key { flex: none; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: #fbf3e2; color: var(--c); font: 400 34px/1 var(--p-display); }
+.p-pull-text { font: 700 29px/1.08 var(--p-serif); min-width: 0; }
+.p-stamp-note { position: absolute; left: 0; right: 0; top: 900px; text-align: center; z-index: 12; font: italic 400 30px/1 var(--p-serif); color: var(--p-brown); }
+
+/* ── TIMER: бумажная розетка, лепестки ложатся по секунде ── */
+.p-qstrip { position: absolute; left: 236px; right: 236px; top: 96px; z-index: 12; padding: 24px 44px; display: flex; flex-direction: column; gap: 10px;
+  background: var(--p-card); border: 1px solid #e3d6bb; box-shadow: 0 12px 16px rgba(60, 30, 10, 0.25); }
+.p-qstrip-label { font: 700 20px/1 var(--p-serif); letter-spacing: 0.24em; text-transform: uppercase; color: var(--p-red); }
+.p-qstrip-text { font: 700 42px/1.15 var(--p-serif); color: var(--p-ink); }
+.p-rosette { position: absolute; left: 896px; top: 610px; width: 0; height: 0; z-index: 10; }
+.p-petal { position: absolute; left: 0; top: 0; width: 0; height: 0; transform: rotate(var(--a)); perspective: 700px; }
+.p-petal i { position: absolute; left: -32px; top: -306px; width: 64px; height: 158px; transform-origin: 50% 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.12)), var(--c);
+  clip-path: polygon(50% 0, 100% 26%, 74% 100%, 26% 100%, 0 26%);
+  transition: transform 0.75s cubic-bezier(.5, 0, .3, 1.2), filter 0.75s; }
+/* лепесток откидывается назад и ложится на страницу — остаётся видно, сколько ушло */
+.p-petal.is-folded i { transform: rotateX(76deg); filter: brightness(0.55) saturate(0.6); }
+.p-timer.is-warn .p-petal:not(.is-folded) i { --c: #b3263a; }
+.p-rosette-core { position: absolute; left: -158px; top: -158px; width: 316px; height: 316px; border-radius: 50%; display: grid; place-content: center; text-align: center;
+  background: var(--p-card); box-shadow: 0 12px 20px rgba(70, 40, 10, 0.3), inset 0 0 0 12px #f0e5cf, inset 0 0 0 15px var(--p-red); }
+.p-rosette-num { font: 400 170px/1 var(--p-display); color: var(--p-red); animation: p-stamp 0.4s cubic-bezier(.3, 1.4, .5, 1) both; }
+.p-rosette-cap { font: italic 400 26px/1 var(--p-serif); color: var(--p-brown); margin-top: 4px; }
+
+/* ── ANSWER: клапан поднимается, под ним — ответ ── */
+.p-burst { position: absolute; left: 896px; top: 610px; width: 0; height: 0; z-index: 9; }
+.p-burst span { position: absolute; left: -64px; top: -470px; width: 128px; height: 470px; transform-origin: 50% 100%;
+  background: var(--c); clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  transform: rotate(var(--a)) scaleY(0); animation: p-ray 0.9s cubic-bezier(.2, .9, .3, 1.25) 1.15s both; }
+@keyframes p-ray { to { transform: rotate(var(--a)) scaleY(1); } }
+.p-burst { filter: drop-shadow(0 8px 8px rgba(70, 40, 10, 0.25)); }
+.p-reveal { position: absolute; left: 446px; width: 900px; top: 430px; height: 350px; z-index: 12; perspective: 1600px; }
+.p-reveal-under { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 30px 60px; text-align: center;
+  background: var(--p-card); border: 1px solid #e3d6bb; box-shadow: 0 16px 22px rgba(60, 30, 10, 0.3); }
+.p-reveal-key { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--p-mustard); color: #fbf3e2; font: 400 36px/1 var(--p-display); }
+.p-reveal-text { font: 400 58px/1.08 var(--p-display); color: var(--p-red); text-wrap: balance; }
+.p-reveal-fact { font: italic 400 26px/1.3 var(--p-serif); color: var(--p-brown); }
+.p-flap { position: absolute; inset: 0; transform-origin: 50% 100%; transform-style: preserve-3d;
+  animation: p-flap 1.15s cubic-bezier(.55, 0, .2, 1) 0.75s both, p-hide 0.01s linear 1.95s both; }
+/* клапан откидывается вниз, к зрителю, и уходит за край страницы */
+@keyframes p-flap { from { transform: rotateX(0deg); } to { transform: rotateX(176deg); } }
+.p-flap-front, .p-flap-back { position: absolute; inset: 0; backface-visibility: hidden; }
+.p-flap-front { display: grid; place-items: center; font: 400 54px/1 var(--p-display); color: #fbf3e2;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 22px, rgba(0, 0, 0, 0) 22px 44px), var(--p-red);
+  box-shadow: 0 16px 22px rgba(60, 30, 10, 0.3); }
+.p-flap-back { transform: rotateX(180deg); background: #e9dcc0; }
+
+/* ── хлопушка: бумажный цилиндр, отдача при выстреле ── */
+.p-popper { position: absolute; z-index: 35; width: 170px; height: 60px; animation: p-recoil 0.5s cubic-bezier(.2, .8, .3, 1) var(--t) both; }
+.p-popper-l { left: 104px; top: 900px; rotate: -55deg; }
+.p-popper-r { right: 104px; top: 900px; rotate: 55deg; scale: -1 1; }
+@keyframes p-recoil { 0% { transform: translateX(0); } 18% { transform: translateX(-26px); } 100% { transform: translateX(0); } }
+.p-popper-body { position: absolute; left: 30px; top: 0; width: 140px; height: 60px; border-radius: 6px 12px 12px 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.25)),
+    repeating-linear-gradient(90deg, #b3263a 0 18px, #f3ead8 18px 26px, #d9a441 26px 34px, #f3ead8 34px 42px); }
+.p-popper-twist { position: absolute; left: 0; top: 12px; width: 36px; height: 36px; background: #d9a441; clip-path: polygon(0 0, 100% 30%, 100% 70%, 0 100%, 30% 50%); }
+.p-popper-string { position: absolute; left: 4px; top: 30px; width: 2px; height: 90px; background: #7a5a3a; transform-origin: 0 0; rotate: 20deg; }
+
+/* ── SCOREBOARD: табель на линованной бумаге, баллы — штампом ── */
+.p-ledger { position: absolute; left: 300px; right: 300px; top: 66px; bottom: 54px; z-index: 10; padding: 34px 70px 26px 150px;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 116px, rgba(179, 38, 58, 0.5) 116px 118px, rgba(0, 0, 0, 0) 118px),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 87px, rgba(44, 74, 122, 0.18) 87px 89px),
+    var(--p-card);
+  box-shadow: 0 20px 30px rgba(60, 30, 10, 0.35); transform-origin: 50% 100%; rotate: -0.5deg;
+  animation: p-up 1.1s cubic-bezier(.25, .8, .3, 1) 0.1s both; }
+.p-ledger-head h2 { margin: 8px 0 18px; font: 400 62px/1 var(--p-display); color: var(--p-red); }
+.p-lrows { margin: 0; padding: 0; list-style: none; display: grid; }
+.p-lrows li { height: 80px; display: grid; grid-template-columns: 70px minmax(0, 1fr) 90px 150px; align-items: center; position: relative; }
+.p-l-place { font: 400 42px/1 var(--p-display); color: var(--p-ink); opacity: 0; animation: p-ink 0.5s ease-out var(--t) both; }
+.p-l-name { font: 700 38px/1 var(--p-serif); color: var(--p-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  clip-path: inset(0 100% 0 0); animation: p-write 0.7s steps(18) var(--t) both; }
+/* имя «вписывают» слева направо — по буквам, а не плавной шторкой */
+@keyframes p-write { to { clip-path: inset(0 0 0 0); } }
+.p-l-delta { font: italic 400 28px/1 var(--p-serif); color: #3f6e57; opacity: 0; animation: p-ink 0.4s ease-out calc(var(--t) + 0.5s) both; }
+.p-l-score { justify-self: end; font: 400 50px/1 var(--p-display); color: var(--p-red); padding: 4px 14px 2px; border: 4px solid currentColor; border-radius: 10px;
+  mix-blend-mode: multiply; rotate: var(--rot); animation: p-stamp 0.42s cubic-bezier(.3, 1.4, .5, 1) calc(var(--t) + 0.55s) both; }
+/* штамп: удар с высоты, оттиск чуть неровный */
+@keyframes p-stamp { 0% { transform: scale(2.1); opacity: 0; } 60% { transform: scale(0.93); opacity: 1; } 100% { transform: none; opacity: 0.92; } }
+.p-lrows li.is-lead::before { content: ''; position: absolute; left: -16px; right: 140px; top: 18px; bottom: 16px; z-index: -1;
+  background: linear-gradient(90deg, rgba(217, 164, 65, 0), rgba(217, 164, 65, 0.55) 4%, rgba(217, 164, 65, 0.55) 96%, rgba(217, 164, 65, 0));
+  transform-origin: 0 50%; transform: scaleX(0); animation: p-marker 0.8s ease-out 3.4s both; }
+@keyframes p-marker { to { transform: scaleX(1); } }
+
+/* ── SPECIAL: «Скрэмбл» на прищепках ── */
+.p-scr-head { position: absolute; top: 96px; left: 0; right: 0; text-align: center; z-index: 12; }
+.p-scr-head h2 { margin: 12px 0 10px; font: 400 76px/1 var(--p-display); color: var(--p-red); }
+.p-scr-head p { margin: 0; font: italic 400 30px/1.2 var(--p-serif); color: var(--p-brown); }
+.p-scr-twine { position: absolute; left: 0; top: 322px; z-index: 11; }
+.p-letter { position: absolute; width: 152px; height: 188px; z-index: 12; transform-origin: 50% -26px;
+  animation: p-hang 1s cubic-bezier(.3, 1.3, .5, 1) var(--t) both, p-sway 3.2s ease-in-out calc(var(--t) + 1s) infinite alternate both; }
+@keyframes p-hang { from { transform: translateY(-520px) rotate(10deg); } to { transform: rotate(0deg); } }
+@keyframes p-sway { from { transform: rotate(var(--sw)); } to { transform: rotate(calc(var(--sw) * -1)); } }
+.p-letter-face { position: absolute; inset: 0; display: grid; place-items: center; background: var(--p-card); border: 1px solid #e3d6bb; border-radius: 4px;
+  font: 400 118px/1 var(--p-display); color: var(--p-red); box-shadow: 0 14px 16px rgba(60, 30, 10, 0.28); }
+.p-pin { position: absolute; z-index: 13; width: 22px; height: 58px; margin-left: -11px; border-radius: 4px;
+  background: linear-gradient(90deg, #a7804f, #d8b07a 45%, #9a7344); box-shadow: 0 4px 4px rgba(60, 30, 10, 0.3);
+  animation: p-ink 0.4s ease-out calc(var(--t) + 0.6s) both; }
+.p-scr.is-solve .p-letter { animation: p-move 1.15s cubic-bezier(.45, 0, .2, 1) var(--d) both; }
+/* букву снимают с прищепки и дугой переносят на её место в слове */
+@keyframes p-move {
+  0% { transform: none; }
+  45% { transform: translate(calc(var(--dx) * 0.5), var(--lift)) rotate(9deg); }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(0deg); }
+}
+.p-scr-done { position: absolute; top: 740px; left: 0; right: 0; text-align: center; z-index: 12; font: italic 400 40px/1 var(--p-serif); color: var(--p-ink); opacity: 0; }
+.p-scr-done b { font-style: normal; color: var(--p-red); }
+.p-scr.is-solve .p-scr-done { animation: p-ink 0.8s ease-out 1.6s both; }
+
+/* ── FINALE ── */
+.p-firework { position: absolute; width: 0; height: 0; z-index: 1; scale: var(--s); filter: drop-shadow(0 6px 5px rgba(70, 40, 10, 0.25)); }
+.p-firework span { position: absolute; left: -9px; top: -150px; width: 18px; height: 130px; transform-origin: 50% 150px;
+  background: var(--c); clip-path: polygon(50% 0, 100% 14%, 64% 100%, 36% 100%, 0 14%);
+  transform: rotate(var(--a)) scaleY(0); animation: p-fw 0.9s cubic-bezier(.2, .9, .3, 1.3) var(--t) both; }
+/* бумажный салют раскрывается веером, как гармошка */
+@keyframes p-fw { to { transform: rotate(var(--a)) scaleY(1); } }
+.p-win-ribbon .p-ribbon-face { padding: 16px 50px 20px; }
+.p-win-kicker { font: 700 22px/1 var(--p-serif); letter-spacing: 0.3em; text-transform: uppercase; color: #ffe2a8; margin-bottom: 8px; }
+.p-win-name { font: 400 82px/1.05 var(--p-display); }
+.p-win-score { position: absolute; top: 300px; left: 0; right: 0; text-align: center; z-index: 12; font: italic 700 34px/1 var(--p-serif); color: var(--p-ink); }
+.p-podium { position: absolute; left: 0; right: 0; top: 590px; display: flex; justify-content: center; gap: 330px; z-index: 14; }
+.p-medal { width: 250px; text-align: center; animation: p-swing-in 1.6s cubic-bezier(.3, .7, .3, 1) var(--t) both; transform-origin: 50% -200px; }
+.p-medal-1 { margin-top: -50px; }
+.p-medal-disc { width: 150px; height: 150px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center; font: 400 86px/1 var(--p-display); color: #fbf3e2;
+  background: radial-gradient(circle, var(--p-red) 0 56%, #fbf3e2 57% 60%, var(--p-mustard) 61%);
+  box-shadow: 0 12px 14px rgba(60, 30, 10, 0.3); }
+.p-medal-1 .p-medal-disc { width: 180px; height: 180px; font-size: 104px; }
+.p-medal-name { font: 700 30px/1.15 var(--p-serif); color: var(--p-ink); background: var(--p-card); padding: 8px 12px; box-shadow: 0 8px 10px rgba(60, 30, 10, 0.2); text-wrap: balance; }
+.p-medal-score { font: 400 40px/1 var(--p-display); color: var(--p-red); margin-top: 8px; }
+.p-greeting { position: absolute; left: 0; right: 0; top: 896px; text-align: center; z-index: 14; font: 400 76px/1 var(--p-display); color: var(--p-red);
+  text-shadow: 3px 4px 0 rgba(217, 164, 65, 0.6); animation: p-up 1.1s cubic-bezier(.25, .8, .3, 1) 4.3s both; transform-origin: 50% 100%; }
