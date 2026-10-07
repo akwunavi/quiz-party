@@ -210,3 +210,21 @@
 
 /* повтор вопросов: сетка картинок не шире тела слайда (базовая ширина 1720px рассчитана на поля классики, а не на страницу/экран ТВ) */
 .theme-ny_book .recap-screen .recap-body > .q-media-grid { width: 100%; max-width: 100%; box-sizing: border-box; }
+
+/* ═══ ТЕЛЕФОН ИГРОКА ═══ страница книги: бумага, красные заголовки, карточки с тенью-«корешком» */
+.theme-ny_book:has(.pl-root, .pl-register, .pl-center, .pl-wait) { background: var(--bg); }
+.theme-ny_book .pl-header { background: var(--nb-card); border-bottom: 3px solid var(--nb-red); box-shadow: 0 3px 0 var(--nb-shade); font-family: var(--nb-serif); }
+.theme-ny_book .pl-header [style*="color"] { color: var(--fg) !important; }
+.theme-ny_book .pl-round, .theme-ny_book .pl-notice, .theme-ny_book .pl-qlabel { color: var(--nb-red); }
+.theme-ny_book .pl-card { background: var(--nb-card); border: 0; border-left: 5px solid var(--nb-mustard); border-radius: 0; box-shadow: 0 4px 0 var(--nb-shade), 0 8px 10px rgba(60, 30, 10, .15); color: var(--fg); }
+.theme-ny_book .pl-qtext, .theme-ny_book .pl-legend, .theme-ny_book .pl-sent { color: var(--fg); }
+.theme-ny_book .pl-choices button, .theme-ny_book .pl-stakes button, .theme-ny_book .pl-match button { background: #fffaf0; border: 2px solid #b9a77f; border-radius: 3px; color: var(--nb-ink); box-shadow: 0 3px 0 var(--nb-shade); font-family: var(--font-display); }
+.theme-ny_book .pl-choices button.sel, .theme-ny_book .pl-stakes button.sel, .theme-ny_book .pl-match button.sel { background: var(--nb-red); border-color: #7a1424; color: #fbf3e2; }
+.theme-ny_book .pl-card input, .theme-ny_book .pl-register input { background: #fffdf6; border: 2px solid #b9a77f; border-radius: 3px; color: var(--nb-ink); font-family: var(--nb-serif); }
+.theme-ny_book .pl-send { background: var(--nb-red); color: #fbf3e2; border-radius: 3px; box-shadow: 0 4px 0 #7a1424; }
+.theme-ny_book .pl-send:disabled { opacity: .55; }
+.theme-ny_book .pl-register h1, .theme-ny_book .pl-wait, .theme-ny_book .pl-center { color: var(--nb-red); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .pl-wait-sub, .theme-ny_book .ed-hint { color: var(--muted); }
+.theme-ny_book .pl-pick { background: var(--nb-card); border: 2px solid #b9a77f; color: var(--fg); }
+.theme-ny_book .pl-pick span:last-child { color: var(--muted); }
+.theme-ny_book .pl-slot, .theme-ny_book .pl-review-row { background: var(--nb-card); border-color: #b9a77f; color: var(--fg); }

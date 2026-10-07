@@ -140,3 +140,21 @@
 
 /* повтор вопросов: сетка картинок не шире тела слайда (базовая ширина 1720px рассчитана на поля классики, а не на страницу/экран ТВ) */
 .theme-ny_home .recap-screen .recap-body > .q-media-grid { width: 100%; max-width: 100%; box-sizing: border-box; }
+
+/* ═══ ТЕЛЕФОН ИГРОКА ═══ «эфир» на синем: золото, рубиновые кнопки, плашки с двойной рамкой */
+.theme-ny_home:has(.pl-root, .pl-register, .pl-center, .pl-wait) { background: #0a1a3d radial-gradient(ellipse at 50% 30%, #16356a, #0a1a3d 62%, #040b1c) fixed; }
+.theme-ny_home .pl-root { background: transparent; color: var(--fg); }
+.theme-ny_home .pl-header { background: rgba(4, 11, 28, .55); border-bottom: 2px solid var(--nh-gold2); font-family: var(--nh-body); }
+.theme-ny_home .pl-round, .theme-ny_home .pl-notice, .theme-ny_home .pl-qlabel { color: var(--nh-gold); }
+.theme-ny_home .pl-card { background: var(--nh-plate); border: 2px solid var(--nh-gold2); border-radius: 6px; color: var(--fg);
+  box-shadow: inset 0 0 0 4px var(--nh-blue), inset 0 0 0 5px rgba(217, 178, 92, .5); }
+.theme-ny_home .pl-qtext, .theme-ny_home .pl-legend, .theme-ny_home .pl-sent { color: var(--fg); }
+.theme-ny_home .pl-choices button, .theme-ny_home .pl-stakes button, .theme-ny_home .pl-match button { background: linear-gradient(180deg, rgba(40, 80, 160, .55), rgba(14, 36, 86, .7)); border: 2px solid var(--nh-gold2); border-radius: 4px; color: var(--nh-ink); font-family: var(--font-display); font-weight: 700; }
+.theme-ny_home .pl-choices button.sel, .theme-ny_home .pl-stakes button.sel, .theme-ny_home .pl-match button.sel { background: linear-gradient(180deg, #d8453a, #9e2026); border-color: var(--nh-gold); color: var(--nh-ink); }
+.theme-ny_home .pl-card input, .theme-ny_home .pl-register input { background: #fff4dc; border: 2px solid var(--nh-gold2); border-radius: 4px; color: #3a1d0e; font-family: var(--nh-body); }
+.theme-ny_home .pl-send { background: linear-gradient(180deg, #d8453a, #9e2026); color: var(--nh-ink); border: 2px solid var(--nh-gold); border-radius: 4px; }
+.theme-ny_home .pl-send:disabled { opacity: .6; }
+.theme-ny_home .pl-register h1, .theme-ny_home .pl-wait, .theme-ny_home .pl-center { color: var(--nh-gold); font-family: var(--font-display); font-weight: 700; text-shadow: 0 0 18px rgba(240, 201, 106, .4); }
+.theme-ny_home .pl-wait-sub, .theme-ny_home .ed-hint { color: var(--muted); }
+.theme-ny_home .pl-pick { background: rgba(8, 22, 56, .7); border: 2px solid var(--nh-gold2); color: var(--fg); }
+.theme-ny_home .pl-slot, .theme-ny_home .pl-review-row { background: rgba(8, 22, 56, .6); border-color: var(--nh-gold2); color: var(--fg); }
