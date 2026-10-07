@@ -18,10 +18,17 @@ export function nyDensity(theme: NyThemeKey, phase: string | undefined, plain = 
   }
 }
 
-/** Вопрос без картинок и вариантов — текст в одной большой рамке. */
-export function isPlainQuestion(q: { media?: { question?: string[] }; answer?: { mode?: string } } | undefined): boolean {
+/** Механики со своим экраном вопроса — «пустым» текстовым вопросом не считаются. */
+const OWN_SCREEN = new Set(['blitz', 'melody', 'jeopardy', 'sprint', 'race', 'four_pics', 'anagram', 'crossword'])
+
+/** Вопрос без картинок и вариантов — текст в одной большой рамке (только свободный ответ
+ *  в «обычной» механике; у механик со своим экраном — своя плотность, ревью 9.90). */
+export function isPlainQuestion(
+  q: { media?: { question?: string[] }; answer?: { mode?: string } } | undefined,
+  mechanic?: string,
+): boolean {
   if (!q) return false
+  if (mechanic && OWN_SCREEN.has(mechanic)) return false
   const imgs = (q.media?.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const mode = q.answer?.mode
-  return imgs.length === 0 && mode !== 'choice' && mode !== 'order' && mode !== 'match'
+  return imgs.length === 0 && q.answer?.mode === 'free_text'
 }

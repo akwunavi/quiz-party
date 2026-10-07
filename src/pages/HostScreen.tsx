@@ -109,7 +109,7 @@ export function HostScreen() {
         .toString(16).toUpperCase().padStart(3, '0')}`
     : null
   const plainForTheme = isNyTheme(theme) && gameState?.phase === 'question' && pack
-    ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index])
+    ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index], pack.rounds[gameState.round_number]?.mechanic)
     : false
   return (
     <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme}>
