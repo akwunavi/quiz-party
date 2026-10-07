@@ -228,3 +228,40 @@
 .theme-ny_book .pl-pick { background: var(--nb-card); border: 2px solid #b9a77f; color: var(--fg); }
 .theme-ny_book .pl-pick span:last-child { color: var(--muted); }
 .theme-ny_book .pl-slot, .theme-ny_book .pl-review-row { background: var(--nb-card); border-color: #b9a77f; color: var(--fg); }
+/* экран «Отвечайте!» и подобные заголовки: рамка/неон базовых тем не нужны на бумаге; имена команд в чипах — чернилами */
+.theme-ny_book .host-screen:not(.lobby-screen) .neon-title:not(.ib-label-text) { border-color: transparent; box-shadow: none; background: none; }
+.theme-ny_book .answer-time-teams [style*="color"], .theme-ny_book .team-answers [style*="color"] { color: var(--fg) !important; }
+
+/* ═══ Крупные панели (3840) ═══ базовые кегли в px/clamp упираются в потолок и на 4K остаются мелкими; здесь потолок — «пиксель мокапа» --u (1920 → 1:1, 3840 → ×2) */
+.theme-ny_book .host-screen .q-text { font-size: calc(58 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-m { font-size: calc(50 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-l { font-size: calc(42 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-xl { font-size: calc(36 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text { font-size: calc(50 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-m { font-size: calc(44 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-l { font-size: calc(38 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-xl { font-size: calc(33 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text { font-size: calc(40 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-m { font-size: calc(34 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-l { font-size: calc(30 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-xl { font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .choice-plate { font-size: calc(31 * var(--u)); }
+.theme-ny_book .host-screen .info-list li { font-size: calc(29 * var(--u)); }
+.theme-ny_book .host-screen .info-round, .theme-ny_book .host-screen .rule-item { font-size: calc(27 * var(--u)); }
+.theme-ny_book .host-screen .answer-main { font-size: calc(58 * var(--u)); }
+.theme-ny_book .host-screen .answer-label, .theme-ny_book .host-screen .answer-note { font-size: calc(24 * var(--u)); }
+.theme-ny_book .host-screen .answer-time-teams > * { font-size: calc(22 * var(--u)); }
+.theme-ny_book .host-screen .score-table td, .theme-ny_book .host-screen .score-table th { font-size: calc(30 * var(--u)); }
+.theme-ny_book .host-screen .sb-name { font-size: calc(34 * var(--u)); }
+.theme-ny_book .p-ros.is-top { --d: calc(120 * var(--u)); } .theme-ny_book .p-ros.is-big { --d: calc(260 * var(--u)); }
+/* 4K: механики — ширины и кегли от --u */
+.theme-ny_book .bz-row { width: min(calc(1700 * var(--u)), 94%); } .theme-ny_book .bz-question { width: min(calc(1500 * var(--u)), 92%); }
+.theme-ny_book .bz-name { font-size: calc(26 * var(--u)); } .theme-ny_book .bz-timer { font-size: calc(66 * var(--u)); }
+.theme-ny_book .bz-meta, .theme-ny_book .bz-pts { font-size: calc(20 * var(--u)); } .theme-ny_book .bz-qtext { font-size: calc(60 * var(--u)); } .theme-ny_book .bz-turn { font-size: calc(16 * var(--u)); }
+.theme-ny_book .jp-theme-name { font-size: calc(27 * var(--u)); } .theme-ny_book .jp-theme-hint { font-size: calc(17 * var(--u)); }
+.theme-ny_book .jp-tile .qt-face { font-size: calc(56 * var(--u)); } .theme-ny_book .jp-board { gap: calc(10 * var(--u)); }
+.theme-ny_book .mel-theme { font-size: calc(32 * var(--u)); } .theme-ny_book .mel-tile .qt-face { font-size: calc(56 * var(--u)); }
+.theme-ny_book .jp-modal-head .mono-tag, .theme-ny_book .mel-modal .mono-tag { font-size: calc(22 * var(--u)); }
+.theme-ny_book .jp-answer .txt, .theme-ny_book .mel-bid-row { font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .an-clue { font-size: calc(44 * var(--u)); }
+.theme-ny_book .host-screen .an-clue { font-family: var(--nb-serif); font-style: normal; font-weight: 700; color: var(--nb-ink); text-shadow: none; text-transform: none; }

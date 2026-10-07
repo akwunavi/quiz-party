@@ -158,3 +158,37 @@
 .theme-ny_home .pl-wait-sub, .theme-ny_home .ed-hint { color: var(--muted); }
 .theme-ny_home .pl-pick { background: rgba(8, 22, 56, .7); border: 2px solid var(--nh-gold2); color: var(--fg); }
 .theme-ny_home .pl-slot, .theme-ny_home .pl-review-row { background: rgba(8, 22, 56, .6); border-color: var(--nh-gold2); color: var(--fg); }
+
+/* ═══ Крупные панели (3840) ═══ базовые кегли в px/clamp упираются в потолок и на 4K остаются мелкими; здесь потолок — «пиксель мокапа» --u (1920 → 1:1, 3840 → ×2) */
+.theme-ny_home .host-screen .q-text { font-size: calc(58 * var(--u)); }
+.theme-ny_home .host-screen .q-text.len-m { font-size: calc(50 * var(--u)); }
+.theme-ny_home .host-screen .q-text.len-l { font-size: calc(42 * var(--u)); }
+.theme-ny_home .host-screen .q-text.len-xl { font-size: calc(36 * var(--u)); }
+.theme-ny_home .host-screen .q-split .q-text { font-size: calc(50 * var(--u)); }
+.theme-ny_home .host-screen .q-split .q-text.len-m { font-size: calc(44 * var(--u)); }
+.theme-ny_home .host-screen .q-split .q-text.len-l { font-size: calc(38 * var(--u)); }
+.theme-ny_home .host-screen .q-split .q-text.len-xl { font-size: calc(33 * var(--u)); }
+.theme-ny_home .host-screen.has-media.has-choices .q-text { font-size: calc(40 * var(--u)); }
+.theme-ny_home .host-screen.has-media.has-choices .q-text.len-m { font-size: calc(34 * var(--u)); }
+.theme-ny_home .host-screen.has-media.has-choices .q-text.len-l { font-size: calc(30 * var(--u)); }
+.theme-ny_home .host-screen.has-media.has-choices .q-text.len-xl { font-size: calc(26 * var(--u)); }
+.theme-ny_home .host-screen .choice-plate { font-size: calc(31 * var(--u)); }
+.theme-ny_home .host-screen .info-list li { font-size: calc(29 * var(--u)); }
+.theme-ny_home .host-screen .info-round, .theme-ny_home .host-screen .rule-item { font-size: calc(27 * var(--u)); }
+.theme-ny_home .host-screen .answer-main { font-size: calc(58 * var(--u)); }
+.theme-ny_home .host-screen .answer-label, .theme-ny_home .host-screen .answer-note { font-size: calc(24 * var(--u)); }
+.theme-ny_home .host-screen .answer-time-teams > * { font-size: calc(22 * var(--u)); }
+.theme-ny_home .host-screen .score-table td, .theme-ny_home .host-screen .score-table th { font-size: calc(30 * var(--u)); }
+.theme-ny_home .host-screen .sb-name { font-size: calc(34 * var(--u)); }
+.theme-ny_home .h-dial.is-top { --d: calc(156 * var(--u)); } .theme-ny_home .h-dial.is-big { --d: calc(280 * var(--u)); }
+/* 4K: механики — ширины и кегли от --u */
+.theme-ny_home .bz-row { width: min(calc(1700 * var(--u)), 94%); } .theme-ny_home .bz-question { width: min(calc(1500 * var(--u)), 92%); }
+.theme-ny_home .bz-name { font-size: calc(26 * var(--u)); } .theme-ny_home .bz-timer { font-size: calc(66 * var(--u)); }
+.theme-ny_home .bz-meta, .theme-ny_home .bz-pts { font-size: calc(20 * var(--u)); } .theme-ny_home .bz-qtext { font-size: calc(60 * var(--u)); } .theme-ny_home .bz-turn { font-size: calc(16 * var(--u)); }
+.theme-ny_home .jp-theme-name { font-size: calc(27 * var(--u)); } .theme-ny_home .jp-theme-hint { font-size: calc(17 * var(--u)); }
+.theme-ny_home .jp-tile .qt-face { font-size: calc(56 * var(--u)); } .theme-ny_home .jp-board { gap: calc(10 * var(--u)); }
+.theme-ny_home .mel-theme { font-size: calc(32 * var(--u)); } .theme-ny_home .mel-tile .qt-face { font-size: calc(56 * var(--u)); }
+.theme-ny_home .jp-modal-head .mono-tag, .theme-ny_home .mel-modal .mono-tag { font-size: calc(22 * var(--u)); }
+.theme-ny_home .jp-answer .txt, .theme-ny_home .mel-bid-row { font-size: calc(26 * var(--u)); }
+.theme-ny_home .host-screen .an-clue { font-size: calc(44 * var(--u)); }
+.theme-ny_home .host-screen .an-clue { font-family: var(--font-display); font-style: normal; font-weight: 600; color: var(--nh-ink); text-transform: none; }
