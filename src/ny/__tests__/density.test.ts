@@ -23,7 +23,7 @@ describe('ny: тема и плотность', () => {
     expect(isPlainQuestion(undefined)).toBe(false)
     expect(isPlainQuestion({ answer: { mode: 'free_text' } })).toBe(true)
     expect(isPlainQuestion({ answer: { mode: 'choice' } })).toBe(false)
-    expect(isPlainQuestion({ media: { question: ['a.jpg'] }, answer: { mode: 'text' } })).toBe(false)
+    expect(isPlainQuestion({ media: { question: ['a.jpg'] }, answer: { mode: 'free_text' } })).toBe(false)
     expect(isPlainQuestion({ media: { question: ['a.mp3'] }, answer: { mode: 'free_text' } })).toBe(true)
     expect(isPlainQuestion({ answer: { mode: 'anagram' } })).toBe(false)
     expect(isPlainQuestion({ answer: { mode: 'free_text' } }, 'blitz')).toBe(false)
