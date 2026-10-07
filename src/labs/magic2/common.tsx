@@ -1,20 +1,8 @@
 // ═══ Magic 2.0 Lab — общие узлы: сцена 1920×1080, тестовые иллюстрации, QR ═══
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import QrCode from '../../components/QrCode'
-import { QR_URL, type TimerState } from './data'
+import { PLAYER_URL } from './data'
 
-export type SceneId = 'lobby' | 'text' | 'dense' | 'match' | 'jp' | 'final' | 'scramble'
-export type ScreenProps = {
-  scene: SceneId
-  /** под-состояние сцены: lobby idle/join · match before/solved · jp board/open/answer · final last/transition/winner/results · scramble shuffle/hints/solved */
-  sub: string
-  /** секунды до конца (таймер вопроса); фазу считает data.timerPhase */
-  left: number
-  timer: TimerState
-  /** меняется на PLAY/REPLAY — анимации входа перезапускаются */
-  play: number
-  reduced: boolean
-}
 
 /** Логическая сцена 1920×1080, вписанная в контейнер (как проектор). */
 export function Stage({ children }: { children: ReactNode }) {
@@ -40,7 +28,7 @@ export function Stage({ children }: { children: ReactNode }) {
 export function Qr({ size, ink = '#1a1424', className }: { size: number; ink?: string; className?: string }) {
   return (
     <div className={`m2-qr ${className ?? ''}`} style={{ width: size, height: size }}>
-      <QrCode value={QR_URL} quiet ink={ink} className="m2-qr-svg" title="Ссылка для игроков" />
+      <QrCode value={PLAYER_URL} quiet ink={ink} className="m2-qr-svg" title="Ссылка для игроков" />
     </div>
   )
 }
@@ -126,3 +114,27 @@ export function InventionEngraving({ kind }: { kind: 'lamp' | 'phone' | 'dynamit
 export const replay = (play: number, ...parts: (string | number)[]) => [...parts, play].join('-')
 
 export const cssv = (o: Record<string, string | number>) => o as CSSProperties
+
+/** Астрономические часы на ратуше: башня, циферблат с кольцом зодиака, фигуры. */
+export function OrlojEngraving() {
+  const ink = '#2b1d14'
+  return (
+    <svg viewBox="0 0 360 480" className="m2-art" preserveAspectRatio="xMidYMid slice">
+      <defs>{hatch('or-h', ink, 4, 45)}{hatch('or-v', ink, 5, 90)}{hatch('or-s', ink, 7, -30)}</defs>
+      <rect width="360" height="480" fill="#efe3c6" />
+      <rect width="360" height="480" fill="url(#or-s)" opacity=".14" />
+      <g stroke={ink} strokeWidth="1.8" fill="none">
+        <path d="M60 480 V150 L180 40 L300 150 V480" fill="#e6d6b2" />
+        <path d="M60 150 H300" /><path d="M180 40 V20 M172 28 H188" />
+        <rect x="60" y="150" width="240" height="330" fill="url(#or-v)" opacity=".35" />
+        <circle cx="180" cy="270" r="92" fill="#efe3c6" /><circle cx="180" cy="270" r="92" fill="url(#or-h)" opacity=".25" />
+        <circle cx="180" cy="270" r="70" /><circle cx="180" cy="248" r="54" strokeDasharray="3 4" />
+        {Array.from({ length: 24 }, (_, i) => <line key={i} x1={180 + Math.cos(i * Math.PI / 12) * 84} y1={270 + Math.sin(i * Math.PI / 12) * 84} x2={180 + Math.cos(i * Math.PI / 12) * 92} y2={270 + Math.sin(i * Math.PI / 12) * 92} />)}
+        <path d="M180 270 L180 196" strokeWidth="3" /><circle cx="180" cy="196" r="7" fill={ink} />
+        <path d="M180 270 L236 300" strokeWidth="3" /><circle cx="236" cy="300" r="10" fill="#efe3c6" /><circle cx="240" cy="300" r="8" fill={ink} />
+        <rect x="150" y="390" width="60" height="70" fill="#e6d6b2" /><circle cx="180" cy="425" r="24" />
+        <path d="M92 190 V240 M268 190 V240" /><circle cx="92" cy="182" r="9" /><circle cx="268" cy="182" r="9" />
+      </g>
+    </svg>
+  )
+}

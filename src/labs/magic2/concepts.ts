@@ -1,11 +1,8 @@
-import type { ComponentType } from 'react'
-import type { ScreenProps } from './common'
-import * as c1 from './c1/Observatory'
-import * as c2 from './c2/Foundry'
-import * as c3 from './c3/Mirror'
+import type { Kit } from './kit'
+import { kit as k1 } from './k1/k1'
+import { kit as k2 } from './k2/k2'
+import { kit as k3 } from './k3/k3'
+import { kit as k4 } from './k4/k4'
+import { kit as k5 } from './k5/k5'
 
-export type ConceptMeta = {
-  num: number; name: string; idea: string; world: string
-  materials: [string, string][]; persists: string; behaves: string; timer: string; teams: string; type: string
-}
-export const CONCEPTS: { meta: ConceptMeta; Screen: ComponentType<ScreenProps> }[] = [c1, c2, c3].map(m => ({ meta: m.meta, Screen: m.Screen }))
+export const CONCEPTS: Kit[] = [k1, k2, k3, k4, k5]
