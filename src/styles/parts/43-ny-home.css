@@ -137,3 +137,6 @@
 .theme-ny_home .q-img img { border: calc(6 * var(--u)) solid var(--nh-gold); border-radius: 4px; box-shadow: 0 14px 28px rgba(0, 0, 0, .5); }
 .theme-ny_home .rule-item .text, .theme-ny_home .rule-item .idx + * { font-family: var(--nh-body); font-weight: 600; }
 .theme-ny_home .round-badge { color: var(--nh-ink); }
+
+/* повтор вопросов: сетка картинок не шире тела слайда (базовая ширина 1720px рассчитана на поля классики, а не на страницу/экран ТВ) */
+.theme-ny_home .recap-screen .recap-body > .q-media-grid { width: 100%; max-width: 100%; box-sizing: border-box; }

@@ -132,7 +132,7 @@
 .theme-ny_book .score-table { color: var(--fg); }
 
 /* табло/перерыв/подсчёт/финал: «средняя» плотность — гирлянда провисает ниже, заголовок не должен лезть под флажки */
-.theme-ny_book[data-ny-density="medium"] :is(.sb-screen, .break-screen, .fin-screen) { padding-top: calc(250 * var(--u)); }
+.theme-ny_book[data-ny-density="medium"] :is(.sb-screen, .break-screen, .fin-screen, .recap-screen) { padding-top: calc(250 * var(--u)); }
 
 /* телефон игрока: тема даёт тёмный фон корня, а текст — чернильный; на телефоне фон бумажный (ревью 9.90) */
 .theme-ny_book .pl-root { background: var(--bg); color: var(--fg); }
@@ -207,3 +207,6 @@
 .theme-ny_book .round-intro .neon-title { font-size: calc(96 * var(--u)) !important; }
 .theme-ny_book .rule-item .text, .theme-ny_book .rule-item .idx + * { font-family: var(--nb-serif); font-weight: 700; }
 .theme-ny_book .round-badge { color: #fbf3e2; }
+
+/* повтор вопросов: сетка картинок не шире тела слайда (базовая ширина 1720px рассчитана на поля классики, а не на страницу/экран ТВ) */
+.theme-ny_book .recap-screen .recap-body > .q-media-grid { width: 100%; max-width: 100%; box-sizing: border-box; }
