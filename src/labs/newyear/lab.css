@@ -23,7 +23,7 @@ body { font-family: var(--lab-font); font-size: 14px; -webkit-font-smoothing: an
 .nyl-brand-name { font-weight: 700; letter-spacing: 0.02em; font-size: 15px; }
 .nyl-brand-sub { color: var(--lab-dim); font-size: 12.5px; }
 
-.nyl-concepts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.nyl-concepts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .nyl-concept { all: unset; cursor: pointer; display: grid; gap: 3px; padding: 10px 12px; border-radius: 10px;
   border: 1px solid var(--lab-line); background: var(--lab-panel); transition: border-color .2s, background .2s; min-width: 0; }
 .nyl-concept:hover { border-color: #3d4450; }
@@ -34,6 +34,18 @@ body { font-family: var(--lab-font); font-size: 14px; -webkit-font-smoothing: an
 .nyl-concept.is-on .nyl-concept-num { color: var(--lab-gold); }
 .nyl-concept-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+.nyl-states { display: flex; flex-wrap: wrap; gap: 6px; }
+.nyl-state { all: unset; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--lab-line);
+  color: var(--lab-dim); font-size: 13px; transition: color .2s, border-color .2s, background .2s; }
+.nyl-state:hover { color: var(--lab-fg); }
+.nyl-state:focus-visible, .nyl-tm:focus-visible { outline: 2px solid var(--lab-gold); outline-offset: 2px; }
+.nyl-state-n { font-variant-numeric: tabular-nums; font-size: 11px; letter-spacing: .08em; opacity: .7; }
+.nyl-state.is-on { color: #15130f; background: var(--lab-gold); border-color: var(--lab-gold); font-weight: 600; }
+.nyl-timerdemo { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 8px 6px 12px; border: 1px dashed var(--lab-line); border-radius: 10px; }
+.nyl-timerdemo-cap { font-size: 12px; color: var(--lab-dim); margin-right: 4px; }
+.nyl-tm { all: unset; cursor: pointer; padding: 6px 11px; border-radius: 7px; background: #22262d; color: var(--lab-fg); font-size: 12.5px; letter-spacing: .06em; transition: background .2s; }
+.nyl-tm:hover { background: #2b3038; }
+.nyl-tm.is-on { background: var(--lab-gold); color: #15130f; font-weight: 700; }
 .nyl-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
 .nyl-screens { display: flex; flex-wrap: wrap; gap: 6px; }
 .nyl-screen-btn { all: unset; cursor: pointer; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--lab-line);
@@ -50,13 +62,17 @@ body { font-family: var(--lab-font); font-size: 14px; -webkit-font-smoothing: an
 .nyl-main { display: grid; gap: 6px; min-width: 0; }
 .nyl-keys { margin: 0; color: var(--lab-dim); font-size: 12px; }
 
-.nyl-notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px 28px; padding: 18px 20px;
+.nyl-notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 28px; padding: 18px 20px;
   border: 1px solid var(--lab-line); border-radius: 12px; background: var(--lab-panel); }
 .nyl-notes-kicker { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lab-gold); }
+.nyl-notes-real { margin: 6px 0 4px; line-height: 1.55; color: var(--lab-fg); max-width: 70ch; }
+.nyl-notes-src { margin: 0; color: var(--lab-dim); font-size: 12.5px; }
+.nyl-notes-here { margin: 6px 0 0; line-height: 1.55; color: var(--lab-fg); max-width: 70ch; }
+.nyl-notes-grid, .nyl-hier { grid-column: 1 / -1; }
 .nyl-notes-title { margin: 4px 0 6px; font-size: 24px; text-wrap: balance; }
 .nyl-notes-tag { margin: 0 0 10px; color: var(--lab-fg); font-weight: 600; }
 .nyl-notes-idea { margin: 0; color: var(--lab-dim); line-height: 1.55; max-width: 60ch; }
-.nyl-notes-grid { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 22px; }
+.nyl-notes-grid { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 22px; }
 .nyl-notes-grid dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lab-dim); margin-bottom: 3px; }
 .nyl-notes-grid dd { margin: 0; line-height: 1.5; }
 .nyl-hier { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -64,10 +80,10 @@ body { font-family: var(--lab-font); font-size: 14px; -webkit-font-smoothing: an
 .nyl-hier span { display: block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lab-gold); margin-bottom: 3px; }
 
 @media (max-width: 900px) {
-  .nyl-concepts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .nyl-concept:last-child { grid-column: 1 / -1; }
+  .nyl-concepts { grid-template-columns: minmax(0, 1fr); }
   .nyl-notes { grid-template-columns: minmax(0, 1fr); }
   .nyl-notes-grid, .nyl-hier { grid-template-columns: minmax(0, 1fr); }
+  .nyl-timerdemo { width: 100%; }
 }
 
 /* ═══ Сцена: 1920×1080 логических пикселей, масштаб — целиком ═══ */

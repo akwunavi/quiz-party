@@ -1,9 +1,13 @@
-// ═══ New Year Mockup Lab ═══
-// Изолированный визуальный эксперимент: пять миров × восемь экранов.
-// Игровой движок не импортируется вообще — только демо-содержимое.
+// ═══ New Year Mockup Lab · Фаза 2 ═══
+// Три мира (Concept 2 / 3 / 4) × 14 настоящих состояний игры. Логика и
+// содержимое — общие и сверены с продакшном (game/states.ts), визуальный
+// слой — свой у каждого мира. Игровой движок не подключается: только чистые
+// функции и типы (кроссворд, «Скрэмбл», рулетка, раскладка блица).
 import { useEffect, useState } from 'react'
-import { SCREENS, type ScreenId } from './content'
 import { CONCEPTS } from './concepts'
+import { STATES } from './game/states'
+import { KitProvider } from './game/kit'
+import { TimerModeCtx, demoSpeed, type TimerMode } from './game/timer'
 import { Stage } from './engine/stage'
 
 function useSystemReducedMotion() {
@@ -19,39 +23,44 @@ function useSystemReducedMotion() {
 }
 
 const readHash = () => {
-  const m = /^#c([1-5])-?([a-z]+)?$/.exec(location.hash)
-  const c = m ? Number(m[1]) - 1 : 0
-  const s = (m?.[2] && SCREENS.some(x => x.id === m[2]) ? m[2] : 'lobby') as ScreenId
-  return { c, s }
+  const m = /^#c([234])s(\d\d)$/.exec(location.hash)
+  const c = m ? CONCEPTS.findIndex(x => x.meta.num === Number(m[1])) : 0
+  const s = m ? STATES.findIndex(x => x.n === m[2]) : 0
+  return { c: Math.max(0, c), s: Math.max(0, s) }
 }
+
+const TIMER_MODES: { id: TimerMode; label: string }[] = [
+  { id: 'run', label: '▶ Ход' }, { id: 'start', label: 'START' }, { id: 'warn', label: 'WARNING' }, { id: 'zero', label: 'ZERO' },
+]
 
 export function Lab() {
   const init = readHash()
   const [ci, setCi] = useState(init.c)
-  const [screen, setScreen] = useState<ScreenId>(init.s)
+  const [si, setSi] = useState(init.s)
   const [playKey, setPlayKey] = useState(0)
   const [paused, setPaused] = useState(false)
   const [reducedToggle, setReducedToggle] = useState(false)
+  const [tmode, setTmode] = useState<TimerMode>('run')
   const sysReduced = useSystemReducedMotion()
   const reduced = reducedToggle || sysReduced
   const concept = CONCEPTS[ci]
-  const C = concept.Screen
+  const st = STATES[si]
+  const C = st.C
 
-  const go = (c: number, s: ScreenId) => {
-    setCi(c); setScreen(s); setPaused(false); setPlayKey(k => k + 1)
-    try { history.replaceState(null, '', `#c${c + 1}${s}`) } catch { /* предпросмотр без истории */ }
+  const go = (c: number, s: number) => {
+    setCi(c); setSi(s); setPaused(false); setTmode('run'); setPlayKey(k => k + 1)
+    try { history.replaceState(null, '', `#c${CONCEPTS[c].meta.num}s${STATES[s].n}`) } catch { /* предпросмотр без истории */ }
   }
+  const replay = () => { setPaused(false); setTmode('run'); setPlayKey(k => k + 1) }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return
-      const idx = SCREENS.findIndex(s => s.id === screen)
-      if (/^[1-5]$/.test(e.key)) go(Number(e.key) - 1, screen)
-      else if (e.key === 'ArrowRight') go(ci, SCREENS[(idx + 1) % SCREENS.length].id)
-      else if (e.key === 'ArrowLeft') go(ci, SCREENS[(idx - 1 + SCREENS.length) % SCREENS.length].id)
+      if (/^[234]$/.test(e.key)) go(CONCEPTS.findIndex(x => x.meta.num === Number(e.key)), si)
+      else if (e.key === 'ArrowRight') go(ci, (si + 1) % STATES.length)
+      else if (e.key === 'ArrowLeft') go(ci, (si - 1 + STATES.length) % STATES.length)
       else if (e.key === ' ') { e.preventDefault(); setPaused(p => !p) }
-      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'к') { setPaused(false); setPlayKey(k => k + 1) }
-      else return
+      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'к') replay()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -64,14 +73,13 @@ export function Lab() {
         <div className="nyl-brand">
           <span className="nyl-brand-mark" aria-hidden="true">✳</span>
           <div>
-            <div className="nyl-brand-name">Quiz Party · New Year</div>
-            <div className="nyl-brand-sub">Mockup Lab — пять миров, восемь экранов, не для продакшна</div>
+            <div className="nyl-brand-name">Quiz Party · New Year · Фаза 2</div>
+            <div className="nyl-brand-sub">Три мира × 14 настоящих состояний игры. Логика и содержимое — как в продакшне, меняется только визуальный слой</div>
           </div>
         </div>
-        <nav className="nyl-concepts" aria-label="Концепции">
+        <nav className="nyl-concepts is-three" aria-label="Концепции">
           {CONCEPTS.map((c, i) => (
-            <button key={c.meta.id} type="button" className={`nyl-concept${i === ci ? ' is-on' : ''}`}
-              aria-pressed={i === ci} onClick={() => go(i, screen)}>
+            <button key={c.meta.id} type="button" className={`nyl-concept${i === ci ? ' is-on' : ''}`} aria-pressed={i === ci} onClick={() => go(i, si)}>
               <span className="nyl-concept-num">Concept {c.meta.num}</span>
               <span className="nyl-concept-name">{c.meta.name}</span>
             </button>
@@ -79,54 +87,69 @@ export function Lab() {
         </nav>
       </header>
 
-      <div className="nyl-bar">
-        <nav className="nyl-screens" aria-label="Экраны">
-          {SCREENS.map(s => (
-            <button key={s.id} type="button" className={`nyl-screen-btn${s.id === screen ? ' is-on' : ''}`}
-              aria-pressed={s.id === screen} onClick={() => go(ci, s.id)}>{s.label}</button>
-          ))}
-        </nav>
-        <div className="nyl-transport">
-          <button type="button" className="nyl-tp" onClick={() => setPaused(p => !p)} aria-label={paused ? 'Play' : 'Pause'}>
-            {paused ? '▶ Play' : '❚❚ Pause'}
+      <nav className="nyl-states" aria-label="Состояния игры">
+        {STATES.map((s, i) => (
+          <button key={s.id} type="button" className={`nyl-state${i === si ? ' is-on' : ''}`} aria-pressed={i === si} onClick={() => go(ci, i)}>
+            <span className="nyl-state-n">{s.n}</span>{s.label}
           </button>
-          <button type="button" className="nyl-tp" onClick={() => { setPaused(false); setPlayKey(k => k + 1) }}>↻ Replay</button>
-          <label className={`nyl-tp nyl-toggle${reduced ? ' is-on' : ''}`} title="Как экран выглядит у тех, кто отключил анимацию в системе">
-            <input id="nyl-reduced" type="checkbox" checked={reduced} disabled={sysReduced}
-              onChange={e => setReducedToggle(e.target.checked)} />
+        ))}
+      </nav>
+
+      <div className="nyl-bar">
+        <div className="nyl-transport">
+          <button type="button" className="nyl-tp" onClick={() => setPaused(p => !p)}>{paused ? '▶ Play' : '❚❚ Pause'}</button>
+          <button type="button" className="nyl-tp" onClick={replay}>↻ Replay</button>
+          <label className={`nyl-tp nyl-toggle${reduced ? ' is-on' : ''}`}>
+            <input id="nyl-reduced" type="checkbox" checked={reduced} disabled={sysReduced} onChange={e => setReducedToggle(e.target.checked)} />
             Без движения{sysReduced ? ' (системная настройка)' : ''}
           </label>
         </div>
+        {st.timer && (
+          <div className="nyl-timerdemo" role="group" aria-label="Состояние таймера (только показ)">
+            <span className="nyl-timerdemo-cap">Таймер: {st.timer.seconds} с — {st.timer.what} · показ ×{demoSpeed(st.timer.seconds)}</span>
+            {TIMER_MODES.map(x => (
+              <button key={x.id} type="button" className={`nyl-tm${tmode === x.id ? ' is-on' : ''}`} aria-pressed={tmode === x.id}
+                onClick={() => { setTmode(x.id); if (x.id === 'run') setPlayKey(k => k + 1) }}>{x.label}</button>
+            ))}
+          </div>
+        )}
       </div>
 
       <main className="nyl-main">
-        <Stage key={`${ci}-${screen}-${playKey}-${reduced}`} paused={paused} reduced={reduced} className={`nyl-c${m.num}`}>
-          <C screen={screen} />
-        </Stage>
-        <p className="nyl-keys">Клавиши: 1–5 — концепция, ← → — экран, пробел — пауза, R — повтор</p>
+        <KitProvider value={concept.kit}>
+          <TimerModeCtx.Provider value={tmode}>
+            <Stage key={`${ci}-${si}-${playKey}-${reduced}`} paused={paused} reduced={reduced} className={`nyl-c${m.num} nyl-s-${st.id}`}>
+              <C />
+            </Stage>
+          </TimerModeCtx.Provider>
+        </KitProvider>
+        <p className="nyl-keys">Клавиши: 2 / 3 / 4 — мир, ← → — состояние, пробел — пауза, R — повтор. Таймеры проигрываются ускоренно; логика (целые секунды, «мало времени» с 10 с, ноль) — как в игре.</p>
       </main>
 
-      <section className="nyl-notes" aria-label="Описание концепции">
-        <div className="nyl-notes-head">
-          <div className="nyl-notes-kicker">Concept {m.num}</div>
-          <h2 className="nyl-notes-title">{m.name}</h2>
-          <p className="nyl-notes-tag">{m.tagline}</p>
-          <p className="nyl-notes-idea">{m.idea}</p>
+      <section className="nyl-notes" aria-label="Описание состояния">
+        <div className="nyl-notes-state">
+          <div className="nyl-notes-kicker">{st.n} · {st.label} · как в игре</div>
+          <p className="nyl-notes-real">{st.real}</p>
+          <p className="nyl-notes-src">Сверено с: {st.src}</p>
+        </div>
+        <div className="nyl-notes-concept">
+          <div className="nyl-notes-kicker">Concept {m.num} · {m.name} · в этом состоянии</div>
+          <p className="nyl-notes-here">{m.states[st.id]}</p>
         </div>
         <dl className="nyl-notes-grid">
-          <div><dt>Метафора</dt><dd>{m.metaphor}</dd></div>
-          <div><dt>Композиция</dt><dd>{m.composition}</dd></div>
-          <div><dt>Свет</dt><dd>{m.light}</dd></div>
-          <div><dt>Материалы</dt><dd>{m.materials}</dd></div>
-          <div><dt>Ели</dt><dd>{m.trees}</dd></div>
-          <div><dt>Язык движения</dt><dd>{m.motion}</dd></div>
+          <div><dt>Контейнеры</dt><dd>{m.containers}</dd></div>
+          <div><dt>Медиа</dt><dd>{m.media}</dd></div>
+          <div><dt>Варианты</dt><dd>{m.options}</dd></div>
+          <div><dt>Таймер</dt><dd>{m.timer}</dd></div>
           <div><dt>Переходы</dt><dd>{m.transitions}</dd></div>
-          <div><dt>Special</dt><dd>{m.special}</dd></div>
+          <div><dt>Разбор ответа</dt><dd>{m.reveal}</dd></div>
+          <div><dt>Плотные / пустые экраны</dt><dd>{m.density}</dd></div>
+          <div><dt>Ели</dt><dd>{m.trees}</dd></div>
         </dl>
         <div className="nyl-hier">
-          <div><span>Primary</span>{m.hierarchy.primary}</div>
-          <div><span>Secondary</span>{m.hierarchy.secondary}</div>
-          <div><span>Atmosphere</span>{m.hierarchy.atmosphere}</div>
+          <div><span>1 · Игра</span>{m.hierarchy.primary}</div>
+          <div><span>2 · Состояние / таймер</span>{m.hierarchy.secondary}</div>
+          <div><span>3 · Атмосфера</span>{m.hierarchy.atmosphere}</div>
         </div>
       </section>
     </div>

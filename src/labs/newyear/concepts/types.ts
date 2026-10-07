@@ -1,5 +1,4 @@
-import type { ComponentType } from 'react'
-import type { ScreenId } from '../content'
+import type { Kit } from '../game/kit'
 
 export interface ConceptMeta {
   id: string
@@ -9,18 +8,21 @@ export interface ConceptMeta {
   /** арт-дирекшн одной фразой */
   idea: string
   metaphor: string
-  composition: string
-  light: string
-  materials: string
-  motion: string
+  /** как мир решает: контейнеры, медиа, варианты, таймер, переходы, разбор, плотность */
+  containers: string
+  media: string
+  options: string
+  timer: string
   transitions: string
+  reveal: string
+  density: string
   trees: string
   hierarchy: { primary: string; secondary: string; atmosphere: string }
-  /** какая существующая механика показана в Special */
-  special: string
+  /** что делает мир в каждом из 14 состояний (по id состояния) */
+  states: Record<string, string>
 }
 
 export interface Concept {
   meta: ConceptMeta
-  Screen: ComponentType<{ screen: ScreenId }>
+  kit: Kit
 }

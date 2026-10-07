@@ -1,8 +1,6 @@
-// Мелкие общие детали сцен: QR-заглушка и демо-таймер.
+// Мелкие общие детали сцен: QR-заглушка.
 import { useMemo, type CSSProperties } from 'react'
 import { rng } from './rng'
-import { useTime } from './stage'
-import { TIMER_SEC } from '../content'
 
 /** Узор «как QR» (декоративный, не сканируется) — место под настоящий код. */
 export function FakeQR({ size, fg, bg, style, className }: { size: number; fg: string; bg: string; style?: CSSProperties; className?: string }) {
@@ -29,22 +27,4 @@ export function FakeQR({ size, fg, bg, style, className }: { size: number; fg: s
       {fin(0, 0)}{fin(N - 7, 0)}{fin(0, N - 7)}
     </svg>
   )
-}
-
-/** Демо-обратный отсчёт: TIMER_SEC → 0, пауза, по кругу. Логика игрового
- *  таймера не трогается — это только картинка для макета. */
-export function useCountdown(total = TIMER_SEC, startDelay = 0.8, hold = 3.5) {
-  const t = useTime(20)
-  const cycle = total + hold
-  const local = Math.max(0, t - startDelay)
-  const inCycle = local % cycle
-  const elapsed = Math.min(total, inCycle)
-  const remaining = total - elapsed
-  return {
-    remaining,
-    sec: Math.ceil(remaining - 1e-6),
-    frac: elapsed / total,
-    done: inCycle >= total,
-    started: t >= startDelay,
-  }
 }
