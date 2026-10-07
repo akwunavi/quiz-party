@@ -1,0 +1,282 @@
+/* ═══ Тема «Новый год · Книга» (ключ темы ny_book, 9.90) — экраны проектора ═══
+   Эталон — мокап Concept 2 в лаборатории (src/labs/newyear, HANDOFF §3cj/§3ck).
+   Сцена (разворот книги, ели, снег) рисуется отдельным слоем (src/ny/book/BookScene.tsx,
+   40-ny-book-world.css); здесь — палитра темы и то, как ложится ИГРОВАЯ вёрстка поверх.
+
+   Единица --u: «один пиксель мокапа» (холст 1920×1080) в текущем окне. Все размеры
+   перенесены из мокапа как calc(N * var(--u)) — так на 1366/1920/3840 композиция одна.
+   Игра — на «странице» книги: поля = книга (64/50) + поля контента мокапа. */
+.theme-ny_book {
+  --u: min(calc(100vw / 1920), calc(100vh / 1080));
+  --bg: #f3ead8; --bg2: #ece2cf; --panel: #fbf6ea; --panel2: #f3ead8;
+  --fg: #1d2b4a; --muted: #5a3b22; --dim: rgba(90, 59, 34, .35);
+  --accent: #b3263a; --accent2: #d9a441; --answer: #2f7a47; --ok: #2f7a47; --danger: #b3263a;
+  --glow: none; --glow2: none;
+  --font-display: 'Ruslan Display', 'Arial Black', Impact, sans-serif;
+  --nb-serif: 'PT Serif', Georgia, 'Times New Roman', serif;
+  --nb-shade: #d8caae; --nb-red: #b3263a; --nb-mustard: #d9a441; --nb-pine: #1f4a3a; --nb-ink: #1d2b4a; --nb-card: #fbf6ea;
+  font-family: var(--nb-serif); color: var(--fg); background: #121b2f; min-height: 100vh;
+}
+
+/* ── слои сцены ── */
+.ny-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.ny-layer-bg { z-index: 0; }
+.ny-layer-fx { z-index: 200; }
+.ny-slot { position: absolute; inset: 0; }
+.theme-ny_book .grid-bg { animation: none; background: none; }
+.theme-ny_book .grid-bg::before, .theme-ny_book .grid-bg::after { display: none; }
+
+/* ── игра ложится на «страницы»: поля контента мокапа (книга 64/50 + 120/84…) ── */
+.theme-ny_book .host-screen { font-family: var(--nb-serif); color: var(--fg); text-align: center;
+  padding: calc(134 * var(--u)) calc(184 * var(--u)) calc(136 * var(--u)); gap: calc(24 * var(--u)); }
+.theme-ny_book .host-screen > * { text-shadow: none; }
+
+/* на проекторе — чистый эфир: ни имени пакета в углу, ни кнопок ведущего (HANDOFF §3ck/§3cl);
+   кнопки возвращает ТОЛЬКО резервный режим (.ny-nav на корне темы, ThemeLayer) */
+.theme-ny_book .pack-badge, .theme-ny_book .fx-toggle { display: none; }
+.theme-ny_book:not(.ny-nav) .host-actions { display: none; }
+.theme-ny_book.ny-nav .host-actions { right: calc(56 * var(--u)); bottom: calc(28 * var(--u)); gap: 8px; z-index: 96; }
+.theme-ny_book.ny-nav .host-actions button { font: 700 calc(19 * var(--u)) / 1 var(--nb-serif); color: var(--fg); padding: calc(11 * var(--u)) calc(18 * var(--u));
+  background: #f3ead8; border: 2px solid #b9a77f; border-radius: 3px; box-shadow: 0 3px 0 var(--nb-shade); opacity: .92; text-transform: none; letter-spacing: 0; }
+
+/* ── 01 ЛОББИ ── */
+.theme-ny_book .lobby-screen { justify-content: flex-start; padding-top: calc(110 * var(--u)); }
+.theme-ny_book .lobby-screen .neon-title { position: relative; isolation: isolate; margin: 0; padding: calc(16 * var(--u)) calc(92 * var(--u)) calc(26 * var(--u));
+  background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(0,0,0,.14)), var(--nb-red);
+  box-shadow: 0 calc(14 * var(--u)) calc(18 * var(--u)) rgba(60, 20, 10, .3);
+  font: 400 calc(128 * var(--u)) / 1 var(--font-display); letter-spacing: .04em; color: #fbf3e2; text-transform: none; text-shadow: 3px 4px 0 rgba(80, 10, 20, .45);
+  animation: p-unfurl 1.1s cubic-bezier(.3, .85, .3, 1) .5s both; }
+.theme-ny_book .lobby-screen .neon-title::before, .theme-ny_book .lobby-screen .neon-title::after { content: ''; position: absolute; top: calc(26 * var(--u)); width: calc(120 * var(--u)); height: 100%; z-index: -1; background: #7a1424;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 26% 50%); }
+.theme-ny_book .lobby-screen .neon-title::before { left: calc(-84 * var(--u)); }
+.theme-ny_book .lobby-screen .neon-title::after { right: calc(-84 * var(--u)); transform: scaleX(-1); }
+.theme-ny_book .lobby-screen .neon-title span { display: block; color: inherit !important; }
+.theme-ny_book .lobby-screen .neon-title br { display: none; }
+
+/* окно составов: вкладыш справа от QR, QR слева остаётся виден */
+.theme-ny_book .groups-overlay { background: rgba(18, 27, 47, .6); justify-content: flex-end; padding-right: calc(260 * var(--u)); align-items: center; }
+.theme-ny_book .groups-modal { width: calc(1150 * var(--u)); max-width: 62vw; padding: calc(30 * var(--u)) calc(40 * var(--u)) calc(38 * var(--u)); border: 0; border-radius: 0; color: var(--fg);
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 41px, rgba(44,74,122,.14) 41px 42px), var(--nb-card);
+  box-shadow: 0 8px 0 var(--nb-shade), 0 28px 40px rgba(0,0,0,.45); transform-origin: 50% 100%; animation: p-rise 1.15s cubic-bezier(.25,.8,.3,1) .1s both; }
+.theme-ny_book .gm-head .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nb-serif); letter-spacing: .26em; color: var(--nb-red); }
+.theme-ny_book .gm-close { background: none; border: 0; color: #5a3b22; font: 700 calc(28 * var(--u)) / 1 var(--nb-serif); }
+.theme-ny_book .lg-team { background: #fffaf0; border: 0; border-top: calc(14 * var(--u)) solid currentColor; border-radius: 0; box-shadow: 0 5px 0 var(--nb-shade), 0 10px 12px rgba(60,30,10,.2); }
+.theme-ny_book .lg-name { font: 400 calc(34 * var(--u)) / 1 var(--font-display); color: var(--fg) !important; }
+.theme-ny_book .lg-players { color: var(--muted); font-style: italic; }
+
+/* QR из лобби по умолчанию (старый угловой) в новогодних темах не рисуется: QR — в сцене */
+.theme-ny_book .lobby-qr-corner, .theme-ny_book .lobby-qr-hint { display: none; }
+.ny-qr-svg { display: block; width: 100%; height: 100%; }
+
+/* ── 02 ПРАВИЛА / информационный слайд ── */
+.theme-ny_book .host-topbar { top: calc(46 * var(--u)); left: calc(184 * var(--u)); right: calc(184 * var(--u)); justify-content: space-between; align-items: center; }
+.theme-ny_book .info-screen .host-topbar, .theme-ny_book .bz-screen .host-topbar { justify-content: center; }
+.theme-ny_book .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nb-serif); letter-spacing: .26em; color: var(--nb-red); text-shadow: none; }
+.theme-ny_book .info-screen .host-topbar .mono-tag { background: var(--nb-card); padding: calc(12 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade); }
+.theme-ny_book .ib-rules-band { background: var(--nb-card); border: 0; border-radius: 0; box-shadow: 0 7px 0 var(--nb-shade), 0 14px 18px rgba(60, 30, 10, .28);
+  transform-origin: 50% 0; animation: p-unfurl 1s cubic-bezier(.3, .85, .3, 1) .1s both; color: var(--fg); }
+.theme-ny_book .info-list li { color: var(--fg); font-family: var(--nb-serif); animation: p-ink .8s ease-out calc(.5s + var(--i, 0) * .16s) both; }
+.theme-ny_book .info-list li::before { color: var(--nb-red); }
+.theme-ny_book .ib-label .neon-title, .theme-ny_book .ib-label-text { font: 400 calc(112 * var(--u)) / 1 var(--font-display); color: var(--nb-red) !important;
+  letter-spacing: .02em; text-shadow: 4px 4px 0 var(--nb-mustard), 8px 9px 0 #e9d9b7; background: none; }
+.theme-ny_book .info-round { border: 0; border-bottom: 3px dotted rgba(90, 59, 34, .45); background: none; color: var(--fg); animation: p-ink .7s ease-out calc(.9s + var(--i, 0) * .12s) both; }
+.theme-ny_book .ir-num { display: grid; place-items: center; border-radius: 50%; background: var(--nb-mustard); font: 400 1em / 1 var(--font-display); color: var(--nb-ink); box-shadow: 0 3px 0 #a87e24; }
+.theme-ny_book .ir-count, .theme-ny_book .info-stats, .theme-ny_book .info-note-corner { color: var(--muted); font-style: italic; }
+.theme-ny_book .ir-name { font-weight: 700; color: var(--fg); }
+
+/* ── 03/04 ВВОД РАУНДА и кроссворд ── */
+.theme-ny_book .round-intro .neon-title, .theme-ny_book .round-intro h1 { font: 400 calc(96 * var(--u)) / 1.02 var(--font-display); color: var(--nb-ink) !important;
+  text-shadow: 4px 4px 0 var(--nb-mustard), 8px 9px 0 #e9d9b7; background: none; text-transform: none; }
+.theme-ny_book .round-badge, .theme-ny_book .rb-num { background: var(--nb-red); color: #fbf3e2; border: 0; border-radius: 0; box-shadow: 0 4px 0 #7a1424; font-family: var(--font-display); }
+.theme-ny_book .meta-line { color: var(--muted); font-style: italic; }
+.theme-ny_book .rule-item { background: var(--nb-card); border: 0; border-left: 9px solid var(--nb-mustard); border-radius: 0; color: var(--fg);
+  box-shadow: 0 5px 0 var(--nb-shade), 0 10px 12px rgba(60, 30, 10, .2); }
+.theme-ny_book .rule-item .idx { color: var(--nb-red); font-family: var(--font-display); }
+.theme-ny_book .rules-frame { background: var(--nb-card); border: 0; border-radius: 0; box-shadow: 0 6px 0 var(--nb-shade); color: var(--fg); }
+.theme-ny_book .rules-frame-label { color: var(--nb-red); font-family: var(--nb-serif); letter-spacing: .26em; }
+
+/* ── 05–08 ВОПРОС ── */
+.theme-ny_book .qnum { font: 700 calc(30 * var(--u)) / 1 var(--nb-serif); letter-spacing: .14em; color: var(--nb-ink); background: var(--nb-card); border: 0; border-radius: 0;
+  padding: calc(14 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade), 0 8px 10px rgba(60, 30, 10, .2); text-shadow: none; }
+.theme-ny_book .q-text, .theme-ny_book .q-text .q-word { font-family: var(--nb-serif); font-weight: 700; color: var(--nb-ink); text-shadow: none; }
+.theme-ny_book .q-frame, .theme-ny_book .q-split > div:first-child { position: relative; background: linear-gradient(90deg, rgba(0,0,0,0) 78px, rgba(179, 38, 58, .4) 78px 80px, rgba(0,0,0,0) 80px),
+  repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 47px, rgba(44, 74, 122, .14) 47px 48px), var(--nb-card);
+  box-shadow: 0 7px 0 var(--nb-shade), 0 16px 22px rgba(60, 30, 10, .28); border: 0; border-radius: 0; }
+.theme-ny_book .q-img { padding: calc(12 * var(--u)); background: #fffdf6; border: 0; border-radius: 0; box-shadow: 0 5px 0 var(--nb-shade), 0 14px 18px rgba(60, 30, 10, .3); }
+.theme-ny_book .q-img:nth-child(odd) { transform: rotate(-1.2deg); } .theme-ny_book .q-img:nth-child(even) { transform: rotate(1.2deg); }
+.theme-ny_book .choice-plate { position: relative; background: var(--nb-card); border: 0; border-radius: 2px; color: var(--nb-ink); font-family: var(--nb-serif); font-weight: 700;
+  box-shadow: 0 6px 0 var(--nb-shade), 0 12px 14px rgba(60, 30, 10, .24); text-shadow: none; }
+.theme-ny_book .choice-plate .key, .theme-ny_book .img-answer .ia-key { display: inline-grid; place-items: center; border-radius: 50%; background: var(--nb-red); color: #fbf3e2;
+  font-family: var(--font-display); font-weight: 400; box-shadow: 0 3px 0 rgba(0, 0, 0, .25); border: 0; }
+.theme-ny_book .choice-plate:nth-child(4n+2) .key { background: var(--nb-mustard); color: var(--nb-ink); }
+.theme-ny_book .choice-plate:nth-child(4n+3) .key { background: var(--nb-pine); }
+.theme-ny_book .choice-plate:nth-child(4n+4) .key { background: #2c4a7a; }
+
+/* ── 13–14 ОТВЕТ ── */
+.theme-ny_book .answer-reveal, .theme-ny_book .answer-block { background: var(--nb-mustard); border: 0; border-radius: 0; color: var(--nb-ink); box-shadow: 0 5px 0 #a87e24;
+  transform-origin: 0 50%; animation: p-pull .8s cubic-bezier(.2, .9, .3, 1.1) both; }
+.theme-ny_book .answer-label { color: var(--muted); font-weight: 700; font-family: var(--nb-serif); }
+.theme-ny_book .answer-main { font-family: var(--font-display); font-weight: 400; color: var(--nb-ink); text-shadow: none; }
+.theme-ny_book .answer-note { color: var(--muted); font-style: italic; }
+
+/* ── табло / перерыв / финал: бумажные карточки на странице ── */
+.theme-ny_book .sb-table-wrap, .theme-ny_book .fin-table-wrap { background: var(--nb-card); border: 0; border-radius: 0; color: var(--fg);
+  box-shadow: 0 7px 0 var(--nb-shade), 0 16px 22px rgba(60, 30, 10, .28); }
+.theme-ny_book .sb-title, .theme-ny_book .clh-title { font-family: var(--font-display); color: var(--nb-red) !important; text-shadow: 4px 4px 0 var(--nb-mustard); background: none; }
+.theme-ny_book .sb-name, .theme-ny_book .score-table td, .theme-ny_book .score-table th { color: var(--fg); }
+
+/* поправки по рендеру: номер вопроса не наезжает на текст, красная линия полей — левее текста, клетки кроссворда — бумажные карточки */
+.theme-ny_book .q-frame, .theme-ny_book .q-split > div:first-child { padding-left: calc(56 * var(--u)); }
+.theme-ny_book .rule-item { display: flex; align-items: baseline; gap: calc(14 * var(--u)); text-align: left; }
+.theme-ny_book .cw-cell:not(.empty):not(.is-empty), .theme-ny_book .cw-layout [class*="cell"]:not([class*="empty"]) { background: var(--nb-card); border-color: #b9a77f; }
+.theme-ny_book .score-table { color: var(--fg); }
+
+/* табло/перерыв/подсчёт/финал: «средняя» плотность — гирлянда провисает ниже, заголовок не должен лезть под флажки */
+.theme-ny_book[data-ny-density="medium"] :is(.sb-screen, .break-screen, .fin-screen, .recap-screen) { padding-top: calc(250 * var(--u)); }
+
+/* телефон игрока: тема даёт тёмный фон корня, а текст — чернильный; на телефоне фон бумажный (ревью 9.90) */
+.theme-ny_book .pl-root { background: var(--bg); color: var(--fg); }
+
+/* ═══ МЕХАНИКИ: «Своя игра», мелодия, блиц, «Скрэмбл» (эталон — мокап Concept 2) ═══ */
+/* окна открытой плитки/трека — вкладыш на разворот, сквозь затемнение виден разворот */
+.theme-ny_book.jp-overlay, .theme-ny_book.mel-overlay { background: rgba(18, 27, 47, .5); min-height: 0; font-family: var(--nb-serif); }
+/* имя команды в карточках — чернилами (цвета команд неоновые, на бумаге нечитаемы) */
+.theme-ny_book :is(.mel-bid-row, .jp-answer, .bz-block, .an-res-line) [style*="color"] { color: var(--fg) !important; }
+.theme-ny_book :is(.jp-modal, .mel-modal) { background: repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 44px, rgba(44,74,122,.12) 44px 45px), var(--nb-card);
+  border: 0; border-radius: 0; color: var(--fg); box-shadow: 0 9px 0 var(--nb-shade), 0 30px 46px rgba(0, 0, 0, .5); animation: p-grow .9s cubic-bezier(.2, .9, .3, 1.1) both; }
+.theme-ny_book :is(.jp-modal-theme, .mel-modal-theme) { font: 400 calc(50 * var(--u)) / 1.05 var(--font-display); color: var(--nb-red); text-shadow: none; }
+.theme-ny_book :is(.jp-count, .mel-count, .mel-big) { font-family: var(--font-display); color: var(--nb-ink); text-shadow: none; }
+.theme-ny_book .jp-count.on { color: var(--nb-red); }
+.theme-ny_book :is(.jp-answer, .mel-bid-row) { background: #fffaf0; border: 0; border-left: 12px solid var(--tc, var(--nb-mustard)); border-radius: 0; color: var(--fg); box-shadow: 0 4px 0 var(--nb-shade); }
+.theme-ny_book :is(.jp-answer .name, .mel-bid-row .name, .bz-name) { color: var(--fg) !important; font-weight: 700; text-shadow: none; }
+.theme-ny_book .mel-bid-row.win { border-left-color: var(--nb-red); }
+.theme-ny_book .jp-grade { border-radius: 50%; border: 0; color: #fff; }
+.theme-ny_book .jp-grade.ok { background: var(--nb-green, #2f7a47); } .theme-ny_book .jp-grade.no { background: var(--nb-red); }
+.theme-ny_book :is(.jp-modal, .mel-modal) :is(button.ghost, button.ghost.dark) { background: var(--nb-card); color: var(--nb-ink); border: 2px solid #b9a77f; border-radius: 3px; box-shadow: 0 3px 0 var(--nb-shade); }
+.theme-ny_book .mel-points-hint, .theme-ny_book .mel-wait, .theme-ny_book .jp-theme-hint { color: var(--muted); font-style: italic; }
+
+/* «Своя игра»: заголовок, колонки тем — цветные закладки, плитки — карточки с цветной цифрой */
+.theme-ny_book .jp-title, .theme-ny_book .jp-title .neon-title { font: 400 calc(68 * var(--u)) / 1 var(--font-display); color: var(--nb-red) !important; background: none;
+  text-shadow: 4px 4px 0 var(--nb-mustard), 8px 9px 0 #e9d9b7; text-transform: none; }
+.theme-ny_book .jp-theme-name { background: hsl(calc(var(--c, 0) * 61deg + 350deg) 46% 36%); color: #fbf3e2; border: 0; border-radius: 2px; font-family: var(--nb-serif); font-weight: 700;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .22), 0 9px 12px rgba(60, 30, 10, .25); text-shadow: none; }
+.theme-ny_book .jp-theme-name .jp-theme-hint { color: rgba(251, 243, 226, .82); }
+.theme-ny_book .jp-tile .qt-front, .theme-ny_book .jp-tile .qt-back { background: var(--nb-card); color: var(--nb-red); border: 0; border-radius: 2px; font-family: var(--font-display); font-weight: 400;
+  box-shadow: 0 5px 0 var(--nb-shade), 0 9px 12px rgba(60, 30, 10, .24); text-shadow: none; }
+.theme-ny_book .jp-tile.done { opacity: 1; }
+.theme-ny_book .jp-tile.done .qt-front { background: #e3d6b8; color: #a99476; box-shadow: inset 0 0 18px rgba(70, 40, 10, .35); }
+.theme-ny_book .jp-tile .qt-front::after { content: none; }
+
+/* мелодия: колонки тем и шестигранные ноты → бумажные закладки и карточки-ноты */
+.theme-ny_book .mel-theme { background: hsl(calc(var(--c, 0) * 76deg + 350deg) 44% 36%); color: #fbf3e2; border: 0; border-radius: 2px; font-family: var(--nb-serif); font-weight: 700;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .22), 0 9px 12px rgba(60, 30, 10, .25); text-shadow: none; }
+.theme-ny_book .mel-tile .mel-face, .theme-ny_book .mel-tile .qt-front { background: var(--nb-card); color: var(--nb-red); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .mel-tile { --neon: var(--nb-red); filter: drop-shadow(0 5px 0 var(--nb-shade)); }
+.theme-ny_book .mel-tile.done { opacity: .5; }
+
+/* блиц: карточки команд — бумага, активная — золото */
+.theme-ny_book .bz-screen .mono-tag { color: var(--nb-red); }
+.theme-ny_book .bz-block { background: var(--nb-card) !important; border: 0 !important; border-top: calc(10 * var(--u)) solid var(--accent2) !important; border-radius: 0; color: var(--fg);
+  box-shadow: 0 5px 0 var(--nb-shade), 0 10px 12px rgba(60, 30, 10, .2); }
+.theme-ny_book .bz-block.on { background: #fff3cf !important; border-top-color: var(--nb-red) !important; }
+.theme-ny_book :is(.bz-timer, .bz-pts, .bz-right, .bz-qtext, .bz-asking, .bz-turn) { color: var(--nb-ink); font-family: var(--nb-serif); text-shadow: none; }
+.theme-ny_book .bz-timer { font-family: var(--font-display); } .theme-ny_book .bz-timer.low { color: var(--nb-red); }
+.theme-ny_book .bz-question { background: var(--nb-card); border: 0; border-radius: 0; box-shadow: 0 7px 0 var(--nb-shade), 0 16px 22px rgba(60, 30, 10, .28); }
+.theme-ny_book .bz-verdict.ok { color: var(--nb-green, #2f7a47); } .theme-ny_book .bz-verdict.no { color: var(--nb-red); }
+.theme-ny_book .bz-dice { background: var(--nb-card); color: var(--nb-red); border: 0; box-shadow: 0 4px 0 var(--nb-shade); font-family: var(--font-display); }
+
+/* «Скрэмбл»: плитки-буквы и клетки доски */
+.theme-ny_book .an-tile { background: var(--nb-card); color: var(--nb-ink); border: 3px solid var(--nb-red); border-radius: 6px; font-family: var(--font-display); box-shadow: 0 4px 0 var(--nb-shade); text-shadow: none; }
+.theme-ny_book .an-tile.used { opacity: .35; }
+.theme-ny_book .an-cell { background: rgba(251, 246, 234, .7); border: 3px solid #b9a77f; border-radius: 6px; color: var(--nb-ink); font-family: var(--font-display); }
+.theme-ny_book .an-cell.filled { background: var(--nb-card); border-color: var(--nb-red); }
+.theme-ny_book .an-cell.hint { background: #f5e3a8; border-color: var(--nb-mustard); }
+.theme-ny_book .an-clue { color: var(--muted); font-style: italic; }
+.theme-ny_book :is(.an-result, .an-res-line) { color: var(--fg); }
+.theme-ny_book .an-board-wrap, .theme-ny_book .host-screen .q-text { text-shadow: none; }
+/* заголовок вопроса «Скрэмбла»/блица не наезжает на гирлянду: плотность считается по механике (isPlainQuestion) */
+.theme-ny_book :is(.jp-tile, .mel-tile) { background: none; border: 0; box-shadow: none; }
+.theme-ny_book .an-clue { font-family: var(--nb-serif); font-style: normal; font-weight: 700; color: var(--nb-ink); text-shadow: none; text-transform: none; font-size: calc(44 * var(--u)); }
+.theme-ny_book .bz-turn { background: var(--nb-red); color: #fbf3e2; border-radius: 2px; text-shadow: none; }
+.theme-ny_book .bz-screen { padding-top: calc(200 * var(--u)); }
+.theme-ny_book .bz-bank { color: var(--nb-red); border-color: var(--nb-red); }
+.theme-ny_book .fin-slide-team[style*="color"] { color: var(--nb-red) !important; text-shadow: none; }
+.theme-ny_book .fin-slide-round, .theme-ny_book .fin-slide-label { color: var(--muted); }
+/* заставка раунда: номер — закладка внутри страницы, название — по мокапу (96), а не во весь экран */
+.theme-ny_book .host-screen .round-badge { left: calc(150 * var(--u)); top: calc(96 * var(--u)); }
+.theme-ny_book .round-intro .neon-title { font-size: calc(96 * var(--u)) !important; }
+.theme-ny_book .rule-item .text, .theme-ny_book .rule-item .idx + * { font-family: var(--nb-serif); font-weight: 700; }
+.theme-ny_book .round-badge { color: #fbf3e2; }
+
+/* повтор вопросов: сетка картинок не шире тела слайда (базовая ширина 1720px рассчитана на поля классики, а не на страницу/экран ТВ) */
+.theme-ny_book .recap-screen .recap-body > .q-media-grid { width: 100%; max-width: 100%; box-sizing: border-box; }
+
+/* ═══ ТЕЛЕФОН ИГРОКА ═══ страница книги: бумага, красные заголовки, карточки с тенью-«корешком» */
+.theme-ny_book:has(.pl-root, .pl-register, .pl-center, .pl-wait) { background: var(--bg); }
+.theme-ny_book .pl-header { background: var(--nb-card); border-bottom: 3px solid var(--nb-red); box-shadow: 0 3px 0 var(--nb-shade); font-family: var(--nb-serif); }
+.theme-ny_book .pl-header [style*="color"] { color: var(--fg) !important; }
+.theme-ny_book .pl-round, .theme-ny_book .pl-notice, .theme-ny_book .pl-qlabel { color: var(--nb-red); }
+.theme-ny_book .pl-card { background: var(--nb-card); border: 0; border-left: 5px solid var(--nb-mustard); border-radius: 0; box-shadow: 0 4px 0 var(--nb-shade), 0 8px 10px rgba(60, 30, 10, .15); color: var(--fg); }
+.theme-ny_book .pl-qtext, .theme-ny_book .pl-legend, .theme-ny_book .pl-sent { color: var(--fg); }
+.theme-ny_book .pl-choices button, .theme-ny_book .pl-stakes button, .theme-ny_book .pl-match button { background: #fffaf0; border: 2px solid #b9a77f; border-radius: 3px; color: var(--nb-ink); box-shadow: 0 3px 0 var(--nb-shade); font-family: var(--font-display); }
+.theme-ny_book .pl-choices button.sel, .theme-ny_book .pl-stakes button.sel, .theme-ny_book .pl-match button.sel { background: var(--nb-red); border-color: #7a1424; color: #fbf3e2; }
+.theme-ny_book .pl-card input, .theme-ny_book .pl-register input { background: #fffdf6; border: 2px solid #b9a77f; border-radius: 3px; color: var(--nb-ink); font-family: var(--nb-serif); }
+.theme-ny_book .pl-send { background: var(--nb-red); color: #fbf3e2; border-radius: 3px; box-shadow: 0 4px 0 #7a1424; }
+.theme-ny_book .pl-send:disabled { opacity: .55; }
+.theme-ny_book .pl-register h1, .theme-ny_book .pl-wait, .theme-ny_book .pl-center { color: var(--nb-red); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .pl-wait-sub, .theme-ny_book .ed-hint { color: var(--muted); }
+.theme-ny_book .pl-pick { background: var(--nb-card); border: 2px solid #b9a77f; color: var(--fg); }
+.theme-ny_book .pl-pick span:last-child { color: var(--muted); }
+.theme-ny_book .pl-slot, .theme-ny_book .pl-review-row { background: var(--nb-card); border-color: #b9a77f; color: var(--fg); }
+/* экран «Отвечайте!» и подобные заголовки: рамка/неон базовых тем не нужны на бумаге; имена команд в чипах — чернилами */
+.theme-ny_book .host-screen:not(.lobby-screen) .neon-title:not(.ib-label-text) { border-color: transparent; box-shadow: none; background: none; }
+.theme-ny_book .answer-time-teams [style*="color"], .theme-ny_book .team-answers [style*="color"] { color: var(--fg) !important; }
+
+/* ═══ Крупные панели (3840) ═══ базовые кегли в px/clamp упираются в потолок и на 4K остаются мелкими; здесь потолок — «пиксель мокапа» --u (1920 → 1:1, 3840 → ×2) */
+.theme-ny_book .host-screen .q-text { font-size: calc(58 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-m { font-size: calc(50 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-l { font-size: calc(42 * var(--u)); }
+.theme-ny_book .host-screen .q-text.len-xl { font-size: calc(36 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text { font-size: calc(50 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-m { font-size: calc(44 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-l { font-size: calc(38 * var(--u)); }
+.theme-ny_book .host-screen .q-split .q-text.len-xl { font-size: calc(33 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text { font-size: calc(40 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-m { font-size: calc(34 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-l { font-size: calc(30 * var(--u)); }
+.theme-ny_book .host-screen.has-media.has-choices .q-text.len-xl { font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .choice-plate { font-size: calc(31 * var(--u)); }
+.theme-ny_book .host-screen .info-list li { font-size: calc(29 * var(--u)); }
+.theme-ny_book .host-screen .info-round, .theme-ny_book .host-screen .rule-item { font-size: calc(27 * var(--u)); }
+.theme-ny_book .host-screen .answer-main { font-size: calc(58 * var(--u)); }
+.theme-ny_book .host-screen .answer-label, .theme-ny_book .host-screen .answer-note { font-size: calc(24 * var(--u)); }
+.theme-ny_book .host-screen .answer-time-teams > * { font-size: calc(22 * var(--u)); }
+.theme-ny_book .host-screen .score-table td, .theme-ny_book .host-screen .score-table th { font-size: calc(30 * var(--u)); }
+.theme-ny_book .host-screen .sb-name { font-size: calc(34 * var(--u)); }
+.theme-ny_book .p-ros.is-top { --d: calc(120 * var(--u)); } .theme-ny_book .p-ros.is-big { --d: calc(260 * var(--u)); }
+/* 4K: механики — ширины и кегли от --u */
+.theme-ny_book .bz-row { width: min(calc(1700 * var(--u)), 94%); } .theme-ny_book .bz-question { width: min(calc(1500 * var(--u)), 92%); }
+.theme-ny_book .bz-name { font-size: calc(26 * var(--u)); } .theme-ny_book .bz-timer { font-size: calc(66 * var(--u)); }
+.theme-ny_book .bz-meta, .theme-ny_book .bz-pts { font-size: calc(20 * var(--u)); } .theme-ny_book .bz-qtext { font-size: calc(60 * var(--u)); } .theme-ny_book .bz-turn { font-size: calc(16 * var(--u)); }
+.theme-ny_book .jp-theme-name { font-size: calc(27 * var(--u)); } .theme-ny_book .jp-theme-hint { font-size: calc(17 * var(--u)); }
+.theme-ny_book .jp-tile .qt-face { font-size: calc(56 * var(--u)); } .theme-ny_book .jp-board { gap: calc(10 * var(--u)); }
+.theme-ny_book .mel-theme { font-size: calc(32 * var(--u)); } .theme-ny_book .mel-tile .qt-face { font-size: calc(56 * var(--u)); }
+.theme-ny_book .jp-modal-head .mono-tag, .theme-ny_book .mel-modal .mono-tag { font-size: calc(22 * var(--u)); }
+.theme-ny_book .jp-answer .txt, .theme-ny_book .mel-bid-row { font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .an-clue { font-size: calc(44 * var(--u)); }
+.theme-ny_book .host-screen .an-clue { font-family: var(--nb-serif); font-style: normal; font-weight: 700; color: var(--nb-ink); text-shadow: none; text-transform: none; }
+
+/* ── награждение ── */
+.theme-ny_book .fin-screen { padding-top: calc(190 * var(--u)); }
+.theme-ny_book .fin-award { gap: calc(10 * var(--u)); }
+.theme-ny_book .fin-award-place { font-family: var(--nb-serif); font-weight: 700; letter-spacing: .26em; color: var(--nb-red); text-shadow: none; }
+.theme-ny_book .fin-award-name[style*="color"] { color: var(--nb-ink) !important; text-shadow: none; font-family: var(--font-display); font-size: calc(62 * var(--u)); background: var(--nb-card); box-shadow: 0 5px 0 var(--nb-shade); padding: calc(6 * var(--u)) calc(30 * var(--u)); }
+.theme-ny_book .fin-award-name:not([style*="color"]) { color: var(--nb-ink); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .fin-award-score { color: var(--nb-red); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .fin-table-wrap td, .theme-ny_book .fin-table-wrap th, .theme-ny_book .fin-table-wrap span { color: var(--fg); }
+.theme-ny_book .fin-screen { padding-top: calc(150 * var(--u)); gap: calc(10 * var(--u)); }
+.theme-ny_book .fin-screen .neon-title { font-size: calc(78 * var(--u)) !important; }
+.theme-ny_book .fin-table-wrap { max-height: none; }
+.theme-ny_book .fin-table-wrap :is(td, th, .total, .pos) { font-family: var(--nb-serif); font-size: calc(28 * var(--u)); color: var(--fg); }
+.theme-ny_book .fin-table-wrap tr { height: calc(54 * var(--u)); }
+.theme-ny_book .fin-screen { padding-bottom: calc(110 * var(--u)); }

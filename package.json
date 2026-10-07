@@ -8,7 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "lint": "eslint .",
-    "deploy:prep": "npm run build && rm -rf docs && cp -r dist docs"
+    "deploy:prep": "npm run build && rm -rf docs && cp -r dist docs",
+    "lab": "vite --open /quiz-party/labs/newyear/",
+    "lab:build": "node scripts/build-ny-lab.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

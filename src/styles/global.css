@@ -59,3 +59,10 @@
 @import './parts/37-tile-card.css';
 @import './parts/38-round-reveal.css';
 @import './parts/39-round-anagram.css';
+
+/* Новогодние темы 9.90 («Книга» / «Тёплый дом»): движок сцены, потом сцены, потом экраны */
+@import './parts/40-ny-engine.css';
+@import './parts/40-ny-book-world.css';
+@import './parts/42-ny-home-world.css';
+@import './parts/41-ny-book.css';
+@import './parts/43-ny-home.css';

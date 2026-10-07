@@ -5,6 +5,8 @@
 // РОВНО тот же компонент, не копия.
 import { useEffect, useRef, useState } from 'react'
 import { MagicCircleTimer } from './MagicCircleTimer'
+import { Rosette } from '../ny/book/BookScene'
+import { Dial } from '../ny/home/HomeScene'
 
 /** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
  *  как на кухонном/спортивном таймере. Синтезируем на месте: не нужен файл,
@@ -51,22 +53,33 @@ export function Timer({ startedAt, seconds, theme, chime = true, variant }: {
   variant?: 'ring'
 }) {
   const [left, setLeft] = useState(seconds)
+  // плавная доля остатка для рисунка таймера новогодних тем (секунды на экране считает `left`)
+  const [frac, setFrac] = useState(1)
   const rang = useRef(false)
+  const nyTheme = theme === 'ny_book' || theme === 'ny_home'
   useEffect(() => {
-    if (!startedAt) { setLeft(seconds); rang.current = false; return }
+    if (!startedAt) { setLeft(seconds); setFrac(1); rang.current = false; return }
     const tick = () => {
       const elapsed = (Date.now() - new Date(startedAt).getTime()) / 1000
       const l = Math.max(0, Math.ceil(seconds - elapsed))
       setLeft(l)
+      if (nyTheme) setFrac(Math.max(0, Math.min(1, (seconds - elapsed) / seconds)))
       // гонг ровно один раз на запуск таймера; в музыкальных раундах выключен,
       // чтобы не наложиться на трек
       if (l === 0 && chime && !rang.current) { rang.current = true; playChime() }
     }
     tick()
-    const t = setInterval(tick, 250)
+    const t = setInterval(tick, nyTheme ? 100 : 250)
     return () => clearInterval(t)
-  }, [startedAt, seconds, chime])
+  }, [startedAt, seconds, chime, nyTheme])
   const low = left <= 10
+  // Новогодние темы (мокапы §3cj/§3ck): Книга — бумажная розетка, Тёплый дом — циферблат
+  // Спасской башни. Логика та же (целые секунды, «мало» с 10, ноль), меняется только рисунок.
+  if (nyTheme) {
+    const t = { seconds, left, frac: startedAt ? frac : 1, low, zero: !!startedAt && left === 0, running: !!startedAt && left > 0 }
+    const size = variant === 'ring' ? 'big' : 'top'
+    return theme === 'ny_book' ? <Rosette t={t} size={size} /> : <Dial t={t} size={size} />
+  }
   if (theme === 'new_year') {
     const R = 44, C = 2 * Math.PI * R
     const frac = Math.max(0, Math.min(1, left / seconds))

@@ -9,3 +9,4 @@ dist
 local-server/app/
 local-server/data/
 local-server/node/
+dist-lab

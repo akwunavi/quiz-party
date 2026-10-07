@@ -5,7 +5,7 @@
 // ── Пакет ──────────────────────────────────────────────
 // 'bank' — хранилище вопросов, в выбор пакета на игре не попадает (см. 0002)
 export type PackStatus = 'draft' | 'ready' | 'active' | 'played' | 'archived' | 'bank'
-export type ThemeKey = 'classic' | 'new_year' | 'potter'
+export type ThemeKey = 'classic' | 'new_year' | 'potter' | 'ny_book' | 'ny_home'
 
 export interface PackSettings {
   bg_music?: string          // общая фоновая музыка вопросов
