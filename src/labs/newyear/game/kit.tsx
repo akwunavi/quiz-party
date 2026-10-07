@@ -4,6 +4,7 @@
 // материал таймера, переход между состояниями, — даёт концепция.
 import { createContext, useContext, type ComponentType, type ReactNode } from 'react'
 import type { GameTimer } from './timer'
+import type { DemoTeam } from './data'
 
 export type Density = 'sparse' | 'medium' | 'dense'
 /** Переход сцены: before — ещё старое состояние, out — старое уходит, cover — кадр закрыт материалом
@@ -15,6 +16,11 @@ export interface Kit {
   /** Сцена: фон, окружение и рамка кадра. density — сколько места отдать
    *  декору (в игре контента много — сцена отступает). */
   World: ComponentType<{ density: Density; scene: string; children: ReactNode }>
+  /** Подключённые команды в материале мира (состав и порядок — как в игре). */
+  Teams: ComponentType<{ teams: DemoTeam[] }>
+  /** QR для входа. Сам код всегда неподвижный, прямой и контрастный; мир решает,
+   *  на чём он «стоит». lit — окно составов открыто, код подсвечен. */
+  Qr: ComponentType<{ lit?: boolean }>
   /** Таймер в материале мира. size: top — в шапке вопроса; big — один на
    *  экран; mini — в окне механики. */
   Timer: ComponentType<{ t: GameTimer; size: 'top' | 'big' | 'mini' }>

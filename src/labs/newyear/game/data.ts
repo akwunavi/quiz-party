@@ -27,6 +27,18 @@ export const TEAMS: DemoTeam[] = TEAM_NAMES.map(([name, icon], i) => ({
   id: `t${i + 1}`, name, icon, color: teamColor(i), alive: i !== 7,
 }))
 
+/** Лобби для проверки нагрузки: те же 8 команд, плюс четыре с ДЛИННЫМИ названиями. */
+const EXTRA_NAMES: [string, string | null][] = [
+  ['Сборная Дедов Морозов района', '🧣'], ['Команда имени Снегурочки', '❄️'], ['Три мандарина и ёлка', null],
+  ['Новый год к нам мчится', '🚀'],
+]
+export function teamsFor(n: number): DemoTeam[] {
+  const all = [...TEAM_NAMES, ...EXTRA_NAMES].map(([name, icon], i) => ({
+    id: `t${i + 1}`, name, icon, color: teamColor(i), alive: i !== 7,
+  }))
+  return all.slice(0, Math.max(1, Math.min(all.length, n)))
+}
+
 // ── рандомайзер: имена вставили в админке, перемешали на 4 команды ──
 // (как TeamRandomizer: по кругу i % n после перемешивания)
 const NAMES = ['Ваня', 'Маша', 'Петя', 'Оля', 'Саша', 'Дима', 'Катя', 'Лёша', 'Настя', 'Женя',

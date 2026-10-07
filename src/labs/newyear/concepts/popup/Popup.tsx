@@ -7,8 +7,10 @@
 import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import { DecoratedTree } from '../../engine/DecoratedTree'
 import { Particles } from '../../engine/stage'
+import { FakeQR } from '../../engine/bits'
 import type { SnowCfg } from '../../engine/particles'
 import type { Kit, Density } from '../../game/kit'
+import type { DemoTeam } from '../../game/data'
 import type { Concept } from '../types'
 import { meta } from './meta'
 import './popup-world.css'
@@ -123,11 +125,64 @@ function World({ density, scene, children }: { density: Density; scene: string; 
           <div className="p-page p-page-l" /><div className="p-page p-page-r" /><div className="p-gutter" />
           <Bunting t={0.1} y={density === 'dense' ? 8 : 30} sag={density === 'dense' ? 22 : 90} />
           <Scenery density={scene === 'randomizer' ? 'sparse' : density} scene={scene === 'randomizer' ? 'lobby' : scene} />
+          {density !== 'dense' && (
+            <div className="p-snow"><Particles z={10} snow={snow(density === 'sparse' ? 40 : 22)} /></div>
+          )}
           <div className="p-content">{children}</div>
           <div className="p-grain" />
         </div>
       </div>
-      {density !== 'dense' && <Particles z={40} snow={snow(density === 'sparse' ? 40 : 22)} />}
+    </div>
+  )
+}
+
+/** Подключённые команды — бумажная гирлянда вымпелов с ласточкиным хвостом:
+ *  висят на бечёвке, имя написано на вымпеле. Рядов столько, чтобы вымпелы
+ *  оставались крупными: 1–4 команды — одна нить, 5–8 — две, дальше — три. */
+const FLAG_W = 270, FLAG_GAP = 22, FLAG_SAG = 30
+function Pennants({ teams }: { teams: DemoTeam[] }) {
+  const rowsN = Math.ceil(teams.length / 4)
+  const per = Math.ceil(teams.length / rowsN)
+  const rows: DemoTeam[][] = Array.from({ length: rowsN }, (_, r) => teams.slice(r * per, (r + 1) * per))
+  return (
+    <div className="p-teams">
+      <div className="p-teams-tag"><span>ПОДКЛЮЧИЛИСЬ</span><b>{teams.length}</b></div>
+      {rows.map((row, r) => {
+        const W = row.length * FLAG_W + (row.length - 1) * FLAG_GAP
+        const y = (f: number) => 4 * FLAG_SAG * f * (1 - f)
+        return (
+          <div key={r} className="p-teams-row" style={{ width: W, height: FLAG_SAG + 150 } as CSSProperties}>
+            <svg className="p-teams-twine" width={W} height={FLAG_SAG + 8} aria-hidden="true">
+              <path d={`M 0 3 Q ${W / 2} ${3 + 2 * FLAG_SAG} ${W} 3`} fill="none" stroke="#7a5a3a" strokeWidth="3" />
+            </svg>
+            {row.map((t, i) => {
+              const cx = i * (FLAG_W + FLAG_GAP) + FLAG_W / 2
+              const f = cx / W
+              const ang = (Math.atan((4 * FLAG_SAG * (1 - 2 * f)) / W) * 180) / Math.PI
+              const n = t.name.length
+              return (
+                <div key={t.id} className={`p-flag-team${t.alive ? '' : ' is-away'}${n > 22 ? ' is-long' : n > 14 ? ' is-mid' : ''}`}
+                  style={{ left: i * (FLAG_W + FLAG_GAP), top: 3 + y(f), width: FLAG_W, '--tc': t.color, '--ang': `${ang}deg`, '--rot': `${ang}deg`, '--i': r * 4 + i } as CSSProperties}>
+                  <span className="p-flag-pin" />
+                  <span className="p-flag-name">{t.icon && <i>{t.icon}</i>}{t.name}</span>
+                </div>
+              )
+            })}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/** QR — настольная карточка-«домик»: стоит на снегу, лист прямой, подложка белая,
+ *  вокруг кода тихая зона. Карточка проявляется со дна (без сдвига и поворота),
+ *  сам код неподвижен. */
+function QrCard({ lit }: { lit?: boolean }) {
+  return (
+    <div className={`p-qr${lit ? ' is-lit' : ''}`}>
+      <div className="p-qr-face"><div className="p-qr-tile"><FakeQR size={320} fg="#1d2b4a" bg="#ffffff" /></div></div>
+      <div className="p-qr-flap" />
     </div>
   )
 }
@@ -159,6 +214,6 @@ function Transition({ phase, kind }: { phase: string; kind: 'rules' | 'round' })
   )
 }
 
-const kit: Kit = { id: 'popup', World, Timer: Rosette, Transition, timing: { out: 0, cover: 0.8, in: 1.45, done: 2.6 } }
+const kit: Kit = { id: 'popup', World, Teams: Pennants, Qr: QrCard, Timer: Rosette, Transition, timing: { out: 0, cover: 0.8, in: 1.45, done: 2.6 } }
 
 export const popup: Concept = { meta, kit }

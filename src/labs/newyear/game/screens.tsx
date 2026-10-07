@@ -5,14 +5,14 @@
 // словарь; как они выглядят и как двигаются, решает CSS концепции.
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useCues, useStage, useTime } from '../engine/stage'
-import { FakeQR } from '../engine/bits'
 import { useKit, type Density, type TransitionPhase } from './kit'
+import { useLabOptions } from './config'
 import { useGameTimer, timerAt, demoSpeed } from './timer'
 import { Photo } from './Photo'
 import {
   BLITZ, CROSSWORD_GRID, CROSSWORD_META, CROSSWORD_ROUND, JEOPARDY, JEOPARDY_ANSWERS, MATCH_TEAM_ANSWERS,
-  MELODY, ORDER_TEAM_ANSWERS, PACK_NAME, Q_MATCH, Q_ORDER, Q_ROUND, RANDOM_GROUPS, RULES_ROUNDS,
-  RULES_SLIDE, RULES_STATS, SCRAMBLE, TEAMS, teamById, type DemoAnswer, type DemoQuestion,
+  MELODY, ORDER_TEAM_ANSWERS, Q_MATCH, Q_ORDER, Q_ROUND, RANDOM_GROUPS, RULES_ROUNDS,
+  RULES_SLIDE, RULES_STATS, SCRAMBLE, TEAMS, teamById, teamsFor, type DemoAnswer, type DemoQuestion,
 } from './data'
 import { blockLayout } from '../../../pages/rounds/BlitzRound'
 import { anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramHintTile, anagramMaxHints, hashStr } from '../../../lib/anagram'
@@ -20,13 +20,16 @@ import { melodySpinPath, melodySpinAt, melodySpinSeed } from '../../../lib/melod
 
 // ── общие мелочи ──────────────────────────────────────────
 
-function Actions({ items }: { items: (string | [string, 'ghost' | 'primary'])[] }) {
+/** Кнопки ведущего на проекторе. В обычном виде их НЕТ: проектор — чистый эфир,
+ *  ходом игры управляет админка. mech — кнопки самой механики (в окнах плитки/трека)
+ *  не навигация и в резервном режиме тоже не рисуются: только Назад / Далее. */
+function Actions({ mech }: { items?: unknown; mech?: boolean }) {
+  const { nav } = useLabOptions()
+  if (!nav || mech) return null
   return (
-    <div className="gs-actions" aria-hidden="true">
-      {items.map((it, i) => {
-        const [label, kind] = typeof it === 'string' ? [it, 'primary'] : it
-        return <span key={i} className={`gs-btn is-${kind}`}>{label}</span>
-      })}
+    <div className="gs-nav" role="group" aria-label="Резервная навигация">
+      <span className="gs-nav-btn is-prev">‹ Назад</span>
+      <span className="gs-nav-btn is-next">Далее ›</span>
     </div>
   )
 }
@@ -58,27 +61,16 @@ const isAfter = (p: TransitionPhase) => p === 'cover' || p === 'in' || p === 'do
 // ── 01 LOBBY (+ рандомайзер) ──────────────────────────────
 
 function Lobby({ groups, exiting }: { groups?: boolean; exiting?: boolean }) {
-  const players = RANDOM_GROUPS.reduce((n, g) => n + g.length, 0)
-  const connected = TEAMS.length
+  const { Teams, Qr } = useKit()
+  const { teams: n } = useLabOptions()
+  const teams = teamsFor(n)
+  const players = RANDOM_GROUPS.reduce((c, g) => c + g.length, 0)
   return (
     <div className={`gs gs-lobby${groups ? ' is-groups' : ''}${exiting ? ' is-exit' : ''}`}>
       <div className="gs-title"><h1 className="gs-logo">QUIZ PARTY</h1></div>
-      <div className="gs-teams">
-        <div className="gs-tag">ПОДКЛЮЧИЛИСЬ ({connected})</div>
-        <div className="gs-chips">
-          {TEAMS.map((t, i) => (
-            <span key={t.id} className={`gs-chip${t.alive ? '' : ' is-away'}`} style={{ '--tc': t.color, '--i': i } as CSSProperties}>
-              {t.icon && <span className="gs-chip-icon">{t.icon}</span>}{t.name}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className={`gs-qr${groups ? ' is-lit' : ''}`}>
-        <FakeQR size={150} fg="#10141c" bg="#ffffff" />
-      </div>
-      {groups && <div className="gs-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>}
-      <div className="gs-pack">{PACK_NAME}</div>
-      <Actions items={[['⟲ Сменить пакет', 'ghost'], 'К первому раунду →']} />
+      <Teams teams={teams} />
+      <Qr lit={groups} />
+      <Actions />
       {groups && (
         <div className="gs-groups-overlay">
           <div className="gs-groups" data-count={RANDOM_GROUPS.length}>
@@ -226,13 +218,40 @@ export function S04Crossword() {
 
 // ── 05–08 ВОПРОС (QuestionScreen) ─────────────────────────
 
-function QText({ text }: { text: string }) {
-  const cls = text.length > 140 ? ' len-xl' : text.length > 95 ? ' len-l' : text.length > 55 ? ' len-m' : ''
-  return <p className={`gs-qtext${cls}`}>{text}</p>
+const LONG_TAIL = ' Подсказка: фильм вышел не в один год, смотрите на костюмы, обстановку и музыку за кадром; ответ — одной строкой, учитываются только полные названия без сокращений.'
+
+/** Текст вписывается в рамку замером, как hooks/useFitText в игре: кегль падает,
+ *  пока рамка (ближайший .gs-frame / .gs-bz-q) не перестанет переполняться. */
+function FitText({ text, className }: { text: string; className: string }) {
+  const ref = useRef<HTMLElement>(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const box = el?.closest('.gs-frame, .gs-bz-q') as HTMLElement | null
+    if (!el || !box) return
+    const fit = () => {
+      // как useFitText: берём максимум и уменьшаем, пока рамка не перестанет переполняться
+      let px = Number(getComputedStyle(box).getPropertyValue('--fit-max')) || 76
+      el.style.fontSize = `${px}px`
+      for (let k = 0; k < 60 && px > 20 && (box.scrollHeight > box.clientHeight + 1 || box.scrollWidth > box.clientWidth + 1); k++) {
+        px = Math.floor(px * 0.95)
+        el.style.fontSize = `${px}px`
+      }
+    }
+    fit()
+    void document.fonts?.ready.then(fit)
+  }, [text])
+  return <p ref={ref as React.RefObject<HTMLParagraphElement>} className={className}>{text}</p>
 }
 
-export function QuestionView({ q, kind }: { q: DemoQuestion; kind: 'match' | 'image1' | 'image2' | 'open' }) {
+function QText({ text }: { text: string }) {
+  const cls = text.length > 140 ? ' len-xl' : text.length > 95 ? ' len-l' : text.length > 55 ? ' len-m' : ''
+  return <FitText text={text} className={`gs-qtext${cls}`} />
+}
+
+export function QuestionView({ q: q0, kind }: { q: DemoQuestion; kind: 'match' | 'image1' | 'image2' | 'open' }) {
   const { Timer } = useKit()
+  const { longText } = useLabOptions()
+  const q = longText ? { ...q0, text: q0.text + LONG_TAIL } : q0
   const t = useGameTimer(Q_ROUND.timer, 1.0)
   const a = q.answer
   const imgs = q.media
@@ -360,7 +379,7 @@ export function S09Jeopardy() {
                 )
               })}
             </div>
-            <Actions items={shown ? [['↻ Переслушать', 'ghost'], ['Закрыть плитку', 'ghost']] : ['Показать ответ', ['↻ Переслушать', 'ghost'], ['Закрыть плитку', 'ghost']]} />
+            <Actions mech items={shown ? [['↻ Переслушать', 'ghost'], ['Закрыть плитку', 'ghost']] : ['Показать ответ', ['↻ Переслушать', 'ghost'], ['Закрыть плитку', 'ghost']]} />
           </div>
         </div>
       )}
@@ -404,7 +423,7 @@ export function S10Melody() {
           </div>
         ))}
       </div>
-      {stage === 'idle' && <Actions items={[['♪ все треки загружены', 'ghost'], 'Рулетка', ['Выбрать вручную', 'ghost']]} />}
+      {stage === 'idle' && <Actions mech items={[['♪ все треки загружены', 'ghost'], 'Рулетка', ['Выбрать вручную', 'ghost']]} />}
       {showModal && (
         <div className="gs-mel-overlay">
           <div className="gs-mel-modal">
@@ -435,17 +454,17 @@ export function S10Melody() {
                     <span className="gs-name">{team.name}</span><b>{b.sec} сек</b>{pos === 0 ? <span className="gs-win-tag">ИГРАЕТ</span> : <span />}</div>
                 })}
               </div>
-              <Actions items={[`Играем ${order[0].sec} сек →`, ['Пропустить трек', 'ghost']]} />
+              <Actions mech items={[`Играем ${order[0].sec} сек →`, ['Пропустить трек', 'ghost']]} />
             </>)}
             {stage === 'snippet' && (<>
               <div className="gs-mel-big gs-listen" style={{ '--tc': lead.color } as CSSProperties}>{lead.name} · играет {order[0].sec} сек</div>
-              <Actions items={['Принимаем ответ →']} />
+              <Actions mech items={['Принимаем ответ →']} />
             </>)}
             {stage === 'answering' && (<>
               <div className="gs-mel-big" style={{ '--tc': lead.color } as CSSProperties}>{lead.name}</div>
               <div className="gs-mel-hint">ставка {order[0].sec} сек → за верный ответ 2 балла</div>
               <div className="gs-mel-answer"><span className="gs-dim">ждём ответ…</span></div>
-              <Actions items={[['✓ Верно', 'primary'], ['✗ Передать ход →', 'ghost']]} />
+              <Actions mech items={[['✓ Верно', 'primary'], ['✗ Передать ход →', 'ghost']]} />
             </>)}
             <span className="gs-mel-escape">Закрыть</span>
           </div>
@@ -501,11 +520,11 @@ export function S11Blitz() {
       <div className={`gs-bz-q${verdict ? ` v-${verdict}` : ''}`} style={{ '--tc': teamById(active).color } as CSSProperties} key={between ? 'between' : turn}>
         {between ? (<>
           <div className="gs-bz-asking">ответили верно!</div>
-          <div className="gs-bz-qtext">{BLITZ.questions[0].q}</div>
+          <FitText text={BLITZ.questions[0].q} className="gs-bz-qtext" />
           <div className="gs-bz-verdict is-ok">Правильный ответ: {BLITZ.questions[0].a}</div>
         </>) : (<>
           <div className="gs-bz-asking">отвечают: <b>{teamById(active).name}</b></div>
-          <div className="gs-bz-qtext">{q.q}</div>
+          <FitText text={q.q} className="gs-bz-qtext" />
           {verdict && <div className="gs-bz-verdict is-ok">ВЕРНО<span className="gs-bz-right"> · {q.a}</span></div>}
         </>)}
       </div>

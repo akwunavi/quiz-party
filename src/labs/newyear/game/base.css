@@ -183,3 +183,10 @@
 .gs-an-tile.is-fly { transform: translate(var(--dx), var(--dy)) scale(var(--sx)); transition: transform 1.1s cubic-bezier(.3, .7, .2, 1); }
 .gs-an-tile.is-used:not(.is-fly) { visibility: hidden; }
 .gs-jp-modal .gs-actions { position: static; justify-content: flex-end; margin-top: 6px; }
+
+/* рамка с текстом: максимум кегля для замера (FitText), у вопроса с картинками — ограниченная высота */
+.gs-frame { --fit-max: 76; }
+.gs-split .gs-frame { --fit-max: 56; }
+.gs-bz-q { --fit-max: 72; min-height: 0; overflow: hidden; }
+.gs-q.kind-match > .gs-frame { max-height: 200px; }
+.gs-qtext, .gs-bz-qtext { margin: 0; }

@@ -8,17 +8,39 @@ import { CONCEPTS } from '../concepts'
 import { STATES } from '../game/states'
 import { demoSpeed, timerAt } from '../game/timer'
 import {
-  BLITZ, CROSSWORD_GRID, JEOPARDY, MELODY, Q_MATCH, Q_ORDER, RULES_ROUNDS, SCRAMBLE, TEAMS,
+  BLITZ, CROSSWORD_GRID, JEOPARDY, MELODY, Q_MATCH, Q_ORDER, RULES_ROUNDS, SCRAMBLE, TEAMS, teamsFor,
 } from '../game/data'
+import { showProjectorNavigation, DEFAULT_OPTIONS } from '../game/config'
 import { anagramQuestion } from '../../../lib/anagram'
 import { rng } from '../engine/rng'
 import { treeBox } from '../engine/tree'
 
-describe('New Year Mockup Lab · Фаза 2', () => {
-  it('ровно три мира — 2, 3, 4 (1 и 5 отклонены), id уникальны', () => {
-    expect(CONCEPTS.map(c => c.meta.num)).toEqual([2, 3, 4])
-    expect(CONCEPTS.map(c => c.kit.id)).toEqual(['popup', 'frost', 'home'])
-    expect(new Set(CONCEPTS.map(c => c.meta.id)).size).toBe(3)
+describe('New Year Mockup Lab · финальное сравнение', () => {
+  it('ровно два мира — 2 и 4 (1, 3 и 5 отклонены), id уникальны', () => {
+    expect(CONCEPTS.map(c => c.meta.num)).toEqual([2, 4])
+    expect(CONCEPTS.map(c => c.kit.id)).toEqual(['popup', 'home'])
+    expect(new Set(CONCEPTS.map(c => c.meta.id)).size).toBe(2)
+  })
+
+  it('у обоих миров своё решение для команд и QR (не один и тот же компонент)', () => {
+    const [a, b] = CONCEPTS.map(c => c.kit)
+    expect(a.Teams).not.toBe(b.Teams)
+    expect(a.Qr).not.toBe(b.Qr)
+  })
+
+  it('навигация проектора выключена по умолчанию (флаг showProjectorNavigation)', () => {
+    expect(showProjectorNavigation).toBe(false)
+    expect(DEFAULT_OPTIONS.nav).toBe(false)
+  })
+
+  it('нагрузка лобби: 3/8/12 команд, есть длинные названия, одна команда отвалилась', () => {
+    expect(teamsFor(3)).toHaveLength(3)
+    expect(teamsFor(8)).toHaveLength(8)
+    const t12 = teamsFor(12)
+    expect(t12).toHaveLength(12)
+    expect(Math.max(...t12.map(t => t.name.length))).toBeGreaterThan(24)
+    expect(new Set(t12.map(t => t.id)).size).toBe(12)
+    expect(t12.some(t => !t.alive)).toBe(true)
   })
 
   it('14 состояний подряд 01…14, у каждого есть описание «как в игре» и источник', () => {

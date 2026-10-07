@@ -1,4 +1,4 @@
-// Мелкие общие детали сцен: QR-заглушка.
+// Мелкие общие детали сцен: QR-заглушка (тихая зона 4 модуля, как требует стандарт).
 import { useMemo, type CSSProperties } from 'react'
 import { rng } from './rng'
 
@@ -21,8 +21,8 @@ export function FakeQR({ size, fg, bg, style, className }: { size: number; fg: s
     </g>
   )
   return (
-    <svg className={className} style={style} width={size} height={size} viewBox={`-2 -2 ${N + 4} ${N + 4}`} aria-label="QR-код комнаты (макет)">
-      <rect x={-2} y={-2} width={N + 4} height={N + 4} fill={bg} rx={1.5} />
+    <svg className={className} style={style} width={size} height={size} viewBox={`-4 -4 ${N + 8} ${N + 8}`} aria-label="QR-код комнаты (макет)">
+      <rect x={-4} y={-4} width={N + 8} height={N + 8} fill={bg} />
       {cells.map(([x, y]) => <rect key={`${x}.${y}`} x={x} y={y} width={1.02} height={1.02} fill={fg} />)}
       {fin(0, 0)}{fin(N - 7, 0)}{fin(0, N - 7)}
     </svg>
