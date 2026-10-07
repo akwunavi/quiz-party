@@ -1,0 +1,125 @@
+{
+  "1": {
+    "name": "Френк",
+    "scale": 0.235,
+    "xOffset": 0,
+    "yOffset": 0,
+    "groundY": 684,
+    "cropTop": 20,
+    "cropRight": 205,
+    "cropBottom": 12,
+    "cropLeft": 125,
+    "frontX": 945,
+    "runStart": 1.65,
+    "runEnd": 5,
+    "shadowX": -101,
+    "shadowRadius": 101,
+    "feather": 2,
+    "frontTrack": []
+  },
+  "2": {
+    "name": "Батон",
+    "scale": 0.23,
+    "xOffset": 0,
+    "yOffset": 0,
+    "groundY": 678,
+    "cropTop": 15,
+    "cropRight": 216,
+    "cropBottom": 12,
+    "cropLeft": 80,
+    "frontX": 952,
+    "runStart": 1.45,
+    "runEnd": 5,
+    "shadowX": -102,
+    "shadowRadius": 99,
+    "feather": 2,
+    "frontTrack": []
+  },
+  "3": {
+    "name": "Пельмень",
+    "scale": 0.235,
+    "xOffset": 0,
+    "yOffset": 0,
+    "groundY": 685,
+    "cropTop": 10,
+    "cropRight": 195,
+    "cropBottom": 10,
+    "cropLeft": 50,
+    "frontX": 970,
+    "runStart": 1.65,
+    "runEnd": 5,
+    "shadowX": -109,
+    "shadowRadius": 112,
+    "feather": 2,
+    "frontTrack": []
+  },
+  "4": {
+    "name": "Турбо",
+    "scale": 0.23,
+    "xOffset": 0,
+    "yOffset": 0,
+    "groundY": 681,
+    "cropTop": 10,
+    "cropRight": 290,
+    "cropBottom": 12,
+    "cropLeft": 230,
+    "frontX": 886,
+    "runStart": 1.7,
+    "runEnd": 5,
+    "shadowX": -79,
+    "shadowRadius": 83,
+    "feather": 2,
+    "frontTrack": []
+  },
+  "5": {
+    "name": "Ракета",
+    "scale": 0.225,
+    "xOffset": 0,
+    "yOffset": 0,
+    "groundY": 694,
+    "cropTop": 10,
+    "cropRight": 0,
+    "cropBottom": 6,
+    "cropLeft": 0,
+    "frontX": 936,
+    "runStart": 2.35,
+    "runEnd": 4.25,
+    "shadowX": -106,
+    "shadowRadius": 109,
+    "feather": 2,
+    "frontTrack": [
+      [
+        2.35,
+        936
+      ],
+      [
+        2.5,
+        914
+      ],
+      [
+        2.85,
+        922
+      ],
+      [
+        3.2,
+        1009
+      ],
+      [
+        3.55,
+        989
+      ],
+      [
+        3.9,
+        1109
+      ],
+      [
+        4.25,
+        1193
+      ],
+      [
+        4.3,
+        1206
+      ]
+    ]
+  }
+}

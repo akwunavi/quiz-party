@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bulldog Racing — Real Dogs · Prototype</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#172f2d;font-family:Arial,sans-serif;color:#eee6cf;display:grid;place-items:center;min-height:100vh}#scene{width:min(100vw,177.777vh);height:auto;display:block}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #edb26f;outline-offset:3px}.controls{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:12px;background:#173c35f5;border:1px solid #78907d;border-radius:12px;box-shadow:0 8px 28px #11292030;max-width:97vw}.controls b{font-size:10px;letter-spacing:1px;margin:0 12px}.controls button,#show{border:0;border-radius:6px;padding:10px;background:transparent;color:#c5d0bd;font-size:11px;white-space:nowrap}.controls button:hover{background:#ffffff15}.controls button[aria-pressed=true]{background:#e0c294;color:#234139}.controls input{width:100px;accent-color:#e5b174}#show{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:#173c35}#show[hidden],.controls[hidden]{display:none}.dogbody{transform-origin:108px 110px}.legs{transform-origin:100px 88px}.moving .dogbody{animation:bounce .36s ease-in-out infinite}.moving .legs{animation:stride .36s ease-in-out infinite}.moving .dust{animation:dust .7s ease-out infinite}.dust{opacity:0}.moving .shadow{animation:shadow .36s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes bounce{0%,100%{transform:translateY(0) rotate(1deg)}45%{transform:translateY(-6px) rotate(-2deg)}}@keyframes stride{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}@keyframes dust{0%{opacity:.45;transform:translate(0,0)}100%{opacity:0;transform:translate(-45px,-12px)}}@keyframes shadow{50%{opacity:.55;transform:scaleX(.8)}}@media(max-width:950px){.controls{flex-wrap:wrap;justify-content:center;width:96vw}.controls b{display:none}}@media(prefers-reduced-motion:reduce){.moving *{animation:none!important}}
+</style>
+</head>
+<body>
+<svg id="scene" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Визуальный прототип гонки пяти бульдогов">
+<defs id="defs">
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#c6ddd9"/><stop offset="1" stop-color="#f3ead0"/></linearGradient>
+<linearGradient id="track" x2=".18" y2="1"><stop stop-color="#8fa79c"/><stop offset=".45" stop-color="#b4c3aa"/><stop offset="1" stop-color="#d4d9bc"/></linearGradient>
+<linearGradient id="grass" x2="0" y2="1"><stop stop-color="#728d66"/><stop offset="1" stop-color="#294f48"/></linearGradient>
+<linearGradient id="air" x2="0" y2="1"><stop stop-color="#d4e2d8" stop-opacity=".92"/><stop offset="1" stop-color="#d4e2d8" stop-opacity="0"/></linearGradient>
+<radialGradient id="shadow"><stop stop-color="#1e3938" stop-opacity=".65"/><stop offset=".55" stop-color="#284a42" stop-opacity=".3"/><stop offset="1" stop-color="#284a42" stop-opacity="0"/></radialGradient>
+<pattern id="grain" width="137" height="93" patternUnits="userSpaceOnUse"><path d="M5 14h7M78 22h4M38 50h10M110 76h11M9 85h3" stroke="#435d56" opacity=".17"/><path d="M47 18h8M86 64h17M12 63h5M124 30h9" stroke="#fffbdf" opacity=".3" stroke-width="1.4"/></pattern>
+<pattern id="curb" width="164" height="16" patternUnits="userSpaceOnUse"><path fill="#ebe1c6" d="M0 0h164v16H0z"/><path fill="#c76a4d" d="M0 0h82v16H0z"/></pattern>
+<pattern id="check" width="32" height="32" patternUnits="userSpaceOnUse"><path fill="#f6ecd1" d="M0 0h32v32H0z"/><path fill="#2f4b48" d="M0 0h16v16H0zM16 16h16v16H16z"/></pattern>
+<g id="tree"><path d="M0 114L4-6h9l5 120" fill="#73745b"/><path d="M-61 30Q-83-1-56-22Q-67-55-34-69Q-9-109 19-77Q62-82 66-40Q100-17 71 15Q59 63 14 48Q-26 69-61 30Z" fill="#557b66"/><path d="M-53-24Q-69-51-34-64Q-8-100 17-72Q57-77 60-41Q33-46 17-24Q-11-9-26-29Q-40-16-53-24Z" fill="#779576"/><path d="M-59 21Q-30 41-7 25Q33 48 72 13Q57 60 14 48Q-26 69-59 21Z" fill="#456956"/></g>
+<g id="pavilion"><path d="M330 215v-30h265v30" fill="#6b8074"/><path d="M315 185l58-52h169l65 52Z" fill="#e5cdb0"/><path d="M315 185l58-52h32l-30 52ZM433 185l7-52h32l16 52ZM549 185l-38-52h31l65 52Z" fill="#be6b4d"/><path d="M336 188v39M588 188v39" stroke="#e3d4ac" stroke-width="7"/><path d="M379 207h163M353 237h225" stroke="#425f55" stroke-width="12"/><g id="crowd"/></g>
+<g id="dog">
+<g class="legs" fill="var(--mask)"><path d="M72 82Q72 101 53 108L40 120Q40 125 56 124L73 112Q92 102 89 82Z"/><path d="M136 82L149 109L168 117Q176 127 160 124L138 117L119 91Z"/></g>
+<g class="dogbody">
+<path d="M43 63Q19 64 27 49Q32 43 38 50Q42 55 34 55" fill="none" stroke="var(--mask)" stroke-width="9" stroke-linecap="round"/>
+<path d="M39 66C43 35 70 38 91 44C112 44 133 35 146 54C161 77 145 96 119 99L69 99C46 94 35 86 39 66Z" fill="var(--body)"/>
+<path d="M51 54Q90 47 122 51" fill="none" stroke="var(--light)" stroke-width="5" opacity=".65" stroke-linecap="round"/>
+<path d="M123 70Q149 78 135 98L107 100Q122 86 123 70Z" fill="#fff3d8" opacity=".8"/>
+<g class="legs" fill="var(--body)"><path d="M61 80Q80 84 75 102L69 120Q77 127 63 127H51Q45 122 52 118L55 100Q45 91 61 80Z"/><path d="M127 82Q139 82 139 94L136 116Q148 118 146 125Q143 129 125 126L121 123L120 98Z"/></g>
+<path d="M137 44Q152 53 152 87" fill="none" stroke="var(--accent)" stroke-width="10"/><circle cx="151" cy="83" r="7" fill="#e3ba67"/>
+<path d="M141 49Q122 25 136 4Q141-2 150 6L164 36" fill="var(--body)" stroke="var(--mask)"/>
+<path d="M140 11Q135 30 149 36L153 29Z" fill="#c38c7e"/>
+<path d="M168 38Q165 10 182 2Q191 1 194 14L190 49" fill="var(--body)" stroke="var(--mask)"/>
+<path d="M179 33Q173 18 185 10Q192 25 185 40Z" fill="#c58f85"/>
+<path d="M137 46Q153 23 179 34Q202 39 199 63L195 85Q179 100 155 89Q132 77 137 46Z" fill="var(--body)"/>
+<path d="M178 64Q195 55 205 64Q211 68 207 78Q199 89 183 86L174 77Z" fill="var(--mask)"/>
+<path d="M177 74Q189 71 199 79Q198 91 184 89Q170 87 170 79Z" fill="#e0cdb7"/>
+<path d="M200 61Q213 61 209 72Q199 78 196 69Z" fill="#252d30"/>
+<ellipse cx="179" cy="53" rx="6" ry="7" fill="#20282b"/><circle cx="181" cy="51" r="2.2" fill="#fff9e6"/>
+<path d="M168 44q7-6 13-1M149 60q-3 10 4 17" fill="none" stroke="var(--mask)" stroke-width="3" stroke-linecap="round"/>
+<path d="M185 84q9 5 15-4" fill="none" stroke="#493c38" stroke-width="2"/>
+<path d="M194 85q11-1 7 10q-7 8-12-2Z" fill="#cd7d78"/>
+</g></g>
+</defs>
+<rect width="1920" height="290" fill="url(#sky)"/>
+<g id="hills"/><g id="middle"/>
+<rect width="1920" height="144" fill="url(#air)"/>
+<path d="M0 245Q480 225 950 243T1920 239V286H0Z" fill="url(#grass)"/>
+<g id="rail"/>
+<path d="M0 277H1920V979H0Z" fill="url(#track)"/>
+<rect y="277" width="1920" height="701" fill="url(#grain)"/>
+<path d="M0 287H1920" stroke="#2e554b" stroke-width="12" opacity=".14"/>
+<path d="M0 278H1920M0 973H1920" stroke="url(#curb)" stroke-width="15"/>
+<path d="M0 289H1920M0 962H1920" stroke="#fff0d2" stroke-width="3" opacity=".85"/>
+<g id="lanes"/>
+<g id="start"><path d="M-2 292V960" stroke="#f2ead0" stroke-width="7"/><g id="boxes"/><text transform="translate(38,675) rotate(-90)" fill="#e7e1bf" font-size="22" font-weight="700" letter-spacing="14">START</text><path d="M-8 283v-97h9v97" fill="#ded4b8"/><path d="M1 187h97l-12 19l12 19H1Z" fill="#cc714f"/><text x="18" y="212" fill="#fff0d5" font-size="18" font-weight="800" letter-spacing="3">START</text></g>
+<g id="finish"><path d="M-68 298V958" stroke="#fff4d3" stroke-width="2" stroke-dasharray="8 12" opacity=".45"/><rect x="-16" y="293" width="32" height="667" fill="url(#check)"/><path d="M-20 292V960M20 292V960" stroke="#f8edcf" stroke-width="3"/><path d="M-48 283V179h170v104h-12v-90H-36v90Z" fill="#cc7852"/><rect x="-66" y="163" width="206" height="52" rx="4" fill="#244c46"/><text x="37" y="196" text-anchor="middle" fill="#f9e9c6" font-size="25" font-weight="800" letter-spacing="6">FINISH</text><rect x="-38" y="972" width="76" height="20" rx="3" fill="#dfad6d"/></g>
+<g id="racers"/>
+<path d="M0 983Q450 964 920 984T1920 979V1080H0Z" fill="url(#grass)"/>
+<g id="front"/>
+<g fill="#294c45"><circle cx="116" cy="85" r="34" fill="none" stroke="#315750" stroke-width="2"/><text x="93" y="98" font-family="Georgia,serif" font-size="33" font-weight="900">BR</text><text x="170" y="64" font-size="12" font-weight="800" letter-spacing="4" fill="#496c61">FRENCHIE RACING CLUB</text><text x="168" y="110" font-size="46" font-weight="900">Большие гонки<tspan fill="#cc714f">.</tspan></text><circle cx="1596" cy="70" r="4" fill="#ce7550"/><text x="1614" y="75" font-size="13" font-weight="800" letter-spacing="3">RACE DAY</text><text x="1740" y="75" font-size="11" letter-spacing="2">5 УЧАСТНИКОВ</text></g>
+<g fill="#dfdec0" font-size="10" letter-spacing="4" opacity=".65"><text x="83" y="1060">BULLDOG GRAND PRIX</text><text x="1490" y="1060">CONCEPT 02 · SIDE-ON CIRCUIT</text></g>
+</svg>
+<div class="controls" id="controls" aria-label="Управление прототипом"><b>PREVIEW / 02</b><span id="states"></span><button id="play" aria-label="Запуск или пауза">▶</button><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Позиция в прогоне"><button id="hide" aria-label="Скрыть панель">Скрыть · H</button></div>
+<button id="show" hidden>Показать панель · H</button>
+<script>
+'use strict';
+// Только визуальная раскадровка. Игровой логики и сетевых запросов здесь нет.
+const $=id=>document.getElementById(id);
+const repeat=(n,f)=>Array.from({length:n},(_,i)=>f(i)).join('');
+const stages=[['START',0,[0,0,0,0,0]],['EARLY',.20,[.20,.214,.19,.207,.179]],['MID',.52,[.48,.548,.453,.51,.415]],['CLOSE FINISH',.85,[.846,.868,.821,.866,.795]],['FINISH',1,[.969,1,.952,.997,.928]]];
+const dogs=[['Френк','#b37a49','#e6b97f','#634733','#da6844'],['Батон','#e9d9b8','#fff0d5','#b4a088','#ce9c38'],['Пельмень','#343b3e','#66716e','#232a30','#436e7b'],['Турбо','#788c9b','#c1ced1','#4c5a6b','#718549'],['Ракета','#a4a9ae','#e0ddd2','#505761','#8a6c89']];
+const ground=[402,534,666,798,930];
+$('crowd').innerHTML=repeat(10,i=>`<circle cx="${367+i*21}" cy="${208+i%2*4}" r="5" fill="#ddc79d"/><path d="M${362+i*21} ${219+i%2*4}q5-7 10 0v12h-10Z" fill="${['#c28061','#eee0bc','#597a79','#caad67'][i%4]}"/>`);
+$('hills').innerHTML=repeat(3,i=>`<g transform="translate(${i*1100},0)"><path d="M-100 218Q100 67 300 178Q460 89 620 163Q790 65 1040 203L1150 269H-100Z" fill="#a0b9a2" opacity=".55"/><path d="M-100 228Q60 162 180 206Q310 136 490 211Q720 150 860 219Q1000 162 1150 233V280H-100Z" fill="#839f89" opacity=".57"/><path d="M120 42q45-19 70 0q60-16 89 3" fill="none" stroke="#f8f3de" stroke-width="9" opacity=".55" stroke-linecap="round"/></g>`);
+$('middle').innerHTML=repeat(4,i=>`<g transform="translate(${i*960-250},0)"><use href="#tree" transform="translate(120,141) scale(.78)"/><use href="#tree" transform="translate(205,171) scale(.62)"/><use href="#tree" transform="translate(850,139) scale(.84)"/><use href="#tree" transform="translate(950,167) scale(.66)"/><use href="#pavilion"/><path d="M630 176Q710 205 805 178" stroke="#d7d1b1" fill="none"/>${repeat(7,j=>`<path d="M${637+j*24} ${182+Math.sin(j/6*Math.PI)*12}l9 21l9-17Z" fill="${j%2?'#e9d3a6':'#be7452'}"/>`)}</g>`);
+$('rail').innerHTML=repeat(10,i=>`<g transform="translate(${i*320},0)"><path d="M20 225v58M185 225v58" stroke="#e4dbb9" stroke-width="7"/><rect x="65" y="236" width="104" height="34" rx="3" fill="${i%2?'#cfb68c':'#315a50'}"/><text x="117" y="258" text-anchor="middle" fill="${i%2?'#465e52':'#eae2c7'}" font-size="12" font-weight="800" letter-spacing="2">${i%2?'GOOD DOGS':'RACE CLUB'}</text></g>`)+ '<path d="M-40 233H3200M-40 260H3200" stroke="#e8dfc1" stroke-width="5"/>';
+$('lanes').innerHTML=[428,560,692,824].map(y=>`<path d="M-30 ${y+1}Q500 ${y-1} 1050 ${y+1}T1970 ${y}" fill="none" stroke="#748c77" stroke-width="6" opacity=".27"/><path class="chalk" d="M-30 ${y}Q500 ${y-2} 1050 ${y}T1970 ${y-1}" fill="none" stroke="#eee7c9" opacity=".7" stroke-width="3" stroke-dasharray="170 5 35 3 240 4"/>`).join('');
+$('boxes').innerHTML=ground.map((y,i)=>`<path d="M-210 ${y+20}h155v-100h-155" fill="none" stroke="#ecdfba" stroke-width="4" opacity=".8"/><text x="-257" y="${y-17}" fill="#eae6c8" font-size="62" font-weight="800" opacity=".8">${i+1}</text>`).join('');
+$('front').innerHTML=repeat(8,i=>`<g transform="translate(${i*340},0)"><path d="M20 1035l28-8m4 0l70-5m36 9l90-8" stroke="#c9cd9c" stroke-width="3" opacity=".25"/><path d="M255 1024q-10-37-21-34q18 8 21 34q1-34 13-39q-6 18-9 39q16-19 24-13" fill="#83965a"/><rect x="18" y="994" width="14" height="71" rx="3" fill="#e4ddbd"/></g>`)+ '<path d="M-100 1011H2700" stroke="#264b44" stroke-width="13" opacity=".22"/><path d="M-100 1007H2700" stroke="#e2ddc1" stroke-width="12"/><path d="M-100 1003H2700" stroke="#ffefd0" stroke-width="3"/>';
+dogs.forEach((d,i)=>$('defs').insertAdjacentHTML('beforeend',`<linearGradient id="coat${i}" x2=".4" y2="1"><stop stop-color="${d[2]}"/><stop offset=".6" stop-color="${d[1]}"/><stop offset="1" stop-color="${d[3]}"/></linearGradient>`));
+$('racers').innerHTML=dogs.map((d,i)=>`<g id="r${i}" style="--body:url(#coat${i});--mask:${d[3]};--light:${d[2]};--accent:${d[4]}"><g id="v${i}"><ellipse class="shadow" cx="114" cy="127" rx="91" ry="12" fill="url(#shadow)"/><g class="dust" fill="#ede5c6"><ellipse cx="30" cy="120" rx="7" ry="3"/><circle cx="15" cy="117" r="3"/></g><use href="#dog"/></g><g id="label${i}"><circle cx="-46" cy="0" r="10" fill="${d[4]}"/><text x="-46" y="4" text-anchor="middle" fill="#fff3d8" font-size="12" font-weight="800">${i+1}</text><text x="-30" y="5" fill="#294a43" font-size="15" font-weight="800">${d[0]}</text></g></g>`).join('');
+$('states').innerHTML=stages.map((s,i)=>`<button data-state="${i}" aria-pressed="${i===0}">${s[0]}</button>`).join('');
+let position=0,playing=false,previous=0;
+const move=(id,x)=>$(id).setAttribute('transform',`translate(${x},0)`);
+function draw(){
+ let k=stages.findIndex(s=>s[1]>=position),p;
+ if(k<=0)p=stages[0][2];else{let a=stages[k-1],b=stages[k],t=(position-a[1])/(b[1]-a[1]);p=a[2].map((v,i)=>v+(b[2][i]-v)*t)}
+ const mean=p.reduce((a,b)=>a+b,0)/5,camera=Math.max(0,Math.min(5320,430+mean*6400-860));
+ move('hills',-(camera*.055%1100));move('middle',-(camera*.25%960));move('rail',-(camera*.65%640));move('front',-(camera*1.35%340));
+ $('grain').setAttribute('patternTransform',`translate(${-camera},0)`);$('curb').setAttribute('patternTransform',`translate(${-camera},0)`);
+ document.querySelectorAll('.chalk').forEach(e=>e.setAttribute('stroke-dashoffset',camera));
+ move('start',430-camera);move('finish',6830-camera);
+ p.forEach((v,i)=>{let w=208*(1+i*.018),h=w/210*103,x=430+v*6400-camera;move('r'+i,x);$('v'+i).setAttribute('transform',`translate(${-w},${ground[i]-h}) scale(${w/210},${h/130})`);$('label'+i).setAttribute('transform',`translate(${-w*.47},${ground[i]+14})`)});
+ $('seek').value=Math.round(position*1000);
+ document.querySelectorAll('[data-state]').forEach((b,i)=>b.setAttribute('aria-pressed',Math.abs(position-stages[i][1])<.001));
+ $('scene').classList.toggle('moving',playing);$('play').textContent=playing?'Ⅱ':'▶';
+}
+function select(i){playing=false;position=stages[i][1];draw()}
+function play(){if(position>=1)position=0;playing=!playing;previous=performance.now();draw()}
+function hide(){let hidden=!$('controls').hidden;$('controls').hidden=hidden;$('show').hidden=!hidden}
+document.querySelectorAll('[data-state]').forEach((b,i)=>b.onclick=()=>select(i));
+$('play').onclick=play;$('hide').onclick=hide;$('show').onclick=hide;
+$('seek').oninput=e=>{playing=false;position=Number(e.target.value)/1000;draw()};
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey)return;if(/^[1-5]$/.test(e.key))select(Number(e.key)-1);if(e.code==='KeyH')hide();if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();play()}});
+function tick(now){if(playing){if(!document.hidden)position=Math.min(1,position+Math.min(now-previous,80)/22000);if(position===1)playing=false;draw()}previous=now;requestAnimationFrame(tick)}
+draw();requestAnimationFrame(tick);
+</script>
+<style>
+#racers text{font-size:11px;opacity:.75} .moving .dust{fill:#f1dcb1} .v2-title{display:none}
+
+#v2-rig{transform:translateY(var(--br-camera-y,0px))}
+.v2-title{font-size:27px;font-weight:800;fill:#fff2cf;filter:drop-shadow(0 2px 3px #153b4a80)}
+.moving .v2-fan{animation:v2-cheer .9s ease-in-out infinite alternate}
+.moving .v2-flag{transform-box:fill-box;transform-origin:left center;animation:v2-flutter .65s ease-in-out infinite alternate}
+.moving .v2-confetti{animation:v2-confetti 1.8s ease-in-out infinite alternate}
+@keyframes v2-cheer{to{transform:translateY(-3px) rotate(2deg)}}
+@keyframes v2-flutter{to{transform:scaleX(.92) skewY(3deg)}}
+@keyframes v2-confetti{to{transform:translate(-10px,7px) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){#v2-rig{transform:none}}
+</style>
+<script>
+(()=>{
+const copies=(n,f)=>Array.from({length:n},(_,i)=>f(i)).join("");const fan=(x,y,c)=>`<g transform="translate(${x},${y})"><g class="v2-fan"><path d="M-5 14l-2 18m11-18l3 18" stroke="#334f51" stroke-width="4"/><path d="M-7 4q7-5 14 0v15H-7Z" fill="${c}"/><circle cy="-5" r="5" fill="#c99067"/><path d="M-7 6l-8-11M7 7l10-12" stroke="#c99067" stroke-width="3" fill="none"/></g></g>`;const tree=(x,y,s)=>`<use href="#park-tree" transform="translate(${x},${y}) scale(${s})"/>`;function scenery(camera,startX,finishX){return`<defs>
+<filter id="p-soft" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="15"/></filter><radialGradient id="p-dust"><stop stop-color="#f5dfb7" stop-opacity=".43"/><stop offset="1" stop-color="#ecd7aa" stop-opacity="0"/></radialGradient>
+<linearGradient id="p-sky" x2="0" y2="1"><stop stop-color="#3e99c7"/><stop offset="1" stop-color="#d4e8ce"/></linearGradient>
+<linearGradient id="p-ground" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#b49c65"/><stop offset=".3" stop-color="#c5a575"/><stop offset=".65" stop-color="#cbb184"/><stop offset="1" stop-color="#ae925f"/></linearGradient>
+<radialGradient id="p-light"><stop stop-color="#fff1b7" stop-opacity=".4"/><stop offset="1" stop-color="#ffe4a1" stop-opacity="0"/></radialGradient>
+<linearGradient id="p-leaf" x2=".8" y2="1"><stop stop-color="#c5ce68"/><stop offset=".26" stop-color="#8dad43"/><stop offset=".65" stop-color="#487c45"/><stop offset="1" stop-color="#245b48"/></linearGradient>
+<linearGradient id="p-grass" x2=".3" y2="1"><stop stop-color="#94b655"/><stop offset=".5" stop-color="#648c40"/><stop offset="1" stop-color="#2e6144"/></linearGradient>
+<linearGradient id="p-trunk"><stop stop-color="#584f35"/><stop offset=".65" stop-color="#a98b54"/><stop offset="1" stop-color="#c4a86a"/></linearGradient>
+<pattern id="grain" width="263" height="183" patternUnits="userSpaceOnUse" data-scroll-pattern="1"><path d="M5 14h7M178 22h4M38 150h10M210 76h11M9 85h3M79 121l6-2M185 154h7" stroke="#695934" opacity=".18"/><path d="M47 18h8M186 164h17M12 63h5M224 30h9" stroke="#fff1c7" opacity=".3" stroke-width="2"/><ellipse cx="98" cy="84" rx="3" ry="1.5" fill="#927c51" opacity=".35"/></pattern>
+<pattern id="curb" width="200" height="16" patternUnits="userSpaceOnUse"/>
+<pattern id="check" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#fff2d4"/><path d="M0 0h12v12H0ZM12 12h12v12H12Z" fill="#324e49"/></pattern>
+<g id="park-tree"><path d="M-9 0l5-122h13L17 0ZM1-80l-34-44l4-5l36 31l36-35l4 5L8-70" fill="url(#p-trunk)"/><path d="M-75-110C-111-140-86-177-55-179C-53-215-4-229 20-207C55-217 96-185 87-157C118-125 84-91 47-94C24-66-23-84-34-97C-49-85-73-92-75-110Z" fill="url(#p-leaf)"/><path d="M-77-162Q-62-190-37-181Q-19-215 15-198Q55-209 78-174Q44-185 25-164Q-1-186-28-165Q-51-175-77-151Z" fill="#c2cc6c" opacity=".48"/><path d="M-67-109Q-37-98-23-115Q2-98 30-113Q58-93 88-122Q83-92 47-94Q24-66-23-84L-34-97Q-54-86-67-109" fill="#205744" opacity=".25"/></g>
+</defs>
+<rect width="1920" height="290" fill="url(#p-sky)"/>
+<ellipse cx="1510" cy="30" rx="570" ry="280" fill="url(#p-light)"/>
+<g id="hills" data-rate=".055" data-cycle="1400">${copies(3,i=>`<g transform="translate(${i*1400-200},0)"><path d="M0 191Q160 70 377 146Q620 44 883 134Q1087 101 1410 195V290H0Z" fill="#88b5a1"/><path d="M0 219Q203 151 424 186Q700 110 940 173Q1158 159 1410 212V291H0Z" fill="#719f79"/><path d="M160 62q79-29 143-2m584-18q76-17 142 2" stroke="#fff7dc" stroke-width="13" stroke-linecap="round" opacity=".5" fill="none"/></g>`)}</g>
+<g id="middle" data-rate=".25" data-cycle="1480">${copies(3,i=>`<g transform="translate(${i*1480-240},0)">${tree(110,239,1.1)}${tree(241,230,.76)}${tree(1050,223,.95)}${tree(1185,240,1.2)}<path d="M489 213v-59h110v59" fill="#fff0d0"/><path d="M470 160l74-64l76 64Z" fill="#e7cf9f"/><path d="M544 96l21 64h-42Z" fill="#df986b"/><path d="M496 160v51m97-51v51" stroke="#b99a69" stroke-width="4"/><path d="M503 213v-34h80v34" fill="#4a7663"/>${fan(645,189,"#d77d5b")}${fan(673,190,"#e6cd85")}<path d="M714 213V136" stroke="#ac9669" stroke-width="3"/><path class="v2-flag" d="M715 137q22-8 46 0v29q-25-6-46 0Z" fill="#e2a76b"/><path d="M278 142Q398 195 479 156" stroke="#d1c498" fill="none"/>${copies(7,j=>`<path d="M${296+j*25} ${149+Math.sin(j/6*Math.PI)*20}l10 19l8-15Z" fill="${["#dd9572","#f3dca6","#7da9a0"][j%3]}"/>`)}</g>`)}</g>
+<path d="M0 230Q235 205 450 228T960 221T1510 226T1920 219V316H0Z" fill="url(#p-grass)"/>
+<g id="rail" data-rate=".65" data-cycle="1340">${copies(3,i=>`<g transform="translate(${i*1340-140},0)"><path d="M60 258v-52m92 48v-48m92 43v-43M55 221h194m-194 19h194" stroke="#c5b185" stroke-width="6"/><path d="M55 218h194" stroke="#eed7a4" stroke-width="2"/><path d="M450 259q-12-27 19-30q3-34 36-22q27-21 41 14q43-7 46 33Z" fill="url(#p-leaf)"/><path d="M1021 265q-31-28 7-40q13-37 41-18q34-24 48 14q40-8 43 34Z" fill="url(#p-leaf)"/>${fan(745,216,"#e1bc76")}${fan(773,215,"#4b8986")}<path d="M745 211l-13-30l23 5l-15 8" fill="#d88763" stroke="#ad9165" stroke-width="2"/></g>`)}</g>
+<path d="M0 280Q251 248 486 278T973 270T1480 280T1920 264V1080H0Z" fill="url(#p-ground)"/>
+<ellipse cx="1310" cy="534" rx="920" ry="620" fill="url(#p-light)"/>
+<g data-rate="1" data-cycle="1700">${copies(3,i=>`<g transform="translate(${i*1700},0)"><path d="M-50 320Q136 308 247 342T548 326M761 289Q881 265 1000 300M1145 991Q1334 975 1501 1008" stroke="#899b54" stroke-width="12" stroke-linecap="round" fill="none" opacity=".14"/><path d="M120 689q210-37 403-12t384-20M1020 458q204-21 492 8M437 896q176-31 393-14" stroke="#e7cc9a" stroke-width="45" stroke-linecap="round" opacity=".08" fill="none"/><path d="M-50 306q162 19 338 92q-152-35-289 0ZM1445 319q144 43 304 119v102q-164-116-362-161Z" fill="#4c6c42" opacity=".12" filter="url(#p-soft)"/>${copies(40,j=>{const x=j*193%1700,y=313+j*131%680;return`<path d="M${x} ${y}l${12+j%10} -1" stroke="${j%3?"#f5deb0":"#6f8250"}" stroke-width="${j%3?1.3:2}" opacity=".24"/>`})}</g>`)}</g>
+<rect y="288" width="1920" height="739" fill="url(#grain)"/>
+<g id="lanes"></g>
+<g id="start" data-zone="start" transform="translate(${startX},0)"><path d="M0 283V996" stroke="#fff0ca" stroke-width="6" opacity=".9"/><path d="M-111 256V133M116 256V133" stroke="#b79760" stroke-width="6"/><path d="M-113 136Q0 172 119 137L115 182Q0 210-109 181Z" fill="#f2d69b"/><text x="3" y="177" text-anchor="middle" font-size="23" font-weight="800" letter-spacing="5" fill="#476954">\u0421\u0422\u0410\u0420\u0422</text><path d="M-208 247V116M213 247V116" stroke="#c4ad76" stroke-width="3"/><path class="v2-flag" d="M-207 117h43l-10 18l10 19h-43ZM214 117h43l-10 18l10 19h-43Z" fill="#df9b70"/>${fan(-164,218,"#e2b765")}${fan(164,218,"#629994")}</g>
+<g id="finish" data-zone="finish" transform="translate(${finishX},0)">
+<g>${[-680,-530,-380,254,384].map((x,i)=>`<path d="M${x} 254V140" stroke="#b69b68" stroke-width="3"/><path class="v2-flag" d="M${x+2} 141q24-8 43 0v34q-24-8-43 0Z" fill="${i%2?"#dd9776":"#e7c679"}"/>${fan(x+38,219,i%2?"#74a5a1":"#e5b765")}${fan(x+65,217,"#d58c68")}`).join("")}</g>
+<path d="M-180 264V119Q0 33 180 119V264" fill="none" stroke="#aa8855" stroke-width="12"/><path d="M-178 117Q0 40 178 117l-3 42Q0 91-175 159Z" fill="#f3db9e"/><path d="M-176 117Q0 41 176 117" stroke="#fff0bc" stroke-width="4" fill="none"/><text x="0" y="118" text-anchor="middle" font-size="28" letter-spacing="6" font-weight="900" fill="#355c51">\u0424\u0418\u041D\u0418\u0428</text>
+<path d="M-660 140Q-421 224-182 139M184 139Q336 197 492 136" fill="none" stroke="#c4aa77" stroke-width="2"/>${copies(15,i=>`<path d="M${-645+i*30} ${146+Math.sin(i/14*Math.PI)*39}l10 20l9-15Z" fill="${i%2?"#e6bd76":"#d98e6d"}"/>`)}
+<path d="M-13 282h26v714h-26Z" fill="url(#check)"/><path d="M-16 282V996M16 282V996" stroke="#fff0d2" stroke-width="3"/>
+<g class="finish-celebration">${copies(22,i=>`<path class="v2-confetti" style="animation-delay:${-i*.13}s" d="M${-285+i*26} ${50+i*31%165}l5 2l-3 8l-4-2Z" fill="${["#db9772","#f1d078","#eef2d6","#729e91"][i%4]}"/>`)}</g>
+</g>`}function foreground(camera){return`<path d="M0 1035Q153 1017 314 1036T631 1033T974 1029T1328 1037T1660 1032T1920 1036V1080H0Z" fill="url(#p-grass)"/><g id="front" data-rate="1.65" data-cycle="730">${copies(4,i=>`<g transform="translate(${i*730},0)"><path d="M42 1079q-16-51-33-48q25-6 37 34q-3-47 16-51q-11 22-10 57q13-26 27-22" fill="#91b351"/><path d="M263 1080q-10-47-32-51q23-3 41 39q-1-48 15-57l-6 58q27-33 38-24" fill="#adc66a"/><path d="M460 1080q-41-27-2-41q-2-25 30-23q31-14 43 20q30-4 47 44Z" fill="url(#p-leaf)"/><path d="M166 1080l-8-43m9 20l13-29" stroke="#527a40" stroke-width="3"/><g fill="#f5deb0"><circle cx="158" cy="1036" r="5"/><circle cx="180" cy="1028" r="4"/></g><path d="M591 1059l44-5m16 15l56-4" stroke="#c1c777" opacity=".4" stroke-width="3"/></g>`)}</g>`}function placeScenery(root,camera,startX,finishX){if(!root)return;root.querySelectorAll("[data-rate]").forEach(node=>node.setAttribute("transform",`translate(${-(camera*Number(node.dataset.rate)%Number(node.dataset.cycle))},0)`));root.querySelectorAll("[data-scroll-pattern]").forEach(node=>node.setAttribute("patternTransform",`translate(${-camera},0)`));const start=root.querySelector('[data-zone="start"]');start?.setAttribute("transform",`translate(${startX},0)`);start?.setAttribute("visibility",startX<-400?"hidden":"visible");const finish=root.querySelector('[data-zone="finish"]');finish?.setAttribute("transform",`translate(${finishX},0)`);finish?.setAttribute("visibility",finishX>2700?"hidden":"visible")}
+
+
+if(document.getElementById('v2-rig'))return;
+const dogDefs=['shadow','dog','coat0','coat1','coat2','coat3','coat4'].map(id=>$(id).outerHTML).join('');
+const savedRacers=$('racers').outerHTML;
+$('scene').innerHTML='<defs id="defs">'+dogDefs+'</defs><g id="v2-rig">'+scenery(0,430,6830)+savedRacers+foreground(0)+'</g><text id="v2-title" class="v2-title" x="54" y="51">Большие гонки</text>';
+ground.splice(0,5,326,488,650,812,974);
+[[2,'<path d="M57 52l12 19M77 49l11 25M97 52l9 16" stroke="#ae926d" stroke-width="5" opacity=".3"/>'],[4,'<path d="M54 50q18-6 20 14q-5 14-15 8q-13 0-5-22ZM89 69q12-21 23-2q9 11-6 20q-21 5-17-18Z" fill="#424c55"/>']].forEach(([i,marks])=>{
+ const dog=$('dog').cloneNode(true);dog.id='v2-dog'+i;
+ dog.querySelector('.dogbody .legs').insertAdjacentHTML('beforebegin',marks);
+ $('defs').appendChild(dog);$('v'+i).querySelector('use').setAttribute('href','#'+dog.id);
+});
+dogs.forEach((dog,i)=>{const dust=document.createElementNS('http://www.w3.org/2000/svg','g');dust.setAttribute('class','p-dust');dust.innerHTML='<ellipse cx="-302" cy="'+(ground[i]-14)+'" rx="98" ry="27" fill="url(#p-dust)"/><ellipse cx="-251" cy="'+(ground[i]-8)+'" rx="52" ry="14" fill="url(#p-dust)"/>'+Array.from({length:5},(_,j)=>'<circle cx="'+(-255-j*16)+'" cy="'+(ground[i]-7-(j*7)%21)+'" r="'+(1+j%2)+'" fill="#eee0b6" opacity=".5"/>').join('');$('r'+i).prepend(dust);});
+const oldDraw=draw;
+draw=function(){
+ oldDraw(); document.querySelectorAll('.p-dust').forEach(n=>n.style.opacity=position>0&&position<1?'.9':'0');
+ const camera=430-Number($('start').getAttribute('transform').match(/translate\(([-.\d]+)/)[1]);
+ placeScenery($('scene'),camera,430-camera,6830-camera);
+ $('v2-rig').style.setProperty('--br-camera-y',(-1.2*Math.sin(camera/530)).toFixed(3)+'px');
+ $('v2-title').setAttribute('opacity','0'); document.querySelector('.finish-celebration').style.opacity=position>=1?'1':'0';
+ dogs.forEach((dog,i)=>{const w=249.6*(1+i*.018),h=w/210*103;
+  $('v'+i).setAttribute('transform','translate('+(-w)+','+(ground[i]-h)+') scale('+(w/210)+','+(h/130)+')');
+  $('label'+i).setAttribute('transform','translate('+(-w*.47)+','+(ground[i]+14)+')');
+ });
+};
+draw();
+
+})();
+</script>
+<style>/* Prototype-only controls. All character-specific numbers are in raceVisualConfig. */
+.run-clip{position:relative;overflow:hidden;width:100%;height:100%;isolation:isolate}
+.run-clip video{position:absolute;max-width:none;display:block;pointer-events:none}
+.run-shadow{opacity:.7;pointer-events:none}
+#racers text{font-size:14px;opacity:.94}
+#calibration{position:fixed;right:16px;top:16px;width:320px;max-height:90vh;overflow:auto;background:#15362ef7;border:1px solid #a0b186;border-radius:12px;padding:16px;color:#f6e8c9;font:13px Arial,sans-serif;z-index:10;box-shadow:0 8px 35px #102e2840}
+#calibration[hidden]{display:none}#calibration h2{font-size:16px;margin:0 0 10px}#calibration p{font-size:11px;line-height:1.5;color:#cbd1b9}#calibration label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:7px 0}#calibration input,#calibration select{width:117px;background:#edf0df;color:#204338;border:0;border-radius:4px;padding:5px}#calibration button{padding:7px;border-radius:5px;border:1px solid #769681;background:#294f41;color:#f5e7cd;cursor:pointer}#calibration textarea{width:100%;height:100px;background:#0d2922;color:#d7e2c4;font:10px monospace;margin-top:8px}#cal-status{white-space:pre-line}#video-notice{position:fixed;top:15px;left:50%;transform:translateX(-50%);padding:10px;background:#193b30ed;border-radius:8px;font-size:13px;z-index:11}#video-notice[hidden]{display:none}.cal-guide{pointer-events:none;display:none}.calibrating .cal-guide.selected{display:inline}
+</style><script>
+window.raceVisualConfig={"1": {"name": "Френк", "scale": 0.235, "xOffset": 0, "yOffset": 0, "groundY": 684, "cropTop": 20, "cropRight": 205, "cropBottom": 12, "cropLeft": 125, "frontX": 945, "runStart": 1.65, "runEnd": 5, "shadowX": -101, "shadowRadius": 101, "feather": 2, "frontTrack": []}, "2": {"name": "Батон", "scale": 0.23, "xOffset": 0, "yOffset": 0, "groundY": 678, "cropTop": 15, "cropRight": 216, "cropBottom": 12, "cropLeft": 80, "frontX": 952, "runStart": 1.45, "runEnd": 5, "shadowX": -102, "shadowRadius": 99, "feather": 2, "frontTrack": []}, "3": {"name": "Пельмень", "scale": 0.235, "xOffset": 0, "yOffset": 0, "groundY": 685, "cropTop": 10, "cropRight": 195, "cropBottom": 10, "cropLeft": 50, "frontX": 970, "runStart": 1.65, "runEnd": 5, "shadowX": -109, "shadowRadius": 112, "feather": 2, "frontTrack": []}, "4": {"name": "Турбо", "scale": 0.23, "xOffset": 0, "yOffset": 0, "groundY": 681, "cropTop": 10, "cropRight": 290, "cropBottom": 12, "cropLeft": 230, "frontX": 886, "runStart": 1.7, "runEnd": 5, "shadowX": -79, "shadowRadius": 83, "feather": 2, "frontTrack": []}, "5": {"name": "Ракета", "scale": 0.225, "xOffset": 0, "yOffset": 0, "groundY": 694, "cropTop": 10, "cropRight": 0, "cropBottom": 6, "cropLeft": 0, "frontX": 936, "runStart": 2.35, "runEnd": 4.25, "shadowX": -106, "shadowRadius": 109, "feather": 2, "frontTrack": [[2.35, 936], [2.5, 914], [2.85, 922], [3.2, 1009], [3.55, 989], [3.9, 1109], [4.25, 1193], [4.3, 1206]]}};
+window.runVideoSources={"1": "assets/bulldog_01_run.mp4", "2": "assets/bulldog_02_run.mp4", "3": "assets/bulldog_03_run.mp4", "4": "assets/bulldog_04_run.mp4", "5": "assets/bulldog_05_run.mp4"};
+(()=>{
+'use strict';
+const cfg=window.raceVisualConfig, defaults=JSON.parse(JSON.stringify(cfg));
+const W=1276,H=720,ns='http://www.w3.org/2000/svg',htmlns='http://www.w3.org/1999/xhtml';
+const layers=[],videos=[];let treatment='soft',frozen=false,selected=1;
+const svg=(tag,attrs)=>{const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e};
+const panel=document.createElement('aside');panel.id='calibration';panel.hidden=true;
+panel.innerHTML=`<h2>RUN · Калибровка</h2><p>Только визуальный слой прототипа. Позиция гонщика не зависит от видео. C — панель, H — скрыть UI.</p><label>Собака<select id="cal-dog">${Object.entries(cfg).map(([id,c])=>`<option value="${id}">${id} · ${c.name}</option>`).join('')}</select></label><div id="cal-fields"></div><label>Изображение<select id="cal-treatment"><option value="soft">Кроп + мягкий край</option><option value="crop">Только кроп</option><option value="raw">Исходный кадр</option><option value="multiply">Кроп · multiply (тест)</option></select></label><button id="cal-freeze">Пауза видео</button> <button id="cal-reset">Сброс собаки</button><p id="cal-status"></p><button id="cal-export">Скачать config JSON</button><textarea id="cal-json" readonly aria-label="Текущий config"></textarea><p>groundY и crop — пиксели исходника; scale — пиксели сцены на пиксель исходника; offsets — пиксели сцены. Крест — progress anchor; линия — контакт земли.</p>`;
+document.body.append(panel);
+const toggle=document.createElement('button');toggle.id='cal-toggle';toggle.textContent='Калибровка · C';toggle.onclick=()=>setPanel(panel.hidden);$('controls').append(toggle);
+const notice=document.createElement('div');notice.id='video-notice';notice.textContent='Загрузка пяти RUN видео…';document.body.append(notice);
+const fields={scale:[.05,.6,.005],xOffset:[-120,120,1],yOffset:[-80,80,1],groundY:[300,720,1],cropTop:[0,300,1],cropRight:[0,600,1],cropBottom:[0,200,1],cropLeft:[0,600,1],frontX:[200,1276,1],runStart:[0,4.9,.05],runEnd:[.1,5.04,.05],feather:[0,12,1]};
+$('cal-fields').innerHTML=Object.entries(fields).map(([key,[min,max,step]])=>`<label>${key}<input id="cal-${key}" type="number" min="${min}" max="${max}" step="${step}" /></label>`).join('');
+function setPanel(open){panel.hidden=!open;$('scene').classList.toggle('calibrating',open);syncPanel()}
+function syncPanel(){const c=cfg[selected];for(const key of Object.keys(fields))$('cal-'+key).value=c[key];$('cal-json').value=JSON.stringify(cfg,null,2);layers.forEach((l,i)=>l.guide.classList.toggle('selected',i+1===selected));}
+for(const[key,[min,max]]of Object.entries(fields))$('cal-'+key).oninput=e=>{const v=Number(e.target.value);if(!Number.isFinite(v))return;const c=cfg[selected];c[key]=Math.max(min,Math.min(max,v));if(c.runEnd<c.runStart+.1){c.runEnd=Math.min(5.04,c.runStart+.1);c.runStart=Math.min(c.runStart,c.runEnd-.1)}updateAll();$('cal-json').value=JSON.stringify(cfg,null,2)};
+$('cal-dog').onchange=e=>{selected=Number(e.target.value);syncPanel()};
+$('cal-treatment').onchange=e=>{treatment=e.target.value;updateAll()};
+$('cal-reset').onclick=()=>{cfg[selected]=JSON.parse(JSON.stringify(defaults[selected]));syncPanel();updateAll()};
+$('cal-export').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'}));a.href=url;a.download='raceVisualConfig.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('cal-freeze').onclick=()=>{frozen=!frozen;videos.forEach(v=>frozen?v.pause():resume(v));$('cal-freeze').textContent=frozen?'Запустить видео':'Пауза видео'};
+document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;if(e.code==='KeyC'){e.preventDefault();setPanel(panel.hidden)}if(e.code==='KeyH'&&$('controls').hidden)setPanel(false)});
+$('hide').addEventListener('click',()=>setPanel(false));
+function resume(v){v.play().catch(()=>{notice.hidden=false;notice.textContent='Нажмите Play, чтобы разрешить воспроизведение видео.'})}
+$('play').addEventListener('click',()=>{if(!frozen)videos.forEach(resume)});
+Object.entries(cfg).forEach(([id,c])=>{
+ const i=Number(id)-1,visual=$('v'+i);visual.replaceChildren();visual.style.transform='none';
+ const shadow=svg('ellipse',{class:'run-shadow',cx:c.shadowX,cy:ground[i]+1,rx:c.shadowRadius,ry:11,fill:'url(#shadow)'});
+ $('r'+i).insertBefore(shadow,visual);
+ const fo=svg('foreignObject',{'data-run-layer':id});fo.style.willChange='transform';const clip=document.createElementNS(htmlns,'div');clip.className='run-clip';
+ const video=document.createElementNS(htmlns,'video');video.id='run-video-'+id;video.muted=true;video.defaultMuted=true;video.autoplay=true;video.loop=true;video.playsInline=true;video.preload='auto';video.setAttribute('muted','');video.setAttribute('playsinline','');video.setAttribute('aria-label',id+' '+c.name+' RUN');video.src=window.runVideoSources[id];
+ clip.append(video);fo.append(clip);visual.append(fo);
+ const guide=svg('g',{class:'cal-guide'});guide.innerHTML=`<path d="M-270 ${ground[i]}H45M0 ${ground[i]-150}V${ground[i]+16}" fill="none" stroke="#ff6644" stroke-width="1" stroke-dasharray="5 4"/><circle cx="0" cy="${ground[i]}" r="4" fill="#ff6644"/>`;$('r'+i).append(guide);
+ layers.push({visual,shadow,fo,clip,video,guide});videos.push(video);
+ video.addEventListener('loadedmetadata',()=>{video.currentTime=cfg[id].runStart;updateLayer(i);if(!frozen)resume(video)});
+ video.addEventListener('error',()=>{notice.hidden=false;notice.textContent='Ошибка видео '+id+': код '+(video.error?.code||'?')});
+ video.addEventListener('playing',()=>{if(videos.length===5&&videos.every(v=>v.readyState>=2&&!v.paused))notice.hidden=true});
+});
+// Only the character image reads media time. Never writes racer X, preview progress, camera, or results.
+function frontAnchor(c,time){const pts=c.frontTrack;if(!pts.length)return c.frontX;let k=pts.findIndex(p=>p[0]>=time);if(k===0)return pts[0][1]+(c.frontX-defaults[5].frontX);if(k<0)return pts.at(-1)[1]+(c.frontX-defaults[5].frontX);const a=pts[k-1],b=pts[k];return a[1]+(b[1]-a[1])*(time-a[0])/(b[0]-a[0])+(c.frontX-defaults[5].frontX)}
+const attr=(node,key,value)=>{value=String(value);if(node.getAttribute(key)!==value)node.setAttribute(key,value)};
+const style=(node,key,value)=>{if(node.style[key]!==value)node.style[key]=value};
+function updateLayer(i){
+ const c=cfg[i+1],l=layers[i],s=c.scale,front=frontAnchor(c,l.video.currentTime||c.runStart);
+ const raw=treatment==='raw';const left=raw?0:c.cropLeft,top=raw?0:c.cropTop,right=raw?0:c.cropRight,bottom=raw?0:c.cropBottom;
+ const x=(left-front)*s+c.xOffset,y=ground[i]+c.yOffset+(top-c.groundY)*s;
+ style(l.fo,'transform',`translate(${x.toFixed(3)}px,${y.toFixed(3)}px)`);attr(l.fo,'width',(W-left-right)*s);attr(l.fo,'height',(H-top-bottom)*s);
+ Object.entries({width:W*s+'px',height:H*s+'px',left:-left*s+'px',top:-top*s+'px'}).forEach(([k,v])=>style(l.video,k,v));
+ const fade=treatment==='soft'?c.feather:0;
+ style(l.clip,'maskImage',fade?`linear-gradient(to right,transparent,#000 ${fade}px,#000 calc(100% - ${fade}px),transparent),linear-gradient(to bottom,transparent,#000 ${fade}px,#000 calc(100% - ${fade}px),transparent)`:'none');
+ l.clip.style.maskComposite='intersect';l.fo.style.mixBlendMode=treatment==='multiply'?'multiply':'normal';
+ attr(l.shadow,'cx',c.shadowX+c.xOffset);attr(l.shadow,'cy',ground[i]+c.yOffset+1);attr(l.shadow,'rx',c.shadowRadius*s/defaults[i+1].scale);
+ $('label'+i).setAttribute('transform',`translate(${Math.max(66,(W-right-front)*s+c.xOffset+62)},${ground[i]-12})`);
+}
+function updateAll(){layers.forEach((_,i)=>updateLayer(i))}
+const sceneDraw=draw;draw=function(){sceneDraw();updateAll()};draw();syncPanel();
+// One lightweight scheduler for RUN section playback and presentation drift. No canvas/render loops.
+setInterval(()=>{
+ videos.forEach((v,i)=>{const c=cfg[i+1];if(v.readyState<2||v.seeking)return;if(!frozen&&(v.currentTime<c.runStart-.05||v.currentTime>=Math.min(c.runEnd,v.duration-.015))){v.currentTime=c.runStart;if(v.paused)resume(v)}if(c.frontTrack.length)updateLayer(i)});
+ if(!panel.hidden){const v=videos[selected-1],q=v.getVideoPlaybackQuality?.();$('cal-status').textContent=`RUN ${v.currentTime.toFixed(2)} s · ${v.paused?'pause':'playing'}\nframes ${q?.totalVideoFrames??'—'} · dropped ${q?.droppedVideoFrames??'—'}\nФон непрозрачный: для финального качества нужен alpha.`}
+},40);
+window.realDogsDebug={videos,layers,updateAll,setPanel,get treatment(){return treatment},setTreatment(value){treatment=value;$('cal-treatment').value=value;updateAll()},get frozen(){return frozen}};
+})();
+
+</script>
+</body>
+</html>
