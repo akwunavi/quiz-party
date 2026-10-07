@@ -133,3 +133,6 @@
 
 /* табло/перерыв/подсчёт/финал: «средняя» плотность — гирлянда провисает ниже, заголовок не должен лезть под флажки */
 .theme-ny_book[data-ny-density="medium"] :is(.sb-screen, .break-screen, .fin-screen) { padding-top: calc(250 * var(--u)); }
+
+/* телефон игрока: тема даёт тёмный фон корня, а текст — чернильный; на телефоне фон бумажный (ревью 9.90) */
+.theme-ny_book .pl-root { background: var(--bg); color: var(--fg); }
