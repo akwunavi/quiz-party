@@ -192,3 +192,15 @@
 .theme-ny_home .jp-answer .txt, .theme-ny_home .mel-bid-row { font-size: calc(26 * var(--u)); }
 .theme-ny_home .host-screen .an-clue { font-size: calc(44 * var(--u)); }
 .theme-ny_home .host-screen .an-clue { font-family: var(--font-display); font-style: normal; font-weight: 600; color: var(--nh-ink); text-transform: none; }
+
+/* ── награждение ── */
+.theme-ny_home .fin-screen { padding-top: calc(190 * var(--u)); }
+.theme-ny_home .fin-award-place { font-family: var(--nh-body); font-weight: 700; letter-spacing: .26em; color: var(--nh-gold); text-shadow: none; }
+.theme-ny_home .fin-award-name[style*="color"] { color: var(--nh-gold) !important; text-shadow: 0 0 22px rgba(240, 201, 106, .45); font-family: var(--font-display); font-weight: 700; font-size: calc(60 * var(--u)); }
+.theme-ny_home .fin-award-score { color: var(--nh-gold); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_home .fin-table-wrap td, .theme-ny_home .fin-table-wrap th { color: var(--fg); }
+.theme-ny_home .fin-screen { padding-top: calc(150 * var(--u)); gap: calc(10 * var(--u)); }
+.theme-ny_home .fin-screen .neon-title { font-size: calc(78 * var(--u)) !important; }
+.theme-ny_home .fin-table-wrap { max-height: none; }
+.theme-ny_home .fin-table-wrap [style*="color"] { color: var(--nh-ink) !important; }
+.theme-ny_home .fin-screen { padding-bottom: calc(90 * var(--u)); }

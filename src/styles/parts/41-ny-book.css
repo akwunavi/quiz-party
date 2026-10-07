@@ -265,3 +265,18 @@
 .theme-ny_book .jp-answer .txt, .theme-ny_book .mel-bid-row { font-size: calc(26 * var(--u)); }
 .theme-ny_book .host-screen .an-clue { font-size: calc(44 * var(--u)); }
 .theme-ny_book .host-screen .an-clue { font-family: var(--nb-serif); font-style: normal; font-weight: 700; color: var(--nb-ink); text-shadow: none; text-transform: none; }
+
+/* ── награждение ── */
+.theme-ny_book .fin-screen { padding-top: calc(190 * var(--u)); }
+.theme-ny_book .fin-award { gap: calc(10 * var(--u)); }
+.theme-ny_book .fin-award-place { font-family: var(--nb-serif); font-weight: 700; letter-spacing: .26em; color: var(--nb-red); text-shadow: none; }
+.theme-ny_book .fin-award-name[style*="color"] { color: var(--nb-ink) !important; text-shadow: none; font-family: var(--font-display); font-size: calc(62 * var(--u)); background: var(--nb-card); box-shadow: 0 5px 0 var(--nb-shade); padding: calc(6 * var(--u)) calc(30 * var(--u)); }
+.theme-ny_book .fin-award-name:not([style*="color"]) { color: var(--nb-ink); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .fin-award-score { color: var(--nb-red); font-family: var(--font-display); text-shadow: none; }
+.theme-ny_book .fin-table-wrap td, .theme-ny_book .fin-table-wrap th, .theme-ny_book .fin-table-wrap span { color: var(--fg); }
+.theme-ny_book .fin-screen { padding-top: calc(150 * var(--u)); gap: calc(10 * var(--u)); }
+.theme-ny_book .fin-screen .neon-title { font-size: calc(78 * var(--u)) !important; }
+.theme-ny_book .fin-table-wrap { max-height: none; }
+.theme-ny_book .fin-table-wrap :is(td, th, .total, .pos) { font-family: var(--nb-serif); font-size: calc(28 * var(--u)); color: var(--fg); }
+.theme-ny_book .fin-table-wrap tr { height: calc(54 * var(--u)); }
+.theme-ny_book .fin-screen { padding-bottom: calc(110 * var(--u)); }
