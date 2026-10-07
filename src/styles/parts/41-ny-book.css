@@ -280,3 +280,56 @@
 .theme-ny_book .fin-table-wrap :is(td, th, .total, .pos) { font-family: var(--nb-serif); font-size: calc(28 * var(--u)); color: var(--fg); }
 .theme-ny_book .fin-table-wrap tr { height: calc(54 * var(--u)); }
 .theme-ny_book .fin-screen { padding-bottom: calc(110 * var(--u)); }
+
+/* ═══ 9.98: правки по живому просмотру ═══ */
+/* 1. Картинки: рамка не занимает места в раскладке (раньше padding 12px у ячейки сбивал пропорцию flex-grow, и ряд выходил неровным).
+   Ячейка шире картинки по высоте — это сохраняем; рамка рисуется тенью-кольцом, поэтому ширина ячейки = ширине картинки · пропорцию. */
+.theme-ny_book .q-img { padding: 0; background: #fffdf6;
+  box-shadow: 0 0 0 calc(12 * var(--u)) #fffdf6, 0 calc(17 * var(--u)) 0 calc(12 * var(--u)) var(--nb-shade), 0 calc(28 * var(--u)) calc(20 * var(--u)) rgba(60, 30, 10, .28); }
+.theme-ny_book .q-media-grid.eq-row { gap: calc(40 * var(--u)); padding-inline: calc(12 * var(--u)); }
+.theme-ny_book .q-media-grid.eq-row .q-img img, .theme-ny_book .q-media-grid.eq-row .q-img { border-radius: 0; }
+.theme-ny_book .q-media-grid.eq-row .q-img img { border: 0; width: 100%; height: 100%; object-fit: contain; }
+
+/* 2. Елки по краям: боковые поля шире, чтобы карточки и текст не заходили на хвою; голый текст получает бумажный ореол */
+.theme-ny_book .host-screen { padding-inline: calc(250 * var(--u)); }
+.theme-ny_book .host-topbar { left: calc(250 * var(--u)); right: calc(250 * var(--u)); }
+.theme-ny_book .host-screen :is(.q-text, .q-recall, .meta-line, .answer-label, .mono-tag, .recap-dots, .fin-slide-label, .fin-slide-round),
+.theme-ny_book .team-answers > .mono-tag { text-shadow: 0 0 calc(10 * var(--u)) var(--nb-card), 0 0 calc(4 * var(--u)) var(--nb-card); }
+
+/* 3. Экран ответов: шапка — бумажные таблички (не сливаются с гирляндой), под ней воздух */
+.theme-ny_book .host-topbar .mono-tag { background: var(--nb-card); padding: calc(12 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade); text-shadow: none; }
+.theme-ny_book .host-screen:has(> .answers-layout) { padding-top: calc(190 * var(--u)); padding-bottom: calc(120 * var(--u)); }
+.theme-ny_book .answers-layout { margin-top: 0 !important; gap: calc(36 * var(--u)); }
+.theme-ny_book .team-answers { padding-top: calc(8 * var(--u)); }
+.theme-ny_book .team-answer { background: #fffaf0; border: 0; border-left: calc(12 * var(--u)) solid var(--dim); border-radius: 0; box-shadow: 0 4px 0 var(--nb-shade); color: var(--fg); }
+/* «Отвечайте!»: розетка меньше и с воздухом, чипы команд не липнут к ней */
+.theme-ny_book .host-screen:has(.answer-pulse) { padding-top: calc(190 * var(--u)); gap: calc(30 * var(--u)); justify-content: flex-start; }
+.theme-ny_book .host-screen:has(.answer-pulse) .p-ros.is-big { --d: calc(190 * var(--u)); margin-block: calc(10 * var(--u)); }
+.theme-ny_book .at-team { background: var(--nb-card); border: 0; box-shadow: 0 4px 0 var(--nb-shade); color: var(--fg); border-radius: 0; }
+.theme-ny_book .at-team.done { box-shadow: 0 4px 0 var(--nb-green, #2f7a47); }
+
+/* 4. Блок ответа — бумажная карточка (на горчичном фоне тонкий шрифт терялся); ответ читаемым шрифтом */
+.theme-ny_book .answer-block { background: var(--nb-card); border: 0; border-top: calc(10 * var(--u)) solid var(--nb-mustard); border-radius: 0; color: var(--nb-ink);
+  box-shadow: 0 6px 0 var(--nb-shade), 0 14px 18px rgba(60, 30, 10, .22); animation-name: ansIn; }
+.theme-ny_book .answer-block .answer-label { color: var(--nb-red); letter-spacing: .26em; font-weight: 700; }
+.theme-ny_book .answer-block .answer-main { color: var(--nb-ink); font-family: var(--nb-serif); font-weight: 700; line-height: 1.12; text-transform: none; letter-spacing: 0; }
+.theme-ny_book .an-screen .answer-block .answer-main, .theme-ny_book .answer-block .answer-main:only-of-type { font-size: calc(64 * var(--u)); }
+.theme-ny_book .answer-block.reveal-in .answer-main { animation: p-ink .8s ease-out .15s both; }
+.theme-ny_book .answers-main > .q-recall { color: var(--muted); font-family: var(--nb-serif); font-style: italic; font-weight: 400; }
+.theme-ny_book .order-answer .oi { background: #fffaf0; border: 0; border-left: calc(10 * var(--u)) solid var(--nb-mustard); border-radius: 0; color: var(--nb-ink); box-shadow: 0 4px 0 var(--nb-shade); font-family: var(--nb-serif); font-weight: 700; }
+.theme-ny_book .order-answer .oi b { color: #fbf3e2; background: var(--nb-pine); width: 1.5em; height: 1.5em; display: inline-grid; place-items: center; border-radius: 50%; font-family: var(--font-display); font-weight: 400; }
+.theme-ny_book .oi-pos { color: var(--nb-red); font-family: var(--font-display); }
+.theme-ny_book .match-answer .mi-label b { color: var(--nb-red); } .theme-ny_book .match-answer .mi-text { color: var(--nb-ink); font-weight: 700; }
+.theme-ny_book .rebus-answer figcaption { color: var(--nb-ink); }
+
+/* 5. Верный вариант — по мокапу: зелёная печать-галочка (как .gs-mark), мягкая зелёная бумага и зелёный корешок; неверные гаснут */
+.theme-ny_book .choice-plate.correct { background: #e4efd9; border: 0; border-left: calc(14 * var(--u)) solid var(--nb-green, #2f7a47); color: var(--nb-ink);
+  box-shadow: 0 6px 0 #b9cfae, 0 12px 14px rgba(47, 122, 71, .28); animation: nb-correct .6s cubic-bezier(.2, .9, .3, 1.1) both; }
+@keyframes nb-correct { from { opacity: .5; transform: translateY(calc(-10 * var(--u))) scale(.97); } to { opacity: 1; transform: none; } }
+.theme-ny_book .choice-plate.correct::after { content: '✓'; margin-left: auto; flex: 0 0 auto; display: grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%;
+  background: var(--nb-green, #2f7a47); color: #fff; font: 700 .85em / 1 var(--nb-serif); box-shadow: 0 3px 0 rgba(0, 0, 0, .22); animation: p-stamp .45s .2s both; }
+.theme-ny_book .choice-plate.correct .key { background: var(--nb-green, #2f7a47); color: #fff; }
+.theme-ny_book .choice-plate.dimmed { animation: none; opacity: .38; filter: grayscale(.9); box-shadow: none; }
+.theme-ny_book .choice-img.correct { outline: calc(8 * var(--u)) solid var(--nb-green, #2f7a47); box-shadow: 0 8px 14px rgba(47, 122, 71, .3); animation: none; }
+.theme-ny_book .choice-img.dimmed { animation: none; opacity: .38; filter: grayscale(.9); }
+.theme-ny_book .answer-block { padding: calc(24 * var(--u)) calc(30 * var(--u)) calc(30 * var(--u)); }
