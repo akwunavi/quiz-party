@@ -1,0 +1,91 @@
+/* ═══ Тема «Новый год · Тёплый дом» (ключ ny_home, 9.90) — экраны проектора ═══
+   Эталон — мокап Concept 4 (src/labs/newyear, HANDOFF §3cj/§3ck). Комната и кинескоп рисуются
+   слоями сцены (src/ny/home/HomeScene.tsx, 42-ny-home-world.css); здесь — «эфир» на экране
+   телевизора: синий фон, золото, рубин. Поля игры = экран кинескопа в текущей плотности
+   (sparse — комната, medium — ТВ крупно, dense — кинескоп на весь кадр), единица --u как у «Книги». */
+.theme-ny_home {
+  --u: min(calc(100vw / 1920), calc(100vh / 1080));
+  --bg: #0a1a3d; --bg2: #16356a; --panel: rgba(8, 22, 56, .72); --panel2: #16356a;
+  --fg: #fff4dc; --muted: #c9b98f; --dim: rgba(255, 244, 220, .35);
+  --accent: #f0c96a; --accent2: #c8323a; --answer: #f0c96a; --ok: #6fcf8a; --danger: #ff6b6b;
+  --glow: none; --glow2: none;
+  --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --nh-body: 'Lora', Georgia, serif;
+  --nh-gold: #f0c96a; --nh-gold2: #d9b25c; --nh-blue: #0a1a3d; --nh-ink: #fff4dc; --nh-plate: rgba(8, 22, 56, .72);
+  --nh-pt: 70; --nh-px: 140; --nh-pb: 92;
+  font-family: var(--nh-body); color: var(--fg); background: #120c08; min-height: 100vh;
+}
+.theme-ny_home[data-ny-density="medium"] { --nh-pt: 54; --nh-px: 190; --nh-pb: 96; }
+.theme-ny_home[data-ny-density="dense"] { --nh-pt: 52; --nh-px: 96; --nh-pb: 100; }
+.theme-ny_home .grid-bg { animation: none; background: none; }
+.theme-ny_home .grid-bg::before, .theme-ny_home .grid-bg::after { display: none; }
+.theme-ny_home .host-screen { font-family: var(--nh-body); color: var(--fg); text-align: center;
+  padding: calc((var(--nh-pt) + 96) * var(--u)) calc(var(--nh-px) * var(--u)) calc(var(--nh-pb) * var(--u)); gap: calc(22 * var(--u)); }
+.theme-ny_home .host-screen > * { text-shadow: none; }
+
+/* чистый эфир: ни имени пакета, ни кнопок ведущего (кроме резервного режима .ny-nav) */
+.theme-ny_home .pack-badge, .theme-ny_home .fx-toggle { display: none; }
+.theme-ny_home:not(.ny-nav) .host-actions { display: none; }
+.theme-ny_home.ny-nav .host-actions { right: calc(56 * var(--u)); bottom: calc(28 * var(--u)); gap: 8px; z-index: 96; }
+.theme-ny_home.ny-nav .host-actions button { font: 700 calc(19 * var(--u)) / 1 var(--nh-body); color: var(--nh-ink); padding: calc(11 * var(--u)) calc(18 * var(--u));
+  background: linear-gradient(180deg, #8a4e2a, #5e3118); border: 2px solid var(--nh-gold2); border-radius: 4px; opacity: .92; text-transform: none; letter-spacing: 0; }
+
+/* ── 01 ЛОББИ (комната) ── */
+.theme-ny_home .lobby-screen { justify-content: flex-start; padding-top: calc(96 * var(--u)); }
+.theme-ny_home .lobby-screen .neon-title { margin: calc(20 * var(--u)) 0 0; background: none; color: var(--nh-gold) !important; text-transform: none;
+  font: 700 calc(120 * var(--u)) / 1 var(--font-display); letter-spacing: .02em; text-shadow: 0 0 26px rgba(240, 201, 106, .45), 4px 5px 0 #7a1a1c;
+  animation: h-scanin .9s ease-out .15s backwards; }
+.theme-ny_home .lobby-screen .neon-title span { display: block; color: inherit !important; }
+.theme-ny_home .lobby-screen .neon-title br { display: none; }
+.theme-ny_home .lobby-qr-corner, .theme-ny_home .lobby-qr-hint { display: none; }
+.theme-ny_home .groups-overlay { background: rgba(4, 10, 28, .66); justify-content: flex-end; padding-right: calc(260 * var(--u)); align-items: center; }
+.theme-ny_home .groups-modal { width: calc(1150 * var(--u)); max-width: 62vw; padding: calc(30 * var(--u)) calc(40 * var(--u)) calc(38 * var(--u)); color: var(--fg);
+  background: var(--nh-plate); border: 3px solid var(--nh-gold2); border-radius: 6px; box-shadow: inset 0 0 0 5px var(--nh-blue), inset 0 0 0 7px rgba(217, 178, 92, .55), 0 0 30px rgba(120, 160, 255, .15); }
+.theme-ny_home .gm-head .mono-tag { color: var(--nh-gold); }
+.theme-ny_home .gm-close { background: none; border: 0; color: var(--nh-gold); font: 700 calc(28 * var(--u)) / 1 var(--nh-body); }
+.theme-ny_home .lg-team { background: #fffaf0; color: #3a1d0e; border: 2px solid rgba(106, 58, 30, .3); border-left: calc(14 * var(--u)) solid currentColor; border-radius: 4px; box-shadow: 0 6px 10px rgba(60, 30, 10, .25); }
+.theme-ny_home .lg-name { font: 700 calc(32 * var(--u)) / 1 var(--font-display); color: #9e2026 !important; }
+.theme-ny_home .lg-players { color: #5a3b22; font-style: italic; }
+
+/* ── 02 ПРАВИЛА ── */
+.theme-ny_home .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nh-body); letter-spacing: .26em; color: var(--nh-gold); text-shadow: 0 0 10px rgba(240, 201, 106, .4); }
+.theme-ny_home .host-topbar { top: calc(var(--nh-pt) * var(--u)); left: calc(var(--nh-px) * var(--u)); right: calc(var(--nh-px) * var(--u)); justify-content: space-between; align-items: center; }
+.theme-ny_home .info-screen .host-topbar, .theme-ny_home .bz-screen .host-topbar { justify-content: center; }
+.theme-ny_home :is(.ib-rules-band, .rules-frame, .q-frame, .q-split > div:first-child, .answer-reveal, .sb-table-wrap, .fin-table-wrap) {
+  background: var(--nh-plate); border: 3px solid var(--nh-gold2); border-radius: 6px; color: var(--fg);
+  box-shadow: inset 0 0 0 5px var(--nh-blue), inset 0 0 0 7px rgba(217, 178, 92, .55), 0 0 30px rgba(120, 160, 255, .15); animation: h-scanin .9s ease-out .15s backwards; }
+.theme-ny_home :is(.choice-plate, .rule-item, .info-round, .team-answer, .img-answer .ia-frame) {
+  background: linear-gradient(180deg, rgba(40, 80, 160, .55), rgba(14, 36, 86, .7)); border: 2px solid var(--nh-gold2); border-radius: 4px; color: var(--fg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 8px 14px rgba(0, 0, 0, .35); text-shadow: none; }
+.theme-ny_home .info-list li, .theme-ny_home .ir-name { color: var(--fg); font-family: var(--nh-body); }
+.theme-ny_home .info-list li::before { color: var(--nh-gold); }
+.theme-ny_home .ir-num { display: grid; place-items: center; border-radius: 50%; background: var(--nh-gold); color: #3a1d0e; font-weight: 700; }
+.theme-ny_home .ir-count, .theme-ny_home .info-stats, .theme-ny_home .info-note-corner { color: var(--muted); font-style: italic; }
+.theme-ny_home .ib-label .neon-title, .theme-ny_home .ib-label-text { font: 700 calc(104 * var(--u)) / 1 var(--font-display); color: var(--nh-gold) !important; background: none;
+  text-shadow: 0 0 26px rgba(240, 201, 106, .45), 4px 5px 0 #7a1a1c; text-transform: none; }
+
+/* ── 03/04 ВВОД РАУНДА ── */
+.theme-ny_home .round-intro .neon-title, .theme-ny_home .round-intro h1 { font: 700 calc(88 * var(--u)) / 1.04 var(--font-display); color: var(--nh-gold) !important; background: none; text-transform: none;
+  text-shadow: 0 0 26px rgba(240, 201, 106, .45), 4px 5px 0 #7a1a1c; }
+.theme-ny_home :is(.round-badge, .rb-num) { background: linear-gradient(180deg, #d8453a, #9e2026); color: #fff4dc; border: 2px solid var(--nh-gold); border-radius: 4px; }
+.theme-ny_home .meta-line { color: var(--muted); font-style: italic; }
+.theme-ny_home .rule-item { display: flex; align-items: baseline; gap: calc(14 * var(--u)); text-align: left; animation: h-wipe .8s ease-out backwards; }
+.theme-ny_home .rule-item .idx, .theme-ny_home .rules-frame-label { color: var(--nh-gold); font-family: var(--font-display); }
+
+/* ── 05–08 ВОПРОС ── */
+.theme-ny_home .qnum { font: 700 calc(28 * var(--u)) / 1 var(--nh-body); letter-spacing: .14em; color: var(--nh-ink); background: linear-gradient(180deg, #d8453a, #9e2026);
+  border: 2px solid var(--nh-gold); border-radius: 4px; padding: calc(14 * var(--u)) calc(24 * var(--u)); box-shadow: 0 6px 12px rgba(0, 0, 0, .4); text-shadow: none; }
+.theme-ny_home .q-text, .theme-ny_home .q-text .q-word { font-family: var(--font-display); font-weight: 600; color: var(--nh-ink); text-shadow: 0 0 14px rgba(160, 200, 255, .35); }
+.theme-ny_home .q-img { padding: calc(8 * var(--u)); background: linear-gradient(180deg, #f0c96a, #b7832e); border: 0; border-radius: 4px; box-shadow: 0 14px 28px rgba(0, 0, 0, .5); }
+.theme-ny_home .choice-plate { font-family: var(--nh-body); font-weight: 600; }
+.theme-ny_home :is(.choice-plate .key, .img-answer .ia-key) { display: inline-grid; place-items: center; border-radius: 4px; background: linear-gradient(180deg, #d8453a, #9e2026);
+  color: #fff4dc; border: 2px solid var(--nh-gold); font-family: var(--font-display); font-weight: 700; }
+
+/* ── 13–14 ОТВЕТ ── */
+.theme-ny_home :is(.answer-reveal, .answer-block) { background: linear-gradient(180deg, #f0c96a, #b7832e); border-color: #fff4dc; color: #3a1d0e; box-shadow: 0 8px 14px rgba(0, 0, 0, .35); animation: h-wipe .9s ease-out backwards; }
+.theme-ny_home .answer-label { color: #6b3b17; font-weight: 700; }
+.theme-ny_home .answer-main { font-family: var(--font-display); font-weight: 700; color: #3a1d0e; text-shadow: none; }
+.theme-ny_home .answer-note { color: var(--muted); font-style: italic; }
+.theme-ny_home :is(.sb-title, .clh-title) { font-family: var(--font-display); color: var(--nh-gold) !important; text-shadow: 0 0 26px rgba(240, 201, 106, .45), 4px 5px 0 #7a1a1c; background: none; }
+.theme-ny_home .q-frame, .theme-ny_home .q-split > div:first-child { padding: calc(24 * var(--u)) calc(40 * var(--u)); }
+.theme-ny_home .score-table { color: var(--fg); }

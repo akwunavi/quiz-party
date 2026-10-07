@@ -4,7 +4,7 @@
 // показ ответа «после вопроса», автопоказ. Лаборатория меняет только
 // СКОРОСТЬ проигрывания (демо) и умеет встать в START / WARNING / ZERO.
 import { createContext, useContext } from 'react'
-import { useTime } from '../engine/stage'
+import { useTime } from '../../../ny/engine/stage'
 
 export type TimerMode = 'run' | 'start' | 'warn' | 'zero'
 export const TimerModeCtx = createContext<TimerMode>('run')

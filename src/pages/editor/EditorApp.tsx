@@ -446,6 +446,8 @@ function PackScreen({ packId, user, onBack }: {
               <option value="classic">Классика</option>
               <option value="new_year">Новый год</option>
               <option value="potter">Магия</option>
+              <option value="ny_book">Новый год · Книга (в разработке)</option>
+              <option value="ny_home">Новый год · Тёплый дом (в разработке)</option>
             </select>
           </div>
           <div className="ed-field"><label>Финальная музыка (табло/финал)</label>

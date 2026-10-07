@@ -8,7 +8,7 @@ import { CONCEPTS } from './concepts'
 import { STATES } from './game/states'
 import { KitProvider } from './game/kit'
 import { TimerModeCtx, demoSpeed, type TimerMode } from './game/timer'
-import { Stage } from './engine/stage'
+import { Stage } from '../../ny/engine/stage'
 import { DEFAULT_OPTIONS, LabOptionsCtx, type LabOptions } from './game/config'
 
 function useSystemReducedMotion() {
@@ -136,7 +136,7 @@ export function Lab() {
         <LabOptionsCtx.Provider value={opts}>
         <KitProvider value={concept.kit}>
           <TimerModeCtx.Provider value={tmode}>
-            <Stage key={`${ci}-${si}-${playKey}-${reduced}`} paused={paused} reduced={reduced} className={`nyl-c${m.num} nyl-s-${st.id}`}>
+            <Stage key={`${ci}-${si}-${playKey}-${reduced}`} paused={paused} reduced={reduced} className={`nyl-c${m.num} nyl-s-${st.id} theme-${concept.kit.id === 'popup' ? 'ny_book' : 'ny_home'}`}>
               <C />
             </Stage>
           </TimerModeCtx.Provider>

@@ -365,6 +365,16 @@ const THEME_COLORS: Record<ThemeKey, {
     bg: '071630', panel: '10305e', panelLine: '7cc7ff', text: 'eaf3ff', muted: 'a9c8ef',
     accent: '7cc7ff', accent2: 'ffd700', danger: 'ff6b6b',
   },
+  // Новогодние темы 9.90: «Книга» — кремовая бумага, клюквенный и горчичный;
+  // «Тёплый дом» — синий «эфир» кинескопа, золото и рубин.
+  ny_book: {
+    bg: 'f3ead8', panel: 'fbf6ea', panelLine: 'd8caae', text: '1d2b4a', muted: '5a3b22',
+    accent: 'b3263a', accent2: 'd9a441', danger: 'b3263a',
+  },
+  ny_home: {
+    bg: '0a1a3d', panel: '16356a', panelLine: 'd9b25c', text: 'fff4dc', muted: 'cfe0ff',
+    accent: 'f0c96a', accent2: 'c8323a', danger: 'c8323a',
+  },
 }
 
 const MIME_BY_EXT: Record<string, string> = {

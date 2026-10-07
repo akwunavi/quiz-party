@@ -1,0 +1,135 @@
+/* ═══ Тема «Новый год · Книга» (ключ темы ny_book, 9.90) — экраны проектора ═══
+   Эталон — мокап Concept 2 в лаборатории (src/labs/newyear, HANDOFF §3cj/§3ck).
+   Сцена (разворот книги, ели, снег) рисуется отдельным слоем (src/ny/book/BookScene.tsx,
+   40-ny-book-world.css); здесь — палитра темы и то, как ложится ИГРОВАЯ вёрстка поверх.
+
+   Единица --u: «один пиксель мокапа» (холст 1920×1080) в текущем окне. Все размеры
+   перенесены из мокапа как calc(N * var(--u)) — так на 1366/1920/3840 композиция одна.
+   Игра — на «странице» книги: поля = книга (64/50) + поля контента мокапа. */
+.theme-ny_book {
+  --u: min(calc(100vw / 1920), calc(100vh / 1080));
+  --bg: #f3ead8; --bg2: #ece2cf; --panel: #fbf6ea; --panel2: #f3ead8;
+  --fg: #1d2b4a; --muted: #5a3b22; --dim: rgba(90, 59, 34, .35);
+  --accent: #b3263a; --accent2: #d9a441; --answer: #2f7a47; --ok: #2f7a47; --danger: #b3263a;
+  --glow: none; --glow2: none;
+  --font-display: 'Ruslan Display', 'Arial Black', Impact, sans-serif;
+  --nb-serif: 'PT Serif', Georgia, 'Times New Roman', serif;
+  --nb-shade: #d8caae; --nb-red: #b3263a; --nb-mustard: #d9a441; --nb-pine: #1f4a3a; --nb-ink: #1d2b4a; --nb-card: #fbf6ea;
+  font-family: var(--nb-serif); color: var(--fg); background: #121b2f; min-height: 100vh;
+}
+
+/* ── слои сцены ── */
+.ny-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.ny-layer-bg { z-index: 0; }
+.ny-layer-fx { z-index: 200; }
+.ny-slot { position: absolute; inset: 0; }
+.theme-ny_book .grid-bg { animation: none; background: none; }
+.theme-ny_book .grid-bg::before, .theme-ny_book .grid-bg::after { display: none; }
+
+/* ── игра ложится на «страницы»: поля контента мокапа (книга 64/50 + 120/84…) ── */
+.theme-ny_book .host-screen { font-family: var(--nb-serif); color: var(--fg); text-align: center;
+  padding: calc(134 * var(--u)) calc(184 * var(--u)) calc(136 * var(--u)); gap: calc(24 * var(--u)); }
+.theme-ny_book .host-screen > * { text-shadow: none; }
+
+/* на проекторе — чистый эфир: ни имени пакета в углу, ни кнопок ведущего (HANDOFF §3ck/§3cl);
+   кнопки возвращает ТОЛЬКО резервный режим (.ny-nav на корне темы, ThemeLayer) */
+.theme-ny_book .pack-badge, .theme-ny_book .fx-toggle { display: none; }
+.theme-ny_book:not(.ny-nav) .host-actions { display: none; }
+.theme-ny_book.ny-nav .host-actions { right: calc(56 * var(--u)); bottom: calc(28 * var(--u)); gap: 8px; z-index: 96; }
+.theme-ny_book.ny-nav .host-actions button { font: 700 calc(19 * var(--u)) / 1 var(--nb-serif); color: var(--fg); padding: calc(11 * var(--u)) calc(18 * var(--u));
+  background: #f3ead8; border: 2px solid #b9a77f; border-radius: 3px; box-shadow: 0 3px 0 var(--nb-shade); opacity: .92; text-transform: none; letter-spacing: 0; }
+
+/* ── 01 ЛОББИ ── */
+.theme-ny_book .lobby-screen { justify-content: flex-start; padding-top: calc(110 * var(--u)); }
+.theme-ny_book .lobby-screen .neon-title { position: relative; isolation: isolate; margin: 0; padding: calc(16 * var(--u)) calc(92 * var(--u)) calc(26 * var(--u));
+  background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(0,0,0,.14)), var(--nb-red);
+  box-shadow: 0 calc(14 * var(--u)) calc(18 * var(--u)) rgba(60, 20, 10, .3);
+  font: 400 calc(128 * var(--u)) / 1 var(--font-display); letter-spacing: .04em; color: #fbf3e2; text-transform: none; text-shadow: 3px 4px 0 rgba(80, 10, 20, .45);
+  animation: p-unfurl 1.1s cubic-bezier(.3, .85, .3, 1) .5s both; }
+.theme-ny_book .lobby-screen .neon-title::before, .theme-ny_book .lobby-screen .neon-title::after { content: ''; position: absolute; top: calc(26 * var(--u)); width: calc(120 * var(--u)); height: 100%; z-index: -1; background: #7a1424;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 26% 50%); }
+.theme-ny_book .lobby-screen .neon-title::before { left: calc(-84 * var(--u)); }
+.theme-ny_book .lobby-screen .neon-title::after { right: calc(-84 * var(--u)); transform: scaleX(-1); }
+.theme-ny_book .lobby-screen .neon-title span { display: block; color: inherit !important; }
+.theme-ny_book .lobby-screen .neon-title br { display: none; }
+
+/* окно составов: вкладыш справа от QR, QR слева остаётся виден */
+.theme-ny_book .groups-overlay { background: rgba(18, 27, 47, .6); justify-content: flex-end; padding-right: calc(260 * var(--u)); align-items: center; }
+.theme-ny_book .groups-modal { width: calc(1150 * var(--u)); max-width: 62vw; padding: calc(30 * var(--u)) calc(40 * var(--u)) calc(38 * var(--u)); border: 0; border-radius: 0; color: var(--fg);
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 41px, rgba(44,74,122,.14) 41px 42px), var(--nb-card);
+  box-shadow: 0 8px 0 var(--nb-shade), 0 28px 40px rgba(0,0,0,.45); transform-origin: 50% 100%; animation: p-rise 1.15s cubic-bezier(.25,.8,.3,1) .1s both; }
+.theme-ny_book .gm-head .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nb-serif); letter-spacing: .26em; color: var(--nb-red); }
+.theme-ny_book .gm-close { background: none; border: 0; color: #5a3b22; font: 700 calc(28 * var(--u)) / 1 var(--nb-serif); }
+.theme-ny_book .lg-team { background: #fffaf0; border: 0; border-top: calc(14 * var(--u)) solid currentColor; border-radius: 0; box-shadow: 0 5px 0 var(--nb-shade), 0 10px 12px rgba(60,30,10,.2); }
+.theme-ny_book .lg-name { font: 400 calc(34 * var(--u)) / 1 var(--font-display); color: var(--fg) !important; }
+.theme-ny_book .lg-players { color: var(--muted); font-style: italic; }
+
+/* QR из лобби по умолчанию (старый угловой) в новогодних темах не рисуется: QR — в сцене */
+.theme-ny_book .lobby-qr-corner, .theme-ny_book .lobby-qr-hint { display: none; }
+.ny-qr-svg { display: block; width: 100%; height: 100%; }
+
+/* ── 02 ПРАВИЛА / информационный слайд ── */
+.theme-ny_book .host-topbar { top: calc(46 * var(--u)); left: calc(184 * var(--u)); right: calc(184 * var(--u)); justify-content: space-between; align-items: center; }
+.theme-ny_book .info-screen .host-topbar, .theme-ny_book .bz-screen .host-topbar { justify-content: center; }
+.theme-ny_book .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nb-serif); letter-spacing: .26em; color: var(--nb-red); text-shadow: none; }
+.theme-ny_book .info-screen .host-topbar .mono-tag { background: var(--nb-card); padding: calc(12 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade); }
+.theme-ny_book .ib-rules-band { background: var(--nb-card); border: 0; border-radius: 0; box-shadow: 0 7px 0 var(--nb-shade), 0 14px 18px rgba(60, 30, 10, .28);
+  transform-origin: 50% 0; animation: p-unfurl 1s cubic-bezier(.3, .85, .3, 1) .1s both; color: var(--fg); }
+.theme-ny_book .info-list li { color: var(--fg); font-family: var(--nb-serif); animation: p-ink .8s ease-out calc(.5s + var(--i, 0) * .16s) both; }
+.theme-ny_book .info-list li::before { color: var(--nb-red); }
+.theme-ny_book .ib-label .neon-title, .theme-ny_book .ib-label-text { font: 400 calc(112 * var(--u)) / 1 var(--font-display); color: var(--nb-red) !important;
+  letter-spacing: .02em; text-shadow: 4px 4px 0 var(--nb-mustard), 8px 9px 0 #e9d9b7; background: none; }
+.theme-ny_book .info-round { border: 0; border-bottom: 3px dotted rgba(90, 59, 34, .45); background: none; color: var(--fg); animation: p-ink .7s ease-out calc(.9s + var(--i, 0) * .12s) both; }
+.theme-ny_book .ir-num { display: grid; place-items: center; border-radius: 50%; background: var(--nb-mustard); font: 400 1em / 1 var(--font-display); color: var(--nb-ink); box-shadow: 0 3px 0 #a87e24; }
+.theme-ny_book .ir-count, .theme-ny_book .info-stats, .theme-ny_book .info-note-corner { color: var(--muted); font-style: italic; }
+.theme-ny_book .ir-name { font-weight: 700; color: var(--fg); }
+
+/* ── 03/04 ВВОД РАУНДА и кроссворд ── */
+.theme-ny_book .round-intro .neon-title, .theme-ny_book .round-intro h1 { font: 400 calc(96 * var(--u)) / 1.02 var(--font-display); color: var(--nb-ink) !important;
+  text-shadow: 4px 4px 0 var(--nb-mustard), 8px 9px 0 #e9d9b7; background: none; text-transform: none; }
+.theme-ny_book .round-badge, .theme-ny_book .rb-num { background: var(--nb-red); color: #fbf3e2; border: 0; border-radius: 0; box-shadow: 0 4px 0 #7a1424; font-family: var(--font-display); }
+.theme-ny_book .meta-line { color: var(--muted); font-style: italic; }
+.theme-ny_book .rule-item { background: var(--nb-card); border: 0; border-left: 9px solid var(--nb-mustard); border-radius: 0; color: var(--fg);
+  box-shadow: 0 5px 0 var(--nb-shade), 0 10px 12px rgba(60, 30, 10, .2); }
+.theme-ny_book .rule-item .idx { color: var(--nb-red); font-family: var(--font-display); }
+.theme-ny_book .rules-frame { background: var(--nb-card); border: 0; border-radius: 0; box-shadow: 0 6px 0 var(--nb-shade); color: var(--fg); }
+.theme-ny_book .rules-frame-label { color: var(--nb-red); font-family: var(--nb-serif); letter-spacing: .26em; }
+
+/* ── 05–08 ВОПРОС ── */
+.theme-ny_book .qnum { font: 700 calc(30 * var(--u)) / 1 var(--nb-serif); letter-spacing: .14em; color: var(--nb-ink); background: var(--nb-card); border: 0; border-radius: 0;
+  padding: calc(14 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade), 0 8px 10px rgba(60, 30, 10, .2); text-shadow: none; }
+.theme-ny_book .q-text, .theme-ny_book .q-text .q-word { font-family: var(--nb-serif); font-weight: 700; color: var(--nb-ink); text-shadow: none; }
+.theme-ny_book .q-frame, .theme-ny_book .q-split > div:first-child { position: relative; background: linear-gradient(90deg, rgba(0,0,0,0) 78px, rgba(179, 38, 58, .4) 78px 80px, rgba(0,0,0,0) 80px),
+  repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 47px, rgba(44, 74, 122, .14) 47px 48px), var(--nb-card);
+  box-shadow: 0 7px 0 var(--nb-shade), 0 16px 22px rgba(60, 30, 10, .28); border: 0; border-radius: 0; }
+.theme-ny_book .q-img { padding: calc(12 * var(--u)); background: #fffdf6; border: 0; border-radius: 0; box-shadow: 0 5px 0 var(--nb-shade), 0 14px 18px rgba(60, 30, 10, .3); }
+.theme-ny_book .q-img:nth-child(odd) { transform: rotate(-1.2deg); } .theme-ny_book .q-img:nth-child(even) { transform: rotate(1.2deg); }
+.theme-ny_book .choice-plate { position: relative; background: var(--nb-card); border: 0; border-radius: 2px; color: var(--nb-ink); font-family: var(--nb-serif); font-weight: 700;
+  box-shadow: 0 6px 0 var(--nb-shade), 0 12px 14px rgba(60, 30, 10, .24); text-shadow: none; }
+.theme-ny_book .choice-plate .key, .theme-ny_book .img-answer .ia-key { display: inline-grid; place-items: center; border-radius: 50%; background: var(--nb-red); color: #fbf3e2;
+  font-family: var(--font-display); font-weight: 400; box-shadow: 0 3px 0 rgba(0, 0, 0, .25); border: 0; }
+.theme-ny_book .choice-plate:nth-child(4n+2) .key { background: var(--nb-mustard); color: var(--nb-ink); }
+.theme-ny_book .choice-plate:nth-child(4n+3) .key { background: var(--nb-pine); }
+.theme-ny_book .choice-plate:nth-child(4n+4) .key { background: #2c4a7a; }
+
+/* ── 13–14 ОТВЕТ ── */
+.theme-ny_book .answer-reveal, .theme-ny_book .answer-block { background: var(--nb-mustard); border: 0; border-radius: 0; color: var(--nb-ink); box-shadow: 0 5px 0 #a87e24;
+  transform-origin: 0 50%; animation: p-pull .8s cubic-bezier(.2, .9, .3, 1.1) both; }
+.theme-ny_book .answer-label { color: var(--muted); font-weight: 700; font-family: var(--nb-serif); }
+.theme-ny_book .answer-main { font-family: var(--font-display); font-weight: 400; color: var(--nb-ink); text-shadow: none; }
+.theme-ny_book .answer-note { color: var(--muted); font-style: italic; }
+
+/* ── табло / перерыв / финал: бумажные карточки на странице ── */
+.theme-ny_book .sb-table-wrap, .theme-ny_book .fin-table-wrap { background: var(--nb-card); border: 0; border-radius: 0; color: var(--fg);
+  box-shadow: 0 7px 0 var(--nb-shade), 0 16px 22px rgba(60, 30, 10, .28); }
+.theme-ny_book .sb-title, .theme-ny_book .clh-title { font-family: var(--font-display); color: var(--nb-red) !important; text-shadow: 4px 4px 0 var(--nb-mustard); background: none; }
+.theme-ny_book .sb-name, .theme-ny_book .score-table td, .theme-ny_book .score-table th { color: var(--fg); }
+
+/* поправки по рендеру: номер вопроса не наезжает на текст, красная линия полей — левее текста, клетки кроссворда — бумажные карточки */
+.theme-ny_book .q-frame, .theme-ny_book .q-split > div:first-child { padding-left: calc(56 * var(--u)); }
+.theme-ny_book .rule-item { display: flex; align-items: baseline; gap: calc(14 * var(--u)); text-align: left; }
+.theme-ny_book .cw-cell:not(.empty):not(.is-empty), .theme-ny_book .cw-layout [class*="cell"]:not([class*="empty"]) { background: var(--nb-card); border-color: #b9a77f; }
+.theme-ny_book .score-table { color: var(--fg); }
+
+/* табло/перерыв/подсчёт/финал: «средняя» плотность — гирлянда провисает ниже, заголовок не должен лезть под флажки */
+.theme-ny_book[data-ny-density="medium"] :is(.sb-screen, .break-screen, .fin-screen) { padding-top: calc(250 * var(--u)); }

@@ -12,8 +12,8 @@ import {
 } from '../game/data'
 import { showProjectorNavigation, DEFAULT_OPTIONS } from '../game/config'
 import { anagramQuestion } from '../../../lib/anagram'
-import { rng } from '../engine/rng'
-import { treeBox } from '../engine/tree'
+import { rng } from '../../../ny/engine/rng'
+import { treeBox } from '../../../ny/engine/tree'
 
 describe('New Year Mockup Lab · финальное сравнение', () => {
   it('ровно два мира — 2 и 4 (1, 3 и 5 отклонены), id уникальны', () => {

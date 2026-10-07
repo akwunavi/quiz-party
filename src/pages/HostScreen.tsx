@@ -29,6 +29,8 @@ import {
   startCounting, startIntro,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
+import { isNyTheme, isPlainQuestion } from '../ny/density'
+import { NyLobby } from '../ny/NyLobby'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -106,8 +108,11 @@ export function HostScreen() {
     ? `Q-${((gameState.round_number + 1) * 97 + gameState.question_index)
         .toString(16).toUpperCase().padStart(3, '0')}`
     : null
+  const plainForTheme = isNyTheme(theme) && gameState?.phase === 'question' && pack
+    ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index])
+    : false
   return (
-    <ThemeLayer theme={theme} isProjector phase={gameState?.phase}>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />
@@ -268,6 +273,10 @@ function HostInner({ gameState, pack }: {
               <button className="ghost dark lobby-groups-btn"
                 onClick={() => setGroupsOpen(true)}>СОСТАВЫ КОМАНД</button>
             )}
+            {isNyTheme(pack?.theme) ? (
+              <NyLobby theme={pack.theme} showQr={!paperMode} lit={groupsShown} playerUrl={playerUrl}
+                teams={lobbyTeams.map(t => ({ id: t.id, name: t.name, icon: t.icon, color: t.color, alive: isAlive(t) }))} />
+            ) : (<>
             <div className="lobby-teams">
               {teams.length > 0 && <div className="mono-tag">ПОДКЛЮЧИЛИСЬ ({teams.length})</div>}
               {teams.length === 0
@@ -292,6 +301,7 @@ function HostInner({ gameState, pack }: {
             {!paperMode && groupsShown && (
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
+            </>)}
             <div className="host-actions">
               <button className="ghost dark" onClick={() => {
                 if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()

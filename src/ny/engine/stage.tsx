@@ -46,29 +46,43 @@ function useClockSource(paused: boolean): Clock {
   }), [])
 }
 
-export function Stage({ children, paused, reduced, className, style }: {
+export function Stage({ children, paused, reduced, className, style, fit = 'width' }: {
   children: ReactNode; paused: boolean; reduced: boolean; className?: string; style?: CSSProperties
+  /** width — лаборатория: сцена 16:9 по ширине контейнера. cover — боевой проектор:
+   *  контейнер на весь экран, сцена масштабируется «с запасом» (без полей) и
+   *  центрируется; игровая вёрстка лежит поверх обычным DOM и сцены не касается. */
+  fit?: 'width' | 'cover'
 }) {
   const wrap = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.5)
+  const [off, setOff] = useState({ x: 0, y: 0 })
   useLayoutEffect(() => {
     const el = wrap.current
     if (!el) return
-    const fit = () => setScale(Math.max(0.05, el.clientWidth / STAGE_W))
-    fit()
-    const ro = new ResizeObserver(fit)
+    const fitNow = () => {
+      if (fit === 'cover') {
+        const s = Math.max(0.05, Math.max(el.clientWidth / STAGE_W, el.clientHeight / STAGE_H))
+        setScale(s)
+        setOff({ x: (el.clientWidth - STAGE_W * s) / 2, y: (el.clientHeight - STAGE_H * s) / 2 })
+      } else {
+        setScale(Math.max(0.05, el.clientWidth / STAGE_W))
+      }
+    }
+    fitNow()
+    const ro = new ResizeObserver(fitNow)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [fit])
   const k = Math.min(2, Math.max(0.5, scale * (window.devicePixelRatio || 1)))
   const kq = Math.round(k * 4) / 4               // не перерисовывать ели на каждый пиксель ресайза
   const clock = useClockSource(paused)
   const ctx = useMemo(() => ({ k: kq, paused, reduced, clock }), [kq, paused, reduced, clock])
+  const cover = fit === 'cover'
   return (
-    <div className="nyl-stage-wrap" ref={wrap} style={{ aspectRatio: '16 / 9' }}>
+    <div className={cover ? 'ny-stage-cover' : 'nyl-stage-wrap'} ref={wrap} style={cover ? undefined : { aspectRatio: '16 / 9' }}>
       <div
         className={`nyl-stage${paused ? ' is-paused' : ''}${reduced ? ' is-reduced' : ''} ${className ?? ''}`}
-        style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})`, ...style }}
+        style={{ width: STAGE_W, height: STAGE_H, transform: `translate(${off.x}px, ${off.y}px) scale(${scale})`, ...style }}
       >
         <Ctx.Provider value={ctx}>{children}</Ctx.Provider>
       </div>

@@ -2,17 +2,24 @@
 // Снег — только на проекторе (isProjector), телефоны получают лишь палитру (ТЗ 8б).
 import type { ThemeKey } from '../types/quiz'
 import { NewYearScene } from './NewYearScene'
+import { NyBackdrop, NyFx } from '../ny/NyScene'
+import { isNyTheme, nyDensity } from '../ny/density'
+import { nyNavEnabled } from '../ny/config'
 
-export function ThemeLayer({ theme, isProjector, phase, children }: {
+export function ThemeLayer({ theme, isProjector, phase, plain, children }: {
   theme: ThemeKey; isProjector?: boolean
+  /** Новогодние темы: вопрос без картинок и вариантов — самый «пустой» экран. */
+  plain?: boolean
   /** Фаза игры (gameState.phase) — управляет ТОЛЬКО плотностью сцены
    *  через [data-phase] на корне .mg-scene (34-magic-environment.css),
    *  раскладку экранов не трогает. */
   phase?: string
   children: React.ReactNode
 }) {
+  const ny = isNyTheme(theme)
   return (
-    <div className={`theme-${theme}`}>
+    <div className={`theme-${theme}${ny && nyNavEnabled() ? ' ny-nav' : ''}`} data-ny-density={ny ? nyDensity(theme, phase, plain) : undefined}>
+      {ny && isProjector && <NyBackdrop theme={theme} phase={phase} plain={plain} />}
       {theme === 'classic' && isProjector && <CyberScene />}
       {theme === 'new_year' && isProjector && <>
         <NewYearScene />
@@ -21,6 +28,7 @@ export function ThemeLayer({ theme, isProjector, phase, children }: {
       </>}
       {theme === 'potter' && isProjector && <MagicScene phase={phase} />}
       {children}
+      {ny && isProjector && <NyFx theme={theme} phase={phase} plain={plain} />}
     </div>
   )
 }

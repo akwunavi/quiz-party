@@ -4,7 +4,7 @@
 // rounds/*.tsx — см. заметки состояний в states.ts). Классы gs-* — общий
 // словарь; как они выглядят и как двигаются, решает CSS концепции.
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { useCues, useStage, useTime } from '../engine/stage'
+import { useCues, useStage, useTime } from '../../../ny/engine/stage'
 import { useKit, type Density, type TransitionPhase } from './kit'
 import { useLabOptions } from './config'
 import { useGameTimer, timerAt, demoSpeed } from './timer'
