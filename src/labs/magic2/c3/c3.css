@@ -1,0 +1,222 @@
+/* ═══ CONCEPT 3 · Тёмная вода ═══
+   Ватерлиния (горизонт глади) — y≈560 в лобби, у вопросов уходит ниже, чтобы текст стоял над водой.
+   Каждый «настоящий» объект — .c3-obj: сверху сам, снизу отражение (перевёрнуто, размыто, гаснет). */
+.c3 { --ink:#ece6f4; --ink-dim:#a39cb3; --bone:#efe6d2; --brass:#c4a466; --brass-hi:#efd9a0; --brass-dk:#5f4a29; --ember:#ff8f6a; --silver:#dfe6f0;
+  --serif:'EB Garamond', Georgia, serif; --wl:620px;
+  position:absolute; inset:0; overflow:hidden; font-family:var(--serif); color:var(--ink); font-variant-numeric:lining-nums tabular-nums; background:#07060b; }
+.c3 * { box-sizing:border-box; }
+.c3.scene-lobby { --wl:560px; } .c3.scene-text { --wl:720px; } .c3.scene-dense { --wl:1000px; } .c3.scene-match { --wl:700px; }
+.c3.scene-jp { --wl:300px; } .c3.scene-scramble { --wl:620px; } .c3.scene-final { --wl:620px; }
+
+/* ── бассейн ── */
+.c3-pool { position:absolute; inset:0; }
+.c3-hall { position:absolute; left:0; right:0; top:0; height:var(--wl); transition: height 1.8s cubic-bezier(.65,.02,.2,1);
+  background: radial-gradient(ellipse 60% 90% at 50% 100%, #231b33 0%, #120e1b 45%, #07060b 100%); }
+.c3-fog { position:absolute; left:0; right:0; top:calc(var(--wl) - 90px); height:120px; transition: top 1.8s cubic-bezier(.65,.02,.2,1);
+  background: linear-gradient(180deg, transparent, rgba(180,170,210,.10) 55%, transparent); filter: blur(6px); }
+.c3-water { position:absolute; left:0; right:0; top:var(--wl); bottom:0; overflow:hidden; transition: top 1.8s cubic-bezier(.65,.02,.2,1);
+  background: linear-gradient(180deg, #120e1a 0%, #08070c 40%, #040306 100%); box-shadow: 0 -1px 0 rgba(223,230,240,.18); }
+.c3-sheen { position:absolute; inset:0; opacity:.55;
+  background: repeating-linear-gradient(180deg, rgba(223,230,240,.035) 0 1px, transparent 1px 9px),
+              radial-gradient(ellipse 40% 26% at 50% 0%, rgba(255,226,170,.10), transparent 70%); }
+/* единственное idle-движение мира: едва заметная мелкая рябь бликов на воде */
+.c3-sheen { animation: c3Shim 14s ease-in-out infinite alternate; }
+@keyframes c3Shim { from { background-position: 0 0, 0 0; } to { background-position: 0 18px, 0 0; } }
+.c3.tm-warning .c3-water { background: linear-gradient(180deg, #1e0f12 0%, #0c0708 40%, #050304 100%); transition: background 1.6s, top 1.8s; }
+.c3.tm-warning .c3-sheen { background: repeating-linear-gradient(180deg, rgba(255,143,106,.05) 0 1px, transparent 1px 9px), radial-gradient(ellipse 40% 26% at 50% 0%, rgba(255,143,106,.18), transparent 70%); }
+.c3-ring { position:absolute; left:50%; top:var(--wl); width:200px; height:40px; margin:-20px 0 0 -100px; border-radius:50%; border:2px solid rgba(223,230,240,.55);
+  animation: c3Ring 2.4s cubic-bezier(.2,.7,.2,1) .2s both; pointer-events:none; }
+@keyframes c3Ring { from { transform:scale(.2); opacity:1; } to { transform:scale(9); opacity:0; } }
+.c3-rim { position:absolute; left:-20px; right:-20px; bottom:0; height:58px;
+  background: linear-gradient(180deg, #6f5630 0, #f0dca2 8%, #d0b06e 38%, #9a7a40 72%, #4a3719 100%); box-shadow: 0 -10px 30px rgba(0,0,0,.7); }
+.c3-content { position:absolute; inset:0; }
+
+/* ── объект с отражением ── */
+.c3-obj { position:absolute; }
+.c3-mirror { position:absolute; left:0; right:0; top:100%; transform: scaleY(-1); transform-origin:50% 50%; opacity:.32; filter: blur(2.5px);
+  -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,.9), transparent 60%); mask-image: linear-gradient(0deg, rgba(0,0,0,.9), transparent 60%); pointer-events:none; }
+.c3-mirror * { animation-name: none !important; opacity:1 !important; filter:none !important; transform:none !important; }
+
+/* ── бортик (выходные данные) и клепсидра — переживают переходы ── */
+.c3-rimtext { position:absolute; left:110px; right:110px; bottom:10px; height:34px; display:flex; justify-content:space-between; align-items:center; z-index:4;
+  font-size:22px; letter-spacing:.24em; text-transform:uppercase; font-variant:small-caps; color:#20150a; font-weight:700; text-shadow:0 1px 0 rgba(255,244,210,.7);
+  opacity:0; transition: opacity 1s; }
+.c3-rimtext.on { opacity:1; }
+.c3-host { position:absolute; right:60px; top:30px; display:flex; gap:10px; z-index:5; }
+.c3-host span { font-size:17px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-dim); padding:7px 14px; border:1px solid rgba(196,164,102,.35); border-radius:3px; background:rgba(7,6,11,.6); }
+.c3-clep { position:absolute; right:84px; top:120px; width:120px; height:560px; opacity:0; transform: translateY(40px); transition: opacity 1s, transform 1.4s cubic-bezier(.65,.02,.2,1); }
+.c3-clep.on { opacity:1; transform:none; }
+.c3-clep-glass { position:absolute; left:34px; top:30px; width:52px; height:440px; border-radius:26px 26px 14px 14px; overflow:hidden;
+  background: linear-gradient(90deg, rgba(223,230,240,.06), rgba(223,230,240,.14) 30%, rgba(223,230,240,.04));
+  box-shadow: 0 0 0 4px #8a6c37, 0 0 0 6px #2b1f0f, inset 0 0 12px rgba(0,0,0,.6), 0 20px 40px rgba(0,0,0,.6); }
+.c3-clep-water { position:absolute; left:0; right:0; bottom:0; transition: height 1s linear, background 1.2s;
+  background: linear-gradient(180deg, rgba(223,230,240,.75) 0 2px, #6a7c9e 2px, #2a3450 100%); }
+.c3-clep.ph-warning .c3-clep-water { background: linear-gradient(180deg, rgba(255,210,180,.85) 0 2px, #c25a38 2px, #4a1c14 100%); }
+.c3-clep-scale span { position:absolute; left:-6px; transform: translateY(50%); font-size:18px; color:var(--brass); margin-bottom:30px; }
+.c3-clep::before, .c3-clep::after { content:''; position:absolute; left:20px; width:80px; height:24px; border-radius:6px;
+  background: linear-gradient(180deg, #e7cf91, #8a6c37 60%, #3b2c15); box-shadow: 0 6px 14px rgba(0,0,0,.6); }
+.c3-clep::before { top:14px; } .c3-clep::after { top:460px; }
+.c3-clep-num { position:absolute; left:0; right:0; top:500px; text-align:center; font-size:60px; font-weight:600; color:var(--bone); line-height:1; }
+.c3-clep.ph-warning .c3-clep-num { color:var(--ember); }
+.c3-clep.ph-zero .c3-clep-num { color:#6f6880; }
+.c3-drop { position:absolute; left:56px; top:484px; width:8px; height:12px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; background:var(--silver); opacity:0; }
+.c3-clep.ph-zero .c3-drop { animation: c3Drop 1s cubic-bezier(.5,0,.9,.4) .1s both; }
+@keyframes c3Drop { 0% { opacity:1; transform:none; } 90% { opacity:1; transform: translateY(150px); } 100% { opacity:0; transform: translateY(160px); } }
+
+/* ── всплытие слов ── */
+.c3-w { display:inline-block; animation: c3Rise 1.2s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes c3Rise { 0% { opacity:0; transform: translateY(46px); filter: blur(8px) brightness(.5); color:#7f8ba6; } 60% { opacity:1; filter: blur(1px); } 100% { opacity:1; transform:none; filter:none; color:var(--bone); } }
+
+/* ── фонари ── */
+.c3-lant { position:absolute; left:0; top:0; width:0; height:0; transition: transform 2s cubic-bezier(.65,.02,.2,1); }
+.c3-lant-body { position:absolute; left:-24px; top:-62px; width:48px; height:62px; border-radius:6px 6px 10px 10px;
+  background: linear-gradient(90deg, #3b2c15, #c4a466 30%, #efd9a0 50%, #8a6c37 75%, #2b1f0f); padding:8px 7px 12px; }
+.c3-lant-body::before { content:''; position:absolute; left:14px; top:-12px; width:20px; height:12px; border:3px solid #a88a4f; border-bottom:0; border-radius:12px 12px 0 0; }
+.c3-lant-body i { display:block; width:100%; height:100%; border-radius:4px;
+  background: radial-gradient(ellipse 50% 60% at 50% 60%, #fffbe8 0 18%, var(--fl) 45%, color-mix(in srgb, var(--fl) 40%, #1a0f05) 100%); box-shadow: 0 0 14px var(--fl); }
+.c3-lant-glow { position:absolute; left:-80px; top:-4px; width:160px; height:44px; border-radius:50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--fl) 55%, transparent), transparent 70%); filter: blur(4px); opacity:.8; }
+.c3-lant::after { content:''; position:absolute; left:-18px; top:6px; width:36px; height:54px; border-radius:6px; transform: scaleY(-.9); transform-origin:50% 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--fl) 60%, transparent), transparent); filter: blur(5px); opacity:.55; }
+.c3-lant-name { position:absolute; left:0; top:22px; transform:translateX(-50%); width:250px; text-align:center; font-size:25px; line-height:1.08; color:var(--bone); text-shadow:0 2px 10px #000; }
+.c3-lant-name em { display:block; font-size:17px; color:var(--ink-dim); }
+.c3-lant.off .c3-lant-body { transform: rotate(-9deg); filter: saturate(.3) brightness(.7); }
+.c3-lant.off .c3-lant-body i { background: radial-gradient(ellipse at 50% 60%, #3a3340, #17131c); box-shadow:none; }
+.c3-lant.off .c3-lant-glow, .c3-lant.off::after { opacity:0; }
+.c3-lant.off .c3-lant-name { color:var(--ink-dim); font-style:italic; }
+.c3-lant.launch { animation: c3Launch 1.8s cubic-bezier(.3,1.2,.4,1) both; }
+@keyframes c3Launch { 0% { opacity:0; margin-top:-70px; } 40% { opacity:1; margin-top:8px; } 70% { margin-top:-4px; } 100% { margin-top:0; } }
+.c3-launch-ring { position:absolute; width:160px; height:40px; margin-left:-0px; border-radius:50%; border:2px solid rgba(255,226,170,.6); animation: c3Ring 2s ease-out .6s both; }
+.c3-fleet .c3-lant { opacity:.85; }
+.c3-fleet.gather .c3-lant { opacity:1; }
+
+/* ── 01 лобби ── */
+.c3-logo { left:0; right:0; top:170px; text-align:center; }
+.c3-logo h1 { margin:0; font-size:190px; line-height:1; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--bone); animation: c3RiseBig 2.4s cubic-bezier(.2,.7,.2,1) both; }
+.c3-logo .c3-mirror { top:calc(100% - 26px); }
+@keyframes c3RiseBig { 0% { opacity:0; transform: translateY(80px); filter: blur(14px); } 100% { opacity:1; transform:none; filter:none; } }
+.c3-q { font-family:'UnifrakturMaguntia', var(--serif); text-transform:none; color:var(--brass-hi); font-size:1.18em; }
+.c3-plinth { position:absolute; left:110px; top:560px; width:300px; padding:26px 26px 18px; text-align:center;
+  background: linear-gradient(180deg, #e7cf91, #a88a4f 8%, #6f5630 40%, #2f2312); border-radius:4px; box-shadow: 0 30px 50px rgba(0,0,0,.7); }
+.c3-plinth .m2-qr { margin:0 auto; box-shadow: 0 0 0 1px #2b1f0f; }
+.c3-plinth > span { display:block; margin-top:12px; font-size:20px; line-height:1.15; color:#fff3d6; font-style:italic; }
+.c3-count { position:absolute; left:0; right:0; top:470px; text-align:center; font-size:26px; letter-spacing:.32em; text-transform:uppercase; color:var(--brass); }
+.c3-count b { color:var(--brass-hi); font-size:32px; }
+
+/* ── 02 текст: над водой, с отражением; никакого стекла ── */
+.c3-qtext { left:260px; right:260px; top:300px; height:400px; display:flex; flex-direction:column; justify-content:flex-end; }
+.c3-qtext .c3-real { display:flex; align-items:flex-end; justify-content:center; height:400px; }
+.c3-qtext p { margin:0; text-align:center; font-size:72px; line-height:1.16; font-weight:500; text-wrap:balance; color:var(--bone); }
+.c3-qtext .c3-mirror { height:400px; top:400px; }
+.c3-textq.tm-zero .c3-qtext p { color:#8d86a0; transition: color 1s; }
+
+/* ── 03 плотный: картины стоят на воде, отражения короткие (декор отступает) ── */
+.c3-dtext { position:absolute; left:160px; right:260px; top:110px; margin:0; font-size:46px; line-height:1.18; font-weight:500; text-wrap:balance; color:var(--bone); }
+.c3-frames { position:absolute; left:160px; right:260px; top:250px; height:420px; }
+.c3-frame { top:0; width:640px; height:420px; animation: c3Up 1s cubic-bezier(.2,.7,.2,1) both; }
+.c3-frame:nth-child(1) { left:0; } .c3-frame:nth-child(2) { left:860px; }
+.c3-frame .c3-real, .c3-frame .c3-mirror { height:420px; }
+.c3-frame .c3-mirror { opacity:.18; }
+.c3-frame-in { position:relative; width:100%; height:100%; padding:12px; background:#0d0a12; box-shadow: 0 0 0 2px #8a6c37, 0 0 0 4px #1b140a; }
+.c3-frame-in span { position:absolute; right:22px; bottom:20px; background:#efe3c6; color:#2b1d14; font-size:22px; padding:0 10px; }
+@keyframes c3Up { from { opacity:0; transform: translateY(50px); } to { opacity:1; transform:none; } }
+.c3-opts { position:absolute; left:160px; right:260px; top:770px; display:grid; grid-template-columns:1fr 1fr; gap:18px 70px; }
+.c3-opt { display:flex; align-items:center; gap:22px; padding:6px 0 12px; font-size:44px; font-weight:500; color:var(--bone); border-bottom:1px solid rgba(223,230,240,.22); animation: c3Up .8s ease-out both; }
+.c3-opt b { width:60px; height:60px; display:grid; place-items:center; border-radius:50%; font-size:32px; color:#20160a; flex:0 0 auto;
+  background: radial-gradient(circle at 35% 30%, #fff3d0, #c4a466 60%, #6f5630); box-shadow: 0 4px 10px rgba(0,0,0,.6); }
+.c3-dense.tm-warning .c3-opt { border-bottom-color: rgba(255,143,106,.45); transition: border-color 1s; }
+
+/* ── 04 сопоставление: подписи — листья на воде, течение сносит их под картинки ── */
+.c3-recall { position:absolute; left:200px; right:200px; top:130px; margin:0; text-align:center; font-size:38px; font-style:italic; color:var(--ink-dim); }
+.c3-mframe { top:240px; width:280px; height:320px; }
+.c3-mframe .c3-real, .c3-mframe .c3-mirror { height:320px; }
+.c3-mnum { position:absolute; left:50%; top:-26px; margin-left:-26px; width:52px; height:52px; display:grid; place-items:center; border-radius:50%; font-size:28px; color:#20160a;
+  background: radial-gradient(circle at 35% 30%, #fff3d0, #c4a466 60%, #6f5630); }
+.c3-currents { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.c3-currents path { fill:none; stroke:rgba(223,230,240,.5); stroke-width:2; stroke-dasharray:4 10; animation: c3Flow 2.2s linear both; }
+@keyframes c3Flow { from { stroke-dashoffset:120; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } to { stroke-dashoffset:0; opacity:0; } }
+.c3-leaf { position:absolute; left:0; top:740px; width:300px; height:84px; display:flex; align-items:center; justify-content:center; gap:16px;
+  font-size:42px; font-weight:500; color:var(--bone); transition: transform 1.6s cubic-bezier(.45,.05,.3,1);
+  background: radial-gradient(ellipse 50% 50% at 50% 60%, rgba(223,230,240,.10), transparent 72%); }
+.c3-leaf b { font-size:26px; width:46px; height:46px; display:grid; place-items:center; border-radius:50%; border:1.5px solid var(--brass); color:var(--brass-hi); }
+.c3-match.solved .c3-leaf { color:#fff; text-shadow: 0 0 20px rgba(223,230,240,.55); }
+.c3-match.solved .c3-leaf b { background:var(--silver); color:#151020; border-color:var(--silver); transition: all .6s 2s; }
+.c3-pairs span { position:absolute; top:828px; width:120px; text-align:center; font-size:24px; letter-spacing:.14em; color:var(--silver); animation: c3Up .6s both; }
+.c3-tanswers { position:absolute; left:200px; right:200px; top:900px; display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:center; font-size:23px; color:var(--ink-dim); }
+.c3-tanswers span { display:inline-flex; align-items:center; gap:10px; }
+.c3-tanswers i { width:10px; height:14px; border-radius:50% 50% 40% 40%; background:var(--fl); box-shadow:0 0 10px var(--fl); }
+.c3-tanswers b { animation: c3Up .4s both; } .c3-tanswers b.ok { color:var(--silver); } .c3-tanswers b.no { color:var(--ember); }
+
+/* ── 05 своя игра: плиты лежат на дне под водой; открытая поднимается стелой ── */
+.c3-floor { position:absolute; left:200px; right:200px; top:150px; height:860px; display:grid; grid-template-columns:repeat(5, 1fr); grid-template-rows:70px repeat(5, 1fr); gap:14px 20px;
+  transform: perspective(1600px) rotateX(30deg); transform-origin: 50% 100%; transition: filter 1.4s, opacity 1.4s; }
+.c3-theme { align-self:end; text-align:center; font-size:30px; text-shadow:0 2px 10px #000; letter-spacing:.1em; text-transform:uppercase; color:var(--brass-hi); line-height:1.05; }
+.c3-theme i { display:block; font-size:19px; text-transform:none; letter-spacing:.02em; color:var(--ink-dim); }
+.c3-slab { display:grid; place-items:center; font-size:58px; font-weight:600; color:#c6d2e6; border-radius:6px;
+  background: linear-gradient(180deg, rgba(60,74,104,.55), rgba(18,22,34,.8)); box-shadow: inset 0 0 0 1px rgba(223,230,240,.18), inset 0 -10px 24px rgba(0,0,0,.6);
+  text-shadow: 0 0 18px rgba(160,190,230,.35); filter: blur(.4px); }
+.c3-slab.done { background: rgba(10,10,16,.5); box-shadow: inset 0 0 0 1px rgba(223,230,240,.05); color:transparent; text-shadow:none; }
+.c3-slab.sel { box-shadow: inset 0 0 0 2px rgba(255,236,190,.7), 0 0 30px rgba(255,226,170,.35); color:#fff3d0; }
+.c3-jp.sub-open .c3-floor, .c3-jp.sub-answer .c3-floor { filter: blur(3px) brightness(.45); }
+.c3-stele { left:430px; top:120px; width:1060px; height:640px; opacity:0; transform: translateY(520px) scaleY(.4); transform-origin:50% 100%; pointer-events:none; }
+.c3-jp.sub-open .c3-stele, .c3-jp.sub-answer .c3-stele { opacity:1; transform:none; transition: transform 1.6s cubic-bezier(.3,1.1,.4,1), opacity .5s; }
+.c3-stele .c3-real, .c3-stele .c3-mirror { height:640px; }
+.c3-stele .c3-mirror { opacity:.2; }
+.c3-stele-in { height:100%; padding:40px 56px; border-radius:6px 6px 0 0;
+  background: linear-gradient(180deg, #1f1a2c, #0f0c16 70%, #0a0810); box-shadow: inset 0 0 0 2px rgba(196,164,102,.6), inset 0 0 0 5px #0a0810, inset 0 0 0 6px rgba(196,164,102,.3), 0 40px 90px rgba(0,0,0,.8); position:relative; }
+.c3-stele-head { display:flex; justify-content:space-between; align-items:flex-start; }
+.c3-stele-head span { font-size:34px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass-hi); line-height:1.1; }
+.c3-stele-head span i { display:block; font-size:24px; letter-spacing:.02em; text-transform:none; color:var(--ink-dim); }
+.c3-stele-head b { font-size:110px; line-height:.9; font-weight:600; color:var(--bone); }
+.c3-stele-count { font-size:24px; font-style:italic; color:var(--ink-dim); margin:4px 0 18px; }
+.c3-stele ol { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.c3-stele li { display:grid; grid-template-columns:16px minmax(0,320px) minmax(0,1fr) 80px; gap:16px; align-items:baseline; font-size:28px; color:var(--bone);
+  padding-bottom:8px; border-bottom:1px solid rgba(223,230,240,.12); animation: c3Up .6s ease-out both; }
+.c3-stele li i { width:10px; height:14px; border-radius:50% 50% 40% 40%; background:var(--fl); box-shadow:0 0 10px var(--fl); align-self:center; }
+.c3-stele li em { color:var(--ink-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.c3-stele li b { text-align:right; color:var(--brass-hi); } .c3-stele li.ok b { color:var(--silver); } .c3-stele li.no b { color:var(--ember); }
+.c3-stele-answer { position:absolute; left:56px; right:56px; bottom:40px; padding-top:16px; border-top:1px solid rgba(223,230,240,.25); font-size:52px; font-weight:600; line-height:1.05; color:#fff;
+  opacity:0; transform: translateY(30px); filter: blur(10px); transition: all 1.4s cubic-bezier(.2,.7,.2,1); text-shadow: 0 0 26px rgba(223,230,240,.4); }
+.c3-stele-answer.on { opacity:1; transform:none; filter:none; }
+.c3-stele-answer span { display:block; font-size:20px; letter-spacing:.26em; text-transform:uppercase; color:var(--silver); text-shadow:none; }
+
+/* ── 06 финал ── */
+.c3-final .c3-recall { top:220px; }
+.c3-answer { left:0; right:0; top:330px; height:290px; text-align:center; }
+.c3-answer .c3-real, .c3-answer .c3-mirror { height:290px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; }
+.c3-alabel { font-size:22px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); }
+.c3-answer b { font-size:170px; line-height:1; font-weight:600; color:#fff; animation: c3RiseBig 1.8s cubic-bezier(.2,.7,.2,1) both; text-shadow: 0 0 40px rgba(223,230,240,.35); }
+.c3-still { position:absolute; left:0; right:0; top:300px; text-align:center; font-size:34px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-dim); font-style:italic; animation: c3Up 2s both; }
+.c3.sub-transition .c3-water { box-shadow: 0 -1px 0 rgba(223,230,240,.4); }
+.c3-winner { left:200px; right:200px; top:110px; height:500px; text-align:center; }
+.c3-winner .c3-real, .c3-winner .c3-mirror { height:500px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:6px; }
+.c3-winner h2 { margin:0; font-size:150px; line-height:1; font-weight:600; color:#fff; animation: c3RiseBig 2.6s cubic-bezier(.2,.7,.2,1) .4s both; text-wrap:balance; }
+.c3-winner .c3-real b { font-size:44px; color:var(--brass-hi); font-weight:500; animation: c3Up 1s 2.4s both; }
+.c3-champ { position:absolute; left:960px; top:930px; animation: c3Up 2s .8s both; }
+.c3-winner .c3-mirror { opacity:.2; }
+.c3-podium { position:absolute; top:820px; width:460px; text-align:center; font-size:38px; color:var(--bone); animation: c3Up 1s 3s both; }
+.c3-podium span { display:block; font-size:20px; letter-spacing:.26em; text-transform:uppercase; color:var(--brass); }
+.c3-podium b { display:block; font-size:28px; color:var(--brass-hi); font-weight:500; }
+.c3-podium.p2 { left:150px; } .c3-podium.p3 { right:150px; }
+.c3-results { position:absolute; left:250px; right:250px; top:70px; }
+.c3-results h2 { margin:0 0 6px; text-align:center; font-size:44px; font-weight:500; font-style:italic; color:var(--silver); }
+.c3-results table { width:100%; border-collapse:collapse; font-size:28px; }
+.c3-results th { font-size:17px; letter-spacing:.2em; text-transform:uppercase; color:var(--brass); font-weight:500; text-align:right; padding:4px 10px; border-bottom:1px solid rgba(196,164,102,.45); }
+.c3-results th:nth-child(2) { text-align:left; }
+.c3-results td { padding:6px 10px; text-align:right; color:var(--ink-dim); border-bottom:1px solid rgba(223,230,240,.08); }
+.c3-results td:first-child { color:var(--brass); width:50px; } .c3-results td:nth-child(2) { text-align:left; color:var(--bone); }
+.c3-results td:last-child { color:var(--brass-hi); font-weight:600; }
+.c3-results td i { display:inline-block; width:10px; height:14px; border-radius:50% 50% 40% 40%; background:var(--fl); box-shadow:0 0 10px var(--fl); margin-right:14px; vertical-align:middle; }
+.c3-results tr { animation: c3Up .9s cubic-bezier(.2,.7,.2,1) both; } .c3-results tr.top td:nth-child(2) { color:#fff; font-weight:600; }
+
+/* ── 07 скрэмбл: буквы на дне всплывают на свои места ── */
+.c3-scr .c3-dtext { text-align:center; left:260px; right:260px; top:150px; }
+.c3-glyph { position:absolute; left:0; top:0; width:72px; height:90px; display:grid; place-items:center; transition: transform 1.6s cubic-bezier(.3,1.05,.4,1), filter 1.2s, opacity 1.2s; }
+.c3-glyph b { font-size:72px; font-weight:600; line-height:1; color:#8fa0c0; filter: blur(2.5px); opacity:.55; transition: inherit; }
+.c3-glyph .c3-glyph-m { position:absolute; top:84px; transform: scaleY(-1); opacity:0; filter: blur(3px); }
+.c3-glyph.up b { color:var(--bone); filter:none; opacity:1; }
+.c3-glyph.up .c3-glyph-m { opacity:.28; color:var(--bone); }
+
+@media (prefers-reduced-motion: reduce) {
+  .c3 *, .c3 *::before, .c3 *::after { animation-duration:.01s !important; animation-delay:0s !important; transition-duration:.2s !important; transition-delay:0s !important; }
+}
