@@ -4,9 +4,13 @@ import gsap from 'gsap'
 import { ForestBackdrop, type Rect, type Mood } from './env'
 import { tphase } from './timers'
 
+// одна сборка таймлайна обслуживает все состояния: пустые выборки (нет такого элемента в этом
+// состоянии) — норма, а не ошибка; без этого консоль сыплет «GSAP target not found»
+gsap.config({ nullTargetWarn: false })
+
 export type Variant = 'A' | 'B' | 'C'
 export type S1Api = { tl: gsap.core.Timeline; setTimer: (n: number) => void; dispose?: () => void }
-export type S1Props = { variant: Variant; state: string; nOv: number | null; onReady: (a: S1Api) => void }
+export type S1Props = { variant: Variant; state: string; nOv: number | null; onReady: (a: S1Api) => void; /** блиц: сколько команд (3 / 5 / 8) */ teams?: number }
 
 /** Таймлайн входа в состояние + «живой» таймер внутри него (пауза/перемотка лаборатории управляют и им). */
 export function useEntrance(onReady: (a: S1Api) => void, build: (tl: gsap.core.Timeline, q: (s: string) => Element[]) => void,

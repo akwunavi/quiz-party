@@ -44,6 +44,14 @@ export const BLITZ = {
   final: [{ id: 't3', correct: 5, missed: 1 }, { id: 't1', correct: 7, missed: 1 }, { id: 't5', correct: 4, missed: 0 }, { id: 't2', correct: 3, missed: 2 }, { id: 't4', correct: 2, missed: 1 }],
 }
 
+/** Для проверки раскладки блица на 8 командах (в игре число команд любое; порядок — по кубику). */
+export const BLITZ_EXTRA: BzTeam[] = [
+  { id: 't6', name: 'Ёжики в тумане', color: tcol(28), left: 60, correct: 0, missed: 0, done: false },
+  { id: 't7', name: 'Знатоки с Лиговского проспекта', color: tcol(190), left: 60, correct: 0, missed: 0, done: false },
+  { id: 't8', name: 'Пять минут славы', color: tcol(330), left: 60, correct: 0, missed: 0, done: false },
+]
+export const BLITZ_EXTRA_FINAL = [{ id: 't6', correct: 3, missed: 0 }, { id: 't7', correct: 5, missed: 3 }, { id: 't8', correct: 1, missed: 1 }]
+
 export const REVEAL = {
   title: 'Три попытки', word: 'КОСМОС', open: [0], note: 'Ракета, астронавт, снимок «Хаббла» и Луна — всё это космос.',
   imgs: [IMG.falcon, IMG.collins, IMG.hubble, MOON],

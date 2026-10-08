@@ -15,16 +15,16 @@ import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from './stage1/Reveal3'
 import type { S1Props, Variant } from './stage1/common'
 
 type Sec = 'media' | 'sprint' | 'blitz' | 'reveal'
-type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number }
+type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** выбранная ведущим композиция — основная */ pick: Variant }
 const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
-  sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87 },
-  blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38 },
-  reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24 },
+  sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, pick: 'A' },
+  blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, pick: 'C' },
+  reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, pick: 'A' },
 }
 const SECS: [Sec, string][] = [['media', 'Вопросы с фото · утверждено'], ['sprint', 'Этап 1 · 120 секунд'], ['blitz', 'Этап 1 · Блиц'], ['reveal', 'Этап 1 · Три попытки']]
 function readMech() {
-  const m = /^#s1-(sprint|blitz|reveal)-([ABC])-(\w+?)(?:-(end|[\d.]+))?$/.exec(location.hash)
-  return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], at: m[4] ?? '' } : null
+  const m = /^#s1-(sprint|blitz|reveal)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
+  return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], teams: Number(m[4] ?? 5), at: m[5] ?? '' } : null
 }
 import { STATES, TOTAL, phaseOf, type StateId } from './content'
 
@@ -46,6 +46,7 @@ export function Lab() {
   const [sec, setSec] = useState<Sec>(im?.sec ?? 'media')
   const [mv, setMv] = useState<Variant>(im?.mv ?? 'A')
   const [ms, setMs] = useState<string>(im?.ms ?? 'active')
+  const [teams, setTeams] = useState<number>(im?.teams ?? 5)
   const secRef = useRef(sec); secRef.current = sec
   const [s, setS] = useState<StateId>(init.s)
   const [run, setRun] = useState(0)
@@ -87,7 +88,7 @@ export function Lab() {
     ;(window as unknown as { __seek: (t: number) => void }).__seek = t => { a.tl.seek(Math.min(t, a.tl.duration())).pause(); paint() }
     ;(window as unknown as { __setN: (n: number) => void }).__setN = n => { ov.current = n; paint() } // для съёмки состояний таймера
   }, [embed, paint])
-  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${sec === 'media' ? `${ver}-${v}-${s}` : `s1-${sec}-${mv}-${ms}`}`) } catch { /* превью */ } }, [ver, v, s, sec, mv, ms])
+  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${sec === 'media' ? `${ver}-${v}-${s}` : `s1-${sec}-${mv}-${ms}${sec === 'blitz' && mv === 'C' && teams !== 5 ? `-n${teams}` : ''}`}`) } catch { /* превью */ } }, [ver, v, s, sec, mv, ms, teams])
 
   const fresh = (keepAnswer = false) => { ov.current = null; setOvr(null); if (!keepAnswer) setAnswer(false); setRun(r => r + 1) } // новая сцена → играет с начала
   const showAnswer = () => { startAt.current = 'E'; setAnswer(true); fresh(true) }
@@ -95,7 +96,7 @@ export function Lab() {
   const jump = (t: number, keepPlaying = false) => { const a = api.current; if (!a) return; a.tl.seek(t); if (keepPlaying) { a.tl.play(); setPlaying(true) } else { a.tl.pause(); setPlaying(false) } paint() }
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
   const M = sec === 'media' ? null : MECHS[sec]
-  const scene = M ? <div className="c7 fr" key={`${sec}-${mv}-${ms}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} /></div>
+  const scene = M ? <div className="c7 fr" key={`${sec}-${mv}-${ms}-${teams}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} teams={teams} /></div>
     : <div className="c7 fr" key={`${ver}-${v}-${s}-${run}`}>{ver === 'old' ? <SceneV6 state={s} mode={v} onReady={onReady} /> : <Scene state={s} mode={v} answer={answer} onReady={onReady} />}</div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
@@ -106,13 +107,19 @@ export function Lab() {
       <div className="fr-pick">
         <span className="fr-cap">Раздел</span>
         <div className="m2-seg" role="group" aria-label="Раздел">
-          {SECS.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') setMs(MECHS[id].states[2].id); fresh() }}>{name}</button>)}
+          {SECS.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') { setMs(MECHS[id].states[2].id); setMv(MECHS[id].pick) } fresh() }}>{name}</button>)}
         </div>
         {M && <>
           <span className="fr-cap">Композиция</span>
           <div className="m2-seg" role="group" aria-label="Композиция">
-            {M.variants.map(x => <button key={x.id} type="button" className={x.id === mv ? 'is-on' : ''} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{x.name}</button>)}
+            {[...M.variants].sort((a, b) => Number(b.id === M.pick) - Number(a.id === M.pick)).map(x => <button key={x.id} type="button" className={`${x.id === mv ? 'is-on' : ''}${x.id === M.pick ? '' : ' fr-old'}`} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{x.id === M.pick ? `★ ${x.name} — выбрана` : `${x.name} (для сравнения)`}</button>)}
           </div>
+          {sec === 'blitz' && mv === 'C' && <>
+            <span className="fr-cap">Команд</span>
+            <div className="m2-seg" role="group" aria-label="Число команд">
+              {[3, 5, 8].map(c => <button key={c} type="button" className={c === teams ? 'is-on' : ''} aria-pressed={c === teams} onClick={() => { setTeams(c); fresh() }}>{c}</button>)}
+            </div>
+          </>}
           <span className="fr-cap">Состояние</span>
           <div className="m2-seg" role="group" aria-label="Состояние">
             {M.states.map(x => <button key={x.id} type="button" className={x.id === ms ? 'is-on' : ''} aria-pressed={x.id === ms} onClick={() => { setMs(x.id); fresh() }}>{x.name}</button>)}

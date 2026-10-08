@@ -48,11 +48,11 @@ function Frames({ idx, rs }: { idx: number[]; rs: Rect[] }) {
     </div>
   ))}</>
 }
-function Cells({ kind, review, cy, d = 110 }: { kind: 'slice' | 'pebble' | 'cap'; review: boolean; cy: number; d?: number }) {
-  const letters = REVEAL.word.split(''), gap = 22, x0 = 1060 - ((letters.length - 1) * (d + gap)) / 2
+function Cells({ kind, review, cy, d = 110, gap = 22 }: { kind: 'slice' | 'pebble' | 'cap'; review: boolean; cy: number; d?: number; gap?: number }) {
+  const letters = REVEAL.word.split(''), x0 = 1060 - ((letters.length - 1) * (d + gap)) / 2
   return <>{letters.map((ch, i) => {
     const open = review || REVEAL.open.includes(i)
-    return <div key={i} className={`rv-cell rv-${kind}${open ? ' open' : ''}`} data-i={i} style={{ left: x0 + i * (d + gap) - d / 2, top: cy - d / 2, width: d, height: d }}><span>{open ? ch : '?'}</span></div>
+    return <div key={i} className={`rv-cell rv-${kind}${open ? ' open' : ''}${REVEAL.open.includes(i) ? ' pre' : ''}`} data-i={i} style={{ left: x0 + i * (d + gap) - d / 2, top: cy - d / 2, width: d, height: d }}><i className="rv-ember" aria-hidden /><span>{open ? ch : '?'}</span></div>
   })}</>
 }
 function Answers({ cls }: { cls: string }) {
@@ -87,7 +87,19 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
       .fromTo(q('.rv-ph.used.just'), { rotation: 0, y: 0, opacity: 1 }, { rotation: variant === 'B' ? 24 : 0, y: variant === 'B' ? 30 : 0, opacity: 0.75, duration: 0.9, ease: 'power2.in' }, 0.2)
     if (variant === 'C') tl.fromTo(q('.rvC-sprout .grow'), { scaleY: 0.6, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.6)' }, 0.5)
     if (state === 'over') tl.fromTo(q('.rv-over'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.6)' }, 0.5)
-    if (review) {
+        .fromTo(q('.rvA-ph.used .rvA-ph-bud'), { rotation: 0 }, { rotation: 14, duration: 0.8, stagger: 0.1, ease: 'power2.in' }, 0.3)
+    if (review && variant === 'A') {
+      // разбор: по лозе под словом бежит свет, спилы по одному переворачиваются — буква выжжена
+      // в древесине и тлеет угольком; на рамах картинок распускаются цветы
+      tl.fromTo(q('.rvA-vine-light'), { strokeDashoffset: 1200 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power1.inOut' }, 0.8)
+        .fromTo(q('.rv-cell:not(.pre)'), { rotationY: -90 }, { rotationY: 0, duration: 0.6, stagger: 0.18, ease: 'back.out(1.4)', transformPerspective: 600 }, 1.0)
+        .fromTo(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.25, duration: 0.35, stagger: 0.18, ease: 'power2.out' }, 1.3)
+        .to(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 1.6, duration: 0.6, stagger: 0.18 }, 1.65)
+        .fromTo(q('.rvA-bloom'), { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, stagger: 0.12, ease: 'back.out(2)' }, 2.1)
+        .fromTo(q('.rv-word-glow'), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 2.2)
+        .fromTo(q('.rv-note'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 2.5)
+        .fromTo(q('.rv-ans'), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, 2.8)
+    } else if (review) {
       tl.fromTo(q('.rv-cell span'), { rotationY: 90 }, { rotationY: 0, duration: 0.45, stagger: 0.12, ease: 'back.out(1.6)' }, 1.0)
         .fromTo(q('.rv-word-glow'), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 1.8)
         .fromTo(q('.rv-note'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 2.2)
@@ -104,23 +116,50 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
     </S1Screen>
   )
 
-  // ── A: три бутона (продолжение утверждённой раскладки)
+  // ── A: три бутона (выбранная) — снизу одна «полоса земли»: слева одуванчик-время,
+  //    в центре слово на спилах, справа стебель фаз; картинки над ней — всегда в одной и той же рамке
+  //    (одна высота для всех фаз: при смене фазы ничего не прыгает)
   if (variant === 'A') {
-    const rs = review ? frames(idx, 40, 300, 1060, 1500, 34) : frames(idx, 58, state === 'p1' ? 560 : 600, 1060, 1500, 56)
+    const rs = review ? frames(idx, 40, 300, 1060, 1500, 34) : frames(idx, 40, 560, 1060, 1500, 56)
     const cy = review ? 470 : 790
+    const exhausted = state === 'over'
+    const word = REVEAL.word.length, d = 116, gap = 24, wx0 = 1060 - ((word - 1) * (d + gap)) / 2 - d / 2 - 30, ww = word * d + (word - 1) * gap + 60
+    const ptsWord = (p: string) => (p === '1' ? 'балл' : 'балла')
     return (
-      <S1Screen rects={[...rs, { x: 640, y: cy - 70, w: 840, h: 150 }]} n={showTimer ? n : null} rootRef={root} cls="rv rvA">
+      <S1Screen rects={[...rs, { x: wx0, y: cy - 80, w: ww, h: 170 }]} n={showTimer ? n : null} rootRef={root} cls={`rv rvA st-${state}`}>
         {(state === 'p2' || state === 'p3') && <div className="rv-ghost" />}
         <Frames idx={idx} rs={rs} />
-        {!review && state !== 'over' && <div className="rv-phase-cap">Фаза {ph + 1} из 3 · {REVEAL.phases[ph].pts} {ph === 0 ? 'балла' : 'балл' + (ph === 1 ? '' : 'а')}</div>}
-        <Cells kind="slice" review={review} cy={cy} />
+        {review && rs.map((r, k) => <span key={k} className="rvA-bloom" style={{ left: r.x + r.w - 6, top: r.y - 8 }} aria-hidden><i /><i /><i /><i /><i /><b /></span>)}
+        <svg className="rvA-vine" style={{ left: wx0, top: cy + d / 2 - 6, width: ww }} viewBox={`0 0 ${ww} 40`} preserveAspectRatio="none" aria-hidden>
+          <path className="rvA-vine-s" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
+          <path className="rvA-vine-light" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
+        </svg>
+        <Cells kind="slice" review={review} cy={cy} d={d} gap={gap} />
         {review && <><i className="rv-word-glow" style={{ top: cy - 90 }} /><div className="rv-note">{REVEAL.note}</div><Answers cls="rvA-ans" /></>}
-        <div className="rvA-stem">
-          <svg viewBox="0 0 330 160"><path d="M 10 120 C 90 100 200 130 320 104" /></svg>
-          {phases.map((p, i) => <div key={i} className={`rv-ph rvA-bud ${p.cls}${p.just ? ' just' : ''}`} style={{ left: 40 + i * 110 }}><i /><b>{p.pts}</b><span>фаза {p.n}</span></div>)}
-        </div>
-        {showTimer && <div className="rv-tm rvA-tm"><Dandelion n={n} total={REVEAL.phases[ph].sec} size={230} seeds={REVEAL.phases[ph].sec} /></div>}
-        {state === 'over' && <div className="rv-over">Время вышло — разбор</div>}
+        {!review && (
+          <div className={`rvA-phases${exhausted ? ' done' : ''}`} aria-label={exhausted ? 'Попытки исчерпаны' : `Фаза ${ph + 1} из 3`}>
+            <div className="rvA-ph-head">{exhausted ? 'Все три фазы позади' : <>Фаза <b>{ph + 1}</b> из 3</>}</div>
+            <svg className="rvA-ph-stem" viewBox="0 0 60 400" preserveAspectRatio="none" aria-hidden><path d="M 30 400 C 22 320 40 250 30 180 C 22 120 38 70 30 10" /></svg>
+            {phases.map((p, i) => {
+              const cls = exhausted ? 'used' : p.cls
+              return (
+                <div key={i} className={`rv-ph rvA-ph ${cls}${p.just ? ' just' : ''}`} style={{ top: 70 + i * 116 }}>
+                  <span className="rvA-ph-bud" aria-hidden>
+                    <svg viewBox="-50 -50 100 100">
+                      <path className="lf" d="M 0 30 C -26 26 -34 8 -30 -2 C -16 0 -6 12 0 30 Z" /><path className="lf" d="M 0 30 C 26 26 34 8 30 -2 C 16 0 6 12 0 30 Z" />
+                      {cls === 'cur' ? <g className="fl">{Array.from({ length: 8 }, (_, j) => <ellipse key={j} cx="0" cy="-22" rx="10" ry="20" transform={`rotate(${j * 45})`} />)}<circle r="10" className="c" /></g>
+                        : cls === 'used' ? <g className="wl"><path d="M 0 18 C -12 10 -14 -10 -4 -24 C 2 -14 6 -2 4 18 Z" /><path d="M 2 18 C 14 8 12 -8 6 -18" /></g>
+                          : <g className="bd"><path d="M 0 22 C -16 14 -16 -12 0 -26 C 16 -12 16 14 0 22 Z" /><path className="sep" d="M 0 22 C -8 10 -8 -6 0 -16" /></g>}
+                    </svg>
+                  </span>
+                  <span className="rvA-ph-t"><b>{p.pts} {ptsWord(p.pts)}</b><small>{cls === 'cur' ? `сейчас · ${p.sec} с` : cls === 'used' ? 'прошла' : `фаза ${p.n} · ${p.sec} с`}</small></span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+        {showTimer && <div className="rv-tm rvA-tm"><Dandelion n={n} total={REVEAL.phases[ph].sec} size={230} seeds={REVEAL.phases[ph].sec} rooted={150} /></div>}
+        {state === 'over' && <div className="rv-over rvA-over">Попытки исчерпаны — разбор</div>}
       </S1Screen>
     )
   }
