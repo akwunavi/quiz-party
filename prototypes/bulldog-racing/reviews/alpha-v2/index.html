@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bulldog RUN alpha v2 · review</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#18352e;color:#f8ead0;font:16px/1.45 system-ui,sans-serif}main{max-width:1460px;margin:auto;padding:24px}h1{font-size:27px;margin:0 0 8px}h2{font-size:19px;margin:0 0 9px}p{margin:8px 0 16px}.muted{color:#c8d5c0}button,a{font:inherit}button,.download{border:0;border-radius:7px;background:#dfc18f;color:#17372f;padding:9px 13px;cursor:pointer;text-decoration:none;display:inline-block}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 24px}.toolbar button[aria-pressed=true]{background:#9ccd77}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}.card{background:#23453b;border:1px solid #68806b;border-radius:12px;padding:13px;min-width:0}.stage{width:100%;aspect-ratio:1276/720;overflow:hidden;border-radius:7px;background:white}.stage video{width:100%;height:100%;display:block;object-fit:contain}.white{background:#fff}.black{background:#000}.green{background:#35dc4d}.track{background:linear-gradient(180deg,#d4c49d 0%,#c5b78e 46%,#9bad78 100%)}.card .download{margin:8px 0 2px;font-size:14px}.comparison{width:100%;max-width:1100px;height:auto;border-radius:8px}.checks{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px}.checks img{width:min(100%,340px);height:auto;border-radius:5px}footer{padding:24px 0;color:#bbccbc}
+</style>
+<main>
+  <h1>Bulldog RUN · проверка прозрачности v2</h1>
+  <p class="muted">№3: исправлены остатки студийной стойки и два дефекта глаза. №5: новый Kling RUN, кадры 41–121 исходного ролика. Видео не зациклены. Сравнение №3 и проверка №5 доступны ниже.</p>
+  <div class="toolbar" id="controls">
+    <button id="play">▶ Play all</button><button id="pause">Пауза</button><button id="restart">С начала</button>
+    <button data-bg="white" aria-pressed="true">Белый</button><button data-bg="black" aria-pressed="false">Чёрный</button><button data-bg="green" aria-pressed="false">Зелёный</button><button data-bg="track" aria-pressed="false">Трасса</button>
+  </div>
+  <div class="cards">
+    <section class="card"><h2>№3 · до исправления</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_03_run_alpha_v1.webm"></video></div><a class="download" href="bulldog_03_run_alpha_v1.webm" download>Скачать старую версию</a></section>
+    <section class="card"><h2>№3 · исправленный v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_03_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_03_run_alpha_v2.webm" download>Скачать №3 v2</a> <a class="download" href="bulldog_03_alpha_masks_v2.tar.gz" download>Маски №3</a></section>
+    <section class="card"><h2>№5 · новый RUN v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_05_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_05_run_alpha_v2.webm" download>Скачать №5 v2</a> <a class="download" href="bulldog_05_alpha_masks_v2.tar.gz" download>Маски №5</a></section>
+  </div>
+  <h2 style="margin-top:30px">№3 · до / после</h2>
+  <p class="muted">Глаз, студийная стойка и исходная тень. В каждой строке один и тот же исходный кадр: слева предыдущая маска, справа новая.</p>
+  <img class="comparison" src="dog3-before-after.jpg" alt="Сравнение кадра №3 до и после удаления стойки">
+  <h2 style="margin-top:30px">Контрольные кадры №3 и №5</h2>
+  <p class="muted">Белый, чёрный, ярко-зелёный и тёплый бежево-зелёный фоны доступны в переключателе для непрерывного просмотра.</p>
+  <div class="checks"><a href="dog3-review.jpg"><img src="dog3-review.jpg" alt="№3 на четырёх фонах"></a><a href="dog5-review.jpg"><img src="dog5-review.jpg" alt="№5 на четырёх фонах"></a></div>
+  <footer><a class="download" href="report.md">Метод и результаты проверки</a></footer>
+</main>
+<script>
+  const videos=[...document.querySelectorAll('video')];
+  document.querySelector('#play').onclick=()=>videos.forEach(v=>v.play());
+  document.querySelector('#pause').onclick=()=>videos.forEach(v=>v.pause());
+  document.querySelector('#restart').onclick=()=>{videos.forEach(v=>{v.currentTime=0;v.play()})};
+  document.querySelectorAll('[data-bg]').forEach(button=>button.onclick=()=>{
+    document.querySelectorAll('.stage').forEach(stage=>stage.className='stage '+button.dataset.bg);
+    document.querySelectorAll('[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));
+  });
+</script>
+</html>
