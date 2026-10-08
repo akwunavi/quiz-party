@@ -44,8 +44,10 @@ const pick = <T,>(r: () => number, a: T[]) => a[Math.floor(r() * a.length)]
 
 /** Один лист: миндалина с прожилкой. */
 function leaf(x: CanvasRenderingContext2D, px: number, py: number, len: number, ang: number, col: string, look: Look, vein = true) {
+  // три формы листа по зерну размера: узкий ивовый, миндалевидный, округлый — лес не из одинаковых штампов
+  const kind = Math.floor(len * 7.3) % 3, w = kind === 0 ? 0.22 : kind === 1 ? 0.32 : 0.46
   x.save(); x.translate(px, py); x.rotate(ang)
-  x.beginPath(); x.moveTo(0, 0); x.quadraticCurveTo(len * 0.45, -len * 0.32, len, 0); x.quadraticCurveTo(len * 0.45, len * 0.32, 0, 0)
+  x.beginPath(); x.moveTo(0, 0); x.bezierCurveTo(len * 0.25, -len * w, len * 0.7, -len * w * 0.9, len, 0); x.bezierCurveTo(len * 0.7, len * w * 0.9, len * 0.25, len * w, 0, 0)
   x.fillStyle = col; x.fill()
   if (look.ink) { x.strokeStyle = 'rgba(2,10,8,.55)'; x.lineWidth = 1; x.stroke() }
   if (vein && len > 12) { x.strokeStyle = 'rgba(255,255,255,.08)'; x.lineWidth = 0.8; x.beginPath(); x.moveTo(1, 0); x.lineTo(len * 0.85, 0); x.stroke() }

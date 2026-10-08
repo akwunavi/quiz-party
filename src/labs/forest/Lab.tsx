@@ -6,29 +6,19 @@
 // размонтировании — оболочка ничего не убивает (иначе гасила бы УЖЕ новую сцену:
 // эффекты смены ключа срабатывают после монтажа следующей сцены).
 import { useCallback, useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
 import { Stage } from '../magic2/common'
-import { Scene as Original } from '../cine7/w3'
-import { Scene, type SceneApi } from './Scene'
+import { Scene, type SceneApi, type Mode } from './Scene'
 import { STATES, TOTAL, phaseOf, type StateId } from './content'
-import type { LookId } from './paint'
 
-type Variant = 'O' | LookId
-const VARIANTS: { id: Variant; name: string; note: string }[] = [
-  { id: 'O', name: 'Оригинал', note: 'Лес из прошлой лаборатории без изменений — для сравнения. Посмотрите, как деревья среднего плана при наклоне отрываются от земли.' },
-  { id: 'A', name: 'A · Иллюстрация', note: 'Книжная иллюстрация: тонкий контур, штриховка коры, листья с прожилками, фактура бумаги, мягкий ровный свет без размытия.' },
-  { id: 'B', name: 'B · Кино', note: 'Кинокадр: дальний план не в фокусе, контровой лунный свет на стволах, сильные лучи с пылью, виньетка и плёночное зерно, медленный наезд камеры.' },
-  { id: 'C', name: 'C · Живой лес', note: 'То же место, но лес действует сильнее: деревья заметно расступаются и пружинят, крона раскрывается и впускает луну, на арке распускаются цветы, от цветов-вариантов по земле расходятся кольца света.' },
-]
-const CHAPTERS: Record<string, string> = { A: 'Лес', B: 'Лес отзывается', C: 'Растёт арка', D: 'Вопрос и цветы', E: 'Покой' }
+const CHAPTERS: Record<string, string> = { A: 'Лес', B: 'Лес прислушивается', C: 'Ветви прорастают', D: 'Открывается вопрос', E: 'Покой' }
 function readHash() {
-  const m = /^#([OABC])-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
-  return { v: (m?.[1] ?? 'B') as Variant, s: (STATES.some(x => x.id === m?.[2]) ? m![2] : 'mc') as StateId, at: m?.[3] ?? '' }
+  const m = /^#(quick|full)-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
+  return { v: (m?.[1] ?? 'quick') as Mode, s: (STATES.some(x => x.id === m?.[2]) ? m![2] : 'img1opt') as StateId, at: m?.[3] ?? '' }
 }
 
 export function Lab() {
   const init = readHash()
-  const [v, setV] = useState<Variant>(init.v)
+  const [v, setV] = useState<Mode>(init.v)
   const [s, setS] = useState<StateId>(init.s)
   const [run, setRun] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -53,10 +43,7 @@ export function Lab() {
     }
   }, [])
   const onReady = useCallback((raw: SceneApi) => {
-    let a = raw
-    // у оригинала нет пустой сцены — показываем его общий план (до события)
-    if (v === 'O' && s !== 'mc') a = { ...raw, tl: gsap.timeline({ paused: true }).add(raw.tl.tweenFromTo(0, raw.tl.labels.B ?? 3)) }
-    if (api.current && api.current.tl !== raw.tl && api.current.tl !== a.tl) api.current.tl.kill() // обёртка прошлого оригинала
+    const a = raw
     api.current = a
     setLabels(Object.entries(a.tl.labels).sort((x, y) => x[1] - y[1]))
     a.tl.eventCallback('onUpdate', () => { if (api.current === a) paint() })
@@ -67,30 +54,24 @@ export function Lab() {
     else if (!embed) { a.tl.restart(); setPlaying(true) }
     paint()
     ;(window as unknown as { __seek: (t: number) => void }).__seek = t => { a.tl.seek(Math.min(t, a.tl.duration())).pause(); paint() }
-  }, [embed, paint, v, s])
+  }, [embed, paint])
   useEffect(() => { try { history.replaceState(null, '', `${location.search}#${v}-${s}`) } catch { /* превью */ } }, [v, s])
 
   const fresh = () => { ov.current = null; setOvr(null); setRun(r => r + 1) } // новая сцена → играет с начала
   const toggle = () => { const a = api.current; if (!a) return; if (a.tl.isActive()) { a.tl.pause(); setPlaying(false) } else { if (a.tl.progress() >= 1) a.tl.restart(); else a.tl.play(); setPlaying(true) } }
   const jump = (t: number, keepPlaying = false) => { const a = api.current; if (!a) return; a.tl.seek(t); if (keepPlaying) { a.tl.play(); setPlaying(true) } else { a.tl.pause(); setPlaying(false) } paint() }
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
-  const V = VARIANTS.find(x => x.id === v)!
-  const scene = (
-    <div className={v === 'O' ? 'c7 c7-3' : 'c7 fr'} key={`${v}-${s}-${run}`}>
-      {v === 'O' ? <Original onReady={onReady} /> : <Scene look={v} state={s} onReady={onReady} />}
-      {v === 'O' && s !== 'mc' && s !== 'empty' && <div className="fr-none">В оригинале экрана с фото не было — сравнивайте A, B и C</div>}
-    </div>
-  )
+  const scene = <div className="c7 fr" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} onReady={onReady} /></div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
     <div className="m2-lab">
       <header className="m2-head">
-        <div className="m2-brand"><span className="m2-brand-q">❦</span><div><b>Зачарованный лес — доработка</b><span>Выберите вариант и экран — анимация запустится сама. Ползунок под кадром — ручная перемотка.</span></div></div>
+        <div className="m2-brand"><span className="m2-brand-q">❦</span><div><b>Зачарованный лес · Концепт C</b><span>Выберите экран — анимация запустится сама. Ползунок под кадром — ручная перемотка.</span></div></div>
       </header>
       <div className="fr-pick">
-        <span className="fr-cap">Вариант</span>
-        <div className="m2-seg" role="group" aria-label="Вариант">
-          {VARIANTS.map(x => <button key={x.id} type="button" className={x.id === v ? 'is-on' : ''} aria-pressed={x.id === v} onClick={() => { setV(x.id); fresh() }}>{x.name}</button>)}
+        <span className="fr-cap">Появление</span>
+        <div className="m2-seg" role="group" aria-label="Появление">
+          {([['quick', 'Обычный вопрос — быстро'], ['full', 'Первый вопрос раунда — лес просыпается']] as const).map(([id, name]) => <button key={id} type="button" className={id === v ? 'is-on' : ''} aria-pressed={id === v} onClick={() => { setV(id); fresh() }}>{name}</button>)}
         </div>
         <span className="fr-cap">Экран</span>
         <div className="m2-seg" role="group" aria-label="Экран">
@@ -117,13 +98,13 @@ export function Lab() {
           <span className="fr-hint">{ovr === null ? 'таймер стартует, когда появляется вопрос' : `зафиксировано: ${ovr} с (${phaseOf(ovr) === 'zero' ? 'ноль' : phaseOf(ovr) === 'warning' ? 'последние 10 секунд' : 'обычный'})`}</span>
         </div>
       </main>
-      <section className="m2-card" aria-label="О варианте">
-        <div className="m2-card-head"><h1>{V.name}</h1><p>{V.note}</p></div>
+      <section className="m2-card" aria-label="Как устроено">
+        <div className="m2-card-head"><h1>Концепт C · Живой лес</h1><p>Каждый вопрос появляется одной последовательностью: лес затихает, по ветви бежит свет, ветвь прорастает и выпускает лианы, вокруг кадра вырастает рама, листва в кадре расходится живым краем — и всё замирает. Фото не закрывает ничего: ни ветки, ни светлячки, ни затемнение.</p></div>
         <dl>
-          <div><dt>Лес отзывается</dt><dd>Ветер стихает, светлячки гаснут. Свет бежит от корней древнего дерева по мху, корням и грибам, светлячки вспыхивают вслед за волной, деревья расступаются и пружинят назад.</dd></div>
-          <div><dt>Растёт арка</dt><dd>Из земли вырастают две ветви и переплетаются аркой, листья разворачиваются вслед за ростом, светлячки садятся на арку. Для фото ветвь растёт перекладиной, на лианах повисают рамы из веток.</dd></div>
-          <div><dt>Вопрос и цветы</dt><dd>Слова появляются по одному. Цветы-варианты поднимаются из земли и раскрываются; буква — в сердцевине, подпись под цветком. Фото открываются, когда занавес листьев разлетается.</dd></div>
-          <div><dt>Таймер</dt><dd>Одуванчик у древнего дерева: каждую секунду улетает семечко. 10 секунд — семена и число янтарные. Ноль — голый стебель.</dd></div>
+          <div><dt>Обычный вопрос</dt><dd>Лес уже проснулся; до читаемого кадра около трёх секунд.</dd></div>
+          <div><dt>Первый вопрос раунда</dt><dd>Полное пробуждение: волна света по корням, деревья расступаются, крона раскрывается — потом то же появление вопроса.</dd></div>
+          <div><dt>3 попытки</dt><dd>Как в игре в фазе 1: две картинки, клетки слова (закрытые — «?», открытые — буквой), номер фазы. Текста вопроса в этой механике нет.</dd></div>
+          <div><dt>Таймер</dt><dd>Одуванчик у древнего дерева: каждую секунду улетает семечко. 10 секунд — янтарные семена и число. Ноль — голый стебель.</dd></div>
         </dl>
       </section>
     </div>
