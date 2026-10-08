@@ -5,5 +5,6 @@ import '../magic2/lab.css'
 import '../cine7/base.css'
 import '../cine7/w3.css'
 import './lab.css'
+import './stage1/stage1.css'
 
 createRoot(document.getElementById('root')!).render(<Lab />)
