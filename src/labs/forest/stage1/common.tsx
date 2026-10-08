@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ForestBackdrop, type Rect, type Mood } from './env'
 import { tphase } from './timers'
+import type { RoundIntroData } from './data'
 
 // одна сборка таймлайна обслуживает все состояния: пустые выборки (нет такого элемента в этом
 // состоянии) — норма, а не ошибка; без этого консоль сыплет «GSAP target not found»
@@ -51,22 +52,30 @@ export function S1Screen({ rects, n, children, rootRef, pulse = 0, cls = '', moo
   )
 }
 
-/** Вступление раунда — общий приём этапа 1: лес раздвигает ветви, из земли поднимается
- *  «вывеска» раунда из сплетённых побегов, правила проступают строками. У каждой механики
- *  своя эмблема (передаётся как emblem). */
-export function RoundIntro({ title, rules, emblem, num }: { title: string; rules: string; emblem: ReactNode; num: string }) {
+/** Вступление раунда — те же поля, что в игре (HostScreen, phase 'round_intro'): «Раунд N»
+ *  крупно в углу, название (строки из редактора), короткая подсказка под ним, правила — списком
+ *  01, 02… сбоку. Лес раздвигает ветви, из земли поднимается эмблема механики, правила проступают
+ *  на листьях по одному. Нет правил — заголовок по центру. */
+export function RoundIntro({ intro, emblem }: { intro: RoundIntroData; emblem: ReactNode }) {
+  const side = intro.rules.length > 0
   return (
-    <div className="s1-intro">
-      <div className="s1-intro-emb">{emblem}</div>
-      <div className="s1-intro-num">{num}</div>
-      <h1 className="s1-intro-title">{title.split('').map((ch, i) => <span key={i} className="ch">{ch === ' ' ? ' ' : ch}</span>)}</h1>
-      <p className="s1-intro-rules">{rules.split(' ').map((w, i) => <span key={i} className="w">{w} </span>)}</p>
+    <div className={`s1-intro${side ? ' side' : ''}`}>
+      <div className="s1-intro-badge"><span>Раунд</span><b>{intro.num}</b></div>
+      <div className="s1-intro-main">
+        <div className="s1-intro-emb">{emblem}</div>
+        <h1 className="s1-intro-title">{intro.titleLines.map((ln, li) => <span key={li} className="ln">{ln.split('').map((ch, i) => <span key={i} className="ch">{ch === ' ' ? '\u00a0' : ch}</span>)}</span>)}</h1>
+        <div className="s1-intro-meta">{intro.meta}</div>
+      </div>
+      {side && <ol className="s1-intro-rules">
+        {intro.rules.map((r, i) => <li key={i} className="w"><span className="idx">{String(i + 1).padStart(2, '0')}</span><span className="t">{r}</span></li>)}
+      </ol>}
     </div>
   )
 }
 export function introTl(tl: gsap.core.Timeline, q: (s: string) => Element[]) {
   tl.fromTo(q('.s1-intro-emb'), { opacity: 0, scale: 0.6, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: 'back.out(1.4)' }, 0.2)
-    .fromTo(q('.s1-intro-num'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 0.6)
+    .fromTo(q('.s1-intro-badge'), { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, 0.4)
+    .fromTo(q('.s1-intro-meta'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 1.3)
     .fromTo(q('.s1-intro-title .ch'), { opacity: 0, y: 30, rotation: -8 }, { opacity: 1, y: 0, rotation: 0, duration: 0.6, stagger: 0.04, ease: 'back.out(1.8)' }, 0.8)
-    .fromTo(q('.s1-intro-rules .w'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.03 }, 1.5)
+    .fromTo(q('.s1-intro-rules .w'), { opacity: 0, x: -24, clipPath: 'inset(0 100% 0 0 round 40px)' }, { opacity: 1, x: 0, clipPath: 'inset(0 0% 0 0 round 40px)', duration: 0.6, stagger: 0.45, ease: 'power2.out' }, 1.7)
 }

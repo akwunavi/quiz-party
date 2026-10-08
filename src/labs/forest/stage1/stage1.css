@@ -5,14 +5,23 @@
 .s1-bg { position:absolute; inset:0; width:1920px; height:1080px; }
 .s1 { --halo: 0 2px 4px rgba(2,12,10,.92), 0 0 22px rgba(2,12,10,.85); }
 
-/* ── вступление раунда */
-.s1-intro { position:absolute; left:360px; right:360px; top:190px; text-align:center; }
-.s1-intro-emb { display:flex; justify-content:center; height:260px; align-items:flex-end; }
-.s1-intro-num { margin-top:18px; font-size:34px; color:#e8d9a8; letter-spacing:.04em; text-shadow:var(--halo); }
-.s1-intro-title { margin:4px 0 18px; font-size:124px; font-weight:700; line-height:1; color:#f4fff9; text-shadow: 0 4px 10px rgba(2,12,10,.9), 0 0 40px rgba(111,242,214,.3); }
-.s1-intro-title .ch { display:inline-block; }
-.s1-intro-rules { margin:0 auto; max-width:1100px; font-size:40px; line-height:1.3; color:#d6efe6; text-shadow:var(--halo); }
-.s1-intro-rules .w { display:inline-block; white-space:pre; }
+/* ── вступление раунда: «Раунд N» в углу, эмблема механики, название, подсказка, правила на листьях */
+.s1-intro { position:absolute; inset:0; }
+.s1-intro-badge { position:absolute; left:64px; top:44px; display:grid; justify-items:start; line-height:.9; text-shadow:var(--halo); }
+.s1-intro-badge span { font-size:34px; color:#e8d9a8; letter-spacing:.04em; }
+.s1-intro-badge b { font-size:150px; color:#f4fffa; text-shadow: 0 4px 10px rgba(2,12,10,.9), 0 0 40px rgba(111,242,214,.25); }
+.s1-intro-main { position:absolute; left:360px; right:360px; top:170px; display:grid; justify-items:center; text-align:center; }
+.s1-intro.side .s1-intro-main { left:200px; right:auto; width:820px; top:200px; }
+.s1-intro-emb { display:flex; justify-content:center; height:240px; align-items:flex-end; }
+.s1-intro-title { margin:14px 0 14px; font-size:124px; font-weight:700; line-height:1.02; color:#f4fff9; text-shadow: 0 4px 10px rgba(2,12,10,.9), 0 0 40px rgba(111,242,214,.3); }
+.s1-intro.side .s1-intro-title { font-size:112px; }
+.s1-intro-title .ln { display:block; } .s1-intro-title .ch { display:inline-block; }
+.s1-intro-meta { font-size:30px; letter-spacing:.06em; color:#cfeee4; text-shadow:var(--halo); }
+.s1-intro-rules { position:absolute; left:1060px; right:80px; top:250px; margin:0; padding:0; list-style:none; display:grid; gap:22px; }
+.s1-intro-rules .w { position:relative; display:flex; gap:22px; align-items:center; padding:20px 40px 22px 26px; border-radius: 40px 110px 40px 110px / 50px 90px 50px 90px;
+  background: linear-gradient(100deg, rgba(14,50,37,.86), rgba(10,40,30,.7)); box-shadow: inset 0 1px 0 rgba(170,235,200,.16), 0 10px 22px rgba(0,0,0,.35); }
+.s1-intro-rules .idx { flex:none; width:58px; height:58px; border-radius:50%; display:grid; place-items:center; font-size:28px; font-weight:700; color:#2a1a08; background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); }
+.s1-intro-rules .t { font-size:36px; line-height:1.2; color:#f2fff9; text-shadow:var(--halo); }
 
 /* ── таймеры */
 .tm-dand, .tm-ring, .tm-vine, .tm-moon { overflow:visible; display:block; }
@@ -415,3 +424,43 @@
 .rvC-cap { margin-top:6px; text-align:center; font-size:28px; color:#e2fbf2; text-shadow:var(--halo); }
 .rvC-cap b { display:block; font-size:40px; color:#ffe2a0; }
 .rvC-over { top:742px; }
+
+/* A — разбор как в игре (ShowAnswers): вопрос → ответ → ответы команд с вердиктом */
+.spA-qnum { position:absolute; top:30px; right:56px; font-size:30px; color:#cfeee4; text-shadow:var(--halo); }
+.spA-qnum b { font-size:48px; color:#f4fffa; }
+.spA-rq { position:absolute; left:90px; width:1080px; top:150px; font-size:62px; line-height:1.14; color:#f4fff9; text-shadow:var(--halo); }
+.spA-rq .sp-n { display:inline-grid; vertical-align:middle; margin-right:22px; width:76px; height:76px; font-size:42px; }
+.spA-rq.recall { top:120px; font-size:40px; color:#d6efe6; }
+.spA-rq.recall .sp-n { width:56px; height:56px; font-size:30px; }
+.spA-rimg { position:absolute; left:220px; top:420px; height:420px; border-radius:8px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.35), 0 14px 32px rgba(0,0,0,.7); }
+.spA-rq.recall ~ .spA-fa { position:absolute; left:90px; width:1080px; top:260px; margin:0; }
+.spA-aimg { position:absolute; left:450px; top:540px; height:320px; border-radius:8px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.35), 0 14px 32px rgba(0,0,0,.7); }
+.spA-teams { position:absolute; left:1230px; width:640px; top:150px; display:grid; gap:14px; }
+.spA-th { font-size:34px; color:#e8d9a8; text-shadow:var(--halo); margin-bottom:6px; }
+.spA-th b { font-size:46px; color:#f4fffa; }
+.spA-ta { position:relative; isolation:isolate; display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto; align-items:center; padding:12px 30px 14px 40px; min-height:104px; }
+.spA-ta-leaf { position:absolute; left:0; top:0; width:100%; height:100%; z-index:-1; overflow:visible; filter: drop-shadow(0 8px 14px rgba(0,0,0,.4)); }
+.spA-ta-leaf path { fill:url(#spLeafG); fill-opacity:.9; stroke:rgba(150,230,190,.22); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.spA-ta .nm { grid-column:1; font-size:26px; font-weight:700; line-height:1.1; text-shadow:var(--halo); }
+.spA-ta .dots, .spA-ta .txt { grid-column:1; grid-row:2; font-size:38px; line-height:1.15; color:#f4fff9; text-shadow:var(--halo); }
+.spA-ta .dots { color:#7fa596; letter-spacing:.2em; }
+.spA-ta.no .txt { text-decoration: line-through 3px rgba(255,170,140,.8); color:#e6cfc6; }
+.spA-ta .mk { grid-column:2; grid-row:1 / span 2; width:62px; height:62px; border-radius:50%; display:grid; place-items:center; font-style:normal; font-size:36px; font-weight:700; }
+.spA-ta.ok .mk { color:#0d2a1c; background: radial-gradient(circle at 35% 30%, #d6ffe4, #6fd79a 60%, #2f8a5a); box-shadow: 0 0 18px rgba(140,255,190,.55); }
+.spA-ta.no .mk { color:#2a0f04; background: radial-gradient(circle at 35% 30%, #f0c3a8, #b5643f 60%, #6b3218); }
+.spA-pod.done i { opacity:1; }
+.spA-pod.cur { box-shadow: inset 0 0 0 3px #ffe2a0, 0 0 18px rgba(255,214,140,.6); }
+.spA .spA-pods { left:80px; right:auto; width:1080px; }
+.spA-fa-lbl { position:absolute; top:-34px; left:0; right:0; text-align:center; font-size:28px; color:#cfeee4; text-shadow:var(--halo); }
+
+/* блиц C — итог: на диске оставшиеся секунды, на табличке расчёт и баллы в зачёт */
+.bz-rule { max-width:1200px; font-size:28px; line-height:1.3; color:#cfeee4; text-shadow:var(--halo); }
+.bzC-plaque.fin { gap:4px; }
+.bzC-calc { display:flex; flex-wrap:wrap; justify-content:center; gap:2px 12px; font-size:21px; line-height:1.2; color:#cfeee4; text-shadow:var(--halo); }
+.bzC-calc b { color:#f4fffa; } .bzC-calc .pen b { color:#ffb79e; } .bzC-calc .sum { color:#ffe2a0; font-weight:700; }
+.bzC-score { margin-top:auto; font-size:22px; color:#e8d9a8; text-shadow:var(--halo); }
+.bzC-score b { font-size:40px; color:#ffe2a0; }
+.bzC.nmany .bzC-calc { font-size:17px; } .bzC.nmany .bzC-score { font-size:17px; } .bzC.nmany .bzC-score b { font-size:30px; }
+.bzC .bz-rank.gold { box-shadow: 0 0 0 3px #fff1c2, 0 0 24px rgba(255,214,140,.8); }
+.bzC-blossom { position:absolute; inset:0; pointer-events:none; }
+.bzC-blossom i { position:absolute; width:calc(16px * var(--sc)); height:calc(16px * var(--sc)); border-radius:50%; background: radial-gradient(circle, #f0c055 0 25%, #ffe6f0 30%, #f5b8d0 70%); box-shadow: 0 0 10px rgba(255,220,235,.6); }

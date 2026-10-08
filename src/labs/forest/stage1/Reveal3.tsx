@@ -112,7 +112,7 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
   const showTimer = state !== 'review' && state !== 'intro'
   if (state === 'intro') return (
     <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={root} cls={`rv rv${variant}`}>
-      <RoundIntro num="Раунд 4" title={REVEAL.title} rules={REVEAL.rules} emblem={<svg viewBox="0 0 220 160" width="230"><path d="M110 156 C 108 110 112 70 110 30" stroke="#4f8f6a" strokeWidth="5" fill="none" />{[[60, 70], [110, 30], [160, 70]].map(([x, y], i) => <g key={i}><path d={`M110 ${100 - i * 10} Q ${(x + 110) / 2} ${y + 30} ${x} ${y}`} stroke="#4f8f6a" strokeWidth="4" fill="none" /><ellipse cx={x} cy={y} rx="16" ry="22" fill={['#c9b6ff', '#8f78d8', '#5b4396'][i]} /></g>)}</svg>} />
+      <RoundIntro intro={REVEAL.intro} emblem={<svg viewBox="0 0 220 160" width="230"><path d="M110 156 C 108 110 112 70 110 30" stroke="#4f8f6a" strokeWidth="5" fill="none" />{[[60, 70], [110, 30], [160, 70]].map(([x, y], i) => <g key={i}><path d={`M110 ${100 - i * 10} Q ${(x + 110) / 2} ${y + 30} ${x} ${y}`} stroke="#4f8f6a" strokeWidth="4" fill="none" /><ellipse cx={x} cy={y} rx="16" ry="22" fill={['#c9b6ff', '#8f78d8', '#5b4396'][i]} /></g>)}</svg>} />
     </S1Screen>
   )
 

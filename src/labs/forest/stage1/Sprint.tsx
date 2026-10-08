@@ -6,14 +6,15 @@
 //   читаемость с дальнего ряда; время — лоза по верху, листья облетают.
 // C «Ярусы» — вопросы по два на четырёх ветвях-ярусах; время — кольцо из 12 цветков
 //   в дупле древнего дерева; разбор идёт ярусами.
-import { SPRINT, type SprintQ } from './data'
+import { SPRINT, SPRINT_TEAM_ANS, type SprintQ } from './data'
 import { Dandelion, BudRing, VineTimer } from './timers'
 import { RoundIntro, S1Screen, introTl, useEntrance, type S1Props } from './common'
 import type { Rect } from './env'
 
 export const SPRINT_STATES = [
   { id: 'intro', name: 'Вступление раунда' }, { id: 'read', name: 'Читаем вопросы (5 с)' }, { id: 'active', name: 'Идёт время' },
-  { id: 'warning', name: 'Последние 10 секунд' }, { id: 'over', name: 'Время вышло' }, { id: 'review', name: 'Разбор: ответ за ответом' }, { id: 'summary', name: 'Разбор: все ответы' },
+  { id: 'warning', name: 'Последние 10 секунд' }, { id: 'over', name: 'Время вышло' },
+  { id: 'review', name: 'Разбор: вопрос 3, ответы скрыты' }, { id: 'reveal', name: 'Разбор: ответ и ответы команд' }, { id: 'reveal7', name: 'Разбор: вопрос с картинкой' },
 ]
 export const SPRINT_VARIANTS = [
   { id: 'A', name: 'A · Поляна с одуванчиком', note: 'Две колонки вопросов висят на лианах, в центре — крупный одуванчик: 24 семени по 5 секунд. Разбор — один вопрос крупно по центру, внизу 8 семян-меток прогресса.' },
@@ -51,9 +52,11 @@ function timerFor(state: string) {
   if (state === 'warning') return { start: 9, from: 0.3, run: 6 }
   return null
 }
-const fixedN = (state: string) => (state === 'over' ? 0 : state === 'intro' || state === 'review' || state === 'summary' ? null : undefined)
+const fixedN = (state: string) => (state === 'over' ? 0 : state === 'intro' || state === 'review' || state === 'reveal' || state === 'reveal7' || state === 'summary' ? null : undefined)
 
-export function Sprint({ variant, state, nOv, onReady }: S1Props) {
+export function Sprint({ variant, state: st0, nOv, onReady }: S1Props) {
+  // B и C (для сравнения) знают только один экран разбора
+  const state = variant !== 'A' && (st0 === 'reveal' || st0 === 'reveal7') ? 'review' : st0
   const tm = timerFor(state)
   const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
     if (state === 'intro') return introTl(tl, q)
@@ -76,20 +79,26 @@ export function Sprint({ variant, state, nOv, onReady }: S1Props) {
     }
     if (state === 'warning') tl.fromTo(q('.sp-tm'), { scale: 1 }, { scale: 1.06, duration: 0.25, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 0)
     if (state === 'over') tl.fromTo(q('.sp-over'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'back.out(1.6)' }, 0.4).to(items, { opacity: 0.55, duration: 0.8 }, 0.3)
+    if (state === 'reveal' || state === 'reveal7') {
+      // показ ответа: из бутона раскрывается цветок, буквы ответа поднимаются из сердцевины;
+      // когда ответ целиком на экране — открываются ответы команд, потом вердикты (как в игре:
+      // автопроверка срабатывает после полного показа ответа)
+      tl.fromTo(q('.spA-rq'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4 }, 0)
+        .fromTo(q('.spA-ta'), { opacity: 0, scaleX: 0.3 }, { opacity: 1, scaleX: 1, duration: 0.4, stagger: 0.05, transformOrigin: '0% 50%' }, 0.1)
+        .fromTo(q('.spA-bloom'), { scale: 0, rotation: -70, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.9, ease: 'back.out(1.5)' }, 0.4)
+        .fromTo(q('.spA-fa-t .ch'), { opacity: 0, y: 26, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.035, ease: 'back.out(2)' }, 0.7)
+        .fromTo(q('.spA-aimg'), { opacity: 0, clipPath: 'circle(0% at 50% 50%)' }, { opacity: 1, clipPath: 'circle(75% at 50% 50%)', duration: 0.8 }, 1.0)
+        .fromTo(q('.spA-ta .dots'), { opacity: 1 }, { opacity: 0, duration: 0.25, stagger: 0.06 }, 1.7)
+        .fromTo(q('.spA-ta .txt'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.06 }, 1.8)
+        .fromTo(q('.spA-ta .mk'), { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.45, stagger: 0.12, ease: 'back.out(2.2)' }, 2.5)
+        .fromTo(q('.spA-ta.no .txt'), { textDecorationColor: 'rgba(255,170,140,0)' }, { textDecorationColor: 'rgba(255,170,140,.8)', duration: 0.3, stagger: 0.12 }, 2.6)
+        .fromTo(q('.spA-pod.cur i'), { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, 1.0)
+    }
     if (state === 'review') {
       if (variant === 'A') {
-        // ответ «распускается»: из бутона раскрывается золотой цветок, буквы ответа поднимаются из его
-        // сердцевины, семя-метка внизу вызревает; прошлый вопрос уносит ветром, как семечко
-        for (let k = 0; k < QS.length; k++) {
-          const at = k * 2.3, f = `.spA-focus[data-k="${k}"]`
-          tl.fromTo(q(`${f}`), { opacity: 0 }, { opacity: 1, duration: 0.01 }, at)
-            .fromTo(q(`${f} .spA-fq`), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5 }, at)
-            .fromTo(q(`${f} .spA-bloom`), { scale: 0, rotation: -70, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.9, ease: 'back.out(1.5)' }, at + 0.7)
-            .fromTo(q(`${f} .spA-fa .ch`), { opacity: 0, y: 26, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.035, ease: 'back.out(2)' }, at + 1.0)
-            .fromTo(q(`.spA-pod[data-k="${k}"]`), { scale: 1 }, { scale: 1.25, duration: 0.25, yoyo: true, repeat: 1 }, at + 1.0)
-            .fromTo(q(`.spA-pod[data-k="${k}"] i`), { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, at + 1.05)
-          if (k < QS.length - 1) tl.to(q(f), { opacity: 0, y: -40, x: 60, rotation: 3, duration: 0.45, ease: 'power2.in' }, at + 2.0)
-        }
+        // до показа ответа: вопрос как был, справа листья ответивших команд — текст скрыт
+        tl.fromTo(q('.spA-rq'), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, 0.1)
+          .fromTo(q('.spA-ta'), { opacity: 0, scaleX: 0.3 }, { opacity: 1, scaleX: 1, duration: 0.5, stagger: 0.08, ease: 'back.out(1.3)', transformOrigin: '0% 50%' }, 0.3)
       } else {
         for (let k = 0; k < REVIEW_AT; k++) {
           const at = k * 1.6
@@ -111,16 +120,16 @@ export function Sprint({ variant, state, nOv, onReady }: S1Props) {
 
   // ── A
   if (variant === 'A') {
-    const rects: Rect[] = state === 'review' ? [{ x: 360, y: 230, w: 1200, h: 560 }] : [{ x: 60, y: 110, w: 740, h: 940 }, { x: 1120, y: 110, w: 740, h: 940 }]
+    const rects: Rect[] = state === 'review' || state === 'reveal' || state === 'reveal7' ? [{ x: 80, y: 110, w: 1080, h: 820 }, { x: 1220, y: 150, w: 660, h: 780 }] : [{ x: 60, y: 110, w: 740, h: 940 }, { x: 1120, y: 110, w: 740, h: 940 }]
     const dn = n ?? 0, rooted = 237
     return (
       <S1Screen rects={state === 'intro' ? [{ x: 460, y: 300, w: 1000, h: 520 }] : rects} n={n} rootRef={root} cls="spA">
-        {state === 'intro' ? <RoundIntro num="Раунд 3" title={SPRINT.title} rules={SPRINT.rules} emblem={<Dandelion n={120} total={120} size={170} seeds={24} />} /> : <>
+        {state === 'intro' ? <RoundIntro intro={SPRINT.intro} emblem={<Dandelion n={120} total={120} size={170} seeds={24} />} /> : <>
           <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden><defs>
             <linearGradient id="spLeafG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#174a35" /><stop offset=".55" stopColor="#0f3a2a" /><stop offset="1" stopColor="#0a2c20" /></linearGradient>
           </defs></svg>
           <div className="sp-head">{SPRINT.title}</div>
-          {state !== 'review' && <>
+          {state !== 'review' && state !== 'reveal' && state !== 'reveal7' && <>
             {state !== 'summary' && <div className="spA-timer sp-tm">
               <Dandelion n={state === 'read' ? 120 : dn} total={SPRINT.total} size={330} seeds={24} rooted={rooted} hideNum={state === 'read'} />
               {state === 'read' && <><b className="spA-count">{n}</b><span className="spA-under">читаем вопросы</span></>}
@@ -136,21 +145,36 @@ export function Sprint({ variant, state, nOv, onReady }: S1Props) {
               </div>
             ))}
           </>}
-          {state === 'review' && <>
-            {QS.map((q, k) => (
-              <div key={q.n} className="spA-focus" data-k={k}>
-                <div className="spA-fq"><span className="sp-n">{q.n}</span>{q.text}</div>
-                <div className="spA-fa">
-                  <svg className="spA-bloom" viewBox="-120 -120 240 240" aria-hidden>
-                    {Array.from({ length: 12 }, (_, j) => <ellipse key={j} cx="0" cy="-62" rx="20" ry="52" transform={`rotate(${j * 30})`} className={`p${j % 2}`} />)}
-                    <circle r="30" className="core" />
-                  </svg>
-                  <span className="spA-fa-t">{q.answer.split('').map((ch, i) => <span key={i} className="ch">{ch === ' ' ? '\u00a0' : ch}</span>)}</span>
-                </div>
+          {(state === 'review' || state === 'reveal' || state === 'reveal7') && (() => {
+            const rq = QS[state === 'reveal7' ? 6 : 2], shown = state !== 'review', ans = SPRINT_TEAM_ANS[rq.n] ?? []
+            return <>
+              <div className="spA-qnum">вопрос <b>{rq.n}</b> / {QS.length}</div>
+              <div className={`spA-rq${shown ? ' recall' : ''}`}><span className="sp-n">{rq.n}</span>{rq.text}</div>
+              {!shown && rq.img && <img className="spA-rimg" src={rq.img.src} alt="" />}
+              {shown && <div className="spA-fa">
+                <span className="spA-fa-lbl">правильный ответ</span>
+                <svg className="spA-bloom" viewBox="-120 -120 240 240" aria-hidden>
+                  {Array.from({ length: 12 }, (_, j) => <ellipse key={j} cx="0" cy="-62" rx="20" ry="52" transform={`rotate(${j * 30})`} className={`p${j % 2}`} />)}
+                  <circle r="30" className="core" />
+                </svg>
+                <span className="spA-fa-t">{rq.answer.split('').map((ch, i) => <span key={i} className="ch">{ch === ' ' ? '\u00a0' : ch}</span>)}</span>
+              </div>}
+              {shown && rq.img && <img className="spA-aimg" src={rq.img.src} alt="" />}
+              <div className="spA-teams">
+                <div className="spA-th">{shown ? 'Ответы команд' : <>Ответили: <b>{ans.length}</b></>}</div>
+                {ans.map(a => (
+                  <div key={a.team} className={`spA-ta ${a.ok ? 'ok' : 'no'}`}>
+                    <svg className="spA-ta-leaf" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden><path d={LEAF} /></svg>
+                    <span className="nm" style={{ color: a.color }}>{a.team}</span>
+                    <span className="dots">• • •</span>
+                    {shown && <span className="txt">{a.text}</span>}
+                    {shown && <i className="mk" aria-label={a.ok ? 'верно' : 'неверно'}>{a.ok ? '✓' : '✗'}</i>}
+                  </div>
+                ))}
               </div>
-            ))}
-            <div className="spA-pods">{QS.map((q, k) => <span key={q.n} className="spA-pod" data-k={k}><i />{q.n}</span>)}</div>
-          </>}
+              <div className="spA-pods">{QS.map((q, k) => <span key={q.n} className={`spA-pod${q.n === rq.n ? ' cur' : ''}${q.n < rq.n ? ' done' : ''}`} data-k={k}><i />{q.n}</span>)}</div>
+            </>
+          })()}
         </>}
       </S1Screen>
     )
@@ -159,7 +183,7 @@ export function Sprint({ variant, state, nOv, onReady }: S1Props) {
   if (variant === 'B') {
     return (
       <S1Screen rects={state === 'intro' ? [{ x: 460, y: 300, w: 1000, h: 520 }] : [{ x: 170, y: 150, w: 1580, h: 860 }]} n={n} rootRef={root} cls="spB">
-        {state === 'intro' ? <RoundIntro num="Раунд 3" title={SPRINT.title} rules={SPRINT.rules} emblem={<svg viewBox="0 0 200 120" width="260"><path d="M10 70 Q100 30 190 60" stroke="#6b8f5e" strokeWidth="6" fill="none" />{Array.from({ length: 9 }, (_, i) => <path key={i} d={`M ${20 + i * 20} ${66 - i * 2} c 4 -14 18 -16 22 -4 c -8 4 -16 6 -22 4 z`} fill="#5fa77a" />)}</svg>} /> : <>
+        {state === 'intro' ? <RoundIntro intro={SPRINT.intro} emblem={<svg viewBox="0 0 200 120" width="260"><path d="M10 70 Q100 30 190 60" stroke="#6b8f5e" strokeWidth="6" fill="none" />{Array.from({ length: 9 }, (_, i) => <path key={i} d={`M ${20 + i * 20} ${66 - i * 2} c 4 -14 18 -16 22 -4 c -8 4 -16 6 -22 4 z`} fill="#5fa77a" />)}</svg>} /> : <>
           <div className="sp-head spB-head">{SPRINT.title}</div>
           <div className="spB-timer sp-tm">
             {n != null && <VineTimer n={state === 'read' ? SPRINT.total : n} total={SPRINT.total} width={1180} />}
@@ -178,7 +202,7 @@ export function Sprint({ variant, state, nOv, onReady }: S1Props) {
   const tiers = [0, 1, 2, 3]
   return (
     <S1Screen rects={state === 'intro' ? [{ x: 460, y: 300, w: 1000, h: 520 }] : [{ x: 470, y: 120, w: 1400, h: 840 }, { x: 60, y: 360, w: 340, h: 360 }]} n={n} rootRef={root} cls="spC">
-      {state === 'intro' ? <RoundIntro num="Раунд 3" title={SPRINT.title} rules={SPRINT.rules} emblem={<BudRing n={120} total={120} size={200} />} /> : <>
+      {state === 'intro' ? <RoundIntro intro={SPRINT.intro} emblem={<BudRing n={120} total={120} size={200} />} /> : <>
         <div className="sp-head spC-head">{SPRINT.title}</div>
         <div className="spC-timer sp-tm">
           {n != null && <BudRing n={state === 'read' ? 120 : n} total={SPRINT.total} size={350} />}

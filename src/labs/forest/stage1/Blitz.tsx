@@ -9,6 +9,8 @@
 // C «Деревца-часы» — у каждой команды деревце: высота кроны = оставшееся время,
 //   листья облетают; плоды на ветвях = очки; на итоге кроны вырастают по очкам.
 import { BLITZ, BLITZ_EXTRA, BLITZ_EXTRA_FINAL, type BzTeam } from './data'
+// итоги — той же чистой функцией, что проектор и пульт в игре (очки → штраф → бонус за время → места → баллы)
+import { blitzResults, type BlitzResultRow } from '../../../lib/blitz'
 import { Dandelion, tphase } from './timers'
 import { RoundIntro, S1Screen, introTl, useEntrance, type S1Props } from './common'
 
@@ -39,10 +41,15 @@ function viewOf(state: string, count = 5): View {
   if (state === 'between') { v.between = true; v.active = 't5'; v.teams = base.map(t => t.id === 't1' ? { ...t, correct: 4, left: 31 } : t) }
   if (state === 'warning') v.teams = base.map(t => t.id === 't1' ? { ...t, left: 9 } : t)
   if (state === 'timeout') { v.teams = base.map(t => t.id === 't1' ? { ...t, left: 0 } : t); v.attempts = 2 }
-  if (state === 'complete') { v.active = null; v.teams = base.map(t => { const f = FINAL.find(x => x.id === t.id)!; return { ...t, left: 0, done: true, correct: f.correct, missed: f.missed } }) }
+  if (state === 'complete') { v.active = null; v.teams = base.map(t => { const f = FINAL.find(x => x.id === t.id)!; return { ...t, left: f.left, correct: f.correct, missed: f.missed } }) }
   return v
 }
 const pts = (t: BzTeam) => t.correct - t.missed
+function resultsOf(teams: BzTeam[]): Map<string, BlitzResultRow & { timedOut: boolean; left: number }> {
+  const rows = blitzResults(teams.map(t => { const f = FINAL.find(x => x.id === t.id)!; return { teamId: t.id, correct: f.correct, missed: f.missed, timedOut: !!f.timedOut, leftMs: f.left * 1000 } }), BLITZ.timeoutPenalty)
+  return new Map(rows.map(r => { const f = FINAL.find(x => x.id === r.teamId)!; return [r.teamId, { ...r, timedOut: !!f.timedOut, left: f.left }] }))
+}
+const ballov = (n: number) => { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? 'баллов' : b === 1 ? 'балл' : b >= 2 && b <= 4 ? 'балла' : 'баллов' }
 const fmtPts = (p: number) => (p > 0 ? `+${p}` : String(p))
 
 function timerFor(state: string) {
@@ -71,7 +78,8 @@ function Center({ state, v, cls }: { state: string; v: View; cls: string }) {
       </div>
     )
   }
-  if (state === 'complete') return <div className={`bz-center ${cls}`}><div className="bz-asking">блиц окончен</div><div className="bz-qtext">Итоги раунда</div></div>
+  if (state === 'complete') return <div className={`bz-center ${cls}`}><div className="bz-asking">блиц окончен</div><div className="bz-qtext">Итоги раунда</div>
+    <div className="bz-rule">очки за ответы · у кого первым кончилось время — штраф −{BLITZ.timeoutPenalty} · за оставшиеся секунды +3 / +2 / +1 · места → баллы 10 / 7 / 5 / 3</div></div>
   if (v.between) return (
     <div className={`bz-center ${cls}`}>
       <div className="bz-asking">ответили верно!</div>
@@ -127,9 +135,12 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
     // итог: кроны отрастают заново, плоды вызревают по очкам, у таблички появляется место
     // (листья растут каждый из своей точки: GSAP крутит CSS-переменную --g, а не transform SVG-группы —
     //  трансформ вложенной в масштабированную группу <g> сдвигал крону вверх)
-    if (state === 'complete') tl.fromTo(q('.bzC-crown'), { '--g': 0 }, { '--g': 1, duration: 1.1, stagger: 0.12, ease: 'back.out(1.6)' }, 0.3)
-      .fromTo(q('.bz-fruit'), { scale: 0 }, { scale: 1, duration: 0.4, stagger: 0.03, ease: 'back.out(2.4)', transformOrigin: '50% 0%' }, 1.2)
-      .fromTo(q('.bz-rank'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.12, ease: 'back.out(2)' }, 1.6)
+    // итог: под табличками по очереди проступает расчёт (ответы → штраф/бонус за время → очки),
+    // потом вспыхивают места и баллы в зачёт; у первого места крона зацветает
+    if (state === 'complete') tl.fromTo(q('.bzC-calc > *'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.06 }, 0.5)
+      .fromTo(q('.bz-rank'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(2)' }, 1.6)
+      .fromTo(q('.bzC-score'), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(2)' }, 1.9)
+      .fromTo(q('.bzC-blossom i'), { scale: 0 }, { scale: 1, duration: 0.5, stagger: 0.03, ease: 'back.out(2.4)' }, 2.3)
   }, tm, [variant, state, tc])
   const live = state === 'question' || state === 'warning'
   const nActive = nOv ?? (live ? nLive : v.teams.find(t => t.id === BLITZ.active)?.left ?? 0)
@@ -142,7 +153,7 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
 
   if (state === 'intro') return (
     <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={root} cls={`bz bz${variant}`} moodOverride={mood}>
-      <RoundIntro num="Раунд 5" title={BLITZ.title} rules={BLITZ.rules} emblem={<svg viewBox="0 0 160 160" width="190"><circle cx="80" cy="80" r="60" fill="#4b331d" /><circle cx="80" cy="80" r="50" fill="#8a6a42" />{[40, 30, 20, 10].map(r => <circle key={r} cx="80" cy="80" r={r} fill="none" stroke="#5a3f22" strokeWidth="2" />)}<path d="M 86 20 L 64 84 L 84 84 L 70 140 L 104 66 L 84 66 Z" fill="#ffe3a0" /></svg>} />
+      <RoundIntro intro={BLITZ.intro} emblem={<svg viewBox="0 0 160 160" width="190"><circle cx="80" cy="80" r="60" fill="#4b331d" /><circle cx="80" cy="80" r="50" fill="#8a6a42" />{[40, 30, 20, 10].map(r => <circle key={r} cx="80" cy="80" r={r} fill="none" stroke="#5a3f22" strokeWidth="2" />)}<path d="M 86 20 L 64 84 L 84 84 L 70 140 L 104 66 L 84 66 Z" fill="#ffe3a0" /></svg>} />
     </S1Screen>
   )
 
@@ -197,10 +208,11 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
   // ── C: деревца-часы
   const N = v.teams.length, M0 = 60, cw = (1920 - 2 * M0) / N
   const tw = Math.min(cw - 14, 320), sc = tw / 320, th = 440 * sc
-  const plaqueH = N >= 7 ? 200 : 176, ground = 1062 - plaqueH - 10, treeTop = ground + 20 * sc - th
+  const plaqueH = state === 'complete' ? (N >= 7 ? 236 : 206) : N >= 7 ? 200 : 176, ground = 1062 - plaqueH - 10, treeTop = ground + 20 * sc - th
   const rightT = v.teams.find(t => t.id === 't1')
   const fr = rightT ? FRUITS[Math.min(Math.max(0, pts(rightT)), FRUITS.length) - 1] : undefined
   const ti = v.teams.findIndex(t => t.id === 't1')
+  const res = state === 'complete' ? resultsOf(v.teams) : null
   const fp = fr ? crownPt(fr) : null
   const spark = state === 'right' && fp && ti >= 0 ? { x: 960, y: 300, dx: M0 + cw * (ti + 0.5) - (160 - fp[0]) * sc - 960, dy: treeTop + fp[1] * sc - 300 } : null
   return (
@@ -210,10 +222,11 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
       <Center state={state} v={v} cls="bzC-center" />
       {v.teams.map((t, i) => {
         const left = leftOf(t), on = t.id === v.active
-        const k = state === 'complete' || state === 'dice' ? 1 : t.done ? 0 : Math.max(0, Math.min(1, left / BLITZ.perTeam))
-        const fruits = Math.max(0, state === 'complete' ? pts(t) : pts(t))
-        const phase = on ? ph(t) : t.done && state !== 'complete' ? 'zero' : 'normal'
-        const status = state === 'complete' ? null : on ? (phase === 'zero' ? 'время вышло' : 'отвечают') : t.done ? 'отыграли' : null
+        const r = res?.get(t.id)
+        const k = state === 'dice' ? 1 : Math.max(0, Math.min(1, left / BLITZ.perTeam))
+        const fruits = Math.max(0, pts(t))
+        const phase = on ? ph(t) : r?.timedOut ? 'zero' : 'normal'
+        const status = r ? (r.timedOut ? 'время вышло' : null) : on ? (phase === 'zero' ? 'время вышло' : 'отвечают') : null
         return (
           <div key={t.id} className={`bz-team bzC-unit${on ? ' on' : ''}${t.done && state !== 'complete' ? ' done' : ''}${i === 0 && state === 'dice' ? ' first' : ''} ph-${phase}`}
             style={{ left: M0 + cw * i, width: cw, ['--tc' as string]: t.color, ['--sc' as string]: sc }}>
@@ -221,14 +234,21 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
             <div className="bzC-treebox" style={{ top: treeTop, width: tw, height: th }}>
               <ClockTree k={k} fruits={fruits} seed={i + 1} lantern={on} newFruit={state === 'right' && t.id === 't1'} />
               {on && phase !== 'zero' && <span className="bzC-flies" aria-hidden>{Array.from({ length: 7 }, (_, j) => <i key={j} style={{ left: `${8 + j * 13}%`, top: `${12 + ((j * 37) % 60)}%`, animationDelay: `${-j * 0.6}s` }} />)}</span>}
-              <div className="bzC-disc"><b className="bz-time">{state === 'complete' ? fmtPts(pts(t)) : left}</b>{state === 'complete' && <span className="bz-rank">{place(t)}</span>}</div>
+              <div className="bzC-disc"><b className="bz-time">{left}</b>{r && <span className={`bz-rank${r.place === 1 ? ' gold' : ''}`}>{r.place}{r.shared ? '=' : ''}</span>}</div>
+              {r?.place === 1 && <span className="bzC-blossom" aria-hidden>{Array.from({ length: 9 }, (_, j) => <i key={j} style={{ left: `${18 + ((j * 37) % 64)}%`, top: `${8 + ((j * 23) % 36)}%` }} />)}</span>}
             </div>
-            <div className="bzC-plaque" style={{ top: ground + 8, height: plaqueH, width: Math.min(cw - 16, 440) }}>
+            <div className={`bzC-plaque${r ? ' fin' : ''}`} style={{ top: ground + 8, height: plaqueH, width: Math.min(cw - 16, 440) }}>
               {status && <div className="bzC-status">{on && <svg className="bz-lamp-ico" viewBox="0 0 24 34" aria-hidden><path d="M12 0 V6" /><rect x="5" y="6" width="14" height="20" rx="5" /><circle cx="12" cy="16" r="4" /></svg>}{status}</div>}
               <div className="bzC-name">{t.name}</div>
-              <div className="bzC-pts">{state === 'complete'
-                ? <span className="bz-pts">{t.correct} верно · {t.missed} мимо</span>
-                : <><i className="bzC-fruit-ico" aria-hidden /><span className="bz-pts">{fmtPts(pts(t))}</span><small>{ochk(pts(t))}</small></>}</div>
+              {r ? <>
+                <div className="bzC-calc">
+                  <span>ответы <b>{fmtPts(r.raw)}</b></span>
+                  {r.timedOut ? <span className="pen">штраф <b>−{BLITZ.timeoutPenalty}</b></span>
+                    : <span>{r.left} с → <b>{r.bonus ? `+${r.bonus}` : '0'}</b></span>}
+                  <span className="sum">= {r.points} {ochk(r.points)}</span>
+                </div>
+                <div className="bzC-score"><b>+{r.score}</b> {ballov(r.score)} в зачёт</div>
+              </> : <div className="bzC-pts"><i className="bzC-fruit-ico" aria-hidden /><span className="bz-pts">{fmtPts(pts(t))}</span><small>{ochk(pts(t))}</small></div>}
             </div>
           </div>
         )

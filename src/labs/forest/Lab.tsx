@@ -13,17 +13,21 @@ import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from './stage1/Sprint'
 import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from './stage1/Blitz'
 import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from './stage1/Reveal3'
 import type { S1Props, Variant } from './stage1/common'
+import { Jeopardy, JP_STATES, JP_VARIANTS } from './stage2/Jeopardy'
+import { Melody, MEL_STATES, MEL_VARIANTS } from './stage2/Melody'
 
-type Sec = 'media' | 'sprint' | 'blitz' | 'reveal'
-type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** выбранная ведущим композиция — основная */ pick: Variant }
+type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel'
+type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** выбранная ведущим композиция — основная (нет — ещё не выбрана) */ pick?: Variant }
 const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, pick: 'A' },
   blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, pick: 'C' },
   reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, pick: 'A' },
+  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24 },
+  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24 },
 }
-const SECS: [Sec, string][] = [['media', 'Вопросы с фото · утверждено'], ['sprint', 'Этап 1 · 120 секунд'], ['blitz', 'Этап 1 · Блиц'], ['reveal', 'Этап 1 · Три попытки']]
+const SECS: [Sec, string][] = [['media', 'Вопросы с фото · утверждено'], ['sprint', 'Этап 1 · 120 секунд'], ['blitz', 'Этап 1 · Блиц'], ['reveal', 'Этап 1 · Три попытки'], ['jp', 'Этап 2 · Своя игра'], ['mel', 'Этап 2 · Угадай мелодию']]
 function readMech() {
-  const m = /^#s1-(sprint|blitz|reveal)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
+  const m = /^#s1-(sprint|blitz|reveal|jp|mel)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
   return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], teams: Number(m[4] ?? 5), at: m[5] ?? '' } : null
 }
 import { STATES, TOTAL, phaseOf, type StateId } from './content'
@@ -107,12 +111,12 @@ export function Lab() {
       <div className="fr-pick">
         <span className="fr-cap">Раздел</span>
         <div className="m2-seg" role="group" aria-label="Раздел">
-          {SECS.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') { setMs(MECHS[id].states[2].id); setMv(MECHS[id].pick) } fresh() }}>{name}</button>)}
+          {SECS.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') { setMs(MECHS[id].states[id === 'jp' || id === 'mel' ? 0 : 2].id); setMv(MECHS[id].pick ?? 'A') } fresh() }}>{name}</button>)}
         </div>
         {M && <>
           <span className="fr-cap">Композиция</span>
           <div className="m2-seg" role="group" aria-label="Композиция">
-            {[...M.variants].sort((a, b) => Number(b.id === M.pick) - Number(a.id === M.pick)).map(x => <button key={x.id} type="button" className={`${x.id === mv ? 'is-on' : ''}${x.id === M.pick ? '' : ' fr-old'}`} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{x.id === M.pick ? `★ ${x.name} — выбрана` : `${x.name} (для сравнения)`}</button>)}
+            {[...M.variants].sort((a, b) => Number(b.id === M.pick) - Number(a.id === M.pick)).map(x => <button key={x.id} type="button" className={`${x.id === mv ? 'is-on' : ''}${!M.pick || x.id === M.pick ? '' : ' fr-old'}`} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{!M.pick ? x.name : x.id === M.pick ? `★ ${x.name} — выбрана` : `${x.name} (для сравнения)`}</button>)}
           </div>
           {sec === 'blitz' && mv === 'C' && <>
             <span className="fr-cap">Команд</span>

@@ -6,5 +6,6 @@ import '../cine7/base.css'
 import '../cine7/w3.css'
 import './lab.css'
 import './stage1/stage1.css'
+import './stage2/stage2.css'
 
 createRoot(document.getElementById('root')!).render(<Lab />)
