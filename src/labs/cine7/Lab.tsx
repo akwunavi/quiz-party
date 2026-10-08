@@ -44,7 +44,8 @@ export function Lab() {
     paintTimer()
     ;(window as unknown as { __seek: (t: number | string) => void }).__seek = t => { a.tl.seek(t as number).pause(); paintTimer() }
   }, [embed, paintTimer])
-  useEffect(() => () => { api.current?.dispose?.(); api.current?.tl.kill() }, [wi, run])
+  // убирать таймлайн здесь НЕЛЬЗЯ: эффект смены ключа срабатывает уже после монтажа
+  // новой сцены и гасил бы её (кнопки «Сначала»/смена мира замораживали кадр). Сцена убирает себя сама.
   useEffect(() => { try { history.replaceState(null, '', `${location.search}#w${wi + 1}`) } catch { /* превью */ } }, [wi])
 
   const replay = () => { ov.current = null; setOverride(null); setRun(r => r + 1) }
