@@ -26,12 +26,12 @@ export const STD_VARIANTS = [
   { id: 'A', name: 'Обычные вопросы и разборы', note: 'Вопрос только текстом — в живой раме из ветвей, листва расходится и открывает текст. Разборы (у каждого типа вопроса своё превращение): открытый ответ прорастает по лозе буква за буквой и заканчивается цветком; у вариантов неверные цветы закрываются и никнут, верный раскрывается золотом; у вопроса по фото рама зацветает; у фото-вариантов неверные снимки зарастают листвой. Справа — «Ответы команд»: до показа «• • •», затем текст, затем ✓ / ✗ (команда без ответа — «—»).' },
 ]
 
-type FS = { grow: number[]; reveal: number[]; bloom: number[]; pulse: number }
+export type FS = { grow: number[]; reveal: number[]; bloom: number[]; pulse: number }
 const LEAF = 'M 0 50 C 2 12 28 1 60 2 C 82 3 94 22 100 50 C 94 78 82 97 60 98 C 28 99 2 88 0 50 Z'
 const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 /** Рамы из ветвей (утверждённая техника Концепта C) на холсте под содержимым */
-function FrameLayer({ rects, srcs, fs, panel }: { rects: FRect[]; srcs: string[]; fs: FS; panel?: number }) {
+export function FrameLayer({ rects, srcs, fs, panel }: { rects: FRect[]; srcs: string[]; fs: FS; panel?: number }) {
   const cv = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const ctx = cv.current!.getContext('2d')!, draw0 = makeFrames({ rects, srcs, panel }, 40)
@@ -40,7 +40,7 @@ function FrameLayer({ rects, srcs, fs, panel }: { rects: FRect[]; srcs: string[]
   }, [rects, srcs, fs, panel])
   return <canvas ref={cv} className="s4-cv" width={1920} height={1080} aria-hidden />
 }
-function fitRect(im: { w: number; h: number }, cx: number, y: number, maxW: number, maxH: number): FRect {
+export function fitRect(im: { w: number; h: number }, cx: number, y: number, maxW: number, maxH: number): FRect {
   const k = Math.min(maxW / im.w, maxH / im.h), w = Math.round(im.w * k), h = Math.round(im.h * k)
   return { x: Math.round(cx - w / 2), y, w, h }
 }
