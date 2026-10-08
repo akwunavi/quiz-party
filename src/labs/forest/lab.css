@@ -1,0 +1,24 @@
+/* Forest Refinement Lab: оформление сцены A/B/C (оригинал — свои стили w3.css). */
+.fr-variants { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 180px), 1fr)); }
+.fr-progress { height:3px; background:#2b2734; margin-bottom:6px; border-radius:2px; overflow:hidden; }
+.fr-progress > div { height:100%; background:var(--lab-brass); transform-origin:0 50%; transform:scaleX(0); }
+.c7.fr { background:#03100d; font-family:'Philosopher', sans-serif; color:#eefff9; }
+.fr-root { position:absolute; inset:0; overflow:hidden; }
+.fr-none { position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); padding:18px 28px; border-radius:12px; background:rgba(3,16,13,.82); color:#cfeee4; font:400 34px/1.3 'Philosopher', sans-serif; text-align:center; }
+/* вопрос: слова прорастают по одному */
+.fq { position:absolute; margin:0; text-align:center; line-height:1.18; font-weight:400; text-wrap:balance; color:#eefff9;
+  text-shadow: 0 2px 4px rgba(2,12,10,.9), 0 0 26px rgba(2,12,10,.85); }
+.fq.is-left { text-align:left; }
+.fq .w { display:inline-block; margin-right:.26em; transform-origin:0 100%; opacity:0; }
+/* вариант: буква в сердцевине цветка, подпись под цветком (верх подписей на одной линии) */
+.fo { position:absolute; width:0; height:0; }
+.fo b { position:absolute; left:-30px; top:-31px; width:60px; text-align:center; font-weight:700; font-size:40px; line-height:58px; color:#2a1440; opacity:0; }
+.fo span { position:absolute; left:-128px; width:256px; text-align:center; font-size:34px; line-height:1.12; font-weight:400; color:#f0fff9; opacity:0;
+  text-shadow: 0 2px 3px rgba(2,12,10,.95), 0 0 18px rgba(2,12,10,.9); }
+/* таймер: число в тёмной сердцевине одуванчика */
+.ft { position:absolute; width:0; height:0; opacity:0; }
+.ft span { position:absolute; left:-80px; width:160px; top:-46px; text-align:center; font-weight:700; font-size:80px; line-height:92px; color:#f2fff9;
+  text-shadow: 0 0 18px rgba(111,242,214,.45), 0 2px 6px #03100d; font-variant-numeric: tabular-nums; }
+.fr-root[data-ph="warning"] .ft span { color:#ffd9a0; text-shadow: 0 0 22px rgba(255,150,70,.7), 0 2px 6px #03100d; }
+.fr-root[data-ph="zero"] .ft span { color:#6f9488; text-shadow:none; }
+.fm { position:absolute; left:640px; right:150px; top:1030px; display:flex; justify-content:space-between; font-size:24px; color:#8fbfb2; opacity:0; }

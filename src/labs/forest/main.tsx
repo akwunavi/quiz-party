@@ -1,0 +1,9 @@
+// Точка входа Forest Refinement Lab (labs/forest/). В сборку игры не входит.
+import { createRoot } from 'react-dom/client'
+import { Lab } from './Lab'
+import '../magic2/lab.css'
+import '../cine7/base.css'
+import '../cine7/w3.css'
+import './lab.css'
+
+createRoot(document.getElementById('root')!).render(<Lab />)

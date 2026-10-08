@@ -16,7 +16,9 @@
     "lab:worlds": "vite --open /quiz-party/labs/worlds7/",
     "lab:worlds:build": "node scripts/build-worlds-lab.mjs",
     "lab:cine": "vite --open /quiz-party/labs/cine7/",
-    "lab:cine:build": "node scripts/build-cine-lab.mjs"
+    "lab:cine:build": "node scripts/build-cine-lab.mjs",
+    "lab:forest": "vite --open /quiz-party/labs/forest/",
+    "lab:forest:build": "node scripts/build-forest-lab.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
