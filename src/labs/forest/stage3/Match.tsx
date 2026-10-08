@@ -12,6 +12,7 @@ import { S1Screen, useEntrance, type S1Props } from '../stage1/common'
 import type { Rect } from '../stage1/env'
 import { MATCH_SETS, pairOf, type MatchSet } from './data'
 import { head, Timer, timer3 } from './common3'
+import { TeamStrip, rowsFrom } from '../stage4/TeamStrip'
 
 export const MATCH_STATES = [
   { id: 'question', name: 'Вопрос: 4 картинки, подписи отдельно' },
@@ -73,7 +74,8 @@ export function Match({ state, nOv, onReady }: S1Props) {
         tl.fromTo(q(`.mt-num[data-k="${k}"]`), { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.45, ease: 'back.out(2.2)' }, at + 1.0)
       })
       tl.fromTo(q('.mt-pairs > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 0.5 + S.items.length * step + 0.2)
-    } else tl.fromTo(q('.mt-pairs > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 0.4)
+        .fromTo(q('.s4-sl'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.12 }, 0.5 + S.items.length * step + 0.9)
+    } else tl.fromTo(q('.mt-pairs > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 0.4).fromTo(q('.s4-sl'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, 0.7)
   }, tm, [state])
   const n = nOv ?? (tm ? nLive : null)
   const rects: Rect[] = [...Ly.img, { x: 300, y: S.items.length > 4 ? 620 : 780, w: 1500, h: 280 }, { x: 360, y: 40, w: 1200, h: 90 }]
@@ -109,6 +111,7 @@ export function Match({ state, nOv, onReady }: S1Props) {
           </div>
         )
       })}
+      {rev && S.items.length <= 4 && <TeamStrip rows={rowsFrom(S.correct_pairs, ' ')} />}
       {rev && <div className="mt-pairs">{S.items.map((_, k) => <span key={k}><b>{k + 1}</b> — <b>{S.right[IDX[k]]}</b></span>)}</div>}
       <Timer n={n} total={S.timer} x={150} base={1040} size={170} rooted={120} />
     </S1Screen>

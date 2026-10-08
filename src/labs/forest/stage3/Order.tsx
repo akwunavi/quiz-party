@@ -11,6 +11,7 @@ import { S1Screen, useEntrance, type S1Props } from '../stage1/common'
 import type { Rect } from '../stage1/env'
 import { ORDER_SETS, type OrderSet } from './data'
 import { head, Timer, timer3 } from './common3'
+import { TeamStrip, rowsFrom } from '../stage4/TeamStrip'
 import hubble from '../media/hubble-deep-field.jpg'
 
 export const ORDER_STATES = [
@@ -71,7 +72,8 @@ export function Order({ state, nOv, onReady }: S1Props) {
           .fromTo(q(`.or-pos[data-i="${i}"]`), { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.4, ease: 'back.out(2.2)' }, at + step * 0.9)
       })
       tl.fromTo(q('.orA-light'), { strokeDashoffset: 2400 }, { strokeDashoffset: 0, duration: 0.4 + Ly.n * step, ease: 'none' }, 0.4)
-    }
+        .fromTo(q('.s4-sl'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.12 }, 0.4 + Ly.n * step + 0.6)
+    } else tl.fromTo(q('.s4-sl'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, 0.5)
   }, tm, [state])
   const n = nOv ?? (tm ? nLive : null)
   const rects: Rect[] = [...Ly.home, ...Ly.slot].map(p => ({ x: p.x - Ly.cw / 2, y: p.y - Ly.ch / 2, w: Ly.cw, h: Ly.ch })).concat([{ x: 360, y: 40, w: 1200, h: 90 }])
@@ -102,6 +104,7 @@ export function Order({ state, nOv, onReady }: S1Props) {
           {rev && <em className="or-pos" data-i={i}>{POS(c.key) + 1}</em>}
         </div>
       })}
+      {rev && <TeamStrip rows={rowsFrom(S.correct_order.split(''), '')} top={968} />}
       <Timer n={n} total={S.timer} x={150} base={1040} size={170} rooted={120} />
     </S1Screen>
   )

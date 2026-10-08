@@ -6,7 +6,7 @@
 import { LOOKS, mk, seeded, noise1, type Pt } from '../paint'
 
 export type FRect = { x: number; y: number; w: number; h: number }
-export type FrameSet = { rects: FRect[]; srcs: string[] }
+export type FrameSet = { rects: FRect[]; srcs: string[]; /** непрозрачность тёмной подложки под фото (по умолчанию 1; для текстового окна — меньше) */ panel?: number }
 /** Числа, которые двигает GSAP: на каждую раму — рост (0..1), раскрытие фото (0..1), цветение (0..1). */
 export type FrameState = { grow: number[]; reveal: number[]; bloom: number[]; pulse: number }
 
@@ -76,7 +76,7 @@ export function makeFrames(set: FrameSet, seedBase = 40) {
     set.rects.forEach((r, k) => {
       const im = imgs[k], rv = clamp01(st.reveal[k] ?? 0), fr = st.grow[k] ?? 0
       if (fr <= 0.6) return
-      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.75)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10; ctx.fillStyle = '#071410'; ctx.globalAlpha = clamp01((fr - 0.6) * 2.5); ctx.fillRect(r.x, r.y, r.w, r.h); ctx.restore()
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.75)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10; ctx.fillStyle = '#071410'; ctx.globalAlpha = clamp01((fr - 0.6) * 2.5) * (set.panel ?? 1); ctx.fillRect(r.x, r.y, r.w, r.h); ctx.restore()
       const cx = r.x + r.w / 2, cy = r.y + r.h / 2, Rm = Math.hypot(r.w, r.h) / 2 * 1.12, R = rv * Rm
       const blob = (fresh = true) => { if (fresh) ctx.beginPath(); for (let i = 0; i <= 64; i++) { const a = (i / 64) * Math.PI * 2, rr = R * (1 + 0.09 * Math.sin(a * 5 + k * 2) + 0.05 * Math.sin(a * 9 + 1)); if (i) ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); else ctx.moveTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr) } ctx.closePath() }
       ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip()
