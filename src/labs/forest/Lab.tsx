@@ -8,17 +8,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Stage } from '../magic2/common'
 import { Scene, type SceneApi, type Mode } from './Scene'
+import { Scene as SceneV6 } from './SceneV6'
 import { STATES, TOTAL, phaseOf, type StateId } from './content'
 
-const CHAPTERS: Record<string, string> = { A: 'Лес', B: 'Лес прислушивается', C: 'Ветви прорастают', D: 'Открывается вопрос', E: 'Покой' }
+const CHAPTERS: Record<string, string> = { A: 'Лес', B: 'Лес прислушивается', C: 'Ветви прорастают', D: 'Открывается вопрос', E: 'Вопрос на экране', R: 'Ответ' }
+type Ver = 'new' | 'old'
 function readHash() {
-  const m = /^#(quick|full)-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
-  return { v: (m?.[1] ?? 'quick') as Mode, s: (STATES.some(x => x.id === m?.[2]) ? m![2] : 'img1opt') as StateId, at: m?.[3] ?? '' }
+  const m = /^#(?:(new|old|ans)-)?(quick|full)-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
+  return { ver: (m?.[1] === 'old' ? 'old' : 'new') as Ver, ans: m?.[1] === 'ans', v: (m?.[2] ?? 'quick') as Mode, s: (STATES.some(x => x.id === m?.[3]) ? m![3] : 'two') as StateId, at: m?.[4] ?? '' }
 }
 
 export function Lab() {
   const init = readHash()
   const [v, setV] = useState<Mode>(init.v)
+  const [ver, setVer] = useState<Ver>(init.ver)
+  const [answer, setAnswer] = useState(init.ans)
+  const startAt = useRef('')
   const [s, setS] = useState<StateId>(init.s)
   const [run, setRun] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -51,17 +56,21 @@ export function Lab() {
     const at = firstAt.current; firstAt.current = ''
     if (at === 'end') { a.tl.progress(1).pause(); setPlaying(false) }
     else if (at) { a.tl.seek(Number(at)).pause(); setPlaying(false) }
+    else if (startAt.current && a.tl.labels[startAt.current] !== undefined) { a.tl.play(startAt.current); setPlaying(true) }
     else if (!embed) { a.tl.restart(); setPlaying(true) }
+    startAt.current = ''
     paint()
     ;(window as unknown as { __seek: (t: number) => void }).__seek = t => { a.tl.seek(Math.min(t, a.tl.duration())).pause(); paint() }
+    ;(window as unknown as { __setN: (n: number) => void }).__setN = n => { ov.current = n; paint() } // для съёмки состояний таймера
   }, [embed, paint])
-  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${v}-${s}`) } catch { /* превью */ } }, [v, s])
+  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${ver}-${v}-${s}`) } catch { /* превью */ } }, [ver, v, s])
 
-  const fresh = () => { ov.current = null; setOvr(null); setRun(r => r + 1) } // новая сцена → играет с начала
+  const fresh = (keepAnswer = false) => { ov.current = null; setOvr(null); if (!keepAnswer) setAnswer(false); setRun(r => r + 1) } // новая сцена → играет с начала
+  const showAnswer = () => { startAt.current = 'E'; setAnswer(true); fresh(true) }
   const toggle = () => { const a = api.current; if (!a) return; if (a.tl.isActive()) { a.tl.pause(); setPlaying(false) } else { if (a.tl.progress() >= 1) a.tl.restart(); else a.tl.play(); setPlaying(true) } }
   const jump = (t: number, keepPlaying = false) => { const a = api.current; if (!a) return; a.tl.seek(t); if (keepPlaying) { a.tl.play(); setPlaying(true) } else { a.tl.pause(); setPlaying(false) } paint() }
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
-  const scene = <div className="c7 fr" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} onReady={onReady} /></div>
+  const scene = <div className="c7 fr" key={`${ver}-${v}-${s}-${run}`}>{ver === 'old' ? <SceneV6 state={s} mode={v} onReady={onReady} /> : <Scene state={s} mode={v} answer={answer} onReady={onReady} />}</div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
     <div className="m2-lab">
@@ -69,6 +78,10 @@ export function Lab() {
         <div className="m2-brand"><span className="m2-brand-q">❦</span><div><b>Зачарованный лес · Концепт C</b><span>Выберите экран — анимация запустится сама. Ползунок под кадром — ручная перемотка.</span></div></div>
       </header>
       <div className="fr-pick">
+        <span className="fr-cap">Версия</span>
+        <div className="m2-seg" role="group" aria-label="Версия">
+          {([['new', 'Доработанная (10.07)'], ['old', 'Прежняя (10.06) — для сравнения']] as const).map(([id, name]) => <button key={id} type="button" className={id === ver ? 'is-on' : ''} aria-pressed={id === ver} onClick={() => { setVer(id); fresh() }}>{name}</button>)}
+        </div>
         <span className="fr-cap">Появление</span>
         <div className="m2-seg" role="group" aria-label="Появление">
           {([['quick', 'Обычный вопрос — быстро'], ['full', 'Первый вопрос раунда — лес просыпается']] as const).map(([id, name]) => <button key={id} type="button" className={id === v ? 'is-on' : ''} aria-pressed={id === v} onClick={() => { setV(id); fresh() }}>{name}</button>)}
@@ -81,7 +94,8 @@ export function Lab() {
       <main className="m2-preview">
         <Stage>{scene}</Stage>
         <div className="fr-player">
-          <button type="button" className="fr-main" onClick={fresh}>▶ Смотреть с начала</button>
+          <button type="button" className="fr-main" onClick={() => fresh()}>▶ Смотреть с начала</button>
+          {ver === 'new' && <button type="button" onClick={showAnswer}>✦ Показать правильный ответ</button>}
           <button type="button" onClick={toggle}>{playing ? '❚❚ Пауза' : '▶ Продолжить'}</button>
           <input ref={range} className="fr-range" type="range" min={0} max={1} step={0.001} defaultValue={0} aria-label="Перемотка"
             onInput={e => { const a = api.current; if (a) jump(Number((e.target as HTMLInputElement).value) * a.tl.duration()) }} />

@@ -11,7 +11,7 @@ import dahlia from './media/dahlia.jpg'
 
 export type Opt = { key: string; text: string }
 export type Img = { src: string; w: number; h: number; caption: string }
-export type StateId = 'mc' | 'img1opt' | 'img1open' | 'port' | 'two' | 'six' | 'three' | 'four' | 'long'
+export type StateId = 'mc' | 'img1opt' | 'img1open' | 'port' | 'two' | 'six' | 'three' | 'four' | 'long' | 'long2'
 export const ROUND_NAME = 'Кино и литература'
 export const QNO = 'Вопрос 5 из 7'
 export const TOTAL = 30
@@ -45,6 +45,14 @@ export const FOUR = { text: 'Какой из снимков не связан с
 export const LONG = {
   text: 'Эта башня стоит на холме Долголетия над озером Куньминху. Парк сожгли в 1860 году и восстановили в конце XIX века. В каком городе он находится?',
 }
+export const LONG2 = {
+  text: 'Слева — ракета, которую SpaceX создала для доставки грузов на орбиту. Справа — один из самых знаменитых снимков глубокого космоса. Что из этого впервые полетело в космос раньше?',
+}
+/** Правильные ответы — только для предпросмотра показа ответа (игровую проверку не трогаем). */
+export const CORRECT: Record<StateId, { key?: string; text?: string }> = {
+  mc: { key: 'Б' }, img1opt: { key: 'А' }, two: { key: 'Б' }, long2: { key: 'Б' }, three: { key: 'Б' }, four: { key: 'Г' },
+  six: { text: 'КОСМОС' }, img1open: { text: 'Пекин' }, port: { text: 'Айлин Коллинз' }, long: { text: 'Пекин' },
+}
 export const STATES: { id: StateId; name: string }[] = [
   { id: 'mc', name: 'Текст и варианты (утверждён)' },
   { id: 'img1opt', name: 'Большое фото + варианты' },
@@ -55,6 +63,7 @@ export const STATES: { id: StateId; name: string }[] = [
   { id: 'three', name: 'Три фото-варианта' },
   { id: 'four', name: 'Четыре фото-варианта' },
   { id: 'long', name: 'Длинный вопрос с фото' },
+  { id: 'long2', name: 'Длинный вопрос, два фото и варианты' },
 ]
 export type Phase = 'normal' | 'warning' | 'zero'
 export const phaseOf = (n: number): Phase => (n <= 0 ? 'zero' : n <= 10 ? 'warning' : 'normal')

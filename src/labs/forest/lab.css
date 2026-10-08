@@ -16,11 +16,11 @@
 .fo span { position:absolute; left:-128px; width:256px; text-align:center; font-size:34px; line-height:1.12; font-weight:400; color:#f0fff9; opacity:0;
   text-shadow: 0 2px 3px rgba(2,12,10,.95), 0 0 18px rgba(2,12,10,.9); }
 /* таймер: число в тёмной сердцевине одуванчика */
-.ft { position:absolute; width:0; height:0; opacity:0; }
-.ft span { position:absolute; left:-80px; width:160px; top:-46px; text-align:center; font-weight:700; font-size:80px; line-height:92px; color:#f2fff9;
-  text-shadow: 0 0 18px rgba(111,242,214,.45), 0 2px 6px #03100d; font-variant-numeric: tabular-nums; }
+.ft { position:absolute; width:0; height:0; }
+.ft span { position:absolute; left:-90px; width:180px; top:-54px; text-align:center; font-weight:700; font-size:94px; line-height:108px; color:#f4fffa; opacity:0;
+  text-shadow: 0 0 22px rgba(111,242,214,.5), 0 3px 8px #03100d; font-variant-numeric: tabular-nums; }
 .fr-root[data-ph="warning"] .ft span { color:#ffd9a0; text-shadow: 0 0 22px rgba(255,150,70,.7), 0 2px 6px #03100d; }
-.fr-root[data-ph="zero"] .ft span { color:#6f9488; text-shadow:none; }
+.fr-root[data-ph="zero"] .ft span { color:#b9cfc6; text-shadow: 0 2px 8px #03100d; }
 .fm { position:absolute; left:640px; right:150px; top:1030px; display:flex; justify-content:space-between; font-size:24px; color:#8fbfb2; opacity:0; }
 /* понятный пульт лаборатории */
 .fr-pick { display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px 14px; align-items:center; }
@@ -37,15 +37,23 @@
 .fr-chapters button.is-on { color:#16120c; background:var(--lab-brass); border-color:var(--lab-brass); }
 .fr-hint { font-size:13px; color:var(--lab-dim); }
 @media (max-width: 640px) { .fr-pick { grid-template-columns:1fr; } }
-/* подписи к мелким цветам (варианты под фото) */
-.fo.is-sm b { top:-26px; font-size:32px; line-height:52px; }
-.fo.is-sm span { font-size:30px; }
-/* буква-бутон у фото-варианта */
+/* подписи к цветам-вариантам: верх подписей на одной линии, многострочные — по центру */
+.fo span { font-size:36px; line-height:1.1; }
+.fo.is-sm b { top:-26px; font-size:30px; line-height:52px; }
+.fo.is-sm span { font-size:34px; }
+/* буква на цветке-метке у фото-варианта */
 .fb { position:absolute; width:0; height:0; }
-.fb b { position:absolute; left:-24px; top:-25px; width:48px; text-align:center; font-weight:700; font-size:34px; line-height:48px; color:#2a1440; opacity:0; }
-/* клетки слова «3 попыток» на спилах */
+.fb b { position:absolute; left:-24px; top:-24px; width:48px; text-align:center; font-weight:700; font-size:32px; line-height:48px; color:#2a1440; opacity:0; }
+/* клетки слова «3 попыток» на спилах: при показе ответа спил переворачивается */
 .fc { position:absolute; width:0; height:0; }
-.fc span { position:absolute; left:-50px; top:-50px; width:100px; text-align:center; font-weight:700; font-size:60px; line-height:100px; opacity:0;
-  color:rgba(40,22,10,.75); text-shadow: 0 1px 0 rgba(255,230,190,.25); }
-.fc.is-open span { color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.8), 0 0 16px rgba(255,214,140,.5); }
-.fp { position:absolute; transform:translateX(-50%); font-size:34px; color:#d6f5ea; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.9); }
+.fc span { position:absolute; left:-56px; top:-56px; width:112px; text-align:center; font-weight:700; font-size:66px; line-height:112px; opacity:0; }
+.fc i { font-style:normal; position:absolute; inset:0; }
+.fc .a { opacity:0; }
+.fc .q { color:rgba(46,26,12,.82); text-shadow: 0 1px 0 rgba(255,230,190,.28); }
+.fc.is-open .q, .fc .a { color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.85), 0 0 18px rgba(255,214,140,.5); }
+.fc.is-flipped .q { opacity:0; } .fc.is-flipped .a { opacity:1; }
+.fp { position:absolute; transform:translateX(-50%); font-size:38px; color:#e2fbf2; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.95), 0 0 18px rgba(2,12,10,.8); }
+/* ответ на открытый вопрос (предпросмотр) */
+.fa { position:absolute; font-size:44px; text-align:center; color:#ffe9b8; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.95), 0 0 22px rgba(255,190,90,.45); }
+.fa.is-left { text-align:left; }
+.fa b { font-weight:700; color:#fff6dc; }
