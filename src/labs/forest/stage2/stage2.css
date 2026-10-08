@@ -5,23 +5,6 @@
 div.jp2-t { position:absolute; transform:translate(-50%,-50%); }
 
 /* — A: лианы со стручками */
-.jp2a-vine { position:absolute; top:0; width:80px; height:1080px; overflow:visible; }
-.jp2a-vine path:first-child { fill:none; stroke:#1d4430; stroke-width:7; stroke-linecap:round; }
-.jp2a-vine .lf { fill:#2f6a49; stroke:rgba(8,30,20,.6); stroke-width:1; }
-.jp2a-tag { position:absolute; top:172px; width:270px; margin-left:-135px; padding:10px 14px 12px; text-align:center; display:grid; gap:2px;
-  border-radius:12px 12px 18px 18px; background: repeating-linear-gradient(178deg, #7d5a34 0 8px, #6e4f2c 8px 11px), #6e4f2c; border:4px solid #2a1a0d; box-shadow: 0 12px 24px rgba(0,0,0,.55); }
-.jp2a-tag b { font-size:36px; line-height:1.05; color:#fff1c8; text-shadow:0 2px 3px rgba(20,10,4,.9); }
-.jp2a-tag span { font-size:22px; color:#f0dcb4; text-shadow:0 1px 2px rgba(20,10,4,.9); }
-.jp2a-pod { width:140px; height:166px; overflow:visible; display:block; }
-.jp2a-pod .stalk { fill:none; stroke:#1d4430; stroke-width:5; }
-.jp2a-pod .body { fill:#e2b45a; stroke:#7a4f18; stroke-width:3; }
-.jp2a-pod .seam { fill:none; stroke:rgba(122,79,24,.6); stroke-width:2; }
-.jp2a-pod .calyx { fill:#3b7a5c; }
-.jp2a-pod text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:52px; fill:#3a2208; }
-.jp2a-t.av .jp2a-pod .body { fill:#f0c86a; filter: drop-shadow(0 0 14px rgba(255,214,120,.45)); }
-.jp2a-pod .husk { fill:#6b5236; stroke:#3a2a1a; stroke-width:2; opacity:.85; }
-.jp2a-t.taken .jp2a-pod .husk { opacity:.35; }
-.jp2a-t.sel .jp2a-pod .body { fill:#ffe39a; filter: drop-shadow(0 0 26px rgba(255,220,130,.95)); }
 
 /* — B: цветы цен */
 .jp2b-stem { position:absolute; width:120px; height:600px; overflow:visible; }
@@ -38,28 +21,8 @@ div.jp2-t { position:absolute; transform:translate(-50%,-50%); }
 .jp2b-t.done .jp2b-petal, .jp2b-t.taken .jp2b-petal { opacity:0; }
 .jp2b-val { position:absolute; transform:translate(-50%,-50%); font-size:46px; font-weight:700; color:#2a1650; text-shadow: 0 1px 0 rgba(255,255,255,.5); white-space:nowrap; }
 .jp2b-t.sel .jp2b-val { color:#3a2208; }
-.jp2b-core { position:absolute; width:76px; height:76px; margin:-38px 0 0 -38px; border-radius:50%; background: radial-gradient(circle at 40% 35%, #ffe9a8, #f0c055 55%, #a87222); box-shadow: 0 0 0 4px rgba(60,30,8,.5), 0 6px 16px rgba(0,0,0,.6); }
-.jp2b-fl.bare .jp2b-core { background: radial-gradient(circle at 40% 35%, #b8a070, #7a6a40 55%, #4a3a20); }
-.jp2b-fall { position:absolute; width:60px; height:60px; }
-.jp2b-fall svg { width:100%; height:100%; overflow:visible; } .jp2b-fall path { fill:#9a86c9; opacity:.8; }
 
 /* — C: фонари на ветвях */
-.jp2c-trunk { position:absolute; left:0; top:0; width:160px; height:1080px; } .jp2c-trunk path { fill:#2a1d13; }
-.jp2c-bough { position:absolute; left:100px; width:1800px; height:60px; overflow:visible; }
-.jp2c-bough path { fill:none; stroke:#3a2a1d; stroke-width:14; stroke-linecap:round; }
-.jp2c-name { position:absolute; left:150px; width:380px; display:grid; gap:2px; text-shadow:var(--halo); }
-.jp2c-name b { font-size:40px; line-height:1.05; color:#f4fff9; } .jp2c-name span { font-size:24px; color:#cfeee4; }
-.jp2c-lan { width:110px; height:210px; overflow:visible; display:block; }
-.jp2c-lan .hook { stroke:#a8956b; stroke-width:3; } .jp2c-lan .ring { fill:none; stroke:#a8956b; stroke-width:3; }
-.jp2c-lan .cap, .jp2c-lan .base { fill:#3a2a1d; stroke:#d8c08a; stroke-width:2; }
-.jp2c-lan .glass { fill:rgba(255,214,140,.82); stroke:#d8c08a; stroke-width:3; }
-.jp2c-lan .bars { stroke:rgba(80,50,20,.45); stroke-width:3; }
-.jp2c-lan .flame { fill:#fff3c2; filter: drop-shadow(0 0 8px #ffb84a); }
-.jp2c-lan text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:46px; fill:#3a2208; }
-.jp2c-t.av .jp2c-lan { filter: drop-shadow(0 0 22px rgba(255,200,110,.45)); }
-.jp2c-t.sel .jp2c-lan { filter: drop-shadow(0 0 36px rgba(255,214,140,.95)); }
-.jp2c-lan.off .glass { fill:rgba(40,52,50,.85); stroke:#5a5a50; } .jp2c-lan.off .cap, .jp2c-lan.off .base { stroke:#5a5a50; }
-.jp2c-t.taken .jp2c-lan { opacity:.35; }
 
 .jp2-selring { position:absolute; width:160px; height:160px; margin:-80px 0 0 -80px; border-radius:50%; border:4px solid rgba(255,226,160,.9); pointer-events:none; }
 
@@ -71,21 +34,11 @@ div.jp2-t { position:absolute; transform:translate(-50%,-50%); }
 .jp2-waves i { position:absolute; width:300px; height:300px; margin:-150px; border-radius:50%; border:3px solid rgba(190,255,230,.4); opacity:0; }
 .jp2-vessel.playing .jp2-waves i { animation: jp2-wave 2.2s ease-out infinite; }
 @keyframes jp2-wave { 0% { transform:scale(.5); opacity:.8; } 100% { transform:scale(1.6); opacity:0; } }
-.jp2-vA .jp2-v-open { position:absolute; left:-200px; top:-260px; width:400px; height:520px; overflow:visible; --o:1; }
-.jp2-vA .stalk { fill:none; stroke:#1d4430; stroke-width:8; }
-.jp2-vA .half path { fill:#d9a24a; stroke:#7a4f18; stroke-width:4; }
-.jp2-vA .half { transform-box: view-box; transform-origin: 0 -186px; }
-.jp2-vA .half.l { transform: rotate(calc(var(--o) * -14deg)); } .jp2-vA .half.r { transform: rotate(calc(var(--o) * 14deg)); }
-.jp2-vA .core { fill:rgba(255,236,170,.25); stroke:rgba(255,226,160,.6); stroke-width:3; }
 .jp2-vB .jp2-v-flip { position:absolute; left:-160px; top:-300px; width:320px; height:340px; transform-style:preserve-3d; }
 .jp2-vB .jp2-v-open { width:320px; height:340px; overflow:visible; display:block; }
 .jp2-vB .jp2-v-open path:first-child { fill:#c9b6ff; stroke:rgba(40,16,80,.55); stroke-width:3; filter: drop-shadow(0 0 30px rgba(200,180,255,.5)); }
 .jp2-vB .jp2-v-open .vein { fill:none; stroke:rgba(255,255,255,.35); stroke-width:3; }
 .jp2-vB .jp2-v-num { top:-200px; color:#2a1650; text-shadow: 0 2px 0 rgba(255,255,255,.4); }
-.jp2-vC .jp2-v-open { position:absolute; left:-150px; top:-290px; width:300px; }
-.jp2-vC .jp2c-lan.big { width:300px; height:574px; }
-.jp2-vC .jp2-v-num { top:-10px; color:#3a2208; text-shadow: 0 1px 0 rgba(255,240,200,.6); }
-.jp2c-flare { position:absolute; width:500px; height:500px; margin:-250px; border-radius:50%; opacity:0; background: radial-gradient(circle, rgba(255,226,160,.6), rgba(255,200,110,0) 65%); }
 
 /* — панель вопроса */
 .jp2-panel { position:absolute; left:880px; right:60px; top:96px; bottom:60px; display:flex; flex-direction:column; gap:22px; z-index:4; }
@@ -94,12 +47,8 @@ div.jp2-t { position:absolute; transform:translate(-50%,-50%); }
 .jp2-head span { font-size:32px; color:#cfeee4; } .jp2-head em { font-style:normal; font-size:44px; color:#ffe2a0; font-weight:700; }
 .jp2-ans { position:relative; display:grid; gap:2px; padding:16px 30px 20px; }
 .jp2-ans span { font-size:26px; color:#cfeee4; } .jp2-ans b { font-size:60px; line-height:1.08; color:#ffe2a0; }
-.jp2-ansA { border-radius: 30px 120px 30px 120px / 40px 90px 40px 90px; background: linear-gradient(100deg, rgba(20,64,46,.94), rgba(14,50,37,.86)); box-shadow: inset 0 1px 0 rgba(170,235,200,.2), 0 12px 26px rgba(0,0,0,.45); }
-.jp2-ansA b, .jp2-ansB b { text-shadow:var(--halo); }
+.jp2-ansB b { text-shadow:var(--halo); }
 .jp2-ansB { border-radius:26px; background: linear-gradient(160deg, rgba(60,40,110,.9), rgba(30,20,70,.9)); box-shadow: 0 0 0 2px rgba(200,180,255,.4), 0 12px 26px rgba(0,0,0,.45); }
-.jp2-ansC { margin-top:30px; border-radius:14px; background: repeating-linear-gradient(178deg, #7d5a34 0 9px, #6e4f2c 9px 12px), #6e4f2c; border:5px solid #2a1a0d; box-shadow: 0 16px 30px rgba(0,0,0,.6); }
-.jp2-ansC span { color:#f4e6c8; } .jp2-ansC b { color:#fff1c8; text-shadow: 0 3px 4px rgba(20,10,4,.95); }
-.jp2-ansC .rope { position:absolute; top:-36px; width:4px; height:36px; background:linear-gradient(#173a2b, #4f8f6a); } .jp2-ansC .rope.l { left:40px; } .jp2-ansC .rope.r { right:40px; }
 .jp2-list { display:grid; gap:12px; }
 .jp2-cnt { position:relative; font-size:34px; color:#e8d9a8; text-shadow:var(--halo); }
 .jp2-cnt em { position:absolute; margin-left:12px; font-style:normal; font-size:46px; line-height:.9; color:#f4fffa; opacity:0; } .jp2-cnt em.c0 { opacity:1; }
@@ -135,55 +84,23 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2a-bell text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:44px; fill:#fff; paint-order:stroke; stroke:#2a1650; stroke-width:5px; }
 .ml2a-bell .wilt { fill:#6b5236; stroke:#3a2a1a; stroke-width:2; }
 .ml2a-t.av .ml2a-bell .cup { filter: drop-shadow(0 0 10px rgba(190,170,255,.45)); }
-.ml2a-t.hot .ml2a-bell .cup, .ml2a-t.pick .ml2a-bell .cup { fill:#ffe2a0; stroke:#7a4f18; filter: drop-shadow(0 0 24px rgba(255,214,140,.95)); }
-.ml2a-t.hot .ml2a-bell text { stroke:#5a3a08; }
 /* B — птицы */
-.ml2b-trunk { position:absolute; left:0; top:0; width:180px; height:1080px; } .ml2b-trunk path { fill:#2a1d13; }
-.ml2b-bough { position:absolute; left:110px; width:1780px; height:50px; overflow:visible; } .ml2b-bough path { fill:none; stroke:#3a2a1d; stroke-width:13; stroke-linecap:round; }
-.ml2b-label { left:170px; width:420px; font-size:40px; line-height:1.05; }
-.ml2b-bird { width:150px; height:130px; overflow:visible; display:block; }
-.ml2b-bird .body { fill:#6b8fa8; } .ml2b-bird .head { fill:#5d7f98; } .ml2b-bird .tail { fill:#4d6b80; } .ml2b-bird .wing { fill:#4a6a82; stroke:rgba(0,0,0,.25); }
-.ml2b-bird .beak { fill:#f0b44a; } .ml2b-bird .eye { fill:#0b1a14; } .ml2b-bird .feet { stroke:#3a2a1d; stroke-width:3; }
-.ml2b-bird .breast { fill:#f2c38a; }
-.ml2b-bird text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:28px; fill:#3a2208; }
-.ml2b-bird.gone .feather { fill:#cfd8dc; stroke:#7a8a90; stroke-width:1.5; opacity:.75; }
-.ml2b-t.hot .ml2b-bird, .ml2b-t.pick .ml2b-bird { filter: drop-shadow(0 0 22px rgba(255,226,160,.95)); }
-.ml2b-t.hot .ml2b-bird .breast { fill:#ffe2a0; }
+
 /* C — спилы-пластинки */
-.ml2c-ring { position:absolute; inset:0; }
-.ml2c-stump { position:absolute; width:320px; height:320px; }
-.ml2c-stump .top { fill:#5a3f22; stroke:#2a1a0d; stroke-width:8; } .ml2c-stump .rg { fill:none; stroke:rgba(40,22,8,.45); stroke-width:3; }
-.ml2c-label { transform:translate(-50%,-50%); font-size:38px; white-space:nowrap; }
-.ml2c-slice { width:126px; height:126px; overflow:visible; display:block; }
-.ml2c-slice .bark { fill:#3a2414; } .ml2c-slice .wood { fill:#b48a57; } .ml2c-slice .ring { fill:none; stroke:rgba(70,40,14,.45); stroke-width:2; }
-.ml2c-slice .label { fill:#f2e2bb; stroke:rgba(70,40,14,.6); stroke-width:2; }
-.ml2c-slice text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:30px; fill:#3a2208; }
-.ml2c-slice.off .bark { fill:#4a3424; } .ml2c-slice .barkline { fill:none; stroke:#2a1a0d; stroke-width:4; }
-.ml2c-slice.off { opacity:.7; }
-.ml2c-t.av .ml2c-slice { filter: drop-shadow(0 8px 12px rgba(0,0,0,.6)); }
-.ml2c-t.hot .ml2c-slice, .ml2c-t.pick .ml2c-slice { filter: drop-shadow(0 0 24px rgba(255,214,140,.95)); }
-.ml2c-t.hot .ml2c-slice .label { fill:#ffe2a0; }
-.ml2c-slice.spin { animation: ml2-spin 1.8s linear infinite; }
-@keyframes ml2-spin { to { transform: rotate(360deg); } }
+
 /* рулетка: огонёк/зайчик на подсвеченной плитке */
 .ml2-spot { position:absolute; width:180px; height:180px; margin:-90px; border-radius:50%; pointer-events:none; background: radial-gradient(circle, rgba(255,240,190,.35), rgba(255,214,140,0) 66%); box-shadow: 0 0 0 3px rgba(255,226,160,.7); }
 .ml2-spot.land { box-shadow: 0 0 0 5px rgba(255,226,160,.95), 0 0 50px rgba(255,214,140,.7); }
 /* сосуд звука */
 .ml2-vessel { position:absolute; width:0; height:0; z-index:4; }
 .ml2-v-in { position:absolute; left:-200px; top:-200px; width:400px; height:400px; display:grid; place-items:center; }
-.ml2a-bell.big { width:360px; height:420px; } .ml2b-bird.big { width:400px; height:350px; } .ml2c-slice.big { width:330px; height:330px; position:absolute; }
-.ml2-vA.playing .ml2-v-in { animation: ml2-ring 1.1s ease-in-out infinite alternate; transform-origin: 50% 0%; }
-@keyframes ml2-ring { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
-.ml2-vB.playing .ml2-v-in { animation: ml2-hop .5s ease-in-out infinite alternate; }
-@keyframes ml2-hop { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-.ml2c-stumpbig { position:absolute; inset:0; width:400px; height:400px; } .ml2c-stumpbig circle { fill:#4a331c; stroke:#2a1a0d; stroke-width:10; }
-.ml2c-arm { position:absolute; right:-60px; top:-60px; width:260px; height:260px; overflow:visible; } .ml2c-arm path { fill:none; stroke:#3a2a1d; stroke-width:10; stroke-linecap:round; } .ml2c-arm circle { fill:#5a3f22; }
+.ml2a-bell.big { width:360px; height:420px; }
 .ml2-notes { position:absolute; left:0; top:-180px; }
 .ml2-notes i { position:absolute; font-style:normal; font-size:44px; color:#ffe2a0; text-shadow:0 0 10px rgba(255,214,140,.8); opacity:0; }
 .ml2-vessel.playing .ml2-notes i { animation: ml2-note 2.2s ease-out infinite; }
 @keyframes ml2-note { 0% { transform: translate(0,0) rotate(-10deg); opacity:0; } 20% { opacity:1; } 100% { transform: translate(60px,-140px) rotate(20deg); opacity:0; } }
 .ml2-vessel .gold { position:absolute; width:520px; height:520px; margin:-260px; border-radius:50%; opacity:0; background: radial-gradient(circle, rgba(255,226,160,.4), rgba(255,200,110,0) 66%); }
-.ml2-vA.won .ml2a-bell .cup { fill:#ffd986; stroke:#7a4f18; } .ml2-vB.won .ml2b-bird .breast { fill:#ffe2a0; } .ml2-vC.won .ml2c-slice .label { fill:#ffe2a0; }
+.ml2-vA.won .ml2a-bell .cup { fill:#ffd986; stroke:#7a4f18; }
 /* панель */
 .ml2-panel { position:absolute; left:880px; right:60px; top:96px; bottom:60px; display:flex; flex-direction:column; gap:22px; z-index:4; }
 .ml2-head { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
@@ -216,21 +133,15 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2.stage .ml2-label { opacity:0; }
 .ml2-tm { margin-top:-10px; margin-right:10px; height:190px; }
 .ml2a-bell .cup { fill:url(#ml2Bell); }
-.ml2a-t.hot .ml2a-bell .cup, .ml2a-t.pick .ml2a-bell .cup, .ml2-vA.won .ml2a-bell .cup { fill:url(#ml2BellG); }
+.ml2-vA.won .ml2a-bell .cup { fill:url(#ml2BellG); }
 .ml2a-bell .in { stroke:rgba(30,10,60,.45); stroke-width:3; }
-.ml2b-bird .body, .ml2b-bird .head { fill:url(#ml2Back); } .ml2b-bird .tail { fill:#3a2e22; } .ml2b-bird .wing { fill:#4a3c2c; stroke:rgba(0,0,0,.35); }
-.ml2b-bird .quill { fill:none; stroke:rgba(230,210,180,.35); stroke-width:1.5; }
-.ml2b-bird .breast { fill:url(#ml2Breast); } .ml2b-bird text { fill:#fff4e0; paint-order:stroke; stroke:#5a2a10; stroke-width:4px; }
-.ml2b-bird .eyehi { fill:#fff; } .ml2b-bird .beak { fill:#d9a24a; }
-.ml2b-t.hot .ml2b-bird .breast, .ml2-vB.won .ml2b-bird .breast { fill:#ffcf7a; }
 .ml2-vessel:not(.won) .gold { display:none; }
-.ml2b-bird { width:180px; height:156px; } .ml2b-bird text { font-size:30px; }
 .ml2.st-bidding .ml2-bids { grid-template-columns:1fr 1fr; }
 .ml2.st-bidding .ml2-bid { grid-template-columns:minmax(0,1fr) auto; padding:10px 20px; min-height:64px; }
 .ml2.st-bidding .ml2-bid .nm { font-size:26px; line-height:1.1; }
 .jp2-row .dots { white-space:nowrap; }
-.jp2-vB.is-warning .jp2-v-num, .jp2-vC.is-warning .jp2-v-num { color:#8a3200; }
-.jp2-vB.is-zero .jp2-v-num { color:#3a2f55; } .jp2-vC.is-zero .jp2-v-num { color:#4a3a2a; }
+.jp2-vB.is-warning .jp2-v-num { color:#8a3200; }
+.jp2-vB.is-zero .jp2-v-num { color:#3a2f55; }
 .jp2-row .dots { right:28px; }
 .jp2:not(.st-reveal) .jp2-row .nm { padding-right:110px; }
 
@@ -254,9 +165,15 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .jp2b-t.taken .jp2b-petal { opacity:.22; }
 .jp2b-val { font-size:48px; }
 .jp2b-t.done .jp2b-val { font-size:36px; color:#cdbda8; text-shadow:none; opacity:.6; text-decoration: line-through 3px rgba(60,30,10,.55); }
-.jp2b-core { position:absolute; width:92px; height:92px; margin:0; border-radius:0; background:none; box-shadow:none; overflow:visible; }
+/* сердцевина — только SVG (круг с семенами); никакого фона у блока: раньше старое правило
+   `.jp2b-fl.bare .jp2b-core { background }` (вес выше) рисовало под ней квадрат */
+.jp2b-core { position:absolute; width:92px; height:92px; overflow:visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,.55)); }
+.jp2b-core .rim { fill:none; stroke:rgba(255,236,170,.35); stroke-width:2; }
 .jp2b-core .disc { fill:#d9a23a; stroke:#5a3a10; stroke-width:4; } .jp2b-core .seed { fill:#6b4a14; }
-.jp2b-fl.bare .jp2b-core .disc { fill:#8a7a58; } .jp2b-fl.bare .jp2b-core .seed { fill:#4a3a24; }
+/* по мере игры сердцевина темнеет и «созревает»: семена крупнее, свет гаснет — форма та же */
+.jp2b-fl.u1 .jp2b-core .disc { fill:#c9963a; } .jp2b-fl.u2 .jp2b-core .disc { fill:#b08638; } .jp2b-fl.u3 .jp2b-core .disc { fill:#9a7a40; }
+.jp2b-fl.bare .jp2b-core .disc { fill:#7d6a48; stroke:#3e2c14; } .jp2b-fl.bare .jp2b-core .seed { fill:#3e2c18; } .jp2b-fl.bare .jp2b-core .rim { stroke:rgba(200,180,140,.15); }
+.jp2b-fl.bare .jp2b-core { filter: drop-shadow(0 3px 6px rgba(0,0,0,.5)) saturate(.7); }
 .jp2b-t.sel .jp2b-petal path:first-child { fill:#ffe2a0; }
 
 .jp2b-leaf { width:336px; margin-left:-168px; height:146px; }
@@ -281,8 +198,7 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2a-sway text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:40px; fill:#fff; paint-order:stroke; stroke:#2a1650; stroke-width:5px; }
 .ml2a-sway .wilt { fill:#6b5236; stroke:#3a2a1a; stroke-width:1.5; }
 .ml2a-t.done .ml2a-sway { animation:none; rotate: 16deg; }
-.ml2a-t.hot .cup, .ml2a-t.pick .cup, .ml2-vA.won .cup { fill:url(#ml2BellG); stroke:#7a4f18; }
-.ml2a-t.hot .ml2a-sway, .ml2a-t.pick .ml2a-sway { filter: drop-shadow(0 0 16px rgba(255,214,140,.9)); }
+.ml2-vA.won .cup { fill:url(#ml2BellG); stroke:#7a4f18; }
 .ml2a-t.taken { opacity:.22; }
 .ml2a-label { top:126px; width:380px; margin-left:-190px; height:104px; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:8px 16px; }
 .ml2a-label b { font-size:34px; line-height:1.04; text-align:center; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
@@ -290,6 +206,16 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2a-col.bare .ml2a-label { filter: saturate(.5) brightness(.75); }
 /* большой колокол у зрителя: качается от цветоножки, только пока звучит музыка */
 .ml2a-bell.big { width:400px; height:460px; overflow:visible; }
-.ml2-vA .ml2-v-in { animation:none !important; }
 .ml2-vA:not(.playing) .ml2a-sway.big { animation:none; }
 .ml2a-sway.big { animation-duration: 1.1s; }
+
+/* мелодия: фокус на звучащем треке — свет вокруг колокола, лес по краям уходит в тень (не заливка) */
+.ml2-focus { position:absolute; inset:0; pointer-events:none; z-index:3; opacity:1;
+  background: radial-gradient(ellipse 520px 460px at var(--fx) var(--fy), rgba(3,16,13,0) 0%, rgba(3,16,13,.35) 55%, rgba(3,16,13,.62) 100%); }
+.ml2.stage .ml2-vessel, .ml2.stage .ml2-panel, .ml2.st-back .ml2-vessel { z-index:4; }
+.ml2-title { z-index:5; }
+/* рулетка: бегущая подсветка — мягкая; итог (won) — только после остановки */
+.ml2a-t.hot .cup { fill:url(#ml2Bell); stroke:#fff3c8; stroke-width:3; }
+.ml2a-t.hot .ml2a-sway { filter: drop-shadow(0 0 12px rgba(255,240,200,.75)); }
+.ml2a-t.won .cup { fill:url(#ml2BellG); stroke:#7a4f18; }
+.ml2a-t.won .ml2a-sway { filter: drop-shadow(0 0 22px rgba(255,214,140,.95)); }

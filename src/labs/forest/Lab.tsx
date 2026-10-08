@@ -1,6 +1,7 @@
-// ═══ Forest Refinement Lab ═══
-// Сравнение: Оригинал (лес из Cinematic Lab как есть) и три доработки A / B / C
-// на одном и том же содержимом, в пяти состояниях. Прод не трогаем.
+// ═══ Forest Lab — Зачарованный лес ═══
+// Утверждено: вопросы с фото (Концепт C), «120 секунд», «Блиц», «Три попытки», «Своя игра»,
+// «Угадай мелодию» — по одной композиции на механику. Этап 3 (в работе): «Скрэмбл»,
+// «Сопоставление», «Порядок», «Кроссворд» — по три концепта A/B/C до выбора ведущего.
 // Управление: любой выбор сразу проигрывает анимацию с начала; ползунок — ручная
 // перемотка; главы — переход к моменту. Сцена сама убирает свой таймлайн при
 // размонтировании — оболочка ничего не убивает (иначе гасила бы УЖЕ новую сцену:
@@ -8,42 +9,50 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Stage } from '../magic2/common'
 import { Scene, type SceneApi, type Mode } from './Scene'
-import { Scene as SceneV6 } from './SceneV6'
 import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from './stage1/Sprint'
 import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from './stage1/Blitz'
 import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from './stage1/Reveal3'
 import type { S1Props, Variant } from './stage1/common'
 import { Jeopardy, JP_STATES, JP_VARIANTS } from './stage2/Jeopardy'
 import { Melody, MEL_STATES, MEL_VARIANTS } from './stage2/Melody'
+import { Scramble, SCR_STATES, SCR_VARIANTS } from './stage3/Scramble'
+import { Match, MATCH_STATES, MATCH_VARIANTS } from './stage3/Match'
+import { Order, ORDER_STATES, ORDER_VARIANTS } from './stage3/Order'
+import { Crossword, CW_STATES, CW_VARIANTS } from './stage3/Crossword'
 
-type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel'
-type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** выбранная ведущим композиция — основная (нет — ещё не выбрана) */ pick?: Variant }
+type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw'
+type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** с какого состояния открывать раздел */ start: number }
 const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
-  sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, pick: 'A' },
-  blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, pick: 'C' },
-  reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, pick: 'A' },
-  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24, pick: 'B' },
-  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24, pick: 'A' },
+  sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, start: 2 },
+  blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, start: 2 },
+  reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, start: 1 },
+  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24, start: 1 },
+  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24, start: 1 },
+  scr: { name: 'Скрэмбл', C: Scramble, states: SCR_STATES, variants: SCR_VARIANTS, normal: 24, start: 0 },
+  match: { name: 'Сопоставление', C: Match, states: MATCH_STATES, variants: MATCH_VARIANTS, normal: 24, start: 0 },
+  order: { name: 'Порядок', C: Order, states: ORDER_STATES, variants: ORDER_VARIANTS, normal: 24, start: 0 },
+  cw: { name: 'Кроссворд', C: Crossword, states: CW_STATES, variants: CW_VARIANTS, normal: 30, start: 0 },
 }
-const SECS: [Sec, string][] = [['media', 'Вопросы с фото · утверждено'], ['sprint', 'Этап 1 · 120 секунд'], ['blitz', 'Этап 1 · Блиц'], ['reveal', 'Этап 1 · Три попытки'], ['jp', 'Этап 2 · Своя игра'], ['mel', 'Этап 2 · Угадай мелодию']]
+const GROUPS: [string, [Sec, string][]][] = [
+  ['Утверждено', [['media', 'Вопросы с фото'], ['sprint', '120 секунд'], ['blitz', 'Блиц'], ['reveal', 'Три попытки'], ['jp', 'Своя игра'], ['mel', 'Угадай мелодию']]],
+  ['Этап 3 — в работе', [['scr', 'Скрэмбл'], ['match', 'Сопоставление'], ['order', 'Порядок'], ['cw', 'Кроссворд']]],
+]
 function readMech() {
-  const m = /^#s1-(sprint|blitz|reveal|jp|mel)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
+  const m = /^#s1-(sprint|blitz|reveal|jp|mel|scr|match|order|cw)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
   return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], teams: Number(m[4] ?? 5), at: m[5] ?? '' } : null
 }
 import { STATES, TOTAL, phaseOf, type StateId } from './content'
 
 const CHAPTERS: Record<string, string> = { A: 'Лес', B: 'Лес прислушивается', C: 'Ветви прорастают', D: 'Открывается вопрос', E: 'Вопрос на экране', R: 'Ответ' }
 const CHAPTERS_S1: Record<string, string> = { A: 'Начало', E: 'Устойчивый кадр' }
-type Ver = 'new' | 'old'
 function readHash() {
-  const m = /^#(?:(new|old|ans)-)?(quick|full)-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
-  return { ver: (m?.[1] === 'old' ? 'old' : 'new') as Ver, ans: m?.[1] === 'ans', v: (m?.[2] ?? 'quick') as Mode, s: (STATES.some(x => x.id === m?.[3]) ? m![3] : 'two') as StateId, at: m?.[4] ?? '' }
+  const m = /^#(?:(new|ans)-)?(quick|full)-(\w+)(?:-(end|[\d.]+))?$/.exec(location.hash)
+  return { ans: m?.[1] === 'ans', v: (m?.[2] ?? 'quick') as Mode, s: (STATES.some(x => x.id === m?.[3]) ? m![3] : 'two') as StateId, at: m?.[4] ?? '' }
 }
 
 export function Lab() {
   const init = readHash()
   const [v, setV] = useState<Mode>(init.v)
-  const [ver, setVer] = useState<Ver>(init.ver)
   const [answer, setAnswer] = useState(init.ans)
   const startAt = useRef('')
   const im = readMech()
@@ -92,7 +101,7 @@ export function Lab() {
     ;(window as unknown as { __seek: (t: number) => void }).__seek = t => { a.tl.seek(Math.min(t, a.tl.duration())).pause(); paint() }
     ;(window as unknown as { __setN: (n: number) => void }).__setN = n => { ov.current = n; paint() } // для съёмки состояний таймера
   }, [embed, paint])
-  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${sec === 'media' ? `${ver}-${v}-${s}` : `s1-${sec}-${mv}-${ms}${sec === 'blitz' && mv === 'C' && teams !== 5 ? `-n${teams}` : ''}`}`) } catch { /* превью */ } }, [ver, v, s, sec, mv, ms, teams])
+  useEffect(() => { try { history.replaceState(null, '', `${location.search}#${sec === 'media' ? `new-${v}-${s}` : `s1-${sec}-${mv}-${ms}${sec === 'blitz' && teams !== 5 ? `-n${teams}` : ''}`}`) } catch { /* превью */ } }, [v, s, sec, mv, ms, teams])
 
   const fresh = (keepAnswer = false) => { ov.current = null; setOvr(null); if (!keepAnswer) setAnswer(false); setRun(r => r + 1) } // новая сцена → играет с начала
   const showAnswer = () => { startAt.current = 'E'; setAnswer(true); fresh(true) }
@@ -101,7 +110,7 @@ export function Lab() {
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
   const M = sec === 'media' ? null : MECHS[sec]
   const scene = M ? <div className="c7 fr" key={`${sec}-${mv}-${ms}-${teams}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} teams={teams} /></div>
-    : <div className="c7 fr" key={`${ver}-${v}-${s}-${run}`}>{ver === 'old' ? <SceneV6 state={s} mode={v} onReady={onReady} /> : <Scene state={s} mode={v} answer={answer} onReady={onReady} />}</div>
+    : <div className="c7 fr" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} answer={answer} onReady={onReady} /></div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
     <div className="m2-lab">
@@ -109,16 +118,20 @@ export function Lab() {
         <div className="m2-brand"><span className="m2-brand-q">❦</span><div><b>Зачарованный лес · Концепт C</b><span>Выберите экран — анимация запустится сама. Ползунок под кадром — ручная перемотка.</span></div></div>
       </header>
       <div className="fr-pick">
-        <span className="fr-cap">Раздел</span>
-        <div className="m2-seg" role="group" aria-label="Раздел">
-          {SECS.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') { setMs(MECHS[id].states[id === 'jp' || id === 'mel' ? 0 : 2].id); setMv(MECHS[id].pick ?? 'A') } fresh() }}>{name}</button>)}
-        </div>
-        {M && <>
-          <span className="fr-cap">Композиция</span>
-          <div className="m2-seg" role="group" aria-label="Композиция">
-            {[...M.variants].sort((a, b) => Number(b.id === M.pick) - Number(a.id === M.pick)).map(x => <button key={x.id} type="button" className={`${x.id === mv ? 'is-on' : ''}${!M.pick || x.id === M.pick ? '' : ' fr-old'}`} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{!M.pick ? x.name : x.id === M.pick ? `★ ${x.name} — выбрана` : `${x.name} (для сравнения)`}</button>)}
+        {GROUPS.map(([g, items]) => <div key={g} className="fr-group">
+          <span className="fr-cap">{g}</span>
+          <div className="m2-seg" role="group" aria-label={g}>
+            {items.map(([id, name]) => <button key={id} type="button" className={id === sec ? 'is-on' : ''} aria-pressed={id === sec} onClick={() => { setSec(id); if (id !== 'media') { setMs(MECHS[id].states[MECHS[id].start].id); setMv(MECHS[id].variants[0].id as Variant) } fresh() }}>{name}</button>)}
           </div>
-          {sec === 'blitz' && mv === 'C' && <>
+        </div>)}
+        {M && <>
+          {M.variants.length > 1 && <>
+            <span className="fr-cap">Концепт</span>
+            <div className="m2-seg" role="group" aria-label="Концепт">
+              {M.variants.map(x => <button key={x.id} type="button" className={x.id === mv ? 'is-on' : ''} aria-pressed={x.id === mv} onClick={() => { setMv(x.id as Variant); fresh() }}>{x.name}</button>)}
+            </div>
+          </>}
+          {sec === 'blitz' && <>
             <span className="fr-cap">Команд</span>
             <div className="m2-seg" role="group" aria-label="Число команд">
               {[3, 5, 8].map(c => <button key={c} type="button" className={c === teams ? 'is-on' : ''} aria-pressed={c === teams} onClick={() => { setTeams(c); fresh() }}>{c}</button>)}
@@ -131,10 +144,6 @@ export function Lab() {
         </>}
       </div>
       {!M && <div className="fr-pick">
-        <span className="fr-cap">Версия</span>
-        <div className="m2-seg" role="group" aria-label="Версия">
-          {([['new', 'Доработанная (10.07)'], ['old', 'Прежняя (10.06) — для сравнения']] as const).map(([id, name]) => <button key={id} type="button" className={id === ver ? 'is-on' : ''} aria-pressed={id === ver} onClick={() => { setVer(id); fresh() }}>{name}</button>)}
-        </div>
         <span className="fr-cap">Появление</span>
         <div className="m2-seg" role="group" aria-label="Появление">
           {([['quick', 'Обычный вопрос — быстро'], ['full', 'Первый вопрос раунда — лес просыпается']] as const).map(([id, name]) => <button key={id} type="button" className={id === v ? 'is-on' : ''} aria-pressed={id === v} onClick={() => { setV(id); fresh() }}>{name}</button>)}
@@ -148,7 +157,7 @@ export function Lab() {
         <Stage>{scene}</Stage>
         <div className="fr-player">
           <button type="button" className="fr-main" onClick={() => fresh()}>▶ Смотреть с начала</button>
-          {!M && ver === 'new' && <button type="button" onClick={showAnswer}>✦ Показать правильный ответ</button>}
+          {!M && <button type="button" onClick={showAnswer}>✦ Показать правильный ответ</button>}
           <button type="button" onClick={toggle}>{playing ? '❚❚ Пауза' : '▶ Продолжить'}</button>
           <input ref={range} className="fr-range" type="range" min={0} max={1} step={0.001} defaultValue={0} aria-label="Перемотка"
             onInput={e => { const a = api.current; if (a) jump(Number((e.target as HTMLInputElement).value) * a.tl.duration()) }} />
@@ -166,7 +175,7 @@ export function Lab() {
         </div>
       </main>
       {M && <section className="m2-card" aria-label="О композиции">
-        <div className="m2-card-head"><h1>{M.name} · {M.variants.find(x => x.id === mv)!.name}</h1><p>{M.variants.find(x => x.id === mv)!.note}</p></div>
+        <div className="m2-card-head"><h1>{M.name}{M.variants.length > 1 ? ` · ${M.variants.find(x => x.id === mv)?.name ?? ''}` : ' · утверждено'}</h1><p>{M.variants.find(x => x.id === mv)?.note}</p></div>
         <dl>{M.variants.filter(x => x.id !== mv).map(x => <div key={x.id}><dt>{x.name}</dt><dd>{x.note}</dd></div>)}</dl>
       </section>}
       {!M && <section className="m2-card" aria-label="Как устроено">
