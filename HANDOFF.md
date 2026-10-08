@@ -8621,6 +8621,8 @@ START / WARNING / ZERO. Таймеры в механиках — как в иг�
 
 **Навыки Anthropic (08.10.2026).** Проверены и установлены из `anthropics/skills`: `canvas-design` (постеры/статичный арт в PNG/PDF, внутри 5,6 МБ шрифтов OFL), `algorithmic-art` (генеративный арт на p5.js, шаблон грузит p5 с cdnjs), `webapp-testing` (Playwright на Python; в контейнере Python-пакета `playwright` нет — для его скриптов `pip install playwright`, браузер брать из `/opt/pw-browsers`, `playwright install` не запускать). Все — Apache 2.0, только markdown/шаблоны/шрифты, сетевых вызовов и секретов нет. НЕ ставили `web-artifacts-builder`: он уже встроен в среду, а его скрипты глобально ставят pnpm и десятки npm-пакетов в отдельный проект — к Vite-проекту квиза не относится.
 
+**Навыки для кинематографичных сцен (08.10.2026).** Проверены и установлены: `gsap-*` (8 официальных навыков GreenSock: core, timeline, plugins, utils, react, frameworks, scrolltrigger, performance; MIT), `frontend-design` (Anthropic, Apache 2.0), `react-three-fiber` (freshtechbro/claudedesignskills, MIT; скрипты на Python только генерируют заготовки компонентов). Сам GSAP и three.js в проект НЕ установлены: навыки — инструкции; ставить `gsap`/`three` в зависимости — отдельное решение (в лабораторию — да, в боевую игру — после проверки на барном проекторе).
+
 ## 7. Пул доработок на будущее
 
 - **[СДЕЛАНО в 9.80, §3cd — ведущий выбрал банк блица] Блиц: перенос вопросов между квизами (вопрос ведущему, 03.10.2026).**
