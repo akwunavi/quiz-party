@@ -11,7 +11,7 @@ import type { Rect } from '../stage1/env'
 import { JP2, TEAM, fmtVal, balla } from './data'
 
 export const JP_STATES = [
-  { id: 'board', name: 'Доска: часть плиток сыграна' }, { id: 'select', name: 'Выбор плитки' },
+  { id: 'fresh', name: 'Доска: все цены доступны' }, { id: 'board', name: 'Доска: часть цен сыграна' }, { id: 'catdone', name: 'Тема сыграна целиком' }, { id: 'select', name: 'Выбор цены' },
   { id: 'question', name: 'Плитка открыта: звучит трек, ответы идут' }, { id: 'reveal', name: 'Показан ответ, оценки ✓/✗' },
   { id: 'back', name: 'Возврат к доске: плитка гаснет' }, { id: 'complete', name: 'Доска сыграна целиком' },
 ]
@@ -27,8 +27,8 @@ const key = (ti: number, i: number) => `${ti}-${i}`
 function tilePos(v: string, ti: number, i: number) {
   if (v === 'A') return { x: 960 + (ti - 2) * 340, y: 388 + i * 168 }
   if (v === 'B') {
-    const cx = 960 + (ti - 2) * 352, cy = [560, 536, 524, 536, 560][ti], a = ([-135, -45, 45, 135][i] * Math.PI) / 180
-    return { x: cx + Math.cos(a) * 92, y: cy + Math.sin(a) * 92 }
+    const cx = 960 + (ti - 2) * 352, cy = [520, 498, 486, 498, 520][ti], a = ([-135, -45, 45, 135][i] * Math.PI) / 180
+    return { x: cx + Math.cos(a) * 104, y: cy + Math.sin(a) * 104 }
   }
   return { x: 700 + i * 300, y: 228 + ti * 172 + 64 }
 }
@@ -41,7 +41,7 @@ export function Jeopardy({ variant, state, nOv, onReady }: S1Props) {
   const sel = tilePos(variant, JP2.open.ti, JP2.open.i)
   const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
     const tiles = q('.jp2-t')
-    if (state === 'board' || state === 'complete') {
+    if (state === 'board' || state === 'complete' || state === 'fresh' || state === 'catdone') {
       if (variant === 'A') tl.fromTo(q('.jp2a-vine'), { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.1, stagger: 0.1, ease: 'power2.out' }, 0)
         .fromTo(q('.jp2a-tag'), { rotation: -14, y: -30, opacity: 0 }, { rotation: 0, y: 0, opacity: 1, duration: 0.9, stagger: 0.1, ease: 'elastic.out(1, 0.5)', transformOrigin: '50% 0%' }, 0.4)
       if (variant === 'B') tl.fromTo(q('.jp2b-stem'), { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 0.9, stagger: 0.08 }, 0)
@@ -59,7 +59,9 @@ export function Jeopardy({ variant, state, nOv, onReady }: S1Props) {
     }
     if (state === 'question') {
       // плитка летит с доски к зрителю и раскрывается; доска уходит в полумрак
-      tl.fromTo(q('.jp2-board'), { opacity: 1, filter: 'blur(0px)' }, { opacity: 0.32, filter: 'blur(2px)', duration: 0.6 }, 0)
+      if (variant === 'B') tl.fromTo(q('.jp2b-fl:not(.selfl) .jp2b-pw'), { scale: 1, opacity: 1 }, { scale: 0.62, opacity: 0.5, duration: 0.8, stagger: 0.03, ease: 'power2.inOut' }, 0)
+        .fromTo(q('.jp2b-fl:not(.selfl) .jp2b-leaf, .jp2b-fl:not(.selfl) .jp2b-core'), { opacity: 1 }, { opacity: 0.45, duration: 0.6 }, 0)
+      else tl.fromTo(q('.jp2-board'), { opacity: 1, filter: 'blur(0px)' }, { opacity: 0.32, filter: 'blur(2px)', duration: 0.6 }, 0)
         .fromTo(q('.jp2-vessel'), { x: sel.x - VX, y: sel.y - VY, scale: 0.28, opacity: 0.9 }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.9, ease: 'power3.inOut' }, 0.1)
         .fromTo(q('.jp2-v-open'), { '--o': 0 }, { '--o': 1, duration: 0.7, ease: 'back.out(1.6)' }, 0.9)
         .fromTo(q('.jp2-head > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.9)
@@ -86,14 +88,16 @@ export function Jeopardy({ variant, state, nOv, onReady }: S1Props) {
     if (state === 'back') {
       // плитка возвращается на место и гаснет (шелуха / опавший лепесток / тёмный фонарь)
       tl.fromTo(q('.jp2-vessel'), { x: 0, y: 0, scale: 1, opacity: 1 }, { x: sel.x - VX, y: sel.y - VY, scale: 0.28, opacity: 0, duration: 0.9, ease: 'power3.inOut' }, 0.1)
-        .fromTo(q('.jp2-board'), { opacity: 0.32, filter: 'blur(2px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.7 }, 0.3)
+      if (variant === 'B') tl.fromTo(q('.jp2b-fl:not(.selfl) .jp2b-pw'), { scale: 0.62, opacity: 0.5 }, { scale: 1, opacity: 1, duration: 0.8, stagger: 0.03, ease: 'back.out(1.4)' }, 0.4)
+        .fromTo(q('.jp2b-fl:not(.selfl) .jp2b-leaf, .jp2b-fl:not(.selfl) .jp2b-core'), { opacity: 0.45 }, { opacity: 1, duration: 0.6 }, 0.4)
+      else tl.fromTo(q('.jp2-board'), { opacity: 0.32, filter: 'blur(2px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.7 }, 0.3)
+      tl
         .fromTo(q('.jp2-t.just'), { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.9)
-      if (variant === 'B') tl.fromTo(q('.jp2b-fall'), { y: -120, rotation: -40, opacity: 1 }, { y: 0, rotation: 30, opacity: 1, duration: 1.4, ease: 'power1.in' }, 0.9)
     }
   }, tm, [variant, state])
 
   const n = nOv ?? (state === 'question' ? nLive : null)
-  const played = state === 'complete' ? TH.flatMap((_, ti) => VAL.map((_, i) => key(ti, i))) : state === 'back' ? [...JP2.played, OPEN] : JP2.played
+  const played = state === 'complete' ? TH.flatMap((_, ti) => VAL.map((_, i) => key(ti, i))) : state === 'fresh' ? [] : state === 'back' ? [...JP2.played, OPEN] : state === 'catdone' ? [...JP2.played, '1-2', '1-3'] : JP2.played
   const inQ = state === 'question' || state === 'reveal' || state === 'back'
   const stOf = (k: string) => (k === OPEN && state === 'select' ? 'sel' : k === OPEN && (state === 'question' || state === 'reveal') ? 'taken' : played.includes(k) ? `done${k === OPEN && state === 'back' ? ' just' : ''}` : 'av')
   const rects: Rect[] = inQ && state !== 'back' ? [{ x: 150, y: 220, w: 560, h: 760 }, { x: 860, y: 70, w: 1000, h: 900 }] : variant === 'C' ? [{ x: 60, y: 160, w: 1800, h: 880 }] : [{ x: 120, y: 150, w: 1680, h: 880 }]
@@ -108,7 +112,6 @@ export function Jeopardy({ variant, state, nOv, onReady }: S1Props) {
         {variant === 'C' && <BoardC stOf={stOf} />}
       </div>
       {state === 'select' && <i className="jp2-selring" style={{ left: sel.x, top: sel.y }} aria-hidden />}
-      {variant === 'B' && state === 'back' && <span className="jp2b-fall" style={{ left: sel.x - 30, top: 1000 }} aria-hidden><svg viewBox="-40 -60 80 80"><path d={PETAL_S} /></svg></span>}
       {inQ && <Vessel variant={variant} n={state === 'question' ? n : null} playing={state === 'question'} />}
       {(state === 'question' || state === 'reveal') && <Panel variant={variant} reveal={state === 'reveal'} n={n} />}
     </S1Screen>
@@ -148,26 +151,38 @@ function BoardA({ stOf }: { stOf: (k: string) => string }) {
     )
   })}</>
 }
-const PETAL = 'M 0 -18 C 34 -36 54 -104 0 -158 C -54 -104 -34 -36 0 -18 Z'
-const PETAL_S = 'M 0 0 C 14 -10 22 -34 0 -54 C -22 -34 -14 -10 0 0 Z'
+const PETAL = 'M 0 -24 C 42 -44 64 -124 0 -186 C -64 -124 -42 -44 0 -24 Z'
+const ANG = [-135, -45, 45, 135] // по часовой стрелке от верхнего левого: 0,5 → 1 → 1,5 → 2
+const FL_X = (ti: number) => 960 + (ti - 2) * 352
+const FL_Y = [520, 498, 486, 498, 520]
+const LABEL_TOP = 806 // все подписи тем — на одной линии, по центру своего стебля
 function BoardB({ stOf }: { stOf: (k: string) => string }) {
   return <>{TH.map((t, ti) => {
-    const cx = 960 + (ti - 2) * 352, cy = [560, 536, 524, 536, 560][ti]
-    const all = VAL.every((_, i) => stOf(key(ti, i)).startsWith('done'))
+    const cx = FL_X(ti), cy = FL_Y[ti]
+    const sts = VAL.map((_, i) => stOf(key(ti, i)))
+    const all = sts.every(x => x.startsWith('done')), sel = sts.some(x => x === 'sel' || x === 'taken')
     return (
-      <div key={ti} className={`jp2b-fl${all ? ' bare' : ''}`}>
-        <svg className="jp2b-stem" style={{ left: cx - 60, top: cy }} viewBox={`0 0 120 ${1080 - cy}`} aria-hidden><path d={`M 60 0 C 50 ${(1080 - cy) * 0.4} 70 ${(1080 - cy) * 0.7} 60 ${1080 - cy}`} /></svg>
-        <div className="jp2b-leaf" style={{ left: cx, top: cy + 210 }}><b>{t.name}</b>{t.hint && <span>{t.hint}</span>}</div>
+      <div key={ti} className={`jp2b-fl${all ? ' bare' : ''}${sel ? ' selfl' : ''}`}>
+        <svg className="jp2b-stem" style={{ left: cx - 70, top: cy }} viewBox={`0 0 140 ${1080 - cy}`} aria-hidden>
+          <path d={`M 70 0 C 62 ${(1080 - cy) * 0.35} 78 ${(1080 - cy) * 0.65} 70 ${1080 - cy}`} />
+          <path className="lf" d={`M 70 ${(1080 - cy) * 0.22} C 40 ${(1080 - cy) * 0.18} 14 ${(1080 - cy) * 0.24} 4 ${(1080 - cy) * 0.3} C 30 ${(1080 - cy) * 0.3} 54 ${(1080 - cy) * 0.28} 70 ${(1080 - cy) * 0.25} Z`} />
+          <path className="lf" d={`M 70 ${(1080 - cy) * 0.12} C 100 ${(1080 - cy) * 0.07} 124 ${(1080 - cy) * 0.12} 136 ${(1080 - cy) * 0.18} C 110 ${(1080 - cy) * 0.19} 86 ${(1080 - cy) * 0.17} 70 ${(1080 - cy) * 0.15} Z`} />
+        </svg>
+        <div className="jp2b-leaf" style={{ left: cx, top: LABEL_TOP }}><b>{t.name}</b>{t.hint && <span>{t.hint}</span>}{all && <em>сыграна</em>}</div>
         {VAL.map((v, i) => {
-          const st = stOf(key(ti, i)), a = [-135, -45, 45, 135][i], p = tilePos('B', ti, i)
+          const st = sts[i], done = st.startsWith('done'), a = ANG[i], rad = ((a + (done ? 14 : 0)) * Math.PI) / 180
           return (
             <div key={i} className={`jp2-t jp2b-t ${st}`} style={{ left: cx, top: cy }}>
-              <svg className="jp2b-petal" viewBox="-80 -170 160 180" style={{ transform: `rotate(${a + 90}deg)` }} aria-hidden><path d={PETAL} /><path className="vein" d="M 0 -24 Q 4 -90 0 -150" /></svg>
-              {!st.startsWith('done') && st !== 'taken' && <b className="jp2b-val" style={{ left: p.x - cx, top: p.y - cy }}>{fmtVal(v)}</b>}
+              <div className="jp2b-pw">
+                <svg className="jp2b-petal" viewBox="-90 -200 180 210" style={{ transform: `rotate(${a + 90 + (done ? 14 : 0)}deg) scale(${done ? 0.84 : 1})` }} aria-hidden><path d={PETAL} /><path className="vein" d="M 0 -30 Q 5 -104 0 -176" /></svg>
+                {st !== 'taken' && <b className="jp2b-val" style={{ left: Math.cos(rad) * (done ? 87 : 104), top: Math.sin(rad) * (done ? 87 : 104) }}>{fmtVal(v)}</b>}
+              </div>
             </div>
           )
         })}
-        <i className="jp2b-core" style={{ left: cx, top: cy }} />
+        <svg className="jp2b-core" style={{ left: cx - 46, top: cy - 46 }} viewBox="-46 -46 92 92" aria-hidden>
+          <circle r="40" className="disc" />{Array.from({ length: 21 }, (_, k) => { const a = k * 2.4, d = Math.sqrt(k / 21) * 30; return <circle key={k} cx={Math.cos(a) * d} cy={Math.sin(a) * d} r="2.6" className="seed" /> })}
+        </svg>
       </div>
     )
   })}</>

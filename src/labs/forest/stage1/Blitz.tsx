@@ -148,7 +148,8 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
   const rank = [...v.teams].sort((a, b) => pts(b) - pts(a))
   const place = (t: BzTeam) => 1 + v.teams.filter(x => pts(x) > pts(t)).length
   const mood = state === 'intro' ? 'calm' : undefined
-  const bank = <div className="bz-bank"><span>в банке</span><b>{BLITZ.bank}</b><span>вопросов</span></div>
+  // банк вопросов — только число (как счётчик remainingCount в углу экрана игры)
+  const bank = <div className="bz-bank" aria-label={`Осталось вопросов: ${BLITZ.bank}`}><b>{BLITZ.bank}</b></div>
   const ph = (t: BzTeam) => tphase(leftOf(t))
 
   if (state === 'intro') return (
@@ -208,7 +209,7 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
   // ── C: деревца-часы
   const N = v.teams.length, M0 = 60, cw = (1920 - 2 * M0) / N
   const tw = Math.min(cw - 14, 320), sc = tw / 320, th = 440 * sc
-  const plaqueH = state === 'complete' ? (N >= 7 ? 236 : 206) : N >= 7 ? 200 : 176, ground = 1062 - plaqueH - 10, treeTop = ground + 20 * sc - th
+  const plaqueH = state === 'complete' ? (N >= 7 ? 250 : 226) : N >= 7 ? 212 : 190, ground = 1062 - plaqueH - 10, treeTop = ground + 20 * sc - th
   const rightT = v.teams.find(t => t.id === 't1')
   const fr = rightT ? FRUITS[Math.min(Math.max(0, pts(rightT)), FRUITS.length) - 1] : undefined
   const ti = v.teams.findIndex(t => t.id === 't1')
@@ -237,7 +238,7 @@ export function Blitz({ variant, state, nOv, onReady, teams: count = 5 }: S1Prop
               <div className="bzC-disc"><b className="bz-time">{left}</b>{r && <span className={`bz-rank${r.place === 1 ? ' gold' : ''}`}>{r.place}{r.shared ? '=' : ''}</span>}</div>
               {r?.place === 1 && <span className="bzC-blossom" aria-hidden>{Array.from({ length: 9 }, (_, j) => <i key={j} style={{ left: `${18 + ((j * 37) % 64)}%`, top: `${8 + ((j * 23) % 36)}%` }} />)}</span>}
             </div>
-            <div className={`bzC-plaque${r ? ' fin' : ''}`} style={{ top: ground + 8, height: plaqueH, width: Math.min(cw - 16, 440) }}>
+            <div className={`bzC-plaque${r ? ' fin' : ''}`} style={{ bottom: 14, height: plaqueH, width: Math.min(cw - 16, 440) }}>
               {status && <div className="bzC-status">{on && <svg className="bz-lamp-ico" viewBox="0 0 24 34" aria-hidden><path d="M12 0 V6" /><rect x="5" y="6" width="14" height="20" rx="5" /><circle cx="12" cy="16" r="4" /></svg>}{status}</div>}
               <div className="bzC-name">{t.name}</div>
               {r ? <>
@@ -280,14 +281,14 @@ const CLUSTERS: [number, number, number, 0 | 1 | 2][] = [
 /** Точки, где висят плоды (на концах веточек, по краю кроны). */
 const FRUITS: [number, number][] = [[62, 190], [264, 192], [116, 182], [206, 186], [160, 178], [86, 158], [238, 160], [138, 150]]
 function rng(seed: number) { let x = seed * 9301 + 49297; return () => { x = (x * 9301 + 49297) % 233280; return x / 233280 } }
-type Leaf = { x: number; y: number; r: number; s: number; layer: 0 | 1 | 2; lit: boolean; order: number }
+type Leaf = { x: number; y: number; r: number; s: number; layer: 0 | 1 | 2; lit: boolean; order: number; cl: number; slot: number }
 const LEAVES: Leaf[] = (() => {
   const r = rng(7), out: Leaf[] = []
-  for (const [cx, cy, R, layer] of CLUSTERS) for (let j = 0; j < 12; j++) {
+  CLUSTERS.forEach(([cx, cy, R, layer], cl) => { for (let j = 0; j < 12; j++) {
     const a = r() * Math.PI * 2, d = Math.sqrt(r()) * R
     const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * 0.8
-    out.push({ x, y, r: r() * 180, s: 1.8 + r() * 1.0, layer, lit: x + y < 250 && layer > 0, order: r() })
-  }
+    out.push({ x, y, r: r() * 180, s: 1.8 + r() * 1.0, layer, lit: x + y < 250 && layer > 0, order: r(), cl, slot: j })
+  } })
   return out
 })()
 /** Крона, ветви, плоды и фонарь крупнее ствола: масштаб вокруг развилки (160, 262). */
@@ -295,12 +296,27 @@ const CROWN_K = 1.18, CROWN_T = `translate(160 262) scale(${CROWN_K}) translate(
 const crownPt = ([x, y]: [number, number]) => [160 + (x - 160) * CROWN_K, 262 + (y - 262) * CROWN_K] as const
 const LEAF_D = 'M 0 -9 C 6 -5 6.5 3 0 10 C -6.5 3 -6 -5 0 -9 Z'
 
+/** Порядок облетания (индексы листьев, первыми — дольше всех держащиеся). Листья снимаются ПО
+ *  ОЧЕРЕДИ из каждого пучка кроны (а внутри пучка — в своём перемешанном порядке), поэтому на любой
+ *  секунде крона редеет равномерно и сохраняет силуэт. Зависит только от номера дерева: перемотка к
+ *  8 секундам даёт тот же набор листьев, что честный отсчёт до 8. */
+const FALL = new Map<number, number[]>()
+function fallOrder(seed: number): number[] {
+  const hit = FALL.get(seed); if (hit) return hit
+  const h = (n: number) => { let t = (n + seed * 0x9E3779B9) >>> 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+  const byCl = CLUSTERS.map((_, c) => LEAVES.map((l, i) => ({ l, i })).filter(x => x.l.cl === c).sort((a, b) => h(a.i) - h(b.i)).map(x => x.i))
+  const clOrder = CLUSTERS.map((_, c) => c).sort((a, b) => h(1000 + a) - h(1000 + b))
+  const out: number[] = []
+  for (let round = 0; round < 12; round++) for (const c of clOrder) if (byCl[c][round] !== undefined) out.push(byCl[c][round])
+  FALL.set(seed, out); return out
+}
+/** Земля дерева в координатах кроны (крона увеличена CROWN_T вокруг развилки). */
+const GROUND_IN_CROWN = 262 + (414 - 262) / 1.18
+
 function ClockTree({ k, fruits, seed, lantern, newFruit }: { k: number; fruits: number; seed: number; lantern: boolean; newFruit: boolean }) {
   const keep = Math.round(k * LEAVES.length)
-  // каждое дерево облетает в своём порядке
-  const rank = LEAVES.map((l, i) => ({ i, o: (l.order * 7 + seed * 0.37) % 1 })).sort((a, b) => a.o - b.o)
-  const goneSet = new Set(rank.slice(keep).map(x => x.i))
-  const pile = Math.round((1 - k) * 14)
+  const goneSet = new Set(fallOrder(seed).slice(keep))
+  const pile = Math.round((1 - k) * 10)
   return (
     <svg className="bzC-tree" viewBox="0 0 320 440" aria-hidden>
       <ellipse className="bzC-shadow" cx="160" cy="424" rx="118" ry="16" />
@@ -313,13 +329,17 @@ function ClockTree({ k, fruits, seed, lantern, newFruit }: { k: number; fruits: 
       {BRANCHES.slice(0, 3).map(([d], j) => <path key={j} className="bzC-branch-rim" d={d} transform="translate(-1.6 -1.2)" />)}
       </g>
       <path className="bzC-moss" d="M 112 426 C 124 414 140 418 150 422 C 160 412 176 414 186 422 C 198 416 212 420 218 428 Z" />
-      {Array.from({ length: pile }, (_, j) => { const rr = rng(seed * 31 + j); const x = 100 + rr() * 120, y = 424 + rr() * 10; return <path key={j} className={`bzC-fallen f${j % 3}`} d={LEAF_D} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rr() * 180).toFixed(0)}) scale(1.3 0.7)`} /> })}
+      {Array.from({ length: pile }, (_, j) => { const rr = rng(seed * 31 + j); const x = 70 + rr() * 180, y = 422 + rr() * 12; return <path key={j} className={`bzC-fallen f${j % 3}`} d={LEAF_D} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rr() * 180).toFixed(0)}) scale(1.3 0.7)`} /> })}
       <g transform={CROWN_T}>
       {[0, 1, 2].map(layer => (
         <g key={layer} className={`bzC-crown l${layer}`}>
           {LEAVES.map((l, j) => l.layer !== layer ? null : (
-            <g key={j} className={`lf${goneSet.has(j) ? ' gone' : ''}${l.lit ? ' lit' : ''}`} style={{ ['--fx' as string]: `${((l.order - 0.5) * 60).toFixed(0)}px`, ['--fy' as string]: `${(420 - l.y).toFixed(0)}px`, ['--d' as string]: `${(l.order * 0.5).toFixed(2)}s` }}>
-              <path d={LEAF_D} transform={`translate(${l.x.toFixed(1)} ${l.y.toFixed(1)}) rotate(${l.r.toFixed(0)}) scale(${l.s.toFixed(2)})`} />
+            // три уровня: точка крепления (атрибут, не меняется никогда) → движение (CSS: облетание,
+            // дрожь; начало отсчёта = точка крепления) → форма листа (поворот/размер, атрибут)
+            <g key={j} transform={`translate(${l.x.toFixed(1)} ${l.y.toFixed(1)})`}>
+              <g className={`lf${goneSet.has(j) ? ' gone' : ''}${l.lit ? ' lit' : ''}`} style={{ ['--fx' as string]: `${((l.order - 0.5) * 70).toFixed(0)}px`, ['--fy' as string]: `${(GROUND_IN_CROWN - l.y).toFixed(0)}px`, ['--fr' as string]: `${(40 + l.order * 110).toFixed(0)}deg`, ['--d' as string]: `${(l.order * 0.5).toFixed(2)}s` }}>
+                <path d={LEAF_D} transform={`rotate(${l.r.toFixed(0)}) scale(${l.s.toFixed(2)})`} />
+              </g>
             </g>
           ))}
         </g>

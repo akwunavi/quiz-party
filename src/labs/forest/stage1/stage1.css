@@ -244,14 +244,16 @@
 .bzC-branch-rim { fill:none; stroke:#6e5843; stroke-width:2; stroke-linecap:round; opacity:.75; }
 .bzC-moss { fill:#24533b; }
 .bzC-fallen { fill:#7a5a2c; } .bzC-fallen.f1 { fill:#93682d; } .bzC-fallen.f2 { fill:#5e4826; }
-.bzC-crown .lf { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--g, 1)); transition: transform 1.6s cubic-bezier(.4,.1,.6,1) var(--d), opacity 1.6s ease var(--d); }
+.bzC-crown .lf { transform-box: view-box; transform-origin: 0 0; transform: scale(var(--g, 1)); transition: transform 1.6s cubic-bezier(.4,.1,.6,1) var(--d), opacity 1.6s ease var(--d); }
 .bzC.st-complete .bzC-crown .lf { transition:none; }
-.bzC-crown .lf.gone { transform: translate(var(--fx), var(--fy)) rotate(80deg); opacity:0; }
+.bzC-crown .lf.gone { transform: translate(var(--fx), var(--fy)) rotate(var(--fr)); opacity:0; }
 .bzC-crown.l0 path { fill:#1b4634; } .bzC-crown.l0 .lit path { fill:#22553f; }
 .bzC-crown.l1 path { fill:#2b6446; stroke:rgba(8,30,20,.35); stroke-width:.6; } .bzC-crown.l1 .lit path { fill:#3c7d58; }
 .bzC-crown.l2 path { fill:#3f8059; stroke:rgba(8,30,20,.35); stroke-width:.6; } .bzC-crown.l2 .lit path { fill:#5d9e72; }
 .bzC-unit.ph-warning .bzC-crown.l1 path { fill:#b27a34; } .bzC-unit.ph-warning .bzC-crown.l2 path { fill:#d9a24a; } .bzC-unit.ph-warning .bzC-crown.l0 path { fill:#7a5426; }
-.bzC-unit.ph-warning .lf:not(.gone) path { animation: bz-tremble .5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 0%; }
+/* дрожь — на группе движения: качается вокруг своей точки крепления (раньше правило ставило
+   transform-origin самому листу и сдвигало его SVG-трансформ — листья съезжали в кучки) */
+.bzC-unit.ph-warning .lf:not(.gone) { animation: bz-tremble .5s ease-in-out infinite alternate; }
 @keyframes bz-tremble { from { rotate: -6deg; } to { rotate: 6deg; } }
 /* на нуле: голое дерево в лунном свете, листья — у корней; дерево остаётся деревом */
 .bzC-unit.ph-zero .bzC-branch, .bzC-unit.ph-zero .bzC-trunk { stroke:#3b3229; }
@@ -464,3 +466,13 @@
 .bzC .bz-rank.gold { box-shadow: 0 0 0 3px #fff1c2, 0 0 24px rgba(255,214,140,.8); }
 .bzC-blossom { position:absolute; inset:0; pointer-events:none; }
 .bzC-blossom i { position:absolute; width:calc(16px * var(--sc)); height:calc(16px * var(--sc)); border-radius:50%; background: radial-gradient(circle, #f0c055 0 25%, #ffe6f0 30%, #f5b8d0 70%); box-shadow: 0 0 10px rgba(255,220,235,.6); }
+/* банк — одно число на деревянном спиле в правом верхнем углу */
+.bz-bank { top:22px; right:44px; width:104px; height:104px; border-radius:50%; display:grid; place-items:center; gap:0;
+  background: repeating-radial-gradient(circle at 48% 46%, #a47c4c 0 6px, #8a643c 6px 8px), #77542f; border:6px solid #2a1a0d; box-shadow: 0 8px 18px rgba(0,0,0,.6), inset 0 -6px 10px rgba(40,20,5,.35); }
+.bz-bank b { font-size:52px; line-height:1; color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.95); }
+.bzC .bz-bank { top:22px; }
+.bzC-plaque { overflow:hidden; }
+/* «Три попытки» A — рамы и раскрытие Концепта C на холсте; номер картинки — бутон в углу рамы */
+.rvA-cv { position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; }
+.rvA-no { position:absolute; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; display:grid; place-items:center; font-size:26px; font-weight:700; color:#2a1a08; z-index:2;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); box-shadow: 0 0 0 3px rgba(20,40,30,.85), 0 4px 10px rgba(0,0,0,.6); }

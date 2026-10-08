@@ -22,8 +22,8 @@ const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, pick: 'A' },
   blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, pick: 'C' },
   reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, pick: 'A' },
-  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24 },
-  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24 },
+  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24, pick: 'B' },
+  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24, pick: 'A' },
 }
 const SECS: [Sec, string][] = [['media', 'Вопросы с фото · утверждено'], ['sprint', 'Этап 1 · 120 секунд'], ['blitz', 'Этап 1 · Блиц'], ['reveal', 'Этап 1 · Три попытки'], ['jp', 'Этап 2 · Своя игра'], ['mel', 'Этап 2 · Угадай мелодию']]
 function readMech() {

@@ -8,7 +8,10 @@
 //   время — лоза; буквы — на речной гальке.
 // C «Росток и луна» — фаза растёт ростком у корней, время — убывающая луна в просвете кроны;
 //   буквы — на шляпках светящихся грибов.
+import { useEffect, useMemo, useRef } from 'react'
+import gsap from 'gsap'
 import { REVEAL } from './data'
+import { makeFrames, type FrameState } from './mediaFrames'
 import { Dandelion, VineTimer, MoonTimer } from './timers'
 import { RoundIntro, S1Screen, introTl, useEntrance, type S1Props } from './common'
 import type { Rect } from './env'
@@ -24,11 +27,12 @@ export const REVEAL_VARIANTS = [
 ]
 
 const P = { p1: 0, p2: 1, p3: 2, over: 2, review: 3 } as Record<string, number>
+const prevOf = (st: string) => (st === 'p2' ? [0, 1] : st === 'p3' ? [2] : [])
 const shown = (st: string) => (st === 'p1' ? [0, 1] : st === 'p2' ? [2] : st === 'p3' || st === 'over' ? [3] : [0, 1, 2, 3])
 function timerFor(state: string) {
   if (state === 'p1') return { start: 30, from: 1.2, run: 8 }
-  if (state === 'p2') return { start: 20, from: 1.2, run: 8 }
-  if (state === 'p3') return { start: 10, from: 1.0, run: 6 }
+  if (state === 'p2') return { start: 20, from: 2.4, run: 8 }
+  if (state === 'p3') return { start: 10, from: 2.4, run: 6 }
   return null
 }
 /** Картинки фазы: одной высоты (равная важность), пропорции свои. */
@@ -39,6 +43,20 @@ function frames(idx: number[], top: number, maxH: number, cx: number, maxW: numb
   while (total(h) > maxW) h -= 4
   let x = cx - total(h) / 2
   return imgs.map(im => { const w = Math.round(im.w * h / im.h), r = { x: Math.round(x), y: top, w, h }; x += w + gap; return r })
+}
+
+/** Холст рам Концепта C: текущие картинки + (при смене фазы) прошлые, которые уходят под листву. */
+type FS = { cur: FrameState; prev: FrameState }
+function FrameCanvas({ idx, rs, prevIdx, prevRs, fs }: { idx: number[]; rs: Rect[]; prevIdx: number[]; prevRs: Rect[]; fs: FS }) {
+  const cv = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    const ctx = cv.current!.getContext('2d')!
+    const cur = makeFrames({ rects: rs, srcs: idx.map(i => REVEAL.imgs[i].src) }, 40), prev = prevRs.length ? makeFrames({ rects: prevRs, srcs: prevIdx.map(i => REVEAL.imgs[i].src) }, 60) : null
+    const draw = () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1920, 1080); if (prev) prev(ctx, fs.prev); cur(ctx, fs.cur) }
+    gsap.ticker.add(draw); return () => gsap.ticker.remove(draw)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fs])
+  return <canvas ref={cv} className="rvA-cv" width={1920} height={1080} aria-hidden />
 }
 
 function Frames({ idx, rs }: { idx: number[]; rs: Rect[] }) {
@@ -74,14 +92,37 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
   const tm = timerFor(state)
   const idx = shown(state)
   const review = state === 'review'
+  // числа рам для холста варианта A — новый объект на каждое состояние (перемотка/повтор не копят значений)
+  const fs = useMemo<FS>(() => {
+    const k = shown(state).length, pk = prevOf(state).length
+    const done = state === 'over' ? 1 : 0
+    return { cur: { grow: Array(k).fill(done), reveal: Array(k).fill(done), bloom: Array(k).fill(0), pulse: 0 }, prev: { grow: Array(pk).fill(1), reveal: Array(pk).fill(1), bloom: Array(pk).fill(0), pulse: 0 } }
+  }, [state])
   const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
     if (state === 'intro') return introTl(tl, q)
+    if (variant === 'A' && state !== 'over') {
+      // смена фазы: прошлые картинки закрывает листва, рама сворачивается — на том же месте вырастает
+      // новая рама и листва расходится живым краем (как в утверждённом Концепте C); слово и стебель фаз не двигаются
+      const swap = fs.prev.grow.length > 0, t0 = swap ? 1.0 : 0.1
+      fs.prev.grow.forEach((_, k) => {
+        tl.fromTo(fs.prev.reveal, { [k]: 1 }, { [k]: 0, duration: 0.55, ease: 'power2.in' }, 0.05 + k * 0.08)
+          .fromTo(fs.prev.grow, { [k]: 1 }, { [k]: 0, duration: 0.6, ease: 'power2.in' }, 0.45 + k * 0.08)
+      })
+      fs.cur.grow.forEach((_, k) => {
+        tl.fromTo(fs.cur.grow, { [k]: 0 }, { [k]: 1, duration: 1.1, ease: 'power2.inOut' }, t0 + k * 0.1)
+          .fromTo(fs.cur.reveal, { [k]: 0 }, { [k]: 1, duration: 0.95, ease: 'power2.inOut' }, t0 + 1.0 + k * 0.1)
+        if (review) tl.fromTo(fs.cur.bloom, { [k]: 0 }, { [k]: 1, duration: 1.0, ease: 'power1.out' }, 2.4 + k * 0.12)
+      })
+      tl.fromTo(fs.cur, { pulse: 0 }, { pulse: 1.15, duration: 1.1, ease: 'power1.inOut' }, t0)
+        .fromTo(q('.rvA-no'), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.4, stagger: 0.08, ease: 'back.out(2)' }, t0 + 1.6)
+    }
     // фото появляются из-под листвы: листва расходится от центра; в фазе 2/3 старые кадры сперва зарастают
     if (state === 'p2' || state === 'p3') tl.fromTo(q('.rv-ghost'), { opacity: 1, clipPath: 'circle(75% at 50% 50%)' }, { clipPath: 'circle(0% at 50% 50%)', duration: 0.6, ease: 'power2.in' }, 0)
     tl.fromTo(q('.rv-frame'), { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, state === 'p2' || state === 'p3' ? 0.5 : 0.1)
       .fromTo(q('.rv-frame img'), { clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)', duration: 0.9, stagger: 0.12, ease: 'power2.inOut' }, state === 'p2' || state === 'p3' ? 0.8 : 0.4)
       .fromTo(q('.rv-foliage'), { opacity: 1 }, { opacity: 0, duration: 0.9, stagger: 0.12 }, state === 'p2' || state === 'p3' ? 0.8 : 0.4)
-    tl.fromTo(q('.rv-cell'), { opacity: 0, y: 30, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.06, ease: 'back.out(1.8)' }, 0.3)
+    // слово на спилах появляется один раз — при смене фазы (A, фазы 2–3) оно уже стоит и не перезапускается
+    if (!(variant === 'A' && (state === 'p2' || state === 'p3' || state === 'over'))) tl.fromTo(q('.rv-cell'), { opacity: 0, y: 30, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.06, ease: 'back.out(1.8)' }, 0.3)
     // смена фазы: текущий маркер раскрывается, прошлый вянет
     tl.fromTo(q('.rv-ph.cur'), { scale: 0.7 }, { scale: 1, duration: 0.7, ease: 'back.out(2)' }, 0.6)
       .fromTo(q('.rv-ph.used.just'), { rotation: 0, y: 0, opacity: 1 }, { rotation: variant === 'B' ? 24 : 0, y: variant === 'B' ? 30 : 0, opacity: 0.75, duration: 0.9, ease: 'power2.in' }, 0.2)
@@ -95,7 +136,6 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
         .fromTo(q('.rv-cell:not(.pre)'), { rotationY: -90 }, { rotationY: 0, duration: 0.6, stagger: 0.18, ease: 'back.out(1.4)', transformPerspective: 600 }, 1.0)
         .fromTo(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.25, duration: 0.35, stagger: 0.18, ease: 'power2.out' }, 1.3)
         .to(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 1.6, duration: 0.6, stagger: 0.18 }, 1.65)
-        .fromTo(q('.rvA-bloom'), { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.7, stagger: 0.12, ease: 'back.out(2)' }, 2.1)
         .fromTo(q('.rv-word-glow'), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 2.2)
         .fromTo(q('.rv-note'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 2.5)
         .fromTo(q('.rv-ans'), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, 2.8)
@@ -105,7 +145,7 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
         .fromTo(q('.rv-note'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 2.2)
         .fromTo(q('.rv-ans'), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, 2.5)
     }
-  }, tm, [variant, state])
+  }, tm, [variant, state, fs])
   const n = nOv ?? (state === 'over' ? 0 : nLive)
   const ph = P[state] ?? 0
   const phases = REVEAL.phases.map((p, i) => ({ ...p, cls: review || i < ph ? 'used' : i === ph ? 'cur' : 'next', just: i === ph - 1 && !review }))
@@ -127,9 +167,8 @@ export function Reveal3({ variant, state, nOv, onReady }: S1Props) {
     const ptsWord = (p: string) => (p === '1' ? 'балл' : 'балла')
     return (
       <S1Screen rects={[...rs, { x: wx0, y: cy - 80, w: ww, h: 170 }]} n={showTimer ? n : null} rootRef={root} cls={`rv rvA st-${state}`}>
-        {(state === 'p2' || state === 'p3') && <div className="rv-ghost" />}
-        <Frames idx={idx} rs={rs} />
-        {review && rs.map((r, k) => <span key={k} className="rvA-bloom" style={{ left: r.x + r.w - 6, top: r.y - 8 }} aria-hidden><i /><i /><i /><i /><i /><b /></span>)}
+        <FrameCanvas idx={idx} rs={rs} prevIdx={prevOf(state)} prevRs={prevOf(state).length ? frames(prevOf(state), 40, 560, 1060, 1500, 56) : []} fs={fs} />
+        {idx.map((i, k) => <span key={i} className="rvA-no" style={{ left: rs[k].x - 4, top: rs[k].y - 4 }}>{i + 1}</span>)}
         <svg className="rvA-vine" style={{ left: wx0, top: cy + d / 2 - 6, width: ww }} viewBox={`0 0 ${ww} 40`} preserveAspectRatio="none" aria-hidden>
           <path className="rvA-vine-s" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
           <path className="rvA-vine-light" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />

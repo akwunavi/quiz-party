@@ -18,12 +18,13 @@ import { melodySpinPath, melodySpinAt, melodyPoints } from '../../../lib/melody'
 import { MEL2, TEAM, ALL_TEAMS, fmtVal, balla } from './data'
 
 export const MEL_STATES = [
-  { id: 'idle', name: 'Доска: часть треков отыграна' }, { id: 'spinning', name: 'Рулетка выбирает трек' },
+  { id: 'fresh', name: 'Доска: все треки доступны' }, { id: 'idle', name: 'Доска: часть треков отыграна' }, { id: 'catdone', name: 'Тема отыграна целиком' },
+  { id: 'spinning', name: 'Рулетка выбирает трек' },
   { id: 'listen', name: 'Слушаем 1 секунду' }, { id: 'bidding', name: 'Ставки: за сколько секунд угадаете' },
   { id: 'bids', name: 'Ставки собраны, очередь' }, { id: 'snippet', name: 'Играет отрывок по ставке' },
   { id: 'answering', name: 'Отвечает первая команда' }, { id: 'wrong', name: 'Неверно — ход второй' },
   { id: 'passed', name: 'Ход передан: трек целиком' }, { id: 'reveal', name: 'Угадали: ответ и баллы' },
-  { id: 'miss', name: 'Никто не угадал: ответ' }, { id: 'complete', name: 'Все треки отыграны' },
+  { id: 'miss', name: 'Никто не угадал: ответ' }, { id: 'back', name: 'Назад к доске: трек отыгран' }, { id: 'complete', name: 'Все треки отыграны' },
 ]
 export const MEL_VARIANTS = [
   { id: 'A', name: 'A · Колокольчики', note: 'Четыре стебля колокольчиков — четыре темы, имя темы на листе над стеблем. Колокол — трек, номер на чашечке. Рулетка — светлячок перелетает с цветка на цветок и садится на выбранный. Выбранный колокол вырастает слева и раскачивается, пока звучит музыка; на верном ответе распускается золотом. Отыгранный колокол закрывается и вянет.' },
@@ -37,7 +38,7 @@ const [PTI, PI] = MEL2.pick.split('-').map(Number)
 const SPIN_FROM = 0.4, SPIN_MS = MEL2.spinSec * 1000
 
 function pos(v: string, ti: number, i: number) {
-  if (v === 'A') return { x: 960 + (ti - 1.5) * 420 + (i % 2 ? 62 : -62), y: 360 + i * 150 }
+  if (v === 'A') { const p = plant(ti).bells[i]; return { x: PLANT_X(ti) - 200 + p.x, y: PLANT_Y + p.y + 50 } }
   if (v === 'B') return { x: 760 + i * 290, y: 268 + ti * 196 }
   const a = ((-90 + ti * 90 + (i + 0.5) * 22.5 - 45) * Math.PI) / 180
   return { x: 960 + Math.cos(a) * 340, y: 584 + Math.sin(a) * 340 }
@@ -59,15 +60,22 @@ export function Melody({ variant, state, nOv, onReady }: S1Props) {
   const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
     tlRef.current = tl
     const items = q('.ml2-t')
-    if (state === 'idle' || state === 'complete') {
-      if (variant === 'A') tl.fromTo(q('.ml2a-stem'), { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.1, stagger: 0.12, ease: 'power2.out' }, 0)
+    if (state === 'idle' || state === 'complete' || state === 'fresh' || state === 'catdone') {
+      if (variant === 'A') tl.fromTo(q('.ml2a-grow'), { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.2, stagger: 0.12, ease: 'power2.out' }, 0)
+          .fromTo(q('.ml2a-sway'), { '--g': 0 }, { '--g': 1, duration: 0.5, stagger: 0.04, ease: 'back.out(1.8)' }, 0.8)
       if (variant === 'B') tl.fromTo(q('.ml2b-bough'), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.0, stagger: 0.1, ease: 'power2.out' }, 0)
       if (variant === 'C') tl.fromTo(q('.ml2c-ring'), { rotation: -40, opacity: 0 }, { rotation: 0, opacity: 1, duration: 1.4, ease: 'power3.out', transformOrigin: '960px 584px' }, 0)
-      tl.fromTo(items, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, stagger: 0.035, ease: 'back.out(1.8)' }, 0.6)
-        .fromTo(q('.ml2-label'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, 0.4)
+      if (variant !== 'A') tl.fromTo(items, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, stagger: 0.035, ease: 'back.out(1.8)' }, 0.6)
+      tl.fromTo(q('.ml2-label'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, 0.4)
     }
     if (state === 'spinning') tl.to({}, { duration: SPIN_MS / 1000 }, SPIN_FROM)
-      .fromTo(q('.ml2-t.pick'), { scale: 1 }, { scale: 1.2, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' }, SPIN_FROM + SPIN_MS / 1000 - 0.2)
+      .fromTo(q(variant === 'A' ? '.ml2a-t.pick .ml2a-sway' : '.ml2-t.pick'), variant === 'A' ? { '--g': 1 } : { scale: 1 }, variant === 'A' ? { '--g': 1.18, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' } : { scale: 1.2, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' }, SPIN_FROM + SPIN_MS / 1000 - 0.2)
+    if (state === 'back') {
+      // назад к доске: колокол возвращается на свою цветоножку и закрывается (трек отыгран)
+      tl.fromTo(q('.ml2-vessel'), { x: 0, y: 0, scale: 1, opacity: 1 }, { x: sel.x - VX, y: sel.y - VY, scale: 0.3, opacity: 0, duration: 0.9, ease: 'power3.inOut' }, 0.1)
+        .fromTo(q('.ml2-board'), { opacity: 0.28, filter: 'blur(2px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.7 }, 0.3)
+        .fromTo(q('.ml2a-t.just .ml2a-sway'), { '--g': 1.25, opacity: 0 }, { '--g': 1, opacity: 1, duration: 0.7, ease: 'power2.out' }, 0.9)
+    }
     if (STAGE.has(state)) {
       // выбранный трек «выходит к зрителю», доска отступает
       if (variant === 'C') tl.fromTo(q('.ml2-board'), { x: 0, scale: 1, opacity: 1 }, { x: VX - 960, y: VY - 584, scale: 0.62, opacity: 0.55, duration: 0.8, ease: 'power3.inOut', transformOrigin: '960px 584px' }, 0)
@@ -103,10 +111,10 @@ export function Melody({ variant, state, nOv, onReady }: S1Props) {
   }, [state])
 
   const n = nOv ?? (tm ? nLive : null)
-  const played = state === 'complete' ? keys : STAGE.has(state) && (state === 'reveal' || state === 'miss') ? [...MEL2.played, MEL2.pick] : MEL2.played
-  const stOf = (k: string) => (k === MEL2.pick && STAGE.has(state) ? 'taken' : played.includes(k) ? 'done' : hot === k ? 'hot' : k === MEL2.pick && state === 'spinning' ? 'av pick' : 'av')
+  const played = state === 'complete' ? keys : state === 'fresh' ? [] : state === 'catdone' ? [...MEL2.played, '3-0', '3-1', '3-2'] : state === 'reveal' || state === 'miss' || state === 'back' ? [...MEL2.played, MEL2.pick] : MEL2.played
+  const stOf = (k: string) => (k === MEL2.pick && STAGE.has(state) ? 'taken' : played.includes(k) ? `done${k === MEL2.pick && state === 'back' ? ' just' : ''}` : hot === k ? 'hot' : k === MEL2.pick && state === 'spinning' ? 'av pick' : 'av')
   const inStage = STAGE.has(state)
-  const rects: Rect[] = inStage ? [{ x: 150, y: 250, w: 560, h: 700 }, { x: 860, y: 80, w: 1000, h: 900 }] : variant === 'C' ? [{ x: 560, y: 180, w: 800, h: 820 }] : [{ x: 120, y: 140, w: 1680, h: 880 }]
+  const rects: Rect[] = inStage && state !== 'back' ? [{ x: 150, y: 250, w: 560, h: 700 }, { x: 860, y: 80, w: 1000, h: 900 }] : variant === 'C' ? [{ x: 560, y: 180, w: 800, h: 820 }] : [{ x: 120, y: 140, w: 1680, h: 880 }]
 
   return (
     <S1Screen rects={rects} n={null} rootRef={root} cls={`ml2 ml2${variant} st-${state}${inStage ? ' stage' : ''}`} moodOverride={n != null && n <= 10 ? (n <= 0 ? 'zero' : 'warning') : 'calm'}>
@@ -123,7 +131,7 @@ export function Melody({ variant, state, nOv, onReady }: S1Props) {
         {variant === 'C' && <BoardC stOf={stOf} />}
       </div>
       {state === 'spinning' && hot && (() => { const [a, b] = hot.split('-').map(Number), p = pos(variant, a, b); return <i className={`ml2-spot${hot === MEL2.pick && (tlRef.current?.time() ?? 0) >= SPIN_FROM + SPIN_MS / 1000 ? ' land' : ''}`} style={{ left: p.x, top: p.y }} aria-hidden /> })()}
-      {inStage && <Vessel variant={variant} playing={PLAYING.has(state)} gold={state === 'reveal'} />}
+      {(inStage || state === 'back') && <Vessel variant={variant} playing={PLAYING.has(state)} gold={state === 'reveal'} />}
       {inStage && <Panel state={state} n={n} />}
       {state === 'reveal' && <i className="ml2-seed" style={{ left: VX, top: VY - 120 }} aria-hidden />}
     </S1Screen>
@@ -131,33 +139,74 @@ export function Melody({ variant, state, nOv, onReady }: S1Props) {
 }
 
 // ── доски ─────────────────────────────────────────────────────────────────
+// ── колокольчики: всё растение — один SVG в одних координатах (400×940, земля на y=900);
+//    точка крепления каждого колокола считается НА КРИВОЙ стебля, колокол висит на конце своей
+//    цветоножки и качается вокруг неё. Раньше стебель был растянутым SVG, а колокола — отдельные
+//    блоки со своими координатами: концы веточек не совпадали с колоколами (колокол «висел рядом»).
+const PLANT_Y = 120, PLANT_X = (ti: number) => 960 + (ti - 1.5) * 420
+type P2 = { x: number; y: number }
+const bez = (a: P2, b: P2, c: P2, d: P2, t: number): P2 => { const u = 1 - t; return { x: u * u * u * a.x + 3 * u * u * t * b.x + 3 * u * t * t * c.x + t * t * t * d.x, y: u * u * u * a.y + 3 * u * u * t * b.y + 3 * u * t * t * c.y + t * t * t * d.y } }
+const PLANTS = new Map<number, ReturnType<typeof makePlant>>()
+function makePlant(ti: number) {
+  const s = ti % 2 ? 1 : -1, A = { x: 200, y: 900 }, B = { x: 200 + s * 26, y: 660 }, C = { x: 200 - s * 30, y: 400 }, D = { x: 200 + s * 14, y: 130 }
+  const stem = `M ${A.x} ${A.y} C ${B.x} ${B.y} ${C.x} ${C.y} ${D.x} ${D.y}`
+  const tip = D
+  // колокола сверху вниз: 1 — выше всех; стороны чередуются, первая — наружу от изгиба стебля
+  const ts = [0.84, 0.66, 0.48, 0.3]
+  const bells = ts.map((t, i) => {
+    const p = bez(A, B, C, D, t), side = (i % 2 ? 1 : -1) * s, reach = 86 - i * 4
+    const e = { x: p.x + side * reach, y: p.y + 6 }
+    return { x: e.x, y: e.y, side, ped: `M ${p.x.toFixed(1)} ${p.y.toFixed(1)} C ${(p.x + side * reach * 0.45).toFixed(1)} ${(p.y - 44).toFixed(1)} ${(e.x - side * 4).toFixed(1)} ${(e.y - 40).toFixed(1)} ${e.x.toFixed(1)} ${e.y.toFixed(1)}`, at: p }
+  })
+  // листья вдоль стебля — между колоколами, на противоположной от колокола стороне
+  const leaves = [0.12, 0.2, 0.39, 0.57, 0.75].map((t, k) => { const p = bez(A, B, C, D, t), side = (k % 2 ? -1 : 1) * s, len = k < 2 ? 96 : 62; return { p, side, len } })
+  return { stem, tip, bells, leaves }
+}
+const plant = (ti: number) => { let p = PLANTS.get(ti); if (!p) { p = makePlant(ti); PLANTS.set(ti, p) } return p }
+const BELL = 'M -7 6 C -26 10 -34 36 -38 66 L -48 86 Q -38 80 -30 90 Q -21 81 -11 92 Q 0 83 11 92 Q 21 81 30 90 Q 38 80 48 86 L 38 66 C 34 36 26 10 7 6 Z'
+const BELL_IN = 'M -40 82 Q 0 66 40 82 Q 30 92 0 90 Q -30 92 -40 82 Z'
+function BellShape({ n, st }: { n: number; st: string }) {
+  const done = st.startsWith('done')
+  return <>
+    <path className="sep" d="M 0 0 L -10 10 M 0 0 L 10 10 M 0 0 L 0 12" />
+    {done ? <path className="wilt" d="M -6 6 C -18 14 -20 40 -10 62 Q -2 70 6 62 C 16 40 14 14 6 6 Z" /> : <>
+      <path className="cup" d={BELL} /><path className="in" d={BELL_IN} />
+      <path className="pist" d="M 0 70 L 0 96" /><circle className="clap" cx="0" cy="98" r="5" />
+      <text y="52" textAnchor="middle" dominantBaseline="middle">{n}</text>
+    </>}
+  </>
+}
 function Bell({ n, st, big }: { n: number; st: string; big?: boolean }) {
-  const done = st === 'done' || st === 'taken'
   return (
-    <svg className={`ml2a-bell${done ? ' off' : ''}${big ? ' big' : ''}`} viewBox="-70 -90 140 160" aria-hidden>
-      <path className="ped" d="M 0 -90 C 6 -80 -4 -70 0 -58" />
-      {done ? <path className="wilt" d="M 0 -58 C 16 -50 20 -20 8 4 C 0 14 -8 10 -10 0 C -16 -20 -14 -48 0 -58 Z" /> : <>
-        <path className="sep" d="M 0 -58 L -14 -66 M 0 -58 L 14 -66" />
-        <path className="cup" d="M -40 -30 C -42 -62 42 -62 40 -30 L 54 34 C 40 24 30 40 18 30 C 8 42 -8 42 -18 30 C -30 40 -40 24 -54 34 Z" />
-        <path className="in" d="M -40 28 C -20 40 20 40 40 28" />
-        <circle className="clap" cx="0" cy="40" r="7" />
-        <text y="-4" textAnchor="middle" dominantBaseline="middle">{n}</text>
-      </>}
+    <svg className={`ml2a-bell${st.startsWith('done') || st === 'taken' ? ' off' : ''}${big ? ' big' : ''}`} viewBox="-130 -30 260 300" aria-hidden>
+      <path className="ped" d="M 0 -30 L 0 0" />
+      <g className="ml2a-sway big"><g transform="scale(2.4)"><BellShape n={n} st={st} /></g></g>
     </svg>
   )
 }
 function BoardA({ stOf }: { stOf: (k: string) => string }) {
   return <>{TH.map((t, ti) => {
-    const cx = 960 + (ti - 1.5) * 420
+    const P = plant(ti), sts = Array.from({ length: NT }, (_, i) => stOf(`${ti}-${i}`)), all = sts.every(x => x.startsWith('done'))
     return (
-      <div key={ti}>
-        <svg className="ml2a-stem" style={{ left: cx - 100 }} viewBox="0 0 200 900" preserveAspectRatio="none" aria-hidden>
-          <path d="M 100 900 C 90 700 112 500 100 320 C 92 200 104 140 100 100" />
-          {Array.from({ length: NT }, (_, i) => { const y = 260 + i * 150 - 180, sd = i % 2 ? 1 : -1; return <path key={i} className="br" d={`M 100 ${y + 40} C ${100 + sd * 30} ${y + 10} ${100 + sd * 52} ${y - 10} ${100 + sd * 62} ${y - 6}`} /> })}
-          <path className="lf" d="M 100 860 C 40 820 10 840 0 880 C 40 870 70 880 100 870 Z M 100 840 C 160 800 190 820 200 860 C 160 852 130 860 100 852 Z" />
+      <div key={ti} className={`ml2a-col${all ? ' bare' : ''}`}>
+        <svg className="ml2a-plant" style={{ left: PLANT_X(ti) - 200, top: PLANT_Y }} viewBox="0 0 400 940" aria-hidden>
+          <ellipse className="shadow" cx="200" cy="906" rx="120" ry="16" />
+          <g className="ml2a-grow">
+            <path className="root" d="M 200 900 C 190 914 176 922 160 928 M 200 900 C 212 914 226 920 244 926 M 200 900 L 198 932" />
+            <path className="stem-back" d={P.stem} /><path className="stem" d={P.stem} />
+            {P.leaves.map((l, k) => { const tx = l.p.x + l.side * l.len, ty = l.p.y - l.len * 0.32
+              return <path key={k} className={`leaf l${k % 2}`} d={`M ${l.p.x} ${l.p.y} C ${l.p.x + l.side * l.len * 0.3} ${l.p.y - l.len * 0.36} ${tx - l.side * l.len * 0.15} ${ty - 14} ${tx} ${ty} C ${tx - l.side * l.len * 0.25} ${ty + 16} ${l.p.x + l.side * l.len * 0.35} ${l.p.y + 10} ${l.p.x} ${l.p.y} Z`} /> })}
+            <path className="bud" d={`M ${P.tip.x} ${P.tip.y} c 10 4 12 22 2 32 c -10 -6 -12 -24 -2 -32 z`} />
+            {P.bells.map((b, i) => <path key={i} className="ped" d={b.ped} />)}
+          </g>
+          {P.bells.map((b, i) => (
+            // точка крепления (атрибут) → качание/рост (CSS, начало координат = точка крепления) → цветок
+            <g key={i} className={`ml2a-t ${sts[i]}`} transform={`translate(${b.x.toFixed(1)} ${b.y.toFixed(1)})`}>
+              <g className="ml2a-sway" style={{ animationDelay: `${-(ti * 0.7 + i * 0.45)}s` }}><BellShape n={i + 1} st={sts[i]} /></g>
+            </g>
+          ))}
         </svg>
-        <div className="ml2-label ml2a-label" style={{ left: cx }}>{t}</div>
-        {Array.from({ length: NT }, (_, i) => { const p = pos('A', ti, i), st = stOf(`${ti}-${i}`); return <div key={i} className={`ml2-t ml2a-t ${st}`} style={{ left: p.x, top: p.y }}><Bell n={i + 1} st={st} /></div> })}
+        <div className="ml2-label ml2a-label" style={{ left: PLANT_X(ti) + P.tip.x - 200 }}><b>{t}</b>{all && <em>отыграна</em>}</div>
       </div>
     )
   })}</>

@@ -2,7 +2,7 @@
 .jp2-title, .ml2-title { position:absolute; top:28px; left:56px; font-size:40px; color:#e8d9a8; letter-spacing:.03em; text-shadow:var(--halo); z-index:3; }
 .jp2-title span, .ml2-title span { font-size:28px; color:#cfeee4; }
 .jp2-board { position:absolute; inset:0; }
-.jp2-t { position:absolute; transform:translate(-50%,-50%); }
+div.jp2-t { position:absolute; transform:translate(-50%,-50%); }
 
 /* — A: лианы со стручками */
 .jp2a-vine { position:absolute; top:0; width:80px; height:1080px; overflow:visible; }
@@ -119,7 +119,8 @@
 
 /* ═══ УГАДАЙ МЕЛОДИЮ ═══ */
 .ml2-board { position:absolute; inset:0; }
-.ml2-t { position:absolute; transform:translate(-50%,-50%); }
+/* только HTML-блоки: на SVG-группе (колокол) CSS-transform перебил бы её атрибут translate() */
+div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2-label { position:absolute; text-shadow:var(--halo); color:#f4fff9; font-weight:700; }
 /* A — колокольчики */
 .ml2a-stem { position:absolute; top:180px; width:200px; height:900px; overflow:visible; }
@@ -232,3 +233,63 @@
 .jp2-vB.is-zero .jp2-v-num { color:#3a2f55; } .jp2-vC.is-zero .jp2-v-num { color:#4a3a2a; }
 .jp2-row .dots { right:28px; }
 .jp2:not(.st-reveal) .jp2-row .nm { padding-right:110px; }
+
+/* ═══ «Цветы цен» — доводка выбранной композиции ═══ */
+.jp2b-stem { width:140px; }
+.jp2b-stem path:first-child { stroke:#3f7a56; stroke-width:9; }
+.jp2b-stem .lf { fill:#2f6a49; stroke:rgba(8,30,20,.5); stroke-width:1; }
+/* подпись — лист на стебле: все на одной линии, высота постоянная, текст по центру — длина имени не сдвигает её */
+.jp2b-leaf { width:320px; margin-left:-160px; height:132px; padding:10px 22px 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:2px; }
+.jp2b-leaf b { font-size:34px; line-height:1.04; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.jp2b-leaf em { font-style:normal; font-size:20px; color:#e8d9a8; }
+.jp2b-fl.bare .jp2b-leaf { filter: saturate(.5) brightness(.75); }
+.jp2b-pw { position:absolute; left:0; top:0; transform-origin:0 0; }
+.jp2b-petal { left:-90px; top:-200px; width:180px; height:210px; transform-origin:90px 200px; }
+.jp2b-petal path:first-child { fill:#c4b0fb; }
+.jp2b-t.av .jp2b-petal path:first-child { fill:#cbb8ff; filter: drop-shadow(0 6px 12px rgba(10,0,30,.45)); }
+/* сыгранная цена: лепесток вянет и никнет, но остаётся на месте — цену видно, она недоступна */
+.jp2b-t.done .jp2b-petal, .jp2b-t.taken .jp2b-petal { opacity:1; }
+.jp2b-t.done .jp2b-petal path:first-child { fill:#7a6a58; stroke:rgba(40,25,10,.6); }
+.jp2b-t.done .jp2b-petal .vein { stroke:rgba(255,230,200,.18); }
+.jp2b-t.taken .jp2b-petal { opacity:.22; }
+.jp2b-val { font-size:48px; }
+.jp2b-t.done .jp2b-val { font-size:36px; color:#cdbda8; text-shadow:none; opacity:.6; text-decoration: line-through 3px rgba(60,30,10,.55); }
+.jp2b-core { position:absolute; width:92px; height:92px; margin:0; border-radius:0; background:none; box-shadow:none; overflow:visible; }
+.jp2b-core .disc { fill:#d9a23a; stroke:#5a3a10; stroke-width:4; } .jp2b-core .seed { fill:#6b4a14; }
+.jp2b-fl.bare .jp2b-core .disc { fill:#8a7a58; } .jp2b-fl.bare .jp2b-core .seed { fill:#4a3a24; }
+.jp2b-t.sel .jp2b-petal path:first-child { fill:#ffe2a0; }
+
+.jp2b-leaf { width:336px; margin-left:-168px; height:146px; }
+.jp2b-leaf b { font-size:31px; -webkit-line-clamp:3; }
+
+/* ═══ «Колокольчики» — растение одним SVG ═══ */
+.ml2a-plant { position:absolute; width:400px; height:940px; overflow:visible; }
+.ml2a-plant .shadow { fill:rgba(0,0,0,.5); filter: blur(5px); }
+.ml2a-plant .root { fill:none; stroke:#2e2116; stroke-width:4; stroke-linecap:round; }
+.ml2a-plant .stem-back { fill:none; stroke:#173a28; stroke-width:11; stroke-linecap:round; }
+.ml2a-plant .stem { fill:none; stroke:#4f8f6a; stroke-width:5.5; stroke-linecap:round; }
+.ml2a-plant .leaf { stroke:rgba(8,30,20,.55); stroke-width:1.2; } .ml2a-plant .leaf.l0 { fill:#2f6a49; } .ml2a-plant .leaf.l1 { fill:#3b7a5c; }
+.ml2a-plant .bud { fill:#6a54b8; stroke:#2a1a60; stroke-width:1.5; }
+.ml2a-plant .ped, .ml2a-bell .ped { fill:none; stroke:#4f8f6a; stroke-width:3.5; stroke-linecap:round; }
+/* качание и рост — вокруг точки крепления (0 0 = конец цветоножки) */
+.ml2a-sway { transform-box: view-box; transform-origin: 0 0; transform: scale(var(--g, 1)); animation: ml2-bellsway 3.6s ease-in-out infinite alternate; }
+@keyframes ml2-bellsway { from { rotate: -3deg; } to { rotate: 3deg; } }
+.ml2a-sway .sep { fill:none; stroke:#3f7a56; stroke-width:3; stroke-linecap:round; }
+.ml2a-sway .cup { fill:url(#ml2Bell); stroke:#3b2580; stroke-width:2; }
+.ml2a-sway .in { fill:rgba(30,10,60,.6); stroke:none; }
+.ml2a-sway .pist { stroke:#e8d9a8; stroke-width:2; } .ml2a-sway .clap { fill:#f0c055; }
+.ml2a-sway text { font-family:'Philosopher', sans-serif; font-weight:700; font-size:40px; fill:#fff; paint-order:stroke; stroke:#2a1650; stroke-width:5px; }
+.ml2a-sway .wilt { fill:#6b5236; stroke:#3a2a1a; stroke-width:1.5; }
+.ml2a-t.done .ml2a-sway { animation:none; rotate: 16deg; }
+.ml2a-t.hot .cup, .ml2a-t.pick .cup, .ml2-vA.won .cup { fill:url(#ml2BellG); stroke:#7a4f18; }
+.ml2a-t.hot .ml2a-sway, .ml2a-t.pick .ml2a-sway { filter: drop-shadow(0 0 16px rgba(255,214,140,.9)); }
+.ml2a-t.taken { opacity:.22; }
+.ml2a-label { top:126px; width:380px; margin-left:-190px; height:104px; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:8px 16px; }
+.ml2a-label b { font-size:34px; line-height:1.04; text-align:center; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ml2a-label em { font-style:normal; font-size:20px; color:#e8d9a8; font-weight:400; }
+.ml2a-col.bare .ml2a-label { filter: saturate(.5) brightness(.75); }
+/* большой колокол у зрителя: качается от цветоножки, только пока звучит музыка */
+.ml2a-bell.big { width:400px; height:460px; overflow:visible; }
+.ml2-vA .ml2-v-in { animation:none !important; }
+.ml2-vA:not(.playing) .ml2a-sway.big { animation:none; }
+.ml2a-sway.big { animation-duration: 1.1s; }
