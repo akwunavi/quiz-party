@@ -8619,6 +8619,8 @@ START / WARNING / ZERO. Таймеры в механиках — как в иг�
 
 **Навык motion-design (08.10.2026).** По просьбе ведущего установлен навык `lottiefiles/motion-design-skill` → `.claude/skills/motion-design/` (только markdown: тайминги, кривые, хореография анимаций; скриптов нет), фиксация версии — `skills-lock.json`. Обновлять той же командой `npx -y skills add lottiefiles/motion-design-skill --skill motion-design --agent claude-code`.
 
+**Навыки Anthropic (08.10.2026).** Проверены и установлены из `anthropics/skills`: `canvas-design` (постеры/статичный арт в PNG/PDF, внутри 5,6 МБ шрифтов OFL), `algorithmic-art` (генеративный арт на p5.js, шаблон грузит p5 с cdnjs), `webapp-testing` (Playwright на Python; в контейнере Python-пакета `playwright` нет — для его скриптов `pip install playwright`, браузер брать из `/opt/pw-browsers`, `playwright install` не запускать). Все — Apache 2.0, только markdown/шаблоны/шрифты, сетевых вызовов и секретов нет. НЕ ставили `web-artifacts-builder`: он уже встроен в среду, а его скрипты глобально ставят pnpm и десятки npm-пакетов в отдельный проект — к Vite-проекту квиза не относится.
+
 ## 7. Пул доработок на будущее
 
 - **[СДЕЛАНО в 9.80, §3cd — ведущий выбрал банк блица] Блиц: перенос вопросов между квизами (вопрос ведущему, 03.10.2026).**
