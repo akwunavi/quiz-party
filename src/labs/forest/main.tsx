@@ -8,5 +8,6 @@ import './lab.css'
 import './stage1/stage1.css'
 import './stage2/stage2.css'
 import './stage3/stage3.css'
+import './stage3/crossword.css'
 
 createRoot(document.getElementById('root')!).render(<Lab />)
