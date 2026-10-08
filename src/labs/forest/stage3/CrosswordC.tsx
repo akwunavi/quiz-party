@@ -10,7 +10,7 @@ import type { Rect } from '../stage1/env'
 import { Timer, head, timer3 } from './common3'
 import { CELLS, CWT, CW_TIMER, G, RANKED, W, Align, Mark, NUMS, cellNums, dirRu, sceneOf, shown, total, verdict, wordCells, lenCls } from './cwcommon'
 
-export const CWC_NOTE = 'Сетка — карта огоньков в тёмном воздухе, без рамы и доски: слово — нить света, пересечение — яркая звезда. Идущее слово горит золотом, прошедшие тлеют, будущие холодные. Разбор: карта уменьшается в угол, слово взлетает с неё светлячками и встаёт колонкой букв, а под ним — ответы команд, каждая буква лежит под своей буквой правильного слова (расхождение видно сразу), справа ✓ / ✗ и +1. Потом свет бежит к следующему слову.'
+export const CWC_NOTE = 'Выбрано ведущим. Сетка — карта огоньков в тёмном воздухе, без рамы и доски: слово — нить света, пересечение — яркая звезда. Идущее слово горит золотом, прошедшие тлеют, будущие холодные. Разбор: карта уменьшается в угол, слово взлетает с неё светлячками и встаёт колонкой букв, а под ним — ответы команд, каждая буква лежит под своей буквой правильного слова (расхождение видно сразу), справа ✓ / ✗ и +1. Потом свет бежит к следующему слову.'
 
 const bb = (() => { const r = CELLS.map(c => c.r), c = CELLS.map(x => x.c); return { r0: Math.min(...r), r1: Math.max(...r), c0: Math.min(...c), c1: Math.max(...c) } })()
 const X0 = 1000, COL = 62, ROW0 = 392, ROWH = 88, ANSY = 292
@@ -123,7 +123,7 @@ export function CrosswordC({ state, nOv, onReady }: S1Props) {
           <b className="sum">{total(t.i)}</b>
         </div>)}
       </div>}
-      {!rev && <Timer n={n} total={CW_TIMER} x={1800} base={440} size={140} rooted={0} />}
+      {!rev && <Timer n={n} total={CW_TIMER} x={165} base={1030} size={170} rooted={120} />}
     </S1Screen>
   )
 }

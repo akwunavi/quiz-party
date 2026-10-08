@@ -38,9 +38,9 @@ function setOf(state: string): OrderSet {
 }
 function layout(S: OrderSet) {
   const n = S.choices.length, long = S === ORDER_SETS.long
-  const cw = n >= 6 ? 256 : n === 5 ? 306 : S.media ? 300 : 380
+  const cw = n >= 6 ? 244 : n === 5 ? 292 : S.media ? 300 : 360
   const ch = n >= 6 ? 112 : n === 5 ? 140 : long ? 196 : 150
-  const L = S.media ? 470 : 240, R = 1850
+  const L = S.media ? 470 : 330, R = 1850
   const xs = Array.from({ length: n }, (_, j) => L + cw / 2 + (n === 1 ? 0 : (j * (R - L - cw)) / (n - 1)))
   const slot: P[] = xs.map(x => ({ x, y: VY - 130 - ch / 2 }))
   const home: P[] = S.choices.map((_, i) => ({ x: xs[i], y: 350 + (i % 2) * (long ? 130 : 60) }))
@@ -76,7 +76,7 @@ export function Order({ state, nOv, onReady }: S1Props) {
   const n = nOv ?? (tm ? nLive : null)
   const rects: Rect[] = [...Ly.home, ...Ly.slot].map(p => ({ x: p.x - Ly.cw / 2, y: p.y - Ly.ch / 2, w: Ly.cw, h: Ly.ch })).concat([{ x: 360, y: 40, w: 1200, h: 90 }])
   // лоза: плавная волна через места, от семени до цветка
-  const pts: P[] = [{ x: 150, y: VY }, ...Ly.xs.map((x, j) => ({ x, y: VY + (j % 2 ? 12 : -12) })), { x: 1820, y: VY - 6 }]
+  const pts: P[] = [{ x: 300, y: VY }, ...Ly.xs.map((x, j) => ({ x, y: VY + (j % 2 ? 12 : -12) })), { x: 1820, y: VY - 6 }]
   const vineD = pts.reduce((d, p, i) => i === 0 ? `M ${p.x} ${p.y}` : `${d} C ${(pts[i - 1].x + p.x) / 2} ${pts[i - 1].y} ${(pts[i - 1].x + p.x) / 2} ${p.y} ${p.x} ${p.y}`, '')
   return (
     <S1Screen rects={rects} n={n} rootRef={root} cls={`s3 or orA st-${rev ? 'reveal' : 'question'}${done ? ' done' : ''} n${Ly.n}`}>
@@ -85,7 +85,7 @@ export function Order({ state, nOv, onReady }: S1Props) {
       {S.media && <figure className="or-media"><img src={hubble} alt="" /></figure>}
       <svg className="orA-back" viewBox="0 0 1920 1080" aria-hidden>
         <path className="orA-vine" d={vineD} /><path ref={pathRef} className="orA-light" d={vineD} />
-        <g className="orA-seed" transform={`translate(150 ${VY})`}><ellipse rx="26" ry="17" /><path d="M -6 -14 C -2 -30 8 -34 16 -32" /></g>
+        <g className="orA-seed" transform={`translate(300 ${VY})`}><ellipse rx="26" ry="17" /><path d="M -6 -14 C -2 -30 8 -34 16 -32" /></g>
         <g transform={`translate(1820 ${VY - 6})`}><g className="orA-flower">{Array.from({ length: 8 }, (_, k) => <g key={k} transform={`rotate(${k * 45})`}><ellipse cx="0" cy="-26" rx="12" ry="26" /></g>)}<circle r="11" /></g></g>
         {Ly.slot.map((s, j) => <g key={j} transform={`translate(${s.x} ${pts[j + 1].y})`}>
           <path className="orA-stem" data-j={j} d={`M 0 0 L 0 ${s.y + Ly.ch / 2 - pts[j + 1].y}`} />
@@ -102,7 +102,7 @@ export function Order({ state, nOv, onReady }: S1Props) {
           {rev && <em className="or-pos" data-i={i}>{POS(c.key) + 1}</em>}
         </div>
       })}
-      <Timer n={n} total={S.timer} x={1800} base={250} size={120} rooted={30} />
+      <Timer n={n} total={S.timer} x={150} base={1040} size={170} rooted={120} />
     </S1Screen>
   )
 }

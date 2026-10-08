@@ -110,7 +110,7 @@ export function Match({ state, nOv, onReady }: S1Props) {
         )
       })}
       {rev && <div className="mt-pairs">{S.items.map((_, k) => <span key={k}><b>{k + 1}</b> — <b>{S.right[IDX[k]]}</b></span>)}</div>}
-      <Timer n={n} total={S.timer} x={150} base={1040} size={140} rooted={50} />
+      <Timer n={n} total={S.timer} x={150} base={1040} size={170} rooted={120} />
     </S1Screen>
   )
 }
