@@ -31,7 +31,7 @@ export default tseslint.config(
   // scripts/ — разовые Node-скрипты для разработчика (например калибровка
   // звука в headless Chromium, 9.59), тот же случай: голый Node/Playwright,
   // не браузерный код src/, не деплоится и не идёт в бандл.
-  { ignores: ['docs/**', 'dist/**', 'node_modules/**', 'infra/**', 'local-server/**', 'scripts/**', 'public/sw.js'] },
+  { ignores: ['docs/**', '.claude/**', 'dist/**', 'node_modules/**', 'infra/**', 'local-server/**', 'scripts/**', 'public/sw.js'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
