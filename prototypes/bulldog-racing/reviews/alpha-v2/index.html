@@ -15,8 +15,8 @@
   </div>
   <div class="cards">
     <section class="card"><h2>№3 · до исправления</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_03_run_alpha_v1.webm"></video></div><a class="download" href="bulldog_03_run_alpha_v1.webm" download>Скачать старую версию</a></section>
-    <section class="card"><h2>№3 · исправленный v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_03_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_03_run_alpha_v2.webm" download>Скачать №3 v2</a> <a class="download" href="bulldog_03_alpha_masks_v2.tar.gz" download>Маски №3</a></section>
-    <section class="card"><h2>№5 · новый RUN v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_05_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_05_run_alpha_v2.webm" download>Скачать №5 v2</a> <a class="download" href="bulldog_05_alpha_masks_v2.tar.gz" download>Маски №5</a></section>
+    <section class="card"><h2>№3 · исправленный v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_03_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_03_run_alpha_v2.webm" download data-file="bulldog_03_run_alpha_v2.webm">Скачать №3 v2</a> <a class="download" href="bulldog_03_alpha_masks_v2.tar.gz" download data-file="bulldog_03_alpha_masks_v2.tar.gz">Маски №3</a></section>
+    <section class="card"><h2>№5 · новый RUN v2</h2><div class="stage white"><video controls muted playsinline preload="metadata" src="bulldog_05_run_alpha_v2.webm"></video></div><a class="download" href="bulldog_05_run_alpha_v2.webm" download data-file="bulldog_05_run_alpha_v2.webm">Скачать №5 v2</a> <a class="download" href="bulldog_05_alpha_masks_v2.tar.gz" download data-file="bulldog_05_alpha_masks_v2.tar.gz">Маски №5</a></section>
   </div>
   <h2 style="margin-top:30px">№3 · до / после</h2>
   <p class="muted">Глаз, студийная стойка и исходная тень. В каждой строке один и тот же исходный кадр: слева предыдущая маска, справа новая.</p>
@@ -34,6 +34,23 @@
   document.querySelectorAll('[data-bg]').forEach(button=>button.onclick=()=>{
     document.querySelectorAll('.stage').forEach(stage=>stage.className='stage '+button.dataset.bg);
     document.querySelectorAll('[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));
+  });
+  document.querySelectorAll('[data-file]').forEach(link=>link.onclick=async event=>{
+    event.preventDefault();
+    const label=link.textContent;
+    link.textContent='Подготовка файла…';
+    try{
+      const response=await fetch(link.href);
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const url=URL.createObjectURL(await response.blob());
+      const save=document.createElement('a');
+      save.href=url;save.download=link.dataset.file;
+      document.body.append(save);save.click();save.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }catch(error){
+      link.textContent='Ошибка загрузки — открыть файл';
+      window.open(link.href,'_blank');
+    }finally{setTimeout(()=>link.textContent=label,4000)}
   });
 </script>
 </html>
