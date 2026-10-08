@@ -151,7 +151,7 @@ export function Std({ state, nOv, onReady }: S1Props) {
           <span>{text.split(' ').map((w, i) => <span key={i} className="w">{w} </span>)}</span>
         </div>
         <div className="s4-qno">{ROUND4.name} · вопрос {ROUND4.qn} из {ROUND4.qcount}</div>
-        <Timer n={n} total={ROUND4.timer} x={150} base={1040} size={170} rooted={120} />
+        <Timer n={n} total={ROUND4.timer} />
       </>}
       {state === 'revtext' && <>
         <div className="s4-recall">{TXT.q}</div>

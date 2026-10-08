@@ -26,9 +26,9 @@ function rosette(base: number) {
   })
 }
 
-export function Dandelion({ n, total, size = 300, seeds = 30, label, hideNum, rooted = 0 }: { n: number; total: number; size?: number; seeds?: number; label?: string; hideNum?: boolean; /** насколько (в единицах рисунка) стебель уходит вниз к земле; >0 — с розеткой листьев и травой */ rooted?: number }) {
+export function Dandelion({ n, total, size = 300, seeds = 30, label, hideNum, rooted = 0, stem = 350 }: { n: number; total: number; size?: number; seeds?: number; label?: string; hideNum?: boolean; /** длина стебля от центра головы до земли (единиц рисунка); по умолчанию 350 */ stem?: number; /** насколько (в единицах рисунка) стебель уходит вниз к земле; >0 — с розеткой листьев и травой */ rooted?: number }) {
   const ph = tphase(n), left = n <= 0 ? 0 : Math.max(1, Math.ceil((n / total) * seeds))
-  const R = 118, droop = ph === 'zero', base = 350 + rooted, H = 520 + rooted
+  const R = 118, droop = ph === 'zero', base = stem + rooted, H = base + 170
   return (
     <svg className={`tm-dand is-${ph}${rooted ? ' rooted' : ''}`} viewBox={`-170 -170 340 ${H}`} width={size} height={size * H / 340} aria-label={`Осталось ${n} секунд`}>
       <defs>

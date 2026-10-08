@@ -123,7 +123,7 @@ export function CrosswordC({ state, nOv, onReady }: S1Props) {
           <b className="sum">{total(t.i)}</b>
         </div>)}
       </div>}
-      {!rev && <Timer n={n} total={CW_TIMER} x={165} base={1030} size={170} rooted={120} />}
+      {!rev && <Timer n={n} total={CW_TIMER} />}
     </S1Screen>
   )
 }

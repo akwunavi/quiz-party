@@ -44,10 +44,10 @@ function layout(S: MatchSet) {
   let x = X_MID - total / 2
   const img: Box[] = ws.map(w => { const r = { x, y: Y_IMG, w, h }; x += w + GAP; return r })
   const minW = n > 4 ? 250 : S === MATCH_SETS.long ? 400 : 330
-  const fin: Box[] = img.map(r => { const w = Math.max(minW, Math.min(S === MATCH_SETS.long ? 520 : 470, Math.round(r.w * 0.97))); return { x: r.x + r.w / 2 - w / 2, y: Y_IMG + h + 56, w, h: 0 } })
+  const fin: Box[] = img.map(r => { const w = Math.max(minW, Math.min(470, Math.round(r.w * 0.97))); return { x: r.x + r.w / 2 - w / 2, y: Y_IMG + h + 56, w, h: 0 } })
   // россыпь подписей на поляне: порядок букв, шахматно по высоте
-  const m = S.right.length, span = 1500, step = span / m
-  const bank = S.right.map((_, i) => ({ cx: 330 + step * (i + 0.5) + (i % 2 ? 14 : -14), y: n > 4 ? (i % 2 ? 790 : 640) : i % 2 ? 936 : (S === MATCH_SETS.long ? 796 : 806) }))
+  const m = S.right.length, span = 1450, step = span / m
+  const bank = S.right.map((_, i) => ({ cx: 400 + step * (i + 0.5) + (i % 2 ? 14 : -14), y: n > 4 ? (i % 2 ? 790 : 640) : i % 2 ? 936 : (S === MATCH_SETS.long ? 796 : 806) }))
   return { img, fin, bank, h }
 }
 const lenCls = (t: string) => (t.length > 60 ? ' xl' : t.length > 40 ? ' lg' : '')
@@ -113,7 +113,7 @@ export function Match({ state, nOv, onReady }: S1Props) {
       })}
       {rev && S.items.length <= 4 && <TeamStrip rows={rowsFrom(S.correct_pairs, ' ')} />}
       {rev && <div className="mt-pairs">{S.items.map((_, k) => <span key={k}><b>{k + 1}</b> — <b>{S.right[IDX[k]]}</b></span>)}</div>}
-      <Timer n={n} total={S.timer} x={150} base={1040} size={170} rooted={120} />
+      <Timer n={n} total={S.timer} />
     </S1Screen>
   )
 }

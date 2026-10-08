@@ -28,7 +28,7 @@ export const SCR_VARIANTS = [
 
 type P = { x: number; y: number }
 type Lay = { cell: number; tile: number; slot: P[]; home: P[]; rowY: number[]; bed: { x0: number; x1: number; y: number }[]; words: { x0: number; x1: number; y: number }[] }
-const CX = 1040, AVAIL = 1500, GAP = 10, WGAP = 58
+const CX = 1100, AVAIL = 1400, GAP = 10, WGAP = 58
 const jit = (p: number, k: number) => Math.sin(p * 12.9898 + k * 78.233) * 0.5 // детерминированный «разброс» без случайности
 
 function layout(S: ScrSet): Lay {
@@ -133,7 +133,7 @@ export function Scramble({ state, nOv, onReady }: S1Props) {
       })}
       {zero && state !== 'reveal' && <div className="scA-time">Время вышло</div>}
       {fin && <div className="s3-result sc-resA" style={{ top: resTop }}><span>угадали</span>{S.guessed.map(k => <em key={k} style={{ color: TEAM3[k].color, borderColor: TEAM3[k].color }}>{TEAM3[k].name}</em>)}</div>}
-      <Timer n={n} total={S.timer} x={165} base={1010} size={170} />
+      <Timer n={n} total={S.timer} />
     </S1Screen>
   )
 }

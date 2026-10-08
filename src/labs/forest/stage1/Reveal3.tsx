@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { REVEAL } from './data'
 import { makeFrames, type FrameState } from './mediaFrames'
-import { Dandelion } from './timers'
+import { Timer } from '../stage3/common3'
 import { RoundIntro, S1Screen, introTl, useEntrance, type S1Props } from './common'
 import type { Rect } from './env'
 
@@ -173,7 +173,7 @@ export function Reveal3({ state, nOv, onReady }: S1Props) {
             })}
           </div>
         )}
-        {showTimer && <div className="rv-tm rvA-tm"><Dandelion n={n} total={REVEAL.phases[ph].sec} size={230} seeds={REVEAL.phases[ph].sec} rooted={150} /></div>}
+        {showTimer && <Timer n={n} total={REVEAL.phases[ph].sec} />}
         {state === 'over' && <div className="rv-over rvA-over">Попытки исчерпаны — разбор</div>}
       </S1Screen>
     )
