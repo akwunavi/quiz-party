@@ -58,12 +58,12 @@ export function Lab() {
   return (
     <div className="m2-lab">
       <header className="m2-head">
-        <div className="m2-brand"><span className="m2-brand-q">◐</span><div><b>Magic 2.0 · Cinematic Direction Lab</b><span>семь миров · одна непрерывная сцена на мир · общий план → событие → перестройка → вопрос → итог</span></div></div>
+        <div className="m2-brand"><span className="m2-brand-q">◐</span><div><b>Magic 2.0 · Cinematic Direction Lab</b><span>Четыре мира по одной непрерывной сцене: общий план, чудо, перестройка, вопрос, итог</span></div></div>
       </header>
       <nav className="m2-concepts c7-worlds" aria-label="Мир">
         {WORLDS.map((w, i) => (
           <button key={w.num} type="button" className={`m2-concept${i === wi ? ' is-on' : ''}`} onClick={() => { setWi(i); ov.current = null; setOverride(null); setPlaying(false) }} aria-pressed={i === wi}>
-            <span className="m2-concept-n">0{w.num}{w.num === 3 ? ' · развитие' : ' · заново'}</span><span className="m2-concept-name">{w.name}</span>
+            <span className="m2-concept-n">0{w.num}{w.num === 3 ? ' · образец' : ' · заново'}</span><span className="m2-concept-name">{w.name}</span>
           </button>
         ))}
       </nav>

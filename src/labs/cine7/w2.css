@@ -1,41 +1,44 @@
-/* 02 · Библиотека: лампа над столом, ореховое дерево, бумага, железо-галловые чернила. */
-.c7-2 { background:#1b120c; font-family:'Alegreya', serif; color:#241812; }
-.l-root { position:absolute; inset:0; }
-.l-desk { position:absolute; inset:0; background:
-  radial-gradient(ellipse 58% 62% at 50% 46%, rgba(255,214,150,.30), transparent 70%),
-  repeating-linear-gradient(92deg, rgba(0,0,0,.18) 0 3px, transparent 3px 11px),
-  linear-gradient(180deg, #3a2516, #2a1a10 60%, #160d07); background-position: 0 0; }
-.l-cam { transform-origin: 50% 46%; will-change: transform; }
-.l-lamp { position:absolute; left:0; right:0; top:-200px; height:900px; pointer-events:none;
-  background: radial-gradient(ellipse 34% 52% at 50% 18%, rgba(255,236,190,.35), transparent 70%); mix-blend-mode: screen; }
-.l-stage { position:absolute; inset:0; perspective:1600px; perspective-origin: 50% 0%; }
-.l-book { position:absolute; left:110px; top:110px; width:1700px; height:860px; transform-origin: 50% 100%; transform-style: preserve-3d; }
-.l-page { position:absolute; top:0; width:850px; height:860px; overflow:hidden;
-  background: radial-gradient(ellipse at 50% 40%, #f6ecd4, #ead9b6 70%, #d9c399); box-shadow: 0 30px 60px rgba(0,0,0,.55); }
-.l-page.left { left:0; border-radius:14px 0 0 14px; background-color:#efe2c4; box-shadow: inset -60px 0 60px -40px rgba(80,50,20,.45), 0 30px 60px rgba(0,0,0,.55); }
-.l-page.right { left:850px; border-radius:0 14px 14px 0; box-shadow: inset 60px 0 60px -40px rgba(80,50,20,.45), 0 30px 60px rgba(0,0,0,.55); }
-.l-line { position:absolute; left:110px; right:70px; font-family:'Bad Script', cursive; font-size:36px; line-height:1; color:#2a2230; opacity:.85; transform-origin: 100% 50%; white-space:nowrap; }
-.l-page.right .l-line { left:70px; right:110px; transform-origin: 0 50%; }
-.l-gutter { position:absolute; left:830px; top:0; width:40px; height:860px; opacity:0;
-  background: linear-gradient(90deg, transparent, rgba(30,26,46,.85) 45%, rgba(30,26,46,.85) 55%, transparent); filter: blur(3px); }
-.l-opt { position:absolute; left:120px; right:60px; display:flex; align-items:baseline; gap:24px; }
-.l-page.right .l-opt { left:90px; }
-.l-opt b { flex:0 0 auto; font-family:'Alegreya', serif; font-weight:600; font-size:62px; color:#7a2a1e; }
-.l-opt i { font-family:'Bad Script', cursive; font-style:normal; font-size:72px; line-height:1.1; color:#1b2433; clip-path: inset(-20% 100% -20% 0); }
-.l-pen { position:absolute; inset:0; width:100%; height:100%; transform-origin: 75% 70%; }
-.l-q { position:absolute; left:220px; right:220px; top:96px; margin:0; text-align:center; font-weight:600; font-size:70px; line-height:1.12; visibility:hidden; }
-.l-fly { position:absolute; left:0; top:0; --lift:0; font-size:70px; line-height:1.12; will-change: transform; }
-.l-fly .hw { position:absolute; left:0; top:0; font-family:'Bad Script', cursive; font-size:44px; line-height:1.6; color:#2a2230; white-space:pre; }
-.l-fly .pr { display:inline-block; font-family:'Alegreya', serif; font-weight:600; color:#fff6e4; white-space:pre; opacity:0;
-  text-shadow: calc(var(--lift) * 10px) calc(var(--lift) * 34px) calc(var(--lift) * 14px) rgba(20,10,4,.6); }
-.l-fly .hw { text-shadow: calc(var(--lift) * 8px) calc(var(--lift) * 26px) calc(var(--lift) * 10px) rgba(60,40,20,.45); transform: translateY(calc(var(--lift) * -10px)); }
-.l-well { position:absolute; left:1712px; top:700px; width:150px; text-align:center; }
-.l-well svg { width:150px; height:160px; }
-.l-glass { fill: rgba(220,230,240,.12); stroke: rgba(240,236,220,.7); stroke-width:3; }
-.l-neck { fill:#2a1a10; stroke: rgba(240,236,220,.6); stroke-width:2; }
-.l-inkv { fill:#1b2433; transition: fill .6s; }
-.l-tn { position:absolute; left:-30px; right:-30px; top:-120px; font-family:'Bad Script', cursive; font-size:110px; line-height:1; color:#fff3dc; text-shadow: 0 4px 18px rgba(0,0,0,.6); }
-.l-root[data-ph="warning"] .l-tn { color:#ff8a6a; }
-.l-root[data-ph="warning"] .l-inkv { fill:#8a1e14; }
-.l-root[data-ph="zero"] .l-tn { color:#8a7a6a; text-decoration: line-through 6px #b04030; }
-.l-meta { position:absolute; left:130px; right:130px; top:40px; display:flex; justify-content:space-between; font-style:italic; font-size:26px; color:#d9c6a4; }
+/* 02 · Библиотека: коридор стеллажей в дымке, холодное окно в торце,
+   единственный тёплый свет — свеча на столе. EB Garamond — книжная печать. */
+.c7-2 { background:#0c0a0e; font-family:'EB Garamond', serif; color:#f3e7cf; }
+.l-root { position:absolute; inset:0; overflow:hidden; }
+.l-cam { transform-origin: 58% 52%; will-change: transform; }
+.c7-2 svg.lay, .c7-2 canvas.lay { width:100%; height:100%; }
+.l-far { transform-origin: 60% 50%; }
+.l-q { position:absolute; left:600px; right:160px; top:190px; margin:0; text-align:center; font-weight:500; font-size:66px; line-height:1.16; text-wrap:balance;
+  text-shadow: 0 2px 22px #0c0a0e, 0 0 3px #0c0a0e; }
+.l-q .split { opacity:0; }
+.l-meta { position:absolute; left:600px; right:160px; top:1034px; display:flex; justify-content:space-between; font-size:24px; font-style:italic; color:#9c8462; }
+/* книга */
+.l-book { position:absolute; left:720px; top:668px; width:900px; height:330px; perspective:1300px; perspective-origin:50% -60%; }
+.l-pages { position:absolute; inset:0; transform: rotateX(44deg); transform-origin:50% 100%; transform-style:preserve-3d; }
+.l-page { position:absolute; top:0; width:450px; height:330px; padding:26px 34px; box-sizing:border-box; overflow:hidden; }
+.l-page.l { left:0; background: linear-gradient(90deg, #8c7350, #c9b086 14%, #c2a97e 80%, #6a5236 97%, #3a2a1a); border-radius:10px 2px 0 10px; }
+.l-page.r { right:0; background: linear-gradient(270deg, #5e4a30, #a88f66 14%, #b29a70 80%, #6a5236 97%, #3a2a1a); border-radius:2px 10px 10px 0; }
+/* свет свечи слева, корешок затенён, верх страниц уходит в полумрак */
+.l-page::after { content:''; position:absolute; inset:0; pointer-events:none;
+  background: linear-gradient(180deg, rgba(12,8,6,.35), rgba(12,8,6,0) 45%), radial-gradient(ellipse 90% 120% at 0% 100%, rgba(255,180,100,.22), rgba(255,180,100,0) 70%); }
+.l-page.r::after { background: linear-gradient(180deg, rgba(12,8,6,.4), rgba(12,8,6,0) 45%), linear-gradient(90deg, rgba(12,8,6,.1), rgba(12,8,6,.45)); }
+/* толщина книжного блока */
+.l-pages::after { content:''; position:absolute; left:6px; right:6px; top:100%; height:16px; transform-origin:50% 0; transform: rotateX(-70deg);
+  background: repeating-linear-gradient(180deg, #8a7454 0 2px, #5a4630 2px 3px); border-radius:0 0 10px 10px; }
+.l-prose { font-size:20px; line-height:1.6; color:#3a2818; white-space:nowrap; opacity:.85; }
+.l-ink { position:absolute; left:30px; right:10px; font-style:italic; font-size:42px; line-height:1.05; color:#1e1008; white-space:nowrap; }
+.l-ink:nth-of-type(1), .l-page .l-ink:nth-last-child(2) { top:52px; }
+.l-page .l-ink:last-child { top:178px; }
+.l-ink b { font-style:normal; font-weight:700; color:#8a2a14; margin-right:.12em; }
+.l-leaf { position:absolute; right:0; top:0; width:450px; height:330px; padding:26px 34px; box-sizing:border-box; overflow:hidden; transform-origin:0 50%;
+  background: linear-gradient(270deg, #6e5838, #b8a076 20%, #ad946a); backface-visibility:hidden; border-radius:0 8px 8px 0; box-shadow: -10px 0 30px rgba(0,0,0,.3); }
+/* свеча-таймер */
+.l-candle { position:absolute; left:500px; width:120px; top:0; height:905px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; }
+.l-time span { display:block; font-weight:500; font-size:108px; line-height:1; color:#ffdcaa; text-shadow: 0 0 30px rgba(255,160,70,.55), 0 2px 10px #0c0a0e; font-variant-numeric: lining-nums tabular-nums; }
+.l-flamebox { height:76px; display:flex; align-items:flex-end; animation: l-flick 2.6s ease-in-out infinite; transform-origin:50% 100%; }
+@keyframes l-flick { 0%,100% { transform: rotate(-2deg) } 40% { transform: rotate(2.5deg) scaleY(1.05) } 70% { transform: rotate(-1deg) scaleY(.96) } }
+.l-flame { width:22px; height:54px; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; transform-origin:50% 100%;
+  background: radial-gradient(ellipse at 50% 72%, #fff8e4 0%, #ffd27e 38%, #ff8a2a 72%, rgba(255,138,42,0) 76%); box-shadow: 0 0 46px 18px rgba(255,170,80,.32); }
+.l-wax { width:48px; height: calc(26px + 190px * var(--wax)); border-radius:6px 6px 2px 2px; transition: height .8s ease;
+  background: linear-gradient(90deg, #9c8460, #efdfbd 38%, #d8c39b 70%, #7c6646); }
+.l-holder { width:120px; height:16px; border-radius:50%; background: radial-gradient(ellipse at 50% 30%, #8a5a2c, #3a2414 70%); }
+.l-root[data-ph="warning"] .l-time span { color:#ff9a6a; text-shadow: 0 0 34px rgba(255,90,40,.8); }
+.l-root[data-ph="zero"] .l-flame { opacity:0; box-shadow:none; }
+.l-root[data-ph="zero"] .l-time span { color:#6e5a46; text-shadow:none; }

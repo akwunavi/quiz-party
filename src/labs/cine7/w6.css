@@ -1,37 +1,35 @@
-/* 06 · Затонувшая академия: светлый мрамор, нефритовая вода, рассветный свет сквозь поверхность. */
-.c7-6 { background:#0e4a55; font-family:'Vollkorn', serif; color:#0f2f35; }
-.u-root { position:absolute; inset:0; }
-.u-cam { transform-origin: 50% 30%; will-change: transform; }
-.u-sky { position:absolute; inset:0; background: linear-gradient(180deg, #cfe9e2 0%, #e9f1ea 50%, #d6e2dc 100%); }
-.c7-6 svg.lay { width:100%; height:100%; }
-.u-dry { position:absolute; inset:0; opacity:0; background: radial-gradient(ellipse 60% 50% at 50% 30%, rgba(255,236,190,.35), transparent 70%); }
-.u-water { position:absolute; left:0; right:0; top:0; height:1080px; will-change: transform; }
-.u-tint { position:absolute; inset:0; background: linear-gradient(180deg, rgba(120,220,210,.55) 0%, rgba(22,120,130,.78) 45%, rgba(8,70,85,.9) 100%); }
-.u-ray { position:absolute; top:-40px; width:200px; height:1100px; transform: rotate(var(--r)); transform-origin: 50% 0;
-  background: linear-gradient(180deg, rgba(255,246,214,.55), rgba(255,246,214,0)); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); mix-blend-mode: screen; }
-.u-edge { position:absolute; left:0; right:0; top:100%; width:100%; height:120px; }
-.u-edge path { fill: rgba(8,70,85,.9); }
-.u-hang { position:absolute; width:16px; height:22px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; opacity:0;
-  background: radial-gradient(circle at 35% 30%, #fff, #bff4ea 40%, #3fb6a8); box-shadow: 0 6px 12px rgba(14,74,85,.25); }
-.u-drops { position:absolute; left:0; right:0; top:182px; height:40px; }
-.u-drop { position:absolute; top:0; width:18px; height:24px; margin-left:-9px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-  background: radial-gradient(circle at 35% 30%, #fff, #bff4ea 40%, #2a9d92); transition: transform .9s cubic-bezier(.5,0,.9,.4), opacity .9s; }
-.u-drop.gone { transform: translateY(70px) scaleY(1.4); opacity:0; }
-.u-root[data-ph="warning"] .u-drop { background: radial-gradient(circle at 35% 30%, #fff, #ffd2c4 40%, #d0583e); }
-.u-tn { position:absolute; left:1660px; top:-150px; width:200px; text-align:right; font-family:'Old Standard TT', serif; font-weight:700; font-size:110px; line-height:1; color:#f6fffb; text-shadow: 0 4px 20px rgba(8,70,85,.6); }
-.u-root[data-ph="warning"] .u-tn { color:#ffd2c4; }
-.u-root[data-ph="zero"] .u-tn { color:#8ab0aa; }
-.u-lens { position:absolute; left:270px; right:270px; top:250px; height:240px; display:grid; place-items:center; padding:0 70px; border-radius: 50% / 34%;
-  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.75), rgba(180,236,226,.55) 55%, rgba(63,182,168,.45)); box-shadow: inset 0 -16px 30px rgba(14,90,95,.25), inset 0 10px 20px rgba(255,255,255,.7), 0 30px 50px rgba(14,74,85,.25);
-  transform-origin: 50% 0; backdrop-filter: blur(2px); }
-.u-q { margin:0; text-align:center; font-family:'Old Standard TT', serif; font-size:60px; line-height:1.16; color:#0b3a40; text-wrap:balance; }
-.u-q .word { display:inline-block; margin:0 .12em; }
-.u-stream { position:absolute; top:470px; width:18px; height:400px; border-radius:9px; transform-origin: 50% 0;
-  background: repeating-linear-gradient(180deg, rgba(255,255,255,.9) 0 10px, rgba(120,220,210,.75) 10px 26px); box-shadow: 0 0 0 4px rgba(120,220,210,.25); }
-.u-opt { position:absolute; top:810px; width:330px; margin-left:-165px; text-align:center; }
-.u-opt .bowl { position:relative; width:220px; height:70px; margin:0 auto; border-radius: 0 0 110px 110px / 0 0 70px 70px; background:#eef3ee; box-shadow: inset 0 -6px 0 #c9d6d0, 0 10px 20px rgba(14,74,85,.25); overflow:hidden; }
-.u-fill { position:absolute; left:0; right:0; bottom:0; height:44px; transform-origin: 50% 100%; background: linear-gradient(180deg, #8fe0d2, #2a9d92); }
-.u-opt .t { margin-top:10px; display:flex; flex-direction:column; align-items:center; gap:0; }
-.u-opt b { font-family:'Old Standard TT', serif; font-weight:700; font-size:40px; line-height:1; color:#1f7a72; }
-.u-opt span { font-size:38px; line-height:1.05; color:#0f2f35; }
-.u-meta { position:absolute; left:110px; right:110px; top:1030px; color:#3f6a68 !important; display:flex; justify-content:space-between; font-style:italic; font-size:26px; color:#eafffb; }
+/* 06 · Затонувшая академия: тёмный камень, зелёная мгла, светлый портал;
+   вода — отдельный слой, обрезанный по уровню (--wl). Тёплое — только золото надписей. */
+.c7-4 { background:#0a1416; font-family:'Alegreya', serif; color:#f2faf6; }
+.a-root { position:absolute; inset:0; overflow:hidden; }
+.a-cam { transform-origin: 60% 50%; will-change: transform; }
+.c7-4 svg.lay { width:100%; height:100%; }
+/* контейнер НЕ создаёт контекст наложения (без clip-path/opacity/z-index), иначе смешивание
+   цветов слоёв пойдёт с пустым фоном и вода станет сплошной заливкой; режем каждый слой */
+.a-water { position:absolute; inset:0; pointer-events:none; }
+.a-water > * { position:absolute; inset:0; clip-path: inset(0 0 calc(1080px - var(--wl)) 0); }
+.a-water .tint { background: linear-gradient(180deg, rgba(3,34,40,.9), rgba(8,62,66,.72) 60%, rgba(5,46,52,.78)); }
+.a-water .deep { display:none; }
+.a-surface { position:absolute; left:0; top: calc(var(--wl) - 30px); width:3840px; height:60px; animation: a-wave 6s linear infinite; pointer-events:none; }
+.a-surface svg { width:3840px; height:60px; }
+.a-surface::after { content:''; position:absolute; left:0; right:0; top:34px; height:50px; background: linear-gradient(180deg, rgba(200,255,240,.22), rgba(200,255,240,0)); }
+@keyframes a-wave { to { transform: translateX(-1920px); } }
+.a-gold { position:absolute; top:734px; width:244px; margin-left:-122px; height:128px; display:grid; place-items:center; text-align:center;
+  background: linear-gradient(180deg, #2a2620, #36312a); box-shadow: inset 0 4px 10px rgba(0,0,0,.65), inset 0 -1px 0 rgba(255,240,210,.08); }
+.a-gold .t { color: color-mix(in srgb, #4a453a calc(var(--wet) * 100%), #e6c27a);
+  text-shadow: 0 2px 0 rgba(0,0,0,.6), 0 -1px 0 rgba(255,235,190,.22), 0 0 calc((1 - var(--wet)) * 18px) rgba(255,190,90,.35); }
+.a-gold b { display:block; font-family:'Old Standard TT', serif; font-weight:700; font-size:32px; line-height:1; margin-bottom:6px; }
+.a-gold span { display:block; font-weight:500; font-size:36px; line-height:1.04; }
+.a-clep { position:absolute; left:342px; top:372px; width:96px; height:496px; display:flex; align-items:flex-end; }
+.a-clep .w { width:100%; height: calc(496px * var(--fill) * var(--lvl)); border-radius:0 0 8px 8px;
+  background: linear-gradient(180deg, rgba(220,255,248,.9) 0 3px, rgba(110,210,196,.6) 3px, rgba(30,110,110,.7)); }
+.a-stream { position:absolute; left:386px; top:150px; width:8px; height:222px; transform-origin:50% 0; transform:scaleY(0);
+  background: linear-gradient(180deg, rgba(200,255,245,.15), rgba(200,255,245,.75)); border-radius:4px; }
+.a-time { position:absolute; left:290px; width:200px; top:222px; text-align:center; }
+.a-time span { display:block; font-family:'Old Standard TT', serif; font-weight:400; font-size:100px; line-height:1; color:#eafff8;
+  text-shadow: 0 0 26px rgba(150,255,230,.5), 0 2px 10px #0a1416; font-variant-numeric: tabular-nums; }
+.a-root[data-ph="warning"] .a-time span { color:#ffcf9a; text-shadow: 0 0 30px rgba(255,140,70,.7); }
+.a-root[data-ph="zero"] .a-time span { color:#5e7470; text-shadow:none; }
+.a-q { position:absolute; left:600px; right:160px; top:206px; margin:0; text-align:center; font-weight:500; font-size:64px; line-height:1.16; text-wrap:balance;
+  text-shadow: 0 2px 22px #0a1416, 0 0 3px #0a1416; }
+.a-meta { position:absolute; left:600px; right:160px; top:1034px; display:flex; justify-content:space-between; font-size:24px; font-style:italic; color:#a5b8ae; }
