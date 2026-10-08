@@ -1,0 +1,5 @@
+/* Seven Worlds Lab — только общее: корень сцены. Всё остальное — у каждого мира своё. */
+.w7 { position:absolute; inset:0; overflow:hidden; }
+.w7 * { box-sizing:border-box; }
+.w7 svg { display:block; }
+.w7-worlds { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 190px), 1fr)); }

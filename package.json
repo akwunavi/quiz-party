@@ -12,7 +12,9 @@
     "lab": "vite --open /quiz-party/labs/newyear/",
     "lab:build": "node scripts/build-ny-lab.mjs",
     "lab:magic": "vite --open /quiz-party/labs/magic2/",
-    "lab:magic:build": "node scripts/build-magic-lab.mjs"
+    "lab:magic:build": "node scripts/build-magic-lab.mjs",
+    "lab:worlds": "vite --open /quiz-party/labs/worlds7/",
+    "lab:worlds:build": "node scripts/build-worlds-lab.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
