@@ -117,7 +117,7 @@ export function HostScreen() {
     ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index], pack.rounds[gameState.round_number]?.mechanic)
     : false
   return (
-    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme}>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme} paper={pack?.settings?.play_mode === 'paper'}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />

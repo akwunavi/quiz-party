@@ -272,3 +272,4 @@ div.ml2-t { position:absolute; transform:translate(-50%,-50%); }
 .ml2-big { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 /* длинное имя темы в шапке панели — не больше двух строк */
 .ml2-head > div:first-child b, .jp2-head b { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ml2-chip { position:absolute; right:28px; bottom:24px; padding:6px 14px; border-radius:10px; background:rgba(3,16,13,.7); }

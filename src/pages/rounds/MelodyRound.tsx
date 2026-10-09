@@ -903,14 +903,15 @@ function ForestMelodyBoard(props: BoardProps) {
  *  основной пульт — телефон ведущего (AdminPage). */
 function ForestMelodyActions({ b, pack, gameState }: { b: ReturnType<typeof useMelodyBoard>; pack: LoadedPack; gameState: GameState }) {
   const { m, idle, played, freeKeys, manualPick, setManualPick, loadState, click, startSpin, currentId, bidSec, bids, ans, grade } = b
-  if (idle) return (
+  if (idle) return (<>
+    {/* прогресс скачивания — сведения, а не управление: остаётся видимым, даже когда кнопки проектора скрыты */}
+    {loadState && loadState.total > 0 && (
+      <span className={`ml2-load ml2-chip${loadState.failed ? ' warn' : ''}`}>
+        {loadState.done + loadState.failed < loadState.total ? `♪ треки ${loadState.done}/${loadState.total}…`
+          : loadState.failed ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}` : '♪ все треки загружены'}
+      </span>
+    )}
     <div className="host-actions ml2-actions">
-      {loadState && loadState.total > 0 && (
-        <span className={`ml2-load${loadState.failed ? ' warn' : ''}`}>
-          {loadState.done + loadState.failed < loadState.total ? `♪ треки ${loadState.done}/${loadState.total}…`
-            : loadState.failed ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}` : '♪ все треки загружены'}
-        </span>
-      )}
       {freeKeys.length > 0
         ? (manualPick
             ? <><span className="ml2-load">выберите колокольчик на экране</span><button className="ghost" onClick={() => setManualPick(false)}>Отмена</button></>
@@ -918,7 +919,7 @@ function ForestMelodyActions({ b, pack, gameState }: { b: ReturnType<typeof useM
                 <button className="ghost" onClick={() => setManualPick(true)}>Выбрать вручную</button></>)
         : <button onClick={() => void finishMelodyRound(gameState, pack)}>Завершить раунд →</button>}
     </div>
-  )
+  </>)
   return (
     <div className="host-actions ml2-actions">
       {m.stage === 'bids' && <>

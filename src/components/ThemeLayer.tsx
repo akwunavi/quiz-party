@@ -10,8 +10,10 @@ import { isForestTheme } from '../forest/config'
 // Лес грузится отдельным куском и только на проекторе в этой теме: телефоны и пульт его не тянут
 const ForestFrame = lazy(() => import('../forest/shell').then(m => ({ default: m.ForestFrame })))
 
-export function ThemeLayer({ theme, isProjector, phase, plain, children }: {
+export function ThemeLayer({ theme, isProjector, phase, plain, paper, children }: {
   theme: ThemeKey; isProjector?: boolean
+  /** Игра на бумаге (бар): ведущий управляет с проектора, поэтому кнопки на нём остаются видны (пока — только в этом режиме). */
+  paper?: boolean
   /** Новогодние темы: вопрос без картинок и вариантов — самый «пустой» экран. */
   plain?: boolean
   /** Фаза игры (gameState.phase) — управляет ТОЛЬКО плотностью сцены
@@ -24,7 +26,7 @@ export function ThemeLayer({ theme, isProjector, phase, plain, children }: {
   // Лес на проекторе: всё содержимое живёт в кадре 1920×1080 с единым холстом леса (forest/shell.tsx)
   if (isForestTheme(theme) && isProjector) {
     return (
-      <div className={`theme-${theme} fo-root${nyNavEnabled() ? ' fo-nav' : ''}`}>
+      <div className={`theme-${theme} fo-root${nyNavEnabled() || paper ? ' fo-nav' : ''}`}>
         <Suspense fallback={null}><ForestFrame>{children}</ForestFrame></Suspense>
       </div>
     )
