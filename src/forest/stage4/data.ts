@@ -4,6 +4,7 @@
 // у команды без ответа — «—» и никакого вердикта. Верность здесь заданы данными (проверка игры не затронута).
 import { IMG } from '../content'
 import { CWT } from '../stage3/cwcommon'
+import type { TeamRow } from './TeamStrip'
 
 export const TEAM_ROWS = CWT
 export type TRow = { text: string | null; ok: boolean | null }
@@ -31,4 +32,15 @@ export const PHOTOS4 = {
   q: 'Какой из снимков не связан с космосом?',
   imgs: [IMG.collins, IMG.falcon, IMG.hubble, IMG.palace], keys: ['А', 'Б', 'В', 'Г'], correct: 3,
   teams: [t('Г'), t('Г'), t('А', false), t('Б', false), t('Г'), t('В', false)],
+}
+
+/** строки колонки/полосы «Ответы команд» из тестовых ответов: шесть команд вечера (CWT) по порядку */
+export function labRows(rows: TRow[]): TeamRow[] {
+  return CWT.map((t, i) => ({ key: i, name: t.name, color: t.color, text: rows[i].text, ok: rows[i].ok }))
+}
+/** ответы команд по правильной строке: три команды верно, одна путает последнюю пару, одна — первую, одна не ответила */
+export function rowsFrom(parts: string[], join: string): TRow[] {
+  const swap = (a: number, b: number) => { const c = [...parts]; [c[a], c[b]] = [c[b], c[a]]; return c.join(join) }
+  const right = parts.join(join), n = parts.length
+  return [{ text: right, ok: true }, { text: right, ok: true }, { text: swap(n - 2, n - 1), ok: false }, { text: swap(0, 1), ok: false }, { text: right, ok: true }, { text: null, ok: null }]
 }

@@ -50,3 +50,37 @@
 .s4-sl.ok .mk { color:#0d2a1c; background: radial-gradient(circle at 35% 30%, #d6ffe4, #6fd79a 60%, #2f8a5a); }
 .s4-sl.no .mk { color:#2a0f04; background: radial-gradient(circle at 35% 30%, #f0c3a8, #b5643f 60%, #6b3218); }
 .s4-sl.nil .mk { color:#9fb8ae; border:2px dashed #7a8f86; }
+
+/* ═══ Игра: разбор ответов на настоящих данных (ReviewGame.tsx). Лаборатория этих классов не получает. ═══ */
+.s4-ans.wrap { flex-wrap:wrap; column-gap:.35em; row-gap:0; }
+.s4-ans .wd { display:inline-flex; gap:6px; white-space:nowrap; }
+.s4-note { position:absolute; width:1160px; text-align:center; font-size:28px; line-height:1.18; color:#cfeee4; text-shadow:var(--halo); z-index:4;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.s4-vid { position:absolute; z-index:3; display:grid; place-items:center; }
+.s4-vid.corner { left:1560px; top:16px; width:330px; height:186px; z-index:7; border-radius:6px; box-shadow:0 0 0 4px #3b2a1c, 0 14px 30px rgba(0,0,0,.7); background:#06140f; }
+.s4-vid .reveal-video { width:100%; height:100%; display:block; }
+.s4-vid .reveal-video video { width:100%; height:100%; max-height:none; max-width:none; object-fit:contain; border-radius:6px; display:block; }
+.s4-th .s4-cnt { font-size:24px; color:#cfeee4; margin-left:18px; }
+.stk { font-size:.7em; color:#ffe2a0; }
+/* колонка команд справа: строки по раскладке teamColLayout (больше 7 — ниже строки, больше 12 — две колонки) */
+.s4-teams.g { display:grid; grid-template-columns:repeat(var(--cols), minmax(0, 1fr)); column-gap:12px; row-gap:var(--gap); align-content:start; }
+.s4-teams.g .s4-th { grid-column:1 / -1; margin-bottom:0; white-space:nowrap; }
+.s4-teams.g .s4-ta { height:var(--rh); min-height:0; margin:0; padding:6px 14px 8px var(--pl); grid-template-columns:minmax(0, 1fr) calc(var(--mks) + 8px); }
+.s4-teams.g .s4-ta .nm { font-size:var(--nfs); min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s4-teams.g .s4-ta .txt { font-size:var(--tfs); min-width:0; display:-webkit-box; -webkit-line-clamp:var(--tl); -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+.s4-teams.g .s4-ta.nil .txt { font-size:calc(var(--tfs) * .8); }
+.s4-teams.g .s4-ta .dots { font-size:var(--tfs); left:var(--pl); bottom:auto; top:calc(var(--nfs) * 1.1 + 8px); }
+.s4-teams.g .s4-ta .mk { width:var(--mks); height:var(--mks); font-size:calc(var(--mks) * .6); }
+.s4-teams.g.c2 .s4-ta-bg { filter:drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
+/* полоса команд снизу (Сопоставление, Порядок) */
+.s4-scnt { position:absolute; left:64px; font-size:26px; color:#cfeee4; text-shadow:var(--halo); z-index:5; }
+.s4-sl .dots { grid-column:1; grid-row:2; font-size:25px; line-height:1.05; color:#7fa596; letter-spacing:.2em; text-shadow:var(--halo); }
+.s4-strip.g { grid-template-columns:repeat(var(--cols), var(--cw)); justify-content:center; gap:var(--gap) 10px; }
+.s4-strip.g .s4-sl { height:var(--rh); min-height:0; grid-template-columns:minmax(0, 1fr) calc(var(--mks) + 4px); }
+.s4-strip.g .s4-sl .nm { font-size:var(--nfs); min-width:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.s4-strip.g .s4-sl .txt, .s4-strip.g .s4-sl .dots { font-size:var(--tfs); min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s4-strip.g .s4-sl .mk { width:var(--mks); height:var(--mks); font-size:calc(var(--mks) * .62); }
+.s4-strip.g:not(.r1) .s4-sl { padding:3px 10px 4px 20px; }
+.s4-strip.g:not(.r1) .s4-sl .nm { display:block; white-space:nowrap; text-overflow:ellipsis; }
+/* бумажная игра / нет команд: разбор по центру кадра */
+.s4.paper .s4-recall { text-align:center; }

@@ -64,6 +64,7 @@ import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
 import { ForestCrosswordAnswers, ForestCrosswordQuestion, crosswordGridOf } from './rounds/ForestCrossword'
+import { ForestAnswers } from './rounds/ForestAnswers'
 import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
 import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
@@ -1766,6 +1767,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
         {actions}
       </>
     )
+  }
+  // «Волшебный лес», обычные вопросы (открытый ответ, варианты, фото, фото-варианты, сопоставление, порядок, ребус):
+  // утверждённые разборы этапа 4. Хуки выше (автопоказ, проверка, запись is_correct) — общие; сцена только рисует.
+  if (isForestTheme(pack.theme) && round.mechanic !== 'crossword' && round.mechanic !== 'anagram'
+    && q.answer.mode !== 'crossword_word' && q.answer.mode !== 'anagram') {
+    return <ForestAnswers key={q.id} round={round} q={q} step={step} answers={answers} teams={teams} allTeams={allTeams}
+      revealed={revealed} checked={checked} paper={paper} revealMs={revealDoneMs(q)} answerText={displayAnswer(q)}
+      effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
+      video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
   }
 
   return (
