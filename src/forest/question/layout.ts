@@ -127,9 +127,9 @@ export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
   if (n === 2) {
     // два фото одной высоты — равная важность; вопрос сверху, цветы-варианты снизу
     const one = fitText(text, 1440, 1, 48, 40, m)
-    const t = wrapCount(text, 1440, one.size, m) <= 1 ? one : fitText(text, 1440, 2, 40, 30, m)
+    const t = wrapCount(text, 1440, one.size, m) <= 1 ? one : fitText(text, 1440, 3, 40, 30, m)
     const lines = Math.max(1, t.lines), top = lines === 1 ? 30 : 26
-    const imgY = lines === 1 ? 112 : lines === 2 ? 200 : 270, imgH = lines === 1 ? 548 : lines === 2 ? 470 : 410
+    const imgY = lines === 1 ? 112 : Math.max(200, top + textH(t.size, lines) + 32), imgH = lines === 1 ? 548 : 670 - imgY
     const rs = row(imgs.slice(0, 2), imgH, 1060, imgY, 48)
     const fl = flowerRow(opts.length, 1100, lines === 1 ? 752 : 748, 52, 360)
     return L({ strands: [{ pts: bough(imgY - 20, 280, 1860), w: 16 }], vines: rs.flatMap(r => hang(r, imgY - 14)), frames: rs.map((r, i) => ({ r, img: imgs[i] })),
