@@ -11,7 +11,7 @@
 import type { ReactNode, RefObject } from 'react'
 import { S1Screen } from '../stage1/common'
 import type { Rect } from '../stage1/env'
-import { fmtVal, balla } from './fmt'
+import { fmtVal, balla, lenCls } from './fmt'
 import { jpTilePos, listDensity, type JpFlower, JP_PETAL_R } from './layout'
 
 /** Состояние сцены: доска, выбор цены, открытая плитка, ответ, возврат к доске. */
@@ -176,7 +176,7 @@ export function JpPanel({ theme, value, reveal, correct, rows, count, countSteps
   return (
     <div className="jp2-panel jp2-pB" ref={panelRef}>
       <div className="jp2-head"><b>{theme.name}</b><span>{theme.hint ? `${theme.hint} · ` : ''}цена <em>{fmtVal(value)}</em> {balla(value)}</span></div>
-      {reveal && <div className="jp2-ans jp2-ansB"><span>правильный ответ</span><b>{correct}</b></div>}
+      {reveal && <div className={`jp2-ans jp2-ansB${lenCls(correct)}`}><span>правильный ответ</span><b>{correct}</b></div>}
       <div className={`jp2-list${listDensity(rows.length)}`}>
         <div className="jp2-cnt">{reveal ? 'Ответы по скорости' : <>Ответили: {countSteps != null ? Array.from({ length: countSteps + 1 }, (_, k) => <em key={k} className={`c${k}`}>{k}</em>) : <em className="c0">{count}</em>}</>}</div>
         {rows.map((a, k) => {

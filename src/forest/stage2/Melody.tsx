@@ -13,7 +13,7 @@ import type { ReactNode, RefObject } from 'react'
 import { Dandelion } from '../stage1/timers'
 import { S1Screen } from '../stage1/common'
 import type { Rect } from '../stage1/env'
-import { fmtVal, balla } from './fmt'
+import { fmtVal, balla, lenCls } from './fmt'
 import { listDensity, melBellPos, type MelCol } from './layout'
 
 /** Стадии сцены — те же, что в лаборатории; `idle` — доска (в том числе «всё отыграно»). */
@@ -29,7 +29,7 @@ const UNDIM = { opacity: 1, filter: 'saturate(1) brightness(1) blur(0px)' }
 
 /** Таймлайн входа в состояние. `land` (только лаборатория) — момент остановки рулетки в таймлайне; в игре рулетка
  *  идёт по настоящему времени, и «вспышку» на итоге сцена делает сама. */
-export function melBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], view: MelView, sel: { x: number; y: number }, opts: { intro?: boolean; spin?: { from: number; ms: number; land: number; pick: string } } = {}) {
+export function melBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], view: MelView, sel: { x: number; y: number }, opts: { intro?: boolean; lab?: boolean; spin?: { from: number; ms: number; land: number; pick: string } } = {}) {
   if (view === 'idle' && opts.intro !== false) {
     tl.fromTo(q('.ml2a-grow'), { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.2, stagger: 0.12, ease: 'power2.out' }, 0)
       .fromTo(q('.ml2a-sway'), { '--g': 0 }, { '--g': 1, duration: 0.5, stagger: 0.04, ease: 'back.out(1.8)' }, 0.8)
@@ -52,7 +52,7 @@ export function melBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], vi
     tl.fromTo(q('.ml2-vessel'), { x: sel.x - VX, y: sel.y - VY, scale: 0.3, opacity: 0.8 }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.8, ease: 'power3.inOut' }, 0.1)
       .fromTo(q('.ml2-panel > *'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.07, ease: 'power3.out' }, 0.5)
   }
-  if (view === 'bidding') q('.ml2-bid .st').forEach((el, k) => { tl.fromTo(el, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' }, 1.6 + k * 1.1) })
+  if (view === 'bidding') q('.ml2-bid .st').forEach((el, k) => { tl.fromTo(el, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' }, opts.lab ? 1.6 + k * 1.1 : 0.9 + k * 0.08) })
   if (view === 'bids') tl.fromTo(q('.ml2-bid'), { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, stagger: 0.12 }, 0.8)
     .fromTo(q('.ml2-bid.win .tag'), { scale: 0 }, { scale: 1, duration: 0.5, ease: 'back.out(2.4)' }, 1.6)
   if (view === 'wrong') tl.fromTo(q('.ml2-wrong'), { x: -12, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'elastic.out(1, 0.35)' }, 1.0)
@@ -231,19 +231,19 @@ export function MelPanel({ view, d }: { view: MelView; d: MelPanelData }) {
       {(view === 'answering' || view === 'wrong') && <>
         <div className="ml2-big" style={{ color: first?.color }}>{first?.name ?? '—'}</div>
         <div className="ml2-hint">ставка {d.bidSec} сек → за верный ответ {won} {balla(won)}</div>
-        <div className="ml2-answer">{d.answer ? <>Ответ: <b>{d.answer}</b></> : <span className="wait">ждём ответ…</span>}</div>
+        <div className={`ml2-answer${lenCls(d.answer)}`}>{d.answer ? <>Ответ: <b>{d.answer}</b></> : <span className="wait">ждём ответ…</span>}</div>
         {d.wrong && <div className="ml2-wrong">{d.wrong}</div>}
-        {d.correctNow && d.correct != null && <div className="ml2-ans"><span>Верно ✓</span><b>{d.correct}</b></div>}
+        {d.correctNow && d.correct != null && <div className={`ml2-ans${lenCls(d.correct)}`}><span>Верно ✓</span><b>{d.correct}</b></div>}
       </>}
       {view === 'passed' && <>
         <div className="ml2-big" style={{ color: first?.color }}><small>ход передан · </small>{first?.name ?? '—'}</div>
         <div className="ml2-hint">трек звучит целиком · за верный ответ — 0,5 балла</div>
-        <div className="ml2-answer">{d.answer ? <>Ответ: <b>{d.answer}</b></> : <span className="wait">ждём ответ…</span>}</div>
+        <div className={`ml2-answer${lenCls(d.answer)}`}>{d.answer ? <>Ответ: <b>{d.answer}</b></> : <span className="wait">ждём ответ…</span>}</div>
         {d.wrong && <div className="ml2-wrong">{d.wrong}</div>}
-        {d.correctNow && d.correct != null && <div className="ml2-ans"><span>Верно ✓</span><b>{d.correct}</b></div>}
+        {d.correctNow && d.correct != null && <div className={`ml2-ans${lenCls(d.correct)}`}><span>Верно ✓</span><b>{d.correct}</b></div>}
       </>}
       {(view === 'reveal' || view === 'miss') && <>
-        <div className="ml2-ans"><span>{view === 'reveal' ? <>Верно ✓ · +{fmtVal(d.wonPts ?? 0)}</> : 'Правильный ответ'}</span><b>{d.correct}</b></div>
+        <div className={`ml2-ans${lenCls(d.correct)}`}><span>{view === 'reveal' ? <>Верно ✓ · +{fmtVal(d.wonPts ?? 0)}</> : 'Правильный ответ'}</span><b>{d.correct}</b></div>
         <div className="ml2-won">{view === 'reveal' ? <><b style={{ color: d.wonTeam?.color }}>{d.wonTeam?.name ?? '—'}</b> забирает {fmtVal(d.wonPts ?? 0)} {balla(d.wonPts ?? 0)}</> : 'Никто не угадал'}</div>
       </>}
     </div>

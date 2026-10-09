@@ -91,7 +91,7 @@ export function melBellPos(c: MelCol, i: number) {
   const b = c.plant.bells[i] ?? c.plant.bells[0]
   return { x: c.left + b.x * c.k, y: c.top + (b.y + 50 * c.kb) * c.k }
 }
-/** Плотность списка команд на панели: обычный (до 5), плотнее (6–8), две колонки (9+). */
-export function listDensity(rows: number): '' | ' d1' | ' d2' {
-  return rows <= 5 ? '' : rows <= 8 ? ' d1' : ' d2'
+/** Плотность списка команд на панели: обычный (до 5), плотнее (6–8), две колонки (9–12), две колонки в одну строку (13+). */
+export function listDensity(rows: number): '' | ' d1' | ' d2' | ' d2 d3' {
+  return rows <= 5 ? '' : rows <= 8 ? ' d1' : rows <= 12 ? ' d2' : ' d2 d3'
 }

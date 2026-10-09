@@ -46,7 +46,7 @@ export function MelodyLab({ state, nOv, onReady }: S1Props) {
   const sel = melBellPos(layout[PTI], PI)
   const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
     tlRef.current = tl
-    melBuild(tl, q, view, sel, { spin: { from: SPIN_FROM, ms: SPIN_MS, land: LAND, pick: MEL2.pick } })
+    melBuild(tl, q, view, sel, { lab: true, spin: { from: SPIN_FROM, ms: SPIN_MS, land: LAND, pick: MEL2.pick } })
   }, tm, [state])
 
   // рулетка: какая плитка подсвечена — читаем из положения таймлайна (перемотка/пауза работают)
