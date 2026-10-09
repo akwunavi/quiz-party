@@ -1,0 +1,44 @@
+/* 02 · Библиотека: коридор стеллажей в дымке, холодное окно в торце,
+   единственный тёплый свет — свеча на столе. EB Garamond — книжная печать. */
+.c7-2 { background:#0c0a0e; font-family:'EB Garamond', serif; color:#f3e7cf; }
+.l-root { position:absolute; inset:0; overflow:hidden; }
+.l-cam { transform-origin: 58% 52%; will-change: transform; }
+.c7-2 svg.lay, .c7-2 canvas.lay { width:100%; height:100%; }
+.l-far { transform-origin: 60% 50%; }
+.l-q { position:absolute; left:600px; right:160px; top:190px; margin:0; text-align:center; font-weight:500; font-size:66px; line-height:1.16; text-wrap:balance;
+  text-shadow: 0 2px 22px #0c0a0e, 0 0 3px #0c0a0e; }
+.l-q .split { opacity:0; }
+.l-meta { position:absolute; left:600px; right:160px; top:1034px; display:flex; justify-content:space-between; font-size:24px; font-style:italic; color:#9c8462; }
+/* книга */
+.l-book { position:absolute; left:720px; top:668px; width:900px; height:330px; perspective:1300px; perspective-origin:50% -60%; }
+.l-pages { position:absolute; inset:0; transform: rotateX(44deg); transform-origin:50% 100%; transform-style:preserve-3d; }
+.l-page { position:absolute; top:0; width:450px; height:330px; padding:26px 34px; box-sizing:border-box; overflow:hidden; }
+.l-page.l { left:0; background: linear-gradient(90deg, #8c7350, #c9b086 14%, #c2a97e 80%, #6a5236 97%, #3a2a1a); border-radius:10px 2px 0 10px; }
+.l-page.r { right:0; background: linear-gradient(270deg, #5e4a30, #a88f66 14%, #b29a70 80%, #6a5236 97%, #3a2a1a); border-radius:2px 10px 10px 0; }
+/* свет свечи слева, корешок затенён, верх страниц уходит в полумрак */
+.l-page::after { content:''; position:absolute; inset:0; pointer-events:none;
+  background: linear-gradient(180deg, rgba(12,8,6,.35), rgba(12,8,6,0) 45%), radial-gradient(ellipse 90% 120% at 0% 100%, rgba(255,180,100,.22), rgba(255,180,100,0) 70%); }
+.l-page.r::after { background: linear-gradient(180deg, rgba(12,8,6,.4), rgba(12,8,6,0) 45%), linear-gradient(90deg, rgba(12,8,6,.1), rgba(12,8,6,.45)); }
+/* толщина книжного блока */
+.l-pages::after { content:''; position:absolute; left:6px; right:6px; top:100%; height:16px; transform-origin:50% 0; transform: rotateX(-70deg);
+  background: repeating-linear-gradient(180deg, #8a7454 0 2px, #5a4630 2px 3px); border-radius:0 0 10px 10px; }
+.l-prose { font-size:20px; line-height:1.6; color:#3a2818; white-space:nowrap; opacity:.85; }
+.l-ink { position:absolute; left:30px; right:10px; font-style:italic; font-size:42px; line-height:1.05; color:#1e1008; white-space:nowrap; }
+.l-ink:nth-of-type(1), .l-page .l-ink:nth-last-child(2) { top:52px; }
+.l-page .l-ink:last-child { top:178px; }
+.l-ink b { font-style:normal; font-weight:700; color:#8a2a14; margin-right:.12em; }
+.l-leaf { position:absolute; right:0; top:0; width:450px; height:330px; padding:26px 34px; box-sizing:border-box; overflow:hidden; transform-origin:0 50%;
+  background: linear-gradient(270deg, #6e5838, #b8a076 20%, #ad946a); backface-visibility:hidden; border-radius:0 8px 8px 0; box-shadow: -10px 0 30px rgba(0,0,0,.3); }
+/* свеча-таймер */
+.l-candle { position:absolute; left:500px; width:120px; top:0; height:905px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; }
+.l-time span { display:block; font-weight:500; font-size:108px; line-height:1; color:#ffdcaa; text-shadow: 0 0 30px rgba(255,160,70,.55), 0 2px 10px #0c0a0e; font-variant-numeric: lining-nums tabular-nums; }
+.l-flamebox { height:76px; display:flex; align-items:flex-end; animation: l-flick 2.6s ease-in-out infinite; transform-origin:50% 100%; }
+@keyframes l-flick { 0%,100% { transform: rotate(-2deg) } 40% { transform: rotate(2.5deg) scaleY(1.05) } 70% { transform: rotate(-1deg) scaleY(.96) } }
+.l-flame { width:22px; height:54px; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; transform-origin:50% 100%;
+  background: radial-gradient(ellipse at 50% 72%, #fff8e4 0%, #ffd27e 38%, #ff8a2a 72%, rgba(255,138,42,0) 76%); box-shadow: 0 0 46px 18px rgba(255,170,80,.32); }
+.l-wax { width:48px; height: calc(26px + 190px * var(--wax)); border-radius:6px 6px 2px 2px; transition: height .8s ease;
+  background: linear-gradient(90deg, #9c8460, #efdfbd 38%, #d8c39b 70%, #7c6646); }
+.l-holder { width:120px; height:16px; border-radius:50%; background: radial-gradient(ellipse at 50% 30%, #8a5a2c, #3a2414 70%); }
+.l-root[data-ph="warning"] .l-time span { color:#ff9a6a; text-shadow: 0 0 34px rgba(255,90,40,.8); }
+.l-root[data-ph="zero"] .l-flame { opacity:0; box-shadow:none; }
+.l-root[data-ph="zero"] .l-time span { color:#6e5a46; text-shadow:none; }

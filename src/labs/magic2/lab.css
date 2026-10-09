@@ -1,0 +1,50 @@
+/* ═══ Оболочка лаборатории: тихий графит, не спорит со сценой. Сцена — герой. ═══ */
+:root { --lab-bg:#0e0d12; --lab-panel:#16141c; --lab-line:#2b2734; --lab-fg:#ebe6df; --lab-dim:#9c96a6; --lab-brass:#cfae6e;
+  --lab-font:'EB Garamond', Georgia, serif; color-scheme:dark; }
+html, body { background:var(--lab-bg); color:var(--lab-fg); margin:0; }
+body { font: 16px/1.45 var(--lab-font); -webkit-font-smoothing:antialiased; }
+button { font: inherit; }
+.m2-lab { max-width:1500px; margin:0 auto; padding-inline:max(16px,2vw); padding-block:16px 48px; display:grid; gap:12px; }
+.m2-head { display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center; justify-content:space-between; }
+.m2-brand { display:flex; gap:12px; align-items:center; }
+.m2-brand b { display:block; font-size:18px; letter-spacing:.02em; }
+.m2-brand span { color:var(--lab-dim); font-size:13.5px; }
+.m2-brand-q { font-family:'UnifrakturMaguntia', 'EB Garamond', serif; font-size:44px; line-height:1; color:var(--lab-brass); }
+.m2-concepts { display:flex; flex-wrap:wrap; gap:8px; }
+.m2-concept { all:unset; cursor:pointer; display:grid; padding:8px 14px; border:1px solid var(--lab-line); border-radius:8px; background:var(--lab-panel); min-width:0; transition:border-color .2s, background .2s; }
+.m2-concept:hover { border-color:#4a4356; }
+.m2-concept.is-on { border-color:var(--lab-brass); background:#1e1a16; }
+.m2-concept-n { font-size:11px; letter-spacing:.16em; color:var(--lab-dim); }
+.m2-concept.is-on .m2-concept-n { color:var(--lab-brass); }
+.m2-concept-name { font-size:17px; font-weight:600; }
+.m2-scenes { display:flex; flex-wrap:wrap; gap:6px; }
+.m2-scene { all:unset; cursor:pointer; padding:6px 12px; border:1px solid var(--lab-line); border-radius:999px; color:var(--lab-dim); font-size:15px; transition:color .2s, border-color .2s; }
+.m2-scene b { color:var(--lab-brass); margin-right:7px; font-weight:600; font-variant-numeric:lining-nums; }
+.m2-scene:hover { color:var(--lab-fg); }
+.m2-scene.is-on { color:var(--lab-fg); border-color:var(--lab-brass); }
+.m2-transport { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; }
+.m2-seg { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.m2-seg button { all:unset; cursor:pointer; padding:5px 11px; border-radius:6px; border:1px solid var(--lab-line); font-size:12.5px; letter-spacing:.1em; color:var(--lab-dim); transition:color .2s, border-color .2s, background .2s; }
+.m2-seg button:hover { color:var(--lab-fg); }
+.m2-seg button.is-on { color:#16120c; background:var(--lab-brass); border-color:var(--lab-brass); }
+.m2-seg button.is-play { color:var(--lab-brass); border-color:var(--lab-brass); }
+.m2-left { color:var(--lab-dim); font-size:13px; font-variant-numeric:tabular-nums lining-nums; padding-inline:6px; }
+.m2-concept:focus-visible, .m2-scene:focus-visible, .m2-seg button:focus-visible { outline:2px solid var(--lab-brass); outline-offset:2px; }
+.m2-preview { min-width:0; }
+.m2-stage-box { position:relative; width:100%; aspect-ratio:16/9; max-width:100%; overflow:hidden; background:#000; border-radius:6px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.m2-stage { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; overflow:hidden; }
+.m2-embed .m2-stage-box { border-radius:0; box-shadow:none; }
+.m2-card { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:12px 28px; background:var(--lab-panel); border:1px solid var(--lab-line); border-radius:8px; padding:16px 20px; }
+.m2-card-head span { font-size:11px; letter-spacing:.16em; color:var(--lab-brass); }
+.m2-card-head h1 { font-size:30px; line-height:1.1; margin:4px 0 8px; font-weight:600; }
+.m2-card-head p { margin:0; font-size:17px; font-style:italic; color:var(--lab-fg); }
+.m2-card dl { margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:10px 20px; }
+.m2-card dt { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--lab-brass); }
+.m2-card dd { margin:2px 0 0; font-size:15px; color:#d8d2dd; }
+.m2-card ul { margin:0; padding-left:16px; } .m2-card li { margin:2px 0; }
+@media (max-width:860px) { .m2-card { grid-template-columns:1fr; } }
+
+/* общее для сцен: картинки-гравюры и QR */
+.m2-art { display:block; width:100%; height:100%; }
+.m2-qr { background:#fff; }
+.m2-qr-svg { display:block; width:100%; height:100%; }

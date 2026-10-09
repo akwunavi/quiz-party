@@ -1,0 +1,27 @@
+/* 03 · Лес (развитие): ночь, бирюзовая биолюминесценция, янтарные светлячки, кора и мох. */
+.c7-3 { background:#03100d; font-family:'Philosopher', sans-serif; color:#ecfff8; }
+.f-root { position:absolute; inset:0; }
+.f-cam { transform-origin: 40% 60%; will-change: transform; }
+.f-bg { width:100%; height:100%; }
+.c7-3 svg.lay { width:100%; height:100%; }
+.f-q { position:absolute; left:640px; right:300px; top:300px; margin:0; text-align:center; font-size:62px; line-height:1.18; text-wrap:balance; text-shadow: 0 2px 22px #03100d; }
+.f-q .split { transform-origin: 0 100%; }
+.f-opt { position:absolute; top:700px; width:300px; margin-left:-150px; text-align:center; }
+.f-opt svg { width:140px; height:140px; margin:0 auto; }
+.f-petal { fill: rgba(190,150,255,.88); stroke:#e7dcff; stroke-width:1.5; }
+.f-opt circle { fill:#ffd56b; }
+.f-opt b { position:absolute; left:50%; top:44px; width:50px; margin-left:-25px; font-size:42px; font-weight:700; color:#2a103f; }
+.f-opt span { display:block; margin-top:6px; font-size:36px; line-height:1.1; text-shadow: 0 2px 12px #03100d; }
+.f-dand { position:absolute; left:250px; top:540px; width:240px; transform: scale(.9); transform-origin: 50% 0; }
+.f-dand svg { width:240px; height:420px; }
+.f-dand-stem { fill:none; stroke:#4f8f6a; stroke-width:5; stroke-linecap:round; }
+.f-dand .hd { fill:#e8fff6; }
+.f-dand g g line { stroke: rgba(232,255,246,.55); stroke-width:1.5; }
+.f-dand g g circle { fill:#e8fff6; transition: fill .6s; }
+.f-dand g g g { transition: transform 1.6s cubic-bezier(.3,0,.6,1), opacity 1.6s; }
+.f-dand g g g.gone { transform: translate(calc(80px + var(--k) * 4px), calc(-140px - var(--k) * 3px)) rotate(40deg); opacity:0; }
+.f-dand span { position:absolute; left:0; right:0; top:110px; text-align:center; font-weight:700; font-size:84px; line-height:1; text-shadow: 0 0 20px rgba(111,242,214,.6), 0 2px 10px #03100d; }
+.f-root[data-ph="warning"] .f-dand g g circle { fill:#ffd56b; }
+.f-root[data-ph="warning"] .f-dand span { color:#ffe1b0; text-shadow: 0 0 22px rgba(255,122,77,.8); }
+.f-root[data-ph="zero"] .f-dand span { color:#5f8f82; text-shadow:none; }
+.f-meta { position:absolute; left:440px; right:120px; top:186px; display:flex; justify-content:space-between; font-size:26px; color:#8fbfb2; }

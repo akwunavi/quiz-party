@@ -1,0 +1,375 @@
+/* ═══ CONCEPT 1.5 · Обсерватория — материал, свет и магия ═══
+   Закон мира: свет — вещество. Пишет (клип-маска с горячей кромкой → остывает),
+   проецирует (конус + круглая диафрагма), тянет (луч, по которому едет подпись),
+   ходит по орбитам (дуга вместо прямой). Никаких частиц ради частиц. */
+.mx.k1 { --ink:#f2ead9; --dim:#b3aac4; --brass:#c9a668; --brass-hi:#f3dfa8; --brass-dk:#7c6440; --ember:#ff8f6a; --ivory:#f4ead3; --ash:#6f6779;
+  --light:#fff4cf; color:var(--ink);
+  background: radial-gradient(ellipse 120% 90% at 50% 120%, #1d1530 0%, #0c0915 52%, #06050a 100%); }
+
+/* ── мир ── */
+.k1-rot { position:absolute; inset:0; transform-origin:50% 140%; transition: transform 5s cubic-bezier(.55,0,.25,1); }
+.k1-rot.turned { transform: rotate(32deg); }
+.k1.sub-event.st-rules .k1-rot, .k1.sub-event.st-roundT .k1-rot { animation: k1SkyTurn 2.4s cubic-bezier(.6,0,.3,1) both; }
+.k1.sub-event.st-cw .k1-rot { animation: k1SkyTurn 3s cubic-bezier(.6,0,.3,1) both; --turn: 14deg; }
+@keyframes k1SkyTurn { from { transform: rotate(0); } to { transform: rotate(var(--turn, 7deg)); } }
+.k1-sky { position:absolute; inset:0; width:100%; height:100%; }
+.k1-sky circle { fill:#f3ead6; }
+.k1-dome { position:absolute; inset:0; width:100%; height:100%; }
+.k1-dome path { fill:none; stroke:rgba(201,166,104,.10); stroke-width:1.4; }
+.k1-dome .par { stroke:rgba(201,166,104,.06); }
+/* щель купола и створки: закрыты до первого акта */
+.k1-slit { position:absolute; left:810px; width:300px; top:-40px; height:1120px; opacity:0; transition: opacity 2.6s ease 1s;
+  background: linear-gradient(180deg, rgba(190,200,255,.16), rgba(190,200,255,.05) 60%, rgba(190,200,255,0));
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); }
+.k1-slit.open { opacity:.75; }
+.k1-leaf { position:absolute; top:-30px; height:250px; width:240px; background: linear-gradient(180deg, #0b0812, #171021);
+  border-bottom:2px solid var(--brass-dk); transition: transform 2.4s cubic-bezier(.7,0,.2,1) .4s; box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+.k1-leaf.l { left:720px; border-right:2px solid var(--brass-dk); transform-origin:0 0; }
+.k1-leaf.r { left:960px; border-left:2px solid var(--brass-dk); transform-origin:100% 0; }
+.k1-leaf.l.open { transform: translate(-60px, -290px) rotate(-8deg); }
+.k1-leaf.r.open { transform: translate(60px, -290px) rotate(8deg); }
+.k1-dawn { position:absolute; inset:0; opacity:0; transition: opacity 1.6s ease;
+  background: radial-gradient(ellipse 70% 34% at 50% 106%, rgba(255,128,80,.36), rgba(255,128,80,0) 70%); }
+.k1.tm-warning .k1-dawn { opacity:1; }
+.k1.tm-zero .k1-dawn { opacity:.2; transition-duration:.5s; }
+.k1.tm-zero .k1-sky { filter: brightness(.6); transition: filter .8s; }
+.k1-horizon { position:absolute; left:-40px; right:-40px; bottom:-580px; height:640px; border-radius:50% 50% 0 0 / 22% 22% 0 0;
+  background: linear-gradient(180deg, #17111f, #08060c 40%); box-shadow: 0 -1px 0 rgba(201,166,104,.45), 0 -30px 60px rgba(0,0,0,.6); }
+
+/* армилла */
+.k1-arm { position:absolute; left:960px; top:540px; width:1200px; height:1200px; margin:-600px 0 0 -600px;
+  transition: transform 2.2s cubic-bezier(.65,.02,.2,1), opacity 1.6s ease; }
+.k1-arm svg { width:100%; height:100%; overflow:visible; }
+.k1-ring ellipse { fill:none; stroke:var(--brass); stroke-width:2.2; vector-effect:non-scaling-stroke; }
+.k1-ring line { stroke:var(--brass); stroke-width:1.2; vector-effect:non-scaling-stroke; }
+.k1-ring { transition: transform 2.2s cubic-bezier(.65,.02,.2,1), opacity 1.4s; transform-box:fill-box; transform-origin:center; }
+.k1-core { fill:var(--brass-hi); opacity:0; transition: opacity 1s; }
+.k1-notch { transition: transform 1.2s cubic-bezier(.3,1.4,.4,1) .9s; }
+.k1.st-lobby.sub-join .k1-notch { transform: rotate(7.5deg); }
+.k1-arm .r1 { opacity:.5; } .k1-arm .r2 { opacity:.3; } .k1-arm .r3 { opacity:.2; }
+.k1-arm.pose-lobby, .k1-arm.pose-randomizer, .k1-arm.pose-rules { transform: translate(0,-60px) scale(1.25); }
+.k1-arm.pose-lobby .r1, .k1-arm.pose-randomizer .r1, .k1-arm.pose-rules .r1 { transform: scaleY(.3) rotate(-4deg); }
+.k1-arm.pose-lobby .r2, .k1-arm.pose-randomizer .r2, .k1-arm.pose-rules .r2 { transform: scaleX(.42) rotate(18deg); }
+.k1-arm.pose-lobby .r3, .k1-arm.pose-randomizer .r3, .k1-arm.pose-rules .r3 { transform: scaleX(.18) rotate(-34deg); }
+.k1-arm.pose-act { transform: translate(0,-120px) scale(1.5); }
+.k1-arm.pose-act .r1 { transform: scaleX(.08); opacity:.7; } .k1-arm.pose-act .r2 { transform: scaleY(.2) rotate(8deg); } .k1-arm.pose-act .r3 { transform: scaleY(.2) rotate(-8deg); }
+.k1-arm.pose-cw, .k1-arm.pose-text, .k1-arm.pose-one, .k1-arm.pose-match { transform: translate(0,10px) scale(1.2); }
+.k1-arm.pose-cw .r1, .k1-arm.pose-text .r1, .k1-arm.pose-one .r1, .k1-arm.pose-match .r1 { transform: scaleY(.42); opacity:.3; }
+.k1-arm.pose-cw .r2, .k1-arm.pose-text .r2, .k1-arm.pose-one .r2, .k1-arm.pose-match .r2 { transform: scaleY(.46) rotate(4deg); opacity:.14; }
+.k1-arm.pose-cw .r3, .k1-arm.pose-text .r3, .k1-arm.pose-one .r3, .k1-arm.pose-match .r3 { transform: scaleY(.38) rotate(-3deg); opacity:.08; }
+.k1-arm.pose-dense, .k1-arm.pose-scramble, .k1-arm.pose-blitz, .k1-arm.pose-board, .k1-arm.pose-orderA { transform: translate(0,160px) scale(1.7); opacity:.5; }
+.k1-arm.pose-dense .r1, .k1-arm.pose-scramble .r1, .k1-arm.pose-blitz .r1, .k1-arm.pose-board .r1, .k1-arm.pose-orderA .r1 { transform: scaleY(.34); }
+.k1-arm.pose-dense .r2, .k1-arm.pose-scramble .r2, .k1-arm.pose-blitz .r2, .k1-arm.pose-board .r2, .k1-arm.pose-orderA .r2 { transform: scaleY(.38) rotate(3deg); opacity:.12; }
+.k1-arm.pose-dense .r3, .k1-arm.pose-scramble .r3, .k1-arm.pose-blitz .r3, .k1-arm.pose-board .r3, .k1-arm.pose-orderA .r3 { opacity:0; }
+.k1-arm.pose-matchA { transform: translate(0,135px) scale(1.6); }
+.k1-arm.pose-matchA .r1 { transform: scaleY(.05); opacity:.45; } .k1-arm.pose-matchA .r2 { transform: scaleY(.09); opacity:.12; } .k1-arm.pose-matchA .r3 { opacity:0; }
+.k1-arm.pose-jp, .k1-arm.pose-melody, .k1-arm.pose-roundT { transform: translate(0,60px) scale(1.12); }
+.k1-arm.pose-jp .r1, .k1-arm.pose-melody .r1, .k1-arm.pose-roundT .r1 { transform: scaleX(.02); opacity:.25; }
+.k1-arm.pose-jp .r2, .k1-arm.pose-melody .r2, .k1-arm.pose-roundT .r2 { transform: scaleY(.02); opacity:.2; }
+.k1-arm.pose-jp .r3, .k1-arm.pose-melody .r3, .k1-arm.pose-roundT .r3 { opacity:0; }
+/* прицел: кольца сжимаются в окуляр вокруг выбранной клетки */
+.k1-arm.pose-aim { transform: translate(var(--ax), var(--ay)) scale(.26); }
+.k1-arm.pose-aim .r1 { transform: none; opacity:.95; } .k1-arm.pose-aim .r2 { transform: scaleY(.3); opacity:.6; } .k1-arm.pose-aim .r3 { transform: scaleX(.3); opacity:.6; }
+.k1.st-jp.sub-open .k1-arm.pose-aim, .k1.st-jp.sub-answer .k1-arm.pose-aim { transform: translate(0,20px) scale(1.05); opacity:.35; }
+.k1.st-jp.sub-open .k1-arm.pose-aim .r2, .k1.st-jp.sub-answer .k1-arm.pose-aim .r2, .k1.st-jp.sub-open .k1-arm.pose-aim .r3, .k1.st-jp.sub-answer .k1-arm.pose-aim .r3 { opacity:0; }
+.k1-arm.pose-final { transform: translate(0,40px) scale(1.4); }
+.k1-arm.pose-final .r1 { transform: scaleY(.3); } .k1-arm.pose-final .r2 { transform: scaleY(.3); opacity:.1; } .k1-arm.pose-final .r3 { opacity:0; }
+.k1-arm.pose-sphere { transform: translate(0,-440px) scale(.15); transition-duration: 3.6s; }
+.k1-arm.pose-sphere .r1 { transform: none; opacity:.95; } .k1-arm.pose-sphere .r2 { transform: scaleX(.36) rotate(24deg); opacity:.75; }
+.k1-arm.pose-sphere .r3 { transform: scaleY(.36) rotate(-24deg); opacity:.75; } .k1-arm.pose-sphere .k1-core { opacity:1; }
+.k1-arm.pose-aside { transform: translate(800px,-420px) scale(.14); opacity:.6; }
+.k1-arm.pose-aside .r2 { transform: scaleX(.36) rotate(24deg); } .k1-arm.pose-aside .r3 { transform: scaleY(.36) rotate(-24deg); } .k1-arm.pose-aside .k1-core { opacity:1; }
+
+/* звёзды команд у парапета → финальный круг */
+.k1-tstars { position:absolute; inset:0; transition: opacity 1s; }
+.k1-tstars.off { opacity:0; }
+.k1-ts { position:absolute; left:0; top:0; width:10px; height:10px; margin:-5px; border-radius:50%;
+  background: hsl(var(--h) 70% 80%); box-shadow: 0 0 10px hsl(var(--h) 70% 70% / .8);
+  transform: translate(var(--x), var(--y)); transition: transform 2.6s cubic-bezier(.5,0,.2,1) var(--d); }
+.k1-ts.dim { background:var(--ash); box-shadow:none; }
+.k1-tstars.fin .k1-ts { transform: translate(var(--fx), var(--fy)); }
+.k1-tstars.fin .k1-ts.win { transform: translate(var(--fx), var(--fy)) scale(1.8); }
+/* падающая звезда приносит команду */
+.k1-meteor { position:absolute; left:0; top:0; width:160px; height:3px; border-radius:3px; opacity:0;
+  background: linear-gradient(90deg, rgba(255,244,207,0), var(--light)); transform-origin: 100% 50%; }
+.k1-meteor[data-on="1"] { animation: k1Meteor .95s cubic-bezier(.5,0,.9,.6) both; }
+@keyframes k1Meteor {
+  0% { opacity:0; transform: translate(1880px, -40px) rotate(152deg) scaleX(.4); }
+  15% { opacity:1; }
+  90% { opacity:1; transform: translate(1340px, 884px) rotate(152deg) scaleX(1); }
+  100% { opacity:0; transform: translate(1332px, 892px) rotate(152deg) scaleX(.05); } }
+/* сверхновая победителя — одна волна, не салют */
+.k1-nova { position:absolute; left:960px; top:100px; width:30px; height:30px; margin:-15px; border-radius:50%; opacity:0; }
+.k1-nova.n-transition { animation: k1Born 1.2s ease-out 2.8s both; background: var(--light); box-shadow: 0 0 30px 8px rgba(255,244,207,.7); }
+.k1-nova.n-winner { opacity:1; background: var(--light); box-shadow: 0 0 30px 8px rgba(255,244,207,.7); }
+.k1-nova.n-winner::after { content:''; position:absolute; inset:-2px; border-radius:50%; border:2px solid var(--brass-hi); animation: k1Wave 2.6s cubic-bezier(.2,.6,.3,1) .2s both; }
+.k1-nova.n-results { opacity:0; transition: opacity .8s; }
+@keyframes k1Born { from { opacity:0; transform: scale(.1); } to { opacity:1; transform: scale(1); } }
+@keyframes k1Wave { 0% { transform: scale(1); opacity:1; } 100% { transform: scale(70); opacity:0; } }
+
+/* ── свет пишет: горячая кромка → остывает в слоновую кость ── */
+@keyframes k1Write {
+  0% { clip-path: inset(-20% 100% -20% -6%); color: var(--light); text-shadow: 0 0 18px rgba(255,226,150,.95); }
+  55% { clip-path: inset(-20% -6% -20% -6%); color: var(--light); text-shadow: 0 0 14px rgba(255,226,150,.7); }
+  100% { clip-path: inset(-20% -6% -20% -6%); color: inherit; text-shadow: 0 0 0 rgba(255,226,150,0); } }
+.k1 .x-qtext .x-w, .k1 .x-intro-title span, .k1 .x-jp-correct b, .k1 .x-mel-correct, .k1 .x-bz-verdict.on b, .k1 .x-scr-win.on,
+.k1 .x-answer-line b, .k1 .x-answer b, .k1 .x-fin-winner .x-fw, .k1 .x-rules-title, .k1 .x-sb-new.on, .k1 .x-logo,
+.k1 .x-team.is-join b, .k1 .x-player {
+  animation: k1Write 1.1s cubic-bezier(.4,0,.2,1) both; animation-delay: var(--d, 0s); }
+.k1 .x-intro-title span { animation-delay: calc(.9s + var(--i) * .35s); animation-duration: 1.4s; }
+.k1 .x-team.is-join b { animation-delay: .95s; }
+.k1 .x-player { animation-delay: calc(1s + var(--k) * .07s); }
+.k1 .x-sb-new.on { animation-delay: calc(.4s + var(--i) * .08s); }
+.k1 .x-answer-line b { animation-delay: 2.8s; }
+.k1 .x-fin-winner .x-fw { animation-delay: calc(.6s + var(--i) * .3s); animation-duration: 1.6s; }
+.k1 .x-logo { animation-duration: 2s; }
+/* остывание на нуле: слова из света становятся камнем */
+.k1 .x-qtext { color: var(--ink); transition: color 1.2s; }
+.k1.tm-zero .x-qtext { color: #a59fb0; }
+
+/* ── общие узлы ── */
+.k1 .x-mark { width:14px; height:14px; border-radius:50%; background: hsl(var(--h) 70% 80%); box-shadow: 0 0 12px hsl(var(--h) 75% 70% / .9); }
+.k1 .x-team.off .x-mark { background: var(--ash); box-shadow: none; }
+.k1 .x-team.off b { color: var(--dim); }
+.k1 .x-team em { color: var(--dim); }
+.k1 .x-meta { color: var(--brass); }
+.k1 .x-meta b { color: var(--brass-hi); }
+.k1 .x-key { border-radius:50%; background: radial-gradient(circle at 35% 30%, #fffaf0, var(--ivory) 60%, #cbbd9f); color:#241a2c; box-shadow: 0 0 0 2px var(--brass-dk), 0 4px 14px rgba(0,0,0,.5); }
+.k1 .x-opt { color: var(--ink); }
+.k1 .x-opts-row .x-opt, .k1 .x-opts-grid .x-opt { border-bottom: 1px solid rgba(201,166,104,.35); }
+.k1 .x-opts .x-opt { animation: k1Write 1s both; animation-delay: calc(1.6s + var(--i) * .18s); }
+.k1 .x-img { padding:8px; background:#0d0a14; border:2px solid var(--brass); box-shadow: 0 0 0 6px rgba(13,10,20,.85), 0 0 0 7px rgba(201,166,104,.3), 0 20px 50px rgba(0,0,0,.6); }
+.k1 .x-num { border-radius:50%; background: var(--ivory); color:#241a2c; box-shadow: 0 0 0 2px var(--brass-dk); }
+.k1 .x-dimg figcaption { background: rgba(13,10,20,.85); color: var(--brass-hi); }
+/* проекция: конус света сверху и круглая диафрагма — картинка ложится на холст */
+.k1 .x-img::before { content:''; position:absolute; left:50%; bottom:100%; width:160%; height:520px; transform: translateX(-50%); pointer-events:none;
+  background: linear-gradient(180deg, rgba(255,240,200,0), rgba(255,240,200,.16)); clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%);
+  animation: k1Cone 2.2s ease-out both; animation-delay: calc(.2s + var(--i) * .3s); }
+@keyframes k1Cone { 0% { opacity:0; } 25% { opacity:1; } 100% { opacity:0; } }
+.k1 .x-img-in { animation: k1Iris 1.5s cubic-bezier(.4,0,.2,1) both; animation-delay: calc(.4s + var(--i) * .3s); }
+@keyframes k1Iris { from { clip-path: circle(0% at 50% 0%); filter: brightness(2.2) sepia(.6); } to { clip-path: circle(142% at 50% 0%); filter: none; } }
+
+/* ── 01 лобби ── */
+.k1 .x-logo { color: var(--ivory); text-shadow: 0 0 40px rgba(243,223,168,.25); }
+.k1 .x-lq { color: var(--brass-hi); }
+.k1 .x-count { color: var(--brass); }
+.k1 .x-count b { color: var(--brass-hi); }
+.k1 .x-qrcard { background: var(--ivory); color:#2a2032; border-radius:4px; box-shadow: 0 0 0 2px var(--brass), 0 0 0 10px rgba(201,166,104,.12), 0 30px 60px rgba(0,0,0,.6); }
+.k1 .x-qrcard::before { content:''; position:absolute; left:50%; bottom:100%; width:340px; height:320px; transform:translateX(-50%);
+  background: linear-gradient(180deg, rgba(255,240,200,0), rgba(255,240,200,.1)); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); }
+.k1 .x-teams .x-team { color: var(--ink); }
+/* ── 02 составы: имена втягиваются в свои звёзды, звёзды взлетают, сверху проецируются составы ── */
+.k1.st-randomizer .x-base .x-team b, .k1.st-randomizer .x-base .x-team em { transition: clip-path .9s cubic-bezier(.6,0,.4,1) calc(var(--i) * .05s); clip-path: inset(-20% -6% -20% -6%); }
+.k1.st-randomizer .x-base .x-team.is-join b { animation:none; }
+.k1.st-randomizer:not(.sub-before) .x-base .x-team b, .k1.st-randomizer:not(.sub-before) .x-base .x-team em { clip-path: inset(-20% 100% -20% -6%); }
+.k1.st-randomizer .x-base .x-team .x-mark { transition: transform 1.3s cubic-bezier(.6,0,.3,1) calc(.8s + var(--i) * .05s), opacity .6s calc(1.8s + var(--i) * .05s); }
+.k1.st-randomizer:not(.sub-before) .x-base .x-team .x-mark { transform: translate(calc(980px - var(--i) * 20px), -620px) scale(.4); opacity:0; }
+.k1 .x-groups { background: rgba(12,9,20,.88); border:1px solid rgba(201,166,104,.5); box-shadow: 0 0 0 6px rgba(12,9,20,.6), 0 30px 80px rgba(0,0,0,.6); }
+.k1 .rnd-event .x-groups { animation: k1Project 1.4s cubic-bezier(.4,0,.2,1) 1.1s both; }
+@keyframes k1Project { from { clip-path: circle(0% at 50% 0%); } to { clip-path: circle(150% at 50% 0%); } }
+.k1 .rnd-event .x-groups::before, .k1 .rnd-ready .x-groups::before { content:''; position:absolute; left:50%; bottom:100%; width:900px; height:440px; transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(255,240,200,0), rgba(255,240,200,.14)); clip-path: polygon(49% 0, 51% 0, 100% 100%, 0 100%); animation: k1Cone 2.6s ease-out 1s both; }
+.k1 .rnd-ready .x-groups::before { animation: none; opacity:0; }
+.k1 .rnd-ready .x-player { animation: none; }
+.k1 .x-groups-head { color: var(--brass); }
+.k1 .x-group { border-top:1px solid rgba(201,166,104,.4); }
+.k1 .x-gname { color: var(--brass-hi); }
+.k1 .x-player { color: var(--ink); }
+
+/* ── переходы: небо поворачивается, экран уходит за горизонт по дуге ── */
+.k1 .x-lay.x-from, .k1 .x-lay.x-to { transform-origin: 50% 240%; }
+.k1.sub-event .x-from { animation: k1Set var(--td, 1.6s) cubic-bezier(.6,0,.4,1) both; }
+.k1.sub-event .x-to { animation: k1Rise var(--td, 1.6s) cubic-bezier(.3,0,.2,1) both; animation-delay: calc(var(--td, 1.6s) * .45); }
+.k1 .tx-event { --rot: 24deg; --td: 1.8s; }
+.k1 .tx-major { --rot: 40deg; --td: 2.2s; }
+.k1 .tx-minor { --rot: 9deg; --td: 1.2s; }
+@keyframes k1Set { from { transform: rotate(0); opacity:1; } 70% { opacity:.6; } to { transform: rotate(calc(var(--rot) * -1)); opacity:0; } }
+@keyframes k1Rise { from { transform: rotate(var(--rot)); opacity:0; } 30% { opacity:.7; } to { transform: rotate(0); opacity:1; } }
+/* акт: сетка загорается звёздами по порядку, звезда становится клеткой */
+.k1 .x-cell { border:1px solid rgba(201,166,104,.55); background: rgba(244,234,211,.05); color: var(--brass); }
+.k1 .x-cell i { color: var(--brass-hi); }
+.k1 .x-cell.cur { background: rgba(255,232,170,.2); border-color: var(--brass-hi); box-shadow: 0 0 14px rgba(255,226,150,.35); }
+.k1.st-cw:not(.sub-question) .x-to .x-cell { animation: k1Cell .9s cubic-bezier(.3,1.3,.5,1) both; animation-delay: calc(1.6s + var(--o) * .035s); }
+.k1.st-cw.sub-after .x-to .x-cell { animation: none; }
+@keyframes k1Cell { 0% { transform: scale(.14); border-radius:50%; background: var(--light); box-shadow: 0 0 18px var(--light); opacity:0; }
+  30% { opacity:1; } 100% { transform: scale(1); border-radius:0; } }
+.k1 .x-intro-n, .k1 .x-intro-meta { color: var(--brass); }
+.k1 .x-intro-title { color: var(--ivory); }
+.k1 .x-intro-rules span { color: var(--brass); }
+.k1 .x-intro-rules li { color: var(--ink); }
+.k1 .x-cwn { color: var(--brass); }
+
+/* ── 03 правила ── */
+.k1 .x-rules-title { color: var(--ivory); }
+.k1 .x-rule span { color: var(--brass); }
+.k1 .x-round { border-bottom: 1px solid rgba(201,166,104,.25); }
+.k1 .x-round b { color: var(--brass-hi); } .k1 .x-round em { color: var(--dim); }
+.k1 .x-stats, .k1 .x-note { color: var(--dim); }
+
+/* ── 09 своя игра: плитки — окуляры; выбор — армилла прицеливается; открытие — диафрагма ── */
+.k1 .x-jp-title { color: var(--ivory); }
+.k1 .x-jp-theme { color: var(--brass-hi); } .k1 .x-jp-theme i { color: var(--dim); }
+.k1 .x-tile { border-radius:56px; border:2px solid var(--brass); color: var(--brass-hi);
+  background: radial-gradient(ellipse at 50% 30%, #2a2140, #0d0a15 70%); box-shadow: inset 0 0 20px rgba(0,0,0,.8), 0 6px 18px rgba(0,0,0,.5);
+  transition: opacity .8s, transform 1s cubic-bezier(.3,1.4,.5,1), box-shadow .8s; }
+.k1 .x-tile.done { border-color: rgba(201,166,104,.25); color: var(--ash); background: #0b0911; }
+.k1 .jp-select .x-tile:not(.sel), .k1 .jp-open .x-tile, .k1 .jp-answer .x-tile { opacity:.22; }
+.k1 .jp-select .x-tile.sel { transform: scale(1.12); box-shadow: inset 0 0 30px rgba(255,226,150,.7), 0 0 40px rgba(255,226,150,.5); color: var(--light); }
+.k1 .jp-open .x-jp-theme, .k1 .jp-answer .x-jp-theme { opacity:.2; transition: opacity .8s; }
+.k1 .x-jp-open { background: rgba(10,8,16,.94); border:2px solid var(--brass); border-radius:10px; box-shadow: 0 0 0 10px rgba(10,8,16,.6), 0 40px 100px rgba(0,0,0,.8); }
+.k1 .jp-open .x-jp-open { animation: k1Eyepiece 1.3s cubic-bezier(.5,0,.2,1) both; }
+@keyframes k1Eyepiece { from { clip-path: circle(0px at calc((var(--ox) - 420) * 1px) calc((var(--oy) - 150) * 1px)); }
+  to { clip-path: circle(1400px at calc((var(--ox) - 420) * 1px) calc((var(--oy) - 150) * 1px)); } }
+.k1 .x-jp-otheme { color: var(--ivory); } .k1 .x-jp-otheme i, .k1 .x-jp-otile { color: var(--brass); }
+.k1 .x-jp-count { color: var(--dim); } .k1 .x-jp-count b { color: var(--brass-hi); }
+.k1 .x-jp-ans-label { color: var(--brass); }
+.k1 .x-jp-answers li { border-bottom: 1px solid rgba(201,166,104,.18); }
+.k1 .x-jp-answers li.no em, .k1 .x-jp-answers li.no .x-team b { color: var(--ash); transition: color 1.2s; }
+.k1 .x-jp-answers li.ok .x-verdict { color: var(--brass-hi); }
+.k1 .x-jp-answers li.no .x-verdict { color: var(--ash); }
+.k1 .x-jp-correct { border-top: 1px solid var(--brass); background: linear-gradient(180deg, rgba(255,226,150,.08), transparent); }
+.k1 .x-jp-correct span { color: var(--brass); } .k1 .x-jp-correct b { color: var(--ivory); animation-delay: .4s; }
+
+/* ── 10 мелодия: пластинка сама поднимается с доски, летит в луч и крутится ── */
+.k1 .x-mel-theme { color: var(--brass-hi); }
+.k1 .x-rec { border-radius:50%; transition: transform 1.5s cubic-bezier(.5,0,.2,1), opacity .8s;
+  background: repeating-radial-gradient(circle, #121016 0 2px, #1d1a23 2px 4px); box-shadow: 0 0 0 2px #2a2533, 0 10px 24px rgba(0,0,0,.6); }
+.k1 .x-rec-grooves { border-radius:50%; background: conic-gradient(from 20deg, transparent 0 10%, rgba(255,240,200,.14) 14%, transparent 20% 60%, rgba(255,240,200,.1) 64%, transparent 70%); }
+.k1 .x-rec::after { content:''; position:absolute; width:56px; height:56px; border-radius:50%; background: radial-gradient(circle, #0b0910 0 4px, var(--brass) 5px); }
+.k1 .x-rec b { color:#1a1420; font-size:26px; }
+.k1 .x-rec.done { opacity:.25; }
+.k1 .mel-chosen .x-rec:not(.pick), .k1 .mel-bids .x-rec:not(.pick), .k1 .mel-reveal .x-rec:not(.pick) { opacity:.12; }
+.k1 .mel-chosen .x-mel-theme, .k1 .mel-bids .x-mel-theme, .k1 .mel-reveal .x-mel-theme { opacity:.15; transition: opacity .8s; }
+.k1 .mel-chosen .x-rec.pick { transform: translate(calc((960 - var(--px)) * 1px), calc((540 - var(--py)) * 1px)) scale(2.8); z-index:3; }
+.k1 .mel-bids .x-rec.pick, .k1 .mel-reveal .x-rec.pick { transform: translate(calc((300 - var(--px)) * 1px), calc((560 - var(--py)) * 1px)) scale(1.7); z-index:3; }
+.k1 .mel-chosen .x-rec.pick .x-rec-grooves, .k1 .mel-bids .x-rec.pick .x-rec-grooves { animation: k1Spin 1.8s linear infinite; }
+@keyframes k1Spin { to { transform: rotate(360deg); } }
+.k1 .mel-chosen .x-rec.pick::before { content:''; position:absolute; left:50%; bottom:50%; width:120px; height:900px; transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(255,240,200,0), rgba(255,240,200,.12)); clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); }
+.k1 .x-mel-win { background: rgba(10,8,16,.94); border:2px solid var(--brass); border-radius:10px; box-shadow: 0 40px 100px rgba(0,0,0,.8); }
+.k1 .mel-bids .x-mel-win { animation: k1Project 1.1s cubic-bezier(.4,0,.2,1) both; }
+.k1 .x-mel-head { color: var(--brass); }
+.k1 .x-mel-q { color: var(--ivory); }
+.k1 .x-bids li { border-bottom: 1px solid rgba(201,166,104,.2); }
+.k1 .x-bids li b { color: var(--brass-hi); }
+.k1 .x-bids li { animation: k1Write .9s both; animation-delay: calc(1s + var(--i) * .35s); }
+.k1 .x-bids li.win { background: linear-gradient(90deg, rgba(255,226,150,.12), transparent); }
+.k1 .x-plays { color: var(--brass); }
+.k1 .x-mel-hint { color: var(--dim); }
+.k1 .x-mel-correct { color: var(--ivory); }
+.k1 .x-mel-result { color: var(--ink); }
+
+/* ── 11 блиц: сдержанно — столб света на отвечающих, звезда на верном ── */
+.k1 .x-bz-bank { color: var(--brass); } .k1 .x-bz-bank b { color: var(--brass-hi); }
+.k1 .x-bz { position:relative; border:1px solid rgba(201,166,104,.28); background: rgba(12,9,20,.6); transition: border-color .6s, background .6s; }
+.k1 .x-bz-clock { color: var(--ink); } .k1 .x-bz-pts { color: var(--dim); }
+.k1 .x-bz.on { border-color: var(--brass-hi); background: linear-gradient(180deg, rgba(255,226,150,.14), rgba(12,9,20,.7)); }
+.k1 .x-bz.on::before { content:''; position:absolute; left:10%; right:10%; bottom:100%; height:140px; pointer-events:none;
+  background: linear-gradient(180deg, rgba(255,240,200,0), rgba(255,240,200,.14)); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+.k1 .x-bz-row.bot .x-bz.on::before { bottom:auto; top:100%; transform: scaleY(-1); }
+.k1 .bz-verdict .x-bz.on::after { content:''; position:absolute; right:16px; top:16px; width:18px; height:18px; border-radius:50%;
+  background: var(--light); box-shadow: 0 0 16px var(--light); animation: k1Born .5s ease-out both; }
+.k1 .x-bz-asking { color: var(--brass); } .k1 .x-bz-text { color: var(--ivory); }
+.k1 .x-bz-verdict { color: var(--brass); } .k1 .x-bz-verdict b { color: var(--ivory); }
+
+/* ── 12 скрэмбл: буквы — звёзды, рассыпанные по небу; подсказка и решение — падают в созвездие ── */
+.k1 .x-scr-clue { color: var(--ink); }
+.k1 .x-slot { border-bottom: 2px solid rgba(201,166,104,.4); transition: border-color .6s; }
+.k1 .x-slot::after { content:''; position:absolute; left:50%; bottom:-7px; width:6px; height:6px; margin-left:-3px; border-radius:50%; background: var(--brass-dk); }
+.k1 .x-slot.got { border-color: var(--brass-hi); }
+.k1 .x-letter { color: var(--light); text-shadow: 0 0 16px rgba(255,226,150,.6);
+  --scx: calc(var(--sx) + sin(var(--p) * 2.4rad) * 18px); --scy: calc(var(--sy) + cos(var(--p) * 2.4rad) * 120px - 70px);
+  transform: translate(var(--scx), var(--scy)) rotate(calc(sin(var(--p) * 3.1rad) * 16deg)) scale(.84); }
+.k1 .x-letter.placed { transform: translate(var(--tx), var(--ty)); color: var(--ivory); text-shadow: 0 0 8px rgba(255,226,150,.3);
+  animation: k1Fall 1.5s cubic-bezier(.5,0,.3,1) both; animation-delay: calc(var(--li) * .07s); }
+.k1 .scr-hints .x-letter.placed { animation-delay: calc(var(--hi) * .5s); }
+@keyframes k1Fall {
+  0% { transform: translate(var(--scx), var(--scy)) rotate(calc(sin(var(--p) * 3.1rad) * 16deg)) scale(.84); }
+  45% { transform: translate(calc((var(--scx) + var(--tx)) / 2), calc(var(--scy) - 130px)) rotate(0) scale(1.15); color: var(--light); text-shadow: 0 0 26px var(--light); }
+  100% { transform: translate(var(--tx), var(--ty)) rotate(0) scale(1); } }
+.k1 .x-scr-win { color: var(--brass-hi); animation-delay: 1.6s; }
+
+/* ── 13 сопоставление: луч от картинки ловит подпись и тащит к паре ── */
+.k1 .x-recall { color: var(--dim); }
+.k1 .x-link { stroke: var(--brass-hi); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(255,226,150,.8));
+  stroke-dasharray: 600; stroke-dashoffset: 600; animation: k1Beam 2s ease-in-out both; animation-delay: calc(.2s + var(--i) * .6s); }
+@keyframes k1Beam { 0% { stroke-dashoffset: 600; opacity:1; } 35% { stroke-dashoffset: 0; opacity:1; } 70% { opacity:.9; } 100% { stroke-dashoffset: 0; opacity:0; } }
+.k1 .ma-solved .x-link { animation: none; opacity:0; }
+.k1 .x-mlabel { transition: transform 1.1s cubic-bezier(.6,0,.2,1.15); transition-delay: calc(.75s + var(--i) * .6s); }
+.k1 .ma-solved .x-mlabel { transition: none; }
+.k1 .ma-reveal .x-mlabel::before, .k1 .ma-solved .x-mlabel::before { content:''; position:absolute; left:50%; bottom:100%; width:2px; height:170px; margin-left:-1px;
+  background: linear-gradient(180deg, rgba(255,226,150,.9), rgba(255,226,150,.15)); transform-origin: 50% 100%;
+  animation: k1Stitch .6s ease-out both; animation-delay: calc(1.8s + var(--i) * .6s); }
+.k1 .ma-solved .x-mlabel::before { animation: none; }
+@keyframes k1Stitch { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.k1 .x-mlabel { position:absolute; }
+.k1 .x-answer-line { color: var(--brass); } .k1 .x-answer-line b { color: var(--ivory); }
+.k1 .x-tans-label { color: var(--brass); }
+.k1 .x-ta em { color: var(--dim); }
+.k1 .x-ta.ok .x-verdict { color: var(--brass-hi); } .k1 .x-ta.no .x-verdict, .k1 .x-ta.no em { color: var(--ash); }
+
+/* ── 14 порядок: предметы обходят друг друга по орбитам ── */
+.k1 .x-ord-label { color: var(--brass); }
+.k1 .x-ord { border:1px solid rgba(201,166,104,.3); background: rgba(12,9,20,.7); color: var(--ink); }
+.k1 .oa-reveal .x-ord { animation: k1Orbit 1.8s cubic-bezier(.55,0,.3,1) both; animation-delay: calc(.2s + var(--i) * .3s); }
+@keyframes k1Orbit { 0% { transform: translate(0,0); } 50% { transform: translate(calc(var(--dir) * -170px), calc(var(--dy) / 2)) scale(.94); } 100% { transform: translate(0, var(--dy)); } }
+.k1 .x-ord-pos { color: var(--brass-hi); transition: opacity .6s 1.8s; }
+.k1 .oa-solved .x-ord { border-color: var(--brass); }
+
+/* ── 16 табло: поднявшиеся идут по орбите слева, опустившиеся — справа ── */
+.k1 .x-sb-title { color: var(--ivory); }
+.k1 .x-sb-head { color: var(--brass); }
+.k1 .x-sb-row { border-bottom: 1px solid rgba(201,166,104,.16); color: var(--ink); }
+.k1 .x-sb-row.lead { background: linear-gradient(90deg, rgba(255,226,150,.12), transparent 70%); }
+.k1 .x-sb-place { color: var(--brass); } .k1 .x-sb-sum { color: var(--brass-hi); }
+.k1 .sb-reorder .x-sb-row.up { animation: k1OrbL 2s cubic-bezier(.55,0,.3,1) .6s both; }
+.k1 .sb-reorder .x-sb-row.down { animation: k1OrbR 2s cubic-bezier(.55,0,.3,1) .6s both; }
+@keyframes k1OrbL { 0% { transform: translate(0,0); } 50% { transform: translate(-90px, calc(var(--dy) / 2)); } 100% { transform: translate(0, var(--dy)); } }
+@keyframes k1OrbR { 0% { transform: translate(0,0); } 50% { transform: translate(90px, calc(var(--dy) / 2)); opacity:.7; } 100% { transform: translate(0, var(--dy)); } }
+
+/* ── 18 финал: ответ поднимается звездой, небо поворачивается, кольца смыкаются, победитель пишется светом ── */
+.k1 .x-answer span { color: var(--brass); } .k1 .x-answer b { color: var(--ivory); }
+.k1 .fin-transition .x-answer b { animation: k1Ascend 3s cubic-bezier(.6,0,.3,1) both; }
+@keyframes k1Ascend { 0% { transform: none; } 30% { transform: none; color: var(--light); text-shadow: 0 0 30px var(--light); }
+  100% { transform: translateY(-360px) scale(.04); color: var(--light); text-shadow: 0 0 60px var(--light); opacity:0; } }
+.k1 .fin-transition .x-fin-last .x-meta, .k1 .fin-transition .x-fin-last .x-recall, .k1 .fin-transition .x-answer span { opacity:0; transition: opacity 1s; }
+.k1 .x-fin-kicker { color: var(--brass); top:205px; }
+.k1 .x-fin-winner h2 { top:255px; }
+.k1 .x-fin-winner h2 { color: var(--ivory); }
+.k1 .x-fin-score { color: var(--brass-hi); }
+.k1 .fin-winner .x-fin-kicker, .k1 .fin-winner .x-fin-score, .k1 .fin-winner .x-podium { animation: k1Rise2 1.4s ease-out both; }
+.k1 .fin-winner .x-fin-score { animation-delay: 1.8s; } .k1 .fin-winner .x-podium { animation-delay: 2.4s; }
+@keyframes k1Rise2 { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: none; } }
+.k1 .x-pod > span:first-child { color: var(--brass); } .k1 .x-pod b { color: var(--brass-hi); }
+.k1 .x-fin-rtitle { color: var(--ivory); }
+.k1 .x-res-head { color: var(--brass); }
+.k1 .x-res-row { border-bottom: 1px solid rgba(201,166,104,.14); color: var(--ink); }
+.k1 .x-res-row.top > b { color: var(--brass-hi); }
+.k1 .x-res-row > span:nth-child(n+3) { color: var(--dim); }
+.k1 .fin-results .x-res-row { animation: k1Write .9s both; animation-delay: calc(.3s + var(--i) * .1s); }
+
+/* ── таймер: латунный лимб с кометой ── */
+.k1-timer { position:relative; width:100%; height:100%; }
+.k1-timer svg { width:100%; height:100%; overflow:visible; }
+.k1-limb { fill: rgba(12,9,20,.75); stroke: var(--brass); stroke-width:1.6; }
+.k1-tick { stroke: var(--brass-hi); stroke-width:3; stroke-linecap:round; transition: stroke .6s, opacity .6s; }
+.k1-tick.out { stroke:#3d3448; opacity:.6; }
+.k1-timer.ph-warning .k1-tick:not(.out) { stroke: var(--ember); }
+.k1-comet { transition: transform 1s linear; }
+.k1-comet .core { fill:#fff6dc; transition: transform 1s cubic-bezier(.6,0,.3,1); }
+.k1-comet .halo { fill: rgba(243,223,168,.3); filter: blur(4px); transition: transform 1s cubic-bezier(.6,0,.3,1), opacity .6s; }
+.k1-timer.ph-warning .k1-comet .halo { fill: rgba(255,143,106,.5); }
+.k1-timer.ph-zero .k1-comet .core, .k1-timer.ph-zero .k1-comet .halo { transform: translateX(-92px); }
+.k1-timer.ph-zero .k1-comet .halo { opacity:0; }
+.k1-set { fill:none; stroke: var(--brass-hi); stroke-width:2; opacity:0; }
+.k1-timer.ph-zero .k1-set { animation: k1SetRing 1.2s ease-out .6s both; }
+@keyframes k1SetRing { 0% { opacity:1; transform: scale(.3); } 100% { opacity:0; transform: scale(5); } }
+.k1-timer b { position:absolute; inset:0; display:grid; place-items:center; font-size:72px; font-weight:600; color: var(--brass-hi); transition: color .6s; }
+.k1-timer.ph-warning b { color: var(--ember); }
+.k1-timer.ph-zero b { color: var(--ash); }
+.k1-timer.ts-mini b { font-size:34px; }
+.k1 .x-mel-head .k1-timer b { font-size:40px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mx.k1 *, .mx.k1 *::before, .mx.k1 *::after { animation-duration: .01s !important; animation-delay: 0s !important; transition-duration: .01s !important; transition-delay: 0s !important; }
+}

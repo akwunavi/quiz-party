@@ -1,0 +1,17 @@
+import type { World } from './content'
+import { w1 } from './w1'
+import './w1.css'
+import { w2 } from './w2'
+import './w2.css'
+import { w3 } from './w3'
+import './w3.css'
+import { w4 } from './w4'
+import './w4.css'
+import { w5 } from './w5'
+import './w5.css'
+import { w6 } from './w6'
+import './w6.css'
+import { w7 } from './w7'
+import './w7.css'
+
+export const WORLDS: World[] = [w1, w2, w3, w4, w5, w6, w7]
