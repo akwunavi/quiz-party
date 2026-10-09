@@ -21,3 +21,8 @@
 
 /* Экраны Леса в игре прозрачны: лес за ними — один общий холст оболочки (в лаборатории каждый экран рисует свой) */
 .theme-enchanted_forest.fo-root .s1, .theme-enchanted_forest.fo-root .lb3 { background: transparent; }
+.theme-enchanted_forest .fo-screen { position: absolute; inset: 0; }
+.theme-enchanted_forest .fr-wait { position: absolute; inset: 0; }
+/* Служебные плашки проектора не должны лежать поверх вопроса: бейдж пакета скрыт, подсказка про звук — тихая, в правом нижнем углу */
+.theme-enchanted_forest.fo-root .pack-badge { display: none; }
+.theme-enchanted_forest.fo-root .audio-gate { top: 12px; bottom: auto; left: auto; right: 28px; transform: none; font-size: 20px; opacity: .85; }

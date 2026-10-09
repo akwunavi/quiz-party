@@ -524,6 +524,7 @@ function HostInner({ gameState, pack }: {
       <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
         q={q} qIndex={gameState.question_index} qCount={round.questions.length}
         timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
+        timerStartedAt={gameState.timer_started_at}
         timerSlot={round.mechanic !== 'jeopardy' &&
           <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
             theme={pack.theme} />}

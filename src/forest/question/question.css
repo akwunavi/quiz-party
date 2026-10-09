@@ -1,0 +1,39 @@
+/* Сцена вопроса Леса (Концепт C): текст, цветы-варианты, метки, клетки слова, таймер-одуванчик. Общая для Лаборатории и игры. */
+.fr-root { position:absolute; inset:0; overflow:hidden; }
+/* вопрос: слова прорастают по одному */
+.fq { position:absolute; margin:0; text-align:center; line-height:1.18; font-weight:400; text-wrap:balance; color:#eefff9;
+  text-shadow: 0 2px 4px rgba(2,12,10,.9), 0 0 26px rgba(2,12,10,.85); }
+.fq.is-left { text-align:left; }
+.fq .w { display:inline-block; margin-right:.26em; transform-origin:0 100%; opacity:0; }
+/* вариант: буква в сердцевине цветка, подпись под цветком (верх подписей на одной линии) */
+.fo { position:absolute; width:0; height:0; }
+.fo b { position:absolute; left:-30px; top:-31px; width:60px; text-align:center; font-weight:700; font-size:40px; line-height:58px; color:#2a1440; opacity:0; }
+.fo span { position:absolute; left:-128px; width:256px; text-align:center; font-size:34px; line-height:1.12; font-weight:400; color:#f0fff9; opacity:0;
+  text-shadow: 0 2px 3px rgba(2,12,10,.95), 0 0 18px rgba(2,12,10,.9); }
+/* таймер: число в тёмной сердцевине одуванчика */
+.ft { position:absolute; width:0; height:0; }
+.ft span { position:absolute; left:-90px; width:180px; top:-54px; text-align:center; font-weight:700; font-size:94px; line-height:108px; color:#f4fffa; opacity:0;
+  text-shadow: 0 0 22px rgba(111,242,214,.5), 0 3px 8px #03100d; font-variant-numeric: tabular-nums; }
+.fr-root[data-ph="warning"] .ft span { color:#ffd9a0; text-shadow: 0 0 22px rgba(255,150,70,.7), 0 2px 6px #03100d; }
+.fr-root[data-ph="zero"] .ft span { color:#b9cfc6; text-shadow: 0 2px 8px #03100d; }
+.fm { position:absolute; left:640px; right:150px; top:1030px; display:flex; justify-content:space-between; font-size:24px; color:#8fbfb2; opacity:0; }
+/* подписи к цветам-вариантам: верх подписей на одной линии, многострочные — по центру */
+.fo span { font-size:36px; line-height:1.1; }
+.fo.is-sm b { top:-26px; font-size:30px; line-height:52px; }
+.fo.is-sm span { font-size:34px; }
+/* буква на цветке-метке у фото-варианта */
+.fb { position:absolute; width:0; height:0; }
+.fb b { position:absolute; left:-24px; top:-24px; width:48px; text-align:center; font-weight:700; font-size:32px; line-height:48px; color:#2a1440; opacity:0; }
+/* клетки слова «3 попыток» на спилах: при показе ответа спил переворачивается */
+.fc { position:absolute; width:0; height:0; }
+.fc span { position:absolute; left:-56px; top:-56px; width:112px; text-align:center; font-weight:700; font-size:66px; line-height:112px; opacity:0; }
+.fc i { font-style:normal; position:absolute; inset:0; }
+.fc .a { opacity:0; }
+.fc .q { color:rgba(46,26,12,.82); text-shadow: 0 1px 0 rgba(255,230,190,.28); }
+.fc.is-open .q, .fc .a { color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.85), 0 0 18px rgba(255,214,140,.5); }
+.fc.is-flipped .q { opacity:0; } .fc.is-flipped .a { opacity:1; }
+.fp { position:absolute; transform:translateX(-50%); font-size:38px; color:#e2fbf2; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.95), 0 0 18px rgba(2,12,10,.8); }
+/* ответ на открытый вопрос (предпросмотр) */
+.fa { position:absolute; font-size:44px; text-align:center; color:#ffe9b8; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.95), 0 0 22px rgba(255,190,90,.45); }
+.fa.is-left { text-align:left; }
+.fa b { font-weight:700; color:#fff6dc; }

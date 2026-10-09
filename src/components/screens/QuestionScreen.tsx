@@ -9,7 +9,9 @@
 // Механики standard/test_stop/rebus/stakes_unique/stakes_free/thematic_x2/
 // crossword — все идут этим экраном. У sprint/four_pics/jeopardy/melody/
 // race/blitz — свои экраны (rounds/*.tsx), сюда не попадают.
-import { useEffect, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react'
+import { useInShell } from '../../forest/shellCtx'
+import { isForestTheme } from '../../forest/config'
 import { AudioGate } from '../AudioGate'
 import { FitImg } from '../FitImg'
 import { FitAnswer } from '../FitAnswer'
@@ -21,6 +23,9 @@ import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
+
+// «Волшебный лес»: свой экран вопроса, грузится отдельным куском и только на проекторе в этой теме
+const ForestQuestionScreen = lazy(() => import('../../forest/question/ForestQuestionScreen'))
 
 /** Правильный ответ вопроса одной строкой — для экрана разбора и предпросмотра.
  *  Общая функция: ShowAnswers/RecapSlides/BlitzScreen в HostScreen.tsx и
@@ -81,10 +86,7 @@ export function QuestionVideo({ src, hidden, waitFor, go }: {
   )
 }
 
-export function QuestionScreen({
-  pack, round, roundIdx, q, qIndex, qCount, timeLow, reveal, timerRunning,
-  timerSlot, effectsSlot, actionsSlot,
-}: {
+type QuestionScreenProps = {
   pack: LoadedPack
   round: LoadedRound
   /** Индекс раунда в пакете (для номера «Р1/Р2…» — displayRoundNumber
@@ -109,7 +111,24 @@ export function QuestionScreen({
    *  предпросмотре — та же разметка, но приглушённая и некликабельная (Р1,
    *  HANDOFF.md), чтобы было видно, налезает ли контент на кнопки. */
   actionsSlot?: ReactNode
-}) {
+  /** Начало отсчёта таймера (gameState.timer_started_at) — для тем с собственным таймером («Волшебный лес»). */
+  timerStartedAt?: string | null
+}
+
+export function QuestionScreen(props: QuestionScreenProps) {
+  const inShell = useInShell()
+  if (inShell && isForestTheme(props.pack.theme)) {
+    return <Suspense fallback={null}><ForestQuestionScreen pack={props.pack} round={props.round} roundIdx={props.roundIdx}
+      q={props.q} qIndex={props.qIndex} qCount={props.qCount} reveal={props.reveal} timerStartedAt={props.timerStartedAt ?? null}
+      effectsSlot={props.effectsSlot} actionsSlot={props.actionsSlot} answerText={displayAnswer(props.q)} /></Suspense>
+  }
+  return <ClassicQuestionScreen {...props} />
+}
+
+function ClassicQuestionScreen({
+  pack, round, roundIdx, q, qIndex, qCount, timeLow, reveal, timerRunning,
+  timerSlot, effectsSlot, actionsSlot,
+}: QuestionScreenProps) {
   const media = q.media.question ?? []
   const imgs = media.filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const avs = media.filter(m => /\.(mp3|mp4|webm|wav)$/i.test(m))

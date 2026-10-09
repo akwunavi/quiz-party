@@ -9,7 +9,8 @@
 // эффекты смены ключа срабатывают после монтажа следующей сцены).
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Stage } from '../magic2/common'
-import { Scene, type SceneApi, type Mode } from '../../forest/Scene'
+import type { SceneApi, Mode } from '../../forest/Scene'
+import { SceneLab } from './sceneLab'
 import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from '../../forest/stage1/Sprint'
 import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from '../../forest/stage1/Blitz'
 import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from '../../forest/stage1/Reveal3'
@@ -138,7 +139,7 @@ export function Lab() {
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
   const M = sec === 'media' ? null : MECHS[sec]
   const scene = M ? <div className="c7 fr theme-enchanted_forest" key={`${sec}-${mv}-${ms}-${teams}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} teams={teams} /></div>
-    : <div className="c7 fr theme-enchanted_forest" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} answer={answer} onReady={onReady} /></div>
+    : <div className="c7 fr theme-enchanted_forest" key={`${v}-${s}-${run}`}><SceneLab state={s} mode={v} answer={answer} onReady={onReady} /></div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
     <div className="m2-lab">

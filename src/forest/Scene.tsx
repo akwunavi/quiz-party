@@ -10,107 +10,14 @@
 // к правильному цветку/раме, тот отзывается, остальные притихают.
 // Всё рисуется в одном холсте от состояния `st` (GSAP двигает только числа) —
 // перемотка в любую точку даёт тот же кадр.
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { LOOKS, W, H, groundY, seeded, noise1, mk, paintBack, paintMids, paintGround, paintMist, paintFront, paintVignette, type Pt, type Look } from './paint'
-import { MC, IMG1, PORT, TWO, SIX, THREE, FOUR, LONG, LONG2, IMG, CORRECT, ROUND_NAME, QNO, phaseOf, type StateId, type Img, type Opt } from './content'
+import { phaseOf } from './timerPhase'
 
-export type SceneApi = { tl: gsap.core.Timeline; setTimer: (n: number) => void; dispose?: () => void }
+export type SceneApi = { tl: gsap.core.Timeline; setTimer: (n: number, total?: number) => void; dispose?: () => void }
 export type Mode = 'quick' | 'full'
-type Rect = { x: number; y: number; w: number; h: number }
-type Flower = { x: number; y: number; r: number }
-type Layout = {
-  strands: { pts: Pt[]; w: number }[]; frames: { r: Rect; img: Img }[]; vines: [Pt, Pt][]
-  flowers: Flower[]; opts: Opt[]; label: number; labelW: number
-  q: { text: string; left: number; top: number; width: number; size: number; align: 'center' | 'left' } | null
-  markers: { key: string; x: number; y: number; frame: number }[]
-  cells: { word: string; open: number[]; cx: number; cy: number; d: number; gap: number } | null
-  phase: { text: string; x: number; y: number } | null
-  dand: Pt; ans: { x: number; y: number; w: number; align: 'center' | 'left' } | null
-}
-const byH = (img: Img, h: number) => Math.round(img.w * h / img.h)
-const fit = (img: Img, cx: number, cy: number, mw: number, mh: number): Rect => {
-  const k = Math.min(mw / img.w, mh / img.h), w = Math.round(img.w * k), h = Math.round(img.h * k)
-  return { x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h }
-}
-/** Ряд картинок одной высоты (равная важность), по центру cx, с промежутком gap. */
-function row(imgs: Img[], h: number, cx: number, y: number, gap: number): Rect[] {
-  const ws = imgs.map(i => byH(i, h)), total = ws.reduce((a, b) => a + b, 0) + gap * (imgs.length - 1)
-  let x = Math.round(cx - total / 2)
-  return ws.map(w => { const r = { x, y, w, h }; x += w + gap; return r })
-}
-const G = (x: number) => ({ x, y: groundY(x) + 6 })
-const DAND_TEXT = { x: 236, y: 610 }   // утверждённый экран текста — место прежнее
-const DAND_MEDIA = { x: 206, y: 800 }  // экраны с фото — нижний левый угол, верх экрана отдан фото
-const bough = (y: number, x0: number, x1: number): Pt[] => [{ x: x0, y: y + 34 }, { x: x0 + (x1 - x0) * 0.18, y: y + 6 }, { x: x0 + (x1 - x0) * 0.42, y }, { x: x0 + (x1 - x0) * 0.66, y: y + 4 }, { x: x0 + (x1 - x0) * 0.86, y: y + 12 }, { x: x1, y: y + 26 }]
-const hang = (r: Rect, from: number): [Pt, Pt][] => [r.x + r.w * 0.2, r.x + r.w * 0.8].map(x => [{ x, y: from }, { x, y: r.y - 10 }] as [Pt, Pt])
-/** Опоры от земли к нижним углам кадра — для одиночного большого фото. */
-const props = (r: Rect): { pts: Pt[]; w: number }[] => [
-  { pts: [G(r.x - 70), { x: r.x - 64, y: (r.y + r.h + groundY(r.x)) / 2 + 20 }, { x: r.x - 30, y: r.y + r.h - 10 }, { x: r.x - 12, y: r.y + r.h * 0.55 }], w: 18 },
-  { pts: [G(r.x + r.w + 70), { x: r.x + r.w + 64, y: (r.y + r.h + groundY(r.x + r.w)) / 2 + 20 }, { x: r.x + r.w + 30, y: r.y + r.h - 10 }, { x: r.x + r.w + 12, y: r.y + r.h * 0.55 }], w: 18 },
-]
-const base: Layout = { strands: [], frames: [], vines: [], flowers: [], opts: [], label: 0, labelW: 280, q: null, markers: [], cells: null, phase: null, dand: DAND_MEDIA, ans: null }
-const F4 = [560, 920, 1280, 1640]
-
-function layoutOf(s: StateId): Layout {
-  if (s === 'mc') return { ...base, dand: DAND_TEXT, labelW: 270,
-    strands: [{ pts: [G(548), { x: 506, y: 760 }, { x: 532, y: 520 }, { x: 630, y: 330 }, { x: 790, y: 212 }, { x: 990, y: 158 }, { x: 1210, y: 150 }], w: 30 },
-      { pts: [G(1748), { x: 1788, y: 760 }, { x: 1764, y: 520 }, { x: 1676, y: 330 }, { x: 1526, y: 214 }, { x: 1326, y: 160 }, { x: 1100, y: 154 }], w: 30 }],
-    flowers: [735, 1005, 1275, 1545].map(x => ({ x, y: 716, r: 74 })), label: 806,
-    q: { text: MC.text, left: 620, top: 318, width: 1060, size: 60, align: 'center' }, opts: MC.options }
-  if (s === 'two' || s === 'long2') {
-    // два фото одной высоты — равная важность; вопрос сверху, цветы-варианты снизу
-    const long = s === 'long2'
-    const rs = row([IMG.falcon, IMG.hubble], long ? 470 : 548, 1060, long ? 200 : 112, 48)
-    return { ...base, strands: [{ pts: bough(long ? 176 : 92, 280, 1860), w: 16 }], vines: rs.flatMap(r => hang(r, (long ? 182 : 98))),
-      frames: [{ r: rs[0], img: IMG.falcon }, { r: rs[1], img: IMG.hubble }],
-      flowers: F4.map(x => ({ x, y: long ? 748 : 752, r: 52 })), label: long ? 812 : 818, opts: TWO.options,
-      q: long ? { text: LONG2.text, left: 380, top: 26, width: 1440, size: 40, align: 'center' } : { text: TWO.text, left: 380, top: 30, width: 1440, size: 48, align: 'center' } }
-  }
-  if (s === 'three') {
-    // три фото одной высоты в ряд, промежутки шире — в них живут метки А/Б/В
-    const imgs = [IMG.coffee, IMG.hubble, IMG.dahlia], rs = row(imgs, 386, 1004, 214, 78)
-    return { ...base, strands: [{ pts: bough(168, 60, 1890), w: 16 }], vines: rs.flatMap(r => hang(r, 174)),
-      frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: rs.map((r, i) => ({ key: 'АБВ'[i], x: r.x - 40, y: r.y + r.h / 2, frame: i })),
-      q: { text: THREE.text, left: 380, top: 40, width: 1440, size: 48, align: 'center' }, ans: null }
-  }
-  if (s === 'four') {
-    // сетка 2×2: ячейки 712×432, центральная лоза между столбцами держит рамы
-    const imgs = [IMG.collins, IMG.falcon, IMG.hubble, IMG.palace]
-    const rs = imgs.map((im, i) => fit(im, i % 2 ? 1500 : 760, i < 2 ? 322 : 780, 650, 432))
-    return { ...base,
-      strands: [{ pts: [G(1130), { x: 1122, y: 760 }, { x: 1136, y: 540 }, { x: 1126, y: 330 }, { x: 1132, y: 110 }], w: 18 }],
-      vines: [], frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: rs.map((r, i) => ({ key: 'АБВГ'[i], x: r.x - 40, y: r.y + r.h / 2, frame: i })),
-      q: { text: FOUR.text, left: 380, top: 26, width: 1500, size: 44, align: 'center' } }
-  }
-  if (s === 'six') {
-    // «3 попытки», фаза 1: две большие картинки (у каждой свои пропорции) + клетки слова
-    const rs = row([IMG.falcon, IMG.collins], 560, 1060, 58, 56)
-    return { ...base, strands: [], vines: rs.flatMap(r => hang(r, -10)), frames: [{ r: rs[0], img: IMG.falcon }, { r: rs[1], img: IMG.collins }],
-      cells: { word: SIX.word, open: SIX.open, cx: 1060, cy: 788, d: 112, gap: 22 }, phase: { text: `Фаза ${SIX.phase} из 3`, x: 1060, y: 660 } }
-  }
-  if (s === 'img1opt') {
-    const r = fit(IMG.palace, 1090, 408, 1000, 600)
-    return { ...base, strands: props(r), frames: [{ r, img: IMG.palace }], flowers: [700, 960, 1220, 1480].map(x => ({ x, y: 790, r: 50 })), label: 852, opts: IMG1.options,
-      q: { text: IMG1.text, left: 440, top: 32, width: 1300, size: 48, align: 'center' } }
-  }
-  if (s === 'img1open') {
-    const r = fit(IMG.palace, 1080, 524, 1260, 812)
-    return { ...base, strands: props(r), frames: [{ r, img: IMG.palace }], q: { text: IMG1.text, left: 440, top: 34, width: 1300, size: 50, align: 'center' },
-      ans: { x: 1080, y: r.y + r.h + 8, w: 900, align: 'center' } }
-  }
-  if (s === 'port') {
-    const r = fit(IMG.collins, 750, 540, 660, 860)
-    return { ...base, strands: [{ pts: bough(70, 260, 1180), w: 16 }], vines: hang(r, 76), frames: [{ r, img: IMG.collins }],
-      q: { text: PORT.text, left: 1150, top: 360, width: 680, size: 52, align: 'left' }, ans: { x: 1150, y: 660, w: 680, align: 'left' } }
-  }
-  if (s === 'long') {
-    const r = fit(IMG.palace, 840, 540, 900, 700)
-    return { ...base, strands: [{ pts: bough(190, 260, 1330), w: 16 }], vines: hang(r, 196), frames: [{ r, img: IMG.palace }],
-      q: { text: LONG.text, left: 1340, top: 300, width: 520, size: 40, align: 'left' }, ans: { x: 1340, y: 700, w: 520, align: 'left' } }
-  }
-  return base
-}
+import { type Layout, type Rect, type Flower } from './question/layout'
 
 function spline(P: Pt[], n = 160): Pt[] {
   const out: Pt[] = []
@@ -158,13 +65,12 @@ function petalsFor(seed: number) {
   return { back: ring(8, 1.06, 0.32, 0.1), mid: ring(7, 0.86, 0.33, 0.1 + Math.PI / 7), cup: ring(5, 0.5, 0.3, 0.4), sep: ring(5, 0.55, 0.16, 0.25) }
 }
 
-export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: Mode; answer: boolean; onReady: (a: SceneApi) => void }) {
+export type Correct = { key?: string; text?: string }
+export function Scene({ layout: L, correct: corr, roundName, qno, mode, answer, onReady }: { layout: Layout; correct: Correct; roundName: string; qno: string; mode: Mode; answer: boolean; onReady: (a: SceneApi) => void }) {
   const look = LOOKS.C
   const root = useRef<HTMLDivElement>(null)
   const cvRef = useRef<HTMLCanvasElement>(null)
   const tnum = useRef<HTMLSpanElement>(null)
-  const L = useMemo(() => layoutOf(state), [state])
-  const corr = CORRECT[state]
   useLayoutEffect(() => {
     const el = root.current!, ctx = cvRef.current!.getContext('2d')!
     const q = gsap.utils.selector(root)
@@ -178,7 +84,7 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
       const box = (r: Rect, pad: number) => x.fillRect((r.x - pad) / 4, (r.y - pad) / 4, (r.w + pad * 2) / 4, (r.h + pad * 2) / 4)
       L.frames.forEach(f => box(f.r, 40))
       if (L.q) box({ x: L.q.left, y: L.q.top, w: L.q.width, h: L.q.size * 1.2 * Math.ceil(L.q.text.length * L.q.size * 0.5 / L.q.width) }, 30)
-      if (L.flowers.length && state !== 'mc') box({ x: L.flowers[0].x - 150, y: L.flowers[0].y - 60, w: L.flowers[L.flowers.length - 1].x - L.flowers[0].x + 300, h: 200 }, 20)
+      if (L.flowers.length && L.frames.length) box({ x: L.flowers[0].x - 150, y: L.flowers[0].y - 60, w: L.flowers[L.flowers.length - 1].x - L.flowers[0].x + 300, h: 200 }, 20)
       if (L.cells) box({ x: L.cells.cx - 420, y: L.cells.cy - 120, w: 840, h: 190 }, 20)
       return c
     })()
@@ -233,7 +139,7 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
     const st = {
       camX: full ? 30 : 0, camZ: full ? 1.07 : 1, hush: 0, wave: 0, after: full ? 0 : 0.55, sync: 0, bend: full ? 0 : 0.72, sway: 1, part: full ? 0 : 1, light: full ? 0 : 1,
       grow: lines.map(() => 0), energy: 0, frame: halves.map(() => 0), fpulse: 0, gather: 0, focus: 0, reveal: L.frames.map(() => 0), vine: 0,
-      fl: L.flowers.map(() => ({ g: 0, b: 0 })), mk: L.markers.map(() => 0), cells: 0, flip: 0, dand: 0, n: 30, bloomArch: 0,
+      fl: L.flowers.map(() => ({ g: 0, b: 0 })), mk: L.markers.map(() => 0), cells: 0, flip: 0, dand: 0, n: 30, k: 30, bloomArch: 0,
       ans: 0, hit: 0,
     }
     const gone: number[] = []
@@ -363,7 +269,7 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
       for (let i = 0; i < 30; i++) {
         const a = -Math.PI / 2 + (i / 30) * Math.PI * 2 + (warn ? Math.sin(t * 7 + i * 1.9) * 0.025 * (1 + (10 - st.n) * 0.12) : 0)
         let x0 = hx, y0 = hy, al = 1, rot = 0
-        if (i >= st.n) { const at = gone[i]; if (at === undefined) continue; const age = t - at; if (age > 3 || age < 0) continue; x0 += age * 80 + Math.sin(age * 2.4 + i) * 14; y0 -= age * 56 + age * age * 6; al = 1 - age / 3; rot = age * 0.6 }
+        if (i >= st.k) { const at = gone[i]; if (at === undefined) continue; const age = t - at; if (age > 3 || age < 0) continue; x0 += age * 80 + Math.sin(age * 2.4 + i) * 14; y0 -= age * 56 + age * age * 6; al = 1 - age / 3; rot = age * 0.6 }
         const aa = a + rot, lean = warn ? 0.18 : 0, ex = x0 + Math.cos(aa) * R, ey = y0 + Math.sin(aa) * R
         ctx.globalAlpha = al
         ctx.fillStyle = '#5a4a32'; ctx.beginPath(); ctx.ellipse(x0 + Math.cos(aa) * 76, y0 + Math.sin(aa) * 76, 5, 2, aa, 0, 6.3); ctx.fill()
@@ -605,17 +511,19 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
 
     onReady({
       tl,
-      setTimer: n => {
-        if (n < lastN) for (let i = n; i < lastN; i++) gone[i] = gsap.ticker.time
-        if (n > lastN) gone.length = 0
-        lastN = n; st.n = n
+      // n — секунды на цифре; total — длительность вопроса: лепестки-семена (их всегда 30) убывают пропорционально
+      setTimer: (n, total) => {
+        const k = total && total > 0 ? Math.max(0, Math.min(30, Math.ceil(30 * n / total))) : n
+        if (k < lastN) for (let i = k; i < lastN; i++) gone[i] = gsap.ticker.time
+        if (k > lastN) gone.length = 0
+        lastN = k; st.n = n; st.k = k
         if (tnum.current) tnum.current.textContent = String(n)
         el.setAttribute('data-ph', phaseOf(n))
       },
       dispose: () => gsap.ticker.remove(draw),
     })
     return () => { gsap.ticker.remove(draw); tl.kill() }
-  }, [look, mode, answer, state, L, corr, onReady])
+  }, [look, mode, answer, L, corr, onReady])
 
   const cellX = (i: number) => L.cells ? L.cells.cx - ((L.cells.word.length - 1) * (L.cells.d + L.cells.gap)) / 2 + i * (L.cells.d + L.cells.gap) : 0
   return (
@@ -624,9 +532,9 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
       {L.q && <p className={`fq${L.q.align === 'left' ? ' is-left' : ''}`} style={{ left: L.q.left, top: L.q.top, width: L.q.width, fontSize: L.q.size }}>
         {L.q.text.split(' ').map((w, i) => <span key={i} className="w">{w}</span>)}
       </p>}
-      {L.opts.map((o, i) => (
+      {L.opts.slice(0, L.flowers.length).map((o, i) => (
         <div key={o.key} className={`fo${L.flowers[i].r < 60 ? ' is-sm' : ''}`} style={{ left: L.flowers[i].x, top: L.flowers[i].y }}>
-          <b>{o.key}</b><span style={{ top: L.label - L.flowers[i].y, width: L.labelW, left: -L.labelW / 2 }}>{o.text}</span>
+          <b>{o.key}</b><span style={{ top: L.label - L.flowers[i].y, width: L.labelW, left: -L.labelW / 2, fontSize: L.flowers[i].r >= 60 && L.labelSize < 36 ? L.labelSize : undefined }}>{o.text}</span>
         </div>
       ))}
       {L.markers.map(m => <div key={m.key} className="fb" style={{ left: m.x, top: m.y }}><b>{m.key}</b></div>)}
@@ -636,7 +544,7 @@ export function Scene({ state, mode, answer, onReady }: { state: StateId; mode: 
       {L.phase && <div className="fp" style={{ left: L.phase.x, top: L.phase.y }}>{L.phase.text}</div>}
       {L.ans && corr.text && <div className={`fa${L.ans.align === 'left' ? ' is-left' : ''}`} style={{ left: L.ans.align === 'left' ? L.ans.x : L.ans.x - L.ans.w / 2, top: L.ans.y, width: L.ans.w }}>Ответ: <b>{corr.text}</b></div>}
       <div className="ft" style={{ left: L.dand.x, top: L.dand.y }}><span ref={tnum}>30</span></div>
-      <div className="fm"><span>{state === 'six' ? '3 попытки' : ROUND_NAME}</span><span>{QNO}</span></div>
+      <div className="fm"><span>{roundName}</span><span>{qno}</span></div>
     </div>
   )
 }

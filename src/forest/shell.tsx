@@ -2,8 +2,9 @@
 // Один холст леса на весь вечер (а не новый на каждый экран): экраны сообщают оболочке, где у них содержимое (дымка
 // под ним, светлячки облетают), настроение (обычно / тревога / время вышло) и «импульс» — волну света по корням.
 // Всё внутри кадра 1920×1080, который масштабируется под окно (как в лаборатории), поэтому вёрстка экранов — в «пикселях мокапа».
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { ForestBackdrop, type Rect, type Mood } from './stage1/env'
+import { ShellCtx, useInShell } from './shellCtx'
 import './styles'
 
 export type SceneState = { rects: Rect[]; mood: Mood; pulse: number; hidden: boolean }
@@ -18,9 +19,7 @@ export const forestScene = {
   reset() { scene = { ...DEFAULT, pulse: scene.pulse }; emit() },
   pulse() { scene = { ...scene, pulse: scene.pulse + 1 }; emit() },
 }
-/** Внутри оболочки (игра) — true; в лаборатории каждый экран рисует свой холст, как раньше. */
-export const ShellCtx = createContext(false)
-export const useInShell = () => useContext(ShellCtx)
+export { ShellCtx, useInShell }
 
 /** Экран сообщает оболочке, где его содержимое; при размонтировании возвращается к умолчанию. */
 export function useForestScene(patch: Partial<SceneState>, key: string) {
