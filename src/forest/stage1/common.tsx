@@ -1,7 +1,8 @@
 // ═══ Этап 1 — общий каркас экрана механики ═══
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ForestBackdrop, type Rect, type Mood } from './env'
+import { forestScene, useForestScene, useInShell } from '../shell'
 import { tphase } from './timers'
 import type { RoundIntroData } from './data'
 
@@ -44,9 +45,14 @@ export function useEntrance(onReady: (a: S1Api) => void, build: (tl: gsap.core.T
 
 export function S1Screen({ rects, n, children, rootRef, pulse = 0, cls = '', moodOverride }: { rects: Rect[]; n: number | null; children: ReactNode; rootRef: React.RefObject<HTMLDivElement>; pulse?: number; cls?: string; moodOverride?: Mood }) {
   const mood: Mood = moodOverride ?? (n == null ? 'calm' : tphase(n) === 'warning' ? 'warning' : tphase(n) === 'zero' ? 'zero' : 'calm')
+  // В игре лес общий для всех экранов (forest/shell.tsx): экран лишь сообщает, где его содержимое и какое «настроение»;
+  // в лаборатории каждый экран рисует свой холст, как раньше.
+  const shell = useInShell()
+  useForestScene({ rects, mood }, `${mood}|${rects.map(r => `${r.x},${r.y},${r.w},${r.h}`).join('|')}`)
+  useEffect(() => { if (shell && pulse) forestScene.pulse() }, [shell, pulse])
   return (
     <div className={`s1 ${cls}`} ref={rootRef} data-mood={mood}>
-      <ForestBackdrop rects={rects} mood={mood} pulse={pulse} />
+      {!shell && <ForestBackdrop rects={rects} mood={mood} pulse={pulse} />}
       {children}
     </div>
   )
