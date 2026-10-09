@@ -32,8 +32,10 @@ export function scrLayout(template: AnagramTemplate, order: number[]): ScrLay {
       if (w + add > AVAIL && rows[rows.length - 1].length) { rows.push([i]); w = ww } else { rows[rows.length - 1].push(i); w += add } })
     return rows
   }
+  // строка не шире области (одно длинное слово целиком в строке тоже должно поместиться)
+  const fits = (r: number[][], c: number) => r.every(ids => ids.reduce((a, i) => a + wid(words[i].length, c), 0) + WGAP * (ids.length - 1) <= AVAIL)
   let cell = 56, rows = wrap(56), found = false
-  for (let c = 92; c >= 40; c -= 2) { const r = wrap(c); if (r.length === 1 && c >= 70) { cell = c; rows = r; found = true; break } if (r.length <= 2) { cell = c; rows = r; found = true; break } }
+  for (let c = 92; c >= 40; c -= 2) { const r = wrap(c); if (!fits(r, c)) continue; if (r.length === 1 && c >= 70) { cell = c; rows = r; found = true; break } if (r.length <= 2) { cell = c; rows = r; found = true; break } }
   if (!found) { cell = 40; rows = wrap(40) }
   const rowY = rows.length === 1 ? [880] : rows.length === 2 ? [782, 930] : rows.map((_, i) => 760 + i * Math.min(cell + 30, 280 / (rows.length - 1)))
   const slot: P[] = [], bed: ScrLay['bed'] = [], wordsB: ScrLay['words'] = []
@@ -87,8 +89,10 @@ export function scrHintTl(tl: gsap.core.Timeline, q: Q, Ly: ScrLay, order: numbe
 /** показ ответа: семена собираются, по очереди (в порядке слова) планируют на места, чашечки распускаются, по грядке бежит
  *  золотой побег, потом — «угадали». Возвращает момент конца. */
 export function scrRevealTl(tl: gsap.core.Timeline, q: Q, Ly: ScrLay, order: number[], flying: number[], N: number) {
-  tl.to(q('.sc-tileA:not(.landed) .scA-fluff'), { opacity: 1, duration: 0.4 }, 0.1)
-    .to(q('.sc-tileA:not(.landed)'), { y: -16, duration: 0.5, ease: 'sine.out' }, 0.1) // «собраться»: семена замирают и чуть приподнимаются
+  // летят только эти семена (в игре — даже если React ещё не успел пометить прежние севшими)
+  const els = flying.map(i => q(`.s3-tile[data-p="${order.indexOf(i)}"]`)[0]).filter(Boolean)
+  tl.to(els.map(e => e.querySelector('.scA-fluff')).filter(Boolean), { opacity: 1, duration: 0.4 }, 0.1)
+    .to(els, { y: -16, duration: 0.5, ease: 'sine.out' }, 0.1) // «собраться»: семена замирают и чуть приподнимаются
   const step = N > 18 ? 0.14 : 0.2
   flying.forEach((i, j) => { const at = 0.9 + j * step; tl.set(q(`.s3-tile[data-p="${order.indexOf(i)}"]`), { y: 0 }, at - 0.001); scrFly(tl, q, Ly, order, i, at, 1.0) })
   const end = 0.9 + flying.length * step + 1.0

@@ -56,6 +56,11 @@ export function wordForQuestion(grid: CrosswordGrid, word: string | undefined, q
   return same[0]?.number ?? byNum?.number ?? null
 }
 
+/** номер слова в сетке для каждого вопроса раунда (по индексу вопроса) */
+export function questionNums(grid: CrosswordGrid, questions: { answer: { mode: string; word?: string } }[]): (number | null)[] {
+  return questions.map((q, i) => wordForQuestion(grid, q.answer.mode === 'crossword_word' ? q.answer.word : undefined, i))
+}
+
 export type Dl = { ch: string; st: 'ok' | 'bad' | 'extra' }
 /** Ответ по буквам под буквами слова; null — ответ слишком длинный для побуквенной выкладки (показываем текстом).
  *  Это только раскраска «где разошлось»; засчитано или нет — решает вердикт (✓/✗), а не она. */

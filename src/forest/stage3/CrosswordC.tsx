@@ -42,6 +42,8 @@ export type CwPart = {
   rows: CwTeamRow[]
   /** раскраска букв и ✓/✗ — только когда вердикт объявлен (в игре — после автопроверки ShowAnswers) */
   judged: boolean
+  /** пояснение к ответу (answer_note) — после вердикта */
+  note?: string
 }
 export type CwTallyRow = { key: string | number; name: string; color: string; pips: (boolean | null)[]; sum: number }
 
@@ -77,7 +79,7 @@ export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, p
   const curWord = cur != null ? m.W(cur)?.word ?? '' : ''
   const RG = rowGeom(Math.max(1, ...(parts ?? []).map(p => p.rows.length)), Math.max(curWord.length, ...(parts ?? []).map(p => m.W(p.num)?.word.length ?? 0)))
   const std = RG.ROWH === 88 && RG.COL === 62 && RG.lt === 54
-  const gridVars = std ? undefined : { ['--lt' as string]: `${RG.lt}px`, ['--gap' as string]: `${RG.COL - RG.lt}px` }
+  const gridVars = std ? undefined : { ['--lt' as string]: `${RG.lt}px`, ['--ltf' as string]: `${Math.round(RG.lt * 0.555)}px`, ['--gap' as string]: `${RG.COL - RG.lt}px` }
   const cellCls = (c: Cell) => {
     const ns = m.cellNums(c), key = `${c.r},${c.c}`
     const old = ns.some(x => shown(x)), isCur = curCells.has(key) && !complete
@@ -92,7 +94,7 @@ export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, p
     <span className={`cwC-lab ${p.cls}`}>Правильный ответ</span>
     <span className="cwC-cells"><span className="cwC-al">{[...m.W(p.num).word.toUpperCase()].map((ch, i) => <i key={i} className="cwC-lt ok big"><b className="ch" style={p.covered ? { opacity: 0 } : undefined}>{ch}</b></i>)}</span></span>
   </div>
-  const rec = (p: CwPart) => <div className={`cwC-rec ${p.cls}${lenCls(p.clue)}`} style={p.hidden ? { opacity: 0 } : undefined}><em>Разбор · слово {p.num} · {m.dirRu(p.num)}{p.recExtra ?? ''}</em>{p.clue}</div>
+  const rec = (p: CwPart) => <div className={`cwC-rec ${p.cls}${lenCls(p.clue)}`} style={p.hidden ? { opacity: 0 } : undefined}><em>Разбор · слово {p.num} · {m.dirRu(p.num)}{p.recExtra ?? ''}</em>{p.clue}{p.note ? <span className="cwC-rnote">{p.note}</span> : null}</div>
   const TG = tally ? tallyGeom(tally.rows.length, m.nums.length) : null
   const tstd = !TG || (TG.step === 92 && TG.pip === 40)
   return (
@@ -119,7 +121,7 @@ export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, p
         })}
       </div>
       {side}
-      {!rev && clue && cur != null && <div className="cwC-clue"><div className="k">слово {cur} · {m.dirRu(cur)} · {curWord.length} {lettersWord(curWord.length)}</div><div className={`t${lenCls(clue.text)}`}>{clue.text}</div>
+      {!rev && clue && <div className="cwC-clue">{cur != null && <div className="k">слово {cur} · {m.dirRu(cur)} · {curWord.length} {lettersWord(curWord.length)}</div>}<div className={`t${lenCls(clue.text)}`}>{clue.text}</div>
         {clue.answer ? <div className="cwC-open">{clue.answer}</div> : null}{clue.note ? <div className="cwC-note">{clue.note}</div> : null}</div>}
       {rev && !complete && parts && <>
         <div className="cwC-veil" />
@@ -127,7 +129,7 @@ export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, p
       </>}
       {complete && tally && <div className="cwC-tally">
         <div className="cwC-rec pd"><em>Кроссворд разгадан</em>Угадано слов из {m.nums.length}</div>
-        {tally.rows.map((t, k) => <div key={t.key} className="cwC-tr" style={{ top: TG!.top + k * TG!.step, ...(tstd ? null : { height: Math.min(80, TG!.step), ['--pip' as string]: `${TG!.pip}px` }) }}>
+        {tally.rows.map((t, k) => <div key={t.key} className="cwC-tr" style={{ top: TG!.top + k * TG!.step, ...(tstd ? null : { height: Math.min(80, TG!.step), ['--pip' as string]: `${TG!.pip}px`, ['--pipf' as string]: `${Math.round(TG!.pip / 2)}px` }) }}>
           <span className="cwC-nm" style={{ color: t.color }}>{t.name}</span>
           <span className="pips">{m.nums.map((num, i) => <i key={num} className={t.pips[i] === true ? 'ok' : t.pips[i] === false ? 'no' : 'nil'}>{num}</i>)}</span>
           <b className="sum">{t.sum}</b>
