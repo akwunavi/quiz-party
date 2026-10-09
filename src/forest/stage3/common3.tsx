@@ -1,8 +1,8 @@
 // ═══ Этап 3 — общие детали концептов: шапка, одуванчик-таймер, состояние таймера ═══
 import { Dandelion } from '../stage1/timers'
 
-export const head = (title: string, qn: number, qcount: number) => (
-  <div className="s3-head"><b>{title}</b><span>вопрос {qn} / {qcount}</span></div>
+export const head = (title: string, qn: number, qcount: number, extra?: string) => (
+  <div className="s3-head"><b>{title}</b><span>вопрос {qn} / {qcount}{extra}</span></div>
 )
 /** Единый таймер всех экранов с «стоящим» одуванчиком: размер и место — как на утверждённых экранах с фото
  *  (голова ≈ 260 px, центр (206, 800)), стебель короткий, внизу трава. Поменять размер нужно ЗДЕСЬ, а не на экранах. */

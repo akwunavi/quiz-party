@@ -49,6 +49,13 @@
 .fin .sc-tileA b { color:#4a2a05; }
 .fin .sc-tileA::before { background: radial-gradient(circle at 38% 32%, #fffbe8, #f6e3a8 55%, #d9b45e); }
 .sc-resA { }
+/* игра: картинка вопроса (одна) — в свободном углу над одуванчиком; длинные определения из настоящих паков мельче */
+.scA-img { position:absolute; left:40px; top:110px; width:300px; height:470px; margin:0; z-index:3; display:grid; place-items:center; }
+.scA-img img { display:block; max-width:100%; max-height:100%; object-fit:contain; border-radius:6px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.3), 0 14px 30px rgba(0,0,0,.7); }
+.sc.has-img .sc-clueA { left:380px; }
+.sc-clueA.lg { font-size:40px; } .sc-clueA.xl { font-size:33px; }
+.s3-result .scA-note { flex-basis:100%; text-align:center; font-size:24px; color:#cfeee4; }
+.s3-result .scA-tm { font-size:28px; color:#ffe2a0; }
 @media (prefers-reduced-motion: reduce) { .scA-fluff, .warn .sc-tileA:not(.landed) .scA-fluff { animation:none; } }
 
 /* ── СОПОСТАВЛЕНИЕ / ПОРЯДОК — общие листы с подписью ── */

@@ -61,6 +61,7 @@ import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
+import { ForestCrosswordAnswers, ForestCrosswordQuestion, crosswordGridOf } from './rounds/ForestCrossword'
 import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
 import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
@@ -520,22 +521,14 @@ function HostInner({ gameState, pack }: {
     // здесь для кнопки «Показать ответ» / «Время ответов →».
     const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
-    return (
-      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
-        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
-        timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
-        timerStartedAt={gameState.timer_started_at}
-        timerSlot={round.mechanic !== 'jeopardy' &&
-          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
-            theme={pack.theme} />}
-        effectsSlot={round.mechanic !== 'jeopardy' && <>
+    const effectsSlot = round.mechanic !== 'jeopardy' && <>
           <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
             startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
-        </>}
-        actionsSlot={
+        </>
+    const actionsSlot = (
           <div className="host-actions">
             <BackBtn gameState={gameState} />
             {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
@@ -546,7 +539,22 @@ function HostInner({ gameState, pack }: {
                 ? <button onClick={() => void startAnswerTime(navFrom(gameState)).catch(quietStale)}>Время ответов →</button>
                 : <AfterRoundNav pack={pack} gameState={gameState} />}
           </div>
-        } />
+    )
+    // «Волшебный лес»: кроссворд — утверждённое «Созвездие светлячков» (те же слоты звука/автопоказа/кнопок; гонг — у одуванчика)
+    if (round.mechanic === 'crossword' && isForestTheme(pack.theme) && crosswordGridOf(round)) {
+      return <ForestCrosswordQuestion key={q.id} pack={pack} round={round} q={q} qIndex={gameState.question_index}
+        qCount={round.questions.length} gameState={gameState} effectsSlot={effectsSlot} actionsSlot={actionsSlot} />
+    }
+    return (
+      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
+        timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
+        timerStartedAt={gameState.timer_started_at}
+        timerSlot={round.mechanic !== 'jeopardy' &&
+          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
+            theme={pack.theme} />}
+        effectsSlot={effectsSlot}
+        actionsSlot={actionsSlot} />
     )
   }
 
@@ -1682,6 +1690,26 @@ function ShowAnswers({ pack, round, q, gameState }: {
   // картинки, а mp3 молча выбрасывался — вставленный трек не играл вообще.
   const answerAudio = (q.media.answer ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
 
+  const actions = (
+      <div className="host-actions">
+        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
+        {!revealed
+          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
+          : step < total - 1
+            ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
+            : <AfterRoundNav pack={pack} gameState={gameState} />}
+      </div>
+  )
+  // «Волшебный лес»: разбор кроссворда — «Созвездие светлячков». Хуки выше (автопоказ, автопроверка, запись is_correct)
+  // работают как прежде; сцена только рисует и показывает вердикт по тому же `checked`.
+  if (round.mechanic === 'crossword' && isForestTheme(pack.theme) && crosswordGridOf(round)) {
+    return <ForestCrosswordAnswers key={q.id} pack={pack} round={round} q={q} step={step} answers={answers} teams={teams}
+      allTeams={allTeams} revealed={revealed} checked={checked} paper={paper}
+      effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
+      video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined}
+      imgs={revealed ? revealImgs : q.media.hidden ? [] : questionImgs} actions={actions} />
+  }
+
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
       style={{ justifyContent: 'flex-start' }}>
@@ -1815,14 +1843,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
           })}
         </div>}
       </div>
-      <div className="host-actions">
-        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
-        {!revealed
-          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
-          : step < total - 1
-            ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
-            : <AfterRoundNav pack={pack} gameState={gameState} />}
-      </div>
+      {actions}
     </div>
   )
 }

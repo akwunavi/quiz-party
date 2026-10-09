@@ -56,4 +56,22 @@
 .cwC-tr .pips i { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-size:20px; font-style:normal; font-weight:700; box-sizing:border-box; }
 .cwC-tr .pips i.ok { background: radial-gradient(circle at 40% 36%, #fff4d2, #ffbe5a 60%, #b8741a); color:#3a2008; box-shadow:0 0 12px rgba(255,196,100,.7); } .cwC-tr .pips i.no { background:#2a1010; color:#ffb3a6; border:2px solid #e0604f; } .cwC-tr .pips i.nil { border:2px dashed #7a8f86; color:#9fb8ae; }
 .cwC-tr .sum { font-size:50px; color:#ffe2a0; margin-left:auto; }
+/* игра: размеры под настоящие данные (число команд, длина слова), картинки, открытый ответ, пояснение */
+.cwC-lt { width:var(--lt, 54px); height:var(--lt, 54px); }
+.cwC-al { gap:var(--gap, 8px); }
+.cwC-lt .ch { font-size:var(--ltf, 30px); }
+.cwC-lift .cwC-lt { width:var(--lt, 54px); height:var(--lt, 54px); }
+.cwC-lt.neu { background:rgba(10,24,22,.7); border-color:rgba(255,230,170,.55); } .cwC-lt.neu .ch { color:#fff6e0; }
+.cwC-tr .pips i { width:var(--pip, 40px); height:var(--pip, 40px); font-size:var(--pipf, 20px); }
+.cwC-clue .t.xxl { font-size:31px; }
+.cwC-rec.xxl { font-size:25px; }
+.cwC-rnote { display:block; margin-top:6px; font-size:24px; line-height:1.15; color:#ffe2a0; }
+.cwC-open { margin-top:8px; font-size:46px; font-weight:700; letter-spacing:.08em; color:#ffe2a0; }
+.cwC-note { margin-top:4px; font-size:24px; color:#cfeee4; }
+.cwC-side { position:absolute; z-index:4; display:flex; flex-direction:column; gap:14px; }
+.cwC-side.row { flex-direction:row; }
+.cwC-side.grid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.cwC-sc { flex:1 1 0; min-width:0; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+/* рамку рисует сама картинка, вписанная по пропорции: max-* без object-fit — рамка ровно по снимку */
+.cwC-sc img, .cwC-sc video { display:block; max-width:calc(100% - 12px); max-height:calc(100% - 12px); border-radius:6px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.3), 0 14px 30px rgba(0,0,0,.7); }
 @media (prefers-reduced-motion: reduce) { .cwC-map, .cwC-orb .core, .cwC-dust i { animation:none; } }
