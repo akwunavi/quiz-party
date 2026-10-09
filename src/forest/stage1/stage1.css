@@ -91,7 +91,8 @@
 .spA-bloom { position:absolute; left:50%; top:50%; width:300px; height:300px; margin:-150px 0 0 -150px; overflow:visible; }
 .spA-bloom ellipse.p0 { fill:rgba(255,214,140,.32); } .spA-bloom ellipse.p1 { fill:rgba(255,190,100,.22); }
 .spA-bloom .core { fill:rgba(255,230,170,.35); }
-.spA-fa-t { position:relative; font-size:96px; font-weight:700; color:#ffe2a0; white-space:nowrap; text-shadow: 0 4px 10px rgba(2,12,10,.95), 0 0 30px rgba(2,12,10,.8); }
+.spA-fa-t { position:relative; font-size:96px; font-weight:700; color:#ffe2a0; white-space:normal; text-align:center; text-shadow: 0 4px 10px rgba(2,12,10,.95), 0 0 30px rgba(2,12,10,.8); }
+.spA-fa-t .w { white-space:nowrap; }
 .spA-fa-t .ch { display:inline-block; }
 .spA-pods { position:absolute; left:0; right:0; bottom:90px; display:flex; justify-content:center; gap:26px; }
 .spA-pod { position:relative; width:62px; height:62px; border-radius:50%; display:grid; place-items:center; font-size:30px; font-weight:700; color:#f4fffa; text-shadow: 0 1px 3px #03100d, 0 0 6px #03100d; background:rgba(3,16,13,.6); box-shadow: inset 0 0 0 3px #3f7a56; overflow:hidden; isolation:isolate; }
@@ -329,3 +330,42 @@
 .rvA-cv { position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; }
 .rvA-no { position:absolute; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; display:grid; place-items:center; font-size:26px; font-weight:700; color:#2a1a08; z-index:2;
   background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); box-shadow: 0 0 0 3px rgba(20,40,30,.85), 0 4px 10px rgba(0,0,0,.6); }
+
+/* ═══ Игра: настоящее содержимое (число вопросов, длина текстов, число команд) ═══
+   Классы ниже появляются только когда содержимое не влезает в лабораторную раскладку — кадры лаборатории не меняются. */
+.spA .sp-t, .spA-rq, .spA-ta .txt, .spA-ta .nm, .bz-qtext, .bz-qsmall, .bz-sign b, .rv-note, .rv-atext { overflow-wrap:anywhere; }
+.spA-note { position:absolute; left:90px; width:1080px; top:478px; text-align:center; font-size:32px; line-height:1.2; font-style:italic; color:#e8f5ee; text-shadow:var(--halo); }
+.spA-none { font-size:30px; color:#9fb8ad; text-shadow:var(--halo); }
+.spA-teams.is-tight { gap:10px; }
+.spA-teams.is-tight .spA-ta { min-height:80px; padding:8px 26px 10px 36px; }
+.spA-teams.is-tight .spA-ta .nm { font-size:22px; }
+.spA-teams.is-tight .spA-ta .dots, .spA-teams.is-tight .spA-ta .txt { font-size:30px; }
+.spA-teams.is-tight .spA-ta .mk { width:50px; height:50px; font-size:28px; }
+.spA-teams.is-two { left:1200px; width:690px; grid-template-columns:1fr 1fr; column-gap:12px; }
+.spA-teams.is-two .spA-th { grid-column:1 / -1; }
+.spA-teams.is-two .spA-ta { padding:8px 16px 10px 28px; }
+.spA-teams.is-two .spA-ta .txt { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.spA-teams.is-two.is-tight .spA-ta { min-height:64px; }
+.spA-teams.is-two.is-tight .spA-ta .nm { font-size:19px; }
+.spA-teams.is-two.is-tight .spA-ta .dots, .spA-teams.is-two.is-tight .spA-ta .txt { font-size:24px; }
+.spA-teams.is-two.is-tight .spA-ta .mk { width:40px; height:40px; font-size:22px; }
+.spA-pods.many { gap:12px; flex-wrap:wrap; align-content:flex-end; }
+.spA-pods.many .spA-pod { width:50px; height:50px; font-size:24px; }
+/* игра на бумаге: колонки ответов команд нет — разбор по центру экрана */
+.spA.paper .spA-rq, .spA.paper .spA-rq.recall ~ .spA-fa, .spA.paper .spA-note { left:420px; }
+.spA.paper .spA-rimg { left:550px; } .spA.paper .spA-aimg { left:780px; }
+.spA.paper .spA-pods { left:420px; }
+/* В игре те же имена классов носят боевые экраны (13-round-race.css: .bz-asking/.bz-qtext/.bz-verdict/.bz-bank/.bz-dice-cap,
+   38-round-reveal.css: .rv-note) — их шрифт, разрядка, отступы и прозрачность протекали в Лес. Возвращаем значения
+   по умолчанию (в лаборатории глобальных стилей нет — там эти строки ничего не меняют). */
+.s1 .bz-asking, .s1 .bz-asking b, .s1 .bz-qtext, .s1 .bz-verdict, .s1 .bz-dice-cap, .s1 .bz-bank, .s1 .bz-pts, .s1 .rv-note { font-family:'Philosopher', sans-serif; letter-spacing:normal; }
+.s1 .bz-asking { margin-bottom:0; }
+.s1 .rv-note { opacity:1; }
+/* «Три попытки» в игре: вердикта ещё нет — место под знак остаётся, знака нет; много команд — две колонки */
+.rv-ans.nv .rv-mark { visibility:hidden; }
+.rvA-ans.rv-answers.is-two { left:120px; right:120px; grid-template-columns:1fr 1fr; gap:8px 50px; }
+.rvA-ans.is-two .rv-ans { font-size:28px; } .rvA-ans.is-two .rv-aph { font-size:22px; }
+.rvA-ans.is-two .rv-ans b { max-width:330px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rvA-ans.is-tight .rv-ans { font-size:24px; } .rvA-ans.is-tight .rv-mark { width:32px; height:32px; font-size:20px; }
+.rvA-ans.is-tiny { gap:4px 40px; } .rvA-ans.is-tiny .rv-ans { font-size:20px; } .rvA-ans.is-tiny .rv-aph { font-size:18px; }
+.s1-empty { position:absolute; left:0; right:0; top:480px; text-align:center; font-size:40px; color:#cfeee4; text-shadow:var(--halo); }
