@@ -1,0 +1,155 @@
+[
+  {
+    "name": "01_start_from_existing_run.mp4",
+    "bytes": 964662,
+    "sha256": "0e82e2698e5989f27830c60d34f922f254f89cc59020b8231a89a6e6c96ea6b2",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "121",
+    "duration": 5.041667,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "02_run_loop_test.mp4",
+    "bytes": 2211273,
+    "sha256": "d0dcab2c0ed5a18c8cfb25e7217608488b94c7a7d661a5d649f776f71d5f7e59",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "243",
+    "duration": 10.125,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "02b_internal_loop_candidate.mp4",
+    "bytes": 801689,
+    "sha256": "aad97abbf02875ff78d04311cf0f3e37187ec13ef9914590558e4738e0e81372",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "88",
+    "duration": 3.666667,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "03_stop_feasibility.mp4",
+    "bytes": 270897,
+    "sha256": "50353cb6d7a7a5fc3fce6f0c770211535d79bdc4544af8deee8c011db89af2ef",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "55",
+    "duration": 2.291667,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "03b_reverse_stop_diagnostic.mp4",
+    "bytes": 276963,
+    "sha256": "0c7f0c7677798af7b8275fd88a95b5766daf3b7ed0339b54df9f9851d8997c2f",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "51",
+    "duration": 2.125,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "04_sniff_action_variants.mp4",
+    "bytes": 3071514,
+    "sha256": "977ca37965371ba3f8da8e81a475ed0116afc13faaea17b053d5bbce3e956289",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "527",
+    "duration": 21.958333,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "04b_sniff_neutral_candidate.mp4",
+    "bytes": 1202902,
+    "sha256": "1d698a83dc64c30c0608687fbc04c1645754dfd9dee75628d034dd6da7361906",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "205",
+    "duration": 8.541667,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "05_return_feasibility.mp4",
+    "bytes": 271525,
+    "sha256": "2ff7f6178f29c628a91a3612bafff314ebf6919e9ebd84973f1694ba4af3446f",
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "57",
+    "duration": 2.375,
+    "alpha_mode": null,
+    "faststart": true,
+    "decodes": true
+  },
+  {
+    "name": "dog4-start-alpha.webm",
+    "bytes": 2965184,
+    "sha256": "2eb5537a8efcfaeed86b4010ad6eebb6e791646bd690a6d7b3da23bf933b5783",
+    "codec": "vp9",
+    "pix_fmt": "yuv420p",
+    "size": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": "40",
+    "duration": 1.667,
+    "alpha_mode": "1",
+    "faststart": null,
+    "decodes": true
+  }
+]

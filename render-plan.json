@@ -1,0 +1,102 @@
+{
+  "sources": {
+    "start": {
+      "kind": "png",
+      "directory": "/workspace/artifacts/bulldog-racing/dog4-tech-audit/start-alpha/rgba",
+      "frame_count": 40
+    },
+    "run": {
+      "kind": "webm",
+      "path": "/workspace/artifacts/bulldog-racing/dog4-alpha/published/dog4-run-alpha.webm",
+      "frame_count": 81
+    },
+    "sniff": {
+      "kind": "png",
+      "directory": "/workspace/artifacts/bulldog-racing/sniff-pee-lab/v2/rgba",
+      "frame_count": 241
+    }
+  },
+  "videos": {
+    "01_start_from_existing_run.mp4": [
+      {
+        "source": "start",
+        "start": 0,
+        "end": 39,
+        "label": "ORIGINAL RUN source #0-39: STAND to START candidate"
+      },
+      {
+        "source": "run",
+        "start": 0,
+        "end": 80,
+        "label": "APPROVED RUN alpha #0-80 = original #40-120"
+      }
+    ],
+    "02_run_loop_test.mp4": [
+      {
+        "source": "run",
+        "start": 0,
+        "end": 80,
+        "repeat": 3,
+        "label": "APPROVED RUN repeated 3x: inspect visible loop seam"
+      }
+    ],
+    "03_stop_feasibility.mp4": [
+      {
+        "source": "run",
+        "start": 0,
+        "end": 22,
+        "label": "RUN phase alpha #0-22; natural speed, NO STOP present"
+      },
+      {
+        "source": "run",
+        "start": 22,
+        "end": 22,
+        "hold_frames": 8,
+        "label": "DIAGNOSTIC FREEZE: not real braking"
+      },
+      {
+        "source": "sniff",
+        "start": 0,
+        "end": 0,
+        "hold_frames": 24,
+        "label": "HARD CUT to STAND: missing STOP transition"
+      }
+    ],
+    "04_sniff_action_variants.mp4": [
+      {
+        "source": "sniff",
+        "start": 0,
+        "end": 240,
+        "label": "A FULL SNIFF #0-240 = 10.042 s"
+      },
+      {
+        "source": "sniff",
+        "start": 24,
+        "end": 216,
+        "label": "B CROP #24-216 = 8.042 s; loses initial/final poses"
+      },
+      {
+        "source": "sniff",
+        "start": 124,
+        "end": 216,
+        "label": "C CROP #124-216 = 3.875 s; starts nose at floor"
+      }
+    ],
+    "05_return_feasibility.mp4": [
+      {
+        "source": "sniff",
+        "start": 208,
+        "end": 240,
+        "label": "SNIFF END #208-240: side view and step"
+      },
+      {
+        "source": "sniff",
+        "start": 0,
+        "end": 0,
+        "hold_frames": 24,
+        "label": "HARD CUT to STAND #0: incompatible angle, missing RETURN"
+      }
+    ]
+  },
+  "background": "#D1C5AA"
+}

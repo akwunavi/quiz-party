@@ -1,0 +1,58 @@
+{
+  "02_run_loop_test.mp4": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "resolution": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": 243,
+    "duration": "10.125000",
+    "faststart_moov_before_mdat": true,
+    "sha256": "d0dcab2c0ed5a18c8cfb25e7217608488b94c7a7d661a5d649f776f71d5f7e59",
+    "bytes": 2211273
+  },
+  "03_stop_feasibility.mp4": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "resolution": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": 55,
+    "duration": "2.291667",
+    "faststart_moov_before_mdat": true,
+    "sha256": "50353cb6d7a7a5fc3fce6f0c770211535d79bdc4544af8deee8c011db89af2ef",
+    "bytes": 270897
+  },
+  "04_sniff_action_variants.mp4": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "resolution": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": 527,
+    "duration": "21.958333",
+    "faststart_moov_before_mdat": true,
+    "sha256": "977ca37965371ba3f8da8e81a475ed0116afc13faaea17b053d5bbce3e956289",
+    "bytes": 3071514
+  },
+  "05_return_feasibility.mp4": {
+    "codec": "h264",
+    "pix_fmt": "yuv420p",
+    "resolution": [
+      1276,
+      720
+    ],
+    "fps": "24/1",
+    "frames": 57,
+    "duration": "2.375000",
+    "faststart_moov_before_mdat": true,
+    "sha256": "2ff7f6178f29c628a91a3612bafff314ebf6919e9ebd84973f1694ba4af3446f",
+    "bytes": 271525
+  }
+}
