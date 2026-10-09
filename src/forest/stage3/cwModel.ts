@@ -75,8 +75,10 @@ export const lenCls = (t: string) => (t.length > 160 ? ' xl xxl' : t.length > 70
 
 export type MapGeom = { P: number; OX: number; OY: number }
 /** Где лежит сетка. Утверждённые размеры — потолок (клетка 78 / 56 / 66 px); сетка крупнее — клетка меньше, чтобы
- *  поместиться в ту же область. `bottom` — нижняя граница карты на экране вопроса (над определением). */
-export function mapGeom(bb: CwModel['bb'], mode: 'question' | 'review' | 'complete', o: { bottom?: number; right?: number } = {}): MapGeom {
+ *  поместиться в ту же область. `bottom` — нижняя граница карты на экране вопроса (над определением); `maxW` — ширина
+ *  карты в углу (в игре уже, чем в лаборатории: справа от неё имена команд, а сетки бывают шире утверждённой). */
+export const GAME_MAP_W = { review: 560, complete: 660 }
+export function mapGeom(bb: CwModel['bb'], mode: 'question' | 'review' | 'complete', o: { bottom?: number; right?: number; maxW?: number } = {}): MapGeom {
   const cols = bb.c1 - bb.c0 + 1, rows = bb.r1 - bb.r0 + 1
   if (mode === 'question') {
     const top = 96, right = o.right ?? 1520, left = 1920 - right, h = Math.max(200, (o.bottom ?? 876) - top)
@@ -85,10 +87,10 @@ export function mapGeom(bb: CwModel['bb'], mode: 'question' | 'review' | 'comple
     return { P, OX: cx - (cols * P) / 2, OY: top + Math.max(0, (h - rows * P) / 2) }
   }
   if (mode === 'complete') {
-    const P = Math.max(24, Math.min(66, Math.floor(924 / cols), Math.floor(660 / rows)))
+    const P = Math.max(24, Math.min(66, Math.floor((o.maxW ?? 924) / cols), Math.floor(660 / rows)))
     return { P, OX: 70, OY: 200 + Math.max(0, (660 - rows * P) / 2) }
   }
-  const P = Math.max(22, Math.min(56, Math.floor(784 / cols), Math.floor(560 / rows)))
+  const P = Math.max(22, Math.min(56, Math.floor((o.maxW ?? 784) / cols), Math.floor(560 / rows)))
   return { P, OX: 44, OY: 310 + Math.max(0, (560 - rows * P) / 2) }
 }
 

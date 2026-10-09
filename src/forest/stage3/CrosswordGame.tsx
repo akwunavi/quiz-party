@@ -9,7 +9,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { CrosswordScene, ANSY, X0, cwGeom, type CwTallyRow, type CwTeamRow } from './CrosswordC'
-import { lenCls, rowGeom, teamsWord, type CwModel } from './cwModel'
+import { GAME_MAP_W, lenCls, rowGeom, teamsWord, type CwModel } from './cwModel'
 
 /** Нижняя граница карты над определением: высота определения по длине (кегль — как в CSS по lenCls) */
 export function clueBottom(text: string, withAnswer: boolean, note: string) {
@@ -105,7 +105,7 @@ export function CrosswordReviewGame({ m, title, qn, qcount, cur, reviewed, revea
   useLayoutEffect(() => {
     if (stage !== 'anim' || cur == null) return
     const wc = m.wordCells(cur), len = Math.max(1, wc.length)
-    const { cx, cy, orb } = cwGeom(m, 'review')
+    const { cx, cy, orb } = cwGeom(m, 'review', { maxW: GAME_MAP_W.review })
     const tl = gsap.timeline({ onComplete: () => setStage(s => (s === 'anim' ? 'open' : s)) })
     tl.fromTo(q('.cwC-ans .ch, .cwC-trow .ch'), { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0)
       .fromTo(q('.cwC-ans .cwC-lt, .cwC-trow .cwC-lt, .cwC-trow .cwC-none, .cwC-trow .cwC-txt'), { opacity: 0, scale: 0.4 }, { opacity: 0, scale: 0.4, duration: 0.01 }, 0)
@@ -168,7 +168,7 @@ export function CrosswordReviewGame({ m, title, qn, qcount, cur, reviewed, revea
     <CrosswordScene m={m} mode={mode} title={title} qn={qn} qcount={qcount} cur={cur} past={x => reviewed.has(x)}
       shown={x => reviewed.has(x)} curLit={stage === 'open'} parts={part} lifts={stage === 'anim'}
       tally={mode === 'complete' && tally ? { rows: tally } : undefined} n={null} total={1} rootRef={root}
-      cls={`st-${mode === 'complete' ? 'complete' : 'review'} rev`} timer={false}
+      cls={`st-${mode === 'complete' ? 'complete' : 'review'} rev`} timer={false} maxW={mode === 'complete' ? GAME_MAP_W.complete : GAME_MAP_W.review}
       side={mode === 'review' && sideN > 0 && side ? <div className={`cwC-side${sideN > 1 ? ' row' : ''}`} style={{ left: 44, top: 96, width: 540, height: 190 }}>{side}</div> : undefined} />
   )
 }

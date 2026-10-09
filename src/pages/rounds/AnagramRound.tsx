@@ -375,8 +375,9 @@ function ForestAnagramBoard({ pack, round, q, qIndex, qCount, gameState, effects
     : rightTeams.length
       ? <><span>угадали</span>{rightTeams.map(chip)}{note}</>
       : <><span>никто не угадал</span>{note}</>
-  const chars = rightTeams.reduce((a, t) => a + t.name.length * 15 + 60, 160)
-  const resultLines = Math.ceil(chars / 1400) + (q.answer_note ? Math.ceil(q.answer_note.length / 90) : 0)
+  // сколько строк займёт результат (28px: ~13,5 px на знак, у плашки поля и зазор ~50 px; ширина строки 1460)
+  const chars = (race ? [winnerTeam].filter(Boolean) as Team[] : rightTeams).reduce((a, t) => a + t.name.length * 13.5 + 50, race ? 420 : 130)
+  const resultLines = Math.ceil(chars / 1460) + (q.answer_note ? Math.ceil(q.answer_note.length / 110) : 0)
   return (
     <>
       <AudioGate />

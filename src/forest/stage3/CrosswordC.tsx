@@ -21,7 +21,7 @@ const RECTS: Rect[] = [{ x: 60, y: 80, w: 860, h: 860 }]
 
 export type CwMode = 'question' | 'review' | 'complete'
 /** Геометрия карты: где клетка и какого размера огонёк */
-export function cwGeom(m: CwModel, mode: CwMode, o?: { bottom?: number; right?: number }) {
+export function cwGeom(m: CwModel, mode: CwMode, o?: { bottom?: number; right?: number; maxW?: number }) {
   const g = mapGeom(m.bb, mode, o)
   const cx = (c: number) => g.OX + (c - m.bb.c0) * g.P + g.P / 2, cy = (r: number) => g.OY + (r - m.bb.r0) * g.P + g.P / 2
   return { g, cx, cy, orb: g.P * (mode === 'complete' ? 0.72 : 0.62) }
@@ -47,7 +47,7 @@ export type CwPart = {
 }
 export type CwTallyRow = { key: string | number; name: string; color: string; pips: (boolean | null)[]; sum: number }
 
-export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, past, shown, curLit, clue, parts, lifts, tally, n, total, rootRef, cls = '', bottom, right, side, timer = true }: {
+export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, past, shown, curLit, clue, parts, lifts, tally, n, total, rootRef, cls = '', bottom, right, maxW, side, timer = true }: {
   m: CwModel; mode: CwMode; title: string; qn: number; qcount: number
   /** текущее слово (номер в сетке); null — слово не нашлось в сетке */
   cur: number | null; next?: number | null
@@ -67,12 +67,14 @@ export function CrosswordScene({ m, mode, title, qn, qcount, cur, next = null, p
   cls?: string
   /** нижняя/правая граница карты на экране вопроса (если внизу длинное определение или справа картинки) */
   bottom?: number; right?: number
+  /** ширина карты в углу (разбор/итог) */
+  maxW?: number
   /** картинки/видео вопроса или ответа */
   side?: ReactNode
   timer?: boolean
 }) {
   const rev = mode !== 'question', complete = mode === 'complete'
-  const { cx, cy, orb } = cwGeom(m, mode, { bottom, right })
+  const { cx, cy, orb } = cwGeom(m, mode, { bottom, right, maxW })
   const wc = cur != null ? m.wordCells(cur) : []
   const curCells = new Set(wc.map(c => `${c.r},${c.c}`)), nxCells = new Set(next != null ? m.wordCells(next).map(c => `${c.r},${c.c}`) : [])
   const lineD = (num: number) => m.wordCells(num).map((c, i) => `${i ? 'L' : 'M'} ${cx(c.c)} ${cy(c.r)}`).join(' ')
