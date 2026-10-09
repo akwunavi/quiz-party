@@ -355,6 +355,12 @@
 .spA.paper .spA-rq, .spA.paper .spA-rq.recall ~ .spA-fa, .spA.paper .spA-note { left:420px; }
 .spA.paper .spA-rimg { left:550px; } .spA.paper .spA-aimg { left:780px; }
 .spA.paper .spA-pods { left:420px; }
+/* В игре те же имена классов носят боевые экраны (13-round-race.css: .bz-asking/.bz-qtext/.bz-verdict/.bz-bank/.bz-dice-cap,
+   38-round-reveal.css: .rv-note) — их шрифт, разрядка, отступы и прозрачность протекали в Лес. Возвращаем значения
+   по умолчанию (в лаборатории глобальных стилей нет — там эти строки ничего не меняют). */
+.s1 .bz-asking, .s1 .bz-asking b, .s1 .bz-qtext, .s1 .bz-verdict, .s1 .bz-dice-cap, .s1 .bz-bank, .s1 .bz-pts, .s1 .rv-note { font-family:'Philosopher', sans-serif; letter-spacing:normal; }
+.s1 .bz-asking { margin-bottom:0; }
+.s1 .rv-note { opacity:1; }
 /* «Три попытки» в игре: вердикта ещё нет — место под знак остаётся, знака нет; много команд — две колонки */
 .rv-ans.nv .rv-mark { visibility:hidden; }
 .rvA-ans.rv-answers.is-two { left:120px; right:120px; grid-template-columns:1fr 1fr; gap:8px 50px; }

@@ -116,9 +116,11 @@ export function ForestReveal({ qid, imgs, phase, startedAt, phaseSec, short, set
   const { sizes, ready } = useImageSizes(imgs)
   const fr = revealFrames(imgs.length, phase)
   const still = fr.still || state === 'over'
-  const fsKey = `${qid}|${state}|${fr.shown.join(',')}|${fr.prev.join(',')}|${still}|${ready}`
+  // время вышло: рамы стоят, уходящих картинок нет (как в утверждённом кадре «попытки исчерпаны»)
+  const prev = still ? [] : fr.prev
+  const fsKey = `${qid}|${state}|${fr.shown.join(',')}|${prev.join(',')}|${still}|${ready}`
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fs = useMemo(() => revealFs(state, fr.shown.length, fr.prev.length, still), [fsKey])
+  const fs = useMemo(() => revealFs(state, fr.shown.length, prev.length, still), [fsKey])
   const wordShown = useRef<string | null>(null)
   useStageTl(root, qid && ready ? fsKey : null, (tl, q) => {
     // спилы появляются один раз за вопрос; при смене фазы слово уже стоит
@@ -133,7 +135,7 @@ export function ForestReveal({ qid, imgs, phase, startedAt, phaseSec, short, set
     </S1Screen>
   )
   const v: RevealView = {
-    state, imgs: withSizes(imgs, sizes), shown: fr.shown, prev: fr.prev, still,
+    state, imgs: withSizes(imgs, sizes), shown: fr.shown, prev, still,
     // пока размеры картинок не известны, слово не выводим — иначе спилы мелькнули бы до своего входа
     groups: ready ? groups : [], open, phases: revealPhases(settings, short, typeof phase === 'number' ? { phase, sec: phaseSec ?? undefined } : undefined),
     note, answers,

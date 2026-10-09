@@ -126,7 +126,7 @@ export function SprintScene({ state, n, rootRef, title, total, questions, intro,
     const root = rootRef.current
     if (!root || state === 'intro' || isReview(state)) return
     const colH = 934, gapR = 18, cellH = (colH - gapR * (rows - 1)) / rows
-    const imgH = Math.min(136, Math.floor(cellH - 30))
+    const imgH = Math.min(136, Math.floor(cellH - 52)) // поля вопроса 24+24 и запас
     root.querySelectorAll<HTMLElement>('.spA .sp-img').forEach(e => { e.style.height = imgH < 136 ? `${imgH}px` : '' })
     const its = [...root.querySelectorAll<HTMLElement>('.spA-col .sp-q')]
     shrinkToFit([...root.querySelectorAll<HTMLElement>('.spA-col .sp-t')], () => its.every(e => e.offsetHeight <= cellH + 0.5), 22)

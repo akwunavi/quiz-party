@@ -84,7 +84,7 @@ export function revealBuild(tl: gsap.core.Timeline, q: (s: string) => Element[],
   if (review) {
     // разбор: по лозе под словом бежит свет, спилы по одному переворачиваются — буква выжжена
     // в древесине и тлеет угольком; на рамах картинок распускаются цветы
-    tl.fromTo(q('.rvA-vine-light'), { strokeDashoffset: 1200 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power1.inOut' }, 0.8)
+    tl.fromTo(q('.rvA-vine-light'), { strokeDashoffset: (_: number, el: Element) => parseFloat((el as SVGElement).style.strokeDasharray) || 1200 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power1.inOut' }, 0.8)
       .fromTo(q('.rv-cell:not(.pre)'), { rotationY: -90 }, { rotationY: 0, duration: 0.6, stagger: 0.18, ease: 'back.out(1.4)', transformPerspective: 600 }, 1.0)
       .fromTo(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.25, duration: 0.35, stagger: 0.18, ease: 'power2.out' }, 1.3)
       .to(q('.rv-cell:not(.pre) .rv-ember'), { opacity: 0, scale: 1.6, duration: 0.6, stagger: 0.18 }, 1.65)
@@ -163,7 +163,7 @@ export function Reveal3Scene({ v, n, fs, rootRef, introEmblem, extra }: { v: Rev
       {v.shown.map((i, k) => <span key={i} className="rvA-no" style={{ left: rs[k].x - 4, top: rs[k].y - 4 }}>{i + 1}</span>)}
       {wl.cells.length > 0 && <svg className="rvA-vine" style={{ left: wx0, top: vineTop, width: ww }} viewBox={`0 0 ${ww} 40`} preserveAspectRatio="none" aria-hidden>
         <path className="rvA-vine-s" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
-        <path className="rvA-vine-light" d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
+        <path className="rvA-vine-light" style={ww + 40 > 1200 ? { strokeDasharray: ww + 40, strokeDashoffset: ww + 40 } : undefined} d={`M 0 18 C ${ww * 0.25} 34 ${ww * 0.5} 4 ${ww * 0.75} 22 S ${ww - 20} 14 ${ww} 18`} />
       </svg>}
       {wl.cells.map(c => {
         const pre = v.open.includes(c.flat), open = review || pre
