@@ -1,0 +1,64 @@
+/* ═══ Этап 5 · Лобби: три концепта (A — Сердце леса, B — Полуночный праздник, C — Зеркальное озеро) ═══ */
+.lb3 { position:absolute; inset:0; overflow:hidden; background:#02100d; font-family:'Philosopher', sans-serif; color:#eefff9; --halo: 0 2px 4px rgba(2,12,10,.95), 0 0 20px rgba(2,12,10,.9); }
+.lb3-bg, .lb3-fg { position:absolute; left:0; top:0; width:1920px; height:1080px; will-change:transform; }
+.lb3-bg { z-index:1; } .lb3-fg { z-index:3; pointer-events:none; }
+.lb3-grp-btn { position:absolute; right:60px; top:118px; z-index:14; font:700 26px 'Philosopher', sans-serif; letter-spacing:.06em; color:#f4e6b8; background:rgba(6,26,20,.82); border:1.5px solid rgba(244,230,184,.55); border-radius:999px; padding:12px 28px; cursor:default; }
+/* рандомайзер */
+.rz3 { position:absolute; inset:0; z-index:9; pointer-events:none; }
+.rz-veil { position:absolute; inset:0; z-index:8; opacity:0; pointer-events:none; }
+.rz-vA { background: radial-gradient(ellipse 70% 70% at 55% 55%, rgba(1,10,8,.7), rgba(1,8,6,.84)); }
+.rz-head { position:absolute; left:420px; right:60px; top:36px; text-align:center; opacity:0; display:grid; gap:2px; text-shadow:var(--halo); }
+.rz-head b { font-size:60px; font-weight:700; color:#f4e6b8; } .rz-head span { font-size:34px; color:#cfeee4; }
+.rz-grp { position:absolute; text-align:center; opacity:0; } .rz-sg { display:grid; place-items:center; }
+.rz-gn { font-size:38px; font-weight:700; margin-top:6px; text-shadow:var(--halo); } .k8 .rz-gn { font-size:30px; }
+.rz-n { position:absolute; width:230px; text-align:center; font-size:34px; line-height:1.1; padding:5px 12px; border-radius:999px; background:rgba(5,22,17,.86); border:1.5px solid var(--tc); color:#f4fffa; box-shadow:0 0 14px color-mix(in srgb, var(--tc) 40%, transparent); z-index:10; white-space:nowrap; will-change:transform; }
+.k8 .rz-n { font-size:30px; width:200px; } .rz-n.landed { box-shadow:0 0 18px color-mix(in srgb, var(--tc) 70%, transparent); }
+/* ─── A · Сердце леса ─── */
+.a-team { position:absolute; width:0; height:0; z-index:5; --ls: var(--s); }
+.a-lamp { position:absolute; width:calc(128px * var(--ls) * 1.25); height:calc(126px * var(--ls) * 1.25); left:calc(-64px * var(--ls) * 1.25); top:calc(-112px * var(--ls) * 1.25); overflow:visible; }
+.a-team.compact .a-lamp { left:-176px; width:calc(128px * var(--ls)); height:calc(126px * var(--ls)); top:calc(-112px * var(--ls)); }
+.a-team .nm { position:absolute; left:-170px; width:340px; top:18px; text-align:center; font-size:var(--nm); line-height:1.05; font-weight:700; color:var(--tc); text-shadow:var(--halo), 0 0 26px color-mix(in srgb, var(--tc) 55%, transparent); text-wrap:balance; }
+.a-team.compact .nm { left:-60px; width:238px; top:-52px; text-align:left; transform:translateY(-50%); }
+.a-sg { display:grid; place-items:center; } .a-sg .a-lamp { position:static; width:auto; height:100%; } 
+.a-stele { position:absolute; width:290px; height:400px; z-index:12; }
+.a-stele > svg { position:absolute; left:0; top:0; width:290px; height:400px; overflow:visible; }
+.a-qrbox { position:absolute; left:42px; top:94px; width:206px; height:206px; border-radius:10px; overflow:hidden; box-shadow:0 0 0 6px #1a2620, 0 0 calc(30px * var(--lit)) calc(8px * var(--lit)) rgba(143,243,207,.7); }
+.a-qrbox .m2-qr { width:206px; height:206px; }
+.a-qrcap { position:absolute; left:20px; width:250px; top:318px; text-align:center; font-size:26px; line-height:1.1; color:#cfeee4; text-shadow:var(--halo); }
+.a-wait { position:absolute; left:520px; width:1200px; top:818px; text-align:center; z-index:6; display:grid; gap:8px; text-shadow:var(--halo); } .a-wait b { font-size:70px; font-weight:700; color:#f4e6b8; } .a-wait span { font-size:38px; color:#cfeee4; }
+.a-count { position:absolute; right:60px; top:54px; font-size:40px; color:#cfeee4; text-shadow:var(--halo); z-index:6; } .a-count b { display:inline-block; font-size:52px; color:#f4fffa; }
+.a-ready { position:absolute; right:60px; top:50px; font-size:46px; font-weight:700; color:#ffe2a0; text-shadow:var(--halo), 0 0 30px rgba(255,200,110,.6); z-index:6; opacity:0; }
+/* ─── B · Полуночный праздник ─── */
+.rz-vB { background: radial-gradient(ellipse 70% 70% at 55% 50%, rgba(2,8,18,.68), rgba(2,6,14,.84)); }
+.rz-B .rz-n { border-radius:14px 14px 22px 22px; background:rgba(26,16,6,.82); color:#fff3d0; border-color:#d9b36a; }
+.b-team { position:absolute; width:0; height:0; z-index:5; }
+.b-lan { position:absolute; width:calc(120px * var(--sc, 1)); height:calc(170px * var(--sc, 1)); left:calc(-60px * var(--sc, 1)); top:0; overflow:visible; }
+.b-team .nm { position:absolute; top:calc(70px * var(--sc, 1)); width:var(--nw); font-size:var(--nm); line-height:1.05; font-weight:700; color:var(--tc); text-shadow:var(--halo), 0 0 26px color-mix(in srgb, var(--tc) 55%, transparent); text-wrap:balance; transform:translateY(-50%); }
+.b-team.sideL .nm { right:calc(52px * var(--sc, 1)); text-align:right; } .b-team.sideR .nm { left:calc(52px * var(--sc, 1)); text-align:left; }
+.b-sg { display:grid; place-items:center; } .b-sg .b-lan { position:static; width:auto; height:100%; }
+.b-grade { position:absolute; inset:0; z-index:1; background: linear-gradient(180deg, rgba(4,10,34,.62), rgba(5,18,34,.42) 60%, rgba(2,12,18,.5)); }
+.b-stand { position:absolute; width:270px; height:270px; z-index:12; } .b-stand > svg { position:absolute; left:0; top:0; width:270px; height:270px; overflow:visible; }
+.b-qrbox { position:absolute; left:43px; top:20px; width:184px; height:184px; border-radius:8px; overflow:hidden; box-shadow:0 0 0 5px #3b2713, 0 0 calc(30px * var(--lit)) calc(8px * var(--lit)) rgba(255,214,140,.75); } .b-qrbox .m2-qr { width:184px; height:184px; }
+.b-qrcap { position:absolute; left:20px; width:230px; top:210px; text-align:center; font-size:22px; line-height:1.1; color:#ffe9b8; text-shadow:var(--halo); }
+.b-wait { position:absolute; left:1090px; width:800px; top:900px; text-align:left; z-index:6; display:grid; gap:8px; text-shadow:var(--halo); } .b-wait b { font-size:54px; font-weight:700; color:#ffe9b8; } .b-wait span { font-size:32px; color:#cfeee4; }
+.b-count { position:absolute; right:60px; bottom:34px; font-size:40px; color:#ffe9b8; text-shadow:var(--halo); z-index:6; } .b-count b { display:inline-block; font-size:52px; color:#f4fffa; }
+.b-ready { position:absolute; right:60px; top:50px; font-size:46px; font-weight:700; color:#ffe2a0; text-shadow:var(--halo), 0 0 30px rgba(255,200,110,.6); z-index:6; opacity:0; }
+/* ─── C · Зеркальное озеро ─── */
+.rz-vC { background: radial-gradient(ellipse 70% 70% at 55% 62%, rgba(1,12,10,.52), rgba(1,9,8,.74)); }
+.rz-C .rz-n { background:rgba(4,30,26,.82); border-color:var(--tc); }
+.c-team { position:absolute; width:0; height:0; z-index:5; }
+.c-orb { position:absolute; width:calc(160px * var(--s) * 0.9); height:calc(190px * var(--s) * 0.9); left:calc(-80px * var(--s) * 0.9); top:calc(-64px * var(--s) * 0.9); overflow:visible; }
+.c-team .nm { position:absolute; left:-165px; width:330px; top:calc(44px * var(--s)); text-align:center; font-size:var(--nm); line-height:1.05; font-weight:700; color:var(--tc); text-shadow:var(--halo), 0 0 26px color-mix(in srgb, var(--tc) 55%, transparent); text-wrap:balance; }
+.c-sg { display:grid; place-items:center; } .c-sg .c-orb { position:static; width:auto; height:100%; }
+.c-stele { position:absolute; width:290px; height:400px; z-index:12; } .c-stele > svg { position:absolute; left:0; top:0; width:290px; height:400px; overflow:visible; }
+.c-qrbox { position:absolute; left:42px; top:94px; width:206px; height:206px; border-radius:10px; overflow:hidden; box-shadow:0 0 0 6px #1a2620, 0 0 calc(30px * var(--lit)) calc(8px * var(--lit)) rgba(159,248,220,.7); } .c-qrbox .m2-qr { width:206px; height:206px; }
+.c-qrcap { position:absolute; left:20px; width:250px; top:318px; text-align:center; font-size:26px; line-height:1.1; color:#cfeee4; text-shadow:var(--halo); }
+.c-wait { position:absolute; left:520px; width:1300px; top:820px; text-align:center; z-index:6; display:grid; gap:8px; text-shadow:var(--halo); } .c-wait b { font-size:68px; font-weight:700; color:#e4fff6; } .c-wait span { font-size:36px; color:#cfeee4; }
+.c-count { position:absolute; right:60px; top:54px; font-size:40px; color:#cfeee4; text-shadow:var(--halo); z-index:6; } .c-count b { display:inline-block; font-size:52px; color:#f4fffa; }
+.c-ready { position:absolute; right:60px; top:50px; font-size:46px; font-weight:700; color:#ffe2a0; text-shadow:var(--halo), 0 0 30px rgba(255,200,110,.6); z-index:6; opacity:0; }
+.c-reflwrap { position:absolute; left:0; top:500px; width:1920px; height:580px; overflow:hidden; z-index:2; pointer-events:none; -webkit-mask-image:linear-gradient(#000 0%, rgba(0,0,0,.5) 35%, transparent 80%); mask-image:linear-gradient(#000 0%, rgba(0,0,0,.5) 35%, transparent 80%); }
+.c-refl { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; transform:translateY(500px) scaleY(-1); filter:url(#cRipple) blur(.8px) saturate(.85) brightness(.8); opacity:.62; }
+.a-beam { position:absolute; left:960px; top:0; width:360px; height:1080px; margin-left:-180px; z-index:7; opacity:0; background:linear-gradient(90deg, rgba(255,240,196,0), rgba(255,240,196,.75) 50%, rgba(255,240,196,0)); pointer-events:none; }
+.ho-title { z-index:30; }
+.ho-svg { z-index:29; }
+.c-mist { position:absolute; left:0; top:0; width:1920px; height:1500px; z-index:9; transform:translateY(1100px); pointer-events:none; background:linear-gradient(180deg, rgba(120,230,200,0) 0, rgba(120,230,200,.5) 24%, rgba(60,170,150,.78) 100%); }

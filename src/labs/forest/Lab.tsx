@@ -22,13 +22,14 @@ import { Order, ORDER_STATES, ORDER_VARIANTS } from './stage3/Order'
 import { Crossword, CW_STATES, CW_VARIANTS } from './stage3/Crossword'
 import { Std, STD_STATES, STD_VARIANTS } from './stage4/Std'
 import { Lobby, LOBBY_STATES, LOBBY_VARIANTS } from './stage5/Lobby'
+import { LobbyConcepts, LB_STATES, LB_VARIANTS } from './stage5/lobby/Concepts'
 import { Rules, RULES_STATES, RULES_VARIANTS } from './stage5/Rules'
 import { Intro5, RINT_STATES, RINT_VARIANTS } from './stage5/Intro5'
 import { Board, BOARD_STATES, BOARD_VARIANTS } from './stage5/Board'
 import { Finale, FIN_STATES, FIN_VARIANTS } from './stage5/Finale'
 import { Trans, TRANS_STATES, TRANS_VARIANTS } from './stage5/Trans'
 
-type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw' | 'std' | 'lobby' | 'rules' | 'rint' | 'board' | 'fin' | 'trans'
+type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw' | 'std' | 'lobby' | 'lobby3' | 'rules' | 'rint' | 'board' | 'fin' | 'trans'
 type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** с какого состояния открывать раздел */ start: number }
 const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, start: 2 },
@@ -41,6 +42,7 @@ const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   order: { name: 'Порядок', C: Order, states: ORDER_STATES, variants: ORDER_VARIANTS, normal: 24, start: 0 },
   cw: { name: 'Кроссворд', C: Crossword, states: CW_STATES, variants: CW_VARIANTS, normal: 30, start: 0 },
   std: { name: 'Обычные вопросы и разборы', C: Std, states: STD_STATES, variants: STD_VARIANTS, normal: 30, start: 0 },
+  lobby3: { name: 'Лобби — три концепта', C: LobbyConcepts, states: LB_STATES, variants: LB_VARIANTS, normal: 0, start: 0 },
   lobby: { name: 'Лобби и рандомайзер', C: Lobby, states: LOBBY_STATES, variants: LOBBY_VARIANTS, normal: 0, start: 0 },
   rules: { name: 'Правила', C: Rules, states: RULES_STATES, variants: RULES_VARIANTS, normal: 0, start: 0 },
   rint: { name: 'Вступления раундов', C: Intro5, states: RINT_STATES, variants: RINT_VARIANTS, normal: 0, start: 0 },
@@ -52,10 +54,10 @@ const GROUPS: [string, [Sec, string][]][] = [
   ['Утверждено', [['media', 'Вопросы с фото'], ['sprint', '120 секунд'], ['blitz', 'Блиц'], ['reveal', 'Три попытки'], ['jp', 'Своя игра'], ['mel', 'Угадай мелодию'], ['scr', 'Скрэмбл'], ['match', 'Сопоставление'], ['order', 'Порядок']]],
   ['Этап 3 — в работе', [['cw', 'Кроссворд']]],
   ['Этап 4 — в работе', [['std', 'Обычные вопросы и разборы']]],
-  ['Этап 5 — в работе', [['lobby', 'Лобби и рандомайзер'], ['rules', 'Правила'], ['rint', 'Вступления раундов'], ['board', 'Табло'], ['fin', 'Финал'], ['trans', 'Переходы']]],
+  ['Этап 5 — в работе', [['lobby3', 'Лобби — три концепта'], ['rules', 'Правила'], ['rint', 'Вступления раундов'], ['board', 'Табло'], ['fin', 'Финал'], ['trans', 'Переходы']]],
 ]
 function readMech() {
-  const m = /^#s1-(sprint|blitz|reveal|jp|mel|scr|match|order|cw|std|lobby|rules|rint|board|fin|trans)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
+  const m = /^#s1-(sprint|blitz|reveal|jp|mel|scr|match|order|cw|std|lobby3|lobby|rules|rint|board|fin|trans)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
   return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], teams: Number(m[4] ?? 5), at: m[5] ?? '' } : null
 }
 import { STATES, TOTAL, phaseOf, type StateId } from './content'

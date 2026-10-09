@@ -136,10 +136,10 @@ npx vite build
 ```
 
 Тесты проверяй не только по цвету, но и **по числу**: сейчас должно быть
-**730 пройденных тестов + 7 todo (737 всего) в 72 файлах** (итоговая
-строка `npx vitest run`: «Test Files 69 passed | 3 skipped (72)» — три
+**734 пройденных теста + 7 todo (741 всего) в 73 файлах** (итоговая
+строка `npx vitest run`: «Test Files 70 passed | 3 skipped (73)» — три
 файла это `it.todo`-заглушки для гонок без render-стенда (§3bu), целиком
-«skipped», отсюда 68, а не 71, в счётчике «passed»). 726→730 при 9.90 — `src/ny/__tests__/density.test.ts`: плотность и узнавание ny-тем (HANDOFF §3cl). 723→726 при 9.89 —
+«skipped», отсюда 70, а не 73, в счётчике «passed»). 730→734 при 10.18 — `stage5/lobby/__tests__/lobby3.test.ts`: раскладка лобби Леса без пустых мест, составы рандомайзера (HANDOFF §3da). 726→730 при 9.90 — `src/ny/__tests__/density.test.ts`: плотность и узнавание ny-тем (HANDOFF §3cl). 723→726 при 9.89 —
 `lab.test.ts`: два мира, флаг навигации, нагрузка лобби (HANDOFF §3ck). 718→723 при 9.88 —
 `src/labs/newyear/__tests__/lab.test.ts` переписан под Фазу 2 (HANDOFF §3cj). 711→718 при 9.87 —
 `src/labs/newyear/__tests__/lab.test.ts` (New Year Mockup Lab, HANDOFF §3ci). 710→711 при 9.86 —
