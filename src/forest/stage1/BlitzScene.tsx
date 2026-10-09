@@ -133,6 +133,8 @@ export function blitzBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], 
 
 const LIVE = (s: BzState) => s === 'question' || s === 'warning'
 
+/** эмблема вступления раунда (её же берёт заставка раунда в игре — forest/stage5/Intro5.tsx) */
+export const BLITZ_INTRO_EMBLEM = <svg viewBox="0 0 160 160" width="190"><circle cx="80" cy="80" r="60" fill="#4b331d" /><circle cx="80" cy="80" r="50" fill="#8a6a42" />{[40, 30, 20, 10].map(r => <circle key={r} cx="80" cy="80" r={r} fill="none" stroke="#5a3f22" strokeWidth="2" />)}<path d="M 86 20 L 64 84 L 84 84 L 70 140 L 104 66 L 84 66 Z" fill="#ffe3a0" /></svg>
 export function BlitzScene({ v, rootRef, introEmblem, extra }: { v: BlitzView; rootRef: React.RefObject<HTMLDivElement>; introEmblem?: ReactNode; extra?: ReactNode }) {
   const state = v.state
   const fonts = useFontsReady()
@@ -161,7 +163,7 @@ export function BlitzScene({ v, rootRef, introEmblem, extra }: { v: BlitzView; r
 
   if (state === 'intro') return (
     <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={rootRef} cls="bz bzC" moodOverride={mood}>
-      {v.intro && <RoundIntro intro={v.intro} emblem={introEmblem ?? <svg viewBox="0 0 160 160" width="190"><circle cx="80" cy="80" r="60" fill="#4b331d" /><circle cx="80" cy="80" r="50" fill="#8a6a42" />{[40, 30, 20, 10].map(r => <circle key={r} cx="80" cy="80" r={r} fill="none" stroke="#5a3f22" strokeWidth="2" />)}<path d="M 86 20 L 64 84 L 84 84 L 70 140 L 104 66 L 84 66 Z" fill="#ffe3a0" /></svg>} />}
+      {v.intro && <RoundIntro intro={v.intro} emblem={introEmblem ?? BLITZ_INTRO_EMBLEM} />}
     </S1Screen>
   )
 

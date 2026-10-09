@@ -8,31 +8,17 @@
 // Данные приходят пропсами (StdData): в лаборатории — тестовые (labs/forest/stdLab.tsx), в игре — настоящий вопрос
 // (forest/stage4/ReviewGame.tsx). Куски таймлайна (вход, показ, ответы команд, вердикт) — общие: лаборатория
 // собирает их в один перематываемый таймлайн, игра запускает по настоящим событиям (показ ответа, проверка).
-import { useEffect, useRef, type ReactNode } from 'react'
-import gsap from 'gsap'
+import type { ReactNode } from 'react'
 import { S1Screen } from '../stage1/common'
 import type { Rect } from '../stage1/env'
-import { makeFrames, type FRect } from '../stage1/mediaFrames'
+import { type FRect } from '../stage1/mediaFrames'
+import { FrameLayer, fitRect, type FS } from './frames'
 import { TeamCol, type TeamPhase, type TeamRow } from './TeamStrip'
 import { fitFs, type ColLay } from './teamLayout'
 
-export type FS = { grow: number[]; reveal: number[]; bloom: number[]; pulse: number }
 export const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-
-/** Рамы из ветвей (утверждённая техника Концепта C) на холсте под содержимым */
-export function FrameLayer({ rects, srcs, fs, panel }: { rects: FRect[]; srcs: string[]; fs: FS; panel?: number }) {
-  const cv = useRef<HTMLCanvasElement>(null)
-  useEffect(() => {
-    const ctx = cv.current!.getContext('2d')!, draw0 = makeFrames({ rects, srcs, panel }, 40)
-    const draw = () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1920, 1080); draw0(ctx, fs) }
-    gsap.ticker.add(draw); return () => gsap.ticker.remove(draw)
-  }, [rects, srcs, fs, panel])
-  return <canvas ref={cv} className="s4-cv" width={1920} height={1080} aria-hidden />
-}
-export function fitRect(im: { w: number; h: number }, cx: number, y: number, maxW: number, maxH: number): FRect {
-  const k = Math.min(maxW / im.w, maxH / im.h), w = Math.round(im.w * k), h = Math.round(im.h * k)
-  return { x: Math.round(cx - w / 2), y, w, h }
-}
+// рамы из ветвей — в frames.tsx (их берёт и слайд правил, не втягивая этот файл); здесь реэкспорт для прежних импортов
+export { FrameLayer, fitRect, type FS }
 
 export type StdKind = 'text' | 'mc' | 'img' | 'imgopt'
 /** фото разбора; video — место под скрытое видео вопроса (рама вокруг, само видео кладёт игра поверх) */

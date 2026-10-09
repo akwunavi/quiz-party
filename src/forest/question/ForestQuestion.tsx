@@ -19,13 +19,15 @@ export type ForestQ = {
   answerText?: string
 }
 
-export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm }: {
+export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from }: {
   q: ForestQ; roundName: string; qno: string
   startedAt: string | null; seconds: number
   /** ответ показан (gameState.reveal или экран разбора) */
   reveal: boolean
   /** без звука гонга и без отсчёта (предпросмотр) */
   calm?: boolean
+  /** с какой главы играть появление (повтор вопросов: слайд короткий — сразу «Открывается вопрос», без затихания леса) */
+  from?: string
 }) {
   useForestScene({ hidden: true }, 'fq')
   const sizes = useImageSizes(q.images)
@@ -47,9 +49,10 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
     api.current = a
     // ответ уже показан (обновили страницу / вернулись к вопросу) — сразу к последней главе, без повторного вступления
     if (revealRef.current && a.tl.labels.E !== undefined) a.tl.play('E')
+    else if (from && a.tl.labels[from] !== undefined) a.tl.play(from)
     else a.tl.restart()
     push()
-  }, [push])
+  }, [push, from])
   const correct = useMemo(() => ({ key: q.correctKey, text: q.answerText }), [q.correctKey, q.answerText])
   if (!layout) return <div className="fr-root fr-wait" />
   return <Scene key={`${q.id}-${reveal ? 'a' : 'q'}`} layout={layout} correct={correct} roundName={roundName} qno={qno}
