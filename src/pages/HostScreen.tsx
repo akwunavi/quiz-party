@@ -32,6 +32,8 @@ import { ThemeLayer } from '../components/ThemeLayer'
 import { isNyTheme, isPlainQuestion } from '../ny/density'
 import { isForestTheme } from '../forest/config'
 import { ForestLobby } from '../forest/lobby/ForestLobby'
+import { ForestSprintReview, ForestBlitz } from '../forest/rounds/ForestRounds'
+import { teamTone } from '../forest/rounds/views'
 import { NyLobby } from '../ny/NyLobby'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
@@ -428,6 +430,15 @@ function HostInner({ gameState, pack }: {
 
   // ── «120 секунд»: все вопросы на слайде ──
   if (gameState.phase === 'question' && round.mechanic === 'sprint') {
+    // «Волшебный лес»: сцена во весь кадр оболочки, без обёртки .host-screen (её 100vh не совпадает с кадром 1920×1080)
+    if (isForestTheme(pack.theme)) return (
+      <>
+        <SprintBoard pack={pack} round={round} gameState={gameState} timerNode={null} />
+        <div className="host-actions">
+          <button className="ghost dark" onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
+        </div>
+      </>
+    )
     return (
       <div className="host-screen grid-bg">
         <SprintBoard pack={pack} round={round} gameState={gameState}
@@ -1250,6 +1261,35 @@ function BlitzScreen({ pack, round, gameState }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cur?.verdict, cur?.lastAnswer])
 
+  // «Волшебный лес»: деревца-часы. Ход раунда (кубик, автопроверка, запись итогов) — эффекты выше, без изменений;
+  // сцена получает то же состояние блица, что BlitzBoard, и сама ничего не пишет.
+  if (isForestTheme(pack.theme)) {
+    return (
+      <>
+        <ForestBlitz state={state} teams={teams} bank={bank} teamSeconds={settings.teamSeconds ?? 60}
+          penalty={settings.timeoutPenalty ?? 10}
+          question={id => { const rq = round.questions.find(x => x.id === id); return rq ? { text: rq.question_text, answer: displayAnswer(rq as Question) } : undefined }} />
+        <div className="host-actions">
+          {state?.finished ? <AfterRoundNav pack={pack} gameState={gameState} /> : state && <>
+            {cur?.verdict && (
+              <button className="ghost" onClick={() => {
+                const now = Date.now()
+                const r = resumeAfterCheck(state, now)
+                void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
+              }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
+            )}
+            {cur && cur.verdict !== 'ok' && (
+              <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>Скип −1</button>
+            )}
+            <button className="ghost dark" onClick={() => {
+              if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state))
+            }}>Завершить раунд</button>
+          </>}
+        </div>
+      </>
+    )
+  }
+
   if (!state) {
     return (
       <div className="host-screen grid-bg bz-screen">
@@ -1680,6 +1720,32 @@ function ShowAnswers({ pack, round, q, gameState }: {
   // Звук, приложенный к ОТВЕТУ. Раньше из медиа ответа брались только
   // картинки, а mp3 молча выбрасывался — вставленный трек не играл вообще.
   const answerAudio = (q.media.answer ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
+
+  // «Волшебный лес», «120 секунд»: утверждённый разбор (вопрос → ответ-цветок → ответы команд). Логика выше общая:
+  // авто-показ через 3 с, вердикты — только после полного показа ответа (checked), та же автопроверка.
+  if (isForestTheme(pack.theme) && round.mechanic === 'sprint') {
+    return (
+      <>
+        <ForestSprintReview title={round.title_lines.join(' ')} count={total} step={step}
+          q={{ text: q.question_text, answer: displayAnswer(q) }} shown={revealed} verdicts={checked}
+          answers={paper ? null : rows.map(a => {
+            const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
+            return { team: team?.name ?? '—', color: teamTone(team?.color), text: a.answer_text || '—',
+              ok: checked ? (a.is_correct ?? autocheck(q.answer, a.answer_text)) : null }
+          })}
+          qImgs={q.media.hidden ? [] : questionImgs.map(mediaUrl)} aImgs={revealImgs.map(mediaUrl)} note={q.answer_note || undefined}
+          extra={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null} />
+        <div className="host-actions">
+          {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
+          {!revealed
+            ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
+            : step < total - 1
+              ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
+              : <AfterRoundNav pack={pack} gameState={gameState} />}
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}

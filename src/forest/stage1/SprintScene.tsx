@@ -171,6 +171,8 @@ export function SprintScene({ state, n, rootRef, title, total, questions, intro,
         if (teams.offsetTop + teams.offsetHeight <= 1050) break
       }
     }
+    // rv сводится к rvKey (по содержимому): новый объект на каждый рендер не должен перезапускать замер
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rvKey, state, fonts, rootRef])
 
   if (state === 'intro') {
