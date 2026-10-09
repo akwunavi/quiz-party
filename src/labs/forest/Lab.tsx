@@ -15,8 +15,8 @@ import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from '../../forest/stage1/Spri
 import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from '../../forest/stage1/Blitz'
 import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from '../../forest/stage1/Reveal3'
 import type { S1Props, Variant } from '../../forest/stage1/common'
-import { Jeopardy, JP_STATES, JP_VARIANTS } from '../../forest/stage2/Jeopardy'
-import { Melody, MEL_STATES, MEL_VARIANTS } from '../../forest/stage2/Melody'
+import { JeopardyLab, JP_STATES, JP_VARIANTS } from './jeopardyLab'
+import { MelodyLab, MEL_STATES, MEL_VARIANTS } from './melodyLab'
 import { Scramble, SCR_STATES, SCR_VARIANTS } from './scrambleLab'
 import { Match, MATCH_STATES, MATCH_VARIANTS } from '../../forest/stage3/Match'
 import { Order, ORDER_STATES, ORDER_VARIANTS } from '../../forest/stage3/Order'
@@ -35,8 +35,8 @@ const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, start: 2 },
   blitz: { name: 'Блиц', C: Blitz, states: BLITZ_STATES, variants: BLITZ_VARIANTS, normal: 38, start: 2 },
   reveal: { name: 'Три попытки', C: Reveal3, states: REVEAL_STATES, variants: REVEAL_VARIANTS, normal: 24, start: 1 },
-  jp: { name: 'Своя игра', C: Jeopardy, states: JP_STATES, variants: JP_VARIANTS, normal: 24, start: 1 },
-  mel: { name: 'Угадай мелодию', C: Melody, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24, start: 1 },
+  jp: { name: 'Своя игра', C: JeopardyLab, states: JP_STATES, variants: JP_VARIANTS, normal: 24, start: 1 },
+  mel: { name: 'Угадай мелодию', C: MelodyLab, states: MEL_STATES, variants: MEL_VARIANTS, normal: 24, start: 1 },
   scr: { name: 'Скрэмбл', C: Scramble, states: SCR_STATES, variants: SCR_VARIANTS, normal: 24, start: 0 },
   match: { name: 'Сопоставление', C: Match, states: MATCH_STATES, variants: MATCH_VARIANTS, normal: 24, start: 0 },
   order: { name: 'Порядок', C: Order, states: ORDER_STATES, variants: ORDER_VARIANTS, normal: 24, start: 0 },
