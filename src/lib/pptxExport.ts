@@ -375,6 +375,11 @@ const THEME_COLORS: Record<ThemeKey, {
     bg: '0a1a3d', panel: '16356a', panelLine: 'd9b25c', text: 'fff4dc', muted: 'cfe0ff',
     accent: 'f0c96a', accent2: 'c8323a', danger: 'c8323a',
   },
+  // «Волшебный лес»: тёмный изумруд, мятный свет и тёплое золото — те же токены, что у лаборатории Леса.
+  enchanted_forest: {
+    bg: '03100d', panel: '0a2a22', panelLine: '3f7a56', text: 'eefff9', muted: 'a9d8c6',
+    accent: 'ffd68a', accent2: '7ff4cf', danger: 'ff8f6a',
+  },
 }
 
 const MIME_BY_EXT: Record<string, string> = {

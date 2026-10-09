@@ -30,6 +30,8 @@ import {
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { isNyTheme, isPlainQuestion } from '../ny/density'
+import { isForestTheme } from '../forest/config'
+import { ForestLobby } from '../forest/lobby/ForestLobby'
 import { NyLobby } from '../ny/NyLobby'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
@@ -206,6 +208,31 @@ function HostInner({ gameState, pack }: {
   // ── Лобби / выбор пакета ──
   const paperMode = pack?.settings?.play_mode === 'paper'
 
+  // Кнопки резервной навигации лобби (на проекторе «Леса» скрыты стилем, видны только при ?nav=1)
+  const lobbyActions = (
+    <div className="host-actions">
+      <button className="ghost dark" onClick={() => {
+        if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
+      }}>⟲ Сменить пакет</button>
+      <button onClick={() => void (pack?.settings?.show_intro
+        ? startIntro()
+        : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
+        К первому раунду →</button>
+    </div>
+  )
+  // «Волшебный лес»: лобби — утверждённая композиция «Полуночный праздник» (src/forest/lobby)
+  if (gameState.phase === 'lobby' && gameState.pack_id && pack && isForestTheme(pack.theme)) {
+    return (
+      <>
+        <LobbyMusic pack={pack} />
+        <ForestLobby teams={lobbyTeams.map(t => ({ id: t.id, name: t.name, color: t.color, alive: isAlive(t) }))}
+          playerUrl={playerUrl} paper={paperMode} groups={groups}
+          groupsOpen={groupsOpen} onGroupsOpen={() => setGroupsOpen(true)} onGroupsClose={() => setGroupsOpen(false)} />
+        {lobbyActions}
+      </>
+    )
+  }
+
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
       <div className={`host-screen grid-bg lobby-screen${paperMode ? ' paper-lobby' : ''}`}>
@@ -302,15 +329,7 @@ function HostInner({ gameState, pack }: {
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
             </>)}
-            <div className="host-actions">
-              <button className="ghost dark" onClick={() => {
-                if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
-              }}>⟲ Сменить пакет</button>
-              <button onClick={() => void (pack?.settings?.show_intro
-                ? startIntro()
-                : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
-                К первому раунду →</button>
-            </div>
+            {lobbyActions}
           </>
         )}
       </div>

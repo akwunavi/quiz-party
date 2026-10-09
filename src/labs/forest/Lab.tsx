@@ -9,27 +9,26 @@
 // эффекты смены ключа срабатывают после монтажа следующей сцены).
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Stage } from '../magic2/common'
-import { Scene, type SceneApi, type Mode } from './Scene'
-import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from './stage1/Sprint'
-import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from './stage1/Blitz'
-import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from './stage1/Reveal3'
-import type { S1Props, Variant } from './stage1/common'
-import { Jeopardy, JP_STATES, JP_VARIANTS } from './stage2/Jeopardy'
-import { Melody, MEL_STATES, MEL_VARIANTS } from './stage2/Melody'
-import { Scramble, SCR_STATES, SCR_VARIANTS } from './stage3/Scramble'
-import { Match, MATCH_STATES, MATCH_VARIANTS } from './stage3/Match'
-import { Order, ORDER_STATES, ORDER_VARIANTS } from './stage3/Order'
-import { Crossword, CW_STATES, CW_VARIANTS } from './stage3/Crossword'
-import { Std, STD_STATES, STD_VARIANTS } from './stage4/Std'
-import { Lobby, LOBBY_STATES, LOBBY_VARIANTS } from './stage5/Lobby'
-import { LobbyConcepts, LB_STATES, LB_VARIANTS } from './stage5/lobby/Concepts'
-import { Rules, RULES_STATES, RULES_VARIANTS } from './stage5/Rules'
-import { Intro5, RINT_STATES, RINT_VARIANTS } from './stage5/Intro5'
-import { Board, BOARD_STATES, BOARD_VARIANTS } from './stage5/Board'
-import { Finale, FIN_STATES, FIN_VARIANTS } from './stage5/Finale'
-import { Trans, TRANS_STATES, TRANS_VARIANTS } from './stage5/Trans'
+import { Scene, type SceneApi, type Mode } from '../../forest/Scene'
+import { Sprint, SPRINT_STATES, SPRINT_VARIANTS } from '../../forest/stage1/Sprint'
+import { Blitz, BLITZ_STATES, BLITZ_VARIANTS } from '../../forest/stage1/Blitz'
+import { Reveal3, REVEAL_STATES, REVEAL_VARIANTS } from '../../forest/stage1/Reveal3'
+import type { S1Props, Variant } from '../../forest/stage1/common'
+import { Jeopardy, JP_STATES, JP_VARIANTS } from '../../forest/stage2/Jeopardy'
+import { Melody, MEL_STATES, MEL_VARIANTS } from '../../forest/stage2/Melody'
+import { Scramble, SCR_STATES, SCR_VARIANTS } from '../../forest/stage3/Scramble'
+import { Match, MATCH_STATES, MATCH_VARIANTS } from '../../forest/stage3/Match'
+import { Order, ORDER_STATES, ORDER_VARIANTS } from '../../forest/stage3/Order'
+import { Crossword, CW_STATES, CW_VARIANTS } from '../../forest/stage3/Crossword'
+import { Std, STD_STATES, STD_VARIANTS } from '../../forest/stage4/Std'
+import { LobbyLab, LB_STATES, LB_VARIANTS } from './lobbyLab'
+import { Rules, RULES_STATES, RULES_VARIANTS } from '../../forest/stage5/Rules'
+import { Intro5, RINT_STATES, RINT_VARIANTS } from '../../forest/stage5/Intro5'
+import { Board, BOARD_STATES, BOARD_VARIANTS } from '../../forest/stage5/Board'
+import { Finale, FIN_STATES, FIN_VARIANTS } from '../../forest/stage5/Finale'
+import { Trans, TRANS_STATES, TRANS_VARIANTS } from '../../forest/stage5/Trans'
 
-type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw' | 'std' | 'lobby' | 'lobby3' | 'rules' | 'rint' | 'board' | 'fin' | 'trans'
+type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw' | 'std' | 'lobby3' | 'rules' | 'rint' | 'board' | 'fin' | 'trans'
 type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** с какого состояния открывать раздел */ start: number }
 const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   sprint: { name: '120 секунд', C: Sprint, states: SPRINT_STATES, variants: SPRINT_VARIANTS, normal: 87, start: 2 },
@@ -42,8 +41,7 @@ const MECHS: Record<Exclude<Sec, 'media'>, Mech> = {
   order: { name: 'Порядок', C: Order, states: ORDER_STATES, variants: ORDER_VARIANTS, normal: 24, start: 0 },
   cw: { name: 'Кроссворд', C: Crossword, states: CW_STATES, variants: CW_VARIANTS, normal: 30, start: 0 },
   std: { name: 'Обычные вопросы и разборы', C: Std, states: STD_STATES, variants: STD_VARIANTS, normal: 30, start: 0 },
-  lobby3: { name: 'Лобби — три концепта', C: LobbyConcepts, states: LB_STATES, variants: LB_VARIANTS, normal: 0, start: 0 },
-  lobby: { name: 'Лобби и рандомайзер', C: Lobby, states: LOBBY_STATES, variants: LOBBY_VARIANTS, normal: 0, start: 0 },
+  lobby3: { name: 'Лобби и рандомайзер', C: LobbyLab, states: LB_STATES, variants: LB_VARIANTS, normal: 0, start: 0 },
   rules: { name: 'Правила', C: Rules, states: RULES_STATES, variants: RULES_VARIANTS, normal: 0, start: 0 },
   rint: { name: 'Вступления раундов', C: Intro5, states: RINT_STATES, variants: RINT_VARIANTS, normal: 0, start: 0 },
   board: { name: 'Табло', C: Board, states: BOARD_STATES, variants: BOARD_VARIANTS, normal: 0, start: 0 },
@@ -54,13 +52,13 @@ const GROUPS: [string, [Sec, string][]][] = [
   ['Утверждено', [['media', 'Вопросы с фото'], ['sprint', '120 секунд'], ['blitz', 'Блиц'], ['reveal', 'Три попытки'], ['jp', 'Своя игра'], ['mel', 'Угадай мелодию'], ['scr', 'Скрэмбл'], ['match', 'Сопоставление'], ['order', 'Порядок']]],
   ['Этап 3 — в работе', [['cw', 'Кроссворд']]],
   ['Этап 4 — в работе', [['std', 'Обычные вопросы и разборы']]],
-  ['Этап 5 — в работе', [['lobby3', 'Лобби — три концепта'], ['rules', 'Правила'], ['rint', 'Вступления раундов'], ['board', 'Табло'], ['fin', 'Финал'], ['trans', 'Переходы']]],
+  ['Этап 5 — в работе', [['lobby3', 'Лобби и рандомайзер'], ['rules', 'Правила'], ['rint', 'Вступления раундов'], ['board', 'Табло'], ['fin', 'Финал'], ['trans', 'Переходы']]],
 ]
 function readMech() {
-  const m = /^#s1-(sprint|blitz|reveal|jp|mel|scr|match|order|cw|std|lobby3|lobby|rules|rint|board|fin|trans)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
+  const m = /^#s1-(sprint|blitz|reveal|jp|mel|scr|match|order|cw|std|lobby3|rules|rint|board|fin|trans)-([ABC])-(\w+?)(?:-n(\d+))?(?:-(end|[\d.]+))?$/.exec(location.hash)
   return m ? { sec: m[1] as Sec, mv: m[2] as Variant, ms: m[3], teams: Number(m[4] ?? 5), at: m[5] ?? '' } : null
 }
-import { STATES, TOTAL, phaseOf, type StateId } from './content'
+import { STATES, TOTAL, phaseOf, type StateId } from '../../forest/content'
 
 /** Карта этапа 4: что покрывает вопросы и где лежит разбор каждой механики (прыжок на готовый экран) */
 const MAP_Q: [string, string][] = [['Текст и варианты', 'mc'], ['Фото без вариантов', 'img1open'], ['Фото и варианты', 'img1opt'], ['Вертикальное фото', 'port'], ['Два фото', 'two'], ['Три фото-варианта', 'three'], ['Четыре фото-варианта', 'four'], ['Слово из 6 букв', 'six'], ['Длинный текст + фото', 'long'], ['Длинный текст, два фото', 'long2']]
@@ -139,8 +137,8 @@ export function Lab() {
   const jump = (t: number, keepPlaying = false) => { const a = api.current; if (!a) return; a.tl.seek(t); if (keepPlaying) { a.tl.play(); setPlaying(true) } else { a.tl.pause(); setPlaying(false) } paint() }
   const setOv = (n: number | null) => { ov.current = n; setOvr(n); paint() }
   const M = sec === 'media' ? null : MECHS[sec]
-  const scene = M ? <div className="c7 fr" key={`${sec}-${mv}-${ms}-${teams}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} teams={teams} /></div>
-    : <div className="c7 fr" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} answer={answer} onReady={onReady} /></div>
+  const scene = M ? <div className="c7 fr theme-enchanted_forest" key={`${sec}-${mv}-${ms}-${teams}-${run}`}><M.C variant={mv} state={ms} nOv={null} onReady={onReady} teams={teams} /></div>
+    : <div className="c7 fr theme-enchanted_forest" key={`${v}-${s}-${run}`}><Scene state={s} mode={v} answer={answer} onReady={onReady} /></div>
   if (embed) return <div className="m2-embed"><Stage>{scene}</Stage></div>
   return (
     <div className="m2-lab">
