@@ -1,0 +1,38 @@
+[
+  {
+    "source": "SNIFF",
+    "frame": 12,
+    "raw_iou": 0.9245,
+    "best_iou": 0.9462,
+    "scale": 0.993,
+    "dx": -5.1,
+    "dy": 0.9
+  },
+  {
+    "source": "SNIFF",
+    "frame": 224,
+    "raw_iou": 0.5733,
+    "best_iou": 0.6105,
+    "scale": 0.902,
+    "dx": 9.4,
+    "dy": -19.1
+  },
+  {
+    "source": "SNIFF",
+    "frame": 240,
+    "raw_iou": 0.4677,
+    "best_iou": 0.5934,
+    "scale": 0.958,
+    "dx": -111.0,
+    "dy": 7.1
+  },
+  {
+    "source": "RUN",
+    "frame": 59,
+    "raw_iou": 0.6322,
+    "best_iou": 0.6581,
+    "scale": 1.003,
+    "dx": -23.6,
+    "dy": -8.6
+  }
+]
