@@ -96,6 +96,8 @@ export function sprintMarksTl(tl: gsap.core.Timeline, q: (s: string) => Element[
     .fromTo(q('.spA-ta.no .txt'), { textDecorationColor: 'rgba(255,170,140,0)' }, { textDecorationColor: 'rgba(255,170,140,.8)', duration: 0.3, stagger: 0.12 }, at + 0.1)
 }
 
+/** эмблема вступления раунда (её же берёт заставка раунда в игре — forest/stage5/Intro5.tsx) */
+export const SPRINT_INTRO_EMBLEM = <Dandelion n={120} total={120} size={170} seeds={24} />
 const NBSP = String.fromCharCode(160)
 const isReview = (s: string) => s === 'review' || s === 'reveal' || s === 'reveal7'
 
@@ -178,7 +180,7 @@ export function SprintScene({ state, n, rootRef, title, total, questions, intro,
   if (state === 'intro') {
     return (
       <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={rootRef} cls="spA" moodOverride={mood}>
-        {intro && <RoundIntro intro={intro} emblem={introEmblem ?? <Dandelion n={120} total={120} size={170} seeds={24} />} />}
+        {intro && <RoundIntro intro={intro} emblem={introEmblem ?? SPRINT_INTRO_EMBLEM} />}
       </S1Screen>
     )
   }

@@ -23,11 +23,10 @@ import { Order, ORDER_STATES, ORDER_VARIANTS } from '../../forest/stage3/Order'
 import { Crossword, CW_STATES, CW_VARIANTS } from './crosswordLab'
 import { Std, STD_STATES, STD_VARIANTS } from '../../forest/stage4/Std'
 import { LobbyLab, LB_STATES, LB_VARIANTS } from './lobbyLab'
-import { Rules, RULES_STATES, RULES_VARIANTS } from '../../forest/stage5/Rules'
-import { Intro5, RINT_STATES, RINT_VARIANTS } from '../../forest/stage5/Intro5'
-import { Board, BOARD_STATES, BOARD_VARIANTS } from '../../forest/stage5/Board'
-import { Finale, FIN_STATES, FIN_VARIANTS } from '../../forest/stage5/Finale'
-import { Trans, TRANS_STATES, TRANS_VARIANTS } from '../../forest/stage5/Trans'
+import {
+  Rules, RULES_STATES, RULES_VARIANTS, Intro5, RINT_STATES, RINT_VARIANTS, Board, BOARD_STATES, BOARD_VARIANTS,
+  Finale, FIN_STATES, FIN_VARIANTS, Trans, TRANS_STATES, TRANS_VARIANTS,
+} from './stage5Lab'
 
 type Sec = 'media' | 'sprint' | 'blitz' | 'reveal' | 'jp' | 'mel' | 'scr' | 'match' | 'order' | 'cw' | 'std' | 'lobby3' | 'rules' | 'rint' | 'board' | 'fin' | 'trans'
 type Mech = { name: string; C: (p: S1Props) => JSX.Element; states: { id: string; name: string }[]; variants: { id: string; name: string; note: string }[]; normal: number; /** с какого состояния открывать раздел */ start: number }

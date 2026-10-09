@@ -108,6 +108,8 @@ function FrameCanvas({ srcs, rs, prevSrcs, prevRs, fs }: { srcs: string[]; rs: R
 }
 
 const D = 116, GAP = 24
+/** эмблема вступления раунда (её же берёт заставка раунда в игре — forest/stage5/Intro5.tsx) */
+export const REVEAL_INTRO_EMBLEM = <svg viewBox="0 0 220 160" width="230"><path d="M110 156 C 108 110 112 70 110 30" stroke="#4f8f6a" strokeWidth="5" fill="none" />{[[60, 70], [110, 30], [160, 70]].map(([x, y], i) => <g key={i}><path d={`M110 ${100 - i * 10} Q ${(x + 110) / 2} ${y + 30} ${x} ${y}`} stroke="#4f8f6a" strokeWidth="4" fill="none" /><ellipse cx={x} cy={y} rx="16" ry="22" fill={['#c9b6ff', '#8f78d8', '#5b4396'][i]} /></g>)}</svg>
 export function Reveal3Scene({ v, n, fs, rootRef, introEmblem, extra }: { v: RevealView; n: number | null; fs: FS; rootRef: React.RefObject<HTMLDivElement>; introEmblem?: ReactNode; extra?: ReactNode }) {
   const state = v.state
   const review = state === 'review'
@@ -140,7 +142,7 @@ export function Reveal3Scene({ v, n, fs, rootRef, introEmblem, extra }: { v: Rev
   const showTimer = state !== 'review' && state !== 'intro'
   if (state === 'intro') return (
     <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={rootRef} cls="rv rvA">
-      {v.intro && <RoundIntro intro={v.intro} emblem={introEmblem ?? <svg viewBox="0 0 220 160" width="230"><path d="M110 156 C 108 110 112 70 110 30" stroke="#4f8f6a" strokeWidth="5" fill="none" />{[[60, 70], [110, 30], [160, 70]].map(([x, y], i) => <g key={i}><path d={`M110 ${100 - i * 10} Q ${(x + 110) / 2} ${y + 30} ${x} ${y}`} stroke="#4f8f6a" strokeWidth="4" fill="none" /><ellipse cx={x} cy={y} rx="16" ry="22" fill={['#c9b6ff', '#8f78d8', '#5b4396'][i]} /></g>)}</svg>} />}
+      {v.intro && <RoundIntro intro={v.intro} emblem={introEmblem ?? REVEAL_INTRO_EMBLEM} />}
     </S1Screen>
   )
 

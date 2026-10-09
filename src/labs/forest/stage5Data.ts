@@ -4,9 +4,9 @@
 // в левом нижнем углу, «ждём команды…»), рандомайзер (AdminPage.TeamRandomizer: имена → 2–8 команд → «Составы
 // команд · N · M чел.»), правила (InfoSlide: пункты, раунды, статистика, сноска), табло (rankTeams: ничья по сумме
 // решается по более ПОЗДНИМ раундам, нумерация плотная: после двух вторых мест идёт третье), финал.
-import { TEAMS, total, GROUPS, SB_BEFORE, SB_AFTER, RULES, ROUNDS, PLAYER_URL, LAST } from '../../labs/magic2/data'
-import { MEL2, JP2 } from '../stage2/data'
-import type { RoundIntroData } from '../stage1/data'
+import { TEAMS, total, GROUPS, SB_BEFORE, SB_AFTER, RULES, ROUNDS, PLAYER_URL, LAST } from '../magic2/data'
+import { MEL2, JP2 } from '../../forest/stage2/data'
+import type { RoundIntroData } from '../../forest/stage1/data'
 
 export { GROUPS, RULES, ROUNDS, PLAYER_URL, LAST, MEL2, JP2 }
 export const tcol = (hue: number) => `hsl(${hue} 52% 66%)`

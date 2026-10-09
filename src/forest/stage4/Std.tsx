@@ -6,11 +6,11 @@
 //  · фото — рама зацветает, под ней прорастает ответ;
 //  · фото-варианты — неверные снимки зарастают листвой, верный зацветает.
 // Справа везде — колонка «Ответы команд»: до показа «• • •», потом текст, потом вердикт (как в HostScreen.ShowAnswers).
-import { useEffect, useMemo, useRef } from 'react'
-import gsap from 'gsap'
+import { useMemo } from 'react'
 import { S1Screen, useEntrance, type S1Props } from '../stage1/common'
 import type { Rect } from '../stage1/env'
-import { makeFrames, type FRect } from '../stage1/mediaFrames'
+import { type FRect } from '../stage1/mediaFrames'
+import { FrameLayer, fitRect, type FS } from './frames'
 import { Timer, timer3 } from '../stage3/common3'
 import { MCQ, PHOTO, PHOTOS4, ROUND4, TEAM_ROWS, TXT, type TRow } from './data'
 
@@ -26,24 +26,10 @@ export const STD_VARIANTS = [
   { id: 'A', name: 'Обычные вопросы и разборы', note: 'Вопрос только текстом — в живой раме из ветвей, листва расходится и открывает текст. Разборы (у каждого типа вопроса своё превращение): открытый ответ прорастает по лозе буква за буквой и заканчивается цветком; у вариантов неверные цветы закрываются и никнут, верный раскрывается золотом; у вопроса по фото рама зацветает; у фото-вариантов неверные снимки зарастают листвой. Справа — «Ответы команд»: до показа «• • •», затем текст, затем ✓ / ✗ (команда без ответа — «—»).' },
 ]
 
-export type FS = { grow: number[]; reveal: number[]; bloom: number[]; pulse: number }
+// рамы вынесены в frames.tsx (их берёт и боевой слайд правил); здесь — реэкспорт для прежних импортов
+export { FrameLayer, fitRect, type FS }
 const LEAF = 'M 0 50 C 2 12 28 1 60 2 C 82 3 94 22 100 50 C 94 78 82 97 60 98 C 28 99 2 88 0 50 Z'
 const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-
-/** Рамы из ветвей (утверждённая техника Концепта C) на холсте под содержимым */
-export function FrameLayer({ rects, srcs, fs, panel }: { rects: FRect[]; srcs: string[]; fs: FS; panel?: number }) {
-  const cv = useRef<HTMLCanvasElement>(null)
-  useEffect(() => {
-    const ctx = cv.current!.getContext('2d')!, draw0 = makeFrames({ rects, srcs, panel }, 40)
-    const draw = () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1920, 1080); draw0(ctx, fs) }
-    gsap.ticker.add(draw); return () => gsap.ticker.remove(draw)
-  }, [rects, srcs, fs, panel])
-  return <canvas ref={cv} className="s4-cv" width={1920} height={1080} aria-hidden />
-}
-export function fitRect(im: { w: number; h: number }, cx: number, y: number, maxW: number, maxH: number): FRect {
-  const k = Math.min(maxW / im.w, maxH / im.h), w = Math.round(im.w * k), h = Math.round(im.h * k)
-  return { x: Math.round(cx - w / 2), y, w, h }
-}
 
 function TeamCol({ rows }: { rows: TRow[] }) {
   return <div className="s4-teams">

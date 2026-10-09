@@ -6,27 +6,28 @@
 //  кроссворд — две лозы прорастают крест-накрест, в клетки ложатся буквы; кино и литература — лоза-вопросительный знак
 //  и цветок на месте точки; своя игра — четыре лепестка-цены раскрываются по часовой, один взлетает; угадай мелодию —
 //  три колокольчика раскачиваются по очереди; скрэмбл — буквы-семена падают в чашечки.
-// «120 секунд», «Блиц» и «Три попытки» остаются как утверждены на этапе 1 — здесь они подключены той же вкладкой.
-import { RoundIntro, S1Screen, introTl, useEntrance, type S1Props } from '../stage1/common'
-import { Sprint } from '../stage1/Sprint'
-import { Blitz } from '../stage1/Blitz'
-import { Reveal3 } from '../stage1/Reveal3'
-import { INTROS5 } from './data'
+// «120 секунд», «Блиц» и «Три попытки» — как утверждены на этапе 1 (та же разметка и эмблема, что у их сцен).
+// Сцена рисует только то, что ей дали: лаборатория — тестовый вечер (labs/forest/stage5Lab.tsx), игра — настоящий
+// раунд (номер, title_lines, metaLine, rules). Длинные тексты вписываются замером, только если не влезают.
+import { useLayoutEffect, type ReactNode } from 'react'
+import { RoundIntro, S1Screen, introTl, useEntrance, type S1Api } from '../stage1/common'
+import type { RoundIntroData } from '../stage1/data'
+import type { Mood } from '../stage1/env'
+import { SPRINT_INTRO_EMBLEM } from '../stage1/SprintScene'
+import { BLITZ_INTRO_EMBLEM } from '../stage1/BlitzScene'
+import { REVEAL_INTRO_EMBLEM } from '../stage1/Reveal3Scene'
+import { useFontsReady, shrinkToFit } from '../stage1/gameHooks'
+import { introTitleLines, introTitleSize, type IntroKind } from './views'
 
-export const RINT_STATES = [
-  { id: 'crossword', name: '1 · Литературный кроссворд' },
-  { id: 'standard', name: '2 · Кино и литература (обычные вопросы)' },
-  { id: 'jeopardy', name: '3 · Своя игра' },
-  { id: 'melody', name: '4 · Угадай мелодию' },
-  { id: 'anagram', name: '6 · Скрэмбл' },
-  { id: 'sprint', name: '120 секунд (утверждено, этап 1)' },
-  { id: 'blitz', name: 'Блиц (утверждено, этап 1)' },
-  { id: 'reveal', name: 'Три попытки (утверждено, этап 1)' },
-]
-export const RINT_VARIANTS = [{ id: 'A', name: 'Лицо у каждого раунда', note: 'Один скелет (номер раунда, название, подсказка, правила на листьях) и своё лицо у каждой механики: эмблема со своим способом появления и свой оттенок свечения номера. Не длинная заставка: около трёх секунд до читаемого кадра.' }]
+export type { IntroKind } from './views'
 
 const ACC: Record<string, string> = { crossword: '#ffd98a', standard: '#7ff2d8', jeopardy: '#c9b6ff', melody: '#8fc8ff', anagram: '#ffc27a' }
-const FRC = (n: number) => (n % 2 ? '#e8c06a' : '#f0d58a')
+/** утверждённые заставки этапа 1: класс сцены и «настроение» — как у SprintScene/BlitzScene/Reveal3Scene в состоянии intro */
+const STAGE1: Partial<Record<IntroKind, { cls: string; mood?: Mood; emblem: ReactNode }>> = {
+  sprint: { cls: 'spA', emblem: SPRINT_INTRO_EMBLEM },
+  blitz: { cls: 'bz bzC', mood: 'calm', emblem: BLITZ_INTRO_EMBLEM },
+  reveal: { cls: 'rv rvA', emblem: REVEAL_INTRO_EMBLEM },
+}
 
 function Emblem({ id }: { id: string }) {
   if (id === 'crossword') {
@@ -61,34 +62,53 @@ function Emblem({ id }: { id: string }) {
   </svg>
 }
 
-export function Intro5({ state, variant, nOv, onReady, teams }: S1Props) {
-  if (state === 'sprint') return <Sprint variant={variant} state="intro" nOv={nOv} onReady={onReady} teams={teams} />
-  if (state === 'blitz') return <Blitz variant={variant} state="intro" nOv={nOv} onReady={onReady} teams={teams} />
-  if (state === 'reveal') return <Reveal3 variant={variant} state="intro" nOv={nOv} onReady={onReady} teams={teams} />
-  return <IntroNew state={state} onReady={onReady} />
+/** Таймлайн появления: общий скелет + своя эмблема (у этапа 1 — только скелет, как в их сценах). */
+function introBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], kind: IntroKind) {
+  introTl(tl, q)
+  const T = 0.9
+  if (kind === 'crossword') tl.fromTo(q('.em .vn'), { strokeDashoffset: 300, opacity: 1 }, { strokeDashoffset: 0, duration: 0.9, stagger: 0.25, ease: 'power2.out' }, T)
+    .fromTo(q('.em .ce.r'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.3)
+    .fromTo(q('.em .ce.c'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.9)
+  if (kind === 'standard') tl.fromTo(q('.em .qm'), { strokeDashoffset: 420 }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, T)
+    .fromTo(q('.em .qb'), { scale: 0 }, { scale: 1, svgOrigin: '0 0', duration: 0.8, ease: 'back.out(2)' }, T + 1.0)
+  if (kind === 'jeopardy') tl.fromTo(q('.em .jpt'), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, svgOrigin: '0 0', duration: 0.5, stagger: 0.18, ease: 'back.out(2)' }, T)
+    .to(q('.em .jpt[data-i="1"]'), { y: -22, duration: 0.6, ease: 'sine.inOut', yoyo: true, repeat: 1 }, T + 1.2)
+  if (kind === 'melody') tl.fromTo(q('.em .bell'), { rotation: -26, opacity: 0 }, { rotation: 0, opacity: 1, svgOrigin: '0 0', duration: 1.2, stagger: 0.25, ease: 'elastic.out(1,0.35)' }, T)
+    .fromTo(q('.em .nt'), { opacity: 0, y: 14 }, { opacity: 1, y: -16, duration: 0.7, stagger: 0.2 }, T + 0.8)
+  if (kind === 'anagram') tl.fromTo(q('.em .sd'), { y: -150, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.16, ease: 'bounce.out' }, T)
+    .fromTo(q('.em .cup'), { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.1 }, T - 0.2)
 }
-function IntroNew({ state, onReady }: { state: string; onReady: S1Props['onReady'] }) {
-  const intro = INTROS5[state]
-  const L = Math.max(...intro.titleLines.map(l => l.length)), tfs = Math.min(112, Math.floor(1500 / L))
-  const { root } = useEntrance(onReady, (tl, q) => {
-    introTl(tl, q)
-    const T = 0.9
-    if (state === 'crossword') tl.fromTo(q('.em .vn'), { strokeDashoffset: 300, opacity: 1 }, { strokeDashoffset: 0, duration: 0.9, stagger: 0.25, ease: 'power2.out' }, T)
-      .fromTo(q('.em .ce.r'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.3)
-      .fromTo(q('.em .ce.c'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.9)
-    if (state === 'standard') tl.fromTo(q('.em .qm'), { strokeDashoffset: 420 }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, T)
-      .fromTo(q('.em .qb'), { scale: 0 }, { scale: 1, svgOrigin: '0 0', duration: 0.8, ease: 'back.out(2)' }, T + 1.0)
-    if (state === 'jeopardy') tl.fromTo(q('.em .jpt'), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, svgOrigin: '0 0', duration: 0.5, stagger: 0.18, ease: 'back.out(2)' }, T)
-      .to(q('.em .jpt[data-i="1"]'), { y: -22, duration: 0.6, ease: 'sine.inOut', yoyo: true, repeat: 1 }, T + 1.2)
-    if (state === 'melody') tl.fromTo(q('.em .bell'), { rotation: -26, opacity: 0 }, { rotation: 0, opacity: 1, svgOrigin: '0 0', duration: 1.2, stagger: 0.25, ease: 'elastic.out(1,0.35)' }, T)
-      .fromTo(q('.em .nt'), { opacity: 0, y: 14 }, { opacity: 1, y: -16, duration: 0.7, stagger: 0.2 }, T + 0.8)
-    if (state === 'anagram') tl.fromTo(q('.em .sd'), { y: -150, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.16, ease: 'bounce.out' }, T)
-      .fromTo(q('.em .cup'), { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.1 }, T - 0.2)
-  }, null, [state])
-  return (
-    <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={root} cls={`rv ri ri-${state}`}>
-      <div style={{ ['--acc' as string]: ACC[state], ['--tfs' as string]: `${tfs}px` }}><RoundIntro intro={intro} emblem={<Emblem id={state} />} /></div>
+
+export function RoundIntroScreen({ kind, intro, onReady }: { kind: IntroKind; intro: RoundIntroData; onReady: (a: S1Api) => void }) {
+  const s1 = STAGE1[kind]
+  // длинная строка из редактора (лабораторные — до 24 букв) разбивается по словам, а не мельчит в одну строку
+  const titleLines = introTitleLines(intro.titleLines)
+  const tfs = introTitleSize(titleLines)
+  const key = `${kind}|${JSON.stringify(intro)}`
+  const fonts = useFontsReady()
+  const { root } = useEntrance(onReady, (tl, q) => introBuild(tl, q, kind), null, [key])
+  // Вписывание настоящих текстов (лабораторные влезают — там ничего не меняется): правила — до низа кадра,
+  // заголовок — по ширине колонки и так, чтобы эмблема + название + подсказка не уходили под край.
+  useLayoutEffect(() => {
+    const el = root.current
+    if (!el) return
+    const main = el.querySelector<HTMLElement>('.s1-intro-main'), title = el.querySelector<HTMLElement>('.s1-intro-title')
+    const rules = el.querySelector<HTMLElement>('.s1-intro-rules')
+    if (rules) shrinkToFit([...rules.querySelectorAll<HTMLElement>('.t')], () => rules.offsetTop + rules.offsetHeight <= 1050, 22)
+    // по ширине — до колонки правил (или края кадра); лабораторные заголовки чуть шире колонки, но в эту границу влезают
+    const right = rules ? rules.offsetLeft : 1880
+    // ширина строки — сумма offsetWidth букв (на них висят трансформы входа, scrollWidth их учитывает, а offsetWidth — нет)
+    const lineW = () => Math.max(0, ...[...(title?.querySelectorAll<HTMLElement>('.ln') ?? [])].map(ln => [...ln.children].reduce((s, c) => s + (c as HTMLElement).offsetWidth, 0)))
+    if (main && title) shrinkToFit([title], () => {
+      // заставки этапа 1 переносят название по словам — шире колонки оно не станет
+      const cx = main.offsetLeft + main.clientWidth / 2, w = s1 ? Math.min(lineW(), main.clientWidth) : lineW()
+      return cx + w / 2 <= right && cx - w / 2 >= 20 && main.offsetTop + main.offsetHeight <= 1050
+    }, 40)
+  }, [key, fonts, root, s1])
+  const body = <RoundIntro intro={titleLines === intro.titleLines ? intro : { ...intro, titleLines }} emblem={s1 ? s1.emblem : <Emblem id={kind} />} />
+  return s1
+    ? <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={root} cls={s1.cls} moodOverride={s1.mood}>{body}</S1Screen>
+    : <S1Screen rects={[{ x: 460, y: 300, w: 1000, h: 520 }]} n={null} rootRef={root} cls={`rv ri ri-${kind}`}>
+      <div style={{ ['--acc' as string]: ACC[kind], ['--tfs' as string]: `${tfs}px` }}>{body}</div>
     </S1Screen>
-  )
 }
-void FRC
