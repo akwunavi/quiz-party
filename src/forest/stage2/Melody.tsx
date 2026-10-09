@@ -68,7 +68,7 @@ export function melBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], vi
 }
 
 /** Вся сцена «Угадай мелодию». `stOf` — состояние колокола по ключу «тема-трек» (av / hot / won / taken / done / done just). */
-export function MelodyScene({ rootRef, cls, view, title, sub, themes, layout, stOf, sel, pickNo, hot, landed, n, panel, onPick, children }: {
+export function MelodyScene({ rootRef, cls, view, title, sub, themes, layout, stOf, pickNo, hot, landed, n, panel, onPick, children }: {
   rootRef: RefObject<HTMLDivElement>
   /** класс состояния (`st-…`): в лаборатории — имя её состояния, в игре — MelView */
   cls: string
@@ -78,8 +78,6 @@ export function MelodyScene({ rootRef, cls, view, title, sub, themes, layout, st
   themes: { name: string; tracks: number }[]
   layout: MelCol[]
   stOf: (k: string) => string
-  /** центр выбранного колокола на доске */
-  sel: { x: number; y: number }
   /** номер выбранного трека на большом колоколе */
   pickNo: number
   /** рулетка: подсвеченный колокол и встала ли подсветка окончательно */

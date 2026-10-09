@@ -16,7 +16,7 @@ import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { TileCard } from '../../components/TileCard'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
 // Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
@@ -33,6 +33,12 @@ import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodySettings, MelodyState, MelodyTheme, ThemeKey } from '../../types/quiz'
 import type { PreviewCtx } from '../../lib/previewState'
+import gsap from 'gsap'
+import { isForestTheme } from '../../forest/config'
+import { useEntrance } from '../../forest/stage1/common'
+import { MelodyScene, MelPanel, melBuild, MEL_STAGE, type MelView, type MelPanelData, type MelTeamV } from '../../forest/stage2/Melody'
+import { melLayout, melBellPos } from '../../forest/stage2/layout'
+import { melodyPoints } from '../../lib/melody'
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
@@ -87,13 +93,24 @@ function RevealTrack({ src }: { src: string }) {
   return <div className="mel-reveal-track">♪ играет 15 секунд</div>
 }
 
-export function MelodyBoard({ pack, round, gameState, preview }: {
+type BoardProps = {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
   /** Предпросмотр в редакторе: все эффекты, пишущие в игру (переходы стадий,
    *  звук, начисление баллов), выключены — экран показывает готовую
    *  фиктивную стадию и ничего не меняет в живой сессии (HANDOFF.md). */
   preview?: PreviewCtx
-}) {
+}
+
+/** «Угадай мелодию». Тема «Волшебный лес» на проекторе — утверждённая композиция «Колокольчики» (src/forest/stage2),
+ *  остальные темы — прежняя доска с модалкой. Автомат стадий, звук, таймеры и запись — общие (useMelodyBoard ниже),
+ *  различается только отрисовка. Предпросмотр редактора — всегда прежний вид. */
+export function MelodyBoard(props: BoardProps) {
+  return isForestTheme(props.pack.theme) && !props.preview ? <ForestMelodyBoard {...props} /> : <ClassicMelodyBoard {...props} />
+}
+
+/** Весь автомат стадий мелодии на проекторе: эффекты переходов, звук, предзагрузка, действия ведущего.
+ *  Перенесено из MelodyBoard как есть — обе отрисовки вызывают ровно эту функцию. */
+function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const s = round.settings as MelodySettings
   const themes = s.themes ?? []
   const m: MelodyState = gameState.melody ?? {}
@@ -377,13 +394,6 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   // момент, когда темы приезжают из пакета и заглушка сменяется доской.
   const [manualPick, setManualPick] = useState(false)
 
-  if (themes.length === 0) return (
-    <div className="host-screen grid-bg">
-      <div className="mono-tag">УГАДАЙ МЕЛОДИЮ</div>
-      <p>Темы не заполнены — добавь их в редакторе раунда</p>
-    </div>
-  )
-
   const freeKeys = melodyFree(themes, played)
   const idle = melodyIdle(m)
 
@@ -434,6 +444,22 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
     if (!ans) return
     await gradeMelody(gameState, ans, correct, bidSec)
   }
+  return { s, themes, m, teams, answers, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
+    freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade }
+}
+
+const EmptyMelody = () => (
+  <div className="host-screen grid-bg">
+    <div className="mono-tag">УГАДАЙ МЕЛОДИЮ</div>
+    <p>Темы не заполнены — добавь их в редакторе раунда</p>
+  </div>
+)
+
+function ClassicMelodyBoard(props: BoardProps) {
+  const { pack, gameState, preview } = props
+  const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
+    freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade } = useMelodyBoard(props)
+  if (themes.length === 0) return <EmptyMelody />
 
   return (
     <div className="host-screen grid-bg mel-screen" onPointerDown={preview ? undefined : unlockAudio}>
@@ -653,6 +679,41 @@ export function MelodyBoard({ pack, round, gameState, preview }: {
   )
 }
 
+/** Подсветка барабана по времени (общая для прежней доски и Леса): путь — чистая melodySpinPath с зерном из ключа
+ *  трека и дедлайна (одинаковый на всех экранах), время — от дедлайна стадии. `landed` — подсветка уже встала на
+ *  выбранный трек последним прыжком (дальше она не сдвинется). Перенесено из MelodyGrid как есть. */
+function useMelodySpin(themes: MelodyTheme[], played: string[], spinning: boolean, spinKey: string | undefined,
+  spinDeadline: number, spinTotalMs: number) {
+  const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
+  const free = keys.filter(k => !played.includes(k))
+  const [cursor, setCursor] = useState(-1)
+  const [landed, setLanded] = useState(false)
+
+  const freeSig = free.join(',')
+  useEffect(() => {
+    if (!spinning || !spinKey || free.length === 0) { setCursor(-1); setLanded(false); return }
+    const target = free.indexOf(spinKey)
+    if (target < 0) { setCursor(-1); setLanded(false); return }
+    const end = spinDeadline || Date.now() + spinTotalMs
+    const start = end - spinTotalMs
+    const spin = melodySpinPath(free.length, target, spinTotalMs, melodySpinSeed(`${spinKey}|${end}`))
+    const lastJump = spin.times[spin.times.length - 1] ?? 0
+    let raf = 0
+    const tick = () => {
+      const elapsed = Date.now() - start
+      setCursor(melodySpinAt(spin, elapsed))
+      setLanded(elapsed >= lastJump)
+      if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spinning, spinKey, spinDeadline, spinTotalMs, freeSig])
+
+  const highlighted = spinning && cursor >= 0 ? free[cursor] : undefined
+  return { highlighted, landed: spinning && landed && highlighted === spinKey }
+}
+
 /** Барабан: подсветка прыгает по случайным свободным плиткам, плавно
  *  замедляется и последним прыжком встаёт на выбранный трек. Путь — чистая
  *  melodySpinPath с зерном из ключа трека и дедлайна (одинаковый на всех
@@ -671,30 +732,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
   /** Только для маркера-огонька Magic (шаг 11) — остальным темам не нужен. */
   theme?: ThemeKey
 }) {
-  const keys = themes.flatMap((t, ti) => t.tracks.map((_, i) => `${ti}-${i}`))
-  const free = keys.filter(k => !played.includes(k))
-  const [cursor, setCursor] = useState(-1)
-
-  const freeSig = free.join(',')
-  useEffect(() => {
-    if (!spinning || !spinKey || free.length === 0) { setCursor(-1); return }
-    const target = free.indexOf(spinKey)
-    if (target < 0) { setCursor(-1); return }
-    const end = spinDeadline || Date.now() + spinTotalMs
-    const start = end - spinTotalMs
-    const spin = melodySpinPath(free.length, target, spinTotalMs, melodySpinSeed(`${spinKey}|${end}`))
-    let raf = 0
-    const tick = () => {
-      const elapsed = Date.now() - start
-      setCursor(melodySpinAt(spin, elapsed))
-      if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
-    }
-    tick()
-    return () => cancelAnimationFrame(raf)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spinning, spinKey, spinDeadline, spinTotalMs, freeSig])
-
-  const highlighted = spinning && cursor >= 0 ? free[cursor] : undefined
+  const { highlighted } = useMelodySpin(themes, played, spinning, spinKey, spinDeadline, spinTotalMs)
 
   // ── Magic: блуждающий огонёк, физически перелетающий на "горячую"
   // плитку барабана. Карта key→элемент — обычный ref (не state): позиции
@@ -748,6 +786,164 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
             style={{ gridColumn: ti + 1, gridRow: i + 2 }} />
         )
       }))}
+    </div>
+  )
+}
+
+// ═══ «Волшебный лес»: «Колокольчики» на настоящем автомате стадий ═══
+// Стадия, очередь, ставки, ответы — из общего состояния игры и тех же хуков, что у прежней доски (useMelodyBoard).
+// Сцена добавляет только два коротких перехода-картинки: «неверно — ход второй» (~2,2 с, когда ведущий передал ход)
+// и «назад к доске» (~1,7 с, когда трек закрыт). Звук, дедлайны и запись от них не зависят. Обновили страницу
+// посреди трека — сразу текущая стадия.
+const MEL_WRONG_MS = 2200, MEL_BACK_MS = 1700
+const ACTIVE = new Set(['listen', 'bidding', 'bids', 'snippet', 'answering', 'passed', 'reveal'])
+const WRONG_PASS = '✗ Неверно · ответ не раскрываем — ход переходит второй команде'
+
+function ForestMelodyBoard(props: BoardProps) {
+  const { pack, round, gameState } = props
+  const b = useMelodyBoard(props)
+  const { s, themes, m, teams, answers, played, deadline, left, total, ti, i, track, bids, idle, currentTeam, bidSec, ans } = b
+  const layout = useMemo(() => melLayout(themes.map(t => t.tracks.length)), [themes])
+  const spinTotalMs = m.spinMs ?? Math.min(s.spinSec ?? 5, 8) * 1000
+  const { highlighted: hot, landed } = useMelodySpin(themes, played, m.stage === 'spinning', m.key, deadline, spinTotalMs)
+
+  let target: MelView = 'idle'
+  if (!idle && m.stage) {
+    if (m.stage === 'answering') target = ans?.is_correct === false ? 'wrong' : 'answering'
+    else if (m.stage === 'reveal') target = m.wonTeam ? 'reveal' : 'miss'
+    else target = m.stage as MelView
+  }
+  const [view, setView] = useState<MelView>(target)
+  const targetRef = useRef(target); targetRef.current = target
+  const prev = useRef({ stage: m.stage, key: m.key })
+  const lastKey = useRef(m.key)
+  if (!idle && m.key) lastKey.current = m.key
+  useEffect(() => {
+    const p = prev.current
+    prev.current = { stage: m.stage, key: m.key }
+    let t: number | undefined
+    if (idle && p.key === m.key && p.stage && ACTIVE.has(p.stage)) { setView('back'); t = window.setTimeout(() => setView(targetRef.current), MEL_BACK_MS) }
+    else if (m.stage === 'passed' && p.stage === 'answering' && p.key === m.key) { setView('wrong'); t = window.setTimeout(() => setView(targetRef.current), MEL_WRONG_MS) }
+    else setView(targetRef.current)
+    return () => { if (t) clearTimeout(t) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [m.stage, m.key])
+  // внутри стадии (ответ пришёл, ведущий отметил промах) — сразу; переход «назад/неверно» прерывает только новая стадия
+  useEffect(() => {
+    setView(v => ((v === 'back' && target === 'idle') || (v === 'wrong' && target === 'passed') ? v : target))
+  }, [target])
+
+  const key = lastKey.current ?? '0-0'
+  const [kti, ki] = key.split('-').map(Number)
+  const sel = layout[kti] ? melBellPos(layout[kti], ki) : { x: 0, y: 0 }
+  const intro = useRef(true)
+  const { root } = useEntrance(a => a.tl.play(), (tl, q) => {
+    melBuild(tl, q, view, sel, { intro: intro.current })
+    intro.current = false
+  }, null, [view, themes.length])
+  // рулетка встала на итог — колокол вспыхивает (в лаборатории это момент таймлайна, здесь — настоящего времени)
+  useEffect(() => {
+    if (!landed || !m.key || !root.current) return
+    const el = root.current.querySelector(`.ml2a-t[data-k="${m.key}"] .ml2a-sway`)
+    if (el) gsap.fromTo(el, { '--g': 1 }, { '--g': 1.2, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' })
+  }, [landed, m.key, root])
+
+  if (themes.length === 0) return <EmptyMelody />
+
+  const tv = (id?: string): MelTeamV | null => {
+    if (!id) return null
+    const t = teams.find(x => x.id === id)
+    return { id, name: t?.name ?? '—', color: t?.color }
+  }
+  // таймер — там же, где у прежней доски (есть дедлайн, кроме «слушаем 1 секунду»); полный срок — из настроек раунда
+  const full = m.stage === 'bidding' ? (s.bidSec ?? 10) : m.stage === 'answering' ? (s.answerSec ?? 30)
+    : m.stage === 'passed' ? (s.passAnswerSec ?? 10) : m.stage === 'snippet' ? (m.snippetSec ?? 5) : total
+  const wrongView = view === 'wrong' && m.stage === 'passed'
+  const timer = deadline && m.stage !== 'listen' && !wrongView ? { n: left, total: Math.max(full, left, 1), seeds: m.stage === 'answering' ? 30 : 10 } : null
+  const firstId = m.order?.[0]
+  const firstAns = answers.find(a => a.question_ref === `q-mel-${m.key}` && a.team_id === firstId)
+  const firstBid = Number(bids.find(x => x.team_id === firstId)?.answer_text) || 0
+  const pass = (m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
+  const d: MelPanelData = {
+    themeName: themes[ti]?.name ?? '', trackNo: i + 1, timer,
+    bidding: [...teams].sort((a, c) => a.name.localeCompare(c.name)).map(t => ({ team: { id: t.id, name: t.name, color: t.color }, has: bids.some(x => x.team_id === t.id) })),
+    bids: (m.order ?? []).map(id => { const bb = bids.find(x => x.team_id === id); return { team: tv(id) ?? { id, name: '—' }, sec: bb ? Number(bb.answer_text) || null : null } }),
+    cur: wrongView ? tv(firstId) : currentTeam ? { id: currentTeam.id, name: currentTeam.name, color: currentTeam.color } : tv(m.order?.[m.turn ?? 0]),
+    bidSec: wrongView ? firstBid : bidSec,
+    winPts: melodyPoints(wrongView ? firstBid : bidSec, true),
+    answer: wrongView ? (firstAns?.answer_text || null) : (ans?.answer_text || null),
+    wrong: wrongView ? WRONG_PASS : ans?.is_correct === false ? (pass ? WRONG_PASS : '✗ Неверно · дальше — правильный ответ') : null,
+    correctNow: !wrongView && ans?.is_correct === true && (m.stage === 'answering' || m.stage === 'passed'),
+    correct: track?.correct ?? '', wonTeam: tv(m.wonTeam), wonPts: m.wonPts ?? 0,
+  }
+  const remain = melodyFree(themes, played).length
+  const preview = props.preview
+  const stOf = (k: string) => {
+    if (k === key && MEL_STAGE.has(view)) return 'taken'
+    if (played.includes(k)) return `done${k === key && view === 'back' ? ' just' : ''}`
+    if (view === 'spinning' && hot === k) return landed ? 'won' : 'hot'
+    return 'av'
+  }
+  return (
+    <div style={{ display: 'contents' }} onPointerDown={preview ? undefined : unlockAudio}>
+      <MelodyScene rootRef={root} cls={view} view={view} title={round.title_lines.join(' ') || 'Угадай мелодию'}
+        sub={remain === 0 ? ' · все треки отыграны' : ` · осталось треков: ${remain}`}
+        themes={themes.map(t => ({ name: t.name || '', tracks: t.tracks.length }))} layout={layout} stOf={stOf}
+        pickNo={ki + 1} hot={view === 'spinning' ? hot ?? null : null} landed={landed} n={timer ? timer.n : null}
+        panel={<MelPanel view={view} d={d} />} onPick={!preview && idle && b.manualPick ? b.pickManually : undefined}>
+        {/* дослушать трек на разборе: тот же RevealTrack и в тех же условиях, что в модалке прежней доски; надпись не видна */}
+        {!preview && m.stage === 'reveal' && track?.audio && <div hidden><RevealTrack src={mediaUrl(track.audio)} /></div>}
+        <ForestMelodyActions b={b} pack={pack} gameState={gameState} />
+      </MelodyScene>
+    </div>
+  )
+}
+
+/** Кнопки ведущего — те же действия, что у прежней доски и её модалки. На проекторе Леса скрыты стилем (?nav=1 — вернуть);
+ *  основной пульт — телефон ведущего (AdminPage). */
+function ForestMelodyActions({ b, pack, gameState }: { b: ReturnType<typeof useMelodyBoard>; pack: LoadedPack; gameState: GameState }) {
+  const { m, idle, played, freeKeys, manualPick, setManualPick, loadState, click, startSpin, currentId, bidSec, bids, ans, grade } = b
+  if (idle) return (
+    <div className="host-actions ml2-actions">
+      {loadState && loadState.total > 0 && (
+        <span className={`ml2-load${loadState.failed ? ' warn' : ''}`}>
+          {loadState.done + loadState.failed < loadState.total ? `♪ треки ${loadState.done}/${loadState.total}…`
+            : loadState.failed ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}` : '♪ все треки загружены'}
+        </span>
+      )}
+      {freeKeys.length > 0
+        ? (manualPick
+            ? <><span className="ml2-load">выберите колокольчик на экране</span><button className="ghost" onClick={() => setManualPick(false)}>Отмена</button></>
+            : <><button onClick={startSpin}>{played.length === 0 ? 'Стартуем!' : 'Рулетка'}</button>
+                <button className="ghost" onClick={() => setManualPick(true)}>Выбрать вручную</button></>)
+        : <button onClick={() => void finishMelodyRound(gameState, pack)}>Завершить раунд →</button>}
+    </div>
+  )
+  return (
+    <div className="host-actions ml2-actions">
+      {m.stage === 'bids' && <>
+        <button disabled={!currentId} onClick={() => click(() => melodyClick(gameState, guardMelody(
+          { key: m.key, stage: 'bids' }, cur => melodyPlaySnippetIfFresh(cur, bids))))}>Играем {bidSec || 5} сек →</button>
+        <button className="ghost dark" onClick={() => click(() => melodyClick(gameState,
+          guardMelody({ key: m.key, stage: 'bids' }, cur => melodyRevealMiss(cur))))}>Пропустить трек</button>
+      </>}
+      {m.stage === 'snippet' && <button onClick={() => click(() => melodyClick(gameState, guardMelody(
+        { key: m.key, stage: 'snippet' }, cur => melodyAcceptAnswer(cur, b.s.answerSec ?? 30))))}>Принимаем ответ →</button>}
+      {(m.stage === 'answering' || m.stage === 'passed') && <>
+        <button disabled={!ans} onClick={() => click(() => grade(true))}>✓ Верно</button>
+        <button className="ghost" onClick={() => click(() => passMelody(gameState, ans))}>
+          {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1 ? '✗ Передать ход →' : '✗ Показать ответ →'}
+        </button>
+      </>}
+      {m.stage === 'reveal' && <button onClick={() => click(() => melodyClick(gameState,
+        guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur))))}>К доске →</button>}
+      {m.stage !== 'spinning' && m.stage !== 'reveal' && m.stage !== 'done' && (
+        <button className="ghost dark" onClick={() => {
+          if (!confirm('Закрыть трек и вернуться к доске?\n\nБаллы за него никто не получит.')) return
+          const keyNow = m.key
+          click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
+        }}>Закрыть</button>
+      )}
     </div>
   )
 }

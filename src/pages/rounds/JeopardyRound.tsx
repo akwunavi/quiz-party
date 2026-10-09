@@ -3,7 +3,7 @@
 // экраном) — импорт оттуда тянул бы весь проектор в чужой чанк, а
 // предпросмотру в редакторе нужен ровно этот компонент, не копия.
 import { createPortal } from 'react-dom'
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { TileCard } from '../../components/TileCard'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { setPhase } from '../../lib/gameActions'
@@ -19,10 +19,15 @@ import { room } from '../../lib/transport'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, JeopardyTheme } from '../../types/quiz'
 import type { PreviewCtx } from '../../lib/previewState'
+import gsap from 'gsap'
+import { isForestTheme } from '../../forest/config'
+import { useEntrance } from '../../forest/stage1/common'
+import { JeopardyScene, JpPanel, JpVessel, jpBuild, jpSelPos, JP_NOTE, type JpView, type JpRow } from '../../forest/stage2/Jeopardy'
+import { jpLayout } from '../../forest/stage2/layout'
 
 /** Своя игра: доска тем и плиток. Клик по плитке — играет трек, ответ по кнопке.
  *  Открытые плитки гаснут. Тем может быть любое количество (1..6). */
-export function JeopardyBoard({ pack, round, gameState, preview }: {
+type BoardProps = {
   pack: LoadedPack
   round: LoadedRound
   gameState: GameState
@@ -32,7 +37,17 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
    *  сейчас на другом экране (getRoomId() в браузере один на всё вкладки
    *  этого происхождения, HANDOFF.md). */
   preview?: PreviewCtx
-}) {
+}
+
+/** Своя игра: доска. Тема «Волшебный лес» на проекторе — утверждённая композиция «Цветы цен» (src/forest/stage2),
+ *  остальные темы — прежняя сетка плиток. Логика (открыть/закрыть плитку, звук, ответы, оценки) у обеих одна —
+ *  useJeopardyBoard/useTileModal ниже; различается только отрисовка. Предпросмотр редактора — всегда прежний вид. */
+export function JeopardyBoard(props: BoardProps) {
+  return isForestTheme(props.pack.theme) && !props.preview ? <ForestJeopardyBoard {...props} /> : <ClassicJeopardyBoard {...props} />
+}
+
+/** Состояние доски и действия с плитками — общее для обоих видов (перенесено из JeopardyBoard как есть). */
+function useJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   const themes = (round.settings as { themes?: JeopardyTheme[] }).themes ?? []
   // Открытая плитка живёт в ОБЩЕМ состоянии игры (melody.jp), а не в памяти
   // вкладки: иначе пульт ведущего в телефоне не знает, что плитка открыта, и
@@ -88,6 +103,32 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
   const jpTitleText = round.title_lines.join(' ') || 'СВОЯ ИГРА'
   const jpTitleScrambled = useScrambleReveal(jpTitleText, pack.theme === 'classic')
 
+  /** Открыть плитку по сквозному номеру; `r` — где она на экране (для входа «рост из плитки» прежнего вида). */
+  const openAt = (flat: number, r: DOMRect | undefined) => {
+    // Предпросмотр: клик по плитке ничего не пишет в живую
+    // сессию (та же комната, что у проектора — HANDOFF.md).
+    if (preview) return
+    // синхронизируем номер открытой плитки с игроками:
+    // они шлют ответ по question_index, модалка читает по нему же
+    predictedReplay.current = jpNextReplay(gameState.melody)
+    clickOrigin.current = r ? { tile: flat, x: r.left + r.width / 2, y: r.top + r.height / 2 } : null
+    setTileLocal(flat)
+    void openJeopardyTile(gameState, flat)
+  }
+  /** «Переслушать» для открытой плитки: пока опрос не подтвердил клик (tileLocal ещё не сброшен) — берём
+   *  ПРЕДСКАЗАННЫЙ replay, а не «gameState.melody» прежней плитки: иначе как только опрос доносит настоящее (уже
+   *  увеличенное) число, эффект в TileModal видит скачок и запускает трек заново (см. коммент у predictedReplay). */
+  const replayNonce = !preview && tileLocal !== undefined && predictedReplay.current != null
+    ? predictedReplay.current
+    : (gameState.melody?.jp?.replay ?? 0)
+  const onShowAnswer = () => { if (!preview) void saveMelody(jpShowAnswer(gameState.melody ?? {})) }
+  const onReplay = () => { if (!preview) void saveMelody(jpReplay(gameState.melody ?? {})) }
+  const onClose = (tileKey: string) => { if (preview) return; setTileLocal(null); void closeTile(tileKey) }
+  return { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose }
+}
+
+function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
+  const { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose } = useJeopardyBoard({ pack, round, gameState, preview })
   if (themes.length === 0) return (
     <div className="host-screen grid-bg">
       <div className="mono-tag">СВОЯ ИГРА</div>
@@ -128,18 +169,10 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
                 if (el) tileElRefs.current.set(flat, el); else tileElRefs.current.delete(flat)
               }}
               onClick={() => {
-                // Предпросмотр: клик по плитке ничего не пишет в живую
-                // сессию (та же комната, что у проектора — HANDOFF.md).
                 if (preview) return
-                // синхронизируем номер открытой плитки с игроками:
-                // они шлют ответ по question_index, модалка читает по нему же
                 const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
-                predictedReplay.current = jpNextReplay(gameState.melody)
                 // rect берём ДО открытия модалки — плитка ещё на месте
-                const r = tileElRefs.current.get(flat)?.getBoundingClientRect()
-                clickOrigin.current = r ? { tile: flat, x: r.left + r.width / 2, y: r.top + r.height / 2 } : null
-                setTileLocal(flat)
-                void openJeopardyTile(gameState, flat)
+                openAt(flat, tileElRefs.current.get(flat)?.getBoundingClientRect())
               }} />
           )
         }))}
@@ -159,14 +192,6 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
         const at = jpLocate(themes, openTile)
         if (!at) return null
         const { ti, i: rest, tile } = at
-        // Пока опрос не подтвердил клик (tileLocal ещё не сброшен) — берём
-        // ПРЕДСКАЗАННЫЙ replay, а не «gameState.melody» прежней плитки: иначе
-        // как только опрос доносит настоящее (уже увеличенное) число, эффект
-        // в TileModal видит скачок и запускает трек заново (см. коммент у
-        // predictedReplay выше).
-        const replayNonce = !preview && tileLocal !== undefined && predictedReplay.current != null
-          ? predictedReplay.current
-          : (gameState.melody?.jp?.replay ?? 0)
         // Координаты клика — только если ЭТУ плитку открыли отсюда, кликом.
         // Плитка, открытая с телефона ведущего, координат не несёт — рост
         // из точки клика заменяется старым входом модалки (по теме).
@@ -177,9 +202,8 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
             theme={themes[ti]} tile={tile} tileIndex={openTile}
             showAnswer={!!gameState.melody?.jp?.answer}
             replayNonce={replayNonce} origin={origin} preview={preview}
-            onShowAnswer={() => { if (!preview) void saveMelody(jpShowAnswer(gameState.melody ?? {})) }}
-            onReplay={() => { if (!preview) void saveMelody(jpReplay(gameState.melody ?? {})) }}
-            onClose={() => { if (preview) return; setTileLocal(null); void closeTile(`${ti}-${rest}`) }} />
+            onShowAnswer={onShowAnswer} onReplay={onReplay}
+            onClose={() => onClose(`${ti}-${rest}`)} />
         )
       })()}
     </div>
@@ -188,8 +212,7 @@ export function JeopardyBoard({ pack, round, gameState, preview }: {
 
 /** Модалка плитки (перенос из старого Round4): автозапуск трека с обратным
  *  отсчётом клипа, живые ответы команд по скорости, ✓/✗, переслушать. */
-function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packTheme,
-  showAnswer, onShowAnswer, replayNonce, onReplay, origin, preview }: {
+type TileProps = {
   packTheme?: string
   round: LoadedRound
   gameState: GameState
@@ -214,7 +237,11 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
   /** Предпросмотр: трек НЕ запускается вовсе (play() асинхронный — заглушить
    *  после старта не получится, HANDOFF.md), ответы/команды — фиктивные. */
   preview?: PreviewCtx
-}) {
+}
+
+/** Логика открытой плитки — звук с отсчётом, ответы команд, оценки ✓/✗. Перенесено из TileModal как есть: живёт
+ *  ровно столько, сколько смонтирован компонент открытой плитки (закрыли — звук глохнет в очистке эффекта). */
+function useTileModal({ round, gameState, tile, tileIndex, replayNonce, origin, preview }: TileProps) {
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
   // одна ручка на текущий трек: она глушит и звук, и отсчёт
   const handleRef = useRef<SyncedHandle | null>(null)
@@ -294,7 +321,12 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
     setLocalGrades(g => ({ ...g, [id]: correct }))
     await room.patchAnswer(id, { is_correct: correct })
   }
+  return { modalRef, growVars, remaining, playing, teams, audioErr, localGrades, rows, grade }
+}
 
+function TileModal(props: TileProps) {
+  const { theme, tile, onClose, packTheme, showAnswer, onShowAnswer, onReplay } = props
+  const { modalRef, growVars, remaining, playing, teams, audioErr, localGrades, rows, grade } = useTileModal(props)
   return createPortal(
     <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
       <div ref={modalRef} className={`jp-modal hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
@@ -366,4 +398,147 @@ function TileModal({ round, gameState, theme, tile, tileIndex, onClose, packThem
     </div>,
     document.body,
   )
+}
+
+// ═══ «Волшебный лес»: «Цветы цен» на настоящей доске ═══
+// Та же логика, что у прежнего вида (useJeopardyBoard/useTileModal), отрисовка — сцена из src/forest/stage2.
+// Переходы сцены — только картинка: «выбор цены» (~1 с) после открытия плитки и «возврат к доске» (~1,7 с) после
+// закрытия. Звук, отсчёт и ответы от них не зависят: компонент открытой плитки смонтирован, пока плитка открыта в
+// общем состоянии, как и прежняя модалка. Обновили страницу посреди плитки — сразу её состояние, без «выбора».
+const JP_SELECT_MS = 1000, JP_BACK_MS = 1700
+
+function ForestJeopardyBoard(props: BoardProps) {
+  const { pack, round, gameState } = props
+  const b = useJeopardyBoard(props)
+  const { themes, openTile, opened } = b
+  const layout = useMemo(() => jpLayout(themes.map(t => t.tiles.length)), [themes])
+  const at = openTile == null ? null : jpLocate(themes, openTile)
+  const showAnswer = !!gameState.melody?.jp?.answer
+  const target: JpView = at ? (showAnswer ? 'reveal' : 'question') : 'board'
+  // что показывает сцена: целевое состояние + короткие переходы между ними
+  const [view, setView] = useState<JpView>(target)
+  const targetRef = useRef(target); targetRef.current = target
+  const prevOpen = useRef<number | null>(at ? openTile : null)
+  const lastAt = useRef<{ ti: number; i: number } | null>(at ? { ti: at.ti, i: at.i } : null)
+  if (at) lastAt.current = { ti: at.ti, i: at.i }
+  const openNow = at ? openTile : null
+  useEffect(() => {
+    const prev = prevOpen.current
+    prevOpen.current = openNow
+    let t: number | undefined
+    if (openNow != null && openNow !== prev) { setView('select'); t = window.setTimeout(() => setView(targetRef.current), JP_SELECT_MS) }
+    else if (openNow == null && prev != null) { setView('back'); t = window.setTimeout(() => setView(targetRef.current), JP_BACK_MS) }
+    else setView(v => (v === 'select' || v === 'back' ? v : target))
+    return () => { if (t) clearTimeout(t) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openNow])
+  // ответ показан/скрыт, пока плитка открыта, — сразу (если не идёт переход)
+  useEffect(() => { setView(v => (v === 'select' || v === 'back' ? v : target)) }, [target])
+
+  const selAt = lastAt.current
+  const sel = selAt ? jpSelPos(layout, selAt.ti, selAt.i) : { x: 0, y: 0 }
+  const selKey = selAt ? `${selAt.ti}-${selAt.i}` : ''
+  const intro = useRef(true)
+  const { root } = useEntrance(a => a.tl.play(), (tl, q) => {
+    jpBuild(tl, q, view, sel, { intro: intro.current })
+    intro.current = false
+  }, null, [view, themes.length])
+  const [n, setN] = useState<number | null>(null)
+  useEffect(() => { if (openNow == null) setN(null) }, [openNow])
+
+  if (themes.length === 0) return (
+    <div className="host-screen grid-bg">
+      <div className="mono-tag">СВОЯ ИГРА</div>
+      <p>Темы не заполнены — добавь их в редакторе раунда</p>
+      <div className="host-actions">
+        <button onClick={() => void setPhase('round_intro')}>← К титулу</button>
+      </div>
+    </div>
+  )
+
+  const total = themes.reduce((s, t) => s + t.tiles.length, 0)
+  const keys = new Set(themes.flatMap((t, ti) => t.tiles.map((_, i) => `${ti}-${i}`)))
+  const playedN = opened.filter(k => keys.has(k)).length
+  const remain = Math.max(0, total - playedN)
+  const stOf = (k: string) => {
+    if (k === selKey && view === 'select') return 'sel'
+    if (k === selKey && (view === 'question' || view === 'reveal')) return 'taken'
+    if (k === selKey && view === 'back') return 'done just'
+    return opened.includes(k) ? 'done' : 'av'
+  }
+  const flatOf = (ti: number, i: number) => themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+  return (
+    <JeopardyScene rootRef={root} cls={view} view={view} title={b.jpTitleText || 'Своя игра'}
+      sub={remain === 0 ? ' · все плитки сыграны' : ` · осталось плиток: ${remain}`}
+      themes={themes.map(t => ({ name: t.name || '', hint: t.hint, values: t.tiles.map(x => Number(x.value) || 0) }))}
+      layout={layout} stOf={stOf} sel={sel} n={view === 'question' ? n : null}
+      onTile={openTile == null && view === 'board' ? (ti, i) => b.openAt(flatOf(ti, i), undefined) : undefined}>
+      {b.saveErr && <div className="jp2-err">⚠ {b.saveErr}</div>}
+      {at && openTile != null && (
+        <ForestTileOpen key={openTile} round={round} gameState={gameState} theme={themes[at.ti]} tile={at.tile} tileIndex={openTile}
+          showAnswer={showAnswer} replayNonce={b.replayNonce} origin={null} onShowAnswer={b.onShowAnswer} onReplay={b.onReplay}
+          onClose={() => b.onClose(at.key)} packTheme={pack.theme} view={view} onTimer={setN} />
+      )}
+      {!at && <div className="host-actions">
+        {/* кнопки как у прежней доски; на проекторе Леса скрыты стилем (?nav=1 — вернуть) */}
+        <AfterRoundNav pack={pack} gameState={gameState} />
+      </div>}
+    </JeopardyScene>
+  )
+}
+
+/** Открытая плитка в Лесу: сосуд с отсчётом и панель ответов. Логика — та же useTileModal, что у модалки. */
+function ForestTileOpen(props: TileProps & { view: JpView; onTimer: (n: number | null) => void }) {
+  const { theme, tile, view, showAnswer, onShowAnswer, onReplay, onClose, onTimer } = props
+  const { remaining, playing, teams, audioErr, localGrades, rows, grade } = useTileModal(props)
+  useEffect(() => { onTimer(remaining) }, [remaining, onTimer])
+  const verdictOf = (a: { id: string; is_correct?: boolean | null }) => localGrades[a.id] ?? a.is_correct ?? null
+  const list: JpRow[] = rows.map(a => {
+    const team = teams.find(t => t.id === a.team_id)
+    // до «Показать ответ» текста ответа в разметке нет вовсе — только факт ответа
+    return { key: a.id, name: team?.name ?? '—', color: team?.color, text: showAnswer ? (a.answer_text || '—') : '', verdict: verdictOf(a) }
+  })
+  // ответ, пришедший уже на экране, и вердикт, поставленный после показа, — проявляются; при входе их проявляет таймлайн сцены
+  const panelRef = useRef<HTMLDivElement>(null)
+  const seen = useRef<Map<string, boolean | null> | null>(null)
+  useLayoutEffect(() => {
+    const el = panelRef.current
+    const prev = seen.current
+    seen.current = new Map(list.map(r => [r.key, r.verdict]))
+    if (!el || !prev) return
+    for (const r of list) {
+      const row = el.querySelector(`[data-k="${r.key}"]`)
+      if (!row) continue
+      if (!prev.has(r.key)) gsap.fromTo(row, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power3.out' })
+      else if (showAnswer && r.verdict != null && prev.get(r.key) !== r.verdict) {
+        gsap.fromTo(row.querySelector('.mk'), { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.45, ease: 'back.out(2.2)' })
+        gsap.fromTo(row.querySelector('.pts'), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35 })
+      }
+    }
+  })
+  const ungraded = rows.filter(a => verdictOf(a) == null).length
+  const shown = view === 'question' || view === 'reveal'
+  return <>
+    {shown && <>
+      <JpVessel n={view === 'question' ? remaining : null} playing={view === 'question' && playing} />
+      <JpPanel panelRef={panelRef} theme={{ name: theme.name, hint: theme.hint }} value={Number(tile.value) || 0} reveal={view === 'reveal'}
+        correct={view === 'reveal' ? tile.correct : ''} rows={list} count={rows.length}
+        note={<div className="jp2-hint">{audioErr ? `🔇 ${audioErr}` : JP_NOTE}</div>} />
+    </>}
+    <div className="host-actions jp2-actions">
+      {/* те же действия, что в прежней модалке; на проекторе Леса скрыты стилем (?nav=1 — вернуть) */}
+      {showAnswer && rows.map((a, pos) => {
+        const v = verdictOf(a), team = teams.find(t => t.id === a.team_id)
+        return <span key={a.id} className="jp2-grade">#{pos + 1} {team?.name ?? '—'}
+          <button className={v === true ? '' : 'ghost'} onClick={() => void grade(a.id, true)}>✓</button>
+          <button className={v === false ? '' : 'ghost'} onClick={() => void grade(a.id, false)}>✗</button>
+        </span>
+      })}
+      {ungraded > 0 && <span className="jp2-grade">⚠ не оценено: {ungraded}</span>}
+      {audioErr && <button className="ghost" onClick={() => void probeMedia(mediaUrl(tile.audio)).then(t => alert(t))}>что с файлом?</button>}
+      {!showAnswer && <button onClick={onShowAnswer}>Показать ответ</button>}
+      <button className="ghost" onClick={onReplay}>↻ Переслушать</button>
+      <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
+    </div>
+  </>
 }

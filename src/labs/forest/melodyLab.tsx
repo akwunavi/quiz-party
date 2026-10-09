@@ -79,6 +79,6 @@ export function MelodyLab({ state, nOv, onReady }: S1Props) {
   }} />
   return (
     <MelodyScene rootRef={root} cls={state} view={view} title={MEL2.title} sub={state === 'complete' ? ' · все треки отыграны' : ` · осталось треков: ${keys.length - played.length}`}
-      themes={TH.map(name => ({ name, tracks: NT }))} layout={layout} stOf={stOf} sel={sel} pickNo={PI + 1} hot={hot} landed={landed} n={n} panel={panel} />
+      themes={TH.map(name => ({ name, tracks: NT }))} layout={layout} stOf={stOf} pickNo={PI + 1} hot={hot} landed={landed} n={n} panel={panel} />
   )
 }
