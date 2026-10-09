@@ -7,13 +7,13 @@
 //    1 секунду» → ставки секундами (2–5 с → 2 балла, 6–10 с → 1, ход второй команде → 0,5) →
 //    отрывок длиной в ставку → ответ → (передача хода) → ответ на экране; таймеры — bidSec 10,
 //    answerSec 30, passAnswerSec 10 (lib/melody.ts, MelodyRound.tsx).
+// Тестовые данные лаборатории (боевые компоненты их не импортируют — только src/labs/forest/*Lab.tsx и этап 5).
 import { TEAMS } from '../../labs/magic2/data'
 
 const tcol = (hue: number) => `hsl(${hue} 52% 66%)`
 const T = TEAMS.map((t, i) => ({ id: `t${i + 1}`, name: t.name, color: tcol(t.hue) }))
 export const TEAM = (id: string) => T.find(t => t.id === id)!
-export const fmtVal = (v: number) => String(v).replace('.', ',')
-export const balla = (v: number) => (v === 1 ? 'балл' : v < 1 || v % 1 ? 'балла' : v >= 2 && v <= 4 ? 'балла' : 'баллов')
+export { fmtVal, balla } from './fmt'
 
 export const JP2 = {
   title: 'Своя игра',
