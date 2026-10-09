@@ -1,4 +1,4 @@
-// ═══ Этап 3 · «Скрэмбл» — утверждённое направление «Семена над поляной» ═══
+// ═══ Этап 3 · «Скрэмбл» — утверждённое направление «Семена над поляной»: разметка и перелёты (общие для лаборатории и игры) ═══
 // Механика (AnagramRound.tsx + lib/anagram.ts): определение (текст вопроса) сверху, буквы фразы
 // перемешаны на плитках, под ними — пустые клетки слов. Пока идёт таймер, подсказки открываются по
 // одной каждые N секунд (первая буква не подсказывается никогда, минимум две остаются закрытыми):
@@ -7,33 +7,24 @@
 // Образ: буквы — семена одуванчика, парящие над поляной; клетки — чашечки на грядке внизу. В пустой
 // чашечке — пунктирный контур семени («сюда опустится семя»); подсказка и ответ опускают семя в
 // чашечку, и из неё распускается цветок. Слова — отдельные грядки с травяной полосой.
-import { S1Screen, useEntrance, type S1Props } from '../stage1/common'
+// Здесь только РИСУНОК по данным (буквы, какие сели, какие — подсказки) и куски таймлайна; кто и когда их
+// запускает — у вызывающих: в игре src/forest/stage3/ScrambleGame.tsx, в лаборатории src/labs/forest/scrambleLab.tsx.
+import type { ReactNode, RefObject } from 'react'
+import { S1Screen } from '../stage1/common'
 import type { Rect } from '../stage1/env'
-import { SCR_SETS, TEAM3, type ScrSet } from './data'
-import { head, Timer, timer3 } from './common3'
-
-export const SCR_STATES = [
-  { id: 'question', name: 'Вопрос: буквы перемешаны (16 букв)' },
-  { id: 'short', name: 'Короткий ответ (6 букв)' },
-  { id: 'long', name: 'Длинный ответ (22 буквы, 3 слова)' },
-  { id: 'hints', name: 'Подсказки: две буквы уже на месте' },
-  { id: 'warn', name: 'Тревога: 7 секунд' },
-  { id: 'zero', name: 'Время вышло' },
-  { id: 'reveal', name: 'Показ ответа: буквы встают на место' },
-  { id: 'complete', name: 'Итог: слово собрано, кто угадал' },
-]
-export const SCR_VARIANTS = [
-  { id: 'A', name: 'Семена над поляной', note: 'Утверждено. Буквы — семена одуванчика, парящие над поляной; внизу — грядка с чашечками по одной на букву, слова разделены. Пунктирный контур в пустой чашечке показывает, куда опустится семя. Подсказка опускает янтарное семя в его чашечку. Показ: семена по очереди — в порядке слова, слева направо — планируют на свои места, чашечки распускаются цветами, по грядке бежит золотой побег.' },
-]
+import type { AnagramTemplate } from '../../lib/anagram'
+import { head, Timer } from './common3'
 
 type P = { x: number; y: number }
-type Lay = { cell: number; tile: number; slot: P[]; home: P[]; rowY: number[]; bed: { x0: number; x1: number; y: number }[]; words: { x0: number; x1: number; y: number }[] }
+export type ScrLay = { cell: number; tile: number; slot: P[]; home: P[]; rowY: number[]; bed: { x0: number; x1: number; y: number }[]; words: { x0: number; x1: number; y: number }[] }
 const CX = 1100, AVAIL = 1400, GAP = 10, WGAP = 58
 const jit = (p: number, k: number) => Math.sin(p * 12.9898 + k * 78.233) * 0.5 // детерминированный «разброс» без случайности
 
-function layout(S: ScrSet): Lay {
-  const words = S.template.words.map(w => w.filter(c => c.kind === 'letter') as { kind: 'letter'; idx: number }[])
-  const N = S.letters.length
+/** Раскладка: клетки слов (грядки) и «дом» каждой плитки. Утверждённый кадр — до двух строк грядок и клетка ≥ 56;
+ *  длинные фразы из настоящих паков ужимают клетку до 40 и при нужде занимают третью строку. */
+export function scrLayout(template: AnagramTemplate, order: number[]): ScrLay {
+  const words = template.words.map(w => w.filter(c => c.kind === 'letter') as { kind: 'letter'; idx: number }[]).filter(w => w.length)
+  const N = template.letters.length
   const wid = (n: number, c: number) => n * (c + GAP) - GAP
   const wrap = (c: number) => { // жадно по словам: строки, в которые слова влезают по ширине
     const rows: number[][] = [[]]; let w = 0
@@ -41,10 +32,11 @@ function layout(S: ScrSet): Lay {
       if (w + add > AVAIL && rows[rows.length - 1].length) { rows.push([i]); w = ww } else { rows[rows.length - 1].push(i); w += add } })
     return rows
   }
-  let cell = 56, rows = wrap(56)
-  for (let c = 92; c >= 56; c -= 2) { const r = wrap(c); if (r.length === 1 && c >= 70) { cell = c; rows = r; break } if (r.length <= 2) { cell = c; rows = r; break } }
-  const rowY = rows.length === 1 ? [880] : [782, 930]
-  const slot: P[] = [], bed: Lay['bed'] = [], wordsB: Lay['words'] = []
+  let cell = 56, rows = wrap(56), found = false
+  for (let c = 92; c >= 40; c -= 2) { const r = wrap(c); if (r.length === 1 && c >= 70) { cell = c; rows = r; found = true; break } if (r.length <= 2) { cell = c; rows = r; found = true; break } }
+  if (!found) { cell = 40; rows = wrap(40) }
+  const rowY = rows.length === 1 ? [880] : rows.length === 2 ? [782, 930] : rows.map((_, i) => 760 + i * Math.min(cell + 30, 280 / (rows.length - 1)))
+  const slot: P[] = [], bed: ScrLay['bed'] = [], wordsB: ScrLay['words'] = []
   rows.forEach((ids, ri) => {
     const tw = ids.reduce((a, i) => a + wid(words[i].length, cell), 0) + WGAP * (ids.length - 1)
     let x = CX - tw / 2
@@ -57,83 +49,111 @@ function layout(S: ScrSet): Lay {
   const hr = N <= 9 ? 1 : N <= 18 ? 2 : 3
   const cols = Math.ceil(N / hr), pitch = Math.min(190, 1400 / cols)
   const ys = hr === 1 ? [460] : hr === 2 ? [400, 590] : [370, 500, 630]
-  const home = S.order.map((_, p) => { const r = Math.floor(p / cols), c = p % cols, inRow = Math.min(cols, N - r * cols)
+  const home = order.map((_, p) => { const r = Math.floor(p / cols), c = p % cols, inRow = Math.min(cols, N - r * cols)
     return { x: CX + (c - (inRow - 1) / 2) * pitch + jit(p, 1) * pitch * 0.2 + (r % 2 ? pitch * 0.18 : 0), y: ys[r] + jit(p, 2) * 44 } })
-  return { cell, tile, slot, home, rowY, bed, words: wordsB }
+  return { cell, tile: rows.length > 2 ? Math.min(tile, 84) : tile, slot, home, rowY, bed, words: wordsB }
 }
 
-export function Scramble({ state, nOv, onReady }: S1Props) {
-  const S = state === 'short' ? SCR_SETS.short : state === 'long' ? SCR_SETS.long : SCR_SETS.normal
-  const Ly = layout(S)
-  const N = S.letters.length, ORD = S.order, L = S.letters
-  const fin = state === 'reveal' || state === 'complete'
-  const preLanded = new Set(state === 'hints' ? [S.hints[0]] : state === 'reveal' ? S.hints : state === 'complete' ? L.map((_, i) => i) : [])
-  const hinted = new Set(state === 'hints' || fin ? S.hints : [])
-  const flying = state === 'hints' ? [S.hints[1]] : state === 'reveal' ? L.map((_, i) => i).filter(i => !preLanded.has(i)) : []
-  const tm = timer3(state === 'short' || state === 'long' ? 'question' : state, S.timer)
-  const fixedN = state === 'warn' ? 7 : state === 'zero' ? 0 : null
-  const { root, n: nLive } = useEntrance(onReady, (tl, q) => {
-    const k = Ly.cell / Ly.tile
-    if (state === 'question' || state === 'short' || state === 'long' || state === 'warn' || state === 'zero') {
-      tl.fromTo(q('.scA-cup'), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'back.out(2)', transformOrigin: '50% 100%' }, 0.2)
-        .fromTo(q('.scA-bedline'), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.2)
-        .fromTo(q('.s3-tile'), { y: 260, opacity: 0, rotation: -30 }, { y: 0, opacity: 1, duration: 1.2, stagger: { each: 0.05, from: 'random' }, ease: 'power2.out' }, 0.3)
-        .fromTo(q('.s3-cell'), { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.02 }, 0.5)
-    } else tl.fromTo(q('.s3-cell'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0).fromTo(q('.scA-bedline'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0)
-    tl.fromTo(q('.s3-clue .w'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'back.out(1.5)' }, 0.2)
-    // перелёт: одна плавная дуга (подъём — спуск), без «петель»
-    const fly = (i: number, at: number, dur: number) => {
-      const p = ORD.indexOf(i), el = q(`.s3-tile[data-p="${p}"]`)[0]; if (!el) return
-      const h = Ly.home[p], s = Ly.slot[i], dx = s.x - h.x, dy = s.y - h.y
-      tl.fromTo(el, { x: 0, y: 0, rotation: 0, scale: 1 }, { keyframes: [{ x: dx * 0.5, y: dy * 0.5 - 80, rotation: dx > 0 ? 10 : -10, duration: dur * 0.55, ease: 'sine.inOut' }, { x: dx, y: dy, rotation: 0, scale: k, duration: dur * 0.45, ease: 'power2.out' }] }, at)
-      tl.fromTo(q(`.s3-cell[data-i="${i}"]`), { '--lit': 0 }, { '--lit': 1, duration: 0.3 }, at + dur * 0.9)
-    }
-    if (state === 'hints') {
-      tl.fromTo(q(`.s3-tile[data-p="${ORD.indexOf(S.hints[1])}"] .scA-glint`), { opacity: 0 }, { opacity: 1, duration: 0.5, yoyo: true, repeat: 1 }, 0.4)
-      fly(S.hints[1], 1.4, 1.2)
-    }
-    if (state === 'reveal') {
-      tl.to(q('.sc-tileA:not(.landed) .scA-fluff'), { opacity: 1, duration: 0.4 }, 0.1)
-        .to(q('.sc-tileA:not(.landed)'), { y: -16, duration: 0.5, ease: 'sine.out' }, 0.1) // «собраться»: семена замирают и чуть приподнимаются
-      const step = N > 18 ? 0.14 : 0.2
-      flying.forEach((i, j) => { const at = 0.9 + j * step; tl.set(q(`.s3-tile[data-p="${ORD.indexOf(i)}"]`), { y: 0 }, at - 0.001); fly(i, at, 1.0) })
-      const end = 0.9 + flying.length * step + 1.0
-      tl.fromTo(q('.scA-petal'), { scale: 0 }, { scale: 1, duration: 0.5, stagger: 0.025, ease: 'back.out(2)', transformOrigin: '50% 100%' }, end - 0.5)
-        .fromTo(q('.scA-wv'), { strokeDashoffset: 1600 }, { strokeDashoffset: 0, duration: 1.0, ease: 'power1.inOut' }, end)
-        .fromTo(q('.s3-result > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1 }, end + 0.7)
-    }
-    if (state === 'complete') tl.fromTo(q('.s3-result > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.4)
-  }, tm, [state])
-  const n = nOv ?? fixedN ?? (tm ? nLive : null)
+/** Где встаёт строка «угадали …»: под грядками (утверждено); если не помещается — на освободившееся место плиток */
+export function scrResultTop(Ly: ScrLay, lines: number) {
+  const below = Ly.rowY[Ly.rowY.length - 1] + Ly.cell / 2 + 36
+  return below + lines * 52 <= 1070 ? below : 330
+}
+
+type Q = (s: string) => Element[]
+/** Вход в кадр: «question» — семена взлетают с земли, чашечки раскрываются; иначе (ответ уже открыт) — спокойно */
+export function scrEnterTl(tl: gsap.core.Timeline, q: Q, live: boolean) {
+  if (live) {
+    tl.fromTo(q('.scA-cup'), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'back.out(2)', transformOrigin: '50% 100%' }, 0.2)
+      .fromTo(q('.scA-bedline'), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.2)
+      .fromTo(q('.s3-tile'), { y: 260, opacity: 0, rotation: -30 }, { y: 0, opacity: 1, duration: 1.2, stagger: { each: 0.05, from: 'random' }, ease: 'power2.out' }, 0.3)
+      .fromTo(q('.s3-cell'), { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.02 }, 0.5)
+  } else tl.fromTo(q('.s3-cell'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0).fromTo(q('.scA-bedline'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0)
+  tl.fromTo(q('.s3-clue .w'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'back.out(1.5)' }, 0.2)
+}
+/** перелёт плитки буквы `i` в её клетку: одна плавная дуга (подъём — спуск), без «петель» */
+export function scrFly(tl: gsap.core.Timeline, q: Q, Ly: ScrLay, order: number[], i: number, at: number, dur: number) {
+  const k = Ly.cell / Ly.tile
+  const p = order.indexOf(i), el = q(`.s3-tile[data-p="${p}"]`)[0]; if (!el) return
+  const h = Ly.home[p], s = Ly.slot[i], dx = s.x - h.x, dy = s.y - h.y
+  tl.fromTo(el, { x: 0, y: 0, rotation: 0, scale: 1 }, { keyframes: [{ x: dx * 0.5, y: dy * 0.5 - 80, rotation: dx > 0 ? 10 : -10, duration: dur * 0.55, ease: 'sine.inOut' }, { x: dx, y: dy, rotation: 0, scale: k, duration: dur * 0.45, ease: 'power2.out' }] }, at)
+  tl.fromTo(q(`.s3-cell[data-i="${i}"]`), { '--lit': 0 }, { '--lit': 1, duration: 0.3 }, at + dur * 0.9)
+}
+/** подсказка: семя вспыхивает и перелетает в свою чашечку */
+export function scrHintTl(tl: gsap.core.Timeline, q: Q, Ly: ScrLay, order: number[], i: number, glintAt: number, flyAt: number) {
+  tl.fromTo(q(`.s3-tile[data-p="${order.indexOf(i)}"] .scA-glint`), { opacity: 0 }, { opacity: 1, duration: 0.5, yoyo: true, repeat: 1 }, glintAt)
+  scrFly(tl, q, Ly, order, i, flyAt, 1.2)
+}
+/** показ ответа: семена собираются, по очереди (в порядке слова) планируют на места, чашечки распускаются, по грядке бежит
+ *  золотой побег, потом — «угадали». Возвращает момент конца. */
+export function scrRevealTl(tl: gsap.core.Timeline, q: Q, Ly: ScrLay, order: number[], flying: number[], N: number) {
+  tl.to(q('.sc-tileA:not(.landed) .scA-fluff'), { opacity: 1, duration: 0.4 }, 0.1)
+    .to(q('.sc-tileA:not(.landed)'), { y: -16, duration: 0.5, ease: 'sine.out' }, 0.1) // «собраться»: семена замирают и чуть приподнимаются
+  const step = N > 18 ? 0.14 : 0.2
+  flying.forEach((i, j) => { const at = 0.9 + j * step; tl.set(q(`.s3-tile[data-p="${order.indexOf(i)}"]`), { y: 0 }, at - 0.001); scrFly(tl, q, Ly, order, i, at, 1.0) })
+  const end = 0.9 + flying.length * step + 1.0
+  tl.fromTo(q('.scA-petal'), { scale: 0 }, { scale: 1, duration: 0.5, stagger: 0.025, ease: 'back.out(2)', transformOrigin: '50% 100%' }, end - 0.5)
+    .fromTo(q('.scA-wv'), { strokeDashoffset: 1600 }, { strokeDashoffset: 0, duration: 1.0, ease: 'power1.inOut' }, end)
+    .fromTo(q('.s3-result > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1 }, end + 0.7)
+  return end + 0.7 + 0.45
+}
+
+export function ScrambleScene({ title, qn, qcount, qExtra, clue, Ly, letters, order, landed, hinted, fin, n, total, cls, timeUp, result, resTop, rootRef, side }: {
+  title: string; qn: number; qcount: number; qExtra?: string
+  clue: string
+  Ly: ScrLay
+  /** буквы фразы по порядку */
+  letters: string[]
+  /** order[p] — буква на плитке p */
+  order: number[]
+  /** буквы, чьи плитки уже стоят в клетках */
+  landed: ReadonlySet<number>
+  /** буквы-подсказки (янтарные) */
+  hinted: ReadonlySet<number>
+  /** показан ответ: чашечки распускаются цветами */
+  fin: boolean
+  n: number | null; total: number
+  /** дополнительные классы корня (состояние) */
+  cls: string
+  timeUp: boolean
+  /** содержимое строки результата (угадали / балл получает / никто не угадал); null — строки нет */
+  result: ReactNode | null
+  resTop?: number
+  rootRef: RefObject<HTMLDivElement>
+  side?: ReactNode
+}) {
+  const L = letters
   const rects: Rect[] = [{ x: 300, y: 100, w: 1480, h: 900 }]
   const warn = n != null && n > 0 && n <= 10, zero = n === 0
-  const resTop = Ly.rowY[Ly.rowY.length - 1] + Ly.cell / 2 + 36
+  const top = resTop ?? Ly.rowY[Ly.rowY.length - 1] + Ly.cell / 2 + 36
+  const clueCls = clue.length > 200 ? ' xl' : clue.length > 120 ? ' lg' : ''
   return (
-    <S1Screen rects={rects} n={n} rootRef={root} cls={`s3 sc scA st-${state}${fin ? ' fin' : ''}${warn ? ' warn' : ''}${zero ? ' zero' : ''}`}>
-      {head(S.title, S.qn, S.qcount)}
-      <div className="s3-clue sc-clueA">{S.clue.split(' ').map((w, i) => <span key={i} className="w">{w} </span>)}</div>
+    <S1Screen rects={rects} n={n} rootRef={rootRef} cls={`s3 sc scA ${cls}${fin ? ' fin' : ''}${warn ? ' warn' : ''}${zero ? ' zero' : ''}`}>
+      {head(title, qn, qcount, qExtra)}
+      {clue ? <div className={`s3-clue sc-clueA${clueCls}`}>{clue.split(' ').map((w, i) => <span key={i} className="w">{w} </span>)}</div> : null}
+      {side}
       <svg className="scA-bed" viewBox="0 0 1920 1080" aria-hidden>
         {Ly.bed.map((b, i) => <path key={i} className="scA-bedline" d={`M ${b.x0} ${b.y} C ${b.x0 + 200} ${b.y - 12} ${(b.x0 + b.x1) / 2} ${b.y + 10} ${b.x1 - 200} ${b.y - 8} S ${b.x1} ${b.y + 4} ${b.x1} ${b.y}`} />)}
         {Ly.words.map((w, i) => <path key={i} className="scA-wv" d={`M ${w.x0} ${w.y + 6} L ${w.x1} ${w.y + 6}`} />)}
       </svg>
       {L.map((_, i) => {
         const s = Ly.slot[i]
-        return <div key={i} className="s3-cell sc-cellA" data-i={i} style={{ left: s.x - Ly.cell / 2, top: s.y - Ly.cell / 2, width: Ly.cell, height: Ly.cell, ...(fin || preLanded.has(i) ? { ['--lit' as string]: 1 } : null) }}>
+        return <div key={i} className="s3-cell sc-cellA" data-i={i} style={{ left: s.x - Ly.cell / 2, top: s.y - Ly.cell / 2, width: Ly.cell, height: Ly.cell, ...(fin || landed.has(i) ? { ['--lit' as string]: 1 } : null) }}>
           <CupA />
-          {!preLanded.has(i) && <i className="scA-ghost" />}
+          {!landed.has(i) && <i className="scA-ghost" />}
           <PetalsA hidden={!fin} />
         </div>
       })}
-      {ORD.map((li, p) => {
-        const landed = preLanded.has(li), h = landed ? Ly.slot[li] : Ly.home[p], sz = landed ? Ly.cell : Ly.tile
-        return <div key={p} className={`s3-tile sc-tileA${hinted.has(li) ? ' hint' : ''}${landed ? ' landed' : ''}`} data-p={p} style={{ left: h.x - sz / 2, top: h.y - sz / 2, width: sz, height: sz, ['--ph' as string]: `${(p * 0.37) % 2.4}s` }}>
+      {order.map((li, p) => {
+        const isL = landed.has(li), h = isL ? Ly.slot[li] : Ly.home[p], sz = isL ? Ly.cell : Ly.tile
+        return <div key={p} className={`s3-tile sc-tileA${hinted.has(li) ? ' hint' : ''}${isL ? ' landed' : ''}`} data-p={p} style={{ left: h.x - sz / 2, top: h.y - sz / 2, width: sz, height: sz, ['--ph' as string]: `${(p * 0.37) % 2.4}s` }}>
           <svg className="scA-fluff" viewBox="-50 -90 100 100" aria-hidden>{Array.from({ length: 11 }, (_, k) => { const a = (-160 + k * 14) * Math.PI / 180; return <line key={k} x1="0" y1="-30" x2={Math.cos(a) * 46} y2={-30 + Math.sin(a) * 46} /> })}<line x1="0" y1="-30" x2="0" y2="-8" /></svg>
           <b>{L[li]}</b><i className="scA-glint" />
         </div>
       })}
-      {zero && state !== 'reveal' && <div className="scA-time">Время вышло</div>}
-      {fin && <div className="s3-result sc-resA" style={{ top: resTop }}><span>угадали</span>{S.guessed.map(k => <em key={k} style={{ color: TEAM3[k].color, borderColor: TEAM3[k].color }}>{TEAM3[k].name}</em>)}</div>}
-      <Timer n={n} total={S.timer} />
+      {timeUp && <div className="scA-time">Время вышло</div>}
+      {result != null && <div className="s3-result sc-resA" style={{ top }}>{result}</div>}
+      <Timer n={n} total={total} />
     </S1Screen>
   )
 }
