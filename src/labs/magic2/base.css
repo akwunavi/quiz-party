@@ -1,0 +1,224 @@
+/* ═══ Magic 2.0 Lab — общая РАСКЛАДКА (не материал) ═══
+   Холст 1920×1080. Здесь только где что стоит и какого размера; цвет, фактура,
+   свет и вся магия — в файлах концептов (kN.css). Поля: 140 по бокам, 120 сверху. */
+.mx { position:absolute; inset:0; overflow:hidden; font-family:'EB Garamond', Georgia, serif; font-variant-numeric:lining-nums tabular-nums; }
+.mx * { box-sizing:border-box; }
+.x-content { position:absolute; inset:0; z-index:2; }
+.x-world { position:absolute; inset:0; pointer-events:none; }
+.x-front { z-index:4; }
+.x-lay { position:absolute; inset:0; }
+.mx .x-nav { position:absolute; right:24px; bottom:18px; display:flex; gap:8px; z-index:50; }
+.mx .x-nav button { font:600 16px/1 'EB Garamond', serif; padding:6px 12px; border-radius:3px; border:1px solid rgba(255,255,255,.3); background:rgba(0,0,0,.5); color:#ddd; opacity:.7; }
+
+/* слои переходов: до события виден «откуда», после — «куда»; само событие рисует концепт */
+.sub-before .x-to, .sub-intro .x-from, .sub-after .x-from { visibility:hidden; }
+.sub-intro .x-to, .sub-after .x-to { visibility:visible; }
+
+/* общие узлы */
+.x-w { display:inline-block; }
+.x-team { display:inline-flex; align-items:center; gap:12px; min-width:0; }
+.x-team b { font-weight:600; min-width:0; }
+.x-team em { font-size:.62em; font-style:italic; opacity:.8; }
+.x-mark { flex:0 0 auto; display:inline-block; }
+.x-key { display:inline-grid; place-items:center; flex:0 0 auto; }
+.x-meta { position:absolute; left:140px; right:420px; top:56px; display:flex; justify-content:space-between; gap:40px; font-size:24px; letter-spacing:.2em; text-transform:uppercase; }
+.x-meta b { font-size:1.25em; letter-spacing:.04em; }
+.x-tslot { position:absolute; right:120px; top:36px; width:220px; height:220px; display:grid; place-items:center; }
+.x-img { position:absolute; margin:0; }
+.x-img-in { width:100%; height:100%; overflow:hidden; }
+.x-num { position:absolute; left:50%; top:-28px; transform:translateX(-50%); display:grid; place-items:center; width:56px; height:56px; font-size:30px; font-weight:700; }
+.x-qtext { position:absolute; margin:0; text-wrap:balance; }
+
+/* 01 лобби */
+.x-logo { position:absolute; left:0; right:0; top:120px; margin:0; text-align:center; font-size:190px; line-height:1; font-weight:600; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; }
+.x-lq { font-family:'UnifrakturMaguntia', 'EB Garamond', serif; text-transform:none; font-size:1.18em; }
+.x-count { position:absolute; left:0; right:0; top:372px; text-align:center; font-size:26px; letter-spacing:.3em; text-transform:uppercase; }
+.x-qrcard { position:absolute; left:140px; top:500px; margin:0; padding:22px 22px 14px; width:280px; text-align:center; }
+.x-qrcard .m2-qr { margin:0 auto; }
+.x-qrcard figcaption { margin-top:10px; font-size:20px; font-style:italic; }
+.x-teams { position:absolute; left:520px; right:140px; top:470px; height:500px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); grid-template-rows:repeat(3, 1fr); gap:22px 26px; }
+.x-teams .x-team { font-size:27px; line-height:1.1; }
+.x-team.is-wait { visibility:hidden; }
+
+/* 02 рандомайзер */
+.x-overlay { pointer-events:none; }
+.rnd-before .x-groups { visibility:hidden; }
+.x-groups { position:absolute; left:520px; right:140px; top:430px; min-height:420px; padding:28px 34px; }
+.x-groups-head { font-size:24px; letter-spacing:.24em; text-transform:uppercase; margin-bottom:22px; }
+.x-groups-list { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.x-group { padding:18px 22px 20px; min-width:0; }
+.x-gname { display:flex; align-items:center; gap:12px; font-size:34px; font-weight:600; margin-bottom:8px; }
+.x-gpeople { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:26px; }
+.x-player { display:inline-block; }
+
+/* 03 правила */
+.x-rules { position:absolute; inset:0; }
+.x-rules-title { position:absolute; left:140px; top:110px; font-size:120px; line-height:1; font-weight:600; letter-spacing:.06em; }
+.x-rule-list { position:absolute; left:140px; width:980px; top:290px; margin:0; padding:0; list-style:none; display:grid; gap:16px; }
+.x-rule { display:flex; align-items:baseline; gap:20px; font-size:33px; line-height:1.2; }
+.x-rule span { flex:0 0 46px; font-size:30px; font-weight:700; }
+.x-rounds { position:absolute; right:140px; width:560px; top:290px; display:grid; gap:10px; }
+.x-round { display:grid; grid-template-columns:50px minmax(0,1fr) auto; gap:14px; align-items:baseline; font-size:28px; padding-bottom:8px; }
+.x-round b { font-size:30px; } .x-round em { font-size:22px; font-style:italic; }
+.x-stats { position:absolute; right:140px; width:560px; top:800px; font-size:22px; font-style:italic; line-height:1.35; }
+.x-note { position:absolute; left:140px; bottom:70px; font-size:22px; font-style:italic; }
+
+/* 04 заставка раунда / кроссворд */
+.x-intro { position:absolute; inset:0; }
+.x-intro-side { position:absolute; left:200px; right:200px; top:250px; text-align:center; }
+.x-intro.with-grid .x-intro-side { left:1000px; right:120px; top:200px; text-align:left; }
+.x-intro-n { font-size:30px; letter-spacing:.34em; text-transform:uppercase; }
+.x-intro-title { margin:14px 0 18px; font-size:130px; line-height:1.0; font-weight:600; letter-spacing:.03em; }
+.x-intro.with-grid .x-intro-title { font-size:84px; }
+.x-intro-title span { display:block; }
+.x-intro-meta { font-size:26px; letter-spacing:.14em; text-transform:uppercase; }
+.x-intro-rules { margin:34px 0 0; padding:0; list-style:none; display:grid; gap:14px; font-size:30px; line-height:1.2; }
+.x-intro:not(.with-grid) .x-intro-rules { width:1100px; margin-inline:auto; text-align:left; }
+.x-intro-rules li { display:flex; gap:18px; } .x-intro-rules span { flex:0 0 46px; font-weight:700; }
+.x-intro-grid { position:absolute; left:120px; top:150px; width:840px; height:820px; display:grid; place-items:center; }
+.x-cw { position:relative; }
+.x-cell { position:absolute; }
+.x-cell i { position:absolute; left:3px; top:1px; font-size:.36em; font-style:normal; font-weight:700; line-height:1; }
+.x-cw-mini { position:absolute; left:140px; top:540px; width:760px; height:440px; display:grid; place-items:center; }
+.x-qtext-cw { left:980px; right:140px; top:300px; height:600px; display:flex; flex-direction:column; justify-content:center; font-size:60px; line-height:1.15; font-weight:500; }
+.x-cwn { display:block; font-size:24px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:22px; }
+
+/* 05 сопоставление */
+.x-qtext-top { left:140px; right:420px; top:130px; font-size:52px; line-height:1.15; font-weight:500; }
+.x-mimg { top:270px; width:300px; height:320px; }
+.x-opts { position:absolute; }
+.x-opt { display:flex; align-items:center; gap:20px; min-width:0; }
+.x-key { width:58px; height:58px; font-size:30px; font-weight:700; }
+.x-opts-row { left:140px; right:140px; top:740px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:30px; }
+.x-opts-row .x-opt { font-size:40px; font-weight:500; justify-content:center; height:110px; }
+
+/* 06 одна картинка */
+.x-qtext-side { left:140px; width:960px; top:250px; height:700px; display:flex; align-items:center; font-size:58px; line-height:1.18; font-weight:500; }
+.x-oneimg { left:1200px; top:300px; width:540px; height:700px; }
+
+/* 07 две картинки + варианты */
+.x-qtext-dense { left:140px; right:420px; top:130px; font-size:46px; line-height:1.16; font-weight:500; }
+.x-pair { position:absolute; left:140px; right:140px; top:290px; height:400px; display:flex; gap:60px; justify-content:center; }
+.x-dimg { position:relative; width:600px; height:400px; }
+.x-dimg figcaption { position:absolute; right:18px; bottom:14px; font-size:22px; padding:0 10px; }
+.x-opts-grid { left:140px; right:140px; top:760px; display:grid; grid-template-columns:1fr 1fr; gap:22px 60px; }
+.x-opts-grid .x-opt { font-size:42px; font-weight:500; height:104px; padding:0 22px; }
+
+/* 08 текстовый вопрос */
+.x-qtext-big { left:200px; right:200px; top:300px; height:520px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:76px; line-height:1.16; font-weight:500; }
+
+/* 09 своя игра */
+.x-jp-title { position:absolute; left:0; right:0; top:90px; text-align:center; font-size:64px; font-weight:600; letter-spacing:.06em; }
+.x-jp-board { position:absolute; inset:0; }
+.x-jp-theme { position:absolute; top:190px; width:280px; height:80px; display:flex; flex-direction:column; justify-content:center; text-align:center; font-size:27px; line-height:1.05; letter-spacing:.06em; text-transform:uppercase; }
+.x-jp-theme i { font-size:19px; text-transform:none; letter-spacing:.02em; margin-top:4px; }
+.x-tile { position:absolute; width:260px; height:112px; display:grid; place-items:center; font-size:56px; font-weight:700; }
+.x-jp-open { position:absolute; left:420px; top:150px; width:1080px; height:820px; padding:46px 60px; visibility:hidden; }
+.x-jp-open.on { visibility:visible; }
+.x-jp-open-head { display:flex; justify-content:space-between; align-items:flex-start; gap:30px; }
+.x-jp-otheme { font-size:42px; font-weight:600; line-height:1.05; } .x-jp-otheme i { display:block; font-size:26px; font-weight:400; font-style:italic; }
+.x-jp-otile { font-size:28px; letter-spacing:.2em; text-transform:uppercase; white-space:nowrap; }
+.x-jp-count { height:60px; margin-top:16px; font-size:28px; } .x-jp-count b { font-size:52px; }
+.x-jp-ans-label { font-size:22px; letter-spacing:.22em; text-transform:uppercase; margin:12px 0 8px; }
+.x-jp-answers { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.x-jp-answers li { display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr) 50px; gap:20px; align-items:center; font-size:28px; padding:6px 0; }
+.x-jp-answers .x-team { font-size:28px; }
+.x-jp-answers em { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.x-verdict { font-weight:700; text-align:right; }
+.x-jp-correct { position:absolute; left:60px; right:60px; bottom:46px; min-height:150px; padding:20px 30px; visibility:hidden; display:flex; flex-direction:column; justify-content:center; }
+.x-jp-correct.on { visibility:visible; }
+.x-jp-correct span { font-size:20px; letter-spacing:.26em; text-transform:uppercase; } .x-jp-correct b { font-size:52px; line-height:1.05; }
+
+/* 10 мелодия */
+.x-mel-board { position:absolute; inset:0; }
+.x-mel-theme { position:absolute; top:160px; width:320px; text-align:center; font-size:32px; font-weight:600; }
+.x-rec { position:absolute; width:140px; height:140px; display:grid; place-items:center; }
+.x-rec b { position:relative; z-index:2; font-size:34px; font-weight:700; }
+.x-rec-grooves { position:absolute; inset:0; }
+.x-mel-win { position:absolute; left:500px; top:170px; width:920px; height:780px; padding:46px 60px; visibility:hidden; }
+.x-mel-win.on { visibility:visible; }
+.x-mel-head { display:flex; justify-content:space-between; align-items:center; font-size:30px; letter-spacing:.1em; text-transform:uppercase; min-height:120px; }
+.x-mel-head .x-tslot { position:static; width:120px; height:120px; }
+.x-mel-q { margin:18px 0 18px; font-size:44px; font-weight:600; }
+.x-bids { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+.x-bids li { display:grid; grid-template-columns:minmax(0,1fr) 120px; gap:16px; align-items:center; font-size:30px; padding:10px 0; position:relative; }
+.x-bids li b { text-align:right; }
+.x-plays { grid-column:1 / -1; font-size:20px; letter-spacing:.2em; text-transform:uppercase; }
+.x-mel-hint { margin-top:24px; font-size:21px; font-style:italic; }
+.x-mel-correct { font-size:60px; line-height:1.08; font-weight:600; margin-bottom:34px; }
+.x-mel-result { display:flex; align-items:center; gap:22px; font-size:32px; }
+
+/* 11 блиц */
+.x-bz-bank { position:absolute; left:0; right:0; top:60px; text-align:center; font-size:28px; letter-spacing:.24em; text-transform:uppercase; }
+.x-bz-row { position:absolute; left:140px; right:140px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:26px; }
+.x-bz-row.top { top:140px; } .x-bz-row.bot { top:790px; }
+.x-bz { height:196px; padding:16px 18px; display:grid; grid-template-rows:auto 1fr auto; gap:6px; min-width:0; }
+.x-bz .x-team { font-size:25px; line-height:1.08; }
+.x-bz-clock { display:grid; place-items:center; font-size:56px; font-weight:600; }
+.mx .x-bz-clock > * { width:84px; height:84px; }
+.x-bz-pts { font-size:20px; letter-spacing:.14em; text-transform:uppercase; }
+.x-bz-q { position:absolute; left:220px; right:220px; top:360px; height:400px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:18px; }
+.x-bz-asking { font-size:26px; letter-spacing:.14em; text-transform:uppercase; }
+.x-bz-text { font-size:62px; line-height:1.12; font-weight:500; }
+.x-bz-verdict { visibility:hidden; display:flex; gap:24px; align-items:baseline; font-size:40px; }
+.x-bz-verdict.on { visibility:visible; }
+.x-bz-verdict b { font-size:56px; }
+
+/* 12 скрэмбл */
+.x-scr-clue { left:220px; right:420px; top:150px; font-size:46px; line-height:1.18; font-weight:500; }
+.x-scr-slots .x-slot { position:absolute; top:700px; width:80px; height:96px; }
+.x-letter { position:absolute; left:0; top:0; width:80px; height:96px; display:grid; place-items:center; font-size:66px; font-weight:700;
+  transform: translate(var(--sx), var(--sy)); }
+.x-letter.placed { transform: translate(var(--tx), var(--ty)); }
+.x-scr-win { position:absolute; left:0; right:0; top:880px; text-align:center; font-size:34px; visibility:hidden; }
+.x-scr-win.on { visibility:visible; }
+
+/* 13 сопоставление — ответ */
+.x-recall { position:absolute; left:140px; right:420px; top:130px; margin:0; font-size:40px; font-style:italic; }
+.x-links { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; }
+.x-link { fill:none; }
+.x-mlabel { position:absolute; top:760px; left:0; width:320px; height:96px; justify-content:center; font-size:40px; font-weight:500; transform: translateX(var(--x0)); }
+.ma-reveal .x-mlabel, .ma-solved .x-mlabel { transform: translateX(var(--x1)); }
+.x-answer-line { position:absolute; left:140px; right:140px; top:885px; text-align:center; font-size:26px; letter-spacing:.14em; text-transform:uppercase; }
+.x-answer-line b { margin-left:26px; letter-spacing:.06em; font-size:30px; }
+.x-tans { position:absolute; left:140px; right:140px; top:950px; display:flex; flex-wrap:wrap; gap:6px 30px; align-items:center; font-size:22px; }
+.x-tans-label { font-size:17px; letter-spacing:.24em; text-transform:uppercase; }
+.x-ta { display:inline-flex; align-items:center; gap:10px; } .x-ta .x-team { font-size:22px; gap:8px; } .x-ta em { font-size:20px; }
+
+/* 14 порядок — ответ */
+.x-ord-label { position:absolute; left:460px; top:230px; font-size:22px; letter-spacing:.26em; text-transform:uppercase; }
+.x-ord { position:absolute; left:460px; width:1000px; height:96px; display:grid; grid-template-columns:70px 58px minmax(0,1fr); gap:24px; align-items:center; padding:0 28px; font-size:42px; }
+.x-ord-pos { font-size:46px; font-weight:700; opacity:0; }
+.oa-reveal .x-ord, .oa-solved .x-ord { transform: translateY(var(--dy)); }
+.oa-reveal .x-ord-pos, .oa-solved .x-ord-pos { opacity:1; }
+
+/* 16 табло */
+.x-sb-title { position:absolute; left:0; right:0; top:80px; text-align:center; font-size:46px; font-weight:600; }
+.x-sb-head, .x-sb-row { position:absolute; left:300px; width:1320px; display:grid; grid-template-columns:70px minmax(0,1fr) 110px 110px 130px; gap:16px; align-items:center; }
+.x-sb-head { top:176px; font-size:20px; letter-spacing:.22em; text-transform:uppercase; }
+.x-sb-head span:nth-child(n+3), .x-sb-row > span:nth-child(n+3) { text-align:right; }
+.x-sb-row { height:54px; font-size:30px; transform: translateY(var(--dy)); }
+.x-sb-row .x-team { font-size:28px; }
+.x-sb-place { font-weight:700; } .x-sb-sum { font-weight:700; }
+
+/* 18 финал */
+.x-final > div { position:absolute; inset:0; }
+.fin-last .x-fin-winner, .fin-last .x-fin-results, .fin-transition .x-fin-winner, .fin-transition .x-fin-results,
+.fin-winner .x-fin-last, .fin-winner .x-fin-results, .fin-results .x-fin-last, .fin-results .x-fin-winner { visibility:hidden; }
+.fin-transition .x-fin-last { visibility:visible; }
+.x-answer { position:absolute; left:0; right:0; top:360px; text-align:center; }
+.x-answer span { display:block; font-size:24px; letter-spacing:.3em; text-transform:uppercase; }
+.x-answer b { display:block; margin-top:12px; font-size:170px; line-height:1; font-weight:600; }
+.x-fin-kicker { position:absolute; left:0; right:0; top:150px; text-align:center; font-size:28px; letter-spacing:.34em; text-transform:uppercase; }
+.x-fin-winner h2 { position:absolute; left:160px; right:160px; top:210px; margin:0; text-align:center; font-size:150px; line-height:1; font-weight:600; text-wrap:balance; }
+.x-fw { display:inline-block; }
+.x-fin-score { position:absolute; left:0; right:0; top:560px; text-align:center; font-size:46px; font-weight:500; }
+.x-podium { position:absolute; left:220px; right:220px; top:690px; display:flex; justify-content:space-between; }
+.x-pod { width:520px; display:grid; gap:8px; justify-items:center; text-align:center; font-size:34px; }
+.x-pod > span:first-child { font-size:22px; letter-spacing:.24em; text-transform:uppercase; } .x-pod b { font-size:32px; } .x-pod .x-team { font-size:36px; }
+.x-fin-rtitle { position:absolute; left:0; right:0; top:60px; text-align:center; font-size:52px; font-weight:600; }
+.x-res-head, .x-res-row { position:absolute; left:260px; width:1400px; display:grid; grid-template-columns:60px minmax(0,1fr) repeat(6, 64px) 100px; gap:10px; align-items:center; }
+.x-res-head { top:150px; font-size:19px; letter-spacing:.2em; text-transform:uppercase; }
+.x-res-head span:nth-child(n+3), .x-res-row > span:nth-child(n+3), .x-res-row > b { text-align:right; }
+.x-res-row { top:calc(190px + var(--i) * 66px); height:56px; font-size:28px; }
+.x-res-row .x-team { font-size:28px; } .x-res-row > b { font-size:32px; }

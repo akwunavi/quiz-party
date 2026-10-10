@@ -28,6 +28,9 @@ import {
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodyState, RevealSettings, RevealState } from '../../types/quiz'
 import type { PreviewCtx } from '../../lib/previewState'
+import { isForestTheme } from '../../forest/config'
+import { ForestReveal } from '../../forest/rounds/ForestRounds'
+import { teamTone } from '../../forest/rounds/views'
 
 export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -111,6 +114,33 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
 
   const word = q?.answer.mode === 'crossword_word' ? q.answer.word : ''
   const groups = useFitText<HTMLDivElement>([word, rv.phase])
+
+  // «Волшебный лес» (проектор): рамы из ветвей и спилы с буквами. Фазы, автопереход, автопроверка — эффекты выше;
+  // таймер рисунка — от того же melody.rv.startedAt/phaseSec, что у боевого Timer. В предпросмотре — прежний экран.
+  if (!preview && isForestTheme(pack.theme)) {
+    const fImgs = q ? (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m)).map(mediaUrl) : []
+    return (
+      <>
+        <ForestReveal qid={q?.id ?? null} imgs={fImgs} phase={rv.phase ?? 1} startedAt={rv.startedAt ?? null} phaseSec={rv.phaseSec ?? null}
+          short={!!rv.short} settings={s} groups={revealGroups(word)} open={q?.service.openLetters ?? []} note={q?.answer_note || undefined}
+          answers={rows.map(a => {
+            const team = teams.find(t => t.id === a.team_id)
+            return { team: team?.name ?? '—', color: teamTone(team?.color), text: a.answer_text || '—', phase: a.stake, ok: a.is_correct }
+          })} />
+        {q && <div className="host-actions">
+          {rv.phase === 'review' && isLast
+            ? <AfterRoundNav pack={pack} gameState={gameState} />
+            : <button onClick={() => {
+              if (rv.phase === 'review') {
+                if (!isLast) void gotoQuestion(gameState.question_index + 1, navFrom(gameState)).catch(quietStale)
+                return
+              }
+              void saveReveal(bag, revealNext(rv, s, false))
+            }}>Дальше →</button>}
+        </div>}
+      </>
+    )
+  }
 
   if (!q) return (
     <div className="host-screen grid-bg">

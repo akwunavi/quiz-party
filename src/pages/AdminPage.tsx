@@ -48,6 +48,7 @@ import { casEnabled } from '../lib/sessionBag'
 import {
   melodyIdle, melodyFree, melodyKeys, melodySpin, melodyPlaySnippetIfFresh,
   melodyRevealMiss, melodyToBoard, guardMelody, melodyBidSec, melodyEmergencyClose,
+  melodyAcceptAnswer, melodyPick,
 } from '../lib/melody'
 import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
 import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
@@ -1989,6 +1990,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   const themes = s.themes ?? []
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const [manualPick, setManualPick] = useState(false)
 
   const m: MelodyState = gameState.melody ?? {}
   const played = m.played ?? []
@@ -2044,6 +2046,30 @@ function MelodyControls({ round, gameState, onFinish }: {
               return melodySpin(cur, target, freeNow.length, s.spinSec ?? 5, s.trackSec ?? 30)
             }))
           }}>🎲 {played.length === 0 ? 'СТАРТУЕМ!' : 'РУЛЕТКА'}</button>
+          {/* ручной выбор трека — то же действие, что клик по колокольчику на проекторе (раньше на пульте его не было) */}
+          {!manualPick
+            ? <button className="adm-btn" onClick={() => setManualPick(true)}>ВЫБРАТЬ ТРЕК ВРУЧНУЮ</button>
+            : <>
+                {themes.map((th, ti) => {
+                  const keys = free.filter(k => k.startsWith(`${ti}-`))
+                  if (!keys.length) return null
+                  return (
+                    <div key={ti} className="adm-tally">
+                      <span>{th.name}</span>
+                      <span className="adm-row-btns">
+                        {keys.map(k => (
+                          <button key={k} className="adm-btn" onClick={() => {
+                            setManualPick(false)
+                            void runAction('выбор трека мелодии', () => melodyClick(gameState, cur => (
+                              melodyIdle(cur) && !(cur.played ?? []).includes(k) ? melodyPick(cur, k, s.trackSec ?? 30) : null)))
+                          }}>{Number(k.split('-')[1]) + 1}</button>
+                        ))}
+                      </span>
+                    </div>
+                  )
+                })}
+                <button className="adm-btn" onClick={() => setManualPick(false)}>ОТМЕНА</button>
+              </>}
         </>) : (<>
           <div className="adm-qtext" style={{ textAlign: 'center' }}>
             Все {total} треков отыграны.
@@ -2113,11 +2139,15 @@ function MelodyControls({ round, gameState, onFinish }: {
         </div>
       </>)}
 
-      {m.stage === 'snippet' && (
+      {m.stage === 'snippet' && (<>
         <div className="adm-qtext" style={{ textAlign: 'center', color: currentTeam?.color }}>
           ♪ играет {bidSec || 5} сек для «{currentTeam?.name ?? '—'}»…
         </div>
-      )}
+        {/* раньше кнопка была только на проекторе: если отрывок не пошёл, пульт ждал автоперехода */}
+        <button className="adm-btn primary"
+          onClick={() => void runAction('принимаем ответ', () => melodyClick(gameState, guardMelody(
+            { key: m.key, stage: 'snippet' }, cur => melodyAcceptAnswer(cur, s.answerSec ?? 30))))}>ПРИНИМАЕМ ОТВЕТ →</button>
+      </>)}
 
       {(m.stage === 'answering' || m.stage === 'passed') && (<>
         <div className="adm-tally">

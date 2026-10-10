@@ -1,0 +1,28 @@
+/* ═══ Волшебный лес: оболочка проектора (ключ темы enchanted_forest) ═══
+   Только каркас: кадр 1920×1080 по центру окна. Рисунок экранов — в src/forest/**.css
+   (селекторы там автоматически получают префикс .theme-enchanted_forest, см. vite.config.ts). */
+.theme-enchanted_forest.fo-root { position: fixed; inset: 0; overflow: hidden; background: #03100d; color: #eefff9; font-family: 'Philosopher', sans-serif; }
+.theme-enchanted_forest .fo-box { position: absolute; inset: 0; }
+.theme-enchanted_forest .fo-frame { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 50% 50%; overflow: hidden; }
+/* Проектор — витрина, а не пульт: кнопок «Дальше/Назад» на нём нет. Резерв: `?nav=1` или localStorage qp-ny-nav=1 (класс fo-nav). */
+.theme-enchanted_forest.fo-root:not(.fo-nav) .host-actions { display: none !important; }
+
+/* Палитра темы для всех поверхностей (телефон игрока, пульт, редактор-предпросмотр) */
+.theme-enchanted_forest {
+  --bg: #03100d; --bg2: #072019; --panel: #0a2a22; --fg: #eefff9; --muted: #a9d8c6; --dim: #3f7a56;
+  --accent: #ffd68a; --accent2: #7fe9c6; --ok: #7ff4cf; --danger: #ff8f6a; --answer: #ffe2a0;
+  --glow: 0 0 24px rgba(255,214,138,.4); --glow2: 0 0 18px rgba(127,233,198,.35);
+  background: var(--bg); color: var(--fg);
+}
+
+/* Служебные подписи в лобби не нужны: имя пакета и тихое «ОБЛАКО» скрыты; ошибка связи остаётся видимой */
+.theme-enchanted_forest.fo-root .pack-badge-lobby { display: none; }
+.theme-enchanted_forest.fo-root .link-badge:not(.is-error):not(.is-busy) { opacity: 0; }
+
+/* Экраны Леса в игре прозрачны: лес за ними — один общий холст оболочки (в лаборатории каждый экран рисует свой) */
+.theme-enchanted_forest.fo-root .s1, .theme-enchanted_forest.fo-root .lb3 { background: transparent; }
+.theme-enchanted_forest .fo-screen { position: absolute; inset: 0; }
+.theme-enchanted_forest .fr-wait { position: absolute; inset: 0; }
+/* Служебные плашки проектора не должны лежать поверх вопроса: бейдж пакета скрыт, подсказка про звук — тихая, в правом нижнем углу */
+.theme-enchanted_forest.fo-root .pack-badge { display: none; }
+.theme-enchanted_forest.fo-root .audio-gate { top: 12px; bottom: auto; left: auto; right: 28px; transform: none; font-size: 20px; opacity: .85; }

@@ -30,6 +30,15 @@ import {
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { isNyTheme, isPlainQuestion } from '../ny/density'
+import { isForestTheme } from '../forest/config'
+import { ForestLobby } from '../forest/lobby/ForestLobby'
+import { ForestSprintReview, ForestBlitz } from '../forest/rounds/ForestRounds'
+import { teamTone } from '../forest/rounds/views'
+import { hueOf } from '../forest/util'
+import { ForestAnswerTime, ForestBoard, ForestFin, ForestFinaleIntro, ForestRecap, ForestRoundIntro, ForestRules, ForestTransitions } from '../forest/stage5/game5'
+import { introKindOf } from '../forest/stage5/views'
+import { boardRowsFrom, mmss, playedCols, podiumSlots, rulesViewFrom, type BoardView } from '../forest/stage5/views'
+import { useImageSizes } from '../forest/stage1/gameHooks'
 import { NyLobby } from '../ny/NyLobby'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
@@ -59,6 +68,8 @@ import { MelodyBoard } from './rounds/MelodyRound'
 import { RaceBoard } from './rounds/RaceRound'
 import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
+import { ForestCrosswordAnswers, ForestCrosswordQuestion, crosswordGridOf } from './rounds/ForestCrossword'
+import { ForestAnswers } from './rounds/ForestAnswers'
 import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
 import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
@@ -112,7 +123,7 @@ export function HostScreen() {
     ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index], pack.rounds[gameState.round_number]?.mechanic)
     : false
   return (
-    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme}>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme} paper={pack?.settings?.play_mode === 'paper'}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />
@@ -120,6 +131,8 @@ export function HostScreen() {
           {theme !== 'new_year' && ...}: постоянное число детей ThemeLayer
           важно, чтобы новая сборка не перемонтировала проектор целиком. */}
       <ScreenFx theme={theme} trigger={fxTrigger} hud={hudLabel} />
+      {/* «Волшебный лес»: короткие вставки на смене фазы (forest/stage5/Trans.tsx); вне Леса ничего не рисует */}
+      <ForestTransitions on={isForestTheme(theme)} phase={gameState?.phase} />
       {/* В лобби (не на бумаге) в том же углу QR — подпись поднимается
           над ним, чтобы не наехать (см. .pack-badge-lobby, 01-base.css). */}
       {pack && <div className={`pack-badge${
@@ -205,6 +218,31 @@ function HostInner({ gameState, pack }: {
 
   // ── Лобби / выбор пакета ──
   const paperMode = pack?.settings?.play_mode === 'paper'
+
+  // Кнопки резервной навигации лобби (на проекторе «Леса» скрыты стилем, видны только при ?nav=1)
+  const lobbyActions = (
+    <div className="host-actions">
+      <button className="ghost dark" onClick={() => {
+        if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
+      }}>⟲ Сменить пакет</button>
+      <button onClick={() => void (pack?.settings?.show_intro
+        ? startIntro()
+        : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
+        К первому раунду →</button>
+    </div>
+  )
+  // «Волшебный лес»: лобби — утверждённая композиция «Полуночный праздник» (src/forest/lobby)
+  if (gameState.phase === 'lobby' && gameState.pack_id && pack && isForestTheme(pack.theme)) {
+    return (
+      <>
+        <LobbyMusic pack={pack} />
+        <ForestLobby teams={lobbyTeams.map(t => ({ id: t.id, name: t.name, color: t.color, alive: isAlive(t) }))}
+          playerUrl={playerUrl} paper={paperMode} groups={groups}
+          groupsOpen={groupsOpen} onGroupsOpen={() => setGroupsOpen(true)} onGroupsClose={() => setGroupsOpen(false)} />
+        {lobbyActions}
+      </>
+    )
+  }
 
   if (gameState.phase === 'lobby' || !gameState.pack_id || !pack) {
     return (
@@ -302,15 +340,7 @@ function HostInner({ gameState, pack }: {
               <div className="lobby-qr-hint">СКАНИРУЙ, ЧТОБЫ ИГРАТЬ</div>
             )}
             </>)}
-            <div className="host-actions">
-              <button className="ghost dark" onClick={() => {
-                if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
-              }}>⟲ Сменить пакет</button>
-              <button onClick={() => void (pack?.settings?.show_intro
-                ? startIntro()
-                : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
-                К первому раунду →</button>
-            </div>
+            {lobbyActions}
           </>
         )}
       </div>
@@ -331,6 +361,29 @@ function HostInner({ gameState, pack }: {
   // ── Титул раунда ──
   if (gameState.phase === 'round_intro') {
     const grid = (round.settings as { grid?: CrosswordGrid }).grid
+    const introActions = (
+      <div className="host-actions">
+        {round.mechanic === 'anagram' ? <AnagramFirstBtn round={round} gameState={gameState} /> :
+        <button onClick={() => void gotoQuestion(0, navFrom(gameState)).catch(quietStale)}>
+          {round.mechanic === 'jeopardy' ? 'Начать раунд →'
+            : round.mechanic === 'race' ? 'К скачкам →'
+            : round.mechanic === 'melody' ? 'К трекам →'
+            : round.mechanic === 'four_pics' ? 'Поехали →'
+            : round.mechanic === 'sprint' ? 'Поехали →'
+            : 'Первый вопрос →'}</button>}
+      </div>
+    )
+    // «Волшебный лес»: заставка раунда этапа 5 (эмблема механики, правила на листьях) — для всех механик, включая кроссворд
+    if (isForestTheme(pack.theme)) return (
+      <>
+        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        <ForestRoundIntro kind={introKindOf(round.mechanic)} intro={{
+          num: displayRoundNumber(pack, gameState.round_number), titleLines: round.title_lines,
+          meta: metaLine(round), rules: round.rules,
+        }} />
+        {introActions}
+      </>
+    )
     return (
       <div className="host-screen grid-bg round-intro">
         {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
@@ -393,22 +446,22 @@ function HostInner({ gameState, pack }: {
             </div>
           )}
         </>)}
-        <div className="host-actions">
-          {round.mechanic === 'anagram' ? <AnagramFirstBtn round={round} gameState={gameState} /> :
-          <button onClick={() => void gotoQuestion(0, navFrom(gameState)).catch(quietStale)}>
-            {round.mechanic === 'jeopardy' ? 'Начать раунд →'
-              : round.mechanic === 'race' ? 'К скачкам →'
-              : round.mechanic === 'melody' ? 'К трекам →'
-              : round.mechanic === 'four_pics' ? 'Поехали →'
-              : round.mechanic === 'sprint' ? 'Поехали →'
-              : 'Первый вопрос →'}</button>}
-        </div>
+        {introActions}
       </div>
     )
   }
 
   // ── «120 секунд»: все вопросы на слайде ──
   if (gameState.phase === 'question' && round.mechanic === 'sprint') {
+    // «Волшебный лес»: сцена во весь кадр оболочки, без обёртки .host-screen (её 100vh не совпадает с кадром 1920×1080)
+    if (isForestTheme(pack.theme)) return (
+      <>
+        <SprintBoard pack={pack} round={round} gameState={gameState} timerNode={null} />
+        <div className="host-actions">
+          <button className="ghost dark" onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
+        </div>
+      </>
+    )
     return (
       <div className="host-screen grid-bg">
         <SprintBoard pack={pack} round={round} gameState={gameState}
@@ -501,21 +554,14 @@ function HostInner({ gameState, pack }: {
     // здесь для кнопки «Показать ответ» / «Время ответов →».
     const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
       ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
-    return (
-      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
-        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
-        timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
-        timerSlot={round.mechanic !== 'jeopardy' &&
-          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
-            theme={pack.theme} />}
-        effectsSlot={round.mechanic !== 'jeopardy' && <>
+    const effectsSlot = round.mechanic !== 'jeopardy' && <>
           <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
             startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
-        </>}
-        actionsSlot={
+        </>
+    const actionsSlot = (
           <div className="host-actions">
             <BackBtn gameState={gameState} />
             {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && !gameState.reveal &&
@@ -526,7 +572,22 @@ function HostInner({ gameState, pack }: {
                 ? <button onClick={() => void startAnswerTime(navFrom(gameState)).catch(quietStale)}>Время ответов →</button>
                 : <AfterRoundNav pack={pack} gameState={gameState} />}
           </div>
-        } />
+    )
+    // «Волшебный лес»: кроссворд — утверждённое «Созвездие светлячков» (те же слоты звука/автопоказа/кнопок; гонг — у одуванчика)
+    if (round.mechanic === 'crossword' && isForestTheme(pack.theme) && crosswordGridOf(round)) {
+      return <ForestCrosswordQuestion key={q.id} pack={pack} round={round} q={q} qIndex={gameState.question_index}
+        qCount={round.questions.length} gameState={gameState} effectsSlot={effectsSlot} actionsSlot={actionsSlot} />
+    }
+    return (
+      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={gameState.question_index} qCount={round.questions.length}
+        timeLow={timeLow} reveal={gameState.reveal} timerRunning={!!gameState.timer_started_at}
+        timerStartedAt={gameState.timer_started_at}
+        timerSlot={round.mechanic !== 'jeopardy' &&
+          <Timer key={q.id} startedAt={gameState.timer_started_at} seconds={round.timer_seconds}
+            theme={pack.theme} />}
+        effectsSlot={effectsSlot}
+        actionsSlot={actionsSlot} />
     )
   }
 
@@ -918,6 +979,20 @@ function RecapSlides({ pack, round, gameState }: {
   }, [i, q?.id])
 
   if (!q) return null
+  const recapActions = (
+    <div className="host-actions">
+      <button className="ghost" onClick={toAnswers}>Пропустить повтор</button>
+      <button onClick={next}>{last ? 'К ответам →' : 'Следующий →'}</button>
+    </div>
+  )
+  // «Волшебный лес»: тот же утверждённый экран вопроса, без таймера и без ответа (озвучка и отсчёт слайда — выше, общие)
+  if (isForestTheme(pack.theme)) return (
+    <>
+      <ForestRecap key={q.id} q={q} roundName={round.title_lines.join(' ').replace(/\s+/g, ' ').trim()}
+        qno={`Повтор вопросов · ${i + 1} из ${questions.length}`} seconds={round.timer_seconds} />
+      {recapActions}
+    </>
+  )
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|wav|mp4|webm)$/i.test(m))
   const hasText = !!q.question_text.trim()
   // Классы те же, что на экране вопроса: без них правила вписывания
@@ -947,10 +1022,7 @@ function RecapSlides({ pack, round, gameState }: {
           <i key={k} className={k === i ? 'on' : k < i ? 'done' : ''} />
         ))}
       </div>
-      <div className="host-actions">
-        <button className="ghost" onClick={toAnswers}>Пропустить повтор</button>
-        <button onClick={next}>{last ? 'К ответам →' : 'Следующий →'}</button>
-      </div>
+      {recapActions}
     </div>
   )
 }
@@ -1045,13 +1117,26 @@ function InfoScreen({ pack, slide, packId, gameState }: {
   // где игры ещё нет и packStats получает teamCount === undefined).
   const teams = useTeams(gameState.game_id)
   const stats = packStats(pack, teams.length)
+  // «Волшебный лес»: размер единственной картинки слайда — для рамы из ветвей (хук до любого return)
+  const forest = isForestTheme(pack.theme)
+  const imgUrls = forest && (slide.images ?? []).length === 1 ? [mediaUrl(slide.images[0])] : []
+  const imgSize = useImageSizes(imgUrls)
+  const nav = (
+    <div className="host-actions">
+      <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)}
+        packId={packId} paper={pack.settings?.play_mode === 'paper'} />
+    </div>
+  )
+  if (forest) {
+    // «Лоза правил» этапа 5; сочетания, которых нет в лаборатории (картинка + раунды/статистика, несколько картинок),
+    // остаются прежним экраном — ничего из слайда не теряется
+    const view = rulesViewFrom({ slide, rounds, stats, image: imgUrls.length ? { src: imgUrls[0], ...imgSize.sizes[0] } : null })
+    if (view) return <>{imgUrls.length && !imgSize.ready ? null : <ForestRules view={view} />}{nav}</>
+  }
   return (
     <>
       <InfoSlideView slide={slide} rounds={rounds} stats={stats} mediaUrl={mediaUrl} />
-      <div className="host-actions">
-        <InfoNav slides={pack.settings?.info_slides ?? []} index={indexOfSlide(pack, slide)}
-          packId={packId} paper={pack.settings?.play_mode === 'paper'} />
-      </div>
+      {nav}
     </>
   )
 }
@@ -1230,6 +1315,35 @@ function BlitzScreen({ pack, round, gameState }: {
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cur?.verdict, cur?.lastAnswer])
+
+  // «Волшебный лес»: деревца-часы. Ход раунда (кубик, автопроверка, запись итогов) — эффекты выше, без изменений;
+  // сцена получает то же состояние блица, что BlitzBoard, и сама ничего не пишет.
+  if (isForestTheme(pack.theme)) {
+    return (
+      <>
+        <ForestBlitz state={state} teams={teams} bank={bank} teamSeconds={settings.teamSeconds ?? 60}
+          penalty={settings.timeoutPenalty ?? 10}
+          question={id => { const rq = round.questions.find(x => x.id === id); return rq ? { text: rq.question_text, answer: displayAnswer(rq as Question) } : undefined }} />
+        <div className="host-actions">
+          {state?.finished ? <AfterRoundNav pack={pack} gameState={gameState} /> : state && <>
+            {cur?.verdict && (
+              <button className="ghost" onClick={() => {
+                const now = Date.now()
+                const r = resumeAfterCheck(state, now)
+                void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
+              }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
+            )}
+            {cur && cur.verdict !== 'ok' && (
+              <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>Скип −1</button>
+            )}
+            <button className="ghost dark" onClick={() => {
+              if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state))
+            }}>Завершить раунд</button>
+          </>}
+        </div>
+      </>
+    )
+  }
 
   if (!state) {
     return (
@@ -1556,6 +1670,25 @@ function AnswerTime({ pack, round, gameState }: {
     return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [round.id])
 
+  const atActions = (
+    <div className="host-actions">
+      <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1, navFrom(gameState)).catch(quietStale)}>← Назад</button>
+      <button onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
+    </div>
+  )
+  // «Волшебный лес»: одуванчик-таймер (тот же timer_started_at и гонг) и листья команд с тем же счётчиком ответов
+  if (isForestTheme(pack.theme)) return (
+    <>
+      <ForestAnswerTime num={displayRoundNumber(pack, gameState.round_number)} paper={paper}
+        startedAt={gameState.timer_started_at} seconds={seconds}
+        teams={paper ? null : teams.map(t => {
+          const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
+          return { id: t.id, name: t.name, color: teamTone(t.color), got, total: totalQ, done: got >= totalQ }
+        })} />
+      {atActions}
+    </>
+  )
+
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`}>
       <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>
@@ -1582,10 +1715,7 @@ function AnswerTime({ pack, round, gameState }: {
           })}
         </div>
       )}
-      <div className="host-actions">
-        <button className="ghost dark" onClick={() => void gotoQuestion(round.questions.length - 1, navFrom(gameState)).catch(quietStale)}>← Назад</button>
-        <button onClick={() => void gotoAnswers(0, false, navFrom(gameState)).catch(quietStale)}>К ответам →</button>
-      </div>
+      {atActions}
     </div>
   )
 }
@@ -1661,6 +1791,53 @@ function ShowAnswers({ pack, round, q, gameState }: {
   // Звук, приложенный к ОТВЕТУ. Раньше из медиа ответа брались только
   // картинки, а mp3 молча выбрасывался — вставленный трек не играл вообще.
   const answerAudio = (q.media.answer ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
+
+  const actions = (
+      <div className="host-actions">
+        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
+        {!revealed
+          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
+          : step < total - 1
+            ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
+            : <AfterRoundNav pack={pack} gameState={gameState} />}
+      </div>
+  )
+  // «Волшебный лес»: разбор кроссворда — «Созвездие светлячков». Хуки выше (автопоказ, автопроверка, запись is_correct)
+  // работают как прежде; сцена только рисует и показывает вердикт по тому же `checked`.
+  if (round.mechanic === 'crossword' && isForestTheme(pack.theme) && crosswordGridOf(round)) {
+    return <ForestCrosswordAnswers key={q.id} pack={pack} round={round} q={q} step={step} answers={answers} teams={teams}
+      allTeams={allTeams} revealed={revealed} checked={checked} paper={paper}
+      effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
+      video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined}
+      imgs={revealed ? revealImgs : q.media.hidden ? [] : questionImgs} actions={actions} />
+  }
+  // «Волшебный лес», «120 секунд»: утверждённый разбор (вопрос → ответ-цветок → ответы команд). Логика выше общая:
+  // авто-показ через 3 с, вердикты — только после полного показа ответа (checked), та же автопроверка.
+  if (isForestTheme(pack.theme) && round.mechanic === 'sprint') {
+    return (
+      <>
+        <ForestSprintReview title={round.title_lines.join(' ')} count={total} step={step}
+          q={{ text: q.question_text, answer: displayAnswer(q) }} shown={revealed} verdicts={checked}
+          answers={paper ? null : rows.map(a => {
+            const team = teams.find(t => t.id === a.team_id) ?? allTeams.find(t => t.id === a.team_id)
+            return { team: team?.name ?? '—', color: teamTone(team?.color), text: a.answer_text || '—',
+              ok: checked ? (a.is_correct ?? autocheck(q.answer, a.answer_text)) : null }
+          })}
+          qImgs={q.media.hidden ? [] : questionImgs.map(mediaUrl)} aImgs={revealImgs.map(mediaUrl)} note={q.answer_note || undefined}
+          extra={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null} />
+        {actions}
+      </>
+    )
+  }
+  // «Волшебный лес», обычные вопросы (открытый ответ, варианты, фото, фото-варианты, сопоставление, порядок, ребус):
+  // утверждённые разборы этапа 4. Хуки выше (автопоказ, проверка, запись is_correct) — общие; сцена только рисует.
+  if (isForestTheme(pack.theme) && round.mechanic !== 'crossword' && round.mechanic !== 'anagram'
+    && q.answer.mode !== 'crossword_word' && q.answer.mode !== 'anagram') {
+    return <ForestAnswers key={q.id} round={round} q={q} step={step} answers={answers} teams={teams} allTeams={allTeams}
+      revealed={revealed} checked={checked} paper={paper} revealMs={revealDoneMs(q)} answerText={displayAnswer(q)}
+      effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
+      video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
+  }
 
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`}
@@ -1795,14 +1972,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
           })}
         </div>}
       </div>
-      <div className="host-actions">
-        {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
-        {!revealed
-          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
-          : step < total - 1
-            ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
-            : <AfterRoundNav pack={pack} gameState={gameState} />}
-      </div>
+      {actions}
     </div>
   )
 }
@@ -2044,6 +2214,28 @@ function ScoreboardScreen({ pack, gameState }: {
     }, 900)
     return () => clearTimeout(t)
   }, [revealed, ranked, prevRanked, pack.theme, gameState.round_number])
+  // «Волшебный лес»: листья на ветви (этап 5). Те же строки/места/очки, тот же счётчик раскрытия (по строке в 2.2 с);
+  // колонки — сыгранные раунды (и любые, где уже есть очки).
+  if (isForestTheme(pack.theme)) {
+    const colIdx = scored.map(r => pack.rounds.indexOf(r))
+    const n = playedCols(colIdx, gameState.round_number, rows.map(r => colIdx.map(i => (perRound.get(r.team.id) ?? [])[i] ?? 0)))
+    const shown = colIdx.slice(0, n)
+    const hasPrev = colIdx.some(i => i < gameState.round_number)
+    const view: BoardView = {
+      kind: 'regular', title: 'Табло', sub: `после раунда ${n} из ${scored.length}`, flip: false,
+      cols: shown.map(i => displayRoundNumber(pack, i)),
+      rows: boardRowsFrom(rows, perRound, shown, teamTone, hasPrev
+        ? { order: prevRanked.map(t => t.id) } : undefined),
+    }
+    return (
+      <>
+        <ForestBoard view={view} reveal={revealed} flipKey={hasPrev ? String(gameState.round_number) : null} />
+        <div className="host-actions">
+          <AfterRoundNav pack={pack} gameState={gameState} />
+        </div>
+      </>
+    )
+  }
   return (
     <div className="host-screen grid-bg sb-screen">
       <div className="mono-tag">ПОЛОЖЕНИЕ КОМАНД</div>
@@ -2124,6 +2316,15 @@ function BreakScreen({ pack, round, gameState }: {
   }, [gameState.timer_started_at, minutes])
   const mm = String(Math.floor(left / 60)).padStart(2, '0')
   const ss = String(left % 60).padStart(2, '0')
+  // «Волшебный лес»: тот же отсчёт (timer_started_at), крупные часы на поляне
+  if (isForestTheme(pack.theme)) return (
+    <>
+      <ForestFin view={{ state: 'break', clock: mmss(left), sub: 'Антракт · скоро продолжим' }} step="break" />
+      <div className="host-actions">
+        <AfterRoundNav pack={pack} gameState={gameState} />
+      </div>
+    </>
+  )
   return (
     <div className="host-screen grid-bg break-screen">
       {/* Р3: у Magic крупного «ПЕРЕРЫВ» достаточно — подпись-дублёр не
@@ -2173,9 +2374,20 @@ function CountingScreen({ pack, gameState }: {
     a.play().catch(() => {})
     return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [pack.settings?.finale_music, pack.settings?.bg_music])
+  // бутоны команд на поляне «Леса» (только для рисунка): в других темах лишний опрос не нужен
+  const teams = useTeams(isForestTheme(pack.theme) ? gameState.game_id : null)
 
   const mm = String(Math.floor(left / 60)).padStart(2, '0')
   const ss = String(left % 60).padStart(2, '0')
+  // «Волшебный лес»: «огоньки собираются к бутону» (этап 5, Финал · Ожидание) + тот же отсчёт
+  if (isForestTheme(pack.theme)) return (
+    <>
+      <ForestFin view={{ state: 'antic', hues: teams.map(t => hueOf(t.color)), title: 'Подводим итоги', sub: 'Скоро объявим победителей', clock: mmss(left) }} step={`antic-${teams.length > 0}`} />
+      <div className="host-actions">
+        <button onClick={() => void finishGame(gameState.pack_id, true)}>К итогам →</button>
+      </div>
+    </>
+  )
   return (
     <div className="host-screen grid-bg break-screen counting-screen">
       <div className="mono-tag accent">ПОДВОДИМ ИТОГИ</div>
@@ -2295,7 +2507,46 @@ function Finale({ pack, gameId, gameState }: {
   // Все хуки выше уже отработали — гейт можно ставить здесь: и сценарий
   // «бар» (медали 3→2→1→таблица), и сценарий «шоу» (ретро по раундам →
   // победитель → таблица) начинаются ПОСЛЕ этой строки.
-  if (!cinematicDone) return <FinalCinematic onDone={() => setCinematicDone(true)} />
+  const forest = isForestTheme(pack.theme)
+  if (!cinematicDone) return forest
+    ? <ForestFinaleIntro hues={teams.map(t => hueOf(t.color))} onDone={() => setCinematicDone(true)} />
+    : <FinalCinematic onDone={() => setCinematicDone(true)} />
+
+  // ── «Волшебный лес»: те же шаги, места, очки и таймеры, рисунок этапа 5 (forest/stage5/Finale.tsx) ──
+  if (forest) {
+    const newGame = (
+      <div className="host-actions">
+        <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
+      </div>
+    )
+    const colIdx = scored.map(x => x.i)
+    const table: BoardView = {
+      kind: 'final', title: 'Итоги игры', sub: 'разбивка по раундам', flip: false,
+      cols: colIdx.map(i => displayRoundNumber(pack, i)), rows: boardRowsFrom(rows, roundScores, colIdx, teamTone),
+    }
+    const tableScreen = <><ForestBoard view={table} reveal={revealedFin} flipKey={null} />{newGame}</>
+    const next = () => void setFinaleStep(step + 1)
+    if (bar) {
+      const places = [...new Set(rows.map(r => r.place))].filter(p => p <= 3).sort((a, b) => b - a)
+      if (step >= places.length) return tableScreen
+      const shown = new Set(places.slice(0, step + 1))
+      const slots = podiumSlots(rows, teamTone, hueOf).filter(s => shown.has(s.place))
+      return <ForestFin view={{ state: 'medals', slots }} step={`medals-${step}`} only={places[step] - 1} onClick={next} />
+    }
+    if (step < winnerStep) {
+      const cards = roundWinners.map(w => ({
+        n: displayRoundNumber(pack, w.idx), name: w.round.title_lines.join(' ').replace(/\s+/g, ' ').trim(),
+        team: w.team ? { name: w.team.name, color: teamTone(w.team.color) } : null, pts: w.team ? w.score : 0,
+      }))
+      return <ForestFin view={{ state: 'retro', cards, shown: step + 1 }} step={`retro-${step}`} only={step} onClick={next} />
+    }
+    if (step === winnerStep) {
+      const champs = rows.filter(r => r.place === 1)
+      return <ForestFin view={{ state: 'winner', names: champs.map(r => ({ name: r.team.name, color: teamTone(r.team.color) })), sum: champs[0]?.total ?? 0, hues: teams.map(t => hueOf(t.color)) }}
+        step="winner" onClick={next} />
+    }
+    return tableScreen
+  }
 
   const colors = ['#ffd700', '#ff2fa0', '#00e5ff', '#b6ff3c', '#ff8c42']
   const fireworks = (

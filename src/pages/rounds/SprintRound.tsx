@@ -9,6 +9,8 @@ import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, SprintSettings, Question } from '../../types/quiz'
 import { createAudio } from '../../lib/audioSource'
 import type { PreviewCtx } from '../../lib/previewState'
+import { isForestTheme } from '../../forest/config'
+import { ForestSprintBoard } from '../../forest/rounds/ForestRounds'
 
 export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -65,6 +67,14 @@ export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
     return () => clearInterval(t)
   }, [preview, gameState.timer_started_at, manualStart])
 
+  // «Волшебный лес» (проектор): утверждённая поляна с одуванчиком; таймер рисунка — от того же timer_started_at,
+  // все эффекты выше (автостарт, музыка, переход к разбору) — общие. В предпросмотре редактора — прежний экран.
+  if (!preview && isForestTheme(pack.theme)) {
+    return <ForestSprintBoard title={round.title_lines.join(' ')} seconds={round.timer_seconds} startedAt={gameState.timer_started_at}
+      countdown={manualStart ? null : countdown}
+      questions={questions.map(q => ({ text: q.question_text, img: sprintImg(q) }))} />
+  }
+
   // нечётное число вопросов: первый — «герой» на всю ширину над таймером
   const hero = questions.length % 2 === 1 ? questions[0] : null
   const rest = hero ? questions.slice(1) : questions
@@ -98,6 +108,12 @@ export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
       </div>
     </div>
   )
+}
+
+/** Картинка вопроса на слайде — первая не-звуковая из медиа вопроса (та же выборка, что у карточки). */
+function sprintImg(q: Question): string | undefined {
+  const img = (q.media.question ?? []).find(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  return img ? mediaUrl(img) : undefined
 }
 
 function SprintCard({ n, q }: { n: number; q: Question }) {

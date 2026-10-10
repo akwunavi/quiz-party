@@ -9,6 +9,7 @@
 // понадобилась своя вёрстка, это симптом, что где-то опять заводится копия
 // вместо переиспользования (см. preview-no-copy.test.ts).
 import { useState } from 'react'
+import { isForestTheme } from '../../forest/config'
 import { ThemeLayer } from '../../components/ThemeLayer'
 import { Timer } from '../../components/Timer'
 import { QuestionScreen } from '../../components/screens/QuestionScreen'
@@ -56,7 +57,7 @@ export function QuestionPreview({ pack, round, qIndex, onClose }: {
       {/* phase="question": без него фон Magic-сцены в ГП отличался бы от
           боевого — [data-phase] управляет плотностью декора (34-magic-
           environment.css), предпросмотр раньше звал ThemeLayer без phase. */}
-      <ThemeLayer theme={pack.theme} isProjector phase="question">
+      <ThemeLayer theme={pack.theme} isProjector={!isForestTheme(pack.theme)} phase="question">
         {(() => {
           switch (round.mechanic) {
             case 'sprint':

@@ -1,0 +1,371 @@
+/* ═══ Этап 1 — «120 секунд», «Блиц», «Три попытки» в Зачарованном лесу ═══
+   Проектор 1920×1080, Philosopher — шрифт леса; текст всегда с тёмным ореолом,
+   цвета — из палитры леса (изумруд, лунная бирюза, янтарь, лиловый цветков). */
+.s1 { position:absolute; inset:0; overflow:hidden; font-family:'Philosopher', sans-serif; color:#eefff9; background:#03100d; }
+.s1-bg { position:absolute; inset:0; width:1920px; height:1080px; }
+.s1 { --halo: 0 2px 4px rgba(2,12,10,.92), 0 0 22px rgba(2,12,10,.85); }
+
+/* ── вступление раунда: «Раунд N» в углу, эмблема механики, название, подсказка, правила на листьях */
+.s1-intro { position:absolute; inset:0; }
+.s1-intro-badge { position:absolute; left:64px; top:44px; display:grid; justify-items:start; line-height:.9; text-shadow:var(--halo); }
+.s1-intro-badge span { font-size:34px; color:#e8d9a8; letter-spacing:.04em; }
+.s1-intro-badge b { font-size:150px; color:#f4fffa; text-shadow: 0 4px 10px rgba(2,12,10,.9), 0 0 40px rgba(111,242,214,.25); }
+.s1-intro-main { position:absolute; left:360px; right:360px; top:170px; display:grid; justify-items:center; text-align:center; }
+.s1-intro.side .s1-intro-main { left:200px; right:auto; width:820px; top:200px; }
+.s1-intro-emb { display:flex; justify-content:center; height:240px; align-items:flex-end; }
+.s1-intro-title { margin:14px 0 14px; font-size:124px; font-weight:700; line-height:1.02; color:#f4fff9; text-shadow: 0 4px 10px rgba(2,12,10,.9), 0 0 40px rgba(111,242,214,.3); }
+.s1-intro.side .s1-intro-title { font-size:112px; }
+.s1-intro-title .ln { display:block; } .s1-intro-title .ch { display:inline-block; }
+.s1-intro-meta { font-size:30px; letter-spacing:.06em; color:#cfeee4; text-shadow:var(--halo); }
+.s1-intro-rules { position:absolute; left:1060px; right:80px; top:250px; margin:0; padding:0; list-style:none; display:grid; gap:22px; }
+.s1-intro-rules .w { position:relative; display:flex; gap:22px; align-items:center; padding:20px 40px 22px 26px; border-radius: 40px 110px 40px 110px / 50px 90px 50px 90px;
+  background: linear-gradient(100deg, rgba(14,50,37,.86), rgba(10,40,30,.7)); box-shadow: inset 0 1px 0 rgba(170,235,200,.16), 0 10px 22px rgba(0,0,0,.35); }
+.s1-intro-rules .idx { flex:none; width:58px; height:58px; border-radius:50%; display:grid; place-items:center; font-size:28px; font-weight:700; color:#2a1a08; background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); }
+.s1-intro-rules .t { font-size:36px; line-height:1.2; color:#f2fff9; text-shadow:var(--halo); }
+
+/* ── таймеры */
+.tm-dand { overflow:visible; display:block; }
+.tm-stem { fill:none; stroke:#5f9b78; stroke-width:6; stroke-linecap:round; transition: d .9s ease; }
+.tm-achene { fill:#5a4a32; }
+.tm-beak { stroke:rgba(225,255,245,.55); stroke-width:1.5; }
+.tm-tuft { stroke:rgba(236,255,248,.9); stroke-width:1.2; }
+.tm-seed { transition: transform 2.6s cubic-bezier(.3,.1,.5,1) var(--d), opacity 2.6s ease var(--d); }
+.tm-seed.gone { transform: translate(var(--dx), var(--dy)) rotate(40deg); opacity:0; }
+.tm-num { font-family:'Philosopher', sans-serif; font-weight:700; font-size:92px; fill:#f4fffa; paint-order:stroke; stroke:rgba(3,16,13,.92); stroke-width:10px; stroke-linejoin:round; }
+.tm-cap { font-family:'Philosopher', sans-serif; font-size:30px; fill:#cfeee4; paint-order:stroke; stroke:rgba(3,16,13,.9); stroke-width:6px; }
+.tm-pit { fill:rgba(160,190,175,.35); }
+.tm-dand.rooted .tm-stem-back { fill:none; stroke:#1f3d2c; stroke-width:12; stroke-linecap:round; }
+.tm-dand.rooted .tm-stem-hi { stroke:#6aa883; stroke-width:5; }
+.tm-ground { fill:rgba(2,10,8,.55); filter: blur(6px); }
+.tm-ros path:first-child { fill:#3f7d58; stroke:#163826; stroke-width:1.5; stroke-linejoin:round; }
+.tm-ros.l1 path:first-child { fill:#4d8f66; } .tm-ros.l2 path:first-child { fill:#346b4b; }
+.tm-ros-rib { fill:none; stroke:rgba(210,250,225,.5); stroke-width:2; }
+.tm-grass { fill:none; stroke:#3f7a56; stroke-width:3; stroke-linecap:round; }
+.is-zero .tm-ros path:first-child { fill:#4a5a3a; }
+.is-warning .tm-tuft { stroke:rgba(255,206,130,.95); }
+.is-warning .tm-seed:not(.gone) { animation: tm-tremble .55s ease-in-out infinite alternate; }
+@keyframes tm-tremble { from { transform: rotate(-1.6deg); } to { transform: rotate(1.6deg); } }
+.is-warning .tm-num { fill:#ffd9a0; }
+.is-zero .tm-num { fill:#b9cfc6; }
+.is-zero .tm-stem { stroke:#4a7a60; }
+
+/* ═══ 120 СЕКУНД ═══ */
+.sp-head { position:absolute; top:30px; left:0; right:0; text-align:center; font-size:40px; color:#e8d9a8; letter-spacing:.03em; text-shadow:var(--halo); }
+.sp-q { position:relative; display:flex; gap:20px; align-items:flex-start; }
+.sp-n { flex:none; width:62px; height:62px; border-radius:50%; display:grid; place-items:center; font-size:34px; font-weight:700; color:#2a1a08;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); box-shadow: 0 3px 10px rgba(0,0,0,.6); }
+.sp-body { flex:1; min-width:0; }
+.sp-t { font-size:38px; line-height:1.18; color:#f2fff9; text-shadow:var(--halo); }
+.sp-a { margin-top:8px; font-size:42px; font-weight:700; color:#ffe2a0; text-shadow:var(--halo); }
+.sp-img { flex:none; height:150px; border-radius:6px; box-shadow: 0 0 0 3px #3b2a1c, 0 0 0 5px rgba(143,211,180,.35), 0 10px 26px rgba(0,0,0,.7); }
+.sp-mark { position:absolute; left:-46px; top:14px; width:34px; height:34px; opacity:0; border-radius:0 70% 0 70%; background:linear-gradient(135deg,#8fe3b8,#3f8a62); box-shadow:0 0 18px rgba(143,255,200,.6); }
+.sp-q.rv { opacity:.42; }
+.sp-over { font-size:54px; font-weight:700; color:#ffd9a0; text-shadow:var(--halo); text-align:center; }
+/* A — поляна с одуванчиком.
+   Слои колонки: лиана (z0) → лист-подложка вопроса (внутри .sp-q, изолирован) → номер на лиане.
+   Раньше лиана следующего вопроса (bottom:100%, height:1000px) рисовалась ПОВЕРХ номера предыдущего. */
+.spA-col { position:absolute; top:112px; width:740px; height:934px; display:grid; grid-template-rows:repeat(4, 1fr); row-gap:18px; z-index:2; }
+.spA-col.c0 { left:60px; } .spA-col.c1 { left:1120px; }
+.spA-vine { position:absolute; left:0; top:-112px; width:64px; height:1060px; z-index:0; overflow:visible; pointer-events:none; }
+.spA-vine-s { fill:none; stroke:#1d4430; stroke-width:5; stroke-linecap:round; }
+.spA-vine-l { fill:#2f6a49; stroke:rgba(8,30,20,.6); stroke-width:1; }
+.spA .sp-q { z-index:1; isolation:isolate; align-self:center; align-items:center; gap:22px; padding:24px 64px 24px 0; min-height:0; }
+.spA .sp-n { position:relative; z-index:2; box-shadow: 0 0 0 4px rgba(8,30,20,.85), 0 3px 10px rgba(0,0,0,.6); }
+.spA .sp-body, .spA .sp-img { position:relative; z-index:1; }
+.spA .sp-t { font-size:39px; line-height:1.16; }
+.spA .sp-img { height:136px; }
+/* лист-подложка (SVG, тянется по размеру вопроса; жилки — постоянной толщины) */
+.sp-leaf { position:absolute; left:6px; top:-6px; width:calc(100% + 4px); height:calc(100% + 12px); z-index:-1; overflow:visible; pointer-events:none; filter: drop-shadow(0 10px 18px rgba(0,0,0,.4)); }
+.sp-leaf-main { fill:url(#spLeafG); fill-opacity:.9; stroke:rgba(150,230,190,.22); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.sp-leaf-under { fill:#1f5a3f; fill-opacity:.55; }
+.sp-leaf-rib { fill:none; stroke:rgba(170,235,200,.09); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.sp-a { position:relative; display:inline-flex; align-items:center; gap:12px; margin-top:8px; padding:2px 26px 4px 14px; border-radius: 8px 40px 8px 40px;
+  background: linear-gradient(100deg, rgba(255,200,110,.2), rgba(255,200,110,.06)); }
+.sp-a-leaf { flex:none; width:22px; height:22px; border-radius:0 70% 0 70%; background:linear-gradient(135deg,#ffe3a0,#c98a3a); }
+.spA-timer { position:absolute; left:960px; top:275px; width:330px; transform:translateX(-50%); z-index:1; }
+.spA-timer .tm-dand { display:block; }
+.spA-count { position:absolute; left:0; right:0; top:105px; text-align:center; font-size:120px; line-height:1; color:#f4fffa; text-shadow:var(--halo); }
+.spA-under { position:absolute; left:-60px; right:-60px; top:318px; text-align:center; font-size:34px; color:#cfeee4; text-shadow:var(--halo); }
+.spA-timer .sp-over.spA-under { font-size:52px; color:#ffd9a0; }
+.spA-fa { position:relative; margin-top:70px; height:200px; display:grid; place-items:center; }
+.spA-bloom { position:absolute; left:50%; top:50%; width:300px; height:300px; margin:-150px 0 0 -150px; overflow:visible; }
+.spA-bloom ellipse.p0 { fill:rgba(255,214,140,.32); } .spA-bloom ellipse.p1 { fill:rgba(255,190,100,.22); }
+.spA-bloom .core { fill:rgba(255,230,170,.35); }
+.spA-fa-t { position:relative; font-size:96px; font-weight:700; color:#ffe2a0; white-space:normal; text-align:center; text-shadow: 0 4px 10px rgba(2,12,10,.95), 0 0 30px rgba(2,12,10,.8); }
+.spA-fa-t .w { white-space:nowrap; }
+.spA-fa-t .ch { display:inline-block; }
+.spA-pods { position:absolute; left:0; right:0; bottom:90px; display:flex; justify-content:center; gap:26px; }
+.spA-pod { position:relative; width:62px; height:62px; border-radius:50%; display:grid; place-items:center; font-size:30px; font-weight:700; color:#f4fffa; text-shadow: 0 1px 3px #03100d, 0 0 6px #03100d; background:rgba(3,16,13,.6); box-shadow: inset 0 0 0 3px #3f7a56; overflow:hidden; isolation:isolate; }
+.spA-pod i { position:absolute; inset:0; z-index:-1; opacity:0; border-radius:50%; background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); }
+/* B */
+
+/* C */
+
+/* ═══ БЛИЦ ═══ */
+.bz-bank { position:absolute; top:26px; right:56px; display:flex; align-items:baseline; gap:12px; font-size:28px; color:#cfeee4; text-shadow:var(--halo); }
+.bz-bank b { font-size:64px; color:#f4fffa; }
+.bz-center { position:absolute; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:16px; }
+.bz-asking { font-size:36px; color:#cfeee4; text-shadow:var(--halo); }
+.bz-asking b { font-weight:700; }
+.bz-qtext { font-size:80px; line-height:1.1; font-weight:700; color:#f6fffb; text-shadow: 0 4px 10px rgba(2,12,10,.92), 0 0 30px rgba(2,12,10,.85); }
+.bz-qsmall { font-size:46px; color:#e3f5ee; text-shadow:var(--halo); }
+.bz-verdict { font-size:54px; font-weight:700; text-shadow:var(--halo); }
+.bz-verdict.ok { color:#bff7cf; } .bz-verdict.ok b { color:#ffe2a0; margin-left:12px; }
+.bz-verdict.no { color:#ffb79e; }
+.bz-next { font-size:36px; color:#d6efe6; text-shadow:var(--halo); }
+.bz-att { display:flex; align-items:center; gap:14px; font-size:28px; color:#cfeee4; text-shadow:var(--halo); }
+.bz-att i { width:34px; height:34px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background: radial-gradient(circle at 40% 40%, #d9ccff, #8f78d8 60%, #4f379a); box-shadow:0 0 12px rgba(185,160,255,.5); }
+.bz-att i.used { background: radial-gradient(circle at 40% 40%, #a08060, #6b5236); box-shadow:none; transform:rotate(-20deg) scale(.82); }
+.bz-reel { height:96px; overflow:hidden; mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent); }
+.bz-reel-name { height:96px; line-height:96px; font-size:66px; font-weight:700; white-space:nowrap; color:#f4fffa; text-shadow:var(--halo); }
+.bz-reel-name.pick { color:#ffe2a0; }
+.bz-dice-cap { font-size:28px; color:#cfeee4; text-shadow:var(--halo); }
+.bz-rank { position:absolute; width:64px; height:64px; border-radius:50%; display:grid; place-items:center; font-size:36px; font-weight:700; color:#2a1a08;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); box-shadow:0 4px 14px rgba(0,0,0,.6); }
+/* A — пни */
+
+.bz-time { font-weight:700; color:#fff4d8; font-variant-numeric: tabular-nums; }
+/* B — тропа */
+
+/* C — деревца-часы: дерево + диск времени на стволе + табличка (имя, очки) — один блок команды */
+.bzC-round { position:absolute; top:30px; left:56px; font-size:34px; color:#e8d9a8; letter-spacing:.03em; text-shadow:var(--halo); }
+.bzC .bz-bank { top:24px; }
+.bzC-center { left:300px; right:300px; top:70px; height:380px; gap:18px; }
+.bzC.nfew .bzC-center { height:360px; }
+.bzC .bz-asking { font-size:38px; display:flex; align-items:center; gap:12px; }
+.bzC .bz-qtext { font-size:84px; }
+.bz-lamp-ico { width:22px; height:32px; flex:none; overflow:visible; }
+.bz-lamp-ico path { stroke:#d8c08a; stroke-width:2; fill:none; } .bz-lamp-ico rect { fill:#5a3f22; stroke:#d8c08a; stroke-width:1.5; } .bz-lamp-ico circle { fill:#ffd27a; filter: drop-shadow(0 0 4px #ffb84a); }
+.bzC-unit { position:absolute; top:0; bottom:0; pointer-events:none; }
+.bzC-treebox { position:absolute; left:50%; transform:translateX(-50%); }
+.bzC-tree { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.bzC-shadow { fill:rgba(0,0,0,.55); filter: blur(5px); }
+.bzC-roots { fill:none; stroke:#2e2116; stroke-width:6; stroke-linecap:round; }
+.bzC-trunk { fill:#3a2a1d; }
+.bzC-bark { fill:none; stroke:#22170e; stroke-width:2; stroke-linecap:round; }
+.bzC-trunk-rim { fill:none; stroke:#7a6248; stroke-width:2.2; stroke-linecap:round; opacity:.8; transform: translate(-1.5px, 0); }
+.bzC-branch { fill:none; stroke:#3a2a1d; stroke-linecap:round; stroke-linejoin:round; }
+.bzC-branch-rim { fill:none; stroke:#6e5843; stroke-width:2; stroke-linecap:round; opacity:.75; }
+.bzC-moss { fill:#24533b; }
+.bzC-fallen { fill:#7a5a2c; } .bzC-fallen.f1 { fill:#93682d; } .bzC-fallen.f2 { fill:#5e4826; }
+.bzC-crown .lf { transform-box: view-box; transform-origin: 0 0; transform: scale(var(--g, 1)); transition: transform 1.6s cubic-bezier(.4,.1,.6,1) var(--d), opacity 1.6s ease var(--d); }
+.bzC.st-complete .bzC-crown .lf { transition:none; }
+.bzC-crown .lf.gone { transform: translate(var(--fx), var(--fy)) rotate(var(--fr)); opacity:0; }
+.bzC-crown.l0 path { fill:#1b4634; } .bzC-crown.l0 .lit path { fill:#22553f; }
+.bzC-crown.l1 path { fill:#2b6446; stroke:rgba(8,30,20,.35); stroke-width:.6; } .bzC-crown.l1 .lit path { fill:#3c7d58; }
+.bzC-crown.l2 path { fill:#3f8059; stroke:rgba(8,30,20,.35); stroke-width:.6; } .bzC-crown.l2 .lit path { fill:#5d9e72; }
+.bzC-unit.ph-warning .bzC-crown.l1 path { fill:#b27a34; } .bzC-unit.ph-warning .bzC-crown.l2 path { fill:#d9a24a; } .bzC-unit.ph-warning .bzC-crown.l0 path { fill:#7a5426; }
+/* дрожь — на группе движения: качается вокруг своей точки крепления (раньше правило ставило
+   transform-origin самому листу и сдвигало его SVG-трансформ — листья съезжали в кучки) */
+.bzC-unit.ph-warning .lf:not(.gone) { animation: bz-tremble .5s ease-in-out infinite alternate; }
+@keyframes bz-tremble { from { rotate: -6deg; } to { rotate: 6deg; } }
+/* на нуле: голое дерево в лунном свете, листья — у корней; дерево остаётся деревом */
+.bzC-unit.ph-zero .bzC-branch, .bzC-unit.ph-zero .bzC-trunk { stroke:#3b3229; }
+.bzC-unit.ph-zero .bzC-branch-rim, .bzC-unit.ph-zero .bzC-trunk-rim { stroke:#a9c7d6; opacity:.7; }
+.bzC-unit.done .bzC-tree { filter: saturate(.6) brightness(.8); }
+.bz-fruit circle:first-of-type { fill:#e8a33c; stroke:#7a4a14; stroke-width:1.5; }
+.bz-fruit-hi { fill:rgba(255,240,200,.75); }
+.bz-fruit-stalk { stroke:#4a3420; stroke-width:2; }
+.bz-fruit { transform-box: fill-box; transform-origin: 50% 0%; }
+.bzC-lantern-rope { stroke:#a8956b; stroke-width:1.6; }
+.bzC-lantern-glow { fill:rgba(255,200,110,.28); filter: blur(6px); animation: bz-glow 2.4s ease-in-out infinite alternate; }
+.bzC-lantern-body { fill:#5a3f22; stroke:#d8c08a; stroke-width:1.5; }
+.bzC-lantern-fire { fill:#ffe39a; filter: drop-shadow(0 0 5px #ffb84a); }
+.bzC-lantern { transform-box: view-box; transform-origin: 240px 158px; animation: bz-swing 3.2s ease-in-out infinite alternate; }
+@keyframes bz-swing { from { rotate: -4deg; } to { rotate: 4deg; } }
+@keyframes bz-glow { from { opacity:.6; } to { opacity:1; } }
+.bzC-unit.ph-zero .bzC-lantern-fire { fill:#8a7a60; filter:none; } .bzC-unit.ph-zero .bzC-lantern-glow { opacity:.15; animation:none; }
+/* луч луны на играющую команду + светлячки вокруг кроны — видно сразу и не только цветом */
+.bzC-beam { position:absolute; left:6%; right:6%; top:0; opacity:.9; pointer-events:none;
+  background: linear-gradient(180deg, rgba(190,255,230,0) 0%, rgba(190,255,230,.07) 35%, rgba(210,255,235,.16) 100%);
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
+.bzC-unit.ph-warning .bzC-beam { background: linear-gradient(180deg, rgba(255,210,140,0), rgba(255,200,120,.08) 35%, rgba(255,200,120,.18)); }
+.bzC-flies { position:absolute; left:10%; right:10%; top:4%; height:50%; }
+.bzC-flies i { position:absolute; width:7px; height:7px; border-radius:50%; background:#fff3b8; box-shadow:0 0 10px 3px rgba(255,230,140,.7);
+  animation: bz-fly 3.4s ease-in-out infinite alternate; }
+@keyframes bz-fly { 0% { transform: translate(0,0); opacity:.3; } 50% { opacity:1; } 100% { transform: translate(18px,-26px); opacity:.5; } }
+.bzC-disc { position:absolute; left:50%; top:67%; width:calc(108px * var(--sc)); height:calc(108px * var(--sc)); transform:translate(-50%,-50%); border-radius:50%; display:grid; place-items:center;
+  background: repeating-radial-gradient(circle at 48% 46%, #a47c4c 0 calc(6px * var(--sc)), #8a643c calc(6px * var(--sc)) calc(8px * var(--sc))), #77542f;
+  border: calc(6px * var(--sc)) solid #2a1a0d; box-shadow: 0 8px 18px rgba(0,0,0,.6), inset 0 -6px 10px rgba(40,20,5,.35); }
+.bzC-disc .bz-time { font-size:calc(58px * var(--sc)); line-height:1; color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.95), 0 0 10px rgba(20,10,4,.7); }
+.bzC-unit.on .bzC-disc { box-shadow: 0 0 0 4px rgba(255,214,140,.85), 0 0 40px rgba(255,214,140,.55), 0 8px 18px rgba(0,0,0,.6); }
+.bzC-unit.ph-warning .bzC-disc .bz-time { color:#ffd08a; }
+.bzC-unit.ph-zero .bzC-disc { background: repeating-radial-gradient(circle at 48% 46%, #6e6a62 0 calc(6px * var(--sc)), #5c5852 calc(6px * var(--sc)) calc(8px * var(--sc))); }
+.bzC-unit.ph-zero .bzC-disc .bz-time { color:#d8e6ee; }
+.bzC-plaque { position:absolute; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; padding:12px 12px 10px; text-align:center;
+  border-radius: 14px 14px 26px 26px / 14px 14px 30px 30px; background: linear-gradient(180deg, rgba(6,24,18,.82), rgba(4,16,12,.7)); box-shadow: inset 0 1px 0 rgba(150,230,190,.18), 0 8px 20px rgba(0,0,0,.4); }
+.bzC-unit.on .bzC-plaque { box-shadow: inset 0 2px 0 rgba(255,214,140,.85), 0 0 0 2px rgba(255,214,140,.55), 0 0 30px rgba(255,200,110,.25); }
+.bzC-status { display:flex; align-items:center; gap:8px; font-size:22px; line-height:1; color:#ffe2a0; text-shadow:var(--halo); }
+.bzC-unit.done .bzC-status { color:#9fb8ad; }
+.bzC-name { font-size:26px; line-height:1.08; font-weight:700; color:var(--tc); text-shadow:var(--halo); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.bzC.nmany .bzC-name { font-size:21px; -webkit-line-clamp:4; }
+.bzC-pts { display:flex; align-items:baseline; gap:8px; margin-top:auto; }
+.bzC-pts .bz-pts { font-size:34px; font-weight:700; color:#ffe2a0; text-shadow:var(--halo); }
+.bzC-pts small { font-size:22px; color:#cfeee4; }
+.bzC-fruit-ico { width:18px; height:18px; border-radius:50%; align-self:center; background: radial-gradient(circle at 35% 35%, #ffe3a0, #e8a33c 55%, #7a4a14); }
+.bzC-unit.done .bzC-plaque { opacity:.75; }
+.bzC .bz-rank { position:absolute; right:calc(100% - 8px); top:-14px; width:calc(56px * var(--sc)); height:calc(56px * var(--sc)); font-size:calc(30px * var(--sc)); }
+.bzC.nmany .bzC-pts .bz-pts { font-size:26px; } .bzC.st-complete.nmany .bzC-pts .bz-pts { font-size:19px; font-weight:400; }
+.bz-spark { position:absolute; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; opacity:0; pointer-events:none; background: radial-gradient(circle, #fffbe0 0 30%, #ffd27a 50%, rgba(255,200,110,0) 72%); box-shadow: 0 0 30px 10px rgba(255,214,140,.55); }
+/* табличка с ответом на двух лианах (пауза между ходами) */
+.bz-sign { position:relative; margin:26px 0 2px; padding:10px 56px 14px; border-radius:14px; display:grid; justify-items:center;
+  background: repeating-linear-gradient(178deg, #7d5a34 0 9px, #6e4f2c 9px 12px), #6e4f2c; border:5px solid #2a1a0d; box-shadow: 0 16px 30px rgba(0,0,0,.6), inset 0 2px 0 rgba(255,220,170,.25); }
+.bz-sign span { font-size:26px; color:#f4e6c8; text-shadow:0 2px 3px rgba(20,10,4,.9); }
+.bz-sign b { font-size:66px; line-height:1.05; color:#fff1c8; text-shadow: 0 3px 4px rgba(20,10,4,.95), 0 0 24px rgba(255,214,140,.45); }
+.bz-rope { position:absolute; top:-40px; width:4px; height:40px; background:linear-gradient(#173a2b, #4f8f6a); }
+.bz-rope.l { left:30px; } .bz-rope.r { right:30px; }
+
+/* ═══ ТРИ ПОПЫТКИ ═══ */
+
+.rv-cell { position:absolute; display:grid; place-items:center; perspective:500px; }
+.rv-cell span { display:block; font-size:64px; font-weight:700; line-height:1; }
+.rv-slice { border-radius:50%; border:9px solid #22150b; background: repeating-radial-gradient(circle at 46% 44%, #a47c4c 0 7px, #8a643c 7px 9px), #77542f; box-shadow: 0 12px 22px rgba(0,0,0,.6); }
+.rv-slice span { color:rgba(46,26,12,.8); text-shadow: 0 1px 0 rgba(255,230,190,.3); }
+.rv-slice.open span { color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.9), 0 0 18px rgba(255,214,140,.55); }
+.rv-phase-cap { position:absolute; left:1060px; top:666px; transform:translateX(-50%); font-size:38px; color:#e2fbf2; text-shadow:var(--halo); white-space:nowrap; }
+.rv-over { position:absolute; left:1060px; top:666px; transform:translateX(-50%); font-size:46px; font-weight:700; color:#ffd9a0; text-shadow:var(--halo); white-space:nowrap; background:transparent; }
+.rv-word-glow { position:absolute; left:1060px; width:980px; margin-left:-490px; height:190px; opacity:0; pointer-events:none; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255,214,140,.32), transparent 70%); }
+.rv-note { position:absolute; left:300px; right:300px; top:562px; text-align:center; font-size:34px; font-style:italic; color:#e8f5ee; text-shadow:var(--halo); }
+.rv-answers { position:absolute; left:330px; right:330px; top:636px; display:grid; grid-template-columns:1fr 1fr; gap:14px 50px; }
+.rv-ans { display:flex; align-items:baseline; gap:14px; font-size:32px; text-shadow:var(--halo); }
+.rv-mark { flex:none; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-style:normal; font-weight:700; font-size:26px; align-self:center; }
+.rv-ans.ok .rv-mark { background:#5fbf8a; color:#0d2a1c; } .rv-ans.no .rv-mark { background:#b5643f; color:#2a0f04; }
+.rv-ans b { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:360px; }
+.rv-atext { font-style:italic; color:#f2fff9; } .rv-ans.no .rv-atext { text-decoration: line-through rgba(255,170,140,.7); }
+.rv-aph { margin-left:auto; font-size:24px; color:#9fc4b6; white-space:nowrap; }
+/* A — выбранная: спилы, стебель фаз, одуванчик на земле */
+.rvA-tm { position:absolute; left:70px; top:600px; z-index:1; }
+.rvA .rv-cell { z-index:2; }
+.rvA .rv-slice { border:none; border-radius:50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,236,200,.28), transparent 42%),
+    conic-gradient(from 205deg at 47% 45%, transparent 0 38deg, rgba(50,26,8,.55) 38deg 39.5deg, transparent 40deg 300deg, rgba(50,26,8,.35) 300deg 301deg, transparent 301.5deg),
+    repeating-radial-gradient(circle at 47% 45%, #b88d57 0 4px, #a07646 4px 6px, #ad8350 6px 10px, #94693b 10px 11px),
+    #9a7044;
+  box-shadow: inset 0 0 0 9px #3a2414, inset 0 0 0 11px #6b4524, inset 0 0 0 13px rgba(30,15,5,.5), 0 9px 0 #26160a, 0 18px 26px rgba(0,0,0,.65); }
+.rvA .rv-slice span { font-size:70px; color:rgba(54,30,10,.78); text-shadow: 0 1.5px 0 rgba(255,228,185,.45), 0 -1px 0 rgba(20,8,0,.35); }
+.rvA .rv-slice.open span { color:#fff0c8; text-shadow: 0 2px 3px rgba(30,12,2,.95), 0 0 6px rgba(120,50,0,.9), 0 0 22px rgba(255,190,90,.7); }
+.rv-ember { position:absolute; inset:-14px; border-radius:50%; opacity:0; pointer-events:none; background: radial-gradient(circle, rgba(255,214,140,.0) 52%, rgba(255,190,90,.75) 60%, rgba(255,140,40,0) 72%); }
+.rvA-vine { position:absolute; height:40px; overflow:visible; z-index:1; pointer-events:none; }
+.rvA-vine-s { fill:none; stroke:#2f5e44; stroke-width:6; stroke-linecap:round; }
+.rvA-vine-light { fill:none; stroke:#ffe3a0; stroke-width:4; stroke-linecap:round; stroke-dasharray:1200; stroke-dashoffset:1200; filter: drop-shadow(0 0 6px rgba(255,200,110,.9)); }
+.rvA-over { left:1060px; top:648px; font-size:44px; }
+/* стебель фаз: заголовок «Фаза N из 3», три узла — раскрытый цветок (сейчас), увядший (прошла), бутон (впереди) */
+.rvA-phases { position:absolute; left:1534px; top:612px; width:360px; height:440px; }
+.rvA-ph-head { position:absolute; left:0; right:0; top:0; font-size:34px; color:#e2fbf2; text-shadow:var(--halo); }
+.rvA-ph-head b { font-size:48px; color:#ffe2a0; }
+.rvA-phases.done .rvA-ph-head { font-size:30px; color:#ffd9a0; }
+.rvA-ph-stem { position:absolute; left:20px; top:66px; width:60px; height:380px; overflow:visible; }
+.rvA-ph-stem path { fill:none; stroke:#4f8f6a; stroke-width:6; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+.rvA-ph { position:absolute; left:0; display:flex; align-items:center; gap:14px; }
+.rvA-ph-bud { width:100px; height:100px; flex:none; display:block; transform-origin:50% 80%; }
+.rvA-ph-bud svg { width:100%; height:100%; overflow:visible; display:block; }
+.rvA-ph-bud .lf { fill:#3b7a5c; }
+.rvA-ph .fl ellipse { fill:#c9b6ff; stroke:rgba(40,16,80,.5); stroke-width:1; } .rvA-ph .fl .c { fill:#f0c055; }
+.rvA-ph.cur .rvA-ph-bud { filter: drop-shadow(0 0 16px rgba(200,180,255,.75)); }
+.rvA-ph .bd path:first-child { fill:#4a8a63; stroke:#1d4430; stroke-width:1.5; } .rvA-ph .bd .sep { fill:none; stroke:#8fd0a8; stroke-width:1.5; opacity:.6; }
+.rvA-ph .wl path:first-child { fill:#8a6440; stroke:#4a3020; stroke-width:1.5; } .rvA-ph .wl path:last-child { fill:none; stroke:#6b4a2c; stroke-width:2; }
+.rvA-ph.used .rvA-ph-bud .lf { fill:#5a5a3a; }
+.rvA-ph-t { display:grid; line-height:1.05; text-shadow:var(--halo); }
+.rvA-ph-t b { font-size:40px; color:#ffe2a0; white-space:nowrap; }
+.rvA-ph-t small { font-size:24px; color:#cfeee4; }
+.rvA-ph.cur .rvA-ph-t b { font-size:46px; }
+.rvA-ph.used .rvA-ph-t b { color:#a8988a; text-decoration: line-through 3px rgba(255,190,150,.55); font-size:34px; }
+.rvA-ph.used .rvA-ph-t small { color:#9fb8ad; }
+.rvA-ph.next .rvA-ph-t b { color:#cfe6dc; font-size:34px; } .rvA-ph.next .rvA-ph-t { opacity:.8; }
+.rvA .rv-note { top:556px; }
+.rvA-ans { top:630px; }
+.rvA-ans.rv-answers { left:400px; right:400px; grid-template-columns:1fr; gap:10px; }
+.rvA .rv-ans { font-size:34px; } .rvA .rv-ans b { max-width:none; overflow:visible; } .rvA .rv-aph { font-size:26px; }
+/* B */
+
+/* C */
+
+/* A — разбор как в игре (ShowAnswers): вопрос → ответ → ответы команд с вердиктом */
+.spA-qnum { position:absolute; top:30px; right:56px; font-size:30px; color:#cfeee4; text-shadow:var(--halo); }
+.spA-qnum b { font-size:48px; color:#f4fffa; }
+.spA-rq { position:absolute; left:90px; width:1080px; top:150px; font-size:62px; line-height:1.14; color:#f4fff9; text-shadow:var(--halo); }
+.spA-rq .sp-n { display:inline-grid; vertical-align:middle; margin-right:22px; width:76px; height:76px; font-size:42px; }
+.spA-rq.recall { top:120px; font-size:40px; color:#d6efe6; }
+.spA-rq.recall .sp-n { width:56px; height:56px; font-size:30px; }
+.spA-rimg { position:absolute; left:220px; top:420px; height:420px; border-radius:8px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.35), 0 14px 32px rgba(0,0,0,.7); }
+.spA-rq.recall ~ .spA-fa { position:absolute; left:90px; width:1080px; top:260px; margin:0; }
+.spA-aimg { position:absolute; left:450px; top:540px; height:320px; border-radius:8px; box-shadow: 0 0 0 4px #3b2a1c, 0 0 0 6px rgba(143,211,180,.35), 0 14px 32px rgba(0,0,0,.7); }
+.spA-teams { position:absolute; left:1230px; width:640px; top:150px; display:grid; gap:14px; }
+.spA-th { font-size:34px; color:#e8d9a8; text-shadow:var(--halo); margin-bottom:6px; }
+.spA-th b { font-size:46px; color:#f4fffa; }
+.spA-ta { position:relative; isolation:isolate; display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto; align-items:center; padding:12px 30px 14px 40px; min-height:104px; }
+.spA-ta-leaf { position:absolute; left:0; top:0; width:100%; height:100%; z-index:-1; overflow:visible; filter: drop-shadow(0 8px 14px rgba(0,0,0,.4)); }
+.spA-ta-leaf path { fill:url(#spLeafG); fill-opacity:.9; stroke:rgba(150,230,190,.22); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.spA-ta .nm { grid-column:1; font-size:26px; font-weight:700; line-height:1.1; text-shadow:var(--halo); }
+.spA-ta .dots, .spA-ta .txt { grid-column:1; grid-row:2; font-size:38px; line-height:1.15; color:#f4fff9; text-shadow:var(--halo); }
+.spA-ta .dots { color:#7fa596; letter-spacing:.2em; }
+.spA-ta.no .txt { text-decoration: line-through 3px rgba(255,170,140,.8); color:#e6cfc6; }
+.spA-ta .mk { grid-column:2; grid-row:1 / span 2; width:62px; height:62px; border-radius:50%; display:grid; place-items:center; font-style:normal; font-size:36px; font-weight:700; }
+.spA-ta.ok .mk { color:#0d2a1c; background: radial-gradient(circle at 35% 30%, #d6ffe4, #6fd79a 60%, #2f8a5a); box-shadow: 0 0 18px rgba(140,255,190,.55); }
+.spA-ta.no .mk { color:#2a0f04; background: radial-gradient(circle at 35% 30%, #f0c3a8, #b5643f 60%, #6b3218); }
+.spA-pod.done i { opacity:1; }
+.spA-pod.cur { box-shadow: inset 0 0 0 3px #ffe2a0, 0 0 18px rgba(255,214,140,.6); }
+.spA .spA-pods { left:80px; right:auto; width:1080px; }
+.spA-fa-lbl { position:absolute; top:-34px; left:0; right:0; text-align:center; font-size:28px; color:#cfeee4; text-shadow:var(--halo); }
+
+/* блиц C — итог: на диске оставшиеся секунды, на табличке расчёт и баллы в зачёт */
+.bz-rule { max-width:1200px; font-size:28px; line-height:1.3; color:#cfeee4; text-shadow:var(--halo); }
+.bzC-plaque.fin { gap:4px; }
+.bzC-calc { display:flex; flex-wrap:wrap; justify-content:center; gap:2px 12px; font-size:21px; line-height:1.2; color:#cfeee4; text-shadow:var(--halo); }
+.bzC-calc b { color:#f4fffa; } .bzC-calc .pen b { color:#ffb79e; } .bzC-calc .sum { color:#ffe2a0; font-weight:700; }
+.bzC-score { margin-top:auto; font-size:22px; color:#e8d9a8; text-shadow:var(--halo); }
+.bzC-score b { font-size:40px; color:#ffe2a0; }
+.bzC.nmany .bzC-calc { font-size:17px; } .bzC.nmany .bzC-score { font-size:17px; } .bzC.nmany .bzC-score b { font-size:30px; }
+.bzC .bz-rank.gold { box-shadow: 0 0 0 3px #fff1c2, 0 0 24px rgba(255,214,140,.8); }
+.bzC-blossom { position:absolute; inset:0; pointer-events:none; }
+.bzC-blossom i { position:absolute; width:calc(16px * var(--sc)); height:calc(16px * var(--sc)); border-radius:50%; background: radial-gradient(circle, #f0c055 0 25%, #ffe6f0 30%, #f5b8d0 70%); box-shadow: 0 0 10px rgba(255,220,235,.6); }
+/* банк — одно число на деревянном спиле в правом верхнем углу */
+.bz-bank { top:22px; right:44px; width:104px; height:104px; border-radius:50%; display:grid; place-items:center; gap:0;
+  background: repeating-radial-gradient(circle at 48% 46%, #a47c4c 0 6px, #8a643c 6px 8px), #77542f; border:6px solid #2a1a0d; box-shadow: 0 8px 18px rgba(0,0,0,.6), inset 0 -6px 10px rgba(40,20,5,.35); }
+.bz-bank b { font-size:52px; line-height:1; color:#fff4d8; text-shadow: 0 2px 4px rgba(20,10,4,.95); }
+.bzC .bz-bank { top:22px; }
+.bzC-plaque { overflow:hidden; }
+/* «Три попытки» A — рамы и раскрытие Концепта C на холсте; номер картинки — бутон в углу рамы */
+.rvA-cv { position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; }
+.rvA-no { position:absolute; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; display:grid; place-items:center; font-size:26px; font-weight:700; color:#2a1a08; z-index:2;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #f0c055 55%, #a87222); box-shadow: 0 0 0 3px rgba(20,40,30,.85), 0 4px 10px rgba(0,0,0,.6); }
+
+/* ═══ Игра: настоящее содержимое (число вопросов, длина текстов, число команд) ═══
+   Классы ниже появляются только когда содержимое не влезает в лабораторную раскладку — кадры лаборатории не меняются. */
+.spA .sp-t, .spA-rq, .spA-ta .txt, .spA-ta .nm, .bz-qtext, .bz-qsmall, .bz-sign b, .rv-note, .rv-atext { overflow-wrap:anywhere; }
+.spA-note { position:absolute; left:90px; width:1080px; top:478px; text-align:center; font-size:32px; line-height:1.2; font-style:italic; color:#e8f5ee; text-shadow:var(--halo); }
+.spA-none { font-size:30px; color:#9fb8ad; text-shadow:var(--halo); }
+.spA-teams.is-tight { gap:10px; }
+.spA-teams.is-tight .spA-ta { min-height:80px; padding:8px 26px 10px 36px; }
+.spA-teams.is-tight .spA-ta .nm { font-size:22px; }
+.spA-teams.is-tight .spA-ta .dots, .spA-teams.is-tight .spA-ta .txt { font-size:30px; }
+.spA-teams.is-tight .spA-ta .mk { width:50px; height:50px; font-size:28px; }
+.spA-teams.is-two { left:1200px; width:690px; grid-template-columns:1fr 1fr; column-gap:12px; }
+.spA-teams.is-two .spA-th { grid-column:1 / -1; }
+.spA-teams.is-two .spA-ta { padding:8px 16px 10px 28px; }
+.spA-teams.is-two .spA-ta .txt { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.spA-teams.is-two.is-tight .spA-ta { min-height:64px; }
+.spA-teams.is-two.is-tight .spA-ta .nm { font-size:19px; }
+.spA-teams.is-two.is-tight .spA-ta .dots, .spA-teams.is-two.is-tight .spA-ta .txt { font-size:24px; }
+.spA-teams.is-two.is-tight .spA-ta .mk { width:40px; height:40px; font-size:22px; }
+.spA-pods.many { gap:12px; flex-wrap:wrap; align-content:flex-end; }
+.spA-pods.many .spA-pod { width:50px; height:50px; font-size:24px; }
+/* игра на бумаге: колонки ответов команд нет — разбор по центру экрана */
+.spA.paper .spA-rq, .spA.paper .spA-rq.recall ~ .spA-fa, .spA.paper .spA-note { left:420px; }
+.spA.paper .spA-rimg { left:550px; } .spA.paper .spA-aimg { left:780px; }
+.spA.paper .spA-pods { left:420px; }
+/* В игре те же имена классов носят боевые экраны (13-round-race.css: .bz-asking/.bz-qtext/.bz-verdict/.bz-bank/.bz-dice-cap,
+   38-round-reveal.css: .rv-note) — их шрифт, разрядка, отступы и прозрачность протекали в Лес. Возвращаем значения
+   по умолчанию (в лаборатории глобальных стилей нет — там эти строки ничего не меняют). */
+.s1 .bz-asking, .s1 .bz-asking b, .s1 .bz-qtext, .s1 .bz-verdict, .s1 .bz-dice-cap, .s1 .bz-bank, .s1 .bz-pts, .s1 .rv-note { font-family:'Philosopher', sans-serif; letter-spacing:normal; }
+.s1 .bz-asking { margin-bottom:0; }
+.s1 .rv-note { opacity:1; }
+/* «Три попытки» в игре: вердикта ещё нет — место под знак остаётся, знака нет; много команд — две колонки */
+.rv-ans.nv .rv-mark { visibility:hidden; }
+.rvA-ans.rv-answers.is-two { left:120px; right:120px; grid-template-columns:1fr 1fr; gap:8px 50px; }
+.rvA-ans.is-two .rv-ans { font-size:28px; } .rvA-ans.is-two .rv-aph { font-size:22px; }
+.rvA-ans.is-two .rv-ans b { max-width:330px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rvA-ans.is-tight .rv-ans { font-size:24px; } .rvA-ans.is-tight .rv-mark { width:32px; height:32px; font-size:20px; }
+.rvA-ans.is-tiny { gap:4px 40px; } .rvA-ans.is-tiny .rv-ans { font-size:20px; } .rvA-ans.is-tiny .rv-aph { font-size:18px; }
+.s1-empty { position:absolute; left:0; right:0; top:480px; text-align:center; font-size:40px; color:#cfeee4; text-shadow:var(--halo); }

@@ -1,0 +1,10 @@
+.c7 { position:absolute; inset:0; overflow:hidden; }
+.c7 * { box-sizing:border-box; }
+.c7 svg { display:block; overflow:visible; }
+.c7 canvas { position:absolute; inset:0; width:1920px; height:1080px; }
+.c7-worlds { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.c7-progress { height:3px; background:#2b2734; margin-bottom:6px; border-radius:2px; overflow:hidden; }
+.c7-progress > div { height:100%; background:var(--lab-brass); transform-origin:0 50%; transform:scaleX(0); }
+.c7 .lay { position:absolute; inset:0; }
+.c7 .split { display:inline-block; white-space:pre; }
+.c7 .word { display:inline-block; white-space:nowrap; } .c7 .word:not(:last-child) { margin-right:.26em; }

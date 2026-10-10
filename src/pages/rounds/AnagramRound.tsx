@@ -25,7 +25,11 @@ import {
   anagramFlightPlan,
 } from '../../lib/anagram'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
-import type { AnagramSettings, GameState, Question } from '../../types/quiz'
+import type { AnagramSettings, Answer, GameState, Question, Team } from '../../types/quiz'
+import { isForestTheme } from '../../forest/config'
+import { ScrambleGame } from '../../forest/stage3/ScrambleGame'
+import { useRealTimer } from '../../forest/useTimer'
+import { hueOf, tcol } from '../../forest/util'
 import type { PreviewCtx } from '../../lib/previewState'
 
 /** Страховка посадки плитки, если `transitionend` не придёт (вкладка в
@@ -51,9 +55,7 @@ function motionReduced(): boolean {
     && !document.documentElement.classList.contains('fx-force-motion')
 }
 
-export function AnagramBoard({
-  pack, round, roundIdx, q, qIndex, qCount, gameState, timerSlot, effectsSlot, actionsSlot, preview,
-}: {
+type BoardProps = {
   pack: LoadedPack
   round: LoadedRound
   roundIdx: number
@@ -67,14 +69,16 @@ export function AnagramBoard({
   /** Предпросмотр в редакторе: ни одного сетевого запроса (хуки получают
    *  null), команды/ответы — фиктивные. Записей в сеть тут нет и в бою. */
   preview?: PreviewCtx
-}) {
-  // ── все хуки — до любого раннего return (React #310) ──
-  const liveTeams = useTeams(preview ? null : gameState.game_id)
-  const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
-  const shown = useQuestionShown(preview ? null : gameState.game_id)
-  const teams = preview ? preview.teams : liveTeams
-  const answers = preview ? preview.answers : liveAnswers
+}
 
+/** «Волшебный лес» на проекторе — утверждённая сцена «Семена над поляной» (src/forest/stage3); остальные темы и
+ *  предпросмотр редактора — прежняя доска. Хуков здесь нет: выбор только между двумя компонентами. */
+export function AnagramBoard(props: BoardProps) {
+  return isForestTheme(props.pack.theme) && !props.preview ? <ForestAnagramBoard {...props} /> : <AnagramBoardClassic {...props} />
+}
+
+/** Тик подсказок и их число — общие для обеих досок: считается от timer_started_at, после показа ответа замирает. */
+function useAnagramHints(q: Question, round: LoadedRound, gameState: GameState) {
   const s = (round.settings ?? {}) as AnagramSettings
   const spec = q.answer.mode === 'anagram' ? q.answer : null
   const phrase = spec?.phrase ?? ''
@@ -89,8 +93,6 @@ export function AnagramBoard({
   const reveal = gameState.reveal
   const timerSec = round.timer_seconds
   const intervalSec = s.hintIntervalSec ?? 10
-  const paperMode = pack.settings?.play_mode === 'paper'
-  const race = (s.mode ?? 'standard') === 'race' && !paperMode
 
   // Тик — только пока таймер идёт и ответ не показан: после этого экран
   // «успокаивается» (подсказки после конца таймера замирают сами).
@@ -113,6 +115,40 @@ export function AnagramBoard({
     maxHints: anagramMaxHints(letters.length),
   })
   const hinted = hintOrder.slice(0, open)
+  return { s, phrase, orderKey, template, letters, order, tiles, hinted }
+}
+
+/** Итог вопроса — общий для обеих досок: в гонке балл первому по серверному accepted_at, иначе — все угадавшие. */
+function anagramOutcome(p: { rows: Answer[]; teams: Team[]; phrase: string; race: boolean; shown: ReadonlyMap<string, string>; qid: string; startedAt: string | null }) {
+  const { rows, teams, phrase, race } = p
+  const winner = race ? anagramWinner(rows, phrase) : null
+  const winnerTeam = winner ? teams.find(t => t.id === winner) : undefined
+  const start = anagramStartIso(p.shown, p.qid, p.startedAt)
+  const winnerRow = winner ? rows.find(r => r.team_id === winner) : undefined
+  const winnerMs = winnerRow ? anagramElapsedMs(winnerRow, start.iso) : NaN
+  const rightTeams = race ? [] : rows
+    .filter(a => (a.is_correct ?? isAnagramCorrect(a.answer_text, phrase)) === true)
+    .map(a => teams.find(t => t.id === a.team_id))
+    .filter((t): t is NonNullable<typeof t> => !!t)
+  return { winnerTeam, start, winnerMs, rightTeams }
+}
+
+function AnagramBoardClassic({
+  pack, round, roundIdx, q, qIndex, qCount, gameState, timerSlot, effectsSlot, actionsSlot, preview,
+}: BoardProps) {
+  // ── все хуки — до любого раннего return (React #310) ──
+  const liveTeams = useTeams(preview ? null : gameState.game_id)
+  const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
+  const shown = useQuestionShown(preview ? null : gameState.game_id)
+  const teams = preview ? preview.teams : liveTeams
+  const answers = preview ? preview.answers : liveAnswers
+
+  const { s, phrase, orderKey, template, letters, order, tiles, hinted } = useAnagramHints(q, round, gameState)
+  const startedAt = gameState.timer_started_at
+  const reveal = gameState.reveal
+  const paperMode = pack.settings?.play_mode === 'paper'
+  const race = (s.mode ?? 'standard') === 'race' && !paperMode
+
   const hintedKey = hinted.join(',')
   // Плитки, которые ДОЛЖНЫ оказаться в клетках: при показе ответа — все,
   // иначе — плитки открытых подсказок.
@@ -230,15 +266,7 @@ export function AnagramBoard({
   const hintedSet = new Set(hinted)
   const landedCells = new Map<number, number>()   // клетка → плитка
   landed.forEach(p => landedCells.set(order[p], p))
-  const winner = race ? anagramWinner(rows, phrase) : null
-  const winnerTeam = winner ? teams.find(t => t.id === winner) : undefined
-  const start = anagramStartIso(shown, q.id, startedAt)
-  const winnerRow = winner ? rows.find(r => r.team_id === winner) : undefined
-  const winnerMs = winnerRow ? anagramElapsedMs(winnerRow, start.iso) : NaN
-  const rightTeams = race ? [] : rows
-    .filter(a => (a.is_correct ?? isAnagramCorrect(a.answer_text, phrase)) === true)
-    .map(a => teams.find(t => t.id === a.team_id))
-    .filter((t): t is NonNullable<typeof t> => !!t)
+  const { winnerTeam, start, winnerMs, rightTeams } = anagramOutcome({ rows, teams, phrase, race, shown, qid: q.id, startedAt })
   // на бумаге ответов в базе нет — результат зачитывает ведущий по бланкам
   const showResult = allLanded && !paperMode
 
@@ -313,5 +341,52 @@ export function AnagramBoard({
 
       {actionsSlot}
     </div>
+  )
+}
+
+/** «Скрэмбл» в «Волшебном лесу». Данные и правила — те же, что у прежней доски (useAnagramHints, anagramOutcome),
+ *  звук/автопоказ/автопролистывание и кнопки — те же слоты из HostScreen. Таймер-одуванчик считает от того же
+ *  timer_started_at; гонг играет он (кольцо timerSlot здесь не монтируется — иначе гонг прозвучал бы дважды). */
+function ForestAnagramBoard({ pack, round, q, qIndex, qCount, gameState, effectsSlot, actionsSlot }: BoardProps) {
+  const teams = useTeams(gameState.game_id)
+  const answers = useAnswers(gameState.game_id, gameState.round_number)
+  const shown = useQuestionShown(gameState.game_id)
+  const { s, phrase, template, letters, order, hinted } = useAnagramHints(q, round, gameState)
+  const startedAt = gameState.timer_started_at
+  const reveal = gameState.reveal
+  const paperMode = pack.settings?.play_mode === 'paper'
+  const race = (s.mode ?? 'standard') === 'race' && !paperMode
+  // возвращённый показанный вопрос (reveal без таймера) — таймера нет вовсе, как у прежней доски
+  const timerOff = reveal && !startedAt
+  const tm = useRealTimer(timerOff ? null : startedAt, round.timer_seconds, true)
+
+  const media = q.media.question ?? []
+  const img = q.media.hidden ? null : media.find(m => !/\.(mp3|mp4|webm|wav)$/i.test(m)) ?? null
+  const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
+  const { winnerTeam, start, winnerMs, rightTeams } = anagramOutcome({ rows, teams, phrase, race, shown, qid: q.id, startedAt })
+  const col = (c: string) => tcol(hueOf(c))
+  const chip = (t: Team) => <em key={t.id} style={{ color: col(t.color), borderColor: col(t.color) }}>{t.icon ? `${t.icon} ` : ''}{t.name}</em>
+  const note = q.answer_note ? <span className="scA-note">{q.answer_note}</span> : null
+  // на бумаге ответов в базе нет — результат зачитывает ведущий по бланкам
+  const result = paperMode ? null : race
+    ? winnerTeam
+      ? <><span>балл получает</span>{chip(winnerTeam)}{Number.isFinite(winnerMs) && winnerMs >= 0 && <span className="scA-tm">{start.approx ? '≈ ' : ''}за {formatRaceTime(winnerMs)}</span>}{note}</>
+      : <><span>никто не угадал</span>{note}</>
+    : rightTeams.length
+      ? <><span>угадали</span>{rightTeams.map(chip)}{note}</>
+      : <><span>никто не угадал</span>{note}</>
+  // сколько строк займёт результат (28px: ~13,5 px на знак, у плашки поля и зазор ~50 px; ширина строки 1460)
+  const chars = (race ? [winnerTeam].filter(Boolean) as Team[] : rightTeams).reduce((a, t) => a + t.name.length * 13.5 + 50, race ? 420 : 130)
+  const resultLines = Math.ceil(chars / 1460) + (q.answer_note ? Math.ceil(q.answer_note.length / 110) : 0)
+  return (
+    <>
+      <AudioGate />
+      {effectsSlot}
+      <ScrambleGame title={round.title_lines.join(' ')} qn={qIndex + 1} qcount={qCount} race={race}
+        clue={q.question_text.trim()} img={img ? mediaUrl(img) : null} template={template} letters={letters} order={order}
+        hinted={hinted} reveal={reveal} n={timerOff || reveal ? null : startedAt ? tm.left : round.timer_seconds}
+        total={round.timer_seconds} result={result} resultLines={resultLines} />
+      {actionsSlot}
+    </>
   )
 }
