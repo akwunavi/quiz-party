@@ -2374,8 +2374,8 @@ function CountingScreen({ pack, gameState }: {
     a.play().catch(() => {})
     return () => { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [pack.settings?.finale_music, pack.settings?.bg_music])
-  // бутоны команд на поляне «Леса» (только для рисунка)
-  const teams = useTeams(gameState.game_id)
+  // бутоны команд на поляне «Леса» (только для рисунка): в других темах лишний опрос не нужен
+  const teams = useTeams(isForestTheme(pack.theme) ? gameState.game_id : null)
 
   const mm = String(Math.floor(left / 60)).padStart(2, '0')
   const ss = String(left % 60).padStart(2, '0')

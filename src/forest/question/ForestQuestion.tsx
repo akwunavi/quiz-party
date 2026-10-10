@@ -1,7 +1,7 @@
 // ═══ Вопрос в «Волшебном лесу»: утверждённая сцена (Концепт C) на настоящем вопросе игры ═══
 // Показывает вопрос, цветы-варианты/фото, таймер-одуванчик и (когда ведущий открыл ответ) свет к верному ответу.
 // Игровой логики здесь нет: ответ, таймер и «показан ли ответ» приходят из общего состояния игры.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Scene, type SceneApi } from '../Scene'
 import { layoutFor, type Img, type Opt, type QInput } from './layout'
 import { fontMeasure, fontReady } from './measure'
@@ -17,9 +17,11 @@ export type ForestQ = {
   correctKey?: string
   /** текст верного ответа (для открытых вопросов) */
   answerText?: string
+  /** первая «картинка» — место под видео вопроса (16:9), плеер рисует `renderVideo` */
+  video?: boolean
 }
 
-export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from }: {
+export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from, renderVideo }: {
   q: ForestQ; roundName: string; qno: string
   startedAt: string | null; seconds: number
   /** ответ показан (gameState.reveal или экран разбора) */
@@ -28,6 +30,8 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   calm?: boolean
   /** с какой главы играть появление (повтор вопросов: слайд короткий — сразу «Открывается вопрос», без затихания леса) */
   from?: string
+  /** плеер видимого видео — кладётся ровно на раму первой «картинки» */
+  renderVideo?: (r: { x: number; y: number; w: number; h: number }) => ReactNode
 }) {
   useForestScene({ hidden: true }, 'fq')
   const sizes = useImageSizes(q.images)
@@ -35,7 +39,7 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   useEffect(() => { let dead = false; void fontReady().then(() => { if (!dead) setFonts(true) }); return () => { dead = true } }, [])
   const layout = useMemo(() => {
     if (!sizes || !fonts) return null
-    const images: Img[] = q.images.map((src, i) => ({ src, w: sizes[i].w, h: sizes[i].h }))
+    const images: Img[] = q.images.map((src, i) => (q.video && i === 0 ? { src, w: 1280, h: 720 } : { src, w: sizes[i].w, h: sizes[i].h }))
     const inp: QInput = { text: q.text, options: q.options, images, answerText: q.answerText }
     return layoutFor(inp, fontMeasure)
   }, [sizes, fonts, q.images, q.text, q.options, q.answerText])
@@ -55,6 +59,10 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   }, [push, from])
   const correct = useMemo(() => ({ key: q.correctKey, text: q.answerText }), [q.correctKey, q.answerText])
   if (!layout) return <div className="fr-root fr-wait" />
-  return <Scene key={`${q.id}-${reveal ? 'a' : 'q'}`} layout={layout} correct={correct} roundName={roundName} qno={qno}
-    mode="quick" answer={reveal} onReady={onReady} />
+  const vr = q.video && renderVideo ? layout.frames[0]?.r : null
+  return <>
+    <Scene key={`${q.id}-${reveal ? 'a' : 'q'}`} layout={layout} correct={correct} roundName={roundName} qno={qno}
+      mode="quick" answer={reveal} onReady={onReady} />
+    {vr && <div className="fo-video" style={{ left: vr.x, top: vr.y, width: vr.w, height: vr.h }}>{renderVideo!(vr)}</div>}
+  </>
 }

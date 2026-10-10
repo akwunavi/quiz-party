@@ -37,3 +37,6 @@
 .fa { position:absolute; font-size:44px; text-align:center; color:#ffe9b8; opacity:0; text-shadow: 0 2px 6px rgba(2,12,10,.95), 0 0 22px rgba(255,190,90,.45); }
 .fa.is-left { text-align:left; }
 .fa b { font-weight:700; color:#fff6dc; }
+/* видео вопроса лежит на раме первой «картинки»; встроенный max-height плеера (46vh) здесь не нужен */
+.fo-video { position:absolute; z-index:3; display:grid; }
+.fo-video video { width:100% !important; height:100% !important; max-height:none !important; object-fit:contain; border-radius:6px; background:#000; }
