@@ -1,13 +1,14 @@
 // ═══ Вопрос в «Волшебном лесу»: утверждённая сцена (Концепт C) на настоящем вопросе игры ═══
 // Показывает вопрос, цветы-варианты/фото, таймер-одуванчик и (когда ведущий открыл ответ) свет к верному ответу.
 // Игровой логики здесь нет: ответ, таймер и «показан ли ответ» приходят из общего состояния игры.
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Scene, type SceneApi } from '../Scene'
 import { layoutFor, type Img, type Opt, type QInput } from './layout'
 import { fontMeasure, fontReady } from './measure'
 import { useImageSizes } from './useImageSizes'
 import { useRealTimer } from '../useTimer'
-import { useForestScene } from '../shell'
+import { forestScene } from '../shell'
+import { useInShell } from '../shellCtx'
 
 export type ForestQ = {
   id: string; text: string; options: Opt[]
@@ -37,7 +38,13 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   /** без таймера-одуванчика (экран ответа до показа верного ответа) */
   noTimer?: boolean
 }) {
-  useForestScene({ hidden: true }, 'fq')
+  // сцена рисует свой лес, поэтому общий холст оболочки на это время скрыт; при уходе лишь возвращаем его (остальное состояние оболочки не сбрасываем)
+  const inShell = useInShell()
+  useLayoutEffect(() => {
+    if (!inShell) return
+    forestScene.set({ hidden: true })
+    return () => forestScene.set({ hidden: false })
+  }, [inShell])
   const sizes = useImageSizes(q.images)
   const [fonts, setFonts] = useState(false)
   useEffect(() => { let dead = false; void fontReady().then(() => { if (!dead) setFonts(true) }); return () => { dead = true } }, [])

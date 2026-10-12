@@ -33,3 +33,10 @@
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%), linear-gradient(to bottom, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
   -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%), linear-gradient(to bottom, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%); mask-composite: intersect;
 }
+/* Перекрёстное растворение сцены вопроса и разбора (ForestAnswers): без резкой смены экрана */
+.theme-enchanted_forest .fo-x { position: absolute; inset: 0; }
+.theme-enchanted_forest .fo-xout { z-index: 5; pointer-events: none; animation: fo-x-out .9s ease-in forwards; }
+.theme-enchanted_forest .fo-xin { animation: fo-x-in .8s .1s ease-out both; }
+@keyframes fo-x-out { to { opacity: 0; } }
+@keyframes fo-x-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .theme-enchanted_forest .fo-xout, .theme-enchanted_forest .fo-xin { animation-duration: .01s; animation-delay: 0s; } }

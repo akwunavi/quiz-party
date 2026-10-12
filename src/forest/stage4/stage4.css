@@ -84,3 +84,7 @@
 .s4-strip.g:not(.r1) .s4-sl .nm { display:block; white-space:nowrap; text-overflow:ellipsis; }
 /* бумажная игра / нет команд: разбор по центру кадра */
 .s4.paper .s4-recall { text-align:center; }
+/* ребус: расшифровка под картинкой (слог, перешедший от соседней картинки, подсвечен) */
+.s4-rcap { position:absolute; z-index:4; text-align:center; font-size:40px; line-height:1.1; color:#f4fff9; text-shadow:var(--halo); animation: s4-rcap-in .6s .35s both; }
+.s4-rcap b { color:#ffd98a; font-weight:700; }
+@keyframes s4-rcap-in { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
