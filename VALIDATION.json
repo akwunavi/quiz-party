@@ -1,0 +1,58 @@
+{
+  "DOG4_STOP_CONTACT_SHEET.png": {
+    "bytes": 572803,
+    "sha256": "26535dc5f4b3d37291362158221db48e403e8875f1c8095fbbbf78de8737edf5",
+    "size": [
+      2552,
+      780
+    ]
+  },
+  "DOG4_STOP_END.png": {
+    "bytes": 198573,
+    "sha256": "16ea61e4d22816e5809ffc86fd87f3adcb857857dd308a8fca896f60af2ed623",
+    "size": [
+      1276,
+      720
+    ]
+  },
+  "DOG4_STOP_END_original.png": {
+    "bytes": 467815,
+    "sha256": "6e83df60512e38e50e5c4140d283c705b7cb8b794011d74c0a18e13601b235d3",
+    "size": [
+      1276,
+      720
+    ]
+  },
+  "DOG4_STOP_START.png": {
+    "bytes": 181283,
+    "sha256": "98ff66f683f4cdf7f02baefb5ff7fcfb659f63c0bffd6e0b9b0b4186bce3de9d",
+    "size": [
+      1276,
+      720
+    ]
+  },
+  "DOG4_STOP_START_BACKUP_11.png": {
+    "bytes": 176022,
+    "sha256": "544aaa314ce75a540a9f9f8469acbf61ee63e058e7ad060073dbd0b5b92166f0",
+    "size": [
+      1276,
+      720
+    ]
+  },
+  "DOG4_STOP_START_BACKUP_11_original.png": {
+    "bytes": 416324,
+    "sha256": "f897a79ae0bbd3b1b38f908c0ddd40cdbf34afa2517cc6573abd6a889849b11f",
+    "size": [
+      1276,
+      720
+    ]
+  },
+  "DOG4_STOP_START_original.png": {
+    "bytes": 430766,
+    "sha256": "0705c2ba64ac68aa16b7ec507e884f6769ffe1fcad4e5fca66643423651d8690",
+    "size": [
+      1276,
+      720
+    ]
+  }
+}
