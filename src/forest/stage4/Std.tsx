@@ -43,6 +43,8 @@ export type StdData = {
   caption: string
   /** пояснение к ответу (answer_note) — после проверки */
   note?: string
+  /** ребус: расшифровка под каждой картинкой (слово с выделенной частью — слогом, который «забирается» у соседней картинки) */
+  captions?: { plain: string; hot: string; first: boolean }[]
 }
 export const STD_CLS: Record<StdKind, string> = { text: 'revtext', mc: 'revmc', img: 'revimg', imgopt: 'revimgopt' }
 
@@ -75,7 +77,7 @@ export function stdLayout(d: StdData, dx = 0) {
   const top = Math.max(190, Math.round(rBot + 22))
   let rects: FRect[] = [], srcs: string[] = []
   if (d.kind === 'img' && d.photos.length) {
-    const ph = d.photos.slice(0, 4), maxH = 710 - top
+    const ph = d.photos.slice(0, 4), maxH = (d.captions?.length ? 620 : 710) - top
     // одна картинка ответа: слева, а правильный ответ — справа от неё (не под ней)
     if (ph.length === 1 && !ph[0].video) rects = [fitRect(ph[0], 380 + dx, top, 640, 880 - top)]
     else if (ph.length === 1) rects = [fitRect(ph[0], 650 + dx, top, 900, maxH)]
@@ -247,6 +249,10 @@ export function StdScene({ d, ly, fs, rows, phase = 'all', judged = true, colLay
       </>}
       {d.kind === 'img' && !ly.side && <>
         <div className="s4-recall" style={recallSt}>{d.question}</div>
+        {shown && d.captions && ly.frame.rects.map((r, i) => d.captions![i] && (
+          <div key={'rc' + i} className="s4-rcap" style={{ left: r.x - 20, top: r.y + r.h + 26, width: r.w + 40 }}>
+            {d.captions![i].first ? <>{d.captions![i].plain}<b>{d.captions![i].hot}</b></> : <><b>{d.captions![i].hot}</b>{d.captions![i].plain}</>}
+          </div>))}
         {shown && <>
           <i className="s4-glow" style={{ left: X(120), top: 760, width: 1060, height: 240 }} />
           <div className="s4-lab" style={{ left: X(70), width: 1160, top: 744 }}>Правильный ответ</div>

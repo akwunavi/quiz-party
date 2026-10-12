@@ -2,15 +2,26 @@
 // Всё сетевое и всё, что решает (ответы, команды, автопоказ через 3 с, проверка `checked`, запись is_correct, звук ответа,
 // скрытое видео), — в HostScreen.ShowAnswers, как и прежде; сюда приходят готовые значения. Вердикт — та же формула
 // (is_correct ведущего, иначе autocheck) и только после `checked`. Кнопки ведущего — прежняя разметка .host-actions.
-import { useMemo, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { mediaUrl } from '../../lib/media'
 import { ForestReviewGame, type ReviewInput } from '../../forest/stage4/ReviewGame'
+import { forestScene } from '../../forest/shell'
 import { ForestQuestion } from '../../forest/question/ForestQuestion'
 import { forestQFrom } from '../../forest/question/fromQuestion'
 import { reviewKind, reviewRows } from '../../forest/stage4/review'
 import type { LoadedRound } from '../../lib/packLoader'
 import type { Answer, Question } from '../../types/quiz'
 
+/** расшифровка ребуса — те же правила, что у прежнего экрана (rebusCaption в HostScreen): у первого слова выделены последние 3 буквы, у второго — первые 3 */
+function rebusCaps(w1?: string, w2?: string): { plain: string; hot: string; first: boolean }[] | undefined {
+  const cap = (word: string | undefined, first: boolean) => {
+    const w = (word ?? '').trim(); if (!w) return null
+    const cut = first ? Math.max(0, w.length - 3) : 3
+    return first ? { plain: w.slice(0, cut), hot: w.slice(cut), first } : { plain: w.slice(cut), hot: w.slice(0, cut), first }
+  }
+  const a = cap(w1, true), b = cap(w2, false)
+  return a || b ? [a ?? { plain: '', hot: '', first: true }, b ?? { plain: '', hot: '', first: false }] : undefined
+}
 const isPic = (m: string) => !/\.(mp3|mp4|webm|wav|m4a|ogg)$/i.test(m)
 const isSound = (m: string) => /\.(mp3|wav|m4a|ogg)$/i.test(m)
 
@@ -47,6 +58,7 @@ export function ForestAnswers({ round, q, step, answers, teams, allTeams, reveal
       qImgs: q.media.hidden ? [] : qPics.map(mediaUrl), aImgs: reveal.map(mediaUrl),
       allImgs: (kind === 'imgopt' || !q.media.hidden ? qPics : []).map(mediaUrl),
       hasAudio: qm.some(isSound), note: q.answer_note?.trim() ?? '',
+      captions: round.mechanic === 'rebus' ? rebusCaps(q.service.word1, q.service.word2) : undefined,
     }
     // содержимое, а не ссылка на объект: пакет перечитывается, а сцену из-за этого пересобирать незачем
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,21 +68,30 @@ export function ForestAnswers({ round, q, step, answers, teams, allTeams, reveal
   const fq = useMemo(() => forestQFrom(q, mediaUrl, answerText),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [q.id, q.question_text, JSON.stringify(q.media), JSON.stringify(q.answer), answerText])
-  if (!revealed) {
-    return (
-      <>
-        {effects}
-        <ForestQuestion q={fq} roundName={round.title_lines.join(' ').replace(/\s+/g, ' ').trim()} qno={`Вопрос ${step + 1} из ${round.questions.length}`}
-          startedAt={null} seconds={round.timer_seconds} reveal={false} calm from="E" noTimer />
-        {actions}
-      </>
-    )
-  }
+  // Переход «ждём ответ → правильный ответ»: сцена вопроса не рвётся, а растворяется, пока проступает разбор
+  // (раньше один экран исчезал и сразу появлялся другой с чужим фоном — выглядело как моргание)
+  const [preOn, setPreOn] = useState(true)
+  useEffect(() => {
+    if (!revealed) { setPreOn(true); return }
+    const t = setTimeout(() => setPreOn(false), 1000)
+    return () => clearTimeout(t)
+  }, [revealed, q.id])
+  // на время растворения возвращаем общий лес оболочки: сквозь тающую сцену вопроса должен проступать он, а не чёрный фон
+  useEffect(() => { if (revealed) forestScene.set({ hidden: false }) }, [revealed])
+  const pre = (revealed ? preOn : true) && (
+    <div className={`fo-x ${revealed ? 'fo-xout' : ''}`}>
+      <ForestQuestion q={fq} roundName={round.title_lines.join(' ').replace(/\s+/g, ' ').trim()} qno={`Вопрос ${step + 1} из ${round.questions.length}`}
+        startedAt={null} seconds={round.timer_seconds} reveal={false} calm from="E" noTimer />
+    </div>)
+  if (!revealed) return <>{effects}{pre}{actions}</>
   return (
     <>
       {effects}
-      <ForestReviewGame key={q.id} inp={inp} rows={paper ? null : rows} answered={answered} revealed={revealed} checked={checked}
-        revealMs={revealMs} video={video} />
+      {pre}
+      <div className="fo-x fo-xin">
+        <ForestReviewGame key={q.id} inp={inp} rows={paper ? null : rows} answered={answered} revealed={revealed} checked={checked}
+          revealMs={revealMs} video={video} />
+      </div>
       {actions}
     </>
   )

@@ -86,6 +86,8 @@ export type ReviewInput = {
   /** в вопросе есть звук (подписи левых элементов сопоставления без картинок — «Трек N») */
   hasAudio: boolean
   note: string
+  /** ребус: расшифровка под картинками (слова word1/word2 с выделенным слогом) */
+  captions?: { plain: string; hot: string; first: boolean }[]
 }
 
 /** Разбор ответов (phase show_answers). rows — null: колонки команд нет (бумажная игра). */
@@ -130,7 +132,7 @@ function StdGame({ inp, photos, stage, judged, done, rows, count, video }: GameP
       kind, title: inp.title, qn: inp.qn, qcount: inp.qcount, question: inp.question, answer: inp.answer,
       options: inp.options, correct: kind === 'imgopt' || kind === 'mc' ? inp.options.findIndex(o => o.key === inp.correctKey) : -1,
       photos: kind === 'img' || kind === 'imgopt' ? ph : [], keys: inp.options.map(o => o.key),
-      caption: inp.options.find(o => o.key === inp.correctKey)?.text.trim() ?? '', note: inp.note,
+      caption: inp.options.find(o => o.key === inp.correctKey)?.text.trim() ?? '', note: inp.note, captions: inp.captions,
     }
   }, [inp, photos, shown, kind, !!video]) // eslint-disable-line react-hooks/exhaustive-deps
   const hasRows = !!rows
