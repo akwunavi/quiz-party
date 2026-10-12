@@ -255,7 +255,7 @@ export function Scene({ layout: L, correct: corr, roundName, qno, mode, answer, 
     }
     const drawDand = (p: Pt, g: number, t: number) => {
       if (g <= 0) return
-      const R = 118, gy = groundY(p.x) + 30, ph = phaseOf(st.n), zero = ph === 'zero', n0 = ease(g)
+      const R = 118, gy = H + 24, ph = phaseOf(st.n), zero = ph === 'zero', n0 = ease(g)
       const droop = zero ? 1 : 0
       const hx = p.x + droop * 10, hy = p.y + droop * 16
       ctx.strokeStyle = '#5f9b78'; ctx.lineWidth = 6; ctx.lineCap = 'round'
@@ -420,7 +420,7 @@ export function Scene({ layout: L, correct: corr, roundName, qno, mode, answer, 
         drawBloom(m.x, m.y, 35, backOut(u), mPetals[i], tgtMarker < 0 ? 0 : i === tgtMarker ? st.hit : -st.hit, t, 0.6)
       })
       if (L.cells) drawCells(L.cells, st.cells, st.flip)
-      drawDand(L.dand, st.dand, t)
+      if (!L.noTimer) drawDand(L.dand, st.dand, t)
       ctx.globalCompositeOperation = 'lighter'
       flies.forEach((f, i) => {
         const tt = f.rest ? t * 0.15 : t
@@ -543,7 +543,7 @@ export function Scene({ layout: L, correct: corr, roundName, qno, mode, answer, 
       ))}
       {L.phase && <div className="fp" style={{ left: L.phase.x, top: L.phase.y }}>{L.phase.text}</div>}
       {L.ans && corr.text && <div className={`fa${L.ans.align === 'left' ? ' is-left' : ''}`} style={{ left: L.ans.align === 'left' ? L.ans.x : L.ans.x - L.ans.w / 2, top: L.ans.y, width: L.ans.w }}>Ответ: <b>{corr.text}</b></div>}
-      <div className="ft" style={{ left: L.dand.x, top: L.dand.y }}><span ref={tnum}>30</span></div>
+      {!L.noTimer && <div className="ft" style={{ left: L.dand.x, top: L.dand.y }}><span ref={tnum}>30</span></div>}
       <div className="fm"><span>{roundName}</span><span>{qno}</span></div>
     </div>
   )

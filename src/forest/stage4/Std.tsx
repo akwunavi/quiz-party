@@ -76,7 +76,9 @@ export function stdLayout(d: StdData, dx = 0) {
   let rects: FRect[] = [], srcs: string[] = []
   if (d.kind === 'img' && d.photos.length) {
     const ph = d.photos.slice(0, 4), maxH = 710 - top
-    if (ph.length === 1) rects = [fitRect(ph[0], 650 + dx, top, 900, maxH)]
+    // одна картинка ответа: слева, а правильный ответ — справа от неё (не под ней)
+    if (ph.length === 1 && !ph[0].video) rects = [fitRect(ph[0], 380 + dx, top, 640, 880 - top)]
+    else if (ph.length === 1) rects = [fitRect(ph[0], 650 + dx, top, 900, maxH)]
     else {
       const gap = 40, sum = ph.reduce((a, p) => a + p.w / p.h, 0)
       const h = Math.round(Math.min(maxH, (1160 - gap * (ph.length - 1)) / sum))
@@ -93,9 +95,11 @@ export function stdLayout(d: StdData, dx = 0) {
     srcs = d.photos.map(p => p.src)
   }
   const n = Math.max(1, d.options.length), step = 1160 / n
-  const ans = d.kind === 'img' ? fitAnswer(d.answer, 1160, 104, 150) : fitAnswer(d.answer, 1160, 150, 250)
+  const side = d.kind === 'img' && d.photos.length === 1 && !d.photos[0].video
+  const ans = side ? fitAnswer(d.answer, 540, 330, 104) : d.kind === 'img' ? fitAnswer(d.answer, 1160, 104, 150) : fitAnswer(d.answer, 1160, 150, 250)
+  const sideTop = side ? Math.max(top + 70, top + Math.round(rects[0].h / 2) - 40) : 0
   return {
-    dx, recallFs: rFs, frame: { rects, srcs },
+    side, sideTop, dx, recallFs: rFs, frame: { rects, srcs },
     ans, ansBase: d.kind === 'img' ? 104 : 150,
     /** варианты: центр цветка, ширина подписи, масштаб цветка */
     cx: (i: number) => 70 + dx + step * (i + 0.5),
@@ -233,7 +237,15 @@ export function StdScene({ d, ly, fs, rows, phase = 'all', judged = true, colLay
         {d.options.map((o, i) => <div key={o.key} className="s4-opt" data-i={i} style={{ left: ly.cx(i) - ly.optW / 2, top: 730, ...(ly.optW !== 270 ? { width: ly.optW } : {}), ...(ly.optFs !== 32 ? { fontSize: ly.optFs } : {}) }}><b>{o.key}</b><span>{o.text}</span></div>)}
         {d.options.map((o, i) => <b key={o.key} className="s4-key" style={{ left: ly.cx(i) - 24, top: 496 }}>{o.key}</b>)}
       </>}
-      {d.kind === 'img' && <>
+      {d.kind === 'img' && ly.side && <>
+        <div className="s4-recall" style={recallSt}>{d.question}</div>
+        {shown && <>
+          <i className="s4-glow" style={{ left: X(700), top: ly.sideTop - 90, width: 620, height: 330 }} />
+          <div className="s4-lab" style={{ left: X(740), width: 540, top: ly.sideTop - 48 }}>Правильный ответ</div>
+          <div className={`s4-ans sm${wrap}`} style={{ left: X(740), width: 540, top: ly.sideTop, fontSize: ly.ans.fs }}>{answerLetters(d.answer)}</div>
+        </>}
+      </>}
+      {d.kind === 'img' && !ly.side && <>
         <div className="s4-recall" style={recallSt}>{d.question}</div>
         {shown && <>
           <i className="s4-glow" style={{ left: X(120), top: 760, width: 1060, height: 240 }} />

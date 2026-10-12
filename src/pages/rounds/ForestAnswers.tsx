@@ -5,6 +5,8 @@
 import { useMemo, type ReactNode } from 'react'
 import { mediaUrl } from '../../lib/media'
 import { ForestReviewGame, type ReviewInput } from '../../forest/stage4/ReviewGame'
+import { ForestQuestion } from '../../forest/question/ForestQuestion'
+import { forestQFrom } from '../../forest/question/fromQuestion'
 import { reviewKind, reviewRows } from '../../forest/stage4/review'
 import type { LoadedRound } from '../../lib/packLoader'
 import type { Answer, Question } from '../../types/quiz'
@@ -50,6 +52,20 @@ export function ForestAnswers({ round, q, step, answers, teams, allTeams, reveal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q.id, q.question_text, JSON.stringify(q.media), JSON.stringify(q.answer), q.answer_note, answerText, round.mechanic, round.title_lines.join('|'), round.questions.length, step])
   const { rows, answered } = reviewRows(q, teams, allTeams, answers, checked)
+  // до показа верного ответа экран остаётся ровно экраном вопроса (без таймера); разбор с командами — после показа
+  const fq = useMemo(() => forestQFrom(q, mediaUrl, answerText),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [q.id, q.question_text, JSON.stringify(q.media), JSON.stringify(q.answer), answerText])
+  if (!revealed) {
+    return (
+      <>
+        {effects}
+        <ForestQuestion q={fq} roundName={round.title_lines.join(' ').replace(/\s+/g, ' ').trim()} qno={`Вопрос ${step + 1} из ${round.questions.length}`}
+          startedAt={null} seconds={round.timer_seconds} reveal={false} calm from="E" noTimer />
+        {actions}
+      </>
+    )
+  }
   return (
     <>
       {effects}

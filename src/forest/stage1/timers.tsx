@@ -42,7 +42,7 @@ export function Dandelion({ n, total, size = 300, seeds = 30, label, hideNum, ro
       {rooted > 0 ? <>
         <path className="tm-stem-back" d={droop ? `M 0 ${base} C -8 ${base - rooted * 0.6} 34 230 22 96` : `M 0 ${base} C -12 ${base - rooted * 0.6} 18 210 0 80`} />
         <path className="tm-stem tm-stem-hi" d={droop ? `M 0 ${base} C -8 ${base - rooted * 0.6} 34 230 22 96` : `M 0 ${base} C -12 ${base - rooted * 0.6} 18 210 0 80`} />
-      </> : <path className="tm-stem" d={droop ? 'M 14 350 Q 30 220 22 96' : 'M 0 350 Q 16 220 0 80'} />}
+      </> : <path className="tm-stem" d={droop ? `M 14 ${stem} Q 30 ${Math.round(stem * 0.63)} 22 96` : `M 0 ${stem} Q 16 ${Math.round(stem * 0.63)} 0 80`} />}
       {rooted > 0 && Array.from({ length: 11 }, (_, k) => { const x = -120 + k * 24 + (k % 3) * 5, h = 22 + (k * 7) % 26; return <path key={k} className="tm-grass" d={`M ${x} ${base + 10} q ${(k % 2 ? 6 : -6)} ${-h * 0.6} ${(k % 2 ? 12 : -10)} ${-h}`} /> })}
       <g className="tm-head" transform={droop ? 'translate(16 18) rotate(8)' : undefined}>
         <circle r={R * 1.5} fill="url(#tmd-back)" />

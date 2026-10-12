@@ -63,7 +63,7 @@ describe('разбор обычного вопроса', () => {
     const im = { src: 'x', w: 600, h: 900 }, wide = { src: 'y', w: 1600, h: 600 }
     for (const photos of [[im], [im, wide], [wide, wide, im, im]]) {
       const L = stdLayout({ ...base, kind: 'img', question: 'В'.repeat(320), photos })
-      for (const r of L.frame.rects) { expect(r.x).toBeGreaterThanOrEqual(60); expect(r.x + r.w).toBeLessThanOrEqual(1240); expect(r.y + r.h).toBeLessThanOrEqual(712) }
+      for (const r of L.frame.rects) { expect(r.x).toBeGreaterThanOrEqual(60); expect(r.x + r.w).toBeLessThanOrEqual(1240); expect(r.y + r.h).toBeLessThanOrEqual(photos.length === 1 ? 892 : 712) }
       for (const r of L.frame.rects) expect(r.y).toBeGreaterThanOrEqual(recallBottom('В'.repeat(320)))
     }
     for (const n of [2, 3, 4, 5, 6]) {

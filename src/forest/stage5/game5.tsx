@@ -102,7 +102,7 @@ export function ForestAnswerTime({ num, paper, startedAt, seconds, teams }: { nu
       <S1Screen rects={paper ? [{ x: 560, y: 160, w: 800, h: 880 }] : [{ x: 60, y: 30, w: 600, h: 1000 }, { x: 680, y: 220, w: 1200, h: 830 }]} n={startedAt ? t.left : null} rootRef={root} cls={`s5 ru at5${paper ? ' paper' : ''}`}>
         <h1 className="ru-title">{title.split('').map((c, i) => <span key={i} className="ch">{c === ' ' ? ' ' : c}</span>)}</h1>
         <div className="at5-sub">Раунд {num} · {paper ? 'передайте бланки ведущему' : 'капитаны отправляют ответы с телефонов'}</div>
-        <div className="at5-timer"><Dandelion n={t.left} total={seconds} size={paper ? 420 : 380} seeds={24} /></div>
+        <div className="at5-timer"><Dandelion n={t.left} total={seconds} size={paper ? 420 : 380} seeds={24} stem={paper ? 530 : 585} /></div>
         {teams && <ul className="at5-teams" style={{ gridTemplateColumns: `repeat(${g.cols}, 1fr)`, gridAutoRows: g.rowH, ['--fz' as string]: `${g.fz}px` }}>
           {teams.map(tm => <li key={tm.id} className={`at5-t${tm.done ? ' done' : ''}`}><span className="nm" style={{ color: tm.color }}>{tm.name}</span><em>{tm.got}/{tm.total}</em></li>)}
         </ul>}

@@ -18,6 +18,8 @@ export type Layout = {
   cells: { word: string; open: number[]; cx: number; cy: number; d: number; gap: number } | null
   phase: { text: string; x: number; y: number } | null
   dand: Pt; ans: { x: number; y: number; w: number; align: 'center' | 'left' } | null
+  /** без таймера-одуванчика (экран ответа до показа: то же содержимое, что на вопросе, но без отсчёта) */
+  noTimer?: boolean
 }
 export type QInput = {
   text: string; options: Opt[]; images: Img[]
@@ -25,6 +27,8 @@ export type QInput = {
   word?: { word: string; open: number[]; phase: number }
   /** правильный ответ открытого вопроса (подпись «Ответ: …» при показе ответа) */
   answerText?: string
+  /** подписи-метки на картинках (буквы вариантов / номера пар); нет — картинки без меток */
+  markers?: string[]
 }
 export type Measure = (text: string, size: number) => number
 
@@ -50,6 +54,25 @@ export function fitText(text: string, width: number, maxLines: number, max: numb
   return { size: min, lines: wrapCount(text, width, min, m) }
 }
 const textH = (size: number, lines: number) => Math.round(size * LINE * Math.max(1, lines))
+/** Самый крупный кегль, при котором текст помещается в коробку maxW × maxH (иначе min). */
+export function fitBox(text: string, maxW: number, maxH: number, max: number, min: number, m: Measure): { size: number; lines: number } {
+  for (let s = max; s >= min; s -= 2) { const l = wrapCount(text, maxW, s, m); if (textH(s, l) <= maxH) return { size: s, lines: l } }
+  return { size: min, lines: wrapCount(text, maxW, min, m) }
+}
+/** Наименьшая ширина, при которой текст переносится на те же строки: строки выходят ровными (браузерный balance работает только до ~6 строк). */
+export function balancedWidth(text: string, maxW: number, size: number, m: Measure): number {
+  const lines = wrapCount(text, maxW, size, m)
+  if (lines <= 1) return maxW
+  const longest = Math.max(...text.trim().split(/\s+/).map(w => m(w, size)))
+  let lo = Math.max(longest, maxW * 0.4), hi = maxW
+  for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (wrapCount(text, mid, size, m) <= lines) hi = mid; else lo = mid }
+  return Math.min(maxW, Math.ceil(hi * 1.03) + 8)
+}
+/** Блок вопроса по центру cx: размер подгоняется под коробку, ширина выравнивается по строкам. */
+function qCenter(text: string, cx: number, cy: number, maxW: number, maxH: number, max: number, min: number, m: Measure): NonNullable<Layout['q']> {
+  const t = fitBox(text, maxW, maxH, max, min, m), w = balancedWidth(text, maxW, t.size, m)
+  return { text, left: Math.round(cx - w / 2), top: Math.round(cy - textH(t.size, t.lines) / 2), width: Math.round(w), size: t.size, align: 'center' }
+}
 
 const byH = (img: Img, h: number) => Math.round(img.w * h / img.h)
 const fit = (img: Img, cx: number, cy: number, mw: number, mh: number): Rect => {
@@ -80,9 +103,8 @@ function flowerRow(n: number, cx: number, y: number, r: number, sp4: number): { 
   const flowers = Array.from({ length: n }, (_, i) => ({ x: Math.round(cx + (i - (n - 1) / 2) * sp), y, r }))
   return { flowers, labelW: Math.min(n <= 4 ? 280 : 256, Math.round(sp - 14)), labelSize: n <= 4 ? 36 : n <= 6 ? 32 : 28 }
 }
-const letters = (imgs: Rect[], keys: string[]) => imgs.map((r, i) => ({ key: keys[i] ?? '', x: r.x - 40, y: r.y + r.h / 2, frame: i }))
+const letters = (imgs: Rect[], keys: string[] | undefined) => (keys ?? []).length ? imgs.map((r, i) => ({ key: keys![i] ?? '', x: r.x - 40, y: r.y + r.h / 2, frame: i })).filter(k => k.key) : []
 
-const KEYS = 'АБВГДЕЖЗИК'
 
 export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
   const { text, options: opts, images: imgs } = inp
@@ -93,21 +115,28 @@ export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
     return L({ opts: [], vines: rs.flatMap(r => hang(r, -10)), frames: rs.map((r, i) => ({ r, img: imgs[i] })),
       cells: { word: inp.word.word, open: inp.word.open, cx: 1060, cy: 788, d: 112, gap: 22 }, phase: { text: `Фаза ${inp.word.phase} из 3`, x: 1060, y: 660 } })
   }
+  const hasText = text.trim().length > 0, big = !hasText && !hasOpts
   if (n === 0) {
-    // текст и цветы-варианты
-    const t = fitText(text, 1060, 5, 60, 36, m), fl = flowerRow(opts.length, 1140, 716, 74, 270)
+    // текст и (если есть) цветы-варианты; без вариантов текст получает всю поляну под аркой
+    const fl = flowerRow(opts.length, 1140, 716, 74, 270)
+    const q = hasOpts ? qCenter(text, 1150, 420, 1060, 420, 64, 30, m) : qCenter(text, 1150, 545, 1100, 500, 76, 30, m)
     return L({ dand: DAND_TEXT, labelW: fl.labelW, labelSize: fl.labelSize,
       strands: [{ pts: [G(548), { x: 506, y: 760 }, { x: 532, y: 520 }, { x: 630, y: 330 }, { x: 790, y: 212 }, { x: 990, y: 158 }, { x: 1210, y: 150 }], w: 30 },
         { pts: [G(1748), { x: 1788, y: 760 }, { x: 1764, y: 520 }, { x: 1676, y: 330 }, { x: 1526, y: 214 }, { x: 1326, y: 160 }, { x: 1100, y: 154 }], w: 30 }],
-      flowers: fl.flowers, label: 806, q: { text, left: 620, top: Math.max(260, 330 - Math.round(textH(t.size, t.lines) / 2) + 90), width: 1060, size: t.size, align: 'center' } })
+      flowers: fl.flowers, label: 806, q })
   }
   if (n === 1) {
     const im = imgs[0]
+    if (big) {
+      // только картинка (ребус): во весь экран, что не занято таймером слева
+      const r = fit(im, 1150, 540, 1480, 900)
+      return L({ strands: props(r), frames: [{ r, img: im }], markers: letters([r], inp.markers) })
+    }
     if (hasOpts) {
       const t = fitText(text, 1300, 2, 48, 32, m), top = 32, tb = top + textH(t.size, t.lines) + 22
       const r = fit(im, 1090, 408 + Math.round((tb - 111) / 2), 1000, Math.min(600, 740 - tb))
       const fl = flowerRow(opts.length, 1090, 790, 50, 260)
-      return L({ strands: props(r), frames: [{ r, img: im }], flowers: fl.flowers, labelW: fl.labelW, labelSize: fl.labelSize, label: 852, q: { text, left: 440, top, width: 1300, size: t.size, align: 'center' } })
+      return L({ strands: props(r), frames: [{ r, img: im }], flowers: fl.flowers, labelW: fl.labelW, labelSize: fl.labelSize, label: 852, q: { ...qCenter(text, 1090, top + textH(t.size, t.lines) / 2, 1300, 200, t.size, t.size, m), size: t.size } })
     }
     if (im.h > im.w * 1.1) {
       const t = fitText(text, 680, 7, 52, 30, m), r = fit(im, 750, 540, 660, 860)
@@ -117,7 +146,7 @@ export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
     const wide = fitText(text, 1300, 2, 50, 34, m)
     if (wrapCount(text, 1300, 50, m) <= 2) {
       const r = fit(im, 1080, 524, 1260, 812)
-      return L({ strands: props(r), frames: [{ r, img: im }], q: { text, left: 440, top: 34, width: 1300, size: wide.size, align: 'center' }, ans: { x: 1080, y: r.y + r.h + 8, w: 900, align: 'center' } })
+      return L({ strands: props(r), frames: [{ r, img: im }], q: { ...qCenter(text, 1090, 34 + textH(wide.size, wrapCount(text, 1300, wide.size, m)) / 2, 1300, 200, wide.size, wide.size, m), size: wide.size }, ans: { x: 1080, y: r.y + r.h + 8, w: 900, align: 'center' } })
     }
     // длинный вопрос с широкой картинкой: фото слева, текст столбцом справа
     const t = fitText(text, 520, 12, 40, 26, m), r = fit(im, 840, 540, 900, 700)
@@ -126,6 +155,10 @@ export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
   }
   if (n === 2) {
     // два фото одной высоты — равная важность; вопрос сверху, цветы-варианты снизу
+    if (big) {
+      const rs = row(imgs.slice(0, 2), 820, 1150, 110, 48, 1480)
+      return L({ strands: [{ pts: bough(70, 360, 1860), w: 16 }], vines: rs.flatMap(r => hang(r, 76)), frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: letters(rs, inp.markers) })
+    }
     const one = fitText(text, 1440, 1, 48, 40, m)
     const t = wrapCount(text, 1440, one.size, m) <= 1 ? one : fitText(text, 1440, 3, 40, 30, m)
     const lines = Math.max(1, t.lines), top = lines === 1 ? 30 : 26
@@ -133,18 +166,26 @@ export function layoutFor(inp: QInput, m: Measure = approxMeasure): Layout {
     const rs = row(imgs.slice(0, 2), imgH, 1060, imgY, 48)
     const fl = flowerRow(opts.length, 1100, lines === 1 ? 752 : 748, 52, 360)
     return L({ strands: [{ pts: bough(imgY - 20, 280, 1860), w: 16 }], vines: rs.flatMap(r => hang(r, imgY - 14)), frames: rs.map((r, i) => ({ r, img: imgs[i] })),
-      flowers: fl.flowers, labelW: fl.labelW, labelSize: fl.labelSize, label: lines === 1 ? 818 : 812, q: { text, left: 380, top, width: 1440, size: t.size, align: 'center' } })
+      flowers: fl.flowers, labelW: fl.labelW, labelSize: fl.labelSize, label: lines === 1 ? 818 : 812, markers: letters(rs, inp.markers), q: { ...qCenter(text, 1100, top + textH(t.size, lines) / 2, 1440, 400, t.size, t.size, m), size: t.size } })
   }
   if (n === 3) {
     // три фото одной высоты в ряд, промежутки шире — в них живут метки А/Б/В
+    if (big) {
+      const rs = row(imgs.slice(0, 3), 700, 1150, 150, 78, 1480)
+      return L({ opts: [], strands: [{ pts: bough(100, 360, 1890), w: 16 }], vines: rs.flatMap(r => hang(r, 106)), frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: letters(rs, inp.markers) })
+    }
     const t = fitText(text, 1440, 2, 48, 30, m), top = 40
     const y0 = Math.max(214, top + textH(t.size, t.lines) + 28), rs = row(imgs.slice(0, 3), Math.min(386, 640 - y0 + 60), 1004, y0, 78)
     return L({ opts: [], strands: [{ pts: bough(y0 - 46, 60, 1890), w: 16 }], vines: rs.flatMap(r => hang(r, y0 - 40)), frames: rs.map((r, i) => ({ r, img: imgs[i] })),
-      markers: letters(rs, opts.length ? opts.map(o => o.key) : [...KEYS]), q: { text, left: 380, top, width: 1440, size: t.size, align: 'center' } })
+      markers: letters(rs, inp.markers), q: { ...qCenter(text, 1100, top + textH(t.size, t.lines) / 2, 1440, 400, t.size, t.size, m), size: t.size } })
   }
   // четыре фото: сетка 2×2, центральная лоза между столбцами держит рамы
+  if (big) {
+    const rs = imgs.slice(0, 4).map((im, i) => fit(im, i % 2 ? 1560 : 820, i < 2 ? 300 : 790, 700, 450))
+    return L({ opts: [], strands: [{ pts: [G(1190), { x: 1182, y: 760 }, { x: 1196, y: 540 }, { x: 1186, y: 330 }, { x: 1192, y: 80 }], w: 18 }], frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: letters(rs, inp.markers) })
+  }
   const t = fitText(text, 1500, 2, 44, 28, m), shift = t.lines > 1 ? 36 : 0
   const rs = imgs.slice(0, 4).map((im, i) => fit(im, i % 2 ? 1500 : 760, (i < 2 ? 322 : 780) + shift, 650, 432 - shift / 2))
   return L({ opts: [], strands: [{ pts: [G(1130), { x: 1122, y: 760 }, { x: 1136, y: 540 }, { x: 1126, y: 330 }, { x: 1132, y: 110 }], w: 18 }],
-    frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: letters(rs, opts.length ? opts.map(o => o.key) : [...KEYS]), q: { text, left: 380, top: 26, width: 1500, size: t.size, align: 'center' } })
+    frames: rs.map((r, i) => ({ r, img: imgs[i] })), markers: letters(rs, inp.markers), q: { ...qCenter(text, 1130, 26 + textH(t.size, t.lines) / 2, 1500, 200, t.size, t.size, m), size: t.size } })
 }

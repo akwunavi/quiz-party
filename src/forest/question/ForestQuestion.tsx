@@ -19,9 +19,11 @@ export type ForestQ = {
   answerText?: string
   /** первая «картинка» — место под видео вопроса (16:9), плеер рисует `renderVideo` */
   video?: boolean
+  /** метки на картинках: буквы вариантов или номера пар; нет — без меток */
+  markers?: string[]
 }
 
-export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from, renderVideo }: {
+export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from, renderVideo, noTimer }: {
   q: ForestQ; roundName: string; qno: string
   startedAt: string | null; seconds: number
   /** ответ показан (gameState.reveal или экран разбора) */
@@ -32,6 +34,8 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   from?: string
   /** плеер видимого видео — кладётся ровно на раму первой «картинки» */
   renderVideo?: (r: { x: number; y: number; w: number; h: number }) => ReactNode
+  /** без таймера-одуванчика (экран ответа до показа верного ответа) */
+  noTimer?: boolean
 }) {
   useForestScene({ hidden: true }, 'fq')
   const sizes = useImageSizes(q.images)
@@ -40,9 +44,10 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   const layout = useMemo(() => {
     if (!sizes || !fonts) return null
     const images: Img[] = q.images.map((src, i) => (q.video && i === 0 ? { src, w: 1280, h: 720 } : { src, w: sizes[i].w, h: sizes[i].h }))
-    const inp: QInput = { text: q.text, options: q.options, images, answerText: q.answerText }
-    return layoutFor(inp, fontMeasure)
-  }, [sizes, fonts, q.images, q.text, q.options, q.answerText])
+    const inp: QInput = { text: q.text, options: q.options, images, answerText: q.answerText, markers: q.markers }
+    const l = layoutFor(inp, fontMeasure)
+    return noTimer ? { ...l, noTimer: true } : l
+  }, [sizes, fonts, q.images, q.text, q.options, q.answerText, q.markers, q.video, noTimer])
   const tm = useRealTimer(calm ? null : startedAt, seconds, !calm)
   const api = useRef<SceneApi | null>(null)
   const tmRef = useRef(tm); tmRef.current = tm

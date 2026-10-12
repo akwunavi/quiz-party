@@ -38,18 +38,45 @@ function ShellBackdrop() {
   return <ForestBackdrop rects={s.rects} mood={s.mood} pulse={s.pulse} />
 }
 
+/** Размытое продолжение леса за пределами кадра: если окно не 16:9, по бокам/снизу не чёрные «уши», а лес.
+ *  Каждые ~130 мс копируем холсты кадра в крошечный холст и растягиваем его на всё окно с размытием (стоимость пренебрежимо мала). */
+function Bleed({ frame }: { frame: React.RefObject<HTMLDivElement> }) {
+  const cv = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    const c = cv.current; if (!c) return
+    const ctx = c.getContext('2d'); if (!ctx) return
+    const tick = () => {
+      if (document.hidden) return
+      ctx.fillStyle = '#03100d'; ctx.fillRect(0, 0, c.width, c.height)
+      frame.current?.querySelectorAll('canvas').forEach(src => {
+        if (src.width >= 1800) { try { ctx.drawImage(src, 0, 0, c.width, c.height) } catch { /* холст ещё пуст */ } }
+      })
+    }
+    tick(); const t = setInterval(tick, 130)
+    return () => clearInterval(t)
+  }, [frame])
+  return <canvas ref={cv} className="fo-bleed" width={240} height={135} aria-hidden />
+}
+
 /** Кадр 1920×1080, вписанный в окно по центру. */
 export function ForestFrame({ children }: { children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
+  const frame = useRef<HTMLDivElement>(null)
   const [k, setK] = useState(() => Math.min(innerWidth / 1920, innerHeight / 1080))
+  const [letter, setLetter] = useState(false)
   useEffect(() => {
-    const on = () => { const b = box.current; if (b) setK(Math.min(b.clientWidth / 1920, b.clientHeight / 1080)) }
+    const on = () => {
+      const b = box.current; if (!b) return
+      setK(Math.min(b.clientWidth / 1920, b.clientHeight / 1080))
+      setLetter(Math.abs(b.clientWidth / b.clientHeight - 16 / 9) > 0.02)
+    }
     on(); addEventListener('resize', on)
     return () => removeEventListener('resize', on)
   }, [])
   return (
     <div ref={box} className="fo-box">
-      <div className="fo-frame" style={{ transform: `translate(-50%, -50%) scale(${k})` }}>
+      {letter && <Bleed frame={frame} />}
+      <div ref={frame} className={`fo-frame${letter ? ' is-letter' : ''}`} style={{ transform: `translate(-50%, -50%) scale(${k})` }}>
         <ShellCtx.Provider value={true}>
           <ShellBackdrop />
           {children}
