@@ -16,7 +16,9 @@
   text-shadow: 0 0 22px rgba(111,242,214,.5), 0 3px 8px #03100d; font-variant-numeric: tabular-nums; }
 .fr-root[data-ph="warning"] .ft span { color:#ffd9a0; text-shadow: 0 0 22px rgba(255,150,70,.7), 0 2px 6px #03100d; }
 .fr-root[data-ph="zero"] .ft span { color:#b9cfc6; text-shadow: 0 2px 8px #03100d; }
-.fm { position:absolute; left:640px; right:150px; top:1030px; display:flex; justify-content:space-between; font-size:24px; color:#8fbfb2; opacity:0; }
+.fm { position:absolute; left:48px; right:48px; top:26px; display:flex; justify-content:space-between; align-items:flex-start; gap:40px; font-size:26px; line-height:1.15; color:#a9d8c6; opacity:0; text-shadow:0 2px 6px rgba(2,12,10,.95), 0 0 14px rgba(2,12,10,.8); pointer-events:none; }
+.fm span:first-child { max-width:340px; text-align:left; }
+.fm span:last-child { white-space:nowrap; text-align:right; }
 /* подписи к цветам-вариантам: верх подписей на одной линии, многострочные — по центру */
 .fo span { font-size:36px; line-height:1.1; }
 .fo.is-sm b { top:-26px; font-size:30px; line-height:52px; }

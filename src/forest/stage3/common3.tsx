@@ -6,7 +6,7 @@ export const head = (title: string, qn: number, qcount: number, extra?: string) 
 )
 /** Единый таймер всех экранов с «стоящим» одуванчиком: размер и место — как на утверждённых экранах с фото
  *  (голова ≈ 260 px, центр (206, 800)), стебель короткий, внизу трава. Поменять размер нужно ЗДЕСЬ, а не на экранах. */
-export const TM = { x: 206, headY: 800, size: 375, stem: 190, rooted: 30 }
+export const TM = { x: 206, headY: 800, size: 375, stem: 235, rooted: 30 }
 export function Timer({ n, total }: { n: number | null; total: number }) {
   if (n == null) return null
   return <div className="s3-tm" style={{ left: TM.x - TM.size / 2, top: TM.headY - TM.size / 2 }}><Dandelion n={n} total={total} size={TM.size} seeds={Math.min(total, 30)} stem={TM.stem} rooted={TM.rooted} /></div>

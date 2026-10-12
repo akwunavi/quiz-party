@@ -14,9 +14,10 @@ export function forestQFrom(q: Question, url: (p: string) => string, answerText:
   const images = hasVideo ? [BLANK, ...pics.slice(0, 3)] : pics
   let options: ForestQ['options'] = []
   let correctKey: string | undefined
-  if (a.mode === 'choice') { options = a.choices.map(c => ({ key: c.key, text: c.text })); correctKey = a.correct_choice }
+  let markers: string[] | undefined
+  if (a.mode === 'choice') { options = a.choices.map(c => ({ key: c.key, text: c.text })); correctKey = a.correct_choice; markers = a.choices.map(c => c.key) }
   else if (a.mode === 'order') options = a.choices.map(c => ({ key: c.key, text: c.text }))
-  else if (a.mode === 'match') options = a.right.map((r, i) => ({ key: r, text: a.right_labels?.[i] ?? '' }))
+  else if (a.mode === 'match') { options = a.right.map((r, i) => ({ key: r, text: a.right_labels?.[i] ?? '' })); markers = a.left.map((_, i) => String(i + 1)) }
   // у вопросов с вариантами подпись «Ответ: …» не нужна — отвечает свет к цветку; у открытых — текст ответа
-  return { id: q.id, text: q.question_text.trim(), options, images, correctKey, answerText: correctKey ? undefined : answerText, video: hasVideo }
+  return { id: q.id, text: q.question_text.trim(), options, images, correctKey, answerText: correctKey ? undefined : answerText, video: hasVideo, markers: hasVideo && markers ? ['', ...markers] : markers }
 }

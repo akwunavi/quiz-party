@@ -38,8 +38,7 @@ function Emblem({ id }: { id: string }) {
       {[...col].map((ch, i) => i === 3 ? null : <g key={'c' + i} className="ce c" transform={`translate(${14 + G} ${12 + i * G})`}><rect width={C} height={C} rx="6" /><text x={C / 2} y={C / 2 + 1}>{ch}</text></g>)}
     </svg>
   }
-  if (id === 'standard') return <svg className="em em-q" viewBox="0 0 220 260" width="200" aria-hidden>
-    <path className="qm" d="M 52 84 C 50 24 170 18 168 84 C 168 128 112 130 110 176" />
+  if (id === 'standard') return <svg className="em em-q" viewBox="0 40 220 220" width="180" aria-hidden>
     <g transform="translate(110 222)"><g className="qb">{Array.from({ length: 8 }, (_, k) => <g key={k} transform={`rotate(${k * 45})`}><ellipse cx="0" cy="-22" rx="9" ry="20" /></g>)}<circle r="8" /></g></g>
   </svg>
   if (id === 'jeopardy') return <svg className="em em-jp" viewBox="0 0 260 260" width="240" aria-hidden>
@@ -69,8 +68,7 @@ function introBuild(tl: gsap.core.Timeline, q: (s: string) => Element[], kind: I
   if (kind === 'crossword') tl.fromTo(q('.em .vn'), { strokeDashoffset: 300, opacity: 1 }, { strokeDashoffset: 0, duration: 0.9, stagger: 0.25, ease: 'power2.out' }, T)
     .fromTo(q('.em .ce.r'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.3)
     .fromTo(q('.em .ce.c'), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)', transformOrigin: '50% 50%' }, T + 0.9)
-  if (kind === 'standard') tl.fromTo(q('.em .qm'), { strokeDashoffset: 420 }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, T)
-    .fromTo(q('.em .qb'), { scale: 0 }, { scale: 1, svgOrigin: '0 0', duration: 0.8, ease: 'back.out(2)' }, T + 1.0)
+  if (kind === 'standard') tl.fromTo(q('.em .qb'), { scale: 0 }, { scale: 1, svgOrigin: '0 0', duration: 0.8, ease: 'back.out(2)' }, T + 0.2)
   if (kind === 'jeopardy') tl.fromTo(q('.em .jpt'), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, svgOrigin: '0 0', duration: 0.5, stagger: 0.18, ease: 'back.out(2)' }, T)
     .to(q('.em .jpt[data-i="1"]'), { y: -22, duration: 0.6, ease: 'sine.inOut', yoyo: true, repeat: 1 }, T + 1.2)
   if (kind === 'melody') tl.fromTo(q('.em .bell'), { rotation: -26, opacity: 0 }, { rotation: 0, opacity: 1, svgOrigin: '0 0', duration: 1.2, stagger: 0.25, ease: 'elastic.out(1,0.35)' }, T)
