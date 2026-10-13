@@ -219,21 +219,24 @@
     },
     {
       "id": "missing-dog3-10",
-      "role": "IDLE source/alpha",
-      "approvalStatus": "MISSING",
-      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+      "role": "IDLE source; alpha pending",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "User supplied source on 2026-10-13; full loop rejected, #34–58 is an internal candidate",
+      "currentPath": "bulldog3/assets/incoming/bulldog_3_idle.mp4"
     },
     {
       "id": "missing-dog3-11",
-      "role": "SELECTED source/alpha",
-      "approvalStatus": "MISSING",
-      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+      "role": "SELECTED source; alpha pending",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "User supplied source on 2026-10-13; one-shot reaction, final exit needs testing",
+      "currentPath": "bulldog3/assets/incoming/bulldog_3_selected.mp4"
     },
     {
       "id": "missing-dog3-12",
-      "role": "FRONT_STAND approved alpha/reference",
-      "approvalStatus": "MISSING",
-      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+      "role": "FRONT_STAND source frame",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "IDLE #0 matches SELECTED/RUN #0 visually; original background remains",
+      "currentPath": "bulldog3/reviews/asset-intake/DOG3_FRONT_STAND_SOURCE_000.png"
     },
     {
       "id": "missing-dog3-13",
@@ -355,6 +358,120 @@
         "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_SOURCE_APPEARANCE.png",
         "sha256": "ee377767ce79e5ab207ddf36acb68ce2e236ac2bf446e92812f662b8eef4fb2a",
         "bytes": 728516
+      }
+    ]
+  },
+  "userUploads20261013": {
+    "scope": "New user attachments after historical search; originals copied without changes",
+    "report": "bulldog3/ASSET_ACCEPTANCE.md",
+    "items": [
+      {
+        "name": "bulldog_3_idle.mp4",
+        "role": "IDLE original; FRONT_STAND source #0",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_idle.mp4",
+        "bytes": 1713078,
+        "sha256": "61a80f28bcc2b5503627056620813dc78a8c44693ba86fb1e9181ece54a30bb5",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": null,
+        "approvalStatus": "TECHNICAL_CANDIDATE"
+      },
+      {
+        "name": "bulldog_3_selected.mp4",
+        "role": "SELECTED original",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_selected.mp4",
+        "bytes": 1898596,
+        "sha256": "a323e95ded9ee9a5cb5aaf6b1e8ca5b5f1580c46c13960e58cacde16ecd88384",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": null,
+        "approvalStatus": "TECHNICAL_CANDIDATE"
+      },
+      {
+        "name": "bulldog_3_run.mp4",
+        "role": "RUN original; byte-identical historical source",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_run.mp4",
+        "bytes": 3053419,
+        "sha256": "fc563e55df8caf9bc76680a46c7d1bd8ea3d08713f834b00f0eccf084583aca2",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": "asset-008175",
+        "approvalStatus": "KNOWN_DUPLICATE"
+      },
+      {
+        "name": "dog3-run-alpha.webm",
+        "role": "RUN alpha-v1; byte-identical historical v1",
+        "repositoryPath": "bulldog3/assets/incoming/dog3-run-alpha.webm",
+        "bytes": 9415022,
+        "sha256": "b96248b11f58ee713eb2185aa5cdd6eb497d64a3dd9a4606060df819001d5060",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 85,
+          "durationSeconds": 3.542,
+          "codec": "vp9",
+          "alpha": true
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": "asset-008150",
+        "approvalStatus": "KNOWN_DUPLICATE"
+      }
+    ],
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_FIRST_FRAMES.png",
+        "bytes": 422053,
+        "sha256": "134d9f76db70a02ef65efe392507467e2947b10d762223eef8b6faf8ec363165"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_FRONT_STAND_SOURCE_000.png",
+        "bytes": 401133,
+        "sha256": "182a9dad2b9c7b949e32c1c80614da444bc413eed54bd3f710feae93dce46e1e"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_CONTACT.png",
+        "bytes": 968542,
+        "sha256": "6086b7d09da9f14bd96ff0cc5f9501c46c0cc5491607b4fefa138d30cc8caff0"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_LOOP_34-58_8X.mp4",
+        "bytes": 939213,
+        "sha256": "2dab4ad86433c75d960b49e1eb4ae47b797d40be56bd02a773f8049b3aeaf3d0"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_LOOP_CANDIDATES.png",
+        "bytes": 623663,
+        "sha256": "ec500f5700c85c684f169b61d0bf7a7f08893d12c0879a50fc44ccc8d0d62f45"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_SELECTED_CONTACT.png",
+        "bytes": 971214,
+        "sha256": "a874034f42fb3741ca86915fb280909d04197562a5dabdb5628fe48adb9a72d6"
       }
     ]
   }
