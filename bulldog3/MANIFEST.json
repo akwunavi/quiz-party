@@ -295,5 +295,67 @@
       "approvalStatus": "MISSING",
       "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
     }
-  ]
+  ],
+  "visualAcceptance20261013": {
+    "report": "bulldog3/VISUAL_ACCEPTANCE.md",
+    "sourceFrameNumbersZeroBased": [
+      0,
+      12,
+      23,
+      36,
+      48,
+      61,
+      72,
+      90,
+      110,
+      120
+    ],
+    "primary": {
+      "source": [
+        61,
+        72
+      ],
+      "alphaV2": [
+        25,
+        36
+      ]
+    },
+    "alternative": {
+      "source": [
+        48,
+        59
+      ],
+      "alphaV2": [
+        12,
+        23
+      ]
+    },
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_ALTERNATIVE_FRAME_SEQUENCE.png",
+        "sha256": "57ababf93cbc8725378eaaf8194a5bd5eea0efa66a5752b702921f84bebad962",
+        "bytes": 362862
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_PRIMARY_FRAME_SEQUENCE.png",
+        "sha256": "984d71c2ad820035280274c55edfe120bd19e6584e4fccc9542b9ea06a7ddbfe",
+        "bytes": 363970
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_LOOP_ALTERNATIVE_12X.mp4",
+        "sha256": "09cd4340c4aa83c83ca08f0b56359f39d035bf20858eff389c354335a7b1cb7a",
+        "bytes": 1141068
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_LOOP_PRIMARY_12X.mp4",
+        "sha256": "dfcebf9c1c5ef44a9af393bdd91b1253f22d23c45c2a21fff81bf926053477d4",
+        "bytes": 1155886
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_SOURCE_APPEARANCE.png",
+        "sha256": "ee377767ce79e5ab207ddf36acb68ce2e236ac2bf446e92812f662b8eef4fb2a",
+        "bytes": 728516
+      }
+    ]
+  }
 }
