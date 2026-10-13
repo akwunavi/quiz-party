@@ -12,9 +12,13 @@
 | `KLING_LOG.md` | каждая генерация Kling: модель, параметры, дословные промпты, ID, стоимость, итог |
 | `KNOWN_ISSUES.md` | известные дефекты исходников и открытые риски |
 | `MANIFEST.json` | клипы, SHA-256, FPS, кадры, статусы приёмки |
-| `plans/RACE_START_PLAN_v2.md` | RACE_STAND → RUN: проверки до Kling, кадры, итоговый промпт (не запущен); `RACE_START_PLAN.md` — версия 1 |
+| `plans/RACE_START_*` | RACE_START: планы (v1, v2), отчёты V1/V2/gen3, координаты; **рабочий вариант gen3** — `race_start_working/` |
 | `plans/START_FRAMES_25_39_PLAN.md` | очистка кадров #25–39 исходного START (пробный прогон есть, пакетный нет) |
 | `plans/*first_version*`, `plans/STOP_prepare_notes.md` | подготовительные документы RACE_STAND и STOP, как были согласованы |
+| `race_start_working/` | рабочий RACE_START (gen3): состав, параметры переходов, массивы компенсации |
+| `track_diag/` | изолированный проигрыватель Френка на дорожке по физике V3 (адаптер, метрики, видео) |
+| `plans/BUTTERFLY_PLAN.md`, `butterfly_prep/` | план и промпт BUTTERFLY (не запущено) |
+| `race_start_v1/`, `race_start_v1_salvage/`, `race_start_v2/`, `race_start_v2_prep/`, `race_start_gen3/`, `race_start_gen3_prep/` | архив генераций RACE_START и их разбор |
 | `alpha_pipeline/` | восстановленный универсальный alpha-конвейер для всех пяти собак |
 | `assets/approved/` | утверждённые файлы Френка (RACE_STAND v3, START/END кадры STOP, STOP v1 исходник и alpha) |
 | `assets/sources/` | исходники, которых нет в других ветках (IDLE, SELECTED, копия master из чата) |

@@ -1,0 +1,330 @@
+{
+ "status": "working variant (user-accepted 13.10.2026), final artistic acceptance pending full-chain check on the real track",
+ "chain": "RUN loop (last pass to #96) -> STOP f1-73 -> RACE_STAND hold -> ENTRY (V1 f1,f7,f8,f9,f10,f11,f16) -> gen3 f2-f37 -> RUN #90-98 -> RUN loop #87-98",
+ "sources": {
+  "RUN": "dog1-run-alpha.webm sha d2c27627...3075 (source frames #87-98)",
+  "STOP": "assets/approved/DOG1_STOP_v1_alpha.webm sha 9b2a45bc...113f",
+  "RACE_STAND": "assets/approved/DOG1_STOP_END.png / STOP f73",
+  "ENTRY": "race_start_v1/DOG1_RACE_START_v1_alpha.webm frames 1,7,8,9,10,11,16 (sha 8388d401...cc77)",
+  "GEN3": "race_start_gen3/DOG1_RACE_START_gen3_alpha.webm frames 2-37 (sha 326e5826...9c1c); source mp4 sha 772d432d...9d08 (never modified)"
+ },
+ "frames_24fps": {
+  "ENTRY": 7,
+  "GEN3": 36,
+  "START_total": 43,
+  "START_seconds": 1.792,
+  "push_off_frame": "gen3 f7 (first front paw lifted), START index 12",
+  "join": "gen3 f37 -> RUN #90 (IoU 0.859, colour diff 39.1, phase4 0.833 on plate-alpha metric)"
+ },
+ "seams": {
+  "STOP_f73->RACE_STAND": "<=2 px",
+  "RACE_STAND->V1 f1": "same screen place only with compensation C=+125 src px (-125 px sprite shift in the START image)",
+  "V1 f16 == gen3 f1 (first frame, diff 1.63/255)": "gen3 starts at f2",
+  "gen3 f37->RUN #90": "-2.7 canvas px step (typical 0.35)"
+ },
+ "compensation": {
+  "note": "diagnostic profiles; raw values kept; V3 not modified",
+  "units": "source px of the 1276x720 frame (x0.1622 = canvas px at 1920)",
+  "N0_none": "C=0 everywhere (V3 as-is, global anchor)",
+  "N1_proportional": "C=125 until push-off, then 125*(1-(2u^3-u^4)) over push-off..join; velocity ramp starts at push-off over 1.29 s",
+  "N3_matched_ramp": "as N1 but velocity ramp ends at gen3 f20 (0.54 s)",
+  "per_frame_C_START_window_N1": [
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   124.99,
+   124.94,
+   124.78,
+   124.5,
+   124.04,
+   123.36,
+   122.45,
+   121.26,
+   119.77,
+   117.96,
+   115.81,
+   113.31,
+   110.43,
+   107.17,
+   103.53,
+   99.5,
+   95.08,
+   90.27,
+   85.08,
+   79.52,
+   73.61,
+   67.35,
+   60.77,
+   53.9,
+   46.75,
+   39.36,
+   31.76,
+   23.98,
+   16.06,
+   8.06,
+   0
+  ],
+  "per_frame_C_START_window_N3": [
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   124.99,
+   124.94,
+   124.78,
+   124.5,
+   124.04,
+   123.36,
+   122.45,
+   121.26,
+   119.77,
+   117.96,
+   115.81,
+   113.31,
+   110.43,
+   107.17,
+   103.53,
+   99.5,
+   95.08,
+   90.27,
+   85.08,
+   79.52,
+   73.61,
+   67.35,
+   60.77,
+   53.9,
+   46.75,
+   39.36,
+   31.76,
+   23.98,
+   16.06,
+   8.06,
+   0
+  ],
+  "engine": {
+   "V0_canvas_px_per_s": 27.857,
+   "layout": {
+    "width": 1920,
+    "height": 1080,
+    "startX": 406,
+    "finishX": 1484,
+    "finishControlOffset": 92,
+    "laneTop": 260,
+    "laneStep": 159,
+    "spriteWidth": 207,
+    "spriteHeight": 116,
+    "spriteAnchorX": 148,
+    "spriteTopOffset": 110
+   }
+  }
+ },
+ "metrics_canvas_px": {
+  "N0_V3native_nocomp": {
+   "jumps_px": {
+    "RUN_PRE->STOP": -0.58,
+    "STOP->EVENT": 0.0,
+    "EVENT->ENTRY": -20.28,
+    "ENTRY->GEN3": -0.63,
+    "GEN3->RUN": -1.36
+   },
+   "typical_step_px": {
+    "RUN_PRE->STOP": 2.02,
+    "STOP->EVENT": 0.01,
+    "EVENT->ENTRY": 0.0,
+    "ENTRY->GEN3": 0.86,
+    "GEN3->RUN": 0.95
+   },
+   "max_backward_giveback_px": 17.16,
+   "negative_velocity_frames_in_START": 12,
+   "min_smoothed_velocity_px_s": -71.6,
+   "paw_slip_planted_px": 25.59,
+   "paw_slip_STOP_last15_px": 0.47,
+   "dog_minus_anchor_px": {
+    "RUN_PRE_avg": -47.4,
+    "STOP_end": -29.0,
+    "EVENT": -29.0,
+    "ENTRY_start": -49.3,
+    "push": -60.7,
+    "join": -51.7,
+    "RUN_end_avg": -48.0
+   },
+   "dog_displacement_px": {
+    "STOP": 59.4,
+    "STOP_engine": 42.4,
+    "START_dog": 22.5,
+    "START_engine": 25.0
+   }
+  },
+  "N1_proportional": {
+   "jumps_px": {
+    "RUN_PRE->STOP": -0.58,
+    "STOP->EVENT": 0.0,
+    "EVENT->ENTRY": -0.0,
+    "ENTRY->GEN3": -0.7,
+    "GEN3->RUN": -2.67
+   },
+   "typical_step_px": {
+    "RUN_PRE->STOP": 2.02,
+    "STOP->EVENT": 0.01,
+    "EVENT->ENTRY": 0.0,
+    "ENTRY->GEN3": 0.73,
+    "GEN3->RUN": 0.35
+   },
+   "max_backward_giveback_px": 9.26,
+   "negative_velocity_frames_in_START": 24,
+   "min_smoothed_velocity_px_s": -24.5,
+   "paw_slip_planted_px": 24.66,
+   "paw_slip_STOP_last15_px": 0.47,
+   "dog_minus_anchor_px": {
+    "RUN_PRE_avg": -47.4,
+    "STOP_end": -29.0,
+    "EVENT": -29.0,
+    "ENTRY_start": -29.0,
+    "push": -40.4,
+    "join": -51.7,
+    "RUN_end_avg": -48.0
+   },
+   "dog_displacement_px": {
+    "STOP": 59.4,
+    "STOP_engine": 42.4,
+    "START_dog": -4.7,
+    "START_engine": 18.0
+   }
+  },
+  "N2_derived": {
+   "jumps_px": {
+    "RUN_PRE->STOP": -0.58,
+    "STOP->EVENT": 0.0,
+    "EVENT->ENTRY": -0.0,
+    "ENTRY->GEN3": -0.7,
+    "GEN3->RUN": -2.66
+   },
+   "typical_step_px": {
+    "RUN_PRE->STOP": 2.02,
+    "STOP->EVENT": 0.01,
+    "EVENT->ENTRY": 0.0,
+    "ENTRY->GEN3": 0.73,
+    "GEN3->RUN": 0.24
+   },
+   "max_backward_giveback_px": 9.25,
+   "negative_velocity_frames_in_START": 21,
+   "min_smoothed_velocity_px_s": -24.5,
+   "paw_slip_planted_px": 24.66,
+   "paw_slip_STOP_last15_px": 0.47,
+   "dog_minus_anchor_px": {
+    "RUN_PRE_avg": -47.4,
+    "STOP_end": -29.0,
+    "EVENT": -29.0,
+    "ENTRY_start": -29.0,
+    "push": -40.4,
+    "join": -51.7,
+    "RUN_end_avg": -48.0
+   },
+   "dog_displacement_px": {
+    "STOP": 59.4,
+    "STOP_engine": 42.4,
+    "START_dog": -4.7,
+    "START_engine": 18.0
+   }
+  },
+  "N3_matched_ramp": {
+   "jumps_px": {
+    "RUN_PRE->STOP": -0.58,
+    "STOP->EVENT": 0.0,
+    "EVENT->ENTRY": -0.0,
+    "ENTRY->GEN3": -0.7,
+    "GEN3->RUN": -2.67
+   },
+   "typical_step_px": {
+    "RUN_PRE->STOP": 2.02,
+    "STOP->EVENT": 0.01,
+    "EVENT->ENTRY": 0.0,
+    "ENTRY->GEN3": 0.73,
+    "GEN3->RUN": 0.32
+   },
+   "max_backward_giveback_px": 9.14,
+   "negative_velocity_frames_in_START": 17,
+   "min_smoothed_velocity_px_s": -24.5,
+   "paw_slip_planted_px": 24.66,
+   "paw_slip_STOP_last15_px": 0.47,
+   "dog_minus_anchor_px": {
+    "RUN_PRE_avg": -47.4,
+    "STOP_end": -29.0,
+    "EVENT": -29.0,
+    "ENTRY_start": -29.0,
+    "push": -40.4,
+    "join": -51.7,
+    "RUN_end_avg": -48.0
+   },
+   "dog_displacement_px": {
+    "STOP": 59.4,
+    "STOP_engine": 42.4,
+    "START_dog": 5.7,
+    "START_engine": 28.4
+   }
+  }
+ },
+ "colour": {
+  "R90": [
+   136.98086285135255,
+   107.05061018591947,
+   94.27700127764561
+  ],
+  "R_loop": [
+   143.81304315901443,
+   111.05979473265971,
+   97.41078857591607
+  ],
+  "g3_f30_37": [
+   145.71304801804106,
+   115.19072274594444,
+   101.55726871490714
+  ],
+  "stand": [
+   145.26259114089433,
+   121.93833501917646,
+   112.25249188687992
+  ],
+  "v1f16": [
+   135.42266532218716,
+   106.59245465092324,
+   94.946605731386
+  ],
+  "gain": [
+   0.9869606402112225,
+   0.9641383618853093,
+   0.9591710156105998
+  ],
+  "dE_g3_vs_loop": 2.112011382537799,
+  "dE_stand_vs_loop": 6.815918676513405,
+  "dE_g3_vs_stand": 4.883100974273616,
+  "run_step_dE_mean": 1.4718980552142533,
+  "run_step_dE_max": 2.4175762914439622
+ },
+ "known_accepted_issues": [
+  "squint/dark face gen3 f7-f13 (~0.3 s)",
+  "planted front paw slides back 14 px by push-off, up to 22 px by f12",
+  "hue difference vs RUN: dE 2.1-3.3 (smaller than existing stand->RUN dE 6.8)",
+  "phase of the join between independent clips is not ideal",
+  "STOP carries +111 src px (+18 canvas px) of baked travel"
+ ]
+}

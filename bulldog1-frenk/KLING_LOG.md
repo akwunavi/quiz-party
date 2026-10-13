@@ -72,3 +72,11 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 - `image_to_video`, `kling-video-v3_0`, 720p, 3 с, audio off, multi-shot off, **без tail_image**, first_image `race_start_v2_prep/DOG1_RACE_START_V2_START_f16.png`, **18 кредитов** (369 → 351).
 - generationId `Acpr8nqaC8-EPguCz0b7xwEbKpyCuuE031Amfyc8e2bH1bANzT40MwdkcVDb7tup8OShL0y5`. Промпт дословно `race_start_gen3/prompt_sent.txt`. Файл `race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4`, SHA `772d432d…9d08`.
 - Итог: присед исчез (взлёт с f7), прищур f7–f13 и скольжение лап назад на 72 px до взлёта остались; лучший ранний шов f37→#90 (0,859/39,1). `plans/RACE_START_GEN3_REPORT.md`.
+
+## Сводка статусов RACE_START (13.10.2026)
+| генерация | статус | кредиты |
+|---|---|---|
+| V1 (стойка → #90, с tail) | **архив**, не принят; f1–f16 → вход рабочего варианта | 18 |
+| V2 (f16 → #90, с tail) | **архив**, не принят | 18 |
+| **gen3 (f16, без tail)** | **рабочий вариант**, принят пользователем 13.10.2026; описание `race_start_working/` | 18 |
+Остаток 351. Новые генерации RACE_START запрещены без отдельного согласования. BUTTERFLY: план и промпт (`plans/BUTTERFLY_PLAN.md`), генерация не запущена.

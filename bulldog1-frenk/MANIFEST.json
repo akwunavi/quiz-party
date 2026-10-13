@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-13 (third update, RACE_START V1)",
+ "as_of": "2026-10-13 (fourth update: RACE_START gen3 working, track diagnostic, BUTTERFLY plan)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -206,5 +206,75 @@
   },
   "report": "plans/RACE_START_V1_REPORT.md",
   "sums": "race_start_v1/SHA256SUMS.txt"
+ },
+ "race_start_working": {
+  "status": "working (user-accepted 2026-10-13); final artistic acceptance pending real-track check",
+  "doc": "race_start_working/RACE_START_WORKING.md",
+  "json": "race_start_working/RACE_START_WORKING.json",
+  "chain": "RUN -> STOP -> RACE_STAND -> ENTRY V1 f1,f7-f11,f16 -> gen3 f2-f37 -> RUN #90-98 -> loop #87-98",
+  "gen3": {
+   "source": "race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4",
+   "sha256": "772d432d0070698e799f30795acdd214ec939d66263f97dd1209bc64affd9d08",
+   "alpha": "race_start_gen3/DOG1_RACE_START_gen3_alpha.webm",
+   "alpha_sha256": "326e5826d8b565ed20b52d1fc036ab7c85fa936ad82f4c8eb9e665f96db99c1c",
+   "kling": {
+    "model": "kling-video-v3_0",
+    "tool": "image_to_video",
+    "resolution": "720p",
+    "duration": 3,
+    "audio": false,
+    "multi_shot": false,
+    "tail_image": null,
+    "credits": 18,
+    "generationId": "Acpr8nqaC8-EPguCz0b7xwEbKpyCuuE031Amfyc8e2bH1bANzT40MwdkcVDb7tup8OShL0y5"
+   }
+  },
+  "frames": {
+   "entry": 7,
+   "gen3": 36,
+   "start_total": 43,
+   "start_seconds": 1.792,
+   "push_off": "gen3 f7"
+  },
+  "transitions": {
+   "gen3_f37_to_run90": {
+    "iou": 0.859,
+    "colour_diff": 39.1,
+    "phase4": 0.833,
+    "step_px_canvas": -2.67
+   },
+   "event_to_entry_without_compensation_px": -20.28
+  },
+  "compensation": "race_start_working/RACE_START_WORKING.json (diagnostic profiles N0..N3, raw values kept)"
+ },
+ "race_start_archive": {
+  "V1": {
+   "status": "archived, not accepted",
+   "dir": "race_start_v1/"
+  },
+  "V2": {
+   "status": "archived, not accepted",
+   "dir": "race_start_v2/"
+  },
+  "salvage_hybrids": {
+   "status": "archived (V3 hybrid f1-49 -> #90 kept as fallback)",
+   "dir": "race_start_v1_salvage/"
+  }
+ },
+ "track_diag": {
+  "dir": "track_diag/",
+  "report": "plans/TRACK_DIAGNOSTIC_REPORT.md",
+  "contract_proposal": "plans/COORDINATE_CONTRACT_PROPOSAL.md",
+  "v3_modified": false
+ },
+ "butterfly": {
+  "status": "plan and prompt prepared, NOT generated",
+  "plan": "plans/BUTTERFLY_PLAN.md",
+  "start_end_image": "butterfly_prep/DOG1_BUTTERFLY_START_END_racestand.png",
+  "prompt": "butterfly_prep/prompt_BUTTERFLY_not_sent.txt"
+ },
+ "kling_credits": {
+  "spent": 78,
+  "remaining": 351
  }
 }

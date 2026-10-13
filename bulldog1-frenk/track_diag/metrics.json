@@ -1,0 +1,146 @@
+{
+ "N0_V3native_nocomp": {
+  "jumps_px": {
+   "RUN_PRE->STOP": -0.58,
+   "STOP->EVENT": 0.0,
+   "EVENT->ENTRY": -20.28,
+   "ENTRY->GEN3": -0.63,
+   "GEN3->RUN": -1.36
+  },
+  "typical_step_px": {
+   "RUN_PRE->STOP": 2.02,
+   "STOP->EVENT": 0.01,
+   "EVENT->ENTRY": 0.0,
+   "ENTRY->GEN3": 0.86,
+   "GEN3->RUN": 0.95
+  },
+  "max_backward_giveback_px": 17.16,
+  "negative_velocity_frames_in_START": 12,
+  "min_smoothed_velocity_px_s": -71.6,
+  "paw_slip_planted_px": 25.59,
+  "paw_slip_STOP_last15_px": 0.47,
+  "dog_minus_anchor_px": {
+   "RUN_PRE_avg": -47.4,
+   "STOP_end": -29.0,
+   "EVENT": -29.0,
+   "ENTRY_start": -49.3,
+   "push": -60.7,
+   "join": -51.7,
+   "RUN_end_avg": -48.0
+  },
+  "dog_displacement_px": {
+   "STOP": 59.4,
+   "STOP_engine": 42.4,
+   "START_dog": 22.5,
+   "START_engine": 25.0
+  }
+ },
+ "N1_proportional": {
+  "jumps_px": {
+   "RUN_PRE->STOP": -0.58,
+   "STOP->EVENT": 0.0,
+   "EVENT->ENTRY": -0.0,
+   "ENTRY->GEN3": -0.7,
+   "GEN3->RUN": -2.67
+  },
+  "typical_step_px": {
+   "RUN_PRE->STOP": 2.02,
+   "STOP->EVENT": 0.01,
+   "EVENT->ENTRY": 0.0,
+   "ENTRY->GEN3": 0.73,
+   "GEN3->RUN": 0.35
+  },
+  "max_backward_giveback_px": 9.26,
+  "negative_velocity_frames_in_START": 24,
+  "min_smoothed_velocity_px_s": -24.5,
+  "paw_slip_planted_px": 24.66,
+  "paw_slip_STOP_last15_px": 0.47,
+  "dog_minus_anchor_px": {
+   "RUN_PRE_avg": -47.4,
+   "STOP_end": -29.0,
+   "EVENT": -29.0,
+   "ENTRY_start": -29.0,
+   "push": -40.4,
+   "join": -51.7,
+   "RUN_end_avg": -48.0
+  },
+  "dog_displacement_px": {
+   "STOP": 59.4,
+   "STOP_engine": 42.4,
+   "START_dog": -4.7,
+   "START_engine": 18.0
+  }
+ },
+ "N2_derived": {
+  "jumps_px": {
+   "RUN_PRE->STOP": -0.58,
+   "STOP->EVENT": 0.0,
+   "EVENT->ENTRY": -0.0,
+   "ENTRY->GEN3": -0.7,
+   "GEN3->RUN": -2.66
+  },
+  "typical_step_px": {
+   "RUN_PRE->STOP": 2.02,
+   "STOP->EVENT": 0.01,
+   "EVENT->ENTRY": 0.0,
+   "ENTRY->GEN3": 0.73,
+   "GEN3->RUN": 0.24
+  },
+  "max_backward_giveback_px": 9.25,
+  "negative_velocity_frames_in_START": 21,
+  "min_smoothed_velocity_px_s": -24.5,
+  "paw_slip_planted_px": 24.66,
+  "paw_slip_STOP_last15_px": 0.47,
+  "dog_minus_anchor_px": {
+   "RUN_PRE_avg": -47.4,
+   "STOP_end": -29.0,
+   "EVENT": -29.0,
+   "ENTRY_start": -29.0,
+   "push": -40.4,
+   "join": -51.7,
+   "RUN_end_avg": -48.0
+  },
+  "dog_displacement_px": {
+   "STOP": 59.4,
+   "STOP_engine": 42.4,
+   "START_dog": -4.7,
+   "START_engine": 18.0
+  }
+ },
+ "N3_matched_ramp": {
+  "jumps_px": {
+   "RUN_PRE->STOP": -0.58,
+   "STOP->EVENT": 0.0,
+   "EVENT->ENTRY": -0.0,
+   "ENTRY->GEN3": -0.7,
+   "GEN3->RUN": -2.67
+  },
+  "typical_step_px": {
+   "RUN_PRE->STOP": 2.02,
+   "STOP->EVENT": 0.01,
+   "EVENT->ENTRY": 0.0,
+   "ENTRY->GEN3": 0.73,
+   "GEN3->RUN": 0.32
+  },
+  "max_backward_giveback_px": 9.14,
+  "negative_velocity_frames_in_START": 17,
+  "min_smoothed_velocity_px_s": -24.5,
+  "paw_slip_planted_px": 24.66,
+  "paw_slip_STOP_last15_px": 0.47,
+  "dog_minus_anchor_px": {
+   "RUN_PRE_avg": -47.4,
+   "STOP_end": -29.0,
+   "EVENT": -29.0,
+   "ENTRY_start": -29.0,
+   "push": -40.4,
+   "join": -51.7,
+   "RUN_end_avg": -48.0
+  },
+  "dog_displacement_px": {
+   "STOP": 59.4,
+   "STOP_engine": 42.4,
+   "START_dog": 5.7,
+   "START_engine": 28.4
+  }
+ }
+}
