@@ -1,6 +1,6 @@
 # Если ты новый агент и не имеешь доступа к прошлой переписке, начни здесь
 
-1. Работай с веткой `codex/dog4-race-v3-5lane-20261012`. Не изменяй production, не делай merge или deploy без разрешения пользователя.
+1. Клонируй репозиторий с обычным полным набором веток (`git clone https://github.com/akwunavi/quiz-party.git`), затем переключись на `codex/dog4-race-v3-5lane-20261012`. Не используй `--single-branch`: часть исторических payload находится в других ветках и указана в манифесте по commit/blob SHA. Не изменяй production, не делай merge или deploy без разрешения пользователя.
 2. Прочитай [APPROVED_RULES.md](APPROVED_RULES.md), [PROJECT_HISTORY.md](PROJECT_HISTORY.md), [DECISIONS.md](DECISIONS.md), [FAILED_EXPERIMENTS.md](FAILED_EXPERIMENTS.md), [ANIMATION_CONTRACT.md](ANIMATION_CONTRACT.md), [ASSET_MANIFEST.json](ASSET_MANIFEST.json).
 3. Убедись, что текущий статус другой работы не изменился. Claude Code параллельно занимается Френком №1 и восстановлением alpha-конвейера. Не меняй его активные материалы; описанное здесь состояние — снимок времени архивации.
 4. Сверь контрольные суммы через `python docs/bulldog-race/tools/verify_archive.py`. Для Git-объекта используй указанный в реестре commit/path; для tar — `path` и `member`. Не заменяй отсутствующий файл похожим по имени.
