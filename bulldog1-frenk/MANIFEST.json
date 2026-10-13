@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-14 (BUTTERFLY V1 accepted as working; game cut f1-f93; synced butterfly; SNIFF_PEE plan)",
+ "as_of": "2026-10-14 (SNIFF_PEE V1 generated)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -343,8 +343,8 @@
   "seam_check_preview": "butterfly_v1/DOG1_BUTTERFLY_v1_game_cut_seam_check.mp4"
  },
  "kling_credits": {
-  "spent": 108,
-  "remaining": 321
+  "spent": 156,
+  "remaining": 273
  },
  "first_start": {
   "status": "accepted as working by user 2026-10-13 (alpha, choreography and seam to RUN); known visual defects stay in KNOWN_ISSUES",
@@ -355,10 +355,53 @@
   "doc": "plans/COORDINATE_CONTRACT_PROPOSAL.md"
  },
  "sniff_pee": {
-  "status": "plan and first prompt prepared; NOT generated",
+  "status": "V1 generated 2026-10-14; conditionally usable, awaiting user decision; RETURN not needed (final pose matches stand, IoU 0.997)",
+  "report": "plans/SNIFF_PEE_V1_REPORT.md",
   "plan": "plans/SNIFF_PEE_PLAN.md",
   "start_end_image": "sniff_prep/DOG1_SNIFF_PEE_START_END_racestand.png",
-  "prompt": "sniff_prep/prompt_SNIFF_PEE_clip1_not_sent.txt",
-  "recommended": "one 8 s clip stand->stand (tail_image = first image), est. 48 credits; fallback keyframe + two clips"
+  "prompt_sent": "sniff_v1/prompt_sent.txt (user-supplied refined text)",
+  "kling": {
+   "model": "kling-video-v3_0",
+   "tool": "image_to_video",
+   "resolution": "720p",
+   "duration": 8,
+   "audio": false,
+   "multi_shot": false,
+   "tail_image": "same as first_image",
+   "credits": 48,
+   "generationId": "AYPNdHMsTvXABUDCGFfs_zeCDMTxsS_06aB0Z2cwXAEnl2TUR3J7Gm6kp_wjUghprbkBpgBT"
+  },
+  "source": {
+   "path": "sniff_v1/DOG1_SNIFF_PEE_v1_kling_source.mp4",
+   "sha256": "2e4ff649cbf1d6938f1558731ccb2387a0fa0f6b0f5629e2993bea1abd9cfbdb",
+   "frames": 193,
+   "fps": 24
+  },
+  "alpha": {
+   "path": "sniff_v1/DOG1_SNIFF_PEE_v1_alpha.webm",
+   "sha256": "5cc484cf8d4366ca3465247db973ac632f0eec39e217f2c87a2a7eff704e2860",
+   "raw_pipeline": "sniff_v1/DOG1_SNIFF_PEE_v1_alpha_raw_pipeline.webm",
+   "raw_sha256": "a9dae426517bdea0a4d1043f060534494f42b8b20414e4132a507505b15ace2b"
+  },
+  "game_cut": {
+   "path": "sniff_v1/DOG1_SNIFF_PEE_v1_alpha_game_f11-f187.webm",
+   "sha256": "ca6e7dec2f0a808a45ed82f2f264f16d32bf02d1c229e6d192c53c3e6ca3ab1b",
+   "frames": 177,
+   "seconds": 7.375,
+   "seam": {
+    "stand_to_f11_iou": 0.9968,
+    "f187_to_stand_iou": 0.9967,
+    "shift_src_px": 0
+   }
+  },
+  "central_action": "near hind leg raised BACK (not sideways), held ~1.5 s with two lifts; sniff 3.3 s; extra hind-leg motion with morph f163-f175",
+  "defects": [
+   "sniff 3.3 s instead of ~1 s",
+   "small object on floor near nose (removed in alpha)",
+   "hind leg raised backward, knee unclear, paw blob without toes",
+   "two lifts",
+   "extra hind-leg motion with morph artefact f163-f175",
+   "squint f19-f21"
+  ]
  }
 }

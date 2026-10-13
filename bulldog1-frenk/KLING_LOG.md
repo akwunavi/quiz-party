@@ -89,3 +89,9 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 
 ## Статус BUTTERFLY V1 (14.10.2026)
 **Принят пользователем как рабочая анимация.** Повторные генерации запрещены. Игровая обрезка f1–f93 (`butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm`). Кредитов потрачено 108 из 429 (остаток 321). SNIFF_PEE: план и промпт готовы (`plans/SNIFF_PEE_PLAN.md`), генерация не запущена.
+
+## 9. SNIFF_PEE V1 — сгенерирован, условно пригоден
+- `image_to_video`, `kling-video-v3_0`, 720p, 8 с, audio off, multi-shot off, first_image = tail_image = `sniff_prep/DOG1_SNIFF_PEE_START_END_racestand.png`, **48 кредитов** (321 → 273; цену заранее запросить нельзя, 6 кредитов/с подтверждены прежними запусками, лимит 48 соблюдён).
+- generationId `AYPNdHMsTvXABUDCGFfs_zeCDMTxsS_06aB0Z2cwXAEnl2TUR3J7Gm6kp_wjUghprbkBpgBT`. Промпт — уточнённый текст пользователя дословно: `sniff_v1/prompt_sent.txt`.
+- Файл `sniff_v1/DOG1_SNIFF_PEE_v1_kling_source.mp4`, SHA `2e4ff649…cbdb`, 193 кадра, без водяного знака.
+- Итог: задняя ближняя лапа поднята назад (не вбок), сниф 3,3 с, предмет на полу, морфинг f163–f175; возврат IoU 0,997. `plans/SNIFF_PEE_V1_REPORT.md`.
