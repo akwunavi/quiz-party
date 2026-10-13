@@ -355,7 +355,7 @@
   "doc": "plans/COORDINATE_CONTRACT_PROPOSAL.md"
  },
  "sniff_pee": {
-  "status": "V1 generated 2026-10-14; conditionally usable, awaiting user decision; RETURN not needed (final pose matches stand, IoU 0.997)",
+  "status": "V1 REJECTED by user 2026-10-14 (head pecks the floor like a chicken); files kept for history; no regeneration without approval",
   "report": "plans/SNIFF_PEE_V1_REPORT.md",
   "plan": "plans/SNIFF_PEE_PLAN.md",
   "start_end_image": "sniff_prep/DOG1_SNIFF_PEE_START_END_racestand.png",
@@ -402,6 +402,10 @@
    "two lifts",
    "extra hind-leg motion with morph artefact f163-f175",
    "squint f19-f21"
-  ]
+  ],
+  "rejection_reason": "rhythmic head pecking at the floor for 3.3 s instead of sniffing; also leg raised backward"
+ },
+ "process_rules": {
+  "alpha": "run alpha only after the user has watched and approved the source video (rule 2026-10-14)"
  }
 }
