@@ -17,7 +17,8 @@
 | `plans/*first_version*`, `plans/STOP_prepare_notes.md` | подготовительные документы RACE_STAND и STOP, как были согласованы |
 | `race_start_working/` | рабочий RACE_START (gen3): состав, параметры переходов, массивы компенсации |
 | `track_diag/` | изолированный проигрыватель Френка на дорожке по физике V3 (адаптер, метрики, видео) |
-| `plans/BUTTERFLY_PLAN.md`, `butterfly_prep/`, `butterfly_v1/`, `plans/BUTTERFLY_V1_REPORT.md` | BUTTERFLY: план, референс, **V1 сгенерирован** (оригинал, alpha, превью, траектория программной бабочки) |
+| `plans/BUTTERFLY_PLAN.md`, `butterfly_prep/`, `butterfly_v1/`, `plans/BUTTERFLY_V1_REPORT.md` | BUTTERFLY: **V1 принят как рабочий** (оригинал, полный и игровой alpha f1–f93, превью, синхронизированная траектория бабочки) |
+| `plans/SNIFF_PEE_PLAN.md`, `sniff_prep/` | SNIFF_PEE: план, референс, промпт первого клипа (не запущено) |
 | `race_start_v1/`, `race_start_v1_salvage/`, `race_start_v2/`, `race_start_v2_prep/`, `race_start_gen3/`, `race_start_gen3_prep/` | архив генераций RACE_START и их разбор |
 | `alpha_pipeline/` | восстановленный универсальный alpha-конвейер для всех пяти собак |
 | `assets/approved/` | утверждённые файлы Френка (RACE_STAND v3, START/END кадры STOP, STOP v1 исходник и alpha) |

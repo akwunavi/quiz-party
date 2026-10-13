@@ -86,3 +86,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 - generationId `AahlAKbjM3iuh-L7OfC36wgaLXxVWUSpdwKtFJSvIiWaCy91gfMI5JxVIE-gMSymOe5RD2qw`. Промпт — текст пользователя дословно: `butterfly_v1/prompt_sent.txt`.
 - Файл `butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4`, SHA `694436b6…f956c`, 121 кадр, без водяного знака.
 - Итог: возврат в стойку IoU 0,997, лапы не скользят, смещение 0; дефекты — насекомое (вырезано), двойной подъём дальней лапы. `plans/BUTTERFLY_V1_REPORT.md`.
+
+## Статус BUTTERFLY V1 (14.10.2026)
+**Принят пользователем как рабочая анимация.** Повторные генерации запрещены. Игровая обрезка f1–f93 (`butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm`). Кредитов потрачено 108 из 429 (остаток 321). SNIFF_PEE: план и промпт готовы (`plans/SNIFF_PEE_PLAN.md`), генерация не запущена.

@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-13 (fifth update: BUTTERFLY V1 generated; first START and contract decisions)",
+ "as_of": "2026-10-14 (BUTTERFLY V1 accepted as working; game cut f1-f93; synced butterfly; SNIFF_PEE plan)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -269,7 +269,7 @@
   "v3_modified": false
  },
  "butterfly": {
-  "status": "V1 generated 2026-10-13, usable working candidate, awaiting user decision",
+  "status": "ACCEPTED as working animation by user (2026-10-14); no regeneration; original MP4 never modified",
   "plan": "plans/BUTTERFLY_PLAN.md",
   "report": "plans/BUTTERFLY_V1_REPORT.md",
   "start_end_image": "butterfly_prep/DOG1_BUTTERFLY_START_END_racestand.png",
@@ -309,7 +309,38 @@
    "shift_src_px": 0
   },
   "usable_frames": "f1-f91 (3.75 s), tail static f91-f121 trimmable",
-  "trajectory_proposal": "butterfly_v1/BUTTERFLY_TRAJECTORY_PROPOSAL.md"
+  "trajectory_proposal": "butterfly_v1/BUTTERFLY_TRAJECTORY_PROPOSAL.md",
+  "accepted_defects": [
+   "far (dark) front paw raised twice instead of the near paw once",
+   "pupil movement weakly readable at 207 px (head and ear reaction expressive)",
+   "long paw f63-70 (arm-like, pad toward camera)",
+   "residual translucent haze near the nose bridge at f37 (idx36), tiny specks idx40/43"
+  ],
+  "game_cut": {
+   "path": "butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm",
+   "sha256": "2e189b0f2602fd6a532c116ed283402ee1530ba5fd2d7048a47d0b746e9951f3",
+   "frames": 93,
+   "seconds": 3.875,
+   "derived_from": "butterfly_v1/DOG1_BUTTERFLY_v1_alpha.webm (full alpha unchanged)",
+   "seam": {
+    "stand_to_f1_iou": 0.9964,
+    "f93_to_stand_iou": 0.9969,
+    "f93_to_stand_colour_diff": 3.4,
+    "shift_src_px": 0
+   },
+   "why_f93": "post-return IoU >=0.996, steps >=0.9986, ear/paw/head returned, eyes open, next blink f99-104"
+  },
+  "programmatic_butterfly": {
+   "proposal": "butterfly_v1/BUTTERFLY_TRAJECTORY_PROPOSAL.md (v2, synced with both paw attempts)",
+   "keyframes": "butterfly_v1/butterfly_trajectory_synced.json",
+   "min_distance_to_silhouette_src_px": 46.9,
+   "previews": [
+    "butterfly_v1/DOG1_BUTTERFLY_v1_with_temp_butterfly_large.mp4",
+    "butterfly_v1/DOG1_BUTTERFLY_v1_with_temp_butterfly_gamescale_x4.mp4"
+   ],
+   "v3_changed": false
+  },
+  "seam_check_preview": "butterfly_v1/DOG1_BUTTERFLY_v1_game_cut_seam_check.mp4"
  },
  "kling_credits": {
   "spent": 108,
@@ -322,5 +353,12 @@
  "coordinate_contract": {
   "status": "principles accepted by user 2026-10-13; saved for future implementation by Codex; V3 not changed; Bulldog 4 parameters stay unchanged",
   "doc": "plans/COORDINATE_CONTRACT_PROPOSAL.md"
+ },
+ "sniff_pee": {
+  "status": "plan and first prompt prepared; NOT generated",
+  "plan": "plans/SNIFF_PEE_PLAN.md",
+  "start_end_image": "sniff_prep/DOG1_SNIFF_PEE_START_END_racestand.png",
+  "prompt": "sniff_prep/prompt_SNIFF_PEE_clip1_not_sent.txt",
+  "recommended": "one 8 s clip stand->stand (tail_image = first image), est. 48 credits; fallback keyframe + two clips"
  }
 }
