@@ -1,0 +1,149 @@
+[
+  {
+    "path": "docs/bulldog-race/archive/parts/part-000.tar",
+    "members": 309,
+    "payloadBytes": 74499563,
+    "sizeBytes": 75059200,
+    "sha256": "ca64610df34e9be54242da52ad8bc0c76bd7b080766e1fc96e968186e57952bd"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-001.tar",
+    "members": 439,
+    "payloadBytes": 74361341,
+    "sizeBytes": 75151360,
+    "sha256": "0bada076580360ff0f4ddf2a5754a01b2692da99b66ab51daa32aec0a31c3544"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-002.tar",
+    "members": 242,
+    "payloadBytes": 74569802,
+    "sizeBytes": 75008000,
+    "sha256": "b7cffafd4e1a0b68cd2160c63149b3805f6fcea255079deb6f700cdd3a82ab70"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-003.tar",
+    "members": 316,
+    "payloadBytes": 71689824,
+    "sizeBytes": 72263680,
+    "sha256": "ac0e2dd12617bdf1894b20c2dce0b920f53168d240ce9240e198d8c021111241"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-004.tar",
+    "members": 391,
+    "payloadBytes": 74278533,
+    "sizeBytes": 74987520,
+    "sha256": "33dda050877d7955e902b91ad689e3013015622a8a12f4714515b2f8d11fae2f"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-005.tar",
+    "members": 495,
+    "payloadBytes": 74457155,
+    "sizeBytes": 75345920,
+    "sha256": "003cdb501f671f524c418dfef15255017512945de18896aa6c4e0161fce1a137"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-006.tar",
+    "members": 272,
+    "payloadBytes": 74373071,
+    "sizeBytes": 74864640,
+    "sha256": "ac77987b219420c14d4f95bc1363bca7d696a1749038ad057d254c8d40ea0ce3"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-007.tar",
+    "members": 304,
+    "payloadBytes": 74421711,
+    "sizeBytes": 74967040,
+    "sha256": "3650332dbdfc391a29aa3069bdc071cd86675d05fc73f15357297b8dc34dc942"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-008.tar",
+    "members": 373,
+    "payloadBytes": 74351497,
+    "sizeBytes": 75028480,
+    "sha256": "08f2c90b25be5d41ddcbc17257739903b494c3f33d78373c7dccb653fd612401"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-009.tar",
+    "members": 352,
+    "payloadBytes": 74456272,
+    "sizeBytes": 75089920,
+    "sha256": "8665e94165b141da8e4ecc9414d88a9819dea0dee40ce1fdaff05d28b9f99eec"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-010.tar",
+    "members": 338,
+    "payloadBytes": 74552181,
+    "sizeBytes": 75161600,
+    "sha256": "504e78bef2157c30160434349a7926ad69497bd5ada121606710f1c9517cefb1"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-011.tar",
+    "members": 279,
+    "payloadBytes": 74658660,
+    "sizeBytes": 75161600,
+    "sha256": "ef9d4199723d917dac326b5556f957517e59bf5baf8894bf52071844b2b74bd4"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-012.tar",
+    "members": 218,
+    "payloadBytes": 74602889,
+    "sizeBytes": 74997760,
+    "sha256": "e842064fdbbd2cbca7f7da3ae357e02fbf17c7e164b046028e5d9ee1469e8673"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-013.tar",
+    "members": 306,
+    "payloadBytes": 69382224,
+    "sizeBytes": 69939200,
+    "sha256": "69533cfb02822eccb9937b1151c549a7015bf7ba7898740929f7e635b74df4e2"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-014.tar",
+    "members": 330,
+    "payloadBytes": 74547184,
+    "sizeBytes": 75141120,
+    "sha256": "01fab5fc7f9f5177763c056fe0ebda9daf00e6dcf12802f7c843572c47eac6f1"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-015.tar",
+    "members": 184,
+    "payloadBytes": 74439849,
+    "sizeBytes": 74772480,
+    "sha256": "3dc19af97a75e6d7a87b5a9de0534f9ec6c369b975ae890d53eb2e038ae37265"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-016.tar",
+    "members": 629,
+    "payloadBytes": 74344099,
+    "sizeBytes": 75479040,
+    "sha256": "57d8b3ae60857e9f656d0a1a192bdaccba615ac360625fdbff3fb3b80d0ae151"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-017.tar",
+    "members": 253,
+    "payloadBytes": 74282829,
+    "sizeBytes": 74741760,
+    "sha256": "b0c26a686be27d227d3d31dfb70aa647baf15d35b2f0e71f6589700019bfa800"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-018.tar",
+    "members": 366,
+    "payloadBytes": 74596973,
+    "sizeBytes": 75264000,
+    "sha256": "cf560a145c417db14ff72fda14ad777e717f49075a8e6301d4a2792892747683"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-019.tar",
+    "members": 297,
+    "payloadBytes": 74342902,
+    "sizeBytes": 74885120,
+    "sha256": "3f4db13c24a5b0755bd122d0cb1e4de7c56cf55603230862d012cfcddd453524"
+  },
+  {
+    "path": "docs/bulldog-race/archive/parts/part-020.tar",
+    "members": 37,
+    "payloadBytes": 23138423,
+    "sizeBytes": 23214080,
+    "sha256": "d4ae669cd10d9d399ca0cd62ba16ccd55e32471f1e4ce367b3b0627ad15d46ad"
+  }
+]

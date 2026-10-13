@@ -1,0 +1,16 @@
+{
+  "logicalEntries": 8229,
+  "uniquePayloadsChecked": 7163,
+  "shardsChecked": 21,
+  "statusCounts": {
+    "UNKNOWN": 8063,
+    "EXPERIMENTAL": 151,
+    "APPROVED": 4,
+    "REFERENCE": 4,
+    "SUPERSEDED": 1,
+    "REJECTED": 3,
+    "MISSING": 3
+  },
+  "errors": [],
+  "ok": true
+}
