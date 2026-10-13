@@ -1,0 +1,1136 @@
+{
+  "seed": 20261013,
+  "runsPerSyntheticConfig": 10000,
+  "assumptions": {
+    "baseSpeed": 0.023809523809523808,
+    "segmentVariation": [
+      0.98,
+      1.02
+    ],
+    "eventWeights": {
+      "BUTTERFLY": 0.45,
+      "ROLL": 0.35,
+      "SNIFF_PEE": 0.2
+    },
+    "eventProgress": [
+      0.18,
+      0.78
+    ],
+    "minimumEventSeparation": 0.22,
+    "countWeightsMax3": [
+      0.2,
+      0.45,
+      0.27,
+      0.08
+    ],
+    "countWeightsMax2": [
+      0.2,
+      0.45,
+      0.35
+    ],
+    "stressRepeatChanceGivenTwo": 0.5
+  },
+  "fixedV3": {
+    "A": {
+      "crossings": [
+        43.008,
+        45.309,
+        46.233,
+        42.381,
+        56.625
+      ],
+      "order": [
+        4,
+        1,
+        2,
+        3,
+        5
+      ],
+      "end": 60.083,
+      "profiles": [
+        {
+          "base": 1,
+          "variations": [
+            1,
+            0.98,
+            1.02,
+            1
+          ],
+          "events": []
+        },
+        {
+          "base": 1.1,
+          "variations": [
+            1.02,
+            1,
+            1.01,
+            0.99
+          ],
+          "events": [
+            [
+              "BUTTERFLY",
+              0.3
+            ]
+          ]
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1,
+            1.02,
+            0.99,
+            1.01
+          ],
+          "events": [
+            [
+              "SNIFF_PEE",
+              0.4
+            ]
+          ]
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1.01,
+            0.98,
+            1.02,
+            1
+          ],
+          "events": [
+            [
+              "ROLL",
+              0.35
+            ]
+          ]
+        },
+        {
+          "base": 1,
+          "variations": [
+            1,
+            0.99,
+            1,
+            1.01
+          ],
+          "events": [
+            [
+              "BUTTERFLY",
+              0.25
+            ],
+            [
+              "ROLL",
+              0.65
+            ]
+          ]
+        }
+      ]
+    },
+    "B": {
+      "crossings": [
+        43.008,
+        48.603,
+        53.549,
+        56.561,
+        60.81
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "end": 64.065,
+      "profiles": [
+        {
+          "base": 1,
+          "variations": [
+            1,
+            0.98,
+            1.02,
+            1
+          ],
+          "events": []
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1.01,
+            1,
+            0.99,
+            1.02
+          ],
+          "events": [
+            [
+              "ROLL",
+              0.25
+            ],
+            [
+              "BUTTERFLY",
+              0.7
+            ]
+          ]
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1,
+            1.02,
+            0.99,
+            1.01
+          ],
+          "events": [
+            [
+              "SNIFF_PEE",
+              0.25
+            ],
+            [
+              "ROLL",
+              0.65
+            ]
+          ]
+        },
+        {
+          "base": 1.1,
+          "variations": [
+            1.02,
+            1,
+            1.01,
+            0.99
+          ],
+          "events": [
+            [
+              "BUTTERFLY",
+              0.2
+            ],
+            [
+              "SNIFF_PEE",
+              0.6
+            ]
+          ]
+        },
+        {
+          "base": 1.2,
+          "variations": [
+            1.01,
+            0.98,
+            1.02,
+            1
+          ],
+          "events": [
+            [
+              "ROLL",
+              0.25
+            ],
+            [
+              "SNIFF_PEE",
+              0.5
+            ],
+            [
+              "BUTTERFLY",
+              0.75
+            ]
+          ]
+        }
+      ]
+    },
+    "C": {
+      "crossings": [
+        43.008,
+        49.767,
+        55.629,
+        57.489,
+        60.126
+      ],
+      "order": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "end": 63.625,
+      "profiles": [
+        {
+          "base": 1,
+          "variations": [
+            1,
+            0.98,
+            1.02,
+            1
+          ],
+          "events": []
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1.01,
+            0.99,
+            1,
+            1
+          ],
+          "events": [
+            [
+              "ROLL",
+              0.25
+            ],
+            [
+              "ROLL",
+              0.65
+            ]
+          ]
+        },
+        {
+          "base": 1,
+          "variations": [
+            1,
+            0.99,
+            1.02,
+            0.99
+          ],
+          "events": [
+            [
+              "BUTTERFLY",
+              0.25
+            ],
+            [
+              "BUTTERFLY",
+              0.65
+            ]
+          ]
+        },
+        {
+          "base": 1.23,
+          "variations": [
+            1,
+            1.02,
+            0.99,
+            1.01
+          ],
+          "events": [
+            [
+              "SNIFF_PEE",
+              0.25
+            ],
+            [
+              "SNIFF_PEE",
+              0.65
+            ]
+          ]
+        },
+        {
+          "base": 1.1,
+          "variations": [
+            1,
+            0.99,
+            1,
+            1.01
+          ],
+          "events": [
+            [
+              "ROLL",
+              0.2
+            ],
+            [
+              "BUTTERFLY",
+              0.45
+            ],
+            [
+              "ROLL",
+              0.75
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "invariants": {
+    "maxFrozenError": 0,
+    "maxDerivativeError": 0,
+    "frameGrid": {
+      "A/24": {
+        "maxDetectionError": 0.03551,
+        "sameOrder": true
+      },
+      "A/30": {
+        "maxDetectionError": 0.02493,
+        "sameOrder": true
+      },
+      "A/60": {
+        "maxDetectionError": 0.00855,
+        "sameOrder": true
+      },
+      "A/120": {
+        "maxDetectionError": 0.00826,
+        "sameOrder": true
+      },
+      "B/24": {
+        "maxDetectionError": 0.03431,
+        "sameOrder": true
+      },
+      "B/30": {
+        "maxDetectionError": 0.03044,
+        "sameOrder": true
+      },
+      "B/60": {
+        "maxDetectionError": 0.01377,
+        "sameOrder": true
+      },
+      "B/120": {
+        "maxDetectionError": 0.00826,
+        "sameOrder": true
+      },
+      "C/24": {
+        "maxDetectionError": 0.04094,
+        "sameOrder": true
+      },
+      "C/30": {
+        "maxDetectionError": 0.03255,
+        "sameOrder": true
+      },
+      "C/60": {
+        "maxDetectionError": 0.01588,
+        "sameOrder": true
+      },
+      "C/120": {
+        "maxDetectionError": 0.00826,
+        "sameOrder": true
+      }
+    },
+    "lateEventReproducer": {
+      "requested": 0.99,
+      "actionProgress": 0.993352,
+      "startP0": 0.993352,
+      "startP1": 1.005256,
+      "actualCrossing": 50.309896,
+      "recordedCrossing": 50.541667,
+      "delay": 0.231771,
+      "progressAtRecordedCrossing": 1.005256
+    }
+  },
+  "synthetic": {
+    "B": {
+      "runs": 10000,
+      "spec": {
+        "base": [
+          0.96,
+          1.16
+        ],
+        "maxEvents": 3,
+        "stress": false
+      },
+      "meanWinner": 42.248,
+      "meanLast": 58.999,
+      "medianEnd": 62.023,
+      "p90End": 69.962,
+      "p95End": 72.004,
+      "maxEnd": 81.944,
+      "meanTopGap": 4.001,
+      "closeUnder1": 0.1869,
+      "oneWinsWithClean": {
+        "rate": 0.0086,
+        "eligible": 6246
+      },
+      "twoWinsWithLow": {
+        "rate": 0.0046,
+        "eligible": 7897
+      },
+      "oneVsCleanPairRate": 0.0067,
+      "twoVsLowPairRate": 0.0265,
+      "halfLocked": 0.2891,
+      "halfLeaderWon": 0.6008,
+      "allFiveStopped": 0.0188,
+      "repeatLongLast": {
+        "rate": 0.5034,
+        "eligible": 2050
+      },
+      "eventCounts": {
+        "zero": 9990,
+        "one": 22425,
+        "two": 13588,
+        "three": 3997
+      },
+      "ranks": [
+        [
+          1965,
+          1998,
+          2016,
+          1968,
+          2053
+        ],
+        [
+          2018,
+          1995,
+          2008,
+          2047,
+          1932
+        ],
+        [
+          2054,
+          1949,
+          1932,
+          2012,
+          2053
+        ],
+        [
+          2000,
+          1981,
+          2033,
+          1976,
+          2010
+        ],
+        [
+          1963,
+          2077,
+          2011,
+          1997,
+          1952
+        ]
+      ],
+      "categories": {
+        "CLEAN": {
+          "dogs": 9990,
+          "winRate": 0.6633,
+          "lastRate": 0.0003
+        },
+        "1xBUTTERFLY": {
+          "dogs": 10081,
+          "winRate": 0.2023,
+          "lastRate": 0.0284
+        },
+        "MIXED": {
+          "dogs": 11924,
+          "winRate": 0.0035,
+          "lastRate": 0.5419
+        },
+        "2xBUTTERFLY": {
+          "dogs": 2836,
+          "winRate": 0.0155,
+          "lastRate": 0.2412
+        },
+        "2xROLL": {
+          "dogs": 1698,
+          "winRate": 0.0065,
+          "lastRate": 0.3492
+        },
+        "1xSNIFF_PEE": {
+          "dogs": 4553,
+          "winRate": 0.0272,
+          "lastRate": 0.1696
+        },
+        "1xROLL": {
+          "dogs": 7791,
+          "winRate": 0.143,
+          "lastRate": 0.0492
+        },
+        "2xSNIFF_PEE": {
+          "dogs": 548,
+          "winRate": 0,
+          "lastRate": 0.8011
+        },
+        "3xBUTTERFLY": {
+          "dogs": 384,
+          "winRate": 0,
+          "lastRate": 0.5911
+        },
+        "3xROLL": {
+          "dogs": 172,
+          "winRate": 0,
+          "lastRate": 0.7442
+        },
+        "3xSNIFF_PEE": {
+          "dogs": 23,
+          "winRate": 0,
+          "lastRate": 1
+        }
+      },
+      "losses": {
+        "BUTTERFLY": {
+          "min": 6.284,
+          "mean": 6.313,
+          "max": 6.341,
+          "samples": 27758
+        },
+        "SNIFF_PEE": {
+          "min": 11.223,
+          "mean": 11.252,
+          "max": 11.279,
+          "samples": 12446
+        },
+        "ROLL": {
+          "min": 7.284,
+          "mean": 7.312,
+          "max": 7.338,
+          "samples": 21388
+        }
+      }
+    },
+    "C": {
+      "runs": 10000,
+      "spec": {
+        "base": [
+          0.94,
+          1.23
+        ],
+        "maxEvents": 3,
+        "stress": false
+      },
+      "meanWinner": 41.016,
+      "meanLast": 58.538,
+      "medianEnd": 61.523,
+      "p90End": 69.565,
+      "p95End": 71.565,
+      "maxEnd": 82.444,
+      "meanTopGap": 4.285,
+      "closeUnder1": 0.1701,
+      "oneWinsWithClean": {
+        "rate": 0.074,
+        "eligible": 6253
+      },
+      "twoWinsWithLow": {
+        "rate": 0.0119,
+        "eligible": 7844
+      },
+      "oneVsCleanPairRate": 0.0532,
+      "twoVsLowPairRate": 0.0516,
+      "halfLocked": 0.314,
+      "halfLeaderWon": 0.6311,
+      "allFiveStopped": 0.0188,
+      "repeatLongLast": {
+        "rate": 0.5073,
+        "eligible": 2056
+      },
+      "eventCounts": {
+        "zero": 10046,
+        "one": 22463,
+        "two": 13417,
+        "three": 4074
+      },
+      "ranks": [
+        [
+          1924,
+          1986,
+          2063,
+          1961,
+          2066
+        ],
+        [
+          2019,
+          1975,
+          1985,
+          2015,
+          2006
+        ],
+        [
+          1997,
+          2010,
+          2084,
+          1981,
+          1928
+        ],
+        [
+          2031,
+          1977,
+          1897,
+          2074,
+          2021
+        ],
+        [
+          2029,
+          2052,
+          1971,
+          1969,
+          1979
+        ]
+      ],
+      "categories": {
+        "CLEAN": {
+          "dogs": 10046,
+          "winRate": 0.6245,
+          "lastRate": 0.0018
+        },
+        "1xSNIFF_PEE": {
+          "dogs": 4467,
+          "winRate": 0.0376,
+          "lastRate": 0.1771
+        },
+        "1xBUTTERFLY": {
+          "dogs": 10082,
+          "winRate": 0.2149,
+          "lastRate": 0.0396
+        },
+        "2xROLL": {
+          "dogs": 1709,
+          "winRate": 0.0111,
+          "lastRate": 0.3511
+        },
+        "2xBUTTERFLY": {
+          "dogs": 2702,
+          "winRate": 0.0244,
+          "lastRate": 0.2439
+        },
+        "1xROLL": {
+          "dogs": 7914,
+          "winRate": 0.1566,
+          "lastRate": 0.0622
+        },
+        "MIXED": {
+          "dogs": 11952,
+          "winRate": 0.0056,
+          "lastRate": 0.522
+        },
+        "3xBUTTERFLY": {
+          "dogs": 378,
+          "winRate": 0,
+          "lastRate": 0.537
+        },
+        "2xSNIFF_PEE": {
+          "dogs": 547,
+          "winRate": 0,
+          "lastRate": 0.8099
+        },
+        "3xROLL": {
+          "dogs": 167,
+          "winRate": 0,
+          "lastRate": 0.7186
+        },
+        "3xSNIFF_PEE": {
+          "dogs": 36,
+          "winRate": 0,
+          "lastRate": 1
+        }
+      },
+      "losses": {
+        "SNIFF_PEE": {
+          "min": 11.224,
+          "mean": 11.252,
+          "max": 11.278,
+          "samples": 12198
+        },
+        "BUTTERFLY": {
+          "min": 6.286,
+          "mean": 6.312,
+          "max": 6.338,
+          "samples": 27574
+        },
+        "ROLL": {
+          "min": 7.286,
+          "mean": 7.312,
+          "max": 7.34,
+          "samples": 21747
+        }
+      }
+    },
+    "D": {
+      "runs": 10000,
+      "spec": {
+        "base": [
+          0.96,
+          1.16
+        ],
+        "maxEvents": 2,
+        "stress": false
+      },
+      "meanWinner": 42.213,
+      "meanLast": 56.907,
+      "medianEnd": 60.083,
+      "p90End": 65.023,
+      "p95End": 66.023,
+      "maxEnd": 70.962,
+      "meanTopGap": 3.945,
+      "closeUnder1": 0.1857,
+      "oneWinsWithClean": {
+        "rate": 0.0108,
+        "eligible": 6268
+      },
+      "twoWinsWithLow": {
+        "rate": 0.0055,
+        "eligible": 8795
+      },
+      "oneVsCleanPairRate": 0.0072,
+      "twoVsLowPairRate": 0.0251,
+      "halfLocked": 0.2797,
+      "halfLeaderWon": 0.6037,
+      "allFiveStopped": 0.0162,
+      "repeatLongLast": {
+        "rate": 0.634,
+        "eligible": 2571
+      },
+      "eventCounts": {
+        "zero": 10033,
+        "one": 22578,
+        "two": 17389,
+        "three": 0
+      },
+      "ranks": [
+        [
+          2030,
+          1996,
+          2031,
+          2008,
+          1935
+        ],
+        [
+          1989,
+          1951,
+          1965,
+          2037,
+          2058
+        ],
+        [
+          1959,
+          1988,
+          2005,
+          2022,
+          2026
+        ],
+        [
+          1967,
+          2036,
+          2017,
+          1963,
+          2017
+        ],
+        [
+          2055,
+          2029,
+          1982,
+          1970,
+          1964
+        ]
+      ],
+      "categories": {
+        "2xBUTTERFLY": {
+          "dogs": 3595,
+          "winRate": 0.0167,
+          "lastRate": 0.299
+        },
+        "MIXED": {
+          "dogs": 10926,
+          "winRate": 0.0044,
+          "lastRate": 0.5306
+        },
+        "1xSNIFF_PEE": {
+          "dogs": 4528,
+          "winRate": 0.0294,
+          "lastRate": 0.1826
+        },
+        "1xBUTTERFLY": {
+          "dogs": 10151,
+          "winRate": 0.195,
+          "lastRate": 0.0276
+        },
+        "CLEAN": {
+          "dogs": 10033,
+          "winRate": 0.6646,
+          "lastRate": 0.0007
+        },
+        "1xROLL": {
+          "dogs": 7899,
+          "winRate": 0.1401,
+          "lastRate": 0.0486
+        },
+        "2xSNIFF_PEE": {
+          "dogs": 716,
+          "winRate": 0,
+          "lastRate": 0.9427
+        },
+        "2xROLL": {
+          "dogs": 2152,
+          "winRate": 0.0023,
+          "lastRate": 0.4438
+        }
+      },
+      "losses": {
+        "BUTTERFLY": {
+          "min": 6.285,
+          "mean": 6.312,
+          "max": 6.338,
+          "samples": 25819
+        },
+        "ROLL": {
+          "min": 7.287,
+          "mean": 7.312,
+          "max": 7.338,
+          "samples": 20059
+        },
+        "SNIFF_PEE": {
+          "min": 11.224,
+          "mean": 11.252,
+          "max": 11.275,
+          "samples": 11478
+        }
+      }
+    },
+    "E": {
+      "runs": 10000,
+      "spec": {
+        "base": [
+          0.96,
+          1.16
+        ],
+        "maxEvents": 2,
+        "stress": true
+      },
+      "meanWinner": 42.185,
+      "meanLast": 58.806,
+      "medianEnd": 62.083,
+      "p90End": 68.462,
+      "p95End": 69.462,
+      "maxEnd": 70.962,
+      "meanTopGap": 4.069,
+      "closeUnder1": 0.1799,
+      "oneWinsWithClean": {
+        "rate": 0.0089,
+        "eligible": 6303
+      },
+      "twoWinsWithLow": {
+        "rate": 0.0043,
+        "eligible": 8800
+      },
+      "oneVsCleanPairRate": 0.0073,
+      "twoVsLowPairRate": 0.0185,
+      "halfLocked": 0.2852,
+      "halfLeaderWon": 0.6132,
+      "allFiveStopped": 0.0191,
+      "repeatLongLast": {
+        "rate": 0.8453,
+        "eligible": 6850
+      },
+      "eventCounts": {
+        "zero": 10053,
+        "one": 22353,
+        "two": 17594,
+        "three": 0
+      },
+      "ranks": [
+        [
+          1974,
+          2055,
+          1964,
+          1955,
+          2052
+        ],
+        [
+          2022,
+          1977,
+          1978,
+          2041,
+          1982
+        ],
+        [
+          2003,
+          1992,
+          1972,
+          2013,
+          2020
+        ],
+        [
+          2003,
+          1977,
+          2077,
+          2000,
+          1943
+        ],
+        [
+          1998,
+          1999,
+          2009,
+          1991,
+          2003
+        ]
+      ],
+      "categories": {
+        "2xROLL": {
+          "dogs": 5336,
+          "winRate": 0.0049,
+          "lastRate": 0.3499
+        },
+        "MIXED": {
+          "dogs": 5657,
+          "winRate": 0.0057,
+          "lastRate": 0.431
+        },
+        "1xBUTTERFLY": {
+          "dogs": 10145,
+          "winRate": 0.1956,
+          "lastRate": 0.0315
+        },
+        "1xROLL": {
+          "dogs": 7776,
+          "winRate": 0.1421,
+          "lastRate": 0.0409
+        },
+        "CLEAN": {
+          "dogs": 10053,
+          "winRate": 0.6651,
+          "lastRate": 0.0004
+        },
+        "2xBUTTERFLY": {
+          "dogs": 1817,
+          "winRate": 0.0176,
+          "lastRate": 0.2179
+        },
+        "2xSNIFF_PEE": {
+          "dogs": 4784,
+          "winRate": 0,
+          "lastRate": 0.82
+        },
+        "1xSNIFF_PEE": {
+          "dogs": 4432,
+          "winRate": 0.0305,
+          "lastRate": 0.1656
+        }
+      },
+      "losses": {
+        "ROLL": {
+          "min": 7.286,
+          "mean": 7.312,
+          "max": 7.339,
+          "samples": 22526
+        },
+        "SNIFF_PEE": {
+          "min": 11.225,
+          "mean": 11.252,
+          "max": 11.277,
+          "samples": 16848
+        },
+        "BUTTERFLY": {
+          "min": 6.285,
+          "mean": 6.312,
+          "max": 6.338,
+          "samples": 18167
+        }
+      }
+    },
+    "F": {
+      "runs": 10000,
+      "spec": {
+        "base": [
+          0.94,
+          1.23
+        ],
+        "maxEvents": 1,
+        "stress": false,
+        "countWeights": [
+          0.2,
+          0.8
+        ],
+        "eventWeights": [
+          0.55,
+          0.35,
+          0.1
+        ]
+      },
+      "meanWinner": 40.495,
+      "meanLast": 50.624,
+      "medianEnd": 54.042,
+      "p90End": 56.981,
+      "p95End": 58.481,
+      "maxEnd": 60.981,
+      "meanTopGap": 3.09,
+      "closeUnder1": 0.2577,
+      "oneWinsWithClean": {
+        "rate": 0.1088,
+        "eligible": 6665
+      },
+      "twoWinsWithLow": {
+        "rate": null,
+        "eligible": 0
+      },
+      "oneVsCleanPairRate": 0.0588,
+      "twoVsLowPairRate": null,
+      "halfLocked": 0.2122,
+      "halfLeaderWon": 0.5119,
+      "allFiveStopped": 0.0054,
+      "repeatLongLast": {
+        "rate": null,
+        "eligible": 0
+      },
+      "eventCounts": {
+        "zero": 9871,
+        "one": 40129,
+        "two": 0,
+        "three": 0
+      },
+      "ranks": [
+        [
+          1951,
+          1940,
+          2034,
+          2068,
+          2007
+        ],
+        [
+          1941,
+          2034,
+          2017,
+          1987,
+          2021
+        ],
+        [
+          1978,
+          2046,
+          2003,
+          1991,
+          1982
+        ],
+        [
+          2017,
+          2008,
+          1974,
+          2018,
+          1983
+        ],
+        [
+          2113,
+          1972,
+          1972,
+          1936,
+          2007
+        ]
+      ],
+      "categories": {
+        "1xBUTTERFLY": {
+          "dogs": 21987,
+          "winRate": 0.1333,
+          "lastRate": 0.1817
+        },
+        "CLEAN": {
+          "dogs": 9871,
+          "winRate": 0.6018,
+          "lastRate": 0.0045
+        },
+        "1xROLL": {
+          "dogs": 14143,
+          "winRate": 0.0778,
+          "lastRate": 0.256
+        },
+        "1xSNIFF_PEE": {
+          "dogs": 3999,
+          "winRate": 0.007,
+          "lastRate": 0.5851
+        }
+      },
+      "losses": {
+        "BUTTERFLY": {
+          "min": 6.283,
+          "mean": 6.313,
+          "max": 6.34,
+          "samples": 21987
+        },
+        "ROLL": {
+          "min": 7.288,
+          "mean": 7.313,
+          "max": 7.338,
+          "samples": 14143
+        },
+        "SNIFF_PEE": {
+          "min": 11.225,
+          "mean": 11.252,
+          "max": 11.278,
+          "samples": 3999
+        }
+      }
+    }
+  }
+}
