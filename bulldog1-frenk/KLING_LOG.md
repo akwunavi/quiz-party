@@ -67,3 +67,8 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 - generationId `AQ5QTJta3ZWmpownwpfKC0vGkm4hnP3zSwu_IExiPJjTvbbaYPLQqYQfb15R8bU1j-U8URLI`. Промпт дословно `race_start_v2/prompt_sent.txt`.
 - Файл `race_start_v2/DOG1_RACE_START_v2_kling_source.mp4`, SHA `8241be2a…2c61`, 73 кадра, без водяного знака.
 - Итог: присед и прищур f13–f21 повторились, толчок только с f20–21; лапы скользят назад до толчка; галоп f22+ хороший, лучший шов f64→#91 (0,903/30,4). Подробности `plans/RACE_START_V2_REPORT.md`.
+
+## 7. RACE_START gen3 (без tail) — сгенерирован, лучшая из трёх, не принят окончательно
+- `image_to_video`, `kling-video-v3_0`, 720p, 3 с, audio off, multi-shot off, **без tail_image**, first_image `race_start_v2_prep/DOG1_RACE_START_V2_START_f16.png`, **18 кредитов** (369 → 351).
+- generationId `Acpr8nqaC8-EPguCz0b7xwEbKpyCuuE031Amfyc8e2bH1bANzT40MwdkcVDb7tup8OShL0y5`. Промпт дословно `race_start_gen3/prompt_sent.txt`. Файл `race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4`, SHA `772d432d…9d08`.
+- Итог: присед исчез (взлёт с f7), прищур f7–f13 и скольжение лап назад на 72 px до взлёта остались; лучший ранний шов f37→#90 (0,859/39,1). `plans/RACE_START_GEN3_REPORT.md`.
