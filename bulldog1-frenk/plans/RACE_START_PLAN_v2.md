@@ -39,16 +39,17 @@
 ### Если разгон из Kling будет «морфить» (запасной способ с реальными кадрами)
 Использовать настоящий разгон из оригинала: **конец Kling-клипа = реальный кадр #45** (из alpha; IoU к стойке 0,607, то есть не хуже #90; позиция x 285–924, центр 604 → сдвиг стойки около −107 px), а дальше реальные #46–63 (18 кадров = 0,75 с) и стык #63→#87 (проверен: IoU 0,796, цвет 25,1, не хуже обычного шага цикла). Kling тогда делает только «стойка → умеренная скорость до #45». Цена: START длиннее (≈ 3 + 0,75 с), зато ритм разгона настоящий. Ранние кадры #37–41 использовать как конец не стоит: это прыжок с вытянутым телом (IoU 0,49–0,54), слишком далёк от стойки.
 
-## Итоговый промпт Kling (не отправлен)
+## Итоговый промпт Kling (не отправлен; редакция после проверки координат)
 ```
-A stocky fawn-beige French bulldog with a white chest and a dark gray muzzle stands calmly in a locked three-quarter side view, facing right. He does not wait: in the very first moment he drops his chest a little and shifts his weight back over his hind legs, ears and eyes forward, as if he has just heard a start signal. Then he thrusts off the floor with both hind paws, his front paws lift and reach forward, and he takes his first short, quick strides. Each stride is a little longer and faster than the one before: a front paw lands, the hind paws swing forward under the hips and push off again, the back stretches and rounds, the head leans forward, the ears flap and the mouth opens in a happy pant. After about a second and a half he is in a full, rhythmic gallop, about two strides per second, and keeps exactly this stride to the end. The last frame is a moment of that gallop where his hind paws are pushing off the floor and his front paws are drawn up under his chest.
+A stocky fawn-beige French bulldog with a white chest and a dark gray muzzle stands calmly in a locked three-quarter side view, facing right. He does not wait: in the very first moment he shifts his weight back over his hind legs and lowers his shoulders and chest a little, ears and eyes forward, as if he has just heard a start signal. Then he thrusts off the floor with both hind paws, his front paws lift and reach forward, and he takes his first short, quick steps. Each step is a little longer and faster than the one before: a front paw lands, the hind paws swing forward under the hips and push off again, the body stretches and bounces, the head leans forward, the ears flap and the mouth opens in a happy pant. After about a second and a half he is running in a full, rhythmic gallop, about two strides per second, and keeps exactly this stride until the end. The last frame is the moment of that gallop where his hind paws push off the floor and his front paws are drawn up under his chest.
 
-The camera does not move at all: no zoom, no pan, no shake. The dog stays at about the same place in the frame and only his body and legs move. Plain seamless light-gray studio backdrop and floor with a soft shadow under him, the same soft lighting throughout. Natural weight transfer, paws never slide or float. It is the same dog in every frame, with the same face, fur color, white chest, ears and proportions, and the same size.
+The camera does not move at all: no zoom, no pan, no shake. The dog stays in place in the frame and only his body and legs move; his forward travel along the track is added later outside the video. Plain seamless light-gray studio backdrop and floor with a soft shadow under him, the same soft lighting throughout. Natural weight transfer, paws never slide or float. It is the same dog in every frame, with the same face, fur color, white chest, ears and proportions, and the same size.
 ```
+(Итоговая редакция от 13.10.2026 после проверки координат: добавлено «опускает плечи и грудь» и «продвижение по трассе добавляется позже вне видео»; убраны упоминания «небольшого продвижения в кадре».)
 Параметры: `image_to_video`, `kling-video-v3_0`, first_image = `race_start_prep/DOG1_RACE_START_START.png`, tail_image = `race_start_prep/DOG1_RACE_START_END_run90.png`, **duration 3**, 720p, `enable_audio=false`, `prefer_multi_shots=false`, `imageCount=1`. Ожидаемая цена по опыту STOP: 18 кредитов (остаток 405).
 
 ## Приёмка и обработка после генерации
-1. Первый кадр = START-кадр, последний = END #90 (разница < 2/255).
+1. Первый кадр = START-кадр, последний = END #90 (разница < 2/255); контуры последнего кадра по заднему/переднему краю и земле совпадают с #90 не хуже ±5 px.
 2. Разгон начинается сразу (нет стояния > 0,3 с), шаги нарастают, нет морфинга лап (смотреть кадры около начала толчка), камера и размер неизменны, внешность Френка сохраняется.
 3. Хвост ровного галопа обрезать по лучшей паре с циклом, скорость не менять.
 4. Alpha: `dog_alpha.py ... --exclude-rect none --floor-shadow`, проверка `verify_alpha.py`.
@@ -56,3 +57,6 @@ The camera does not move at all: no zoom, no pan, no shake. The dog stays at abo
 
 ## Файлы
 `race_start_prep/DOG1_RACE_START_START.png` (рекомендуемый, сдвиг −125), `..._alt_shift150.png`, `DOG1_RACE_START_END_run90.png` (RUN #90 на той же плите + мягкая тень), листы сравнения.
+
+## Координаты и непрерывность
+Проверено отдельным отчётом `RACE_START_COORDINATES_REPORT.md`: START-кадр со сдвигом −125 даёт скачок при существующей архитектуре V3 (нет offset на клип); нужен минимальный интерфейс `shiftFrom/shiftTo` на клип (+125 → 0) или запекание −125 в видео (не рекомендуется).
