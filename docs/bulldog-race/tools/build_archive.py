@@ -38,6 +38,9 @@ def git_index():
             head, raw_path = item.split(b"\t", 1)
             oid = head.split()[2].decode()
             path = raw_path.decode("utf-8", "replace")
+            if path.startswith("docs/bulldog-race/"):
+                # Do not recursively index this archive on a later rebuild.
+                continue
             source = {"branch": ref, "commit": commit, "path": path, "gitBlob": oid}
             by_oid.setdefault(oid, []).append(source)
             if REF_FILTER.search(path) and (ref != "origin/main" or "race" in path.lower()):

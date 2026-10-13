@@ -83,6 +83,8 @@ def main():
         ("Bulldog #4 MASTER original if separate from DOG4_BASE_STAND.png", "User STAND architecture request and DOG4_ASSETS.md", "A distinct master source could not be verified."),
     ]
     for name, source, reason in missing:
+        if any(x["name"] == name and x["approvalStatus"] == "MISSING" for x in data["entries"]):
+            continue
         data["entries"].append({
             "id": f"missing-{len(data['entries']) + 1:06}", "name": name, "type": "missing", "purpose": "historical source",
             "dog": 4, "state": None, "source": source, "sourceBranch": None, "sourceCommit": None,
