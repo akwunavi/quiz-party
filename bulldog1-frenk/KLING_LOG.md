@@ -80,3 +80,9 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 | V2 (f16 → #90, с tail) | **архив**, не принят | 18 |
 | **gen3 (f16, без tail)** | **рабочий вариант**, принят пользователем 13.10.2026; описание `race_start_working/` | 18 |
 Остаток 351. Новые генерации RACE_START запрещены без отдельного согласования. BUTTERFLY: план и промпт (`plans/BUTTERFLY_PLAN.md`), генерация не запущена.
+
+## 8. BUTTERFLY V1 — сгенерирован, пригоден как рабочий кандидат
+- `image_to_video`, `kling-video-v3_0`, 720p, 5 с, audio off, multi-shot off, first_image = tail_image = `butterfly_prep/DOG1_BUTTERFLY_START_END_racestand.png`, **30 кредитов** (351 → 321; цена не запрашивается заранее, подтверждена при отправке, лимит 30 соблюдён).
+- generationId `AahlAKbjM3iuh-L7OfC36wgaLXxVWUSpdwKtFJSvIiWaCy91gfMI5JxVIE-gMSymOe5RD2qw`. Промпт — текст пользователя дословно: `butterfly_v1/prompt_sent.txt`.
+- Файл `butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4`, SHA `694436b6…f956c`, 121 кадр, без водяного знака.
+- Итог: возврат в стойку IoU 0,997, лапы не скользят, смещение 0; дефекты — насекомое (вырезано), двойной подъём дальней лапы. `plans/BUTTERFLY_V1_REPORT.md`.

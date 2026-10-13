@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-13 (fourth update: RACE_START gen3 working, track diagnostic, BUTTERFLY plan)",
+ "as_of": "2026-10-13 (fifth update: BUTTERFLY V1 generated; first START and contract decisions)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -245,7 +245,8 @@
    },
    "event_to_entry_without_compensation_px": -20.28
   },
-  "compensation": "race_start_working/RACE_START_WORKING.json (diagnostic profiles N0..N3, raw values kept)"
+  "compensation": "race_start_working/RACE_START_WORKING.json (diagnostic profiles N0..N3, raw values kept)",
+  "profile_note": "user prefers N3 (0.54 s ramp) for later testing; NOT an approved game-physics setting: ramp-time change needs separate analytical-motion/race-result check"
  },
  "race_start_archive": {
   "V1": {
@@ -268,13 +269,58 @@
   "v3_modified": false
  },
  "butterfly": {
-  "status": "plan and prompt prepared, NOT generated",
+  "status": "V1 generated 2026-10-13, usable working candidate, awaiting user decision",
   "plan": "plans/BUTTERFLY_PLAN.md",
+  "report": "plans/BUTTERFLY_V1_REPORT.md",
   "start_end_image": "butterfly_prep/DOG1_BUTTERFLY_START_END_racestand.png",
-  "prompt": "butterfly_prep/prompt_BUTTERFLY_not_sent.txt"
+  "prompt_sent": "butterfly_v1/prompt_sent.txt",
+  "kling": {
+   "model": "kling-video-v3_0",
+   "tool": "image_to_video",
+   "resolution": "720p",
+   "duration": 5,
+   "audio": false,
+   "multi_shot": false,
+   "tail_image": "same as first_image",
+   "credits": 30,
+   "generationId": "AahlAKbjM3iuh-L7OfC36wgaLXxVWUSpdwKtFJSvIiWaCy91gfMI5JxVIE-gMSymOe5RD2qw"
+  },
+  "source": {
+   "path": "butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4",
+   "sha256": "694436b69672e265a71e7175dc578538bb92fe7a1b12dac710720e36221f956c",
+   "frames": 121,
+   "fps": 24
+  },
+  "alpha": {
+   "path": "butterfly_v1/DOG1_BUTTERFLY_v1_alpha.webm",
+   "sha256": "96027d556b5841f0475a361bc8aca555656441e5a31e8880f1b1215a1105bff0",
+   "raw_pipeline_alpha": "butterfly_v1/DOG1_BUTTERFLY_v1_alpha_raw_pipeline_with_insect_remnants.webm",
+   "raw_sha256": "89a448242cecbe967b536e9785bd9a4f2d7d31e4aca9195e20579087624d0b74"
+  },
+  "start_end": {
+   "stand_vs_f1": {
+    "iou": 0.996,
+    "colour_diff": 2.4
+   },
+   "last_vs_stand": {
+    "iou": 0.997,
+    "colour_diff": 2.4
+   },
+   "shift_src_px": 0
+  },
+  "usable_frames": "f1-f91 (3.75 s), tail static f91-f121 trimmable",
+  "trajectory_proposal": "butterfly_v1/BUTTERFLY_TRAJECTORY_PROPOSAL.md"
  },
  "kling_credits": {
-  "spent": 78,
-  "remaining": 351
+  "spent": 108,
+  "remaining": 321
+ },
+ "first_start": {
+  "status": "accepted as working by user 2026-10-13 (alpha, choreography and seam to RUN); known visual defects stay in KNOWN_ISSUES",
+  "report": "plans/FIRST_START_REPORT.md"
+ },
+ "coordinate_contract": {
+  "status": "principles accepted by user 2026-10-13; saved for future implementation by Codex; V3 not changed; Bulldog 4 parameters stay unchanged",
+  "doc": "plans/COORDINATE_CONTRACT_PROPOSAL.md"
  }
 }

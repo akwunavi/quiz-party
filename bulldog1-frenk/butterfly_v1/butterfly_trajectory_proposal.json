@@ -1,0 +1,236 @@
+{
+ "note": "proposal only; measured from the embedded insect that Kling drew in butterfly_v1 (frames 24-62 measured, 19-21 and 66-84 extrapolated); not implemented in V3",
+ "coordinates": "x/y in the 1276x720 source frame; stand centre x=736, ground y=679; canvas px = src px * 0.1622 (sprite 207 px wide)",
+ "keyframes": [
+  {
+   "frame": 19,
+   "t": 0.75,
+   "x_src": 1262,
+   "y_src": 222,
+   "dx_from_stand_centre_src": 526,
+   "dy_from_ground_src": -457,
+   "dx_canvas": 85.3,
+   "dy_canvas": -74.1
+  },
+  {
+   "frame": 21,
+   "t": 0.833,
+   "x_src": 1215,
+   "y_src": 206,
+   "dx_from_stand_centre_src": 479,
+   "dy_from_ground_src": -473,
+   "dx_canvas": 77.7,
+   "dy_canvas": -76.7
+  },
+  {
+   "frame": 24,
+   "t": 0.958,
+   "x_src": 1146.2,
+   "y_src": 193.5,
+   "dx_from_stand_centre_src": 410.2,
+   "dy_from_ground_src": -485.5,
+   "dx_canvas": 66.5,
+   "dy_canvas": -78.8
+  },
+  {
+   "frame": 26,
+   "t": 1.042,
+   "x_src": 1100.0,
+   "y_src": 152.8,
+   "dx_from_stand_centre_src": 364.0,
+   "dy_from_ground_src": -526.2,
+   "dx_canvas": 59.1,
+   "dy_canvas": -85.4
+  },
+  {
+   "frame": 28,
+   "t": 1.125,
+   "x_src": 1061.5,
+   "y_src": 153.8,
+   "dx_from_stand_centre_src": 325.5,
+   "dy_from_ground_src": -525.2,
+   "dx_canvas": 52.8,
+   "dy_canvas": -85.2
+  },
+  {
+   "frame": 30,
+   "t": 1.208,
+   "x_src": 1033.2,
+   "y_src": 162.3,
+   "dx_from_stand_centre_src": 297.2,
+   "dy_from_ground_src": -516.7,
+   "dx_canvas": 48.2,
+   "dy_canvas": -83.8
+  },
+  {
+   "frame": 32,
+   "t": 1.292,
+   "x_src": 1030.6,
+   "y_src": 160.7,
+   "dx_from_stand_centre_src": 294.6,
+   "dy_from_ground_src": -518.3,
+   "dx_canvas": 47.8,
+   "dy_canvas": -84.1
+  },
+  {
+   "frame": 34,
+   "t": 1.375,
+   "x_src": 1013.3,
+   "y_src": 204.6,
+   "dx_from_stand_centre_src": 277.3,
+   "dy_from_ground_src": -474.4,
+   "dx_canvas": 45.0,
+   "dy_canvas": -77.0
+  },
+  {
+   "frame": 37,
+   "t": 1.5,
+   "x_src": 1029.3,
+   "y_src": 259.0,
+   "dx_from_stand_centre_src": 293.3,
+   "dy_from_ground_src": -420.0,
+   "dx_canvas": 47.6,
+   "dy_canvas": -68.1
+  },
+  {
+   "frame": 39,
+   "t": 1.583,
+   "x_src": 1016.9,
+   "y_src": 301.4,
+   "dx_from_stand_centre_src": 280.9,
+   "dy_from_ground_src": -377.6,
+   "dx_canvas": 45.6,
+   "dy_canvas": -61.3
+  },
+  {
+   "frame": 43,
+   "t": 1.75,
+   "x_src": 1035.3,
+   "y_src": 280.3,
+   "dx_from_stand_centre_src": 299.3,
+   "dy_from_ground_src": -398.7,
+   "dx_canvas": 48.6,
+   "dy_canvas": -64.7
+  },
+  {
+   "frame": 46,
+   "t": 1.875,
+   "x_src": 1044.8,
+   "y_src": 257.3,
+   "dx_from_stand_centre_src": 308.8,
+   "dy_from_ground_src": -421.7,
+   "dx_canvas": 50.1,
+   "dy_canvas": -68.4
+  },
+  {
+   "frame": 48,
+   "t": 1.958,
+   "x_src": 1035.6,
+   "y_src": 252.3,
+   "dx_from_stand_centre_src": 299.6,
+   "dy_from_ground_src": -426.7,
+   "dx_canvas": 48.6,
+   "dy_canvas": -69.2
+  },
+  {
+   "frame": 51,
+   "t": 2.083,
+   "x_src": 1010.3,
+   "y_src": 210.5,
+   "dx_from_stand_centre_src": 274.3,
+   "dy_from_ground_src": -468.5,
+   "dx_canvas": 44.5,
+   "dy_canvas": -76.0
+  },
+  {
+   "frame": 53,
+   "t": 2.167,
+   "x_src": 1036.5,
+   "y_src": 200.7,
+   "dx_from_stand_centre_src": 300.5,
+   "dy_from_ground_src": -478.3,
+   "dx_canvas": 48.7,
+   "dy_canvas": -77.6
+  },
+  {
+   "frame": 56,
+   "t": 2.292,
+   "x_src": 1042.7,
+   "y_src": 268.6,
+   "dx_from_stand_centre_src": 306.7,
+   "dy_from_ground_src": -410.4,
+   "dx_canvas": 49.8,
+   "dy_canvas": -66.6
+  },
+  {
+   "frame": 58,
+   "t": 2.375,
+   "x_src": 1038.0,
+   "y_src": 275.6,
+   "dx_from_stand_centre_src": 302.0,
+   "dy_from_ground_src": -403.4,
+   "dx_canvas": 49.0,
+   "dy_canvas": -65.4
+  },
+  {
+   "frame": 60,
+   "t": 2.458,
+   "x_src": 1027.5,
+   "y_src": 254.0,
+   "dx_from_stand_centre_src": 291.5,
+   "dy_from_ground_src": -425.0,
+   "dx_canvas": 47.3,
+   "dy_canvas": -68.9
+  },
+  {
+   "frame": 62,
+   "t": 2.542,
+   "x_src": 1023.4,
+   "y_src": 253.9,
+   "dx_from_stand_centre_src": 287.4,
+   "dy_from_ground_src": -425.1,
+   "dx_canvas": 46.6,
+   "dy_canvas": -69.0
+  },
+  {
+   "frame": 66,
+   "t": 2.708,
+   "x_src": 1026,
+   "y_src": 266,
+   "dx_from_stand_centre_src": 290,
+   "dy_from_ground_src": -413,
+   "dx_canvas": 47.0,
+   "dy_canvas": -67.0
+  },
+  {
+   "frame": 72,
+   "t": 2.958,
+   "x_src": 1075,
+   "y_src": 205,
+   "dx_from_stand_centre_src": 339,
+   "dy_from_ground_src": -474,
+   "dx_canvas": 55.0,
+   "dy_canvas": -76.9
+  },
+  {
+   "frame": 78,
+   "t": 3.208,
+   "x_src": 1140,
+   "y_src": 140,
+   "dx_from_stand_centre_src": 404,
+   "dy_from_ground_src": -539,
+   "dx_canvas": 65.5,
+   "dy_canvas": -87.4
+  },
+  {
+   "frame": 84,
+   "t": 3.458,
+   "x_src": 1230,
+   "y_src": 85,
+   "dx_from_stand_centre_src": 494,
+   "dy_from_ground_src": -594,
+   "dx_canvas": 80.1,
+   "dy_canvas": -96.4
+  }
+ ]
+}
