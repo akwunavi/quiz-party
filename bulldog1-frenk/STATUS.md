@@ -22,6 +22,7 @@
 42 из 429 (остаток по расчёту 387): RACE_STAND ×3 (по 2), STOP (18), RACE_START V1 (18). Детали — `KLING_LOG.md`.
 
 ## Следующий шаг (ожидает согласования)
+00. RACE_START V2 подготовлен без Kling: `plans/RACE_START_V2_PLAN.md`, `race_start_v2_prep/` — ждёт утверждения кадров и промпта.
 0. Спасение V1 без Kling проверено: `plans/RACE_START_V1_SALVAGE_REPORT.md`, `race_start_v1_salvage/` (лучший гибрид V3, рекомендация — новая генерация).
 1. Решение пользователя по RACE_START V1 (`plans/RACE_START_V1_REPORT.md`): принять гибрид f1–51 + реальные #58–63 / перегенерировать / отказаться.
 2. Принять первый START (`plans/FIRST_START_REPORT.md`).
