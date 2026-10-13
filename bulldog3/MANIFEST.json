@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "scope": "Bulldog #3 research; comprehensive frame-by-frame historical inventory remains in docs/bulldog-race/ASSET_MANIFEST.json",
+  "runFrameMapping": "alpha_v2 output frame n = source MP4 frame n+36 (zero-based), n=0..84",
+  "items": [
+    {
+      "id": "asset-008175",
+      "role": "RUN source",
+      "name": "bulldog_3_run.mp4",
+      "sha256": "fc563e55df8caf9bc76680a46c7d1bd8ea3d08713f834b00f0eccf084583aca2",
+      "bytes": 3053419,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 121,
+        "durationSeconds": 5.041667,
+        "codec": "h264",
+        "alpha": false
+      },
+      "source": "user-upload",
+      "originalPath": "/workspace/attachments/62d126c0-798f-432f-b53c-0b1a7cba1b13/bulldog_3_run.mp4",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-real-dogs-20261007",
+        "commit": "1c652ce822455469101f5f4740653db3f12e8868",
+        "path": "assets/bulldog_03_run.mp4",
+        "gitBlob": "cbfef17e623bbbfffdf2c129f7e564a7a59096d0"
+      },
+      "approvalStatus": "UNKNOWN",
+      "statusEvidence": "Original Kling RUN; visual appearance/reference needs approval",
+      "relatedTo": []
+    },
+    {
+      "id": "asset-008150",
+      "role": "RUN alpha v1",
+      "name": "bulldog_03_run_alpha_v1.webm",
+      "sha256": "b96248b11f58ee713eb2185aa5cdd6eb497d64a3dd9a4606060df819001d5060",
+      "bytes": 9415022,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 85,
+        "durationSeconds": 3.542,
+        "codec": "vp9",
+        "alpha": true
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_run_alpha_v1.webm",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_run_alpha_v1.webm",
+        "gitBlob": "3a47b2df7edb3beebe83cd7452eff896c74b57dc"
+      },
+      "approvalStatus": "SUPERSEDED",
+      "statusEvidence": "Historical report records background/eye/floor defects fixed in v2",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008151",
+      "role": "RUN alpha v2",
+      "name": "bulldog_03_run_alpha_v2.webm",
+      "sha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+      "bytes": 9272249,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 85,
+        "durationSeconds": 3.542,
+        "codec": "vp9",
+        "alpha": true
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_run_alpha_v2.webm",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_run_alpha_v2.webm",
+        "gitBlob": "592a9f9998aa80a511511db7b9f8cbcda8f5d592"
+      },
+      "approvalStatus": "CANDIDATE",
+      "statusEvidence": "Technical transparency verified; loop and library use not visually approved",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008149",
+      "role": "v2 alpha masks",
+      "name": "bulldog_03_alpha_masks_v2.tar.gz",
+      "sha256": "980507abe953cc04bff5c8ddfa984b3ea05c391f6d345d6eae56af6ff86b7dc6",
+      "bytes": 17280034,
+      "media": {},
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_alpha_masks_v2.tar.gz",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_alpha_masks_v2.tar.gz",
+        "gitBlob": "a150c3c04c465f4900525302d769d3662efe7398"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical intermediate masks for repair/reproduction",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008158",
+      "role": "v2 processing report",
+      "name": "report.md",
+      "sha256": "51c7ab3cd19ceea5f2841e183d13f5eac16fa3c98f6b68a795e9eaa1e8d7f580",
+      "bytes": 5251,
+      "media": {},
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/report.md",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/report.md",
+        "gitBlob": "cc4d0e92076045994588299ec2ffb2355aeffb86"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical evidence for ranges, repairs and browser QA",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008155",
+      "role": "v2 multi-background review",
+      "name": "dog3-review.jpg",
+      "sha256": "9bd76c0c9f8f044dc486658541d8bc6b6888f450de2282af41150c0defb00a5f",
+      "bytes": 211756,
+      "media": {
+        "width": 1595,
+        "height": 816,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/dog3-review.jpg",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/dog3-review.jpg",
+        "gitBlob": "7f48c0f09f5a67834b3ea98bd9d5a9d3d7e4b2ab"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical stills on white, black, green and track",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008154",
+      "role": "v1 vs v2 comparison",
+      "name": "dog3-before-after.jpg",
+      "sha256": "3313a5daacc5813c672fc1742c8b78725df64c4740abec3927234c9f17f617ae",
+      "bytes": 154687,
+      "media": {
+        "width": 1276,
+        "height": 1164,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/dog3-before-after.jpg",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/dog3-before-after.jpg",
+        "gitBlob": "08ed2b6c1eead0867b74975a2c0ede34e087dd0b"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical visual explanation of fixed background contamination",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-004922",
+      "role": "source contact sheet",
+      "name": "source-contact.jpg",
+      "sha256": "4b23532e2fe7b58505ab202d41766f4b663ebe0f7416779d8ab3c3aa48764de5",
+      "bytes": 227130,
+      "media": {
+        "width": 1600,
+        "height": 820,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/four-alpha/dog3/source-contact.jpg",
+      "archive": {
+        "kind": "tar-member",
+        "path": "docs/bulldog-race/archive/parts/part-011.tar",
+        "member": "sha256/4b/4b23532e2fe7b58505ab202d41766f4b663ebe0f7416779d8ab3c3aa48764de5"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical contact of full original RUN",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "missing-dog3-09",
+      "role": "original MASTER image (if one exists)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-10",
+      "role": "IDLE source/alpha",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-11",
+      "role": "SELECTED source/alpha",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-12",
+      "role": "FRONT_STAND approved alpha/reference",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-13",
+      "role": "RACE_STAND approved reference",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-14",
+      "role": "INITIAL_START",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-15",
+      "role": "STOP",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-16",
+      "role": "RACE_START (if distinct)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-17",
+      "role": "BUTTERFLY",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-18",
+      "role": "SNIFF_PEE",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-19",
+      "role": "RETURN (if needed)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-20",
+      "role": "ROLL",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-21",
+      "role": "FINISH (if STOP cannot be reused)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-22",
+      "role": "original Kling RUN prompt/settings",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    }
+  ]
+}
