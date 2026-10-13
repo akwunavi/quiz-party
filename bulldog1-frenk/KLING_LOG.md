@@ -95,3 +95,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 - generationId `AYPNdHMsTvXABUDCGFfs_zeCDMTxsS_06aB0Z2cwXAEnl2TUR3J7Gm6kp_wjUghprbkBpgBT`. Промпт — уточнённый текст пользователя дословно: `sniff_v1/prompt_sent.txt`.
 - Файл `sniff_v1/DOG1_SNIFF_PEE_v1_kling_source.mp4`, SHA `2e4ff649…cbdb`, 193 кадра, без водяного знака.
 - Итог: задняя ближняя лапа поднята назад (не вбок), сниф 3,3 с, предмет на полу, морфинг f163–f175; возврат IoU 0,997. `plans/SNIFF_PEE_V1_REPORT.md`.
+
+## 10. SNIFF_PEE V2 — сгенерирован (14.10.2026), ждёт просмотра
+- `image_to_video`, `kling-video-v3_0`, 720p, 8 с, audio off, multi-shot off, first=tail=RACE_STAND; промпт пользователя без таймингов; **48 кредитов** (273 -> 225). generationId AYMi4Bjx8sCkpDUjJRUfQyXnlNXGPqCZTwBoQ0-ELZwa8A-DYVQox0pGnXVmUOfwqGXYwEKE. `sniff_v2/RESULT.md`. Alpha не запускалась (правило 14.10).

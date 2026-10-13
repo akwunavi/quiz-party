@@ -403,7 +403,14 @@
    "extra hind-leg motion with morph artefact f163-f175",
    "squint f19-f21"
   ],
-  "rejection_reason": "rhythmic head pecking at the floor for 3.3 s instead of sniffing; also leg raised backward"
+  "rejection_reason": "rhythmic head pecking at the floor for 3.3 s instead of sniffing; also leg raised backward",
+  "v2": {
+   "source": "sniff_v2/DOG1_SNIFF_PEE_v2_kling_source.mp4",
+   "sha256": "8c1b937a86ee0259f06227bf32800c6d807593a89a6c67af2c6faef7532070ed",
+   "generation_id": "AYMi4Bjx8sCkpDUjJRUfQyXnlNXGPqCZTwBoQ0-ELZwa8A-DYVQox0pGnXVmUOfwqGXYwEKE",
+   "credits": 48,
+   "status": "generated, awaiting user viewing; alpha NOT run (user rule)"
+  }
  },
  "process_rules": {
   "alpha": "run alpha only after the user has watched and approved the source video (rule 2026-10-14)"
