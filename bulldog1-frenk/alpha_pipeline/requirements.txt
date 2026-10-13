@@ -1,0 +1,11 @@
+# Tested 2026-10-13 on Python 3.13.16 / Linux x86-64 / CPU only (4 cores, 15 GB RAM)
+numpy==2.5.4
+pillow==12.3.0
+onnxruntime==1.31.0
+opencv-python-headless==5.0.0.93
+scipy==1.18.1
+numba==0.68.0
+llvmlite==0.50.0
+PyMatting==1.1.16
+# only for verify_alpha.py (Chromium playback test); browsers are NOT downloaded by pip
+playwright==1.63.0

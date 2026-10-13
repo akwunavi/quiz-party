@@ -1,0 +1,142 @@
+{
+ "schema": "bulldog1-frenk/1",
+ "dog_id": "dog1_frenk",
+ "as_of": "2026-10-13",
+ "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
+ "sources_in_other_branches": {
+  "bulldog_01_run.mp4": {
+   "sha256": "bacae613cab9a705691df79aeadc8e547b6d0a1d8c43d37d0d3d970a17eb8409",
+   "git": "origin/preview/bulldog-real-dogs-20261007@1c652ce822455469101f5f4740653db3f12e8868:assets/bulldog_01_run.mp4",
+   "video": "h264 1276x720 24fps 121 frames"
+  },
+  "dog1-run-alpha.webm": {
+   "sha256": "d2c2762797a393f03eca8ec28213d39f43783c52cddbaab59bed9f60a3347075",
+   "git": "origin/preview/bulldogs-1235-alpha-20261008@8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c:dog1-run-alpha.webm",
+   "covers_source_frames": "40-120",
+   "approved": true
+  }
+ },
+ "sources_here": {
+  "idle": {
+   "path": "assets/sources/bulldog_01_idle.mp4",
+   "sha256": "2311906d92b62357e77f3c662e28976c85a98d9f53b2afec7bf3bf9f86761e1f",
+   "bytes": 2031122
+  },
+  "selected": {
+   "path": "assets/sources/bulldog_01_selected.mp4",
+   "sha256": "ffd5c25a71c8bf6cf825f43407aed282873c417f9662eefbff8032127a2998d4",
+   "bytes": 2232871
+  },
+  "master_chat_copy_not_original": {
+   "path": "assets/sources/bulldog_01_master_CHAT_COPY_not_original_2000x1129.png",
+   "sha256": "2b783ffa683c9619d9136301ba8c1edda0a2a228ab5a2f4a160afb2ce4bed28d",
+   "bytes": 652209
+  }
+ },
+ "front_stand": {
+  "source": "bulldog_01_run.mp4 frame #0",
+  "approved": true
+ },
+ "race_stand": {
+  "path": "assets/approved/DOG1_RACE_STAND_v3_2720x1536.png",
+  "sha256": "83214715a108c7c216a567e88a825dcc6a010a509ff440ffae7e6a024ccee07a",
+  "bytes": 3967500,
+  "width": 2720,
+  "height": 1536,
+  "approved": true,
+  "generation_id": "AVcUSt0bkGA2nxz9eUAyU-tR9UT2gzBH1GAJqDaVgws3uiKi0MJGnORQxd1HTabiuNfIBROn",
+  "fallback": {
+   "path": "assets/rejected_experiments/DOG1_RACE_STAND_v1_fallback_2720x1536.png",
+   "sha256": "e05ed0739530bfef87bd36c00b0c5ee96debe2f5e46762be74a60d0536a335b2",
+   "bytes": 4071603
+  }
+ },
+ "run_loop": {
+  "frames": "#87-98 of bulldog_01_run.mp4 (alpha from dog1-run-alpha.webm)",
+  "length_frames": 12,
+  "seconds": 0.5,
+  "fps": 24,
+  "approved": "candidate; used in approved STOP preview A"
+ },
+ "clips": {
+  "START_first": {
+   "plan": "#25-63 of bulldog_01_run.mp4 then loop #87-98; alpha for #25-39 missing",
+   "approved": false,
+   "plan_doc": "plans/START_FRAMES_25_39_PLAN.md"
+  },
+  "STOP": {
+   "approved": true,
+   "variant": "A full, no trimming",
+   "source": {
+    "path": "assets/approved/DOG1_STOP_v1_kling_source.mp4",
+    "sha256": "30c058904313683007a7ec6e183669ad0c459432bfa80c1eafc9f5158457edf5",
+    "bytes": 1875212
+   },
+   "source_frames": 73,
+   "fps": 24,
+   "size": "1276x720",
+   "start_frame": {
+    "path": "assets/approved/DOG1_STOP_START.png",
+    "sha256": "15bb7e2c1f04ce8248a1a01b2d52c5e49142d6f54b0bac7089a58c268fa9fd28",
+    "bytes": 1025831
+   },
+   "end_frame": {
+    "path": "assets/approved/DOG1_STOP_END.png",
+    "sha256": "5d873c41408e8d221661242d5fdb11bbd100691cf9d7e8dde09acb56d257c0a6",
+    "bytes": 869064
+   },
+   "alpha": {
+    "path": "assets/approved/DOG1_STOP_v1_alpha.webm",
+    "sha256": "9b2a45bc1a321dc3bbb0631e23c75633aa2b9f342a48b19ecff7673f2c68113f",
+    "bytes": 1534061,
+    "codec": "vp9 yuva420p alpha_mode=1",
+    "approved": true,
+    "pipeline": "alpha_pipeline/dog_alpha.py",
+    "command": "python dog_alpha.py DOG1_STOP_v1_kling_source.mp4 --work work/stop_full --out DOG1_STOP_v1_alpha.webm --exclude-rect none",
+    "defaults": "strength 1.0, tau 12, r-in 5, r-out 9, margin 24, supersample 2, min-area 600, crf 14"
+   },
+   "generation_id": "AVCNp1X01jED1Ehwpnk_GAgQ-75EMYVZ9ugNUq-eI8btku1DqOzfCThhlVWJ36CW2FrHOYUg",
+   "credits": 18,
+   "chain": "RUN loop #87-98 (last pass to #96) -> STOP f1..f73 -> RACE_STAND hold",
+   "known_issues": "KNOWN_ISSUES.md"
+  },
+  "RACE_START": {
+   "approved": false,
+   "plan_doc": "plans/RACE_START_PLAN.md"
+  },
+  "BUTTERFLY": {
+   "approved": false
+  },
+  "SNIFF_PEE": {
+   "approved": false
+  },
+  "RETURN": {
+   "required": "to_determine",
+   "approved": false
+  },
+  "ROLL": {
+   "approved": false
+  },
+  "FINISH": {
+   "reuse_stop": "to_determine",
+   "approved": false
+  }
+ },
+ "kling": {
+  "credits_before": 429,
+  "credits_after": 405,
+  "spent": 24,
+  "log": "KLING_LOG.md"
+ },
+ "alpha_pipeline": {
+  "dir": "alpha_pipeline",
+  "model": "BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx",
+  "model_sha256": "5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333",
+  "model_bytes": 224005088,
+  "model_source": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx",
+  "python": "3.13.16",
+  "ffmpeg": "6.1.1 (libvpx-vp9)"
+ },
+ "runtime_integration": "out_of_scope",
+ "production_status": "untouched"
+}
