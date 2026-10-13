@@ -61,3 +61,9 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 - Промпт дословно: `race_start_v1/prompt_sent.txt` (= итоговый в `plans/RACE_START_PLAN_v2.md`).
 - Файл `race_start_v1/DOG1_RACE_START_v1_kling_source.mp4`, 73 кадра, SHA `826c73fd…6e50`, без водяного знака.
 - Итог: последний кадр не совпал с RUN #90 (IoU 0,564, цвет 30,7), подкрадывание ≈1,2 с до галопа, рывок f29–34 с тёмным лицом, ритм 9 кадров. Подробности — `plans/RACE_START_V1_REPORT.md`.
+
+## 6. RACE_START V2 — сгенерирован, НЕ принят
+- `image_to_video`, `kling-video-v3_0`, first_image `race_start_v2_prep/DOG1_RACE_START_V2_START_f16.png`, tail_image `race_start_v2_prep/DOG1_RACE_START_V2_END_run90.png`, 3 с, 720p, audio off, multi-shot off, imageCount 1, **18 кредитов** (387 → 369).
+- generationId `AQ5QTJta3ZWmpownwpfKC0vGkm4hnP3zSwu_IExiPJjTvbbaYPLQqYQfb15R8bU1j-U8URLI`. Промпт дословно `race_start_v2/prompt_sent.txt`.
+- Файл `race_start_v2/DOG1_RACE_START_v2_kling_source.mp4`, SHA `8241be2a…2c61`, 73 кадра, без водяного знака.
+- Итог: присед и прищур f13–f21 повторились, толчок только с f20–21; лапы скользят назад до толчка; галоп f22+ хороший, лучший шов f64→#91 (0,903/30,4). Подробности `plans/RACE_START_V2_REPORT.md`.
