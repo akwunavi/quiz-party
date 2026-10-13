@@ -155,7 +155,35 @@ def trimap_from(m, r_in, r_out):
     return tri
 
 
-def matte_one(img_bgr, m, r_in, r_out, margin, ss=2):
+def floor_shadow_cleanup(alpha, h_open=21, band=45, min_area=150, ratio=3.0):
+    """Optional (--floor-shadow): remove a *thin horizontal ribbon* of contact shadow that the mask/matting kept
+    between the paws. Geometry only, no colour test (fur colour never influences the decision):
+    a pixel is a candidate if it does not belong to any 3 x h_open vertical rectangle inside the mask (legs, paws and
+    toes are taller than that, a flat ribbon is not), lies within `band` px of the lowest mask point, and the candidate
+    region is a wide, flat component (area >= min_area, width >= ratio * height).
+    Returns (alpha, number_of_removed_pixels)."""
+    b = (alpha > 0.5).astype(np.uint8)
+    if b.sum() == 0:
+        return alpha, 0
+    y_floor = int(np.nonzero(b.any(axis=1))[0].max())
+    opened = cv2.morphologyEx(b, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (3, h_open)))
+    thin = (b == 1) & (opened == 0)
+    thin[: max(y_floor - band, 0)] = False
+    n, lab, st, _ = cv2.connectedComponentsWithStats(thin.astype(np.uint8), connectivity=8)
+    rm = np.zeros(b.shape, bool)
+    for i in range(1, n):
+        x, y, w, hh, a = st[i, :5]
+        if a >= min_area and w >= ratio * hh:
+            rm |= lab == i
+    if not rm.any():
+        return alpha, 0
+    grow = cv2.dilate(rm.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    soft = cv2.GaussianBlur(grow.astype(np.float32), (0, 0), 1.0)
+    out = alpha * (1.0 - np.where(grow, 1.0, soft))   # whole grown region -> transparent, soft edge outside it
+    return out.astype(np.float32), int(rm.sum())
+
+
+def matte_one(img_bgr, m, r_in, r_out, margin, ss=2, fs=None):
     from pymatting import estimate_alpha_cf, estimate_foreground_ml
     h, w = m.shape
     tri = trimap_from(m, r_in, r_out)
@@ -179,6 +207,12 @@ def matte_one(img_bgr, m, r_in, r_out, margin, ss=2):
     a[t == 1.0] = 1.0; a[t == 0.0] = 0.0
     fg = estimate_foreground_ml(rgb, a)
     alpha = np.zeros((h, w), np.float32); alpha[y0:y1, x0:x1] = a
+    if fs:
+        alpha, removed = floor_shadow_cleanup(alpha, **fs)
+        if removed:
+            print("    floor-shadow: removed %d px" % removed, flush=True)
+        a = alpha[y0:y1, x0:x1].astype(np.float64)
+        fg = estimate_foreground_ml(rgb, a)
     col = np.repeat(np.repeat(img_bgr[..., ::-1].astype(np.float32) / 255.0, 1, 0), 1, 1)  # original RGB
     # extend crop colours outwards (replicate) so alpha=0 pixels have plausible neighbours for chroma subsampling
     ext = np.pad(fg, ((y0, h - y1), (x0, w - x1), (0, 0)), mode="edge").astype(np.float32)
@@ -187,7 +221,7 @@ def matte_one(img_bgr, m, r_in, r_out, margin, ss=2):
     return alpha, out
 
 
-def matte(work, start, end, r_in, r_out, margin, ss=2):
+def matte(work, start, end, r_in, r_out, margin, ss=2, fs=None):
     fr = p(work, "frames")
     for n in range(start, end + 1):
         out = p(work, "rgba", "r%04d.png" % n)
@@ -196,7 +230,7 @@ def matte(work, start, end, r_in, r_out, margin, ss=2):
         t0 = time.time()
         img = cv2.imread(os.path.join(fr, "f%04d.png" % n))
         m = np.load(p(work, "stab", "s%04d.npy" % n)).astype(np.float32)
-        alpha, rgb = matte_one(img, m, r_in, r_out, margin, ss)
+        alpha, rgb = matte_one(img, m, r_in, r_out, margin, ss, fs)
         rgba = np.dstack([np.clip(rgb * 255 + 0.5, 0, 255).astype(np.uint8),
                           np.clip(alpha * 255 + 0.5, 0, 255).astype(np.uint8)])
         cv2.imwrite(out, cv2.cvtColor(rgba, cv2.COLOR_RGBA2BGRA))
@@ -236,6 +270,12 @@ def main():
     ap.add_argument("--min-area", type=int, default=600, help="drop mask islands smaller than this (px)")
     ap.add_argument("--exclude-rect", default="1090,640,1276,720",
                     help="x0,y0,x1,y1 zeroed before anything else (Kling watermark); 'none' to disable")
+    ap.add_argument("--floor-shadow", action="store_true",
+                    help="remove a thin flat contact-shadow ribbon between the paws (geometry rule, default OFF)")
+    ap.add_argument("--fs-height", type=int, default=21, help="floor-shadow: vertical opening height, px")
+    ap.add_argument("--fs-band", type=int, default=45, help="floor-shadow: only within this many px of the lowest mask point")
+    ap.add_argument("--fs-min-area", type=int, default=150)
+    ap.add_argument("--fs-ratio", type=float, default=3.0, help="floor-shadow: min width/height of the ribbon")
     ap.add_argument("--crf", type=int, default=14)
     ap.add_argument("--stages", default="all", help="comma list: extract,masks,stabilise,matte,encode or all")
     a = ap.parse_args()
@@ -249,7 +289,9 @@ def main():
     if "extract" in stages: extract(a.input, a.work, a.start, end)
     if "masks" in stages: masks(a.work, a.start, end, a.model, a.threads)
     if "stabilise" in stages: stabilise(a.work, a.start, end, a.strength, a.tau, a.min_area, ex)
-    if "matte" in stages: matte(a.work, a.start, end, a.r_in, a.r_out, a.margin, a.supersample)
+    if "matte" in stages:
+        fs = dict(h_open=a.fs_height, band=a.fs_band, min_area=a.fs_min_area, ratio=a.fs_ratio) if a.floor_shadow else None
+        matte(a.work, a.start, end, a.r_in, a.r_out, a.margin, a.supersample, fs)
     if "encode" in stages: encode(a.work, a.start, end, info["fps_str"], a.out, a.crf)
     print("done in %.0fs -> %s" % (time.time() - t0, a.out))
 

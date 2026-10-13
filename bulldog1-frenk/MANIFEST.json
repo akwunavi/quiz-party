@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-13",
+ "as_of": "2026-10-13 (second update)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -60,9 +60,31 @@
  },
  "clips": {
   "START_first": {
-   "plan": "#25-63 of bulldog_01_run.mp4 then loop #87-98; alpha for #25-39 missing",
    "approved": false,
-   "plan_doc": "plans/START_FRAMES_25_39_PLAN.md"
+   "status": "alpha ready, awaiting user approval",
+   "frames": "#25-63 of bulldog_01_run.mp4 then loop #87-98",
+   "alpha": {
+    "path": "assets/approved/DOG1_FIRST_START_alpha_src25-63.webm",
+    "sha256": "eed84f1901d5b2269a8cc4aca1567c518363c60aaf7047f1d96f026b4ac698d5",
+    "bytes": 790980,
+    "frames": 39,
+    "fps": 24,
+    "size": "1276x720",
+    "codec": "vp9 yuva420p alpha_mode=1",
+    "command": "python dog_alpha.py bulldog_01_run.mp4 --work work/start --out DOG1_FIRST_START_alpha.webm --start 25 --end 63 (frame #34 re-matted with --floor-shadow)",
+    "pipeline_commit_note": "dog_alpha.py with --floor-shadow"
+   },
+   "front_stand_alpha_frame0": {
+    "path": "assets/approved/DOG1_FRONT_STAND_alpha_frame0.png",
+    "sha256": "37f9b2b95d60d66af02eab6b7f5e4c22bf75cf0da8136a360449ce8b910e8e83",
+    "bytes": 496169
+   },
+   "seam_63_to_87": {
+    "iou": 0.796,
+    "rgb": 25.1,
+    "ordinary_step_mean_iou": 0.789
+   },
+   "report": "plans/FIRST_START_REPORT.md"
   },
   "STOP": {
    "approved": true,
@@ -102,7 +124,24 @@
   },
   "RACE_START": {
    "approved": false,
-   "plan_doc": "plans/RACE_START_PLAN.md"
+   "status": "prepared before Kling, not launched",
+   "plan": "plans/RACE_START_PLAN_v2.md",
+   "start_frame": {
+    "path": "race_start_prep/DOG1_RACE_START_START.png",
+    "sha256": "c006d420bb0f75a7a413842e12aee15ab1827e1a2d4d9814c6f3b85eeb5bde2c",
+    "bytes": 868738
+   },
+   "start_frame_alt_shift150": {
+    "path": "race_start_prep/DOG1_RACE_START_START_alt_shift150.png",
+    "sha256": "3d44421930ba33b9422ee06cbbb3235e99043ceda2430a5868573baa55097f47",
+    "bytes": 880926
+   },
+   "end_frame_run90": {
+    "path": "race_start_prep/DOG1_RACE_START_END_run90.png",
+    "sha256": "02bb517e8df9d6a668737726e7b5c6bac3d0446c189cfe080db7a3bbeee0ffaf",
+    "bytes": 1028447
+   },
+   "kling_settings": "image_to_video kling-video-v3_0, first+tail, 3s, 720p, audio off, multi-shot off, 1 video (~18 credits)"
   },
   "BUTTERFLY": {
    "approved": false

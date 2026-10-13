@@ -12,7 +12,7 @@
 | `KLING_LOG.md` | каждая генерация Kling: модель, параметры, дословные промпты, ID, стоимость, итог |
 | `KNOWN_ISSUES.md` | известные дефекты исходников и открытые риски |
 | `MANIFEST.json` | клипы, SHA-256, FPS, кадры, статусы приёмки |
-| `plans/RACE_START_PLAN.md` | технический план RACE_STAND → RUN (не запущен) |
+| `plans/RACE_START_PLAN_v2.md` | RACE_STAND → RUN: проверки до Kling, кадры, итоговый промпт (не запущен); `RACE_START_PLAN.md` — версия 1 |
 | `plans/START_FRAMES_25_39_PLAN.md` | очистка кадров #25–39 исходного START (пробный прогон есть, пакетный нет) |
 | `plans/*first_version*`, `plans/STOP_prepare_notes.md` | подготовительные документы RACE_STAND и STOP, как были согласованы |
 | `alpha_pipeline/` | восстановленный универсальный alpha-конвейер для всех пяти собак |

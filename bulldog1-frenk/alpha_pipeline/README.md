@@ -41,6 +41,9 @@ Defaults (all overridable): `--strength 1.0 --tau 12 --r-in 5 --r-out 9 --margin
 (the default rectangle blanks the "KlingAI" logo of the *watermarked* downloads; use `none` for watermark-free videos).
 Every stage is cached in `--work`, so an interrupted run continues where it stopped.
 
+## Optional: contact-shadow ribbon (`--floor-shadow`, default OFF)
+Removes a thin, wide, flat shadow ribbon that the mask kept between the paws (geometry only, no colour test): pixels outside every 3×21 vertical rectangle of the mask, within 45 px of the lowest mask point, in a component ≥ 150 px with width ≥ 3 × height. On Dog1 START #25–63 it fires on one frame (#34) and changes nothing elsewhere; it cannot separate a shadow fused with a thick blurred area (#36). Parameters `--fs-height --fs-band --fs-min-area --fs-ratio`.
+
 ## Verify (do this for every clip — an alpha channel alone proves nothing)
 ```
 python verify_alpha.py dogN_clip_alpha.webm --out work/verify_NAME [--ref approved.webm --ref-offset K]
