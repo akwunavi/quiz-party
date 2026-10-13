@@ -1,0 +1,148 @@
+{
+  "requestedRaces": 10000,
+  "firstRequestedSeed": 20261013,
+  "lastRequestedSeed": 20271012,
+  "uniqueEffectiveSeeds": 9968,
+  "fallbackCount": 32,
+  "maxCandidatesChecked": 2,
+  "fallbackExamples": [
+    {
+      "requestedSeed": 20261423,
+      "effectiveSeed": 20261424,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20261928,
+      "effectiveSeed": 20261929,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20262180,
+      "effectiveSeed": 20262181,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20262311,
+      "effectiveSeed": 20262312,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20262576,
+      "effectiveSeed": 20262577,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20262980,
+      "effectiveSeed": 20262981,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20263125,
+      "effectiveSeed": 20263126,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20263739,
+      "effectiveSeed": 20263740,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20263826,
+      "effectiveSeed": 20263827,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    },
+    {
+      "requestedSeed": 20264002,
+      "effectiveSeed": 20264003,
+      "candidatesChecked": 2,
+      "reasons": [
+        "POSITION_EXHAUSTED"
+      ]
+    }
+  ],
+  "eventCounts": {
+    "1": 35089,
+    "2": 9973,
+    "3": 4938
+  },
+  "initialSpeeds": {
+    "NORMAL": 25021,
+    "FAST": 10079,
+    "SLOW": 9924,
+    "VERY_FAST": 2469,
+    "VERY_SLOW": 2507
+  },
+  "afterSpeeds": {
+    "SLOW": 13931,
+    "NORMAL": 34982,
+    "FAST": 13927,
+    "VERY_FAST": 3494,
+    "VERY_SLOW": 3515
+  },
+  "eventTypes": {
+    "SNIFF_PEE": 15906,
+    "ROLL": 25075,
+    "BUTTERFLY": 28868
+  },
+  "differenceFromPreviousAcceptedSampleInPercentagePoints": {
+    "counts": {
+      "1": 0.018,
+      "2": -0.002,
+      "3": -0.016
+    },
+    "initialSpeeds": {
+      "NORMAL": 0.022,
+      "FAST": -0.016,
+      "SLOW": -0.002,
+      "VERY_FAST": 0,
+      "VERY_SLOW": -0.004
+    },
+    "afterSpeeds": {
+      "SLOW": 0.0192,
+      "NORMAL": 0.0065,
+      "FAST": -0.0295,
+      "VERY_FAST": 0.0012,
+      "VERY_SLOW": 0.0027
+    },
+    "eventTypes": {
+      "SNIFF_PEE": 0.0098,
+      "ROLL": -0.0099,
+      "BUTTERFLY": 0
+    }
+  },
+  "preservedValidSeed": 20261013,
+  "rejectedExample": {
+    "requestedSeed": 20261423,
+    "effectiveSeed": 20261424,
+    "candidatesChecked": 2,
+    "reason": "Unable to schedule seed 20261423 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":168}"
+  },
+  "lateStartCrossing": 41.91038594165539
+}

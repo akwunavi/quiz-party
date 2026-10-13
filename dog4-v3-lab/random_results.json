@@ -1,0 +1,106 @@
+{
+  "runs": 10000,
+  "firstSeed": 20261013,
+  "lastAcceptedSeed": 20271044,
+  "rejectedSeeds": 32,
+  "rejectionExamples": [
+    {
+      "seed": 20261423,
+      "error": "Unable to schedule seed 20261423 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":168}"
+    },
+    {
+      "seed": 20261928,
+      "error": "Unable to schedule seed 20261928 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":107}"
+    },
+    {
+      "seed": 20262180,
+      "error": "Unable to schedule seed 20262180 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":238}"
+    },
+    {
+      "seed": 20262311,
+      "error": "Unable to schedule seed 20262311 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":259}"
+    },
+    {
+      "seed": 20262576,
+      "error": "Unable to schedule seed 20262576 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":230}"
+    },
+    {
+      "seed": 20262980,
+      "error": "Unable to schedule seed 20262980 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":239}"
+    },
+    {
+      "seed": 20263125,
+      "error": "Unable to schedule seed 20263125 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":226}"
+    },
+    {
+      "seed": 20263739,
+      "error": "Unable to schedule seed 20263739 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":173}"
+    },
+    {
+      "seed": 20263826,
+      "error": "Unable to schedule seed 20263826 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":152}"
+    },
+    {
+      "seed": 20264002,
+      "error": "Unable to schedule seed 20264002 in 4096 position attempts: {\"fit\":0,\"vertical\":4096,\"allStopped\":268}"
+    }
+  ],
+  "counts": {
+    "1": 35080,
+    "2": 9974,
+    "3": 4946
+  },
+  "initialSpeeds": {
+    "NORMAL": 25010,
+    "FAST": 10087,
+    "SLOW": 9925,
+    "VERY_FAST": 2469,
+    "VERY_SLOW": 2509
+  },
+  "afterSpeeds": {
+    "SLOW": 13921,
+    "NORMAL": 34986,
+    "FAST": 13951,
+    "VERY_FAST": 3494,
+    "VERY_SLOW": 3514
+  },
+  "eventTypes": {
+    "SNIFF_PEE": 15903,
+    "ROLL": 25088,
+    "BUTTERFLY": 28875
+  },
+  "winsByEventCount": {
+    "1": 9849,
+    "2": 150,
+    "3": 1
+  },
+  "winsByFinalSpeed": {
+    "SLOW": 915,
+    "NORMAL": 4588,
+    "FAST": 3307,
+    "VERY_FAST": 1062,
+    "VERY_SLOW": 128
+  },
+  "meanWinner": 47.498567459082565,
+  "medianWinner": 47.55024595539268,
+  "medianEnd": 65.98125,
+  "p95End": 74.06552083333334,
+  "maxEnd": 84.06458333333333,
+  "meanFirstSecondGap": 3.1137534195388104,
+  "closeFinishesUnderOneSecond": 0.2341,
+  "earlyEvents": 5284,
+  "lateEventsAtOrBeyond95Percent": 1318,
+  "racesWithSimultaneousDifferentPlaceEvents": 9813,
+  "racesWithActionStartsWithinOneSecondAtDifferentPlaces": 3219,
+  "positionAttempts": 394780,
+  "maxPositionAttempts": 4059,
+  "rejectedPositionAttempts": {
+    "vertical": 394780,
+    "allFiveStationary": 7633,
+    "fit": 0
+  },
+  "crossingStates": {
+    "RUN": 50000,
+    "START": 0
+  }
+}
