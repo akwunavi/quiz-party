@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-13 (second update)",
+ "as_of": "2026-10-13 (third update, RACE_START V1)",
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -177,5 +177,34 @@
   "ffmpeg": "6.1.1 (libvpx-vp9)"
  },
  "runtime_integration": "out_of_scope",
- "production_status": "untouched"
+ "production_status": "untouched",
+ "race_start_v1": {
+  "status": "generated, NOT accepted (awaiting user decision)",
+  "kling": {
+   "tool": "image_to_video",
+   "model": "kling-video-v3_0",
+   "resolution": "720p",
+   "duration": 3,
+   "audio": false,
+   "multi_shot": false,
+   "count": 1,
+   "credits": 18,
+   "generationId": "AUNtTY6feBLC5ETys0U9h0EBWbw6h78Xgtq1W-m5tGa5v_GZGdspYSEbonR60Asv4NnZIDME"
+  },
+  "first_image": "race_start_prep/DOG1_RACE_START_START.png",
+  "tail_image": "race_start_prep/DOG1_RACE_START_END_run90.png",
+  "source": {
+   "path": "race_start_v1/DOG1_RACE_START_v1_kling_source.mp4",
+   "sha256": "826c73fd6ff7fd9a1a89f03676887069e8564fa3a75ff28b78df3b64653e6d50",
+   "frames": 73,
+   "fps": 24,
+   "size": "1276x720"
+  },
+  "alpha": {
+   "path": "race_start_v1/DOG1_RACE_START_v1_alpha.webm",
+   "sha256": "8388d401f116a1a1d523cd7d385eb5c48d70e127fdcb1e697ebf32356e24cc77"
+  },
+  "report": "plans/RACE_START_V1_REPORT.md",
+  "sums": "race_start_v1/SHA256SUMS.txt"
+ }
 }

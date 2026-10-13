@@ -54,3 +54,10 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 ```
 - Итог: первый и последний кадры совпадают с START и END (1,5 и 1,8 из 255), продвижение вперёд +92 px, финальная стойка около 0,5 с, внешность держится, **но торможения как такового нет**: галоп продолжается около 2 с, затем за 5–6 кадров (50–56) резкая перестройка в стойку, задняя лапа в 50–53 «превращается». Пользователь оценил на глаз как нормальное торможение и принял вариант A. Дефекты записаны в `KNOWN_ISSUES.md`.
 - Подготовка START/END: START = кадр #97 RUN (из утверждённого alpha) на плите фона из RACE_STAND v3 + мягкая тень; END = RACE_STAND v3 без стойки света, прямое уменьшение ×0.469 до 1276×720, затем сдвиг на 125 px вправо (в первой версии END было 35 px, потом добавили ещё 90, чтобы оставить место для продвижения) и на 6 px вверх (выровнять линию земли с START: 682 против 680). Подробности и измерения (размер головы, цвет, резкость, почему коррекции не делались) — `plans/STOP_prepare_notes.md`.
+
+## 5. RACE_START V1 — сгенерирован, НЕ принят
+- `image_to_video`, `kling-video-v3_0`, first_image `race_start_prep/DOG1_RACE_START_START.png`, tail_image `race_start_prep/DOG1_RACE_START_END_run90.png`, duration 3, 720p, enable_audio false, prefer_multi_shots false, imageCount 1, **18 кредитов**.
+- generationId `AUNtTY6feBLC5ETys0U9h0EBWbw6h78Xgtq1W-m5tGa5v_GZGdspYSEbonR60Asv4NnZIDME`.
+- Промпт дословно: `race_start_v1/prompt_sent.txt` (= итоговый в `plans/RACE_START_PLAN_v2.md`).
+- Файл `race_start_v1/DOG1_RACE_START_v1_kling_source.mp4`, 73 кадра, SHA `826c73fd…6e50`, без водяного знака.
+- Итог: последний кадр не совпал с RUN #90 (IoU 0,564, цвет 30,7), подкрадывание ≈1,2 с до галопа, рывок f29–34 с тёмным лицом, ритм 9 кадров. Подробности — `plans/RACE_START_V1_REPORT.md`.

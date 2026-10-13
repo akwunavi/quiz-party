@@ -11,7 +11,7 @@
 | **START первый** (FRONT_STAND → бег) | **alpha готов** (ждёт согласования пользователя) | `assets/approved/DOG1_FIRST_START_alpha_src25-63.webm` (кадры #25–63 оригинала, 39 кадров) + `DOG1_FRONT_STAND_alpha_frame0.png`; стык #63→#87: IoU 0,796, цвет 25,1 (не хуже обычного шага цикла). Отчёт: `plans/FIRST_START_REPORT.md` |
 | RUN цикл | кандидат **#87–98** (12 кадров = 0,5 с), использовался в утверждённом превью A | `dog1-run-alpha.webm` #87–98. Шов #98→#87: IoU 0,805, не хуже обычного шага 0,796; запасной #95–106 хуже (низ лап 22 px при допуске 21) |
 | **STOP** | **утверждён v1, вариант A (полный, без сокращения)**; alpha утверждена | `assets/approved/DOG1_STOP_v1_kling_source.mp4` (SHA `30c05890…edf5`, 73 кадра, 24 fps) и `DOG1_STOP_v1_alpha.webm` (SHA `9b2a45bc…113f`) |
-| RACE_START (RACE_STAND → RUN) | **подготовлен до Kling, не запущен**; кадры и промпт согласованы в основе; найден блокер интеграции: в V3 нет offset на клип (`plans/RACE_START_COORDINATES_REPORT.md`) | `plans/RACE_START_PLAN_v2.md`, `race_start_prep/` (START-кадр со сдвигом −125 px, END-кадр RUN #90) |
+| RACE_START (RACE_STAND → RUN) | **V1 сгенерирован 13.10.2026, НЕ принят** (последний кадр ≠ #90, подкрадывание ≈1,2 с, ритм 9 кадров; отчёт `plans/RACE_START_V1_REPORT.md`, файлы `race_start_v1/`); подготовка: кадры и промпт согласованы в основе; найден блокер интеграции: в V3 нет offset на клип (`plans/RACE_START_COORDINATES_REPORT.md`) | `plans/RACE_START_PLAN_v2.md`, `race_start_prep/` (START-кадр со сдвигом −125 px, END-кадр RUN #90) |
 | BUTTERFLY, SNIFF_PEE, RETURN, ROLL | не начаты | см. контракт `../docs/bulldog-race/ANIMATION_CONTRACT.md` |
 | FINISH | не начат | сначала проверить повторное использование STOP |
 | Alpha-конвейер | **восстановлен и сохранён**, добавлена опция `--floor-shadow` (по умолчанию выключена) | `alpha_pipeline/` |
@@ -19,9 +19,9 @@
 Цепочка, утверждённая для STOP: `RUN loop #87–98 (последний проход до #96) → STOP f1–f73 → RACE_STAND (END) удержание`. Длительность предпросмотра 131 кадр = 5,46 с. Полный STOP оставлен потому, что сокращённый вход (f11 после #96) экономит только 0,42 с, а всё глубже (с f20) даёт скачок стыка заметно хуже обычного шага.
 
 ## Потрачено кредитов Kling
-24 из 429 (до 405): RACE_STAND ×3 (по 2) и STOP (18). Детали — `KLING_LOG.md`.
+42 из 429 (остаток по расчёту 387): RACE_STAND ×3 (по 2), STOP (18), RACE_START V1 (18). Детали — `KLING_LOG.md`.
 
 ## Следующий шаг (ожидает согласования)
-1. Согласовать кадры и промпт RACE_START (`plans/RACE_START_PLAN_v2.md`), затем один запрос Kling (18 кредитов).
+1. Решение пользователя по RACE_START V1 (`plans/RACE_START_V1_REPORT.md`): принять гибрид f1–51 + реальные #58–63 / перегенерировать / отказаться.
 2. Принять первый START (`plans/FIRST_START_REPORT.md`).
 3. Затем BUTTERFLY → SNIFF_PEE(+RETURN) → ROLL → FINISH, каждый отдельным этапом с приёмкой.
