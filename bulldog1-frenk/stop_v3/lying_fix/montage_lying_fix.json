@@ -1,0 +1,8 @@
+{
+ "source": "bulldog1-frenk/stop_v3/STOP_V3_montage.mp4 (66 frames, unchanged)",
+ "kept_montage_frames": "1-6, 14-66",
+ "removed": "7-13 (7 frames, 0.292 s)",
+ "resulting_frames": 59,
+ "seconds": 2.4583333333333335,
+ "cut": "m6 -> m14 (silhouette IoU 0.83 vs 0.86-0.9 for adjacent frames)"
+}
