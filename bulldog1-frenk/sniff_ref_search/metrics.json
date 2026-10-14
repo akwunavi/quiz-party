@@ -1,0 +1,44 @@
+{
+ "C1_PRIMARY_RACE_STAND_v3_2720x1536.png": {
+  "size": [
+   2720,
+   1536
+  ],
+  "laplacian_var_1276": 171.5
+ },
+ "C2_weight3paw_BUTTERFLY_n045.png": {
+  "size": [
+   1276,
+   720
+  ],
+  "laplacian_var_1276": 75.7
+ },
+ "C3_BACKUP_headref_SNIFF_v2_n096.png": {
+  "size": [
+   1276,
+   720
+  ],
+  "laplacian_var_1276": 57.3
+ },
+ "C4_anatomy_FRONT_STAND_alpha.png": {
+  "size": [
+   1276,
+   720
+  ],
+  "laplacian_var_1276": 10.5
+ },
+ "C5_identity_master_chat_copy.png": {
+  "size": [
+   2000,
+   1129
+  ],
+  "laplacian_var_1276": 38.0
+ },
+ "X_WORSTRISK_SNIFF_v2_n108_kicked_leg.png": {
+  "size": [
+   1276,
+   720
+  ],
+  "laplacian_var_1276": 67.0
+ }
+}

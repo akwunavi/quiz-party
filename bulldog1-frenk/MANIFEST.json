@@ -414,5 +414,10 @@
  },
  "process_rules": {
   "alpha": "run alpha only after the user has watched and approved the source video (rule 2026-10-14)"
+ },
+ "sniff_ref_search": {
+  "path": "sniff_ref_search/",
+  "conclusion": "no existing frame has the target marking pose; best base = clean RACE_STAND START_END (C1b); a new still with near hind leg raised sideways/forward is needed; no generation done",
+  "date": "2026-10-14"
  }
 }
