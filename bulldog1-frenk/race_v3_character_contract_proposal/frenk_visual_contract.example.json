@@ -1,0 +1,44 @@
+{
+ "schema": "character-visual-contract/v1-PROPOSAL",
+ "status": "PROPOSAL, not adopted. Visual layer only: nothing here is read by buildDog/scenario/crossing.",
+ "character": "bulldog1-frenk",
+ "fps": 24,
+ "canonicalAsserted": {
+  "source": "dog4-v3-lab/model.mjs (constants parsed by contract_check.mjs; the check fails if they change)",
+  "START_s": 1, "STOP_s": "37/24", "RUN_JOIN_s": "23/24", "LOOP_s": 0.5,
+  "ACTION_s": {"BUTTERFLY": "121/24", "ROLL": "145/24", "SNIFF_PEE+RETURN": "48/24+82/48+20/24+55/32+24/24 + 16/48+68/40+8/24+17/48"},
+  "BASE_FINISH_s": 1.5
+ },
+ "run": {
+  "cycle": {"firstSrc": 87, "lastSrc": 98, "frames": 12, "periodMustEqual_s": 0.5},
+  "stopEntry": {"previousRunFrame": 96, "note": "STOP f1 follows RUN #96 (STOP v1 starts at the #97 pose)"}
+ },
+ "START": {
+  "tableRef": "../race_start_run_integration_kit/frenk_race_start_metadata.json#clip.visual_frames",
+  "keys": {"releaseIdx": 12, "visualJoinFirstRunIdx": 41, "runFrameAtJoin": 88},
+  "lead": {"frames": 3, "derived": true, "rule": "smallest d>=0 with RUN frame at (firstStopPhysFrame-1+d) == stopEntry.previousRunFrame", "max": 12},
+  "retime": null,
+  "shift": {"law": "hold-then-decay (kit N2, 2 passes)", "arrays": "shift_arrays_lead3.json -> modes.native[category].C", "perCategory": true},
+  "pad": "none (moving window: holds forbidden)"
+ },
+ "STOP": {
+  "clip": "STOP v1 (73 frames)",
+  "keys": {"movingFrames": 37, "settledFromFrame": 63, "bakedRootTravelCanvasPx": 17.0},
+  "plan": {"inWindow": [1, 37], "tail": {"frames": [38, 73], "overlay": "action.head", "requires": "physical speed == 0 (stationary window)"}},
+  "rateBounds": [1, 1]
+ },
+ "FINISH_DECELERATE": {"plan": {"inWindow": [1, 37], "tail": {"frames": [38, 73], "overlay": "BASE_FINISH"}}},
+ "ACTIONS": {
+  "SNIFF_PEE": {"bodyFrames": 200, "source": "sniff_pee_v3_2_assembly EVENT (8.333 s)", "pad": "stand, only inside stationary window"},
+  "BUTTERFLY": {"bodyFrames": 93, "source": "game cut f1-f93 (3.875 s)", "pad": "stand, only inside stationary window"},
+  "ROLL": null
+ },
+ "limits": {
+  "retimeRateBounds": [0.9, 1.12],
+  "maxPrePushOffsetCanvasPx": 1.5,
+  "smoothedRollbackCanvasPx": 1.0,
+  "joinStepCanvasPxAbs": 2.7,
+  "maxVisualForwardOffsetCanvasPx": 39,
+  "note": "39 px = 3.34% of the course = smallest measured gap between STOP end and the finish line over 10000 seeds"
+ }
+}

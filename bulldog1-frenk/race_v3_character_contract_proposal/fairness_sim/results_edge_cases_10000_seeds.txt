@@ -1,0 +1,19 @@
+{
+  dogs: 50000,
+  events: 64717,
+  earlyFirstEvents: 5244,
+  earlyShare: '0.1049',
+  minRunBeforeStop_s: '0.9583',
+  minRunBeforeStop_frames: '23.00',
+  crossInStart: 0,
+  crossInRun: 50000,
+  crossInStop: 0,
+  minStopEndToFinishCourse: '0.0334',
+  minActionP: '0.0000',
+  maxActionP: '0.9666'
+}
+distinct RUN-before-first-STOP lengths (frames) after a START, first 12: [
+   23,  35,  47,  59,  71,
+   83,  95, 107, 119, 131,
+  143, 155
+]

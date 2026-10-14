@@ -1,0 +1,66 @@
+{
+ "lead0": {
+  "VERY_SLOW": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.354,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "SLOW": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.416,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "NORMAL": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.472,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "FAST": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.529,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "VERY_FAST": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.59,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  }
+ },
+ "lead3": {
+  "VERY_SLOW": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.202,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "SLOW": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.237,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "NORMAL": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.269,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "FAST": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.302,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  },
+  "VERY_FAST": {
+   "engineStepMaxBeforePushOff_canvasPx_per_frame": 0.337,
+   "engineMinusShiftResidualStep_canvasPx_per_frame": 0.001,
+   "clipBakedBodyStepMax_canvasPx_per_frame": 1.83,
+   "clipBakedStepAtIdx": 6
+  }
+ }
+}

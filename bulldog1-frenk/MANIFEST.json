@@ -511,5 +511,17 @@
   "contract": "31-frame ramp is a PROPOSED per-character parameter, NOT the current V3 contract (START=1 s)",
   "compensation": "N2 derived, 2 passes: rollback 0.80 px NORMAL (0.57-0.88 all categories); per-category arrays in shift_arrays.json",
   "compatible_mode": "native V3 physics START=1 s with visual overrun to idx 41, rollback <= 0.60 px"
+ },
+ "race_v3_character_contract_proposal": {
+  "path": "race_v3_character_contract_proposal/",
+  "status": "architecture PROPOSAL for acceptance; no code in V3/production changed; no new images/video",
+  "recommendation": "P3: common V3 physical windows + per-character visual script (lead/tail/pad/retime) + validator; per-character physics (P1) rejected on measurements",
+  "measured": {
+   "P1_lane0_win_delta_pp": "-4.20..+1.39 (10000 seeds)",
+   "P1_effectiveSeed_changed_races": "2..12",
+   "phase_fix": "lead=3 frames makes RUN #96 precede every STOP slot without moving physical STOP",
+   "pre_push_drift_canvas_px": "0.9-1.5 (lead 3) vs 2.0-3.3 (lead 0)",
+   "unfit_case": "BUTTERFLY after STOP: 132 > 121 frames (-11), needs retime x1.093 or decision"
+  }
  }
 }

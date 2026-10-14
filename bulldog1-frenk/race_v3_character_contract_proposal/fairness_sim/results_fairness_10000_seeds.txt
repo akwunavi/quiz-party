@@ -1,0 +1,7 @@
+seeds 10000 valid 10000 baseline lane0 win% 19.43
+B-naive START 31/24 (+0.146 s lost per START)    lane0 win% 18.20 Δwin% vs baseline -1.23 mean Δcrossing lane0 0.335 s effectiveSeed changed in 5 races, winner flips 189
+B-proposed START 31/24 + runJoin 7/24            lane0 win% 18.04 Δwin% vs baseline -1.39 mean Δcrossing lane0 0.362 s effectiveSeed changed in 2 races, winner flips 167
+natural START31/24+STOP73/24                     lane0 win% 15.23 Δwin% vs baseline -4.20 mean Δcrossing lane0 1.231 s effectiveSeed changed in 12 races, winner flips 494
+natural SNIFF+RETURN 8.333 s                     lane0 win% 20.82 Δwin% vs baseline 1.39 mean Δcrossing lane0 -0.518 s effectiveSeed changed in 7 races, winner flips 145
+natural START+STOP+SNIFF                         lane0 win% 16.30 Δwin% vs baseline -3.13 mean Δcrossing lane0 0.718 s effectiveSeed changed in 9 races, winner flips 505
+B-equalized: START 31/24, every action shortened by the extra START/2 (0.1458 s) lane0 win% 19.01 Δwin% vs baseline -0.42 mean Δcrossing lane0 0.127 s effectiveSeed changed in 4 races, winner flips 124

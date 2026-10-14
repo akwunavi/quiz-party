@@ -1,0 +1,241 @@
+{
+ "canonical": {
+  "START": 1,
+  "STOP": 1.5416666666666667,
+  "RUN_JOIN": 0.9583333333333334,
+  "LOOP": 0.5,
+  "BUTTERFLY": 5.041666666666667,
+  "ROLL": 6.041666666666667,
+  "SNIFF": 7.260416666666666,
+  "RETURN": 2.720833333333333
+ },
+ "checks": {
+  "canonical_matches_V3": {
+   "pass": true
+  },
+  "run_period_equals_LOOP": {
+   "pass": true,
+   "periodFrames": 12
+  },
+  "lead_found_and_matches_contract": {
+   "pass": true,
+   "derivedLead": 3,
+   "contractLead": 3,
+   "frameBeforeFirstStopAtLead0": 93,
+   "table": [
+    {
+     "lead": 0,
+     "runFrameBeforeFirstStop": 93
+    },
+    {
+     "lead": 1,
+     "runFrameBeforeFirstStop": 94
+    },
+    {
+     "lead": 2,
+     "runFrameBeforeFirstStop": 95
+    },
+    {
+     "lead": 3,
+     "runFrameBeforeFirstStop": 96
+    },
+    {
+     "lead": 4,
+     "runFrameBeforeFirstStop": 97
+    },
+    {
+     "lead": 5,
+     "runFrameBeforeFirstStop": 98
+    },
+    {
+     "lead": 6,
+     "runFrameBeforeFirstStop": 87
+    },
+    {
+     "lead": 7,
+     "runFrameBeforeFirstStop": 88
+    },
+    {
+     "lead": 8,
+     "runFrameBeforeFirstStop": 89
+    },
+    {
+     "lead": 9,
+     "runFrameBeforeFirstStop": 90
+    },
+    {
+     "lead": 10,
+     "runFrameBeforeFirstStop": 91
+    },
+    {
+     "lead": 11,
+     "runFrameBeforeFirstStop": 92
+    },
+    {
+     "lead": 12,
+     "runFrameBeforeFirstStop": 93
+    }
+   ]
+  },
+  "every_grid_slot_has_stop_entry_phase": {
+   "pass": true,
+   "slots": [
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96,
+    96
+   ]
+  },
+  "join_before_first_stop": {
+   "pass": true,
+   "joinPhysFrame": 38,
+   "runFramesBeforeFirstStop": 9,
+   "firstStopPhysFrame": 47
+  },
+  "pre_push_drift_within_budget_at_lead": {
+   "pass": true,
+   "budget": 1.5,
+   "atLead0": {
+    "VERY_SLOW": 1.96,
+    "SLOW": 2.3,
+    "NORMAL": 2.61,
+    "FAST": 2.93,
+    "VERY_FAST": 3.26
+   },
+   "atLead": {
+    "VERY_SLOW": 0.9,
+    "SLOW": 1.05,
+    "NORMAL": 1.19,
+    "FAST": 1.34,
+    "VERY_FAST": 1.49
+   },
+   "courseCanvasPx": 1170
+  },
+  "STOP_moving_part_equals_canonical_window": {
+   "pass": true,
+   "movingFrames": 37,
+   "canonicalFrames": 37
+  },
+  "no_NO_FIT_verdicts": {
+   "pass": true,
+   "note": "FITS_WITH_RETIME entries need an eye test of the retimed segment"
+  }
+ },
+ "windowFit": {
+  "SNIFF_PEE": {
+   "afterStop": {
+    "window": 239.55,
+    "body": 200,
+    "stopTail": 36,
+    "lead": 3,
+    "sum": 239,
+    "slack": 0.55,
+    "requiredRate": 1,
+    "verdict": "FITS"
+   },
+   "earlyFromBase": {
+    "window": 239.55,
+    "body": 200,
+    "lead": 3,
+    "slack": 36.55,
+    "verdict": "FITS"
+   }
+  },
+  "BUTTERFLY": {
+   "afterStop": {
+    "window": 121,
+    "body": 93,
+    "stopTail": 36,
+    "lead": 3,
+    "sum": 132,
+    "slack": -11,
+    "requiredRate": 1.093,
+    "verdict": "FITS_WITH_RETIME"
+   },
+   "earlyFromBase": {
+    "window": 121,
+    "body": 93,
+    "lead": 3,
+    "slack": 25,
+    "verdict": "FITS"
+   }
+  },
+  "ROLL": {
+   "status": "NO_CLIP"
+  },
+  "FINISH_DECELERATE_plus_BASE": {
+   "window_frames": 73,
+   "clip": 73,
+   "slack": 0,
+   "verdict": "FITS"
+  }
+ },
+ "bestJoinPairByLead": {
+  "0": {
+   "pair": "g3f31 -> RUN #87",
+   "roughness": 24.5,
+   "prePushOffsetNormalCanvasPx": 2.61
+  },
+  "1": {
+   "pair": "g3f36 -> RUN #91",
+   "roughness": 16.5,
+   "prePushOffsetNormalCanvasPx": 2.07
+  },
+  "2": {
+   "pair": "g3f36 -> RUN #90",
+   "roughness": 17.3,
+   "prePushOffsetNormalCanvasPx": 1.6
+  },
+  "3": {
+   "pair": "g3f35 -> RUN #88",
+   "roughness": 18.3,
+   "prePushOffsetNormalCanvasPx": 1.19
+  },
+  "4": {
+   "pair": "g3f35 -> RUN #87",
+   "roughness": 32.9,
+   "prePushOffsetNormalCanvasPx": 0.86
+  },
+  "5": {
+   "pair": "g3f34 -> RUN #97",
+   "roughness": 44.2,
+   "prePushOffsetNormalCanvasPx": 0.59
+  },
+  "6": {
+   "pair": "g3f34 -> RUN #96",
+   "roughness": 42.3,
+   "prePushOffsetNormalCanvasPx": 0.38
+  },
+  "7": {
+   "pair": "g3f38 -> RUN #87",
+   "roughness": 42.1,
+   "prePushOffsetNormalCanvasPx": 0.23
+  },
+  "8": {
+   "pair": "g3f39 -> RUN #87",
+   "roughness": 28.3,
+   "prePushOffsetNormalCanvasPx": 0.12
+  }
+ },
+ "alternatives": {
+  "retimeInsteadOfLead": {
+   "joinIdxNeeded": 38,
+   "gallopFramesCompressed": "29 -> 26",
+   "rate": 1.115
+  },
+  "rateSlewInsideRunAtFirstSlot": {
+   "extraFramesNeeded": 3,
+   "availableFrames": 6,
+   "rate": 1.6
+  }
+ },
+ "failed": []
+}
