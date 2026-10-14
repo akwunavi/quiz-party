@@ -470,5 +470,13 @@
   ],
   "credits": 0,
   "status": "technical assembly; visual acceptance NOT passed; no alpha; main defect: head pop at seam V2 n97 -> MM n0"
+ },
+ "sniff_pee_v3_1_assembly": {
+  "path": "sniff_pee_v3_1_assembly/",
+  "event": "DOG1_SNIFF_PEE_V3_1_EVENT.mp4 (188 frames, 7.833 s)",
+  "event_short": "DOG1_SNIFF_PEE_V3_1_EVENT_SHORT_no_bob.mp4 (167 frames, 6.958 s)",
+  "compare": "DOG1_SNIFF_PEE_V3_vs_V3_1_COMPARE.mp4",
+  "credits": 0,
+  "status": "technical assembly; visual acceptance NOT passed; head pop removed via reverse of V2 lowering; V3 kept as fallback candidate"
  }
 }
