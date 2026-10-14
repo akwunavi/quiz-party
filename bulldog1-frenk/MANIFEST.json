@@ -478,5 +478,13 @@
   "compare": "DOG1_SNIFF_PEE_V3_vs_V3_1_COMPARE.mp4",
   "credits": 0,
   "status": "technical assembly; visual acceptance NOT passed; head pop removed via reverse of V2 lowering; V3 kept as fallback candidate"
+ },
+ "sniff_pee_v3_2_assembly": {
+  "path": "sniff_pee_v3_2_assembly/",
+  "event": "DOG1_SNIFF_PEE_V3_2_EVENT.mp4 (200 frames, 8.333 s)",
+  "preview": "DOG1_SNIFF_PEE_V3_2_PREVIEW.mp4 (284 frames, 11.833 s)",
+  "compare": "DOG1_SNIFF_PEE_V3_1_vs_V3_2_COMPARE.mp4",
+  "credits": 0,
+  "status": "final montage candidate; visual acceptance NOT passed; hold 0.79 s from existing MM n65-n74 (mirror at n74, step 0.44)"
  }
 }
