@@ -18,7 +18,7 @@ Use a plain uniform neutral background. A soft, small contact shadow directly be
 
 ## Проверка результата после разрешения и запуска
 
-Сохранить исходный результат без правок в этой директории и собрать сравнительный PNG с:
+Сохранить исходный результат без правок в этой директории. `REF_RUN_069.png` — дословно извлечённый source #69. Скрипт `python3 make_comparison.py ПУТЬ_К_ОРИГИНАЛУ.png` соберёт сравнительный PNG с:
 
 1. [RUN source #63](../reviews/race-stand/DOG3_RUN_SOURCE_063.png) — основной ракурс и пропорции;
 2. RUN source #69 из [листа цикла](../reviews/race-stand/DOG3_RUN_61-72_POSES.png) — фаза передней опоры;
