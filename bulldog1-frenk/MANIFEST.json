@@ -486,5 +486,17 @@
   "compare": "DOG1_SNIFF_PEE_V3_1_vs_V3_2_COMPARE.mp4",
   "credits": 0,
   "status": "final montage candidate; visual acceptance NOT passed; hold 0.79 s from existing MM n65-n74 (mirror at n74, step 0.44)"
+ },
+ "race_start_run_join_v1": {
+  "path": "race_start_run_join_v1/",
+  "recommended": "gen3 f35 -> RUN #88 (no offsets, no bridge); original f37 -> #90 kept as fallback",
+  "metrics": {
+   "flow_roughness": "30.2 -> 18.3 (internal norm 10-11)",
+   "vertical_accel": "21.9 -> 1.6",
+   "IoU": "0.858 -> 0.816",
+   "ramp_frames": "31 -> 29 (needs physics check, not done)"
+  },
+  "credits": 0,
+  "status": "montage analysis; visual acceptance NOT passed"
  }
 }
