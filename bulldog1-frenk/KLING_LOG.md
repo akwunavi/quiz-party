@@ -101,3 +101,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 
 ## 11. MARKING_POSE v1 (14.10.2026)
 - `image_to_image`, `kling-image-v3_0_omni`, 2k, 16:9, 1 изображение, референс C1b, **2 кредита** (225 -> 223). generationId AcSf-hLnXPUZfyBMh7-KSczwzGeqU-7kSn0HQtImHidiIXhTJblNgNXFpkufoWE3TJ7RiyP2. Результат не приемлем: обе задние лапы в воздухе и отведены назад, зад приподнят, весь силуэт перерисован. `marking_pose/RESULT.md`.
+
+## 12. MARKING_POSE v2 (14.10.2026)
+- `image_to_image`, `kling-image-v3_0_omni`, 2k, 16:9, 1 изображение, референс C1b, **2 кредита** (223 -> 221). generationId AV8sJAZvauaQrdVob-RHCq2x7FrHI9BdyiDuf1s6IFndFU08w1YxEPAeG-GPt-BgDKQ2IexC. Промпт про «писающего» кобеля и конкретную лапу: результат снова не приемлем (обе задние в воздухе, ближняя назад). `marking_pose/RESULT_v2.md`.

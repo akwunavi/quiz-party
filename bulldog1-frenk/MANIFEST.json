@@ -427,6 +427,13 @@
    "generation_id": "AcSf-hLnXPUZfyBMh7-KSczwzGeqU-7kSn0HQtImHidiIXhTJblNgNXFpkufoWE3TJ7RiyP2",
    "credits": 2,
    "status": "NOT ACCEPTABLE (hind legs both raised backward, not planted; whole dog repainted); awaiting user decision"
+  },
+  "v2": {
+   "original": "marking_pose/DOG1_MARKING_POSE_v2_kling_original.png",
+   "sha256": "cca18ce87b78f9272905e71089f1274a51e3951435a12df5aeea17c23606517e",
+   "generation_id": "AV8sJAZvauaQrdVob-RHCq2x7FrHI9BdyiDuf1s6IFndFU08w1YxEPAeG-GPt-BgDKQ2IexC",
+   "credits": 2,
+   "status": "NOT ACCEPTABLE (both hind legs off floor, near leg backward)"
   }
  }
 }
