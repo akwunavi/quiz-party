@@ -419,5 +419,14 @@
   "path": "sniff_ref_search/",
   "conclusion": "no existing frame has the target marking pose; best base = clean RACE_STAND START_END (C1b); a new still with near hind leg raised sideways/forward is needed; no generation done",
   "date": "2026-10-14"
+ },
+ "marking_pose": {
+  "v1": {
+   "original": "marking_pose/DOG1_MARKING_POSE_v1_kling_original.png",
+   "sha256": "46857cdfa250c8b9ce465aba70e0d21283c91d29ad58a7281fc798e2182a2908",
+   "generation_id": "AcSf-hLnXPUZfyBMh7-KSczwzGeqU-7kSn0HQtImHidiIXhTJblNgNXFpkufoWE3TJ7RiyP2",
+   "credits": 2,
+   "status": "NOT ACCEPTABLE (hind legs both raised backward, not planted; whole dog repainted); awaiting user decision"
+  }
  }
 }

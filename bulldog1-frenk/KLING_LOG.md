@@ -98,3 +98,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 
 ## 10. SNIFF_PEE V2 — сгенерирован (14.10.2026), ждёт просмотра
 - `image_to_video`, `kling-video-v3_0`, 720p, 8 с, audio off, multi-shot off, first=tail=RACE_STAND; промпт пользователя без таймингов; **48 кредитов** (273 -> 225). generationId AYMi4Bjx8sCkpDUjJRUfQyXnlNXGPqCZTwBoQ0-ELZwa8A-DYVQox0pGnXVmUOfwqGXYwEKE. `sniff_v2/RESULT.md`. Alpha не запускалась (правило 14.10).
+
+## 11. MARKING_POSE v1 (14.10.2026)
+- `image_to_image`, `kling-image-v3_0_omni`, 2k, 16:9, 1 изображение, референс C1b, **2 кредита** (225 -> 223). generationId AcSf-hLnXPUZfyBMh7-KSczwzGeqU-7kSn0HQtImHidiIXhTJblNgNXFpkufoWE3TJ7RiyP2. Результат не приемлем: обе задние лапы в воздухе и отведены назад, зад приподнят, весь силуэт перерисован. `marking_pose/RESULT.md`.
