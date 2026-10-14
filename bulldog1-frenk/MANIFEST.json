@@ -441,6 +441,12 @@
    "generation_id": "AQ5y0EQwNUWTYUZKecESQXVYwgyRAEPR-wcIfs0c7Boq4e6Pvj7eBJ8FIrFm3dW7DVqRyDsY",
    "credits": 15,
    "status": "best of three; three-paw support OK, shin points backward; awaiting user visual acceptance"
+  },
+  "v4_user_gpt": {
+   "original": "marking_pose/DOG1_MARKING_POSE_v4_user_gpt_original.png",
+   "sha256": "5db6e3a91ed0324a587b3df8414dd82334b9ebc2e66139c3529460733ac89b6d",
+   "credits": 0,
+   "status": "from user (ChatGPT); candidate target frame, awaiting user decision"
   }
  }
 }
