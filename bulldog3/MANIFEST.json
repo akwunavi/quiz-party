@@ -474,5 +474,36 @@
         "sha256": "a874034f42fb3741ca86915fb280909d04197562a5dabdb5628fe48adb9a72d6"
       }
     ]
+  },
+  "raceStandReference20261014": {
+    "status": "REFERENCE_ONLY_NOT_A_FOUR_PAW_STAND",
+    "source": "bulldog3/assets/incoming/bulldog_3_run.mp4",
+    "sourceFrameZeroBased": 63,
+    "sourceTimeSeconds": 2.625,
+    "alphaV2FrameZeroBased": 27,
+    "existingAlphaV2Sha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+    "report": "bulldog3/RACE_STAND_PLAN.md",
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RACE_STAND_REFERENCE_COMPARISON.png",
+        "bytes": 396959,
+        "sha256": "be49e34e8c474dc0e605f742374ac49d6890d8f0b1f3829a97a849cbc4ea5690"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_61-72_POSES.png",
+        "bytes": 959936,
+        "sha256": "8e7e533e8c99e8d788aa90af7ade76e4e8c4ffb6f9eeaf1d93dd94789e7b6d9e"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_BODY_REF_063_NEUTRAL.png",
+        "bytes": 213251,
+        "sha256": "ecb7b76fc94d97298f89968acde1dd66dde17847c7c9548dcc3ae8b3ba3cd9fe"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_SOURCE_063.png",
+        "bytes": 311918,
+        "sha256": "b2f3b666b3ead4d3107b058b136d0b938e8bcd8da458b65ca436543bb96eba46"
+      }
+    ]
   }
 }
