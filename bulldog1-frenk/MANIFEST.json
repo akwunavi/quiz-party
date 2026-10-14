@@ -434,6 +434,13 @@
    "generation_id": "AV8sJAZvauaQrdVob-RHCq2x7FrHI9BdyiDuf1s6IFndFU08w1YxEPAeG-GPt-BgDKQ2IexC",
    "credits": 2,
    "status": "NOT ACCEPTABLE (both hind legs off floor, near leg backward)"
+  },
+  "v3_gptimage2": {
+   "original": "marking_pose/DOG1_MARKING_POSE_v3_gptimage2_original.png",
+   "sha256": "16ee322e2b070f3d59d4331d4f44825dc355436e2576667f7e900b80ef3e60de",
+   "generation_id": "AQ5y0EQwNUWTYUZKecESQXVYwgyRAEPR-wcIfs0c7Boq4e6Pvj7eBJ8FIrFm3dW7DVqRyDsY",
+   "credits": 15,
+   "status": "best of three; three-paw support OK, shin points backward; awaiting user visual acceptance"
   }
  }
 }
