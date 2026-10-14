@@ -505,5 +505,35 @@
         "sha256": "b2f3b666b3ead4d3107b058b136d0b938e8bcd8da458b65ca436543bb96eba46"
       }
     ]
+  },
+  "raceStandImageV1_20261014": {
+    "status": "GENERATED_CANDIDATE_AWAITING_USER_REVIEW",
+    "method": "one image_gen__imagegen image-to-image invocation with one reference image",
+    "cost": "not exposed by tool; user explicitly authorized one invocation despite unknown price",
+    "source": "bulldog3/reviews/race-stand/DOG3_RUN_BODY_REF_063_NEUTRAL.png",
+    "sourceFrameZeroBased": 63,
+    "report": "bulldog3/race-stand-generation-v1/RESULT_REVIEW.md",
+    "files": [
+      {
+        "path": "bulldog3/race-stand-generation-v1/INPUT_RUN_063.png",
+        "bytes": 213251,
+        "sha256": "ecb7b76fc94d97298f89968acde1dd66dde17847c7c9548dcc3ae8b3ba3cd9fe"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/REF_RUN_069.png",
+        "bytes": 447608,
+        "sha256": "1cdae66ef8b8a78853655204d8e1eadbf1f3b7460637088f565ae3107a5db5af"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/DOG3_RACE_STAND_GENERATED_01.png",
+        "bytes": 1446175,
+        "sha256": "4b53252c44971186e758c79ebfcc1ba31bea1617e7855897d574879ab60e28ce"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/DOG3_RACE_STAND_V1_COMPARISON.png",
+        "bytes": 1268617,
+        "sha256": "5f4091bf0c2f6a5492b084c8a341404543c5fb991abc704cf81c3dbc082529d1"
+      }
+    ]
   }
 }
