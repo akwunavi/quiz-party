@@ -497,6 +497,12 @@
    "ramp_frames": "31 -> 29 (needs physics check, not done)"
   },
   "credits": 0,
-  "status": "montage analysis; visual acceptance NOT passed"
+  "status": "montage analysis; visual acceptance NOT passed",
+  "integration": {
+   "report": "race_start_run_join_v1/INTEGRATION_REPORT.md",
+   "script": "race_start_run_join_v1/integration_check/check.mjs",
+   "verdict": "f35->#88 can be adopted without changing race results iff velocityRamp stays 31 frames (idx 12->43) and visualJoin (idx 41) is separate metadata; coupled ramp would shift crossing by -0.0417 s per START",
+   "engine_progress_diff_decoupled": 0
+  }
  }
 }

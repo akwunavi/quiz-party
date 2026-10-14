@@ -1,0 +1,309 @@
+{
+ "course_px": 1170,
+ "SC": 0.16222570532915362,
+ "V0": 0.023809523809523808,
+ "vs": {
+  "A original f37->#90 (ramp end = join = idx 43)": {
+   "visualJoinIdx": 43,
+   "rampEndIdx": 43,
+   "rampFrames": 31,
+   "rampSeconds": 1.2917,
+   "joinStepCanvasPx": -2.67,
+   "smoothedRollbackCanvasPx": 1.82,
+   "minFrameStepCanvasPx": -2.67,
+   "C_at_join_frames": [
+    8.1,
+    0,
+    0,
+    0
+   ],
+   "runFrameAtRampEnd": "run90",
+   "progressAtIdx": {
+    "i43": 0.01537698,
+    "i60": 0.03224206
+   }
+  },
+  "B coupled f35->#88 (ramp end = join = idx 41)": {
+   "visualJoinIdx": 41,
+   "rampEndIdx": 41,
+   "rampFrames": 29,
+   "rampSeconds": 1.2083,
+   "joinStepCanvasPx": -1.77,
+   "smoothedRollbackCanvasPx": 2.45,
+   "minFrameStepCanvasPx": -1.77,
+   "C_at_join_frames": [
+    8.6,
+    0,
+    0,
+    0
+   ],
+   "runFrameAtRampEnd": "run88",
+   "progressAtIdx": {
+    "i43": 0.01636905,
+    "i60": 0.03323413
+   }
+  },
+  "B decoupled f35->#88 (physics ramp end stays idx 43)": {
+   "visualJoinIdx": 41,
+   "rampEndIdx": 43,
+   "rampFrames": 31,
+   "rampSeconds": 1.2917,
+   "joinStepCanvasPx": -1.68,
+   "smoothedRollbackCanvasPx": 2.21,
+   "minFrameStepCanvasPx": -1.68,
+   "C_at_join_frames": [
+    24,
+    16.1,
+    8.1,
+    0
+   ],
+   "runFrameAtRampEnd": "run90",
+   "progressAtIdx": {
+    "i43": 0.01537698,
+    "i60": 0.03224206
+   }
+  }
+ },
+ "engine_progress_max_abs_diff": {
+  "A_vs_Bdecoupled": 0,
+  "A_vs_Bcoupled": 0.0009920634920634955
+ },
+ "sprite_frame_at_index43": {
+  "A": "run90",
+  "Bdecoupled": "run90",
+  "Bcoupled": "run90"
+ },
+ "frames_different_between_A_and_Bdecoupled": [
+  [
+   41,
+   "g3f36",
+   "run88"
+  ],
+  [
+   42,
+   "g3f37",
+   "run89"
+  ]
+ ],
+ "coupled_ramp_effect": {
+  "rampShorterSeconds": 0.08333,
+  "crossingEarlierPerSTART_seconds": 0.04167,
+  "distanceGainPerSTART_canvasPx_atBase1": 1.161,
+  "perDogWithNevents": {
+   "0": 0.0417,
+   "1": 0.0833,
+   "2": 0.125,
+   "3": 0.1667
+  }
+ },
+ "v3_selftest_START_max_abs_err": 5.551115123125783e-17,
+ "per_frame_C_B_decoupled_src_px": [
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  124.99,
+  124.94,
+  124.78,
+  124.5,
+  124.04,
+  123.36,
+  122.45,
+  121.26,
+  119.77,
+  117.96,
+  115.81,
+  113.31,
+  110.43,
+  107.17,
+  103.53,
+  99.5,
+  95.08,
+  90.27,
+  85.08,
+  79.52,
+  73.61,
+  67.35,
+  60.77,
+  53.9,
+  46.75,
+  39.36,
+  31.76,
+  23.98,
+  16.06,
+  8.06,
+  0,
+  0,
+  0
+ ],
+ "per_frame_C_A_src_px": [
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  124.99,
+  124.94,
+  124.78,
+  124.5,
+  124.04,
+  123.36,
+  122.45,
+  121.26,
+  119.77,
+  117.96,
+  115.81,
+  113.31,
+  110.43,
+  107.17,
+  103.53,
+  99.5,
+  95.08,
+  90.27,
+  85.08,
+  79.52,
+  73.61,
+  67.35,
+  60.77,
+  53.9,
+  46.75,
+  39.36,
+  31.76,
+  23.98,
+  16.06,
+  8.06,
+  0,
+  0,
+  0
+ ],
+ "derived_N2": {
+  "A original f37->#90 (ramp end = join = idx 43)": {
+   "visualJoinIdx": 43,
+   "rampEndIdx": 43,
+   "rampFrames": 31,
+   "rampSeconds": 1.2917,
+   "joinStepCanvasPx": -2.66,
+   "smoothedRollbackCanvasPx": 1.03,
+   "minFrameStepCanvasPx": -2.66,
+   "C_at_join_frames": [
+    8,
+    0,
+    0,
+    0
+   ],
+   "runFrameAtRampEnd": "run90",
+   "progressAtIdx": {
+    "i43": 0.01537698,
+    "i60": 0.03224206
+   },
+   "maxExtraShift_srcPx": 10.86
+  },
+  "B coupled f35->#88 (ramp end = join = idx 41)": {
+   "visualJoinIdx": 41,
+   "rampEndIdx": 41,
+   "rampFrames": 29,
+   "rampSeconds": 1.2083,
+   "joinStepCanvasPx": -1.61,
+   "smoothedRollbackCanvasPx": 1.07,
+   "minFrameStepCanvasPx": -1.61,
+   "C_at_join_frames": [
+    7.6,
+    0,
+    0,
+    0
+   ],
+   "runFrameAtRampEnd": "run88",
+   "progressAtIdx": {
+    "i43": 0.01636905,
+    "i60": 0.03323413
+   },
+   "maxExtraShift_srcPx": 13.92
+  },
+  "B decoupled f35->#88 (physics ramp end stays idx 43)": {
+   "visualJoinIdx": 41,
+   "rampEndIdx": 43,
+   "rampFrames": 31,
+   "rampSeconds": 1.2917,
+   "joinStepCanvasPx": -1.46,
+   "smoothedRollbackCanvasPx": 1.15,
+   "minFrameStepCanvasPx": -1.46,
+   "C_at_join_frames": [
+    22,
+    15.4,
+    8,
+    0
+   ],
+   "runFrameAtRampEnd": "run90",
+   "progressAtIdx": {
+    "i43": 0.01537698,
+    "i60": 0.03224206
+   },
+   "maxExtraShift_srcPx": 13.26
+  }
+ },
+ "per_frame_C_B_decoupled_derived_src_px": [
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125,
+  125.08,
+  125.03,
+  124.87,
+  124.5,
+  124.04,
+  123.36,
+  122.45,
+  120.54,
+  117.42,
+  113.34,
+  108.54,
+  103.44,
+  98.84,
+  94.77,
+  90.9,
+  86.88,
+  82.33,
+  77.25,
+  71.87,
+  66.27,
+  60.44,
+  54.45,
+  48.56,
+  42.95,
+  37.77,
+  32.87,
+  27.73,
+  21.98,
+  15.43,
+  8,
+  0,
+  0,
+  0
+ ]
+}
