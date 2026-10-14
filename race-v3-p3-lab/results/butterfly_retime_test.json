@@ -1,0 +1,145 @@
+{
+ "sequence": {
+  "stopTailFrames": 36,
+  "butterflyFrames": 93,
+  "total": 129,
+  "windowFramesAfterLead": 118,
+  "rate": 1.0932,
+  "source": "results/butterfly_retime_labels.json (lab visualAt output, 121 ticks of the STOP->BUTTERFLY->START window)"
+ },
+ "tempo": {
+  "butterflyBodySeconds_original": 3.875,
+  "butterflyBodySeconds_retimed": 3.545,
+  "stopTailSeconds_original": 1.5,
+  "stopTailSeconds_retimed": 1.372,
+  "speedUpPercent": 9.3
+ },
+ "originalTempo_asIs": {
+  "sourceFramesNeverShown_cutByNextStart": [
+   "bf83",
+   "bf84",
+   "bf85",
+   "bf86",
+   "bf87",
+   "bf88",
+   "bf89",
+   "bf90",
+   "bf91",
+   "bf92",
+   "bf93"
+  ],
+  "count": 11,
+  "poseJumpAtCut_silhouetteFraction_lastShownVsFinalFrame": 0.0418,
+  "finalFrameVsMedianStep": 2.1
+ },
+ "uniformRetime": {
+  "sourceFramesSkipped": [
+   "stop49",
+   "stop61",
+   "stop73",
+   "bf11",
+   "bf23",
+   "bf35",
+   "bf47",
+   "bf58",
+   "bf70",
+   "bf82",
+   "bf93"
+  ],
+  "count": 11,
+  "lastButterflyFrameShown": "bf92"
+ },
+ "silhouetteStepFraction": {
+  "original_shownFrames": {
+   "median": 0.0197,
+   "p95": 0.224,
+   "max": 0.2749
+  },
+  "uniformRetime": {
+   "median": 0.0177,
+   "p95": 0.2307,
+   "max": 0.2749
+  },
+  "sameCountDroppedAtQuietestFrames_alternative_NOT_IMPLEMENTED": {
+   "median": 0.0197,
+   "p95": 0.224,
+   "max": 0.2749,
+   "dropped": [
+    "stop69",
+    "stop72",
+    "bf2",
+    "bf5",
+    "bf10",
+    "bf13",
+    "bf24",
+    "bf27",
+    "bf65",
+    "bf89",
+    "bf92"
+   ]
+  }
+ },
+ "centroidStepCanvasPx": {
+  "original_shownFrames": {
+   "p95": 1.8424,
+   "max": 3.3667
+  },
+  "uniformRetime": {
+   "p95": 2.0059,
+   "max": 3.3667
+  }
+ },
+ "jumpAtSkippedFrames": [
+  {
+   "skipped": "stop49",
+   "jumpAfterSkipFraction": 0.2618,
+   "centroidJumpPx": 2.7
+  },
+  {
+   "skipped": "stop61",
+   "jumpAfterSkipFraction": 0.0705,
+   "centroidJumpPx": 0.8
+  },
+  {
+   "skipped": "stop73",
+   "jumpAfterSkipFraction": 0.0038,
+   "centroidJumpPx": 0.01
+  },
+  {
+   "skipped": "bf11",
+   "jumpAfterSkipFraction": 0.0007,
+   "centroidJumpPx": 0.01
+  },
+  {
+   "skipped": "bf23",
+   "jumpAfterSkipFraction": 0.0096,
+   "centroidJumpPx": 0.06
+  },
+  {
+   "skipped": "bf35",
+   "jumpAfterSkipFraction": 0.0264,
+   "centroidJumpPx": 0.12
+  },
+  {
+   "skipped": "bf47",
+   "jumpAfterSkipFraction": 0.0113,
+   "centroidJumpPx": 0.15
+  },
+  {
+   "skipped": "bf58",
+   "jumpAfterSkipFraction": 0.056,
+   "centroidJumpPx": 0.3
+  },
+  {
+   "skipped": "bf70",
+   "jumpAfterSkipFraction": 0.0119,
+   "centroidJumpPx": 0.04
+  },
+  {
+   "skipped": "bf82",
+   "jumpAfterSkipFraction": 0.0287,
+   "centroidJumpPx": 0.56
+  }
+ ],
+ "caveat": "silhouette/centroid metrics only; the eye test (T11) has not been done and the retime is NOT approved"
+}

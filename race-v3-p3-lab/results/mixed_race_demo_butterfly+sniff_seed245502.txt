@@ -1,0 +1,29 @@
+MIXED RACE DEMO  [butterfly+sniff]  requestedSeed=245502 effectiveSeed=245502  places(lane order)=3 > 5 > 1 > 2 > 4
+lane 1 = Bulldog 1 (Frenk, P3 contract); lanes 2-5 = Bulldog 4 (identity contract). Physical timeline is V3, unchanged.
+
+LANE 1 FRENK  base=1.25  crossing=58.068 s  events: SNIFF_PEE@0.08, BUTTERFLY@0.73
+   visual items (t0..t1 s | window | role | clip | first..last frame | frames | status)
+      0.000..   0.375 | BASE              | hold    | RACE_STAND | RACE_STAND..RACE_STAND |       9 | approved: RACE_STAND v3
+      0.375..   2.958 | START             | body    | START      | v1f1..run96 |      62 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+      2.958..   4.500 | STOP              | move    | STOP       | stop1..stop37 |      37 | approved: STOP v1 variant A (73 frames), alpha exists
+      4.500..   6.000 | SNIFF_PEE         | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+      6.000..  14.333 | SNIFF_PEE         | body    | SNIFF_PEE  | sniffEv1..sniffEv200 |     200 | raw_no_alpha: V3.2 montage EVENT (200 frames) accepted as main montage by architect; NO alpha exists
+     14.333..  14.356 | SNIFF_PEE         | pad     | RACE_STAND | RACE_STAND..RACE_STAND |    0.55 | approved: RACE_STAND v3
+     14.356..  38.440 | START             | body    | START      | v1f1..run96 |     578 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     38.440..  39.981 | STOP              | move    | STOP       | stop1..stop37 |      37 | approved: STOP v1 variant A (73 frames), alpha exists
+     39.981..  41.481 | BUTTERFLY         | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+     41.481..  44.898 | BUTTERFLY         | body    | BUTTERFLY  | bf1..bf82 |      82 | OVERFLOW_TRUNCATED  <<< OVERFLOW (truncated)
+     44.898..  58.481 | START             | body    | START      | v1f1..run96 |     326 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     58.481..  60.023 | FINISH_DECELERATE | move    | STOP       | stop1..stop37 |      37 | PROVISIONAL
+     60.023..  61.523 | BASE              | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+
+LANE 2 DOG4   base=0.88  crossing=58.555 s  events: ROLL@0.22, BUTTERFLY@0.84
+
+LANE 3 DOG4   base=1.25  crossing=45.667 s  events: ROLL@0.72
+
+LANE 4 DOG4   base=1  crossing=66.592 s  events: BUTTERFLY@0.02(early), SNIFF_PEE@0.47, BUTTERFLY@0.93
+
+LANE 5 DOG4   base=1  crossing=52.304 s  events: SNIFF_PEE@0.62
+
+FRENK lane check as-is: missing windows=0 truncated windows=1 provisional=1
+FRENK lane check with the NOT-APPROVED BUTTERFLY retime x1.0932: missing=0 truncated=0

@@ -1,0 +1,28 @@
+MIXED RACE DEMO  [roll]  requestedSeed=23770 effectiveSeed=23770  places(lane order)=5 > 4 > 1 > 2 > 3
+lane 1 = Bulldog 1 (Frenk, P3 contract); lanes 2-5 = Bulldog 4 (identity contract). Physical timeline is V3, unchanged.
+
+LANE 1 FRENK  base=1  crossing=56.676 s  events: ROLL@0.17, BUTTERFLY@0.57
+   visual items (t0..t1 s | window | role | clip | first..last frame | frames | status)
+      0.000..   0.375 | BASE              | hold    | RACE_STAND | RACE_STAND..RACE_STAND |       9 | approved: RACE_STAND v3
+      0.375..   7.458 | START             | body    | START      | v1f1..run96 |     170 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+      7.458..   9.000 | STOP              | move    | STOP       | stop1..stop37 |      37 | approved: STOP v1 variant A (73 frames), alpha exists
+      9.000..  10.500 | ROLL              | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+     10.500..  14.917 | ROLL              | missing | ROLL       | null..null |     106 | MISSING_ASSET
+     14.917..  31.500 | START             | body    | START      | v1f1..run96 |     398 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     31.500..  33.042 | STOP              | move    | STOP       | stop1..stop37 |      37 | approved: STOP v1 variant A (73 frames), alpha exists
+     33.042..  34.542 | BUTTERFLY         | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+     34.542..  37.958 | BUTTERFLY         | body    | BUTTERFLY  | bf1..bf82 |      82 | OVERFLOW_TRUNCATED  <<< OVERFLOW (truncated)
+     37.958..  57.042 | START             | body    | START      | v1f1..run96 |     458 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     57.042..  58.583 | FINISH_DECELERATE | move    | STOP       | stop1..stop37 |      37 | PROVISIONAL
+     58.583..  60.083 | BASE              | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+
+LANE 2 DOG4   base=0.75  crossing=60.983 s  events: ROLL@0.24, ROLL@0.65
+
+LANE 3 DOG4   base=1  crossing=63.250 s  events: BUTTERFLY@0.07, ROLL@0.49, ROLL@0.80
+
+LANE 4 DOG4   base=0.88  crossing=51.908 s  events: BUTTERFLY@0.40
+
+LANE 5 DOG4   base=1.12  crossing=46.142 s  events: BUTTERFLY@0.67
+
+FRENK lane check as-is: missing windows=1 truncated windows=1 provisional=1
+FRENK lane check with the NOT-APPROVED BUTTERFLY retime x1.0932: missing=1 truncated=0

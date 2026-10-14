@@ -1,0 +1,39 @@
+{
+ "races": 10000,
+ "frenkLane": 0,
+ "asIs": {
+  "fullyDisplayable": 1897,
+  "withMissingROLL": 4535,
+  "withOverflow": 4647,
+  "withSniffNoAlpha": 3126
+ },
+ "retime": {
+  "fullyDisplayable": 5465,
+  "withMissingROLL": 4535,
+  "withOverflow": 0
+ },
+ "eventsFrenk": {
+  "SNIFF_PEE/afterStop": 2851,
+  "BUTTERFLY/afterStop": 5276,
+  "ROLL/afterStop": 4747,
+  "ROLL/early": 383,
+  "BUTTERFLY/early": 406,
+  "SNIFF_PEE/early": 275
+ },
+ "dog4Lanes": {
+  "samples": 180000,
+  "mismatches": 0
+ },
+ "physics": {
+  "signatureStable": true
+ },
+ "identitySwap": {
+  "checked": 2500,
+  "mismatches": 0
+ },
+ "verdict": {
+  "physicsUnchanged": true,
+  "dog4LaneIdentity": true,
+  "note": "Fully displayable = no ROLL window (no clip) and no truncated window. The race itself (places, crossings) is always the same: the physics never reads the character."
+ }
+}

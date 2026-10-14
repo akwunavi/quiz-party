@@ -1,0 +1,575 @@
+{
+ "generated": "2026-10-14",
+ "races": 10000,
+ "totalSeconds": 53.1,
+ "results": [
+  {
+   "id": "T1",
+   "title": "physics independent of characters / metadata",
+   "status": "PASS",
+   "scope": "STRUCTURAL: segments/crossing/places/effectiveSeed hashes of real V3 races before vs after 2 contracts were applied to frozen (read-only) segments; V3 files do not import the lab; no character words in physics sources; V3 files unmodified in git. Does not exercise a model change (none exists).",
+   "details": {
+    "races": 10000,
+    "visualCalls": 1200000,
+    "signatureMismatches": 0,
+    "v3FilesReferencingLab": [],
+    "characterWordsInPhysicsSources": false,
+    "v3GitClean": true
+   },
+   "seconds": 20
+  },
+  {
+   "id": "T2",
+   "title": "Bulldog 4 golden: P3 identity metadata == legacy frameFor/stateAt",
+   "status": "PASS",
+   "scope": "Exact equality of [clip, frame] on 5 presets x 5 dogs (1/96 s grid) + 300 random races x 5 dogs (1/48 s grid) + every segment boundary +/- 5e-10..2e-9. Dog4 pixel output is not rendered (no Dog4 assets in this checkout).",
+   "details": {
+    "samples": 4571761,
+    "mismatches": 0,
+    "firstMismatch": null
+   },
+   "seconds": 4.5
+  },
+  {
+   "id": "T3",
+   "title": "independence from FPS / evaluation order",
+   "status": "PASS",
+   "scope": "No clock/RNG/timer sources in lab src; results identical for ascending/shuffled/descending evaluation and for 5 sampling grids; frame at a 24-fps tick identical for 3 float constructions of the tick. A real renderer (rAF loop, interpolation) is not part of the lab, so rendering at different FPS is NOT exercised.",
+   "details": {
+    "noClockSources": true,
+    "orderCalls": 48000,
+    "orderDiffs": 0,
+    "gridSamples": 25265,
+    "gridDiffs": 0,
+    "ticks": 83646,
+    "tickDiffs": 0
+   },
+   "seconds": 3.2
+  },
+  {
+   "id": "T4",
+   "title": "phase: RUN frame before STOP == STOP entry, on every real STOP and FINISH",
+   "status": "PASS",
+   "scope": "Real V3 races, Frenk contract applied to every lane. Checks label before STOP f1 = run96, first STOP frame = stop1, first tail frame = stop38. RUN lengths seen (frames) include the minimum 23.",
+   "details": {
+    "races": 10000,
+    "stopWindowsChecked": 114717,
+    "ofWhichFinish": 50000,
+    "phaseMismatches": 0,
+    "tailEntryMismatches": 0,
+    "firstMismatch": null,
+    "distinctRunLengthsFrames": [
+     23,
+     35,
+     47,
+     59,
+     71,
+     83,
+     95,
+     107
+    ],
+    "minRunLengthFrames": 23
+   },
+   "seconds": 0.9
+  },
+  {
+   "id": "T5",
+   "title": "no truncation: every clip fits its window",
+   "status": "FAIL",
+   "scope": "FAIL is the honest result for the contract AS-IS: BUTTERFLY after STOP overflows by 11 frames at the original tempo. The tested retime variant (x1.0932) is reported separately and is NOT approved. ROLL has no Frenk clip: its windows are reported as MISSING_ASSET, not as a pass.",
+   "details": {
+    "races": 10000,
+    "lanes": 50000,
+    "eventCounts": {
+     "BUTTERFLY": {
+      "afterStop": 26666,
+      "early": 1974
+     },
+     "SNIFF_PEE": {
+      "afterStop": 14593,
+      "early": 1433
+     }
+    },
+    "asIs": {
+     "overflowWindows": {
+      "BUTTERFLY": 26666
+     },
+     "missingAssetWindows": 25295,
+     "minPadFramesBySlot": {
+      "SNIFF_PEE": 0.55,
+      "BUTTERFLY": 25
+     },
+     "validator": {
+      "ok": false,
+      "errors": [
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     }
+    },
+    "retimeVariantX1_0932_NOT_APPROVED": {
+     "overflowWindows": {},
+     "missingAssetWindows": 25295,
+     "minPadFramesBySlot": {
+      "SNIFF_PEE": 0.55,
+      "BUTTERFLY": 32.93
+     },
+     "validator": {
+      "ok": true,
+      "errors": []
+     }
+    }
+   },
+   "seconds": 1.1
+  },
+  {
+   "id": "T6",
+   "title": "no sliding while the sprite stands (pre push-off) / paw contact",
+   "status": "PARTIAL",
+   "scope": "PASS only for the pre-push-off crouch (visual idx 0..11): residual ground step of anchor+shift <= 0.05 px/frame in all 5 categories, driven by visualAt on real V3 physics. Paw contact in STOP, the STOP tail and RUN is analysed separately (analysis/stop_contacts.py) and shows sliding that this contract does NOT remove; see STOP_CONTACT_REPORT.md.",
+   "details": {
+    "preCrouchStatus": "PASS",
+    "thresholdPxPerFrame": 0.05,
+    "worstResidual": 0.0015,
+    "labelMismatches": 0,
+    "perCategory": {
+     "VERY_SLOW": {
+      "engineStepBeforePushOff_canvasPx_per_frame": 0.202,
+      "residualAfterShift_canvasPx_per_frame": 0.0011
+     },
+     "SLOW": {
+      "engineStepBeforePushOff_canvasPx_per_frame": 0.237,
+      "residualAfterShift_canvasPx_per_frame": 0.0013
+     },
+     "NORMAL": {
+      "engineStepBeforePushOff_canvasPx_per_frame": 0.269,
+      "residualAfterShift_canvasPx_per_frame": 0.0015
+     },
+     "FAST": {
+      "engineStepBeforePushOff_canvasPx_per_frame": 0.302,
+      "residualAfterShift_canvasPx_per_frame": 0.0011
+     },
+     "VERY_FAST": {
+      "engineStepBeforePushOff_canvasPx_per_frame": 0.337,
+      "residualAfterShift_canvasPx_per_frame": 0.001
+     }
+    },
+    "stopContactSummary": {
+     "stanceEpisodesInWindow": 4,
+     "windowFootSlideCanvasPx": [
+      -9.14,
+      -19.43,
+      -11.96,
+      -21.22
+     ],
+     "tailFootSlideCanvasPx": [
+      -12.57,
+      -16.38
+     ],
+     "tailFootSlideTotalCanvasPx": 28.9,
+     "finalSettleSpeedPxPerFrame": "4 -> 0 over frames 48-58",
+     "stationaryFromFrame": 63,
+     "runReferenceStanceFootSpeedPxPerFrame": {
+      "median": 12.98,
+      "max": 13.46,
+      "samples": 8
+     },
+     "engineCruisePxPerFrame": 1.161,
+     "verdict": "STRICT FAIL: stance paws slide in the window (RUN-level) and keep sliding in the stationary tail (frames 39-40 and 48-58, ~29 px total); foot-lock shift would need ~129 px of body travel (leash 39 px)"
+    }
+   },
+   "seconds": 0
+  },
+  {
+   "id": "T7",
+   "title": "phase jumps at joins (START -> RUN #88)",
+   "status": "PARTIAL",
+   "scope": "Computed metrics only (rollback <= 1 px, join step <= 2.7 px, join frames g3f35 -> run88, pair roughness as accepted by the architect). The visual (eye) acceptance has NOT been done; STOP -> action and action -> START joins are not measured here.",
+   "details": {
+    "limits": {
+     "rollback": 1,
+     "step": 2.7
+    },
+    "perCategory": {
+     "VERY_SLOW": {
+      "rollbackPx": 0.73,
+      "joinStepPx": -1.56,
+      "stepAfterJoinPx": -0.33,
+      "labelAtJoin": [
+       "g3f35",
+       "run88"
+      ]
+     },
+     "SLOW": {
+      "rollbackPx": 0.54,
+      "joinStepPx": -1.55,
+      "stepAfterJoinPx": -0.18,
+      "labelAtJoin": [
+       "g3f35",
+       "run88"
+      ]
+     },
+     "NORMAL": {
+      "rollbackPx": 0.56,
+      "joinStepPx": -1.53,
+      "stepAfterJoinPx": -0.04,
+      "labelAtJoin": [
+       "g3f35",
+       "run88"
+      ]
+     },
+     "FAST": {
+      "rollbackPx": 0.43,
+      "joinStepPx": -1.48,
+      "stepAfterJoinPx": 0.1,
+      "labelAtJoin": [
+       "g3f35",
+       "run88"
+      ]
+     },
+     "VERY_FAST": {
+      "rollbackPx": 0.03,
+      "joinStepPx": -1.38,
+      "stepAfterJoinPx": 0.25,
+      "labelAtJoin": [
+       "g3f35",
+       "run88"
+      ]
+     }
+    },
+    "pairFlowRoughness_f35_to_run88": 18.3,
+    "roughnessNormReference": "10-11 (kit), original join 30.2"
+   },
+   "seconds": 0
+  },
+  {
+   "id": "T8",
+   "title": "no advantage from clip length (mixed lane assignment)",
+   "status": "PASS",
+   "scope": "STRUCTURAL: results/places/crossing of V3 are unchanged for every placement of Frenk among Dog4 lanes. Win-rate per lane shown for information. The negative control (how much per-character physics WOULD change the odds) is in ../bulldog1-frenk/race_v3_character_contract_proposal/fairness_sim.",
+   "details": {
+    "races": 2000,
+    "placementsPerRace": 5,
+    "visualCalls": 1000000,
+    "signatureMismatches": 0,
+    "winsPerLane": [
+     397,
+     417,
+     393,
+     409,
+     384
+    ]
+   },
+   "seconds": 1.3
+  },
+  {
+   "id": "T9",
+   "title": "leash and finish: visual offset bounded, zero at crossing",
+   "status": "PASS",
+   "scope": "START shift arrays and the STOP tail baked body travel against the 39 px budget (smallest STOP-end-to-finish gap in 50,000 dog-runs = 3.34% of the course); at the analytic crossing time the sprite is in a RUN-loop frame with shift 0. STOP/tail shift is NOT defined (status UNDEFINED_NOT_BUILT), so the offset of the STOP tail is the clip own baked motion only.",
+   "details": {
+    "leashBudgetPx": 39,
+    "maxStartShiftTotalPx_includingConstantStandOffset": 20.28,
+    "maxStartShiftDeviationFromBaselinePx": 4.41,
+    "stopTailBakedForwardTravelPx": 10.6,
+    "stopTotalBakedTravelPx": 17,
+    "crossingsChecked": 50000,
+    "crossingsNotInRunLoop": 0,
+    "crossingViolations": 0,
+    "maxShiftAtCrossingPx": 0,
+    "firstViolation": null
+   },
+   "seconds": 0.6
+  },
+  {
+   "id": "T10",
+   "title": "contract validator",
+   "status": "PASS",
+   "scope": "Dog4 identity metadata valid; Frenk as-is reports exactly one error (BUTTERFLY after STOP, -11 frames) plus incomplete assets; the x1.0932 variant validates; 14 injected faults all detected. The validator checks declarations and window arithmetic, not pixels.",
+   "details": {
+    "dog4": {
+     "ok": true,
+     "errors": []
+    },
+    "frenkAsIs": {
+     "ok": false,
+     "errors": [
+      "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+     ],
+     "incompleteAssets": [
+      {
+       "window": "START",
+       "clip": "START",
+       "status": "working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed"
+      },
+      {
+       "window": "RUN",
+       "clip": "START",
+       "status": "working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed"
+      },
+      {
+       "window": "FINISH_DECELERATE",
+       "status": "provisional"
+      },
+      {
+       "window": "ROLL",
+       "status": "missing: not started"
+      },
+      {
+       "window": "SNIFF_PEE",
+       "clip": "SNIFF_PEE",
+       "status": "raw_no_alpha: V3.2 montage EVENT (200 frames) accepted as main montage by architect; NO alpha exists"
+      }
+     ],
+     "warnings": [
+      "START/START: working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed",
+      "RUN/START: working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed",
+      "SNIFF_PEE/SNIFF_PEE: raw_no_alpha: V3.2 montage EVENT (200 frames) accepted as main montage by architect; NO alpha exists"
+     ],
+     "derivedLead": 3,
+     "fits": {
+      "STOP_moving": {
+       "naturalSeconds": 1.541667,
+       "canonicalSeconds": 1.541667,
+       "ok": true
+      },
+      "BUTTERFLY": {
+       "afterStop": {
+        "window": 121,
+        "body": 93,
+        "stopTail": 36,
+        "lead": 3,
+        "sum": 132,
+        "slack": -11,
+        "verdict": "NO_FIT",
+        "requiredRateOverTailAndBody": 1.0932
+       },
+       "earlyFromBase": {
+        "window": 121,
+        "sum": 96,
+        "slack": 25,
+        "verdict": "FITS"
+       },
+       "verdict": "NO_FIT"
+      },
+      "ROLL": {
+       "verdict": "NO_CLIP"
+      },
+      "SNIFF_PEE": {
+       "afterStop": {
+        "window": 239.55,
+        "body": 200,
+        "stopTail": 36,
+        "lead": 3,
+        "sum": 239,
+        "slack": 0.55,
+        "verdict": "FITS"
+       },
+       "earlyFromBase": {
+        "window": 239.55,
+        "sum": 203,
+        "slack": 36.55,
+        "verdict": "FITS"
+       },
+       "verdict": "FITS"
+      },
+      "FINISH": {
+       "tailFrames": 36,
+       "baseFrames": 36,
+       "slack": 0,
+       "verdict": "FITS"
+      }
+     }
+    },
+    "frenkRetimeVariant": {
+     "ok": true,
+     "errors": [],
+     "fits": {
+      "BUTTERFLY": {
+       "afterStop": {
+        "window": 121,
+        "body": 85.07,
+        "stopTail": 32.93,
+        "lead": 3,
+        "sum": 121,
+        "slack": 0,
+        "verdict": "FITS"
+       },
+       "earlyFromBase": {
+        "window": 121,
+        "sum": 88.07,
+        "slack": 32.93,
+        "verdict": "FITS"
+       },
+       "verdict": "FITS"
+      }
+     }
+    },
+    "injectedFaults": [
+     {
+      "fault": "wrong lead (2 instead of 3)",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: after STOP 131 frames > window 121 (needs retime x1.084 over tail+body, bounds [0.9, 1.12])",
+       "declared lead 2 != derived lead 3 (RUN frame before first STOP would be #95, required #96)"
+      ]
+     },
+     {
+      "fault": "lead beyond push-off (13)",
+      "detected": true,
+      "errors": [
+       "START.lead 13 > releaseIdx 12: push-off would precede the physical START",
+       "BUTTERFLY: after STOP 142 frames > window 121 (needs retime x1.1944 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "pad inside a moving window (START)",
+      "detected": true,
+      "errors": [
+       "START: pad is allowed only in stationary windows (a moving window cannot hold a pose)",
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "tail on an action window",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: tail is allowed only for STOP/FINISH_DECELERATE (continues into the next stationary window)",
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "retime outside bounds (1.5)",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY.rate=1.5 outside retime bounds [0.9, 1.12]"
+      ]
+     },
+     {
+      "fault": "RUN cycle of 13 frames",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])",
+       "RUN cycle 13 frames = 0.5417 s != LOOP 0.5 s"
+      ]
+     },
+     {
+      "fault": "window STOP removed",
+      "detected": true,
+      "errors": [
+       "window 'STOP' is not described (describe it or mark status:'missing')"
+      ]
+     },
+     {
+      "fault": "unknown clip reference",
+      "detected": true,
+      "errors": [
+       "window BUTTERFLY.body -> unknown clip 'NOPE'",
+       "clip 'NOPE' has no assetStatus"
+      ]
+     },
+     {
+      "fault": "ROLL missing but not declared in assetStatus",
+      "detected": true,
+      "errors": [
+       "ROLL: status 'missing' must be declared in assetStatus",
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "STOP moving part of 40 frames",
+      "detected": true,
+      "errors": [
+       "STOP moving part 1.6667 s != canonical 1.5417 s (moving windows cannot be padded; retime or move the excess into a tail)",
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "asset status removed from a used clip",
+      "detected": true,
+      "errors": [
+       "clip 'BUTTERFLY' has no assetStatus",
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "START join label shifted",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: after STOP 132 frames > window 121 (needs retime x1.0932 over tail+body, bounds [0.9, 1.12])",
+       "declared lead 3 != derived lead 2 (RUN frame before first STOP would be #97, required #96)"
+      ]
+     },
+     {
+      "fault": "FINISH tail longer than BASE",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: after STOP 137 frames > window 121 (needs retime x1.1356 over tail+body, bounds [0.9, 1.12])",
+       "SNIFF_PEE: after STOP 244 frames > window 239.55 (needs retime x1.0188 over tail+body, bounds [0.9, 1.12])"
+      ]
+     },
+     {
+      "fault": "Dog4 BUTTERFLY clip 100 frames without pad",
+      "detected": true,
+      "errors": [
+       "BUTTERFLY: clip 4.166666666666667 s != canonical window 5.041666666666667 s and no pad is declared"
+      ]
+     }
+    ],
+    "undetectedFaults": []
+   },
+   "seconds": 0
+  },
+  {
+   "id": "T11",
+   "title": "eye acceptance (retimed BUTTERFLY, joins at game scale, STOP tail)",
+   "status": "NOT_RUN",
+   "scope": "Needs a human viewer; previews exist in results/ and ../bulldog1-frenk/race_start_run_integration_kit/ but were not judged.",
+   "details": {}
+  },
+  {
+   "id": "T12",
+   "title": "local mixed race: Frenk + 4 x Bulldog 4 on real V3 physics",
+   "status": "PARTIAL",
+   "scope": "Physics and Dog4 lanes verified; Frenk lane is evaluated at the label level (no pixel rendering, no Dog4 assets in this checkout). PARTIAL because ROLL has no Frenk clip and BUTTERFLY after STOP is truncated as-is.",
+   "details": {
+    "races": 10000,
+    "frenkLane": 0,
+    "asIs": {
+     "fullyDisplayable": 1897,
+     "withMissingROLL": 4535,
+     "withOverflow": 4647,
+     "withSniffNoAlpha": 3126
+    },
+    "retime": {
+     "fullyDisplayable": 5465,
+     "withMissingROLL": 4535,
+     "withOverflow": 0
+    },
+    "eventsFrenk": {
+     "SNIFF_PEE/afterStop": 2851,
+     "BUTTERFLY/afterStop": 5276,
+     "ROLL/afterStop": 4747,
+     "ROLL/early": 383,
+     "BUTTERFLY/early": 406,
+     "SNIFF_PEE/early": 275
+    },
+    "dog4Lanes": {
+     "samples": 180000,
+     "mismatches": 0
+    },
+    "physics": {
+     "signatureStable": true
+    },
+    "identitySwap": {
+     "checked": 2500,
+     "mismatches": 0
+    },
+    "verdict": {
+     "physicsUnchanged": true,
+     "dog4LaneIdentity": true,
+     "note": "Fully displayable = no ROLL window (no clip) and no truncated window. The race itself (places, crossings) is always the same: the physics never reads the character."
+    }
+   }
+  }
+ ]
+}

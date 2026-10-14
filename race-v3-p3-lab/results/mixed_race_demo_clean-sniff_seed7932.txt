@@ -1,0 +1,25 @@
+MIXED RACE DEMO  [clean-sniff]  requestedSeed=7932 effectiveSeed=7932  places(lane order)=3 > 4 > 5 > 2 > 1
+lane 1 = Bulldog 1 (Frenk, P3 contract); lanes 2-5 = Bulldog 4 (identity contract). Physical timeline is V3, unchanged.
+
+LANE 1 FRENK  base=1  crossing=56.470 s  events: SNIFF_PEE@0.60
+   visual items (t0..t1 s | window | role | clip | first..last frame | frames | status)
+      0.000..   0.375 | BASE              | hold    | RACE_STAND | RACE_STAND..RACE_STAND |       9 | approved: RACE_STAND v3
+      0.375..  25.458 | START             | body    | START      | v1f1..run96 |     602 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     25.458..  27.000 | STOP              | move    | STOP       | stop1..stop37 |      37 | approved: STOP v1 variant A (73 frames), alpha exists
+     27.000..  28.500 | SNIFF_PEE         | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+     28.500..  36.833 | SNIFF_PEE         | body    | SNIFF_PEE  | sniffEv1..sniffEv200 |     200 | raw_no_alpha: V3.2 montage EVENT (200 frames) accepted as main montage by architect; NO alpha exists
+     36.833..  36.856 | SNIFF_PEE         | pad     | RACE_STAND | RACE_STAND..RACE_STAND |    0.55 | approved: RACE_STAND v3
+     36.856..  56.940 | START             | body    | START      | v1f1..run96 |     482 | working: RACE_START gen3 + join f35->RUN#88 (architect: main candidate); visual acceptance NOT passed
+     56.940..  58.481 | FINISH_DECELERATE | move    | STOP       | stop1..stop37 |      37 | PROVISIONAL
+     58.481..  59.981 | BASE              | tail    | STOP_TAIL  | stop38..stop73 |      36 | approved: STOP v1 frames 38-73 (same clip)
+
+LANE 2 DOG4   base=1.25  crossing=56.418 s  events: SNIFF_PEE@0.50, BUTTERFLY@0.95
+
+LANE 3 DOG4   base=1  crossing=47.638 s  events: ROLL@0.42
+
+LANE 4 DOG4   base=1.12  crossing=48.293 s  events: BUTTERFLY@0.22
+
+LANE 5 DOG4   base=1  crossing=50.302 s  events: ROLL@0.08
+
+FRENK lane check as-is: missing windows=0 truncated windows=0 provisional=1
+FRENK lane check with the NOT-APPROVED BUTTERFLY retime x1.0932: missing=0 truncated=0

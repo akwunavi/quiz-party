@@ -523,5 +523,11 @@
    "pre_push_drift_canvas_px": "0.9-1.5 (lead 3) vs 2.0-3.3 (lead 0)",
    "unfit_case": "BUTTERFLY after STOP: 132 > 121 frames (-11), needs retime x1.093 or decision"
   }
+ },
+ "race_v3_p3_lab": {
+  "path": "../race-v3-p3-lab/",
+  "status": "isolated P3 prototype; V3/production/Dog4/source assets unchanged; no new images/AI video/alpha",
+  "tests": "T1-T4,T8-T10 PASS; T5 FAIL (BUTTERFLY after STOP -11 frames); T6,T7 PARTIAL; T11 NOT_RUN; T12 PARTIAL",
+  "readiness": "architecture ready for integration design; Frenk NOT ready (ROLL missing, SNIFF no alpha, FINISH provisional, START not visually accepted, STOP paw contact fails strict criterion)"
  }
 }
