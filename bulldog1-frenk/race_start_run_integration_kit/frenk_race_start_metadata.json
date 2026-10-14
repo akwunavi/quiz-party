@@ -1,0 +1,266 @@
+{
+ "schema": "character-clip-metadata/v0-PROPOSAL",
+ "status": "PROPOSAL for Codex. NOT adopted by V3. dog4-v3-lab (model.mjs, scenario.mjs, layout.json) is unchanged and still hard-codes START=1 s, STOP=37/24 s, RUN_JOIN=23/24 s for every dog.",
+ "character": "bulldog1-frenk",
+ "units": {
+  "fps": 24,
+  "srcFrame": [
+   1276,
+   720
+  ],
+  "scaleCanvasPerSrc": 0.16222570532915362,
+  "shiftSign": "positive = sprite moves right",
+  "indexBase": "idx 0 = first frame of the visual START window"
+ },
+ "clip": {
+  "id": "RACE_START",
+  "visual_frames": [
+   {
+    "idx": 0,
+    "src": "race_start_v1/alpha V1 f1",
+    "phase": "RACE_STAND-compatible crouch"
+   },
+   {
+    "idx": 1,
+    "src": "V1 f7"
+   },
+   {
+    "idx": 2,
+    "src": "V1 f8"
+   },
+   {
+    "idx": 3,
+    "src": "V1 f9"
+   },
+   {
+    "idx": 4,
+    "src": "V1 f10"
+   },
+   {
+    "idx": 5,
+    "src": "V1 f11"
+   },
+   {
+    "idx": 6,
+    "src": "V1 f16"
+   },
+   {
+    "idx_range": [
+     7,
+     40
+    ],
+    "src": "race_start_gen3/alpha G3 f2..f35 (idx = f + 5)",
+    "note": "idx 12 = G3 f7 = first front paw lifted (push-off)"
+   },
+   {
+    "idx_range": [
+     41,
+     51
+    ],
+    "src": "dog1-run-alpha RUN #88..#98 (idx = 41 + (n - 88))",
+    "note": "visual join: G3 f35 -> RUN #88"
+   },
+   {
+    "idx_from": 52,
+    "src": "RUN loop #87..#98 repeating, 12 frames/cycle"
+   }
+  ],
+  "frame_table_equals_original_except": "idx 41-42 are RUN #88/#89 instead of G3 f36/f37; idx 43 = RUN #90 in both",
+  "original_visual_join": {
+   "gen3": "f37",
+   "run": "#90",
+   "idx": 43
+  }
+ },
+ "phases": {
+  "contactRelease_idx": 12,
+  "visualJoin_idx": 41,
+  "runFrame_at_idx_43": "RUN #90",
+  "stopEntryRule": "STOP f1 follows RUN #96 (first #96 at idx 49 => STOP f1 at idx 50; then every +12 frames)"
+ },
+ "physics_contracts": {
+  "current_V3_UNCHANGED": {
+   "BASE_s": 0.5,
+   "START_s": 1.0,
+   "STOP_s": "37/24",
+   "RUN_JOIN_s": "23/24",
+   "LOOP_s": 0.5,
+   "START_progress": "p0 + v*START/2 * 2*(u^3 - u^4/2)",
+   "source": "dog4-v3-lab/model.mjs lines 4-7, 64-71, 76-77, 102, 168"
+  },
+  "proposed_character_contract_NOT_ADOPTED": {
+   "velocityRamp": {
+    "startIdx": 12,
+    "endIdx": 43,
+    "frames": 31,
+    "seconds": "31/24 = 1.2917",
+    "curve": "2*(u^3 - u^4/2)"
+   },
+   "runStartIdx": 43,
+   "runJoin": {
+    "frames": 7,
+    "seconds": "7/24",
+    "period_frames": 12,
+    "basis": "RUN #90 at runStart; STOP f1 after #96"
+   },
+   "note": "values are per-character data; they replace global constants only if the contract is approved"
+  }
+ },
+ "display_modes": {
+  "A_native_V3_physics": {
+   "physics": "START = 1.0 s from idx 0 (24 frames), then RUN at cruise",
+   "visual": "frame table plays 1:1 (41 frames to visualJoin), i.e. visual overrun of 0.71 s past the physical START",
+   "shift_arrays": "shift_arrays.json -> modes.native[category].C",
+   "requires_approval": false,
+   "open_issue": "STOP entry grid: V3 first STOP f1 = runStart + 23/24 = idx 47, preceded by RUN #93; Frenk STOP expects #96 => 3-frame phase offset unless per-character RUN_JOIN is approved"
+  },
+  "B_proposed_contract": {
+   "physics": "velocityRamp idx 12 -> 43 (31 frames), runJoin 7/24",
+   "visual": "same frame table",
+   "shift_arrays": "shift_arrays.json -> modes.contract[category].C",
+   "requires_approval": true
+  }
+ },
+ "shift_arrays": {
+  "file": "shift_arrays.json",
+  "categories": [
+   "VERY_SLOW",
+   "SLOW",
+   "NORMAL",
+   "FAST",
+   "VERY_FAST"
+  ],
+  "speed_multipliers": {
+   "VERY_SLOW": 0.75,
+   "SLOW": 0.88,
+   "NORMAL": 1,
+   "FAST": 1.12,
+   "VERY_FAST": 1.25
+  },
+  "rule": "one array per start-speed category and mode; the NORMAL array must NOT be reused for other categories (reuse gives rollback 2.3 px SLOW and 4.0 px VERY_SLOW)",
+  "generator": "make_kit_data.mjs"
+ },
+ "acceptance_thresholds": {
+  "smoothed_rollback_canvas_px_max": 1.0,
+  "join_step_canvas_px_abs_max": 2.7,
+  "engine_progress_identical_to_original": true,
+  "frame_table_idx_43": "RUN #90",
+  "frames_0_40_identical_to_original_clip": true
+ },
+ "measured": {
+  "contract": {
+   "VERY_SLOW": {
+    "rollback_canvas_px": 0.86,
+    "join_step_canvas_px": -1.42,
+    "step_after_decay_end_canvas_px": 1.42,
+    "second_difference_at_decay_end": 2.09,
+    "max_abs_shift_vs_base_src_px": 40.7,
+    "engine_anchor_travel_before_push_off_canvas_px": 0
+   },
+   "SLOW": {
+    "rollback_canvas_px": 0.88,
+    "join_step_canvas_px": -1.38,
+    "step_after_decay_end_canvas_px": 1.57,
+    "second_difference_at_decay_end": 2.12,
+    "max_abs_shift_vs_base_src_px": 28.8,
+    "engine_anchor_travel_before_push_off_canvas_px": 0
+   },
+   "NORMAL": {
+    "rollback_canvas_px": 0.8,
+    "join_step_canvas_px": -1.33,
+    "step_after_decay_end_canvas_px": 1.71,
+    "second_difference_at_decay_end": 2.14,
+    "max_abs_shift_vs_base_src_px": 17.9,
+    "engine_anchor_travel_before_push_off_canvas_px": 0
+   },
+   "FAST": {
+    "rollback_canvas_px": 0.62,
+    "join_step_canvas_px": -1.28,
+    "step_after_decay_end_canvas_px": 1.85,
+    "second_difference_at_decay_end": 2.15,
+    "max_abs_shift_vs_base_src_px": 12.5,
+    "engine_anchor_travel_before_push_off_canvas_px": 0
+   },
+   "VERY_FAST": {
+    "rollback_canvas_px": 0.57,
+    "join_step_canvas_px": -1.21,
+    "step_after_decay_end_canvas_px": 2,
+    "second_difference_at_decay_end": 2.15,
+    "max_abs_shift_vs_base_src_px": 7.4,
+    "engine_anchor_travel_before_push_off_canvas_px": 0
+   }
+  },
+  "native": {
+   "VERY_SLOW": {
+    "rollback_canvas_px": 0.6,
+    "join_step_canvas_px": -1.54,
+    "step_after_decay_end_canvas_px": -0.33,
+    "second_difference_at_decay_end": 1.22,
+    "max_abs_shift_vs_base_src_px": 27.4,
+    "engine_anchor_travel_before_push_off_canvas_px": 1.96
+   },
+   "SLOW": {
+    "rollback_canvas_px": 0.53,
+    "join_step_canvas_px": -1.51,
+    "step_after_decay_end_canvas_px": -0.18,
+    "second_difference_at_decay_end": 1.33,
+    "max_abs_shift_vs_base_src_px": 18.8,
+    "engine_anchor_travel_before_push_off_canvas_px": 2.3
+   },
+   "NORMAL": {
+    "rollback_canvas_px": 0.54,
+    "join_step_canvas_px": -1.48,
+    "step_after_decay_end_canvas_px": -0.04,
+    "second_difference_at_decay_end": 1.44,
+    "max_abs_shift_vs_base_src_px": 16.1,
+    "engine_anchor_travel_before_push_off_canvas_px": 2.61
+   },
+   "FAST": {
+    "rollback_canvas_px": 0.19,
+    "join_step_canvas_px": -1.4,
+    "step_after_decay_end_canvas_px": 0.1,
+    "second_difference_at_decay_end": 1.5,
+    "max_abs_shift_vs_base_src_px": 18,
+    "engine_anchor_travel_before_push_off_canvas_px": 2.93
+   },
+   "VERY_FAST": {
+    "rollback_canvas_px": 0,
+    "join_step_canvas_px": -1.25,
+    "step_after_decay_end_canvas_px": 0.25,
+    "second_difference_at_decay_end": 1.51,
+    "max_abs_shift_vs_base_src_px": 20.1,
+    "engine_anchor_travel_before_push_off_canvas_px": 3.26
+   }
+  }
+ },
+ "source_assets": [
+  {
+   "path": "race_start_v1/DOG1_RACE_START_v1_alpha.webm",
+   "sha256": "8388d401f116a1a1d523cd7d385eb5c48d70e127fdcb1e697ebf32356e24cc77",
+   "frames_used": "f1,f7-f11,f16"
+  },
+  {
+   "path": "race_start_gen3/DOG1_RACE_START_gen3_alpha.webm",
+   "sha256": "326e5826d8b565ed20b52d1fc036ab7c85fa936ad82f4c8eb9e665f96db99c1c",
+   "frames_used": "f2-f35"
+  },
+  {
+   "path": "race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4",
+   "sha256": "772d432d0070698e799f30795acdd214ec939d66263f97dd1209bc64affd9d08"
+  },
+  {
+   "path": "dog1-run-alpha.webm (branch origin/preview/bulldogs-1235-alpha-20261008@8e30e515)",
+   "sha256": "d2c2762797a393f03eca8ec28213d39f43783c52cddbaab59bed9f60a3347075",
+   "frames_used": "#87-#98 (source frames 40-120 covered)"
+  },
+  {
+   "path": "assets/approved/DOG1_RACE_STAND_v3_2720x1536.png",
+   "sha256": "83214715a108c7c216a567e88a825dcc6a010a509ff440ffae7e6a024ccee07a"
+  }
+ ],
+ "unresolved_outside_this_kit": [
+  "Frenk STOP: 73 frames (3.04 s) vs V3 STOP=37/24 s",
+  "Frenk SNIFF_PEE V3.2: 200 frames (8.33 s) raw, no alpha; V3 SNIFF/RETURN constants are Dog4's",
+  "FINISH_DECELERATE reuses STOP"
+ ]
+}

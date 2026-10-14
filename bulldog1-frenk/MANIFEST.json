@@ -504,5 +504,12 @@
    "verdict": "f35->#88 can be adopted without changing race results iff velocityRamp stays 31 frames (idx 12->43) and visualJoin (idx 41) is separate metadata; coupled ramp would shift crossing by -0.0417 s per START",
    "engine_progress_diff_decoupled": 0
   }
+ },
+ "race_start_run_integration_kit": {
+  "path": "race_start_run_integration_kit/",
+  "status": "integration kit for Codex; visual acceptance NOT passed; V3 unchanged",
+  "contract": "31-frame ramp is a PROPOSED per-character parameter, NOT the current V3 contract (START=1 s)",
+  "compensation": "N2 derived, 2 passes: rollback 0.80 px NORMAL (0.57-0.88 all categories); per-category arrays in shift_arrays.json",
+  "compatible_mode": "native V3 physics START=1 s with visual overrun to idx 41, rollback <= 0.60 px"
  }
 }

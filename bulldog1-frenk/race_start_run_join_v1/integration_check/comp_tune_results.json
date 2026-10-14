@@ -1,0 +1,241 @@
+{
+ "A_N2_reference": {
+  "rollbackCanvasPx": 1.028,
+  "joinStep": -2.66,
+  "endStep": 1.71,
+  "d2AtRampEnd": 4.37,
+  "minFrameStep": -2.66,
+  "maxExtraVsN1_srcPx": 10.9,
+  "peakCshiftRate_srcPxPerS": 192.1
+ },
+ "tests": [
+  {
+   "name": "B N2 baseline (W4,ex2,1 pass)",
+   "rollbackCanvasPx": 1.153,
+   "joinStep": -1.46,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.14,
+   "minFrameStep": -1.46,
+   "maxExtraVsN1_srcPx": 13.3,
+   "peakCshiftRate_srcPxPerS": 192.1
+  },
+  {
+   "name": "B N2, 2 passes",
+   "rollbackCanvasPx": 0.801,
+   "joinStep": -1.33,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.14,
+   "minFrameStep": -1.33,
+   "maxExtraVsN1_srcPx": 17.9,
+   "peakCshiftRate_srcPxPerS": 192.1
+  },
+  {
+   "name": "B N2, ex smoothing 1",
+   "rollbackCanvasPx": 1.136,
+   "joinStep": -1.52,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.15,
+   "minFrameStep": -1.52,
+   "maxExtraVsN1_srcPx": 13.5,
+   "peakCshiftRate_srcPxPerS": 193.4
+  },
+  {
+   "name": "B N2, ex smoothing 1, 2 passes",
+   "rollbackCanvasPx": 0.806,
+   "joinStep": -1.45,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.15,
+   "minFrameStep": -1.45,
+   "maxExtraVsN1_srcPx": 18.8,
+   "peakCshiftRate_srcPxPerS": 194.5
+  },
+  {
+   "name": "B N2, ex smoothing 0 (none)",
+   "rollbackCanvasPx": 1.138,
+   "joinStep": -1.64,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.15,
+   "minFrameStep": -1.64,
+   "maxExtraVsN1_srcPx": 13.6,
+   "peakCshiftRate_srcPxPerS": 193.4
+  },
+  {
+   "name": "B N2, W3 (7-frame)",
+   "rollbackCanvasPx": 0.899,
+   "joinStep": -1.34,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.09,
+   "minFrameStep": -1.34,
+   "maxExtraVsN1_srcPx": 16.5,
+   "peakCshiftRate_srcPxPerS": 184.5
+  },
+  {
+   "name": "B N2, W3,ex1,2 passes",
+   "rollbackCanvasPx": 0.575,
+   "joinStep": -1.25,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.15,
+   "minFrameStep": -1.28,
+   "maxExtraVsN1_srcPx": 21.7,
+   "peakCshiftRate_srcPxPerS": 212.4
+  },
+  {
+   "name": "B smoothstep base + N2",
+   "rollbackCanvasPx": 0.988,
+   "joinStep": -0.68,
+   "endStep": 1.71,
+   "d2AtRampEnd": 0.91,
+   "minFrameStep": -0.94,
+   "maxExtraVsN1_srcPx": 43.5,
+   "peakCshiftRate_srcPxPerS": 171.3
+  },
+  {
+   "name": "B cubic base + N2",
+   "rollbackCanvasPx": 1.377,
+   "joinStep": -1.69,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.69,
+   "minFrameStep": -1.69,
+   "maxExtraVsN1_srcPx": 6.7,
+   "peakCshiftRate_srcPxPerS": 272.8
+  }
+ ],
+ "speed_categories": {
+  "VERY_SLOW": {
+   "reuse_medium_array": {
+    "rollback": 3.988,
+    "joinStep": -1.62
+   },
+   "own_array_2pass": {
+    "rollback": 0.857,
+    "joinStep": -1.42,
+    "maxExtra": 40.7
+   },
+   "A_N2_own": {
+    "rollback": 1.56,
+    "joinStep": -2.89
+   }
+  },
+  "SLOW": {
+   "reuse_medium_array": {
+    "rollback": 2.299,
+    "joinStep": -1.47
+   },
+   "own_array_2pass": {
+    "rollback": 0.876,
+    "joinStep": -1.38,
+    "maxExtra": 28.8
+   },
+   "A_N2_own": {
+    "rollback": 1.326,
+    "joinStep": -2.77
+   }
+  },
+  "NORMAL": {
+   "reuse_medium_array": {
+    "rollback": 0.801,
+    "joinStep": -1.33
+   },
+   "own_array_2pass": {
+    "rollback": 0.801,
+    "joinStep": -1.33,
+    "maxExtra": 17.9
+   },
+   "A_N2_own": {
+    "rollback": 1.028,
+    "joinStep": -2.66
+   }
+  },
+  "FAST": {
+   "reuse_medium_array": {
+    "rollback": 0.51,
+    "joinStep": -1.2
+   },
+   "own_array_2pass": {
+    "rollback": 0.619,
+    "joinStep": -1.28,
+    "maxExtra": 12.5
+   },
+   "A_N2_own": {
+    "rollback": 0.671,
+    "joinStep": -2.53
+   }
+  },
+  "VERY_FAST": {
+   "reuse_medium_array": {
+    "rollback": 0.337,
+    "joinStep": -1.05
+   },
+   "own_array_2pass": {
+    "rollback": 0.566,
+    "joinStep": -1.21,
+    "maxExtra": 7.4
+   },
+   "A_N2_own": {
+    "rollback": 0.48,
+    "joinStep": -2.38
+   }
+  }
+ },
+ "final": {
+  "name": "B decoupled, N2 derived, 2 passes (W4,ex2)",
+  "metrics": {
+   "rollbackCanvasPx": 0.801,
+   "joinStep": -1.33,
+   "endStep": 1.71,
+   "d2AtRampEnd": 2.14,
+   "minFrameStep": -1.33,
+   "maxExtraVsN1_srcPx": 17.9,
+   "peakCshiftRate_srcPxPerS": 192.1
+  },
+  "C_srcPx_idx0_45": [
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125,
+   125.17,
+   125.12,
+   124.97,
+   124.5,
+   124.04,
+   123.36,
+   122.45,
+   120.21,
+   116.16,
+   110.77,
+   104.55,
+   98.31,
+   93.26,
+   89.48,
+   86.27,
+   82.93,
+   78.68,
+   73.52,
+   67.93,
+   62.04,
+   55.86,
+   49.41,
+   43.27,
+   37.77,
+   33.25,
+   29.46,
+   25.6,
+   20.96,
+   15.17,
+   8,
+   0,
+   0,
+   0
+  ],
+  "speed": "NORMAL (base 1.0)"
+ }
+}
