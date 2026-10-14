@@ -457,5 +457,18 @@
   "first": "C1b",
   "tail": "marking_pose/DOG1_MARKING_POSE_v4_aligned_to_C1b_1276x720.png",
   "status": "generated; alpha NOT run (user rule); awaiting user viewing"
+ },
+ "sniff_pee_v3_assembly": {
+  "path": "sniff_pee_v3_assembly/",
+  "event": "DOG1_SNIFF_PEE_V3_EVENT.mp4",
+  "preview": "DOG1_SNIFF_PEE_V3_PREVIEW.mp4",
+  "report": "DOG1_SNIFF_PEE_V3_REPORT.md",
+  "sources": [
+   "sniff_v2/DOG1_SNIFF_PEE_v2_kling_source.mp4 n12-97",
+   "marking_motion_v1/DOG1_MARKING_MOTION_v1_kling_source.mp4 n0-78 (reverse 77->0)",
+   "race_start_v1/gen3/run alpha (preview tail only)"
+  ],
+  "credits": 0,
+  "status": "technical assembly; visual acceptance NOT passed; no alpha; main defect: head pop at seam V2 n97 -> MM n0"
  }
 }
