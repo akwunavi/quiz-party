@@ -1,0 +1,9 @@
+kling-video-v3_0, image_to_video, 720p, 5 s, audio off, multi-shot off, 1 video
+first_image = sniff_prep/DOG1_SNIFF_PEE_START_END_racestand.png (C1b)
+tail_image  = marking_pose/DOG1_MARKING_POSE_v4_aligned_to_C1b_1276x720.png (user's GPT pose, shifted +44 px right, +20 px down to coincide with C1b head/front paws; original untouched)
+
+A stocky fawn-beige French bulldog with a white chest, large upright ears and a dark gray muzzle stands in a fixed three-quarter side view facing right, in a clean studio with a seamless light-gray background and floor. The first frame is the neutral standing pose and the last frame is the leg-lift marking pose. The dog stays on the same spot on the floor; the camera is completely fixed and the scale and framing never change.
+
+One smooth, continuous, unhurried motion: the dog calmly shifts his weight onto both front paws and the far hind leg, his pelvis tilts slightly, and the hind leg nearest to the camera lifts smoothly off the floor, swinging outward and upward from the hip, with the knee bent and the paw turned outward with its sole toward the camera, held beside the body at belly height, exactly as in the last frame. Both front paws and the far hind paw stay flat on the floor with no sliding. His head stays raised, looking ahead to the right with a calm, slightly mischievous expression, ears upright, with only tiny breathing movement. He settles into the final marking pose and holds it still for the last moment of the video.
+
+The same dog throughout, with unchanged face, ears, fur markings and proportions, four anatomically correct legs, soft studio lighting with a soft contact shadow, and a clean empty floor.

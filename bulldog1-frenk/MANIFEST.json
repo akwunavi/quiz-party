@@ -448,5 +448,14 @@
    "credits": 0,
    "status": "from user (ChatGPT); candidate target frame, awaiting user decision"
   }
+ },
+ "marking_motion_v1": {
+  "source": "marking_motion_v1/DOG1_MARKING_MOTION_v1_kling_source.mp4",
+  "sha256": "196bded0215c47a7871f937598babe5555763d5a4a4d998b10ae9703a43a7f5e",
+  "generation_id": "ASyPQYqmOQ7MFlj8yZrzTdcxkKlMSpBRANRmBqlvF2q7PUVyaSFkv83tkObh_xp47UHkbOOj",
+  "credits": 30,
+  "first": "C1b",
+  "tail": "marking_pose/DOG1_MARKING_POSE_v4_aligned_to_C1b_1276x720.png",
+  "status": "generated; alpha NOT run (user rule); awaiting user viewing"
  }
 }

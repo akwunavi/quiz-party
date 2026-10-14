@@ -107,3 +107,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 
 ## 13. MARKING_POSE v3 — GPT-Image2 (14.10.2026)
 - `image_to_image`, `gpt-image2`, quality medium, 2k, 16:9, 1 изображение, референс C1b, **15 кредитов** (221 -> 206; цена стала известна только при отправке). generationId AQ5y0EQwNUWTYUZKecESQXVYwgyRAEPR-wcIfs0c7Boq4e6Pvj7eBJ8FIrFm3dW7DVqRyDsY. Лучший из трёх: три опоры и лицо сохранены, голень поднятой ноги идёт назад. `marking_pose/RESULT_v3.md`.
+
+## 14. MARKING_MOTION v1 (14.10.2026)
+- `image_to_video`, `kling-video-v3_0`, 720p, 5 с, first=C1b, tail=MARKING_POSE v4 (выровнен +44/+20 px), **30 кредитов** (206 -> 176). generationId ASyPQYqmOQ7MFlj8yZrzTdcxkKlMSpBRANRmBqlvF2q7PUVyaSFkv83tkObh_xp47UHkbOOj. Видео доходит до позы метки и держит её ~2,5 с; alpha не запускалась. `marking_motion_v1/RESULT.md`.
