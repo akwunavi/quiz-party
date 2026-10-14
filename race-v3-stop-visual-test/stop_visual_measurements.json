@@ -1,0 +1,414 @@
+{
+ "seed": 1069078,
+ "lane0": {
+  "name": "DOG 1 \u00b7 NORMAL \u00b7 1 \u0441\u043e\u0431\u044b\u0442.",
+  "base": 1,
+  "variations": [
+   1.0130382072739303,
+   1.0064806089457123,
+   1.0038319919165224,
+   1.0009187803138047
+  ],
+  "events": [
+   [
+    "BUTTERFLY",
+    0.5112707481533288
+   ]
+  ]
+ },
+ "variants": {
+  "REF": {
+   "name": "Bulldog 4 (reference, canonical windows)",
+   "physical": {
+    "stopSeconds": 1.5417,
+    "actionWindowSeconds": 5.0417,
+    "engineTravelInStopPx": 21.6,
+    "crossingSeconds": 49.059
+   },
+   "timing": {
+    "actionClipStartsAt_s": 1.542,
+    "actionWindowOpensAt_s": 1.542,
+    "engineStopsAt_s": 1.542,
+    "bodyLastMovesAt_s": 1.542,
+    "gapEngineStopToActionClip_s": 0.0,
+    "startWindowBeginsAt_s": 6.583
+   },
+   "body": {
+    "travelBrakeStartToActionPx": 23.2,
+    "engineTravelPx": 21.6,
+    "bodyOvershootBeyondEngineStopPx": 1.6,
+    "peakBodySpeedPxPerFrame": 1.86,
+    "bodyMovesAfterEngineStop_s": 0.0,
+    "timeTo95PercentOfTravel_s": 0.875
+   },
+   "pawContacts": {
+    "episodes": [
+     {
+      "frames": [
+       1,
+       37
+      ],
+      "worldSlide": 9.4,
+      "maxFootSpeedPxPerFrame": 1.74,
+      "slideBeforeEngineStop": 9.4,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.5,
+      "engineMoving": true
+     }
+    ],
+    "slideBeforeEngineStopPx": 9.4,
+    "slideAfterEngineStopPx": 0,
+    "totalSlidePx": 9.4
+   },
+   "transitionStopToAction": {
+    "silhouetteIoU": 0.962,
+    "bodyStepPx": -0.15
+   }
+  },
+  "A": {
+   "name": "A: STOP 37/24, rest of the clip in the stationary tail",
+   "physical": {
+    "stopSeconds": 1.5417,
+    "actionWindowSeconds": 5.5,
+    "engineTravelInStopPx": 21.6,
+    "crossingSeconds": 49.517
+   },
+   "timing": {
+    "actionClipStartsAt_s": 3.042,
+    "actionWindowOpensAt_s": 1.542,
+    "engineStopsAt_s": 1.542,
+    "bodyLastMovesAt_s": 2.542,
+    "gapEngineStopToActionClip_s": 1.5,
+    "startWindowBeginsAt_s": 6.917
+   },
+   "body": {
+    "travelBrakeStartToActionPx": 38.6,
+    "engineTravelPx": 21.6,
+    "bodyOvershootBeyondEngineStopPx": 17.0,
+    "peakBodySpeedPxPerFrame": 2.49,
+    "bodyMovesAfterEngineStop_s": 1.0,
+    "timeTo95PercentOfTravel_s": 2.125
+   },
+   "pawContacts": {
+    "episodes": [
+     {
+      "frames": [
+       1,
+       2
+      ],
+      "worldSlide": -9.13,
+      "maxFootSpeedPxPerFrame": 9.13,
+      "slideBeforeEngineStop": -9.13,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.042,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       10,
+       12
+      ],
+      "worldSlide": -19.42,
+      "maxFootSpeedPxPerFrame": 11.23,
+      "slideBeforeEngineStop": -19.42,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.458,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       20,
+       21
+      ],
+      "worldSlide": -11.95,
+      "maxFootSpeedPxPerFrame": 11.95,
+      "slideBeforeEngineStop": -11.96,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.833,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       29,
+       31
+      ],
+      "worldSlide": -21.21,
+      "maxFootSpeedPxPerFrame": 14.23,
+      "slideBeforeEngineStop": -21.21,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.25,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       39,
+       40
+      ],
+      "worldSlide": -12.57,
+      "maxFootSpeedPxPerFrame": 12.57,
+      "slideBeforeEngineStop": 0,
+      "slideAfterEngineStop": -12.57,
+      "endsAt_s": 1.625,
+      "engineMoving": false
+     },
+     {
+      "frames": [
+       48,
+       73
+      ],
+      "worldSlide": -16.38,
+      "maxFootSpeedPxPerFrame": 3.97,
+      "slideBeforeEngineStop": 0,
+      "slideAfterEngineStop": -16.39,
+      "endsAt_s": 3,
+      "engineMoving": false
+     }
+    ],
+    "slideBeforeEngineStopPx": 61.7,
+    "slideAfterEngineStopPx": 29.0,
+    "totalSlidePx": 90.7
+   },
+   "transitionStopToAction": {
+    "silhouetteIoU": 0.996,
+    "bodyStepPx": -0.01
+   },
+   "transitionActionToStart": {
+    "silhouetteIoU": 0.995,
+    "bodyStepPx": -0.0,
+    "note": "v1f1 shifted +125 src px (the START baseline)"
+   }
+  },
+  "B": {
+   "name": "B: STOP 63/24, 10-frame stationary tail",
+   "physical": {
+    "stopSeconds": 2.625,
+    "actionWindowSeconds": 4.4167,
+    "engineTravelInStopPx": 36.8,
+    "crossingSeconds": 48.975
+   },
+   "timing": {
+    "actionClipStartsAt_s": 3.042,
+    "actionWindowOpensAt_s": 2.625,
+    "engineStopsAt_s": 2.625,
+    "bodyLastMovesAt_s": 2.542,
+    "gapEngineStopToActionClip_s": 0.417,
+    "startWindowBeginsAt_s": 6.917
+   },
+   "body": {
+    "travelBrakeStartToActionPx": 53.8,
+    "engineTravelPx": 36.8,
+    "bodyOvershootBeyondEngineStopPx": 17.0,
+    "peakBodySpeedPxPerFrame": 2.61,
+    "bodyMovesAfterEngineStop_s": 0.0,
+    "timeTo95PercentOfTravel_s": 2.125
+   },
+   "pawContacts": {
+    "episodes": [
+     {
+      "frames": [
+       1,
+       2
+      ],
+      "worldSlide": -9.13,
+      "maxFootSpeedPxPerFrame": 9.13,
+      "slideBeforeEngineStop": -9.13,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.042,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       10,
+       12
+      ],
+      "worldSlide": -19.15,
+      "maxFootSpeedPxPerFrame": 11.09,
+      "slideBeforeEngineStop": -19.15,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.458,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       20,
+       21
+      ],
+      "worldSlide": -11.59,
+      "maxFootSpeedPxPerFrame": 11.59,
+      "slideBeforeEngineStop": -11.59,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.833,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       29,
+       31
+      ],
+      "worldSlide": -20.19,
+      "maxFootSpeedPxPerFrame": 13.72,
+      "slideBeforeEngineStop": -20.19,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.25,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       39,
+       40
+      ],
+      "worldSlide": -12.18,
+      "maxFootSpeedPxPerFrame": 12.18,
+      "slideBeforeEngineStop": -12.18,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.625,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       48,
+       73
+      ],
+      "worldSlide": -15.33,
+      "maxFootSpeedPxPerFrame": 3.82,
+      "slideBeforeEngineStop": -15.33,
+      "slideAfterEngineStop": 0.0,
+      "endsAt_s": 3,
+      "engineMoving": false
+     }
+    ],
+    "slideBeforeEngineStopPx": 87.6,
+    "slideAfterEngineStopPx": 0.0,
+    "totalSlidePx": 87.6
+   },
+   "transitionStopToAction": {
+    "silhouetteIoU": 0.996,
+    "bodyStepPx": -0.01
+   },
+   "transitionActionToStart": {
+    "silhouetteIoU": 0.995,
+    "bodyStepPx": -0.0,
+    "note": "v1f1 shifted +125 src px (the START baseline)"
+   }
+  },
+  "C": {
+   "name": "C: STOP 73/24, whole clip inside the physical STOP",
+   "physical": {
+    "stopSeconds": 3.0417,
+    "actionWindowSeconds": 4,
+    "engineTravelInStopPx": 42.6,
+    "crossingSeconds": 48.767
+   },
+   "timing": {
+    "actionClipStartsAt_s": 3.042,
+    "actionWindowOpensAt_s": 3.042,
+    "engineStopsAt_s": 3.042,
+    "bodyLastMovesAt_s": 2.5,
+    "gapEngineStopToActionClip_s": 0.0,
+    "startWindowBeginsAt_s": 6.917
+   },
+   "body": {
+    "travelBrakeStartToActionPx": 59.6,
+    "engineTravelPx": 42.6,
+    "bodyOvershootBeyondEngineStopPx": 17.0,
+    "peakBodySpeedPxPerFrame": 2.75,
+    "bodyMovesAfterEngineStop_s": 0.0,
+    "timeTo95PercentOfTravel_s": 2.167
+   },
+   "pawContacts": {
+    "episodes": [
+     {
+      "frames": [
+       1,
+       2
+      ],
+      "worldSlide": -9.13,
+      "maxFootSpeedPxPerFrame": 9.13,
+      "slideBeforeEngineStop": -9.13,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.042,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       10,
+       12
+      ],
+      "worldSlide": -19.12,
+      "maxFootSpeedPxPerFrame": 11.06,
+      "slideBeforeEngineStop": -19.12,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.458,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       20,
+       21
+      ],
+      "worldSlide": -11.53,
+      "maxFootSpeedPxPerFrame": 11.53,
+      "slideBeforeEngineStop": -11.53,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 0.833,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       29,
+       31
+      ],
+      "worldSlide": -19.97,
+      "maxFootSpeedPxPerFrame": 13.61,
+      "slideBeforeEngineStop": -19.97,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.25,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       39,
+       40
+      ],
+      "worldSlide": -12.04,
+      "maxFootSpeedPxPerFrame": 12.04,
+      "slideBeforeEngineStop": -12.04,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 1.625,
+      "engineMoving": true
+     },
+     {
+      "frames": [
+       48,
+       73
+      ],
+      "worldSlide": -13.22,
+      "maxFootSpeedPxPerFrame": 3.67,
+      "slideBeforeEngineStop": -13.22,
+      "slideAfterEngineStop": 0,
+      "endsAt_s": 3,
+      "engineMoving": true
+     }
+    ],
+    "slideBeforeEngineStopPx": 85.0,
+    "slideAfterEngineStopPx": 0,
+    "totalSlidePx": 85.0
+   },
+   "transitionStopToAction": {
+    "silhouetteIoU": 0.996,
+    "bodyStepPx": -0.01
+   },
+   "transitionActionToStart": {
+    "silhouetteIoU": 0.995,
+    "bodyStepPx": -0.0,
+    "note": "v1f1 shifted +125 src px (the START baseline)"
+   }
+  }
+ },
+ "runReferenceFootSweep": {
+  "frenk_RUN_max_px_per_frame_median": 15.41,
+  "dog4_RUN_max_px_per_frame_median": 25.0,
+  "engineCruisePxPerFrame": 1.16,
+  "note": "local foot speed in the sprite (no engine); Frenk RUN frames are from the working scratch decode (outside this branch)"
+ }
+}
