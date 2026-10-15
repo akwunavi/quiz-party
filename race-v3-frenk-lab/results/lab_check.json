@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-15T11:38:16.997Z",
+ "generated": "2026-10-15T12:45:00.773Z",
  "chromium": "141.0.7390.37",
  "errors": [],
  "reproducibility": [
@@ -2372,6 +2372,1083 @@
     "labelsMissingFromAtlas": []
    }
   ],
+  "ROLL_ALL": [
+   {
+    "lane": 0,
+    "name": "ФРЭНК · VERY_FAST · ROLL",
+    "base": 1.25,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.15,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.61,
+      "shiftTo": 124.09
+     },
+     {
+      "t": 2.083,
+      "anchorX": 443.72,
+      "bodyX": 393.08,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.36,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 7.97,
+      "shiftTo": 0
+     },
+     {
+      "t": 11.958,
+      "anchorX": 787.58,
+      "bodyX": 741.14,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 13.5,
+      "anchorX": 814.43,
+      "bodyX": 758.1,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 17.833,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 19.417,
+      "anchorX": 814.43,
+      "bodyX": 758.11,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -165.88,
+      "shiftTo": -40.88
+     },
+     {
+      "t": 19.708,
+      "anchorX": 814.57,
+      "bodyX": 751.97,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.58,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.96,
+      "shiftFrom": -40.75,
+      "shiftTo": -40.58
+     },
+     {
+      "t": 21.125,
+      "anchorX": 852.15,
+      "bodyX": 801.51,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.35,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 2.59,
+      "shiftFrom": -2.61,
+      "shiftTo": 0
+     },
+     {
+      "t": 42,
+      "anchorX": 1579.05,
+      "bodyX": 1532.6,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 43.5,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 43.5,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 1.08
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.7
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 9.75
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 20.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     17.48
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 1,
+    "name": "ФРЭНК · FAST · ROLL",
+    "base": 1.12,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.13,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.65,
+      "shiftTo": 124.18
+     },
+     {
+      "t": 2.083,
+      "anchorX": 439.8,
+      "bodyX": 389.16,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.47,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 0.77,
+      "shiftFrom": 7.67,
+      "shiftTo": 0
+     },
+     {
+      "t": 13.458,
+      "anchorX": 794.7,
+      "bodyX": 748.25,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 15,
+      "anchorX": 818.75,
+      "bodyX": 763.45,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 19.333,
+      "anchorX": 818.75,
+      "bodyX": 763.44,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 20.917,
+      "anchorX": 818.75,
+      "bodyX": 763.47,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -159.53,
+      "shiftTo": -34.53
+     },
+     {
+      "t": 21.208,
+      "anchorX": 818.88,
+      "bodyX": 757.29,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.6,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.98,
+      "shiftFrom": -34.43,
+      "shiftTo": -34.3
+     },
+     {
+      "t": 22.625,
+      "anchorX": 852.55,
+      "bodyX": 801.91,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.12,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 2.36,
+      "shiftFrom": -2.12,
+      "shiftTo": 0
+     },
+     {
+      "t": 46,
+      "anchorX": 1581.85,
+      "bodyX": 1535.4,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 47.5,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 47.5,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 0.25
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.73
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 8.72
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 21.708,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     16.56
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 2,
+    "name": "ФРЭНК · NORMAL · ROLL",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.97,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 20.833,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 22.417,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
+     },
+     {
+      "t": 22.708,
+      "anchorX": 816.43,
+      "bodyX": 755.78,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.61,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -0.99,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 24.125,
+      "anchorX": 846.49,
+      "bodyX": 795.85,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 50.5,
+      "anchorX": 1581.22,
+      "bodyX": 1534.77,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 52,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 52,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.51
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 7.76
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 23.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 3,
+    "name": "ФРЭНК · SLOW · ROLL",
+    "base": 0.88,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.1,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.07,
+      "shiftFrom": 124.72,
+      "shiftTo": 124.36
+     },
+     {
+      "t": 2.083,
+      "anchorX": 432.56,
+      "bodyX": 381.91,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.54,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 0.7,
+      "shiftFrom": 6.41,
+      "shiftTo": 0
+     },
+     {
+      "t": 16.958,
+      "anchorX": 797.21,
+      "bodyX": 750.76,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 18.5,
+      "anchorX": 816.1,
+      "bodyX": 762.71,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 22.833,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 24.417,
+      "anchorX": 816.1,
+      "bodyX": 762.72,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -147.8,
+      "shiftTo": -22.8
+     },
+     {
+      "t": 24.708,
+      "anchorX": 816.21,
+      "bodyX": 756.5,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.01,
+      "shiftFrom": -22.75,
+      "shiftTo": -22.68
+     },
+     {
+      "t": 26.125,
+      "anchorX": 842.66,
+      "bodyX": 792.02,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.31,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.93,
+      "shiftFrom": -1.17,
+      "shiftTo": 0
+     },
+     {
+      "t": 56.5,
+      "anchorX": 1587.28,
+      "bodyX": 1540.83,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 58,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 58,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.28
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 6.81
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     }
+    },
+    "maxShadowHopPx": 1.79,
+    "maxShadowHopAt": {
+     "t": 25.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     14.84
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 4,
+    "name": "ФРЭНК · VERY_SLOW · ROLL",
+    "base": 0.75,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.09,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.05,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.76,
+      "shiftTo": 124.45
+     },
+     {
+      "t": 2.083,
+      "anchorX": 428.63,
+      "bodyX": 377.99,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.55,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.69,
+      "shiftFrom": 5.52,
+      "shiftTo": 0
+     },
+     {
+      "t": 19.958,
+      "anchorX": 802.09,
+      "bodyX": 755.64,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 21.5,
+      "anchorX": 818.2,
+      "bodyX": 765.84,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 25.833,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 27.417,
+      "anchorX": 818.2,
+      "bodyX": 765.85,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -141.44,
+      "shiftTo": -16.44
+     },
+     {
+      "t": 27.708,
+      "anchorX": 818.29,
+      "bodyX": 759.61,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.64,
+      "anchorStepPx": 0.05,
+      "shadowStepPx": -1.02,
+      "shiftFrom": -16.41,
+      "shiftTo": -16.37
+     },
+     {
+      "t": 29.125,
+      "anchorX": 840.83,
+      "bodyX": 790.19,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.53,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 1.7,
+      "shiftFrom": -0.73,
+      "shiftTo": 0
+     },
+     {
+      "t": 64.5,
+      "anchorX": 1579.92,
+      "bodyX": 1533.47,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 66,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 66,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -2.11
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.74
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 5.78
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     }
+    },
+    "maxShadowHopPx": 1.78,
+    "maxShadowHopAt": {
+     "t": 28.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     13.88
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   }
+  ],
   "PAIR": [
    {
     "lane": 1,
@@ -2805,7 +3882,7 @@
    },
    {
     "lane": 4,
-    "name": "ФРЭНК · NORMAL · ROLL (нет клипа)",
+    "name": "ФРЭНК · NORMAL · ROLL",
     "base": 1,
     "seams": [
      {
@@ -2867,6 +3944,42 @@
       "shadowStepPx": 0,
       "shiftFrom": -48.88,
       "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.97,
+      "from": "RACE_STAND",
+      "to": "roll10",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 20.833,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "roll113",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.05,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 22.417,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
      },
      {
       "t": 22.708,
@@ -2956,6 +4069,10 @@
       "followsSprite": -1.88,
       "atAnchor": -0.53
      },
+     "ROLL": {
+      "followsSprite": -1.62,
+      "atAnchor": 7.76
+     },
      "FINISH_DECELERATE": {
       "followsSprite": -1.88,
       "atAnchor": -0.53
@@ -2975,9 +4092,7 @@
      -20.6,
      15.71
     ],
-    "diagnostics": [
-     "ROLL: клипа Фрэнка нет (MISSING_ASSET) — не подменяется"
-    ],
+    "diagnostics": [],
     "labelsMissingFromAtlas": []
    }
   ]
@@ -2985,8 +4100,19 @@
  "roll": {
   "t0": 16.5,
   "t1": 22.541666666666668,
-  "diag": [
-   "ROLL: клипа Фрэнка нет (MISSING_ASSET) — не подменяется"
-  ]
- }
+  "diag": [],
+  "label": "roll46"
+ },
+ "recordings": [
+  {
+   "key": "ROLL_ALL",
+   "file": "LAB_FRENK_ROLL_5_categories_x1.mp4",
+   "framesDir": "results/_frames_ROLL_ALL"
+  },
+  {
+   "key": "PAIR",
+   "file": "LAB_PAIR_dog4_vs_frenk_NORMAL_x1.mp4",
+   "framesDir": "results/_frames_PAIR"
+  }
+ ]
 }

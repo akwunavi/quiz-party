@@ -9,6 +9,7 @@ Sources (decoded with ffmpeg libvpx-vp9 -pix_fmt rgba from these files; see ../R
   RACE_STAND     bulldog1-frenk/stop_v4/alpha/DOG1_RACE_STAND_v3_alpha_1276.webm
   sniffEv1..200  bulldog1-frenk/sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm
   bf1..bf93      bulldog1-frenk/butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm
+  roll10..113    bulldog1-frenk/roll_v1/alpha/DOG1_ROLL_v1_alpha.webm (source frame n)
 usage: build_frenk_atlas.py DECDIR (run/ v1f/ g3f/ v4/ stand.png sniff/ bf/)"""
 import sys,os,json,numpy as np
 from PIL import Image
@@ -18,11 +19,12 @@ groups={
  'start':['v1f1','v1f7','v1f8','v1f9','v1f10','v1f11','v1f16']+[f'g3f{n}' for n in range(2,36)],
  'stop':[f'v4k{n}' for n in range(38,74)]+['RACE_STAND'],
  'sniff':[f'sniffEv{n}' for n in range(1,201)],
- 'bf':[f'bf{n}' for n in range(1,94)]}
+ 'bf':[f'bf{n}' for n in range(1,94)],
+ 'roll':[f'roll{n}' for n in range(10,114)]}
 def src(lab):
     if lab=='RACE_STAND': return f'{D}/stand.png'
     for p,fn in (('run',lambda n:f'{D}/run/f{n-39:03d}.png'),('v1f',lambda n:f'{D}/v1f/f{n:03d}.png'),('g3f',lambda n:f'{D}/g3f/f{n:03d}.png'),
-                 ('v4k',lambda n:f'{D}/v4/f{n-37:03d}.png'),('sniffEv',lambda n:f'{D}/sniff/f{n:03d}.png'),('bf',lambda n:f'{D}/bf/f{n:03d}.png')):
+                 ('v4k',lambda n:f'{D}/v4/f{n-37:03d}.png'),('sniffEv',lambda n:f'{D}/sniff/f{n:03d}.png'),('bf',lambda n:f'{D}/bf/f{n:03d}.png'),('roll',lambda n:f'{D}/roll/f{n:03d}.png')):
         if lab.startswith(p) and lab[len(p):].isdigit(): return fn(int(lab[len(p):]))
     raise KeyError(lab)
 atlas={'cellWidth':W,'cellHeight':H,'columns':C,'sheets':{},'frames':{}}

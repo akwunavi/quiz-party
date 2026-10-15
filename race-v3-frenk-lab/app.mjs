@@ -23,13 +23,14 @@ function labRace(key,lanes){
 }
 const LAB={
   CHAIN_ALL:()=>labRace('CHAIN_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · SNIFF`,base:BASES[c],events:[['SNIFF_PEE',.35]]}))),
+  ROLL_ALL:()=>labRace('ROLL_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · ROLL`,base:BASES[c],events:[['ROLL',.35]]}))),
   BUTTERFLY_ALL:()=>labRace('BUTTERFLY_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · BUTTERFLY`,base:BASES[c],events:[['BUTTERFLY',.35]]}))),
   PAIR:()=>labRace('PAIR',[
     {char:'dog4',name:'№4 · NORMAL · SNIFF',base:1,events:[['SNIFF_PEE',.35]]},
     {char:'frenk',name:'ФРЭНК · NORMAL · SNIFF',base:1,events:[['SNIFF_PEE',.35]]},
     {char:'dog4',name:'№4 · NORMAL · BUTTERFLY',base:1,events:[['BUTTERFLY',.35]]},
     {char:'frenk',name:'ФРЭНК · NORMAL · BUTTERFLY',base:1,events:[['BUTTERFLY',.35]]},
-    {char:'frenk',name:'ФРЭНК · NORMAL · ROLL (нет клипа)',base:1,events:[['ROLL',.35]]}]),
+    {char:'frenk',name:'ФРЭНК · NORMAL · ROLL',base:1,events:[['ROLL',.35]]}]),
 };
 let preset='PAIR',t=0,playing=false,reference=0,referenceTime=0,race=null,frenkLane=-1;
 function build(){

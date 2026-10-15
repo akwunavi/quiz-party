@@ -98,12 +98,12 @@ function analyse(lanes){
   });
 }
 report.lanes={};
-for(const key of ['CHAIN_ALL','BUTTERFLY_ALL','PAIR']){report.lanes[key]=analyse(await sweep(key));}
+for(const key of ['CHAIN_ALL','BUTTERFLY_ALL','ROLL_ALL','PAIR']){report.lanes[key]=analyse(await sweep(key));}
 // ROLL diagnostic is visible on the canvas: seek into the ROLL window of PAIR lane 5 and read the page diagnostics
 {
   await page.evaluate(()=>window.frenkLab.select('PAIR'));
-  const roll=await page.evaluate(()=>{const d=window.frenkLab.race.dogs[4];const s=d.segments.find(x=>x.kind==='ROLL');window.frenkLab.seek((s.t0+s.t1)/2);return {t0:s.t0,t1:s.t1,diag:window.frenkLab.diagnostics};});
-  await writeFile(path.join(OUT,'roll_diagnostic.png'),await page.locator('#race').screenshot());
+  const roll=await page.evaluate(()=>{const d=window.frenkLab.race.dogs[4];const s=d.segments.find(x=>x.kind==='ROLL');window.frenkLab.seek(s.t0+1.5);return {t0:s.t0,t1:s.t1,diag:window.frenkLab.diagnostics,label:window.frenkLab.frenkAt(4,s.t0+1.5).label};});
+  await writeFile(path.join(OUT,'roll_in_lab.png'),await page.locator('#race').screenshot());
   report.roll=roll;
 }
 await writeFile(path.join(OUT,'lab_check.json'),JSON.stringify(report,null,1));
@@ -120,7 +120,7 @@ async function record(key,file,{from=0,to=null}={}){
 }
 if(RECORD){
   report.recordings=[];
-  for(const [key,file] of [['PAIR','LAB_PAIR_dog4_vs_frenk_NORMAL_x1.mp4'],['CHAIN_ALL','LAB_FRENK_SNIFF_chain_5_categories_x1.mp4'],['BUTTERFLY_ALL','LAB_FRENK_BUTTERFLY_5_categories_x1.mp4']]){
+  for(const [key,file] of (process.env.RECORD_KEYS?JSON.parse(process.env.RECORD_KEYS):[['PAIR','LAB_PAIR_dog4_vs_frenk_NORMAL_x1.mp4'],['CHAIN_ALL','LAB_FRENK_SNIFF_chain_5_categories_x1.mp4'],['BUTTERFLY_ALL','LAB_FRENK_BUTTERFLY_5_categories_x1.mp4'],['ROLL_ALL','LAB_FRENK_ROLL_5_categories_x1.mp4']])){
     const dir=await record(key,file);report.recordings.push({key,file,framesDir:path.relative(LAB,dir)});
   }
   await writeFile(path.join(OUT,'lab_check.json'),JSON.stringify(report,null,1));

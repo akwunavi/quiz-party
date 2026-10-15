@@ -1,7 +1,7 @@
 // Frenk visual layer for the browser lab. Physics is NOT touched: it reads the unmodified V3 segments of a dog
 // (dog4-v3-lab/model.mjs) and the unmodified P3 visualAt (race-v3-p3-lab/src/visual.mjs) with the LAB COPY of the
 // Frenk contract (STOP V4). On top of visualAt it applies the STOP V4 visual-metadata proposal (sprite shifts),
-// see characters/frenk.contract.lab.json -> shift.labRules. Missing clips (ROLL) are reported, never substituted.
+// see characters/frenk.contract.lab.json -> shift.labRules. Missing clips are reported, never substituted (ROLL v1 is connected).
 import {visualAt,categoryOf} from '../race-v3-p3-lab/src/visual.mjs';
 
 const MOVING_STOP=new Set(['STOP','FINISH_DECELERATE']);
@@ -32,6 +32,10 @@ export async function loadFrenk(dir='./'){
   // 8 frames in which the entry offset fades (stop shift[0] is category independent).
   const stopLabs=contract.clips.STOP.labels,e0=stopMeta.categories.NORMAL.stopShiftSrc[0],d0=runMean-e0*207/1276-smooth.get(stopLabs[0]);   // sprite px; e0 is in source px
   for(let i=0;i<8;i++){const u=i/8,w=1-u*u*(3-2*u);smooth.set(stopLabs[i],smooth.get(stopLabs[i])+d0*w);}
+  // ROLL: own centroid (body really moves sideways when the dog lies down), 5-frame smoothed, and blended to the
+  // RACE_STAND reference over the first/last 6 frames so the shadow does not hop at RACE_STAND <-> ROLL.
+  if(contract.clips.ROLL){const r=contract.clips.ROLL.labels,n=r.length,s0=r.map((l,i)=>{const w=r.slice(Math.max(0,i-2),i+3);return w.reduce((a,k)=>a+fr[k].cx,0)/w.length;});
+    r.forEach((l,i)=>{const ws=Math.max(0,1-i/6),we=Math.max(0,1-(n-1-i)/6);smooth.set(l,s0[i]+(standCx-s0[0])*ws+(standCx-s0[n-1])*we);});}
   const shadowRef=lab=>lab==null?standCx:/^run\d+$/.test(lab)?runMean:(lab==='RACE_STAND'||/^(sniffEv|bf)\d+$/.test(lab))?standCx:(smooth.get(lab)??fr[lab].cx);
   return {contract,stopMeta,atlas,sheets,oldC:contract.shift.arrays,shadowRef,runMean};
 }

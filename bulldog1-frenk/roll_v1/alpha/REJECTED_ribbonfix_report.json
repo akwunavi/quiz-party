@@ -1,0 +1,35 @@
+{
+ "input": "DOG1_ROLL_v1_alpha.webm",
+ "output": "DOG1_ROLL_v1_alpha_v2_ribbonfix.webm",
+ "framesChanged": [
+  {
+   "frame": 17,
+   "removedPx": 203
+  },
+  {
+   "frame": 18,
+   "removedPx": 3460
+  },
+  {
+   "frame": 19,
+   "removedPx": 3416
+  },
+  {
+   "frame": 20,
+   "removedPx": 9810
+  },
+  {
+   "frame": 85,
+   "removedPx": 9640
+  },
+  {
+   "frame": 86,
+   "removedPx": 8467
+  },
+  {
+   "frame": 89,
+   "removedPx": 2472
+  }
+ ],
+ "framesTotal": 121
+}

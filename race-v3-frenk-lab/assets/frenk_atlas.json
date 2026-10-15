@@ -7,7 +7,8 @@
 "start": "assets/frenk_start.png",
 "stop": "assets/frenk_stop.png",
 "sniff": "assets/frenk_sniff.png",
-"bf": "assets/frenk_bf.png"
+"bf": "assets/frenk_bf.png",
+"roll": "assets/frenk_roll.png"
 },
 "frames": {
 "run87": {
@@ -2306,6 +2307,630 @@
 "sheet": "bf",
 "index": 92,
 "cx": 118.596,
+"bottom": 109
+},
+"roll10": {
+"sheet": "roll",
+"index": 0,
+"cx": 118.584,
+"bottom": 109
+},
+"roll11": {
+"sheet": "roll",
+"index": 1,
+"cx": 118.578,
+"bottom": 109
+},
+"roll12": {
+"sheet": "roll",
+"index": 2,
+"cx": 118.531,
+"bottom": 109
+},
+"roll13": {
+"sheet": "roll",
+"index": 3,
+"cx": 118.301,
+"bottom": 109
+},
+"roll14": {
+"sheet": "roll",
+"index": 4,
+"cx": 117.973,
+"bottom": 109
+},
+"roll15": {
+"sheet": "roll",
+"index": 5,
+"cx": 117.325,
+"bottom": 109
+},
+"roll16": {
+"sheet": "roll",
+"index": 6,
+"cx": 115.909,
+"bottom": 109
+},
+"roll17": {
+"sheet": "roll",
+"index": 7,
+"cx": 115.853,
+"bottom": 109
+},
+"roll18": {
+"sheet": "roll",
+"index": 8,
+"cx": 116.513,
+"bottom": 109
+},
+"roll19": {
+"sheet": "roll",
+"index": 9,
+"cx": 116.238,
+"bottom": 108
+},
+"roll20": {
+"sheet": "roll",
+"index": 10,
+"cx": 115.021,
+"bottom": 107
+},
+"roll21": {
+"sheet": "roll",
+"index": 11,
+"cx": 114.604,
+"bottom": 107
+},
+"roll22": {
+"sheet": "roll",
+"index": 12,
+"cx": 114.916,
+"bottom": 106
+},
+"roll23": {
+"sheet": "roll",
+"index": 13,
+"cx": 113.965,
+"bottom": 105
+},
+"roll24": {
+"sheet": "roll",
+"index": 14,
+"cx": 111.917,
+"bottom": 105
+},
+"roll25": {
+"sheet": "roll",
+"index": 15,
+"cx": 112.4,
+"bottom": 106
+},
+"roll26": {
+"sheet": "roll",
+"index": 16,
+"cx": 112.024,
+"bottom": 106
+},
+"roll27": {
+"sheet": "roll",
+"index": 17,
+"cx": 111.813,
+"bottom": 107
+},
+"roll28": {
+"sheet": "roll",
+"index": 18,
+"cx": 111.7,
+"bottom": 107
+},
+"roll29": {
+"sheet": "roll",
+"index": 19,
+"cx": 111.429,
+"bottom": 107
+},
+"roll30": {
+"sheet": "roll",
+"index": 20,
+"cx": 111.428,
+"bottom": 107
+},
+"roll31": {
+"sheet": "roll",
+"index": 21,
+"cx": 111.805,
+"bottom": 107
+},
+"roll32": {
+"sheet": "roll",
+"index": 22,
+"cx": 111.755,
+"bottom": 105
+},
+"roll33": {
+"sheet": "roll",
+"index": 23,
+"cx": 112.173,
+"bottom": 105
+},
+"roll34": {
+"sheet": "roll",
+"index": 24,
+"cx": 112.941,
+"bottom": 105
+},
+"roll35": {
+"sheet": "roll",
+"index": 25,
+"cx": 113.283,
+"bottom": 105
+},
+"roll36": {
+"sheet": "roll",
+"index": 26,
+"cx": 113.516,
+"bottom": 105
+},
+"roll37": {
+"sheet": "roll",
+"index": 27,
+"cx": 113.62,
+"bottom": 105
+},
+"roll38": {
+"sheet": "roll",
+"index": 28,
+"cx": 113.041,
+"bottom": 105
+},
+"roll39": {
+"sheet": "roll",
+"index": 29,
+"cx": 112.262,
+"bottom": 105
+},
+"roll40": {
+"sheet": "roll",
+"index": 30,
+"cx": 111.539,
+"bottom": 105
+},
+"roll41": {
+"sheet": "roll",
+"index": 31,
+"cx": 111.192,
+"bottom": 105
+},
+"roll42": {
+"sheet": "roll",
+"index": 32,
+"cx": 111.256,
+"bottom": 105
+},
+"roll43": {
+"sheet": "roll",
+"index": 33,
+"cx": 111.187,
+"bottom": 105
+},
+"roll44": {
+"sheet": "roll",
+"index": 34,
+"cx": 111.531,
+"bottom": 105
+},
+"roll45": {
+"sheet": "roll",
+"index": 35,
+"cx": 112.102,
+"bottom": 105
+},
+"roll46": {
+"sheet": "roll",
+"index": 36,
+"cx": 112.467,
+"bottom": 105
+},
+"roll47": {
+"sheet": "roll",
+"index": 37,
+"cx": 112.615,
+"bottom": 105
+},
+"roll48": {
+"sheet": "roll",
+"index": 38,
+"cx": 112.008,
+"bottom": 105
+},
+"roll49": {
+"sheet": "roll",
+"index": 39,
+"cx": 112.462,
+"bottom": 105
+},
+"roll50": {
+"sheet": "roll",
+"index": 40,
+"cx": 112.569,
+"bottom": 106
+},
+"roll51": {
+"sheet": "roll",
+"index": 41,
+"cx": 112.612,
+"bottom": 106
+},
+"roll52": {
+"sheet": "roll",
+"index": 42,
+"cx": 112.248,
+"bottom": 106
+},
+"roll53": {
+"sheet": "roll",
+"index": 43,
+"cx": 112.005,
+"bottom": 106
+},
+"roll54": {
+"sheet": "roll",
+"index": 44,
+"cx": 111.4,
+"bottom": 106
+},
+"roll55": {
+"sheet": "roll",
+"index": 45,
+"cx": 110.591,
+"bottom": 106
+},
+"roll56": {
+"sheet": "roll",
+"index": 46,
+"cx": 111.068,
+"bottom": 106
+},
+"roll57": {
+"sheet": "roll",
+"index": 47,
+"cx": 111.061,
+"bottom": 105
+},
+"roll58": {
+"sheet": "roll",
+"index": 48,
+"cx": 111.165,
+"bottom": 105
+},
+"roll59": {
+"sheet": "roll",
+"index": 49,
+"cx": 111.147,
+"bottom": 105
+},
+"roll60": {
+"sheet": "roll",
+"index": 50,
+"cx": 111.469,
+"bottom": 105
+},
+"roll61": {
+"sheet": "roll",
+"index": 51,
+"cx": 111.816,
+"bottom": 105
+},
+"roll62": {
+"sheet": "roll",
+"index": 52,
+"cx": 111.989,
+"bottom": 105
+},
+"roll63": {
+"sheet": "roll",
+"index": 53,
+"cx": 112.08,
+"bottom": 105
+},
+"roll64": {
+"sheet": "roll",
+"index": 54,
+"cx": 112.722,
+"bottom": 105
+},
+"roll65": {
+"sheet": "roll",
+"index": 55,
+"cx": 113.036,
+"bottom": 105
+},
+"roll66": {
+"sheet": "roll",
+"index": 56,
+"cx": 112.532,
+"bottom": 106
+},
+"roll67": {
+"sheet": "roll",
+"index": 57,
+"cx": 111.921,
+"bottom": 106
+},
+"roll68": {
+"sheet": "roll",
+"index": 58,
+"cx": 111.244,
+"bottom": 106
+},
+"roll69": {
+"sheet": "roll",
+"index": 59,
+"cx": 111.201,
+"bottom": 106
+},
+"roll70": {
+"sheet": "roll",
+"index": 60,
+"cx": 111.348,
+"bottom": 106
+},
+"roll71": {
+"sheet": "roll",
+"index": 61,
+"cx": 111.666,
+"bottom": 106
+},
+"roll72": {
+"sheet": "roll",
+"index": 62,
+"cx": 111.384,
+"bottom": 105
+},
+"roll73": {
+"sheet": "roll",
+"index": 63,
+"cx": 111.975,
+"bottom": 105
+},
+"roll74": {
+"sheet": "roll",
+"index": 64,
+"cx": 112.873,
+"bottom": 105
+},
+"roll75": {
+"sheet": "roll",
+"index": 65,
+"cx": 112.719,
+"bottom": 105
+},
+"roll76": {
+"sheet": "roll",
+"index": 66,
+"cx": 112.021,
+"bottom": 105
+},
+"roll77": {
+"sheet": "roll",
+"index": 67,
+"cx": 111.87,
+"bottom": 105
+},
+"roll78": {
+"sheet": "roll",
+"index": 68,
+"cx": 111.823,
+"bottom": 105
+},
+"roll79": {
+"sheet": "roll",
+"index": 69,
+"cx": 111.658,
+"bottom": 105
+},
+"roll80": {
+"sheet": "roll",
+"index": 70,
+"cx": 111.524,
+"bottom": 105
+},
+"roll81": {
+"sheet": "roll",
+"index": 71,
+"cx": 111.659,
+"bottom": 105
+},
+"roll82": {
+"sheet": "roll",
+"index": 72,
+"cx": 112.057,
+"bottom": 105
+},
+"roll83": {
+"sheet": "roll",
+"index": 73,
+"cx": 112.013,
+"bottom": 105
+},
+"roll84": {
+"sheet": "roll",
+"index": 74,
+"cx": 110.507,
+"bottom": 105
+},
+"roll85": {
+"sheet": "roll",
+"index": 75,
+"cx": 110.766,
+"bottom": 104
+},
+"roll86": {
+"sheet": "roll",
+"index": 76,
+"cx": 110.869,
+"bottom": 105
+},
+"roll87": {
+"sheet": "roll",
+"index": 77,
+"cx": 110.743,
+"bottom": 105
+},
+"roll88": {
+"sheet": "roll",
+"index": 78,
+"cx": 111.389,
+"bottom": 108
+},
+"roll89": {
+"sheet": "roll",
+"index": 79,
+"cx": 111.634,
+"bottom": 109
+},
+"roll90": {
+"sheet": "roll",
+"index": 80,
+"cx": 112.931,
+"bottom": 109
+},
+"roll91": {
+"sheet": "roll",
+"index": 81,
+"cx": 114.185,
+"bottom": 109
+},
+"roll92": {
+"sheet": "roll",
+"index": 82,
+"cx": 115.248,
+"bottom": 109
+},
+"roll93": {
+"sheet": "roll",
+"index": 83,
+"cx": 116.218,
+"bottom": 109
+},
+"roll94": {
+"sheet": "roll",
+"index": 84,
+"cx": 117.77,
+"bottom": 109
+},
+"roll95": {
+"sheet": "roll",
+"index": 85,
+"cx": 118.746,
+"bottom": 109
+},
+"roll96": {
+"sheet": "roll",
+"index": 86,
+"cx": 119.169,
+"bottom": 109
+},
+"roll97": {
+"sheet": "roll",
+"index": 87,
+"cx": 119.117,
+"bottom": 109
+},
+"roll98": {
+"sheet": "roll",
+"index": 88,
+"cx": 119.009,
+"bottom": 109
+},
+"roll99": {
+"sheet": "roll",
+"index": 89,
+"cx": 118.722,
+"bottom": 109
+},
+"roll100": {
+"sheet": "roll",
+"index": 90,
+"cx": 118.624,
+"bottom": 109
+},
+"roll101": {
+"sheet": "roll",
+"index": 91,
+"cx": 118.52,
+"bottom": 109
+},
+"roll102": {
+"sheet": "roll",
+"index": 92,
+"cx": 118.494,
+"bottom": 109
+},
+"roll103": {
+"sheet": "roll",
+"index": 93,
+"cx": 118.487,
+"bottom": 109
+},
+"roll104": {
+"sheet": "roll",
+"index": 94,
+"cx": 118.514,
+"bottom": 109
+},
+"roll105": {
+"sheet": "roll",
+"index": 95,
+"cx": 118.583,
+"bottom": 109
+},
+"roll106": {
+"sheet": "roll",
+"index": 96,
+"cx": 118.65,
+"bottom": 109
+},
+"roll107": {
+"sheet": "roll",
+"index": 97,
+"cx": 118.699,
+"bottom": 109
+},
+"roll108": {
+"sheet": "roll",
+"index": 98,
+"cx": 118.713,
+"bottom": 109
+},
+"roll109": {
+"sheet": "roll",
+"index": 99,
+"cx": 118.684,
+"bottom": 109
+},
+"roll110": {
+"sheet": "roll",
+"index": 100,
+"cx": 118.671,
+"bottom": 109
+},
+"roll111": {
+"sheet": "roll",
+"index": 101,
+"cx": 118.639,
+"bottom": 109
+},
+"roll112": {
+"sheet": "roll",
+"index": 102,
+"cx": 118.628,
+"bottom": 109
+},
+"roll113": {
+"sheet": "roll",
+"index": 103,
+"cx": 118.617,
 "bottom": 109
 }
 }

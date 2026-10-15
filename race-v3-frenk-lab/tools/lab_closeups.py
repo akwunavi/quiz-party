@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Close-ups of Frenk's seams from the BROWSER-recorded frames (results/_frames_<KEY>/f%05d.png, frame = t*24), using the seam
 list of results/lab_check.json: for each seam of the chosen lane, frames [-8, +8], a 300x170 window centred on the visible
-body, x4 nearest (game pixels stay visible), 12 fps (= x0.5), captioned. usage: lab_closeups.py KEY LANE(1-based) OUT.mp4"""
+body, x4 nearest (game pixels stay visible), 12 fps (= x0.5), captioned. usage: lab_closeups.py KEY LANE(1-based) OUT.mp4 [FILTER: only seams whose from/to contains it, e.g. roll]"""
 import sys,json,os,subprocess,tempfile
 from PIL import Image,ImageDraw,ImageFont
-KEY,LANE,OUT=sys.argv[1],int(sys.argv[2]),sys.argv[3]
+KEY,LANE,OUT=sys.argv[1],int(sys.argv[2]),sys.argv[3]; FILT=sys.argv[4] if len(sys.argv)>4 else None
 H=os.path.dirname(os.path.abspath(__file__)); R=os.path.join(H,'..','results')
 rep=json.load(open(f'{R}/lab_check.json')); lane=[l for l in rep['lanes'][KEY] if l['lane']==LANE-1][0]
 L=json.load(open(os.path.join(H,'..','..','dog4-v3-lab','layout.json')))
 y0=L['laneTop']+(LANE-1)*L['laneStep']-L['spriteTopOffset']-40
 font=ImageFont.load_default(); tmp=tempfile.mkdtemp(); n=0
 for s in lane['seams']:
+    if FILT and FILT not in str(s['from'])+str(s['to']): continue
     k=round(s['t']*24); cx=int(round(s['bodyX']))
     for i in range(k-8,k+9):
         p=f'{R}/_frames_{KEY}/f{i:05d}.png'
