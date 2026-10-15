@@ -1,7 +1,7 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-15 (integration package frenk-integration-1.0.0)",
+ "as_of": "2026-10-15 (library frenk-library-1.0.0: race package frenk-integration-1.0.0 + IDLE / SELECTED / RETURN_TO_IDLE alpha)",
  "approved_set": {
   "note": "AUTHORITATIVE list of the approved Frenk versions (2026-10-15). Older sections of this file are history; where they disagree, this section and integration_v1/ win.",
   "integration_package": {
@@ -126,13 +126,65 @@
    "sha256": "eed84f1901d5b2269a8cc4aca1567c518363c60aaf7047f1d96f026b4ac698d5"
   },
   "IDLE": {
-   "status": "NOT READY: source only, no alpha, not a seamless loop",
-   "path": "assets/sources/bulldog_01_idle.mp4"
+   "status": "approved v1 (2026-10-15), alpha ready",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_IDLE_v1_alpha_loop220.webm",
+    "sha256": "26f11b74ec5168f5e688c001677ceb36b0e9c1216dd2b9f30ddd09d674794867",
+    "bytes": 2647317,
+    "frames": 220
+   },
+   "builtFrom": {
+    "path": "selection_alpha_v1/DOG1_IDLE_v1_alpha_f8-f118.webm",
+    "sha256": "40dbb708e61ccdb01488d9c426bfcd56925f300f45c3ceba8912a541894ed3aa",
+    "bytes": 1330587,
+    "frames": 111
+   },
+   "source": {
+    "path": "assets/sources/bulldog_01_idle.mp4",
+    "sha256": "2311906d92b62357e77f3c662e28976c85a98d9f53b2afec7bf3bf9f86761e1f",
+    "bytes": 2031122
+   },
+   "order": "source f8..f118 then f117..f9 (ping-pong); after the last frame comes the first one",
+   "loop": true
   },
   "SELECTED": {
-   "status": "NOT READY: source only, no alpha, ends in an excited pose (exit does not match the next clip)",
-   "path": "assets/sources/bulldog_01_selected.mp4"
-  }
+   "status": "approved v1 (2026-10-15), alpha ready; source motion defects accepted",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_SELECTED_v1_alpha_f20-f121.webm",
+    "sha256": "1aab817a0df74ef3e88620b1c03bee4f05efa139826168538538c3fd57f66126",
+    "bytes": 1426699,
+    "frames": 102
+   },
+   "source": {
+    "path": "assets/sources/bulldog_01_selected.mp4",
+    "sha256": "ffd5c25a71c8bf6cf825f43407aed282873c417f9662eefbff8032127a2998d4",
+    "bytes": 2232871
+   },
+   "order": "source f20..f121"
+  },
+  "library": {
+   "path": "library_v1/",
+   "libraryVersion": "frenk-library-1.0.0",
+   "index": "library_v1/LIBRARY.json",
+   "verify": "python3 library_v1/verify_library.py"
+  },
+  "RETURN_TO_IDLE": {
+   "status": "approved v1 (commit ef37006, montage + brightness grade), alpha ready",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm",
+    "sha256": "866a33aa5b07f95254aedde9c838af62dd11b0db0dbe070dfb69b115e49cecf0",
+    "bytes": 1279851,
+    "frames": 120
+   },
+   "source": {
+    "path": "return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4",
+    "sha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb",
+    "bytes": 1785791
+   },
+   "order": "Kling r2..r121 with the approved per-channel brightness grade (return_to_idle_v1/make_graded_frames.py)",
+   "next": "IDLE loop index 1 (f9)"
+  },
+  "selection_sequence": "IDLE (loop, any number of cycles) -> SELECTED (once) -> RETURN_TO_IDLE (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0)."
  },
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
@@ -668,7 +720,7 @@
  "idle_selected_v1": {
   "path": "idle_selected_v1/",
   "report": "idle_selected_v1/REPORT.md",
-  "status": "ACCEPTED by user 2026-10-15 (IDLE loop f8-f118-f9, SELECTED f20-f121; SELECTED source defects accepted); alpha not made yet",
+  "status": "ACCEPTED (montage); alpha in selection_alpha_v1/",
   "IDLE": "ping-pong loop f8..f118 then f117..f9 (220 frames, 9.17 s) from assets/sources/bulldog_01_idle.mp4",
   "SELECTED": "f20..f121 (102 frames, 4.25 s) from assets/sources/bulldog_01_selected.mp4; source defect f97-f99 (face smear)"
  },
@@ -681,12 +733,16 @@
  },
  "return_to_idle_v1": {
   "path": "return_to_idle_v1/",
-  "status": "generated (1 attempt, 30 credits), montage candidate r2-r121 graded; awaiting visual acceptance; no alpha",
+  "status": "ACCEPTED (commit ef37006, montage + grade); alpha in selection_alpha_v1/",
   "source": {
    "path": "return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4",
    "sha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb"
   },
   "generationId": "Ad9a5UlnNQYtFMACvyXgDnYhOkvcZRLE0jjnVANDdc2ZqPUS98WW8Xzh0hp5zp-_KD59xP8p",
   "chain": "IDLE loop -> SELECTED f20-f121 -> RETURN r2-r121 -> IDLE f9 forward (loop)"
+ },
+ "selection_alpha_v1": {
+  "path": "selection_alpha_v1/",
+  "status": "alpha of the three approved selection animations, verified in the browser"
  }
 }

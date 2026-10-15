@@ -1,0 +1,122 @@
+{
+ "segments": [
+  {
+   "seg": 1,
+   "clip": "idle",
+   "firstIndex": 0,
+   "lastIndex": 219,
+   "presented": 220,
+   "expected": 220,
+   "missing": [],
+   "meanFrameMs": 41.6,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 66.8,
+   "holdBeforeThisSegMs": null
+  },
+  {
+   "seg": 2,
+   "clip": "idle",
+   "firstIndex": 0,
+   "lastIndex": 0,
+   "presented": 1,
+   "expected": 1,
+   "missing": [],
+   "meanFrameMs": 0.0,
+   "p95FrameMs": 0.0,
+   "maxFrameMs": 0.0,
+   "holdBeforeThisSegMs": 33.4
+  },
+  {
+   "seg": 3,
+   "clip": "sel",
+   "firstIndex": 0,
+   "lastIndex": 101,
+   "presented": 97,
+   "expected": 102,
+   "missing": [
+    96,
+    97,
+    98,
+    99,
+    100
+   ],
+   "meanFrameMs": 43.6,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 233.4,
+   "holdBeforeThisSegMs": 30.6
+  },
+  {
+   "seg": 4,
+   "clip": "ret",
+   "firstIndex": 0,
+   "lastIndex": 119,
+   "presented": 116,
+   "expected": 120,
+   "missing": [
+    31,
+    32,
+    33,
+    37
+   ],
+   "meanFrameMs": 43.0,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 199.9,
+   "holdBeforeThisSegMs": 49.5
+  },
+  {
+   "seg": 5,
+   "clip": "idle",
+   "firstIndex": 1,
+   "lastIndex": 219,
+   "presented": 219,
+   "expected": 219,
+   "missing": [],
+   "meanFrameMs": 41.6,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 66.8,
+   "holdBeforeThisSegMs": 40.6
+  },
+  {
+   "seg": 6,
+   "clip": "idle",
+   "firstIndex": 0,
+   "lastIndex": 219,
+   "presented": 220,
+   "expected": 220,
+   "missing": [],
+   "meanFrameMs": 41.6,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 66.8,
+   "holdBeforeThisSegMs": 33.3
+  },
+  {
+   "seg": 7,
+   "clip": "idle",
+   "firstIndex": 0,
+   "lastIndex": 219,
+   "presented": 220,
+   "expected": 220,
+   "missing": [],
+   "meanFrameMs": 41.7,
+   "p95FrameMs": 66.7,
+   "maxFrameMs": 66.8,
+   "holdBeforeThisSegMs": 33.3
+  },
+  {
+   "seg": 8,
+   "clip": "idle",
+   "firstIndex": 0,
+   "lastIndex": 0,
+   "presented": 1,
+   "expected": 1,
+   "missing": [],
+   "meanFrameMs": 0.0,
+   "p95FrameMs": 0.0,
+   "maxFrameMs": 0.0,
+   "holdBeforeThisSegMs": 16.6
+  }
+ ],
+ "framesExpected": 1103,
+ "framesMissing": 9,
+ "idleCyclesAfterReturn": 3
+}

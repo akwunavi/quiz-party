@@ -1,0 +1,78 @@
+{
+ "frames": 1101,
+ "allPresent": true,
+ "cornerAlphaMax": 0.0,
+ "ordinarySteps_p50_p99_max": {
+  "d_cx": [
+   0.076,
+   2.173,
+   4.828
+  ],
+  "d_cy": [
+   0.155,
+   7.924,
+   20.444
+  ],
+  "d_bottom": [
+   0.0,
+   6.0,
+   9.0
+  ],
+  "d_top": [
+   0.0,
+   14.04,
+   30.0
+  ],
+  "d_bright": [
+   0.228,
+   5.701,
+   13.915
+  ],
+  "d_sharp": [
+   3.501,
+   37.08,
+   73.786
+  ]
+ },
+ "switches": [
+  {
+   "k": 220,
+   "from": "idle#219",
+   "to": "sel#0",
+   "switch": true,
+   "d_cx": 0.178,
+   "d_cy": -0.318,
+   "d_bottom": 0.0,
+   "d_top": -1.0,
+   "d_area": 308,
+   "d_bright": 1.406,
+   "d_sharp": -20.738
+  },
+  {
+   "k": 322,
+   "from": "sel#101",
+   "to": "ret#0",
+   "switch": true,
+   "d_cx": 0.029,
+   "d_cy": 0.095,
+   "d_bottom": 0.0,
+   "d_top": 0.0,
+   "d_area": 95,
+   "d_bright": -0.117,
+   "d_sharp": -44.68
+  },
+  {
+   "k": 442,
+   "from": "ret#119",
+   "to": "idle#1",
+   "switch": true,
+   "d_cx": -0.034,
+   "d_cy": -0.003,
+   "d_bottom": 0.0,
+   "d_top": 0.0,
+   "d_area": -48,
+   "d_bright": -1.327,
+   "d_sharp": 27.301
+  }
+ ]
+}

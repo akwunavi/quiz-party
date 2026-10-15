@@ -1,0 +1,150 @@
+{
+ "libraryVersion": "frenk-library-1.0.0",
+ "character": "bulldog1-frenk",
+ "race": {
+  "package": "integration_v1/",
+  "contractVersion": "frenk-integration-1.0.0",
+  "status": "approved, unchanged by this library",
+  "readme": "integration_v1/README.md",
+  "states": [
+   "RACE_STAND",
+   "RUN",
+   "RACE_START",
+   "STOP (V4)",
+   "SNIFF_PEE (V3.2)",
+   "BUTTERFLY",
+   "ROLL",
+   "FINISH (= STOP V4)"
+  ],
+  "files": [
+   {
+    "path": "integration_v1/contract/frenk.contract.integration.json",
+    "sha256": "be99b188d3ac8433a95ae726b6df1cd2a4d915e6f32aaf49015b0f73a8e61f12",
+    "bytes": 19023
+   },
+   {
+    "path": "integration_v1/contract/frenk_start_shift_arrays.json",
+    "sha256": "c2cf47e847ff390d9125d9c96b77039f483fa04c1599cc8cd0d1a1c0a5d44698",
+    "bytes": 9225
+   },
+   {
+    "path": "integration_v1/contract/frenk_stop_v4_shift_arrays.json",
+    "sha256": "766e2ac8a45a6b279327d7b2f11bc9dee0750f6c66f8de3fa139176dae9b40ba",
+    "bytes": 6418
+   },
+   {
+    "path": "integration_v1/atlas/frenk_atlas.json",
+    "sha256": "97f08e5047af772edee08081edc090a94a1c07b1002bd2fc9eafff4ed29a49db",
+    "bytes": 36701
+   },
+   {
+    "path": "integration_v1/atlas/frenk_run.png",
+    "sha256": "36e7c191912eaa006d29c29d0f0e606014a5f912b72dbb5960e947f91fdd517c",
+    "bytes": 190955
+   },
+   {
+    "path": "integration_v1/atlas/frenk_start.png",
+    "sha256": "0d4ec915d7f44bbe948271b8968a24668ceb161b696e513987347c374c61b53a",
+    "bytes": 684608
+   },
+   {
+    "path": "integration_v1/atlas/frenk_stop.png",
+    "sha256": "628076c97f9c1e63da70a5dd6d628466556b51d117ae8c54828a0cf478efa14e",
+    "bytes": 553877
+   },
+   {
+    "path": "integration_v1/atlas/frenk_sniff.png",
+    "sha256": "51562d389ac23d2fb9164077805a9aff9bfe417f34e1e2b6031cf306781eda7f",
+    "bytes": 3147088
+   },
+   {
+    "path": "integration_v1/atlas/frenk_bf.png",
+    "sha256": "6494b4be0c56c9a3cbfed66b025da77c80700ad99f9a67c9ba230d452a8f24e0",
+    "bytes": 1250055
+   },
+   {
+    "path": "integration_v1/atlas/frenk_roll.png",
+    "sha256": "059b1f24695ff5da69723bae3ff7ac845255943533fe85fe786bfa2270afc24d",
+    "bytes": 1454406
+   },
+   {
+    "path": "integration_v1/runtime/frenk_visual.mjs",
+    "sha256": "85f6e41ed7c434f561aa9e74b5518599bdaa5fee60331dc2a88d00ec7ecf0619",
+    "bytes": 8088
+   }
+  ],
+  "check": "node integration_v1/tools/check_package.mjs; integration_v1/tools/rebuild_atlas.sh"
+ },
+ "selection": {
+  "canvas": "1276x720, 24 fps, VP9 + alpha (alpha_mode=1, decode with libvpx-vp9), same studio camera for all three clips; the dog is not repositioned or scaled between clips",
+  "sequence": "IDLE (loop, any number of cycles) -> SELECTED (once) -> RETURN_TO_IDLE (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0).",
+  "IDLE": {
+   "status": "approved v1",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_IDLE_v1_alpha_loop220.webm",
+    "sha256": "26f11b74ec5168f5e688c001677ceb36b0e9c1216dd2b9f30ddd09d674794867",
+    "bytes": 2647317,
+    "frames": 220
+   },
+   "loop": true,
+   "order": "source f8..f118 then f117..f9 (ping-pong); after the last frame comes the first one",
+   "builtFrom": {
+    "path": "selection_alpha_v1/DOG1_IDLE_v1_alpha_f8-f118.webm",
+    "sha256": "40dbb708e61ccdb01488d9c426bfcd56925f300f45c3ceba8912a541894ed3aa",
+    "bytes": 1330587,
+    "frames": 111
+   },
+   "source": {
+    "path": "assets/sources/bulldog_01_idle.mp4",
+    "sha256": "2311906d92b62357e77f3c662e28976c85a98d9f53b2afec7bf3bf9f86761e1f",
+    "bytes": 2031122
+   },
+   "build": "selection_alpha_v1/build_idle_loop.sh",
+   "montage": "idle_selected_v1/labels.json"
+  },
+  "SELECTED": {
+   "status": "approved v1",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_SELECTED_v1_alpha_f20-f121.webm",
+    "sha256": "1aab817a0df74ef3e88620b1c03bee4f05efa139826168538538c3fd57f66126",
+    "bytes": 1426699,
+    "frames": 102
+   },
+   "loop": false,
+   "order": "source f20..f121",
+   "source": {
+    "path": "assets/sources/bulldog_01_selected.mp4",
+    "sha256": "ffd5c25a71c8bf6cf825f43407aed282873c417f9662eefbff8032127a2998d4",
+    "bytes": 2232871
+   },
+   "montage": "idle_selected_v1/labels.json"
+  },
+  "RETURN_TO_IDLE": {
+   "status": "approved v1 (commit ef37006, montage + grade)",
+   "file": {
+    "path": "selection_alpha_v1/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm",
+    "sha256": "866a33aa5b07f95254aedde9c838af62dd11b0db0dbe070dfb69b115e49cecf0",
+    "bytes": 1279851,
+    "frames": 120
+   },
+   "loop": false,
+   "order": "Kling r2..r121 with the approved per-channel brightness grade (return_to_idle_v1/make_graded_frames.py)",
+   "source": {
+    "path": "return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4",
+    "sha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb",
+    "bytes": 1785791
+   },
+   "next": "IDLE loop index 1"
+  },
+  "alpha": {
+   "pipeline": "alpha_pipeline/dog_alpha.py (default settings)",
+   "run": "selection_alpha_v1/run_alpha.sh"
+  }
+ },
+ "notInSequences": {
+  "FRONT_STAND": "approved still with alpha (assets/approved/DOG1_FRONT_STAND_alpha_frame0.png); not part of any sequence",
+  "FIRST_START": "accepted-as-working alpha (assets/approved/DOG1_FIRST_START_alpha_src25-63.webm); not part of any sequence",
+  "selectionToRace": "not designed (out of scope)"
+ },
+ "verify": "python3 library_v1/verify_library.py  (hashes, containers, alpha, rebuild of the IDLE loop and the RETURN grade, race package check)"
+}
