@@ -42,3 +42,15 @@ The same French bulldog, side view, facing right. In the first frame he is landi
 
 ## После приёмки (не сейчас)
 Монтаж: RUN … #96 → кадры STOP V4 до первой стойки → удержание/обрезка → RACE_STAND (`stopEntry.previousRunFrame = 96` не меняется); окно `STOP_s` и долг M2 — по фактической длине; alpha — только после того, как пользователь посмотрит MP4.
+
+## Промпт пользователя (15.10.2026, заменяет промпт выше)
+```
+The same French bulldog, side view, facing right. In the first frame he is already contacting the ground with his front paws after a gallop. From that exact first frame onward, he immediately begins braking and does not perform any new running stride.
+
+His front legs brace and absorb momentum, his hind legs come forward underneath the body and plant, and the body decelerates smoothly. He settles into a complete stop standing upright on all four paws, chest raised, head raised, matching the last frame exactly, then remains still.
+
+He stays in the same place in the frame at the same scale. Static camera, same framing, same lighting, same background.
+
+No extra running step, no sitting, no lying down, no bowing, no crouching on the chest, no dust, no particles, no sliding paws, no jump, no body distortion.
+```
+Параметры без изменений (kling-video-v3_0, 3 с, 720p, 1 видео, без звука, prefer_multi_shots false, 18 кредитов).
