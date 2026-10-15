@@ -25,12 +25,12 @@
 
 ## Промпт
 ```
-The same French bulldog puppy, side view facing right, standing on all four paws exactly as in the first frame. He plops down onto his side and rolls onto his back, then happily wiggles his back on the floor with all four short legs kicking in the air, stubby tail wagging, ears flopping, a joyful playful face. Then he rolls back the same way onto his belly, pushes up with his front legs first, stands up on all four paws and settles into exactly the same standing pose and the same spot as in the last frame, holding still at the end. He stays in the same place on the floor at the same size. Static camera, same framing, same plain studio background and lighting. One dog with four legs and one tail. No jumping, no running, no extra steps, no dust, no objects.
+The same French bulldog puppy, side view facing right, standing on all four paws exactly as in the first frame. He quickly drops down and rolls over onto his back, belly up, white chest and belly facing the sky. Lying on his back, he wiggles happily from side to side and kicks all four short legs in the air like pedaling a bicycle, paws up, stubby tail wagging, ears flopping on the floor, a joyful playful face. He stays on his back for most of the clip. Then he rolls back onto his belly, pushes up with his front legs first, stands up on all four paws and settles into exactly the same standing pose and the same spot as in the last frame, holding still at the end. He stays in the same place on the floor at the same size. Static camera, same framing, same plain studio background and lighting. One dog with four legs and one tail. No jumping, no running, no extra steps, no dust, no objects.
 ```
 Почему так: валяние здесь нужно, поэтому слова «lying/rolls onto his back» разрешены. Запрещены только прыжок, бег и шаги: так модель не уводит собаку с места, а именно это раньше ломало STOP. Начало и конец заданы одной и той же картинкой, поэтому место и масштаб в кадре не должны меняться.
 
 ## Приёмка MP4 (до монтажа и alpha)
-1. Есть все четыре фазы: заваливание на бок → на спине с лапами вверх (≥ 1 с) → понятный обратный перекат и вставание сначала передом → стойка.
+1. Есть все четыре фазы: переворот → **на спине, животом вверх, лапы дрыгают в воздухе (≥ 1,5 с; лежание просто на боку не засчитывается)** → понятный обратный перекат и вставание сначала передом → стойка.
 2. Собака не уезжает: центр корпуса в первой и последней секунде в пределах ±15 исх. px от RACE_STAND, низ лап в стойке y 679 ± 5. Корпус не вращается вокруг точки, как на платформе.
 3. Анатомия на всех кадрах: четыре лапы, один хвост, белая грудь и окрас без дрейфа, морда Фрэнка.
 4. Финал совпадает с RACE_STAND (IoU силуэта ≥ 0,9) хотя бы на 3–5 последних кадрах; начало тоже.
