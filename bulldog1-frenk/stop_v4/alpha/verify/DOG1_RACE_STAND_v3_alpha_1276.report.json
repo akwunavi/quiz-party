@@ -1,0 +1,31 @@
+{
+ "container": {
+  "codec_name": "vp9",
+  "width": 1276,
+  "height": 720,
+  "pix_fmt": "yuv420p",
+  "r_frame_rate": "25/1",
+  "nb_read_frames": "1",
+  "tags": {
+   "ALPHA_MODE": "1"
+  }
+ },
+ "container_ok": true,
+ "frames_decoded": 1,
+ "corner_alpha_max": 0,
+ "alpha_range": [
+  0,
+  255
+ ],
+ "coverage_min_max": [
+  0.209,
+  0.209
+ ],
+ "frames_with_extra_islands_over_20px": [],
+ "largest_extra_island_px": 0,
+ "neighbour_mask_iou_min_mean": null,
+ "semi_transparent_px_mean": 7623,
+ "chromium": {
+  "error": "Page.wait_for_function: Timeout 20000ms exceeded."
+ }
+}

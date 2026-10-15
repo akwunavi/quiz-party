@@ -1,7 +1,7 @@
 {
  "timeline": "chain_timeline_v1_before.json",
- "insideClipsIoUMedian": 0.803,
- "insideClipsIoUP10": 0.75,
+ "insideClipsIoUMedian": 0.936,
+ "insideClipsIoUP10": 0.76,
  "seams": [
   {
    "k": 30,
@@ -9,6 +9,20 @@
    "to": "stop1",
    "iou": 0.782,
    "centroidStepCanvasPx": -0.6
+  },
+  {
+   "k": 103,
+   "from": "stop73",
+   "to": "sniffEv1",
+   "iou": 0.994,
+   "centroidStepCanvasPx": -0.03
+  },
+  {
+   "k": 303,
+   "from": "sniffEv200",
+   "to": "RACE_STAND",
+   "iou": 0.994,
+   "centroidStepCanvasPx": -0.02
   },
   {
    "k": 304,

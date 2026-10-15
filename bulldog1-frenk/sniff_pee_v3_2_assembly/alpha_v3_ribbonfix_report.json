@@ -1,0 +1,23 @@
+{
+ "input": "DOG1_SNIFF_PEE_V3_2_EVENT_alpha.webm",
+ "output": "DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm",
+ "framesChanged": [
+  {
+   "frame": 21,
+   "removedPx": 4230
+  },
+  {
+   "frame": 22,
+   "removedPx": 4626
+  },
+  {
+   "frame": 69,
+   "removedPx": 4602
+  },
+  {
+   "frame": 70,
+   "removedPx": 4394
+  }
+ ],
+ "framesTotal": 200
+}

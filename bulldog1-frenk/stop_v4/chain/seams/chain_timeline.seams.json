@@ -1,0 +1,56 @@
+{
+ "timeline": "chain_timeline.json",
+ "insideClipsIoUMedian": 0.95,
+ "insideClipsIoUP10": 0.768,
+ "seams": [
+  {
+   "k": 30,
+   "from": "run96",
+   "to": "v4k38",
+   "iou": 0.729,
+   "centroidStepCanvasPx": -0.55
+  },
+  {
+   "k": 66,
+   "from": "v4k73",
+   "to": "RACE_STAND",
+   "iou": 0.995,
+   "centroidStepCanvasPx": -0.04
+  },
+  {
+   "k": 67,
+   "from": "RACE_STAND",
+   "to": "sniffEv1",
+   "iou": 0.992,
+   "centroidStepCanvasPx": 0.01
+  },
+  {
+   "k": 267,
+   "from": "sniffEv200",
+   "to": "RACE_STAND",
+   "iou": 0.994,
+   "centroidStepCanvasPx": -0.02
+  },
+  {
+   "k": 304,
+   "from": "RACE_STAND",
+   "to": "v1f1",
+   "iou": 0.995,
+   "centroidStepCanvasPx": 0.03
+  },
+  {
+   "k": 311,
+   "from": "v1f16",
+   "to": "g3f2",
+   "iou": 0.965,
+   "centroidStepCanvasPx": -0.54
+  },
+  {
+   "k": 345,
+   "from": "g3f35",
+   "to": "run88",
+   "iou": 0.811,
+   "centroidStepCanvasPx": -0.07
+  }
+ ]
+}
