@@ -668,8 +668,15 @@
  "idle_selected_v1": {
   "path": "idle_selected_v1/",
   "report": "idle_selected_v1/REPORT.md",
-  "status": "montage candidates awaiting user visual acceptance; no alpha, no generation",
+  "status": "ACCEPTED by user 2026-10-15 (IDLE loop f8-f118-f9, SELECTED f20-f121; SELECTED source defects accepted); alpha not made yet",
   "IDLE": "ping-pong loop f8..f118 then f117..f9 (220 frames, 9.17 s) from assets/sources/bulldog_01_idle.mp4",
   "SELECTED": "f20..f121 (102 frames, 4.25 s) from assets/sources/bulldog_01_selected.mp4; source defect f97-f99 (face smear)"
+ },
+ "return_to_idle_prep": {
+  "path": "return_to_idle_prep/",
+  "status": "no montage solution (SEL f121 vs nearest IDLE frame 10.2 vs moving step 2.2); plan for one Kling generation, not launched",
+  "first": "KLING_FIRST_SELECTED_f121_1276.png",
+  "last": "KLING_LAST_IDLE_f8_1276.png",
+  "cost": "5 s = 30 credits (recommended) or 3 s = 18"
  }
 }
