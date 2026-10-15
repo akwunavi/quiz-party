@@ -1,0 +1,39 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "BASE": {
+      "file": "dog4assets/base.png",
+      "frames": 1
+    },
+    "START": {
+      "file": "dog4assets/start.png",
+      "frames": 40
+    },
+    "RUN": {
+      "file": "dog4assets/run.png",
+      "frames": 23
+    },
+    "STOP": {
+      "file": "dog4assets/stop.png",
+      "frames": 37
+    },
+    "SNIFF_PEE": {
+      "file": "dog4assets/sniff_pee.png",
+      "frames": 229
+    },
+    "RETURN": {
+      "file": "dog4assets/return.png",
+      "frames": 109
+    },
+    "BUTTERFLY": {
+      "file": "dog4assets/butterfly.png",
+      "frames": 121
+    },
+    "ROLL": {
+      "file": "dog4assets/roll.png",
+      "frames": 145
+    }
+  }
+}

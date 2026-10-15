@@ -1,0 +1,2992 @@
+{
+ "generated": "2026-10-15T11:38:16.997Z",
+ "chromium": "141.0.7390.37",
+ "errors": [],
+ "reproducibility": [
+  {
+   "seed": 20261013,
+   "frenkLane": -1,
+   "identical": true,
+   "lab": [
+    57.014038906,
+    50.691026918,
+    61.288102374,
+    57.597261116,
+    47.060535515
+   ],
+   "node": [
+    57.014038906,
+    50.691026918,
+    61.288102374,
+    57.597261116,
+    47.060535515
+   ]
+  },
+  {
+   "seed": 20261013,
+   "frenkLane": 2,
+   "identical": true,
+   "lab": [
+    57.014038906,
+    50.691026918,
+    61.288102374,
+    57.597261116,
+    47.060535515
+   ],
+   "node": [
+    57.014038906,
+    50.691026918,
+    61.288102374,
+    57.597261116,
+    47.060535515
+   ]
+  },
+  {
+   "seed": 1069078,
+   "frenkLane": -1,
+   "identical": true,
+   "lab": [
+    49.058892279,
+    46.729133221,
+    49.315047482,
+    53.711742667,
+    58.536365816
+   ],
+   "node": [
+    49.058892279,
+    46.729133221,
+    49.315047482,
+    53.711742667,
+    58.536365816
+   ]
+  },
+  {
+   "seed": 1069078,
+   "frenkLane": 2,
+   "identical": true,
+   "lab": [
+    49.058892279,
+    46.729133221,
+    49.315047482,
+    53.711742667,
+    58.536365816
+   ],
+   "node": [
+    49.058892279,
+    46.729133221,
+    49.315047482,
+    53.711742667,
+    58.536365816
+   ]
+  },
+  {
+   "seed": 7,
+   "frenkLane": -1,
+   "identical": true,
+   "lab": [
+    51.859996637,
+    45.325475358,
+    51.048289799,
+    54.028788938,
+    62.576768769
+   ],
+   "node": [
+    51.859996637,
+    45.325475358,
+    51.048289799,
+    54.028788938,
+    62.576768769
+   ]
+  },
+  {
+   "seed": 7,
+   "frenkLane": 2,
+   "identical": true,
+   "lab": [
+    51.859996637,
+    45.325475358,
+    51.048289799,
+    54.028788938,
+    62.576768769
+   ],
+   "node": [
+    51.859996637,
+    45.325475358,
+    51.048289799,
+    54.028788938,
+    62.576768769
+   ]
+  },
+  {
+   "seed": 4242,
+   "frenkLane": -1,
+   "identical": true,
+   "lab": [
+    54.415001593,
+    53.435650761,
+    51.365185696,
+    50.20947569,
+    50.338065047
+   ],
+   "node": [
+    54.415001593,
+    53.435650761,
+    51.365185696,
+    50.20947569,
+    50.338065047
+   ]
+  },
+  {
+   "seed": 4242,
+   "frenkLane": 2,
+   "identical": true,
+   "lab": [
+    54.415001593,
+    53.435650761,
+    51.365185696,
+    50.20947569,
+    50.338065047
+   ],
+   "node": [
+    54.415001593,
+    53.435650761,
+    51.365185696,
+    50.20947569,
+    50.338065047
+   ]
+  },
+  {
+   "seed": 123456789,
+   "frenkLane": -1,
+   "identical": true,
+   "lab": [
+    58.047548922,
+    48.021216771,
+    59.044496606,
+    54.1019949,
+    46.127230898
+   ],
+   "node": [
+    58.047548922,
+    48.021216771,
+    59.044496606,
+    54.1019949,
+    46.127230898
+   ]
+  },
+  {
+   "seed": 123456789,
+   "frenkLane": 2,
+   "identical": true,
+   "lab": [
+    58.047548922,
+    48.021216771,
+    59.044496606,
+    54.1019949,
+    46.127230898
+   ],
+   "node": [
+    58.047548922,
+    48.021216771,
+    59.044496606,
+    54.1019949,
+    46.127230898
+   ]
+  }
+ ],
+ "dog4Pixels": {
+  "originalPageStatus": "Готово · пять дорожек · один clock",
+  "frames": [
+   {
+    "seed": 20261013,
+    "time": 12.3,
+    "orig": "_px/orig_0.png",
+    "lab": "_px/lab_0.png"
+   },
+   {
+    "seed": 20261013,
+    "time": 30.1,
+    "orig": "_px/orig_1.png",
+    "lab": "_px/lab_1.png"
+   },
+   {
+    "seed": 1069078,
+    "time": 22,
+    "orig": "_px/orig_2.png",
+    "lab": "_px/lab_2.png"
+   }
+  ]
+ },
+ "lanes": {
+  "CHAIN_ALL": [
+   {
+    "lane": 0,
+    "name": "ФРЭНК · VERY_FAST · SNIFF",
+    "base": 1.25,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.15,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.61,
+      "shiftTo": 124.09
+     },
+     {
+      "t": 2.083,
+      "anchorX": 443.72,
+      "bodyX": 393.08,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.36,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 7.97,
+      "shiftTo": 0
+     },
+     {
+      "t": 11.958,
+      "anchorX": 787.58,
+      "bodyX": 741.14,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 13.5,
+      "anchorX": 814.43,
+      "bodyX": 758.09,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 21.833,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 23.375,
+      "anchorX": 814.43,
+      "bodyX": 758.11,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -165.88,
+      "shiftTo": -40.88
+     },
+     {
+      "t": 23.667,
+      "anchorX": 814.63,
+      "bodyX": 752.02,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.56,
+      "anchorStepPx": 0.11,
+      "shadowStepPx": -0.94,
+      "shiftFrom": -40.75,
+      "shiftTo": -40.58
+     },
+     {
+      "t": 25.083,
+      "anchorX": 852.8,
+      "bodyX": 802.16,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.35,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 2.59,
+      "shiftFrom": -2.61,
+      "shiftTo": 0
+     },
+     {
+      "t": 45.958,
+      "anchorX": 1579.7,
+      "bodyX": 1533.25,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 47.458,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 47.458,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 0.96
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.7
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 7.99
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 24.167,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     17.48
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 1,
+    "name": "ФРЭНК · FAST · SNIFF",
+    "base": 1.12,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.13,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.65,
+      "shiftTo": 124.18
+     },
+     {
+      "t": 2.083,
+      "anchorX": 439.8,
+      "bodyX": 389.16,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.47,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 0.77,
+      "shiftFrom": 7.67,
+      "shiftTo": 0
+     },
+     {
+      "t": 13.458,
+      "anchorX": 794.7,
+      "bodyX": 748.25,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 15,
+      "anchorX": 818.75,
+      "bodyX": 763.44,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 23.333,
+      "anchorX": 818.75,
+      "bodyX": 763.44,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 24.875,
+      "anchorX": 818.75,
+      "bodyX": 763.47,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -159.53,
+      "shiftTo": -34.53
+     },
+     {
+      "t": 25.167,
+      "anchorX": 818.93,
+      "bodyX": 757.34,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.58,
+      "anchorStepPx": 0.09,
+      "shadowStepPx": -0.96,
+      "shiftFrom": -34.43,
+      "shiftTo": -34.3
+     },
+     {
+      "t": 26.583,
+      "anchorX": 853.14,
+      "bodyX": 802.49,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.12,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 2.36,
+      "shiftFrom": -2.12,
+      "shiftTo": 0
+     },
+     {
+      "t": 49.958,
+      "anchorX": 1582.43,
+      "bodyX": 1535.99,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 51.458,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 51.458,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 0.14
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.73
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 6.96
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 25.667,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     16.56
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 2,
+    "name": "ФРЭНК · NORMAL · SNIFF",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.96,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 24.833,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 26.375,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
+     },
+     {
+      "t": 26.667,
+      "anchorX": 816.47,
+      "bodyX": 755.83,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.59,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.98,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 28.083,
+      "anchorX": 847.01,
+      "bodyX": 796.37,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 54.458,
+      "anchorX": 1581.75,
+      "bodyX": 1535.3,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 55.958,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 55.958,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.62
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 6.01
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 27.167,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 3,
+    "name": "ФРЭНК · SLOW · SNIFF",
+    "base": 0.88,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.1,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.07,
+      "shiftFrom": 124.72,
+      "shiftTo": 124.36
+     },
+     {
+      "t": 2.083,
+      "anchorX": 432.56,
+      "bodyX": 381.91,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.54,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 0.7,
+      "shiftFrom": 6.41,
+      "shiftTo": 0
+     },
+     {
+      "t": 16.958,
+      "anchorX": 797.21,
+      "bodyX": 750.76,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 18.5,
+      "anchorX": 816.1,
+      "bodyX": 762.7,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 26.833,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 28.375,
+      "anchorX": 816.1,
+      "bodyX": 762.72,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -147.8,
+      "shiftTo": -22.8
+     },
+     {
+      "t": 28.667,
+      "anchorX": 816.25,
+      "bodyX": 756.54,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.61,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -0.99,
+      "shiftFrom": -22.75,
+      "shiftTo": -22.68
+     },
+     {
+      "t": 30.083,
+      "anchorX": 843.12,
+      "bodyX": 792.48,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.31,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.93,
+      "shiftFrom": -1.17,
+      "shiftTo": 0
+     },
+     {
+      "t": 60.458,
+      "anchorX": 1587.74,
+      "bodyX": 1541.29,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 61.958,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 61.958,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.38
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 5.06
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     }
+    },
+    "maxShadowHopPx": 1.79,
+    "maxShadowHopAt": {
+     "t": 29.167,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     14.84
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 4,
+    "name": "ФРЭНК · VERY_SLOW · SNIFF",
+    "base": 0.75,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.09,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.05,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.76,
+      "shiftTo": 124.45
+     },
+     {
+      "t": 2.083,
+      "anchorX": 428.63,
+      "bodyX": 377.99,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.55,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.69,
+      "shiftFrom": 5.52,
+      "shiftTo": 0
+     },
+     {
+      "t": 19.958,
+      "anchorX": 802.09,
+      "bodyX": 755.64,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 21.5,
+      "anchorX": 818.2,
+      "bodyX": 765.83,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 29.833,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 31.375,
+      "anchorX": 818.2,
+      "bodyX": 765.85,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -141.44,
+      "shiftTo": -16.44
+     },
+     {
+      "t": 31.667,
+      "anchorX": 818.32,
+      "bodyX": 759.64,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.01,
+      "shiftFrom": -16.41,
+      "shiftTo": -16.37
+     },
+     {
+      "t": 33.083,
+      "anchorX": 841.22,
+      "bodyX": 790.58,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.53,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 1.7,
+      "shiftFrom": -0.73,
+      "shiftTo": 0
+     },
+     {
+      "t": 68.458,
+      "anchorX": 1580.31,
+      "bodyX": 1533.86,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 69.958,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 69.958,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -2.21
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.74
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 4.03
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     }
+    },
+    "maxShadowHopPx": 1.78,
+    "maxShadowHopAt": {
+     "t": 32.167,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     13.88
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   }
+  ],
+  "BUTTERFLY_ALL": [
+   {
+    "lane": 0,
+    "name": "ФРЭНК · VERY_FAST · BUTTERFLY",
+    "base": 1.25,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.15,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.61,
+      "shiftTo": 124.09
+     },
+     {
+      "t": 2.083,
+      "anchorX": 443.72,
+      "bodyX": 393.08,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.36,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 7.97,
+      "shiftTo": 0
+     },
+     {
+      "t": 11.958,
+      "anchorX": 787.58,
+      "bodyX": 741.14,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 13.5,
+      "anchorX": 814.43,
+      "bodyX": 758.11,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 17.375,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -165.88,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 18.417,
+      "anchorX": 814.43,
+      "bodyX": 758.11,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -165.88,
+      "shiftTo": -40.88
+     },
+     {
+      "t": 18.708,
+      "anchorX": 814.57,
+      "bodyX": 751.97,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.58,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.96,
+      "shiftFrom": -40.75,
+      "shiftTo": -40.58
+     },
+     {
+      "t": 20.125,
+      "anchorX": 852.15,
+      "bodyX": 801.51,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.35,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 2.59,
+      "shiftFrom": -2.61,
+      "shiftTo": 0
+     },
+     {
+      "t": 41,
+      "anchorX": 1579.05,
+      "bodyX": 1532.6,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.33,
+      "anchorStepPx": 1.45,
+      "shadowStepPx": 1.45,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 42.5,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 13.458,
+      "anchorX": 814.43,
+      "bodyX": 758.08,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     },
+     {
+      "t": 42.5,
+      "anchorX": 1605.89,
+      "bodyX": 1549.54,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -61.1,
+      "shiftTo": -165.88
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 1.08
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.7
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 6.07
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": 0.38
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 19.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     17.48
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 1,
+    "name": "ФРЭНК · FAST · BUTTERFLY",
+    "base": 1.12,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.13,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.65,
+      "shiftTo": 124.18
+     },
+     {
+      "t": 2.083,
+      "anchorX": 439.8,
+      "bodyX": 389.16,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.47,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 0.77,
+      "shiftFrom": 7.67,
+      "shiftTo": 0
+     },
+     {
+      "t": 13.458,
+      "anchorX": 794.7,
+      "bodyX": 748.25,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 15,
+      "anchorX": 818.75,
+      "bodyX": 763.46,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 18.875,
+      "anchorX": 818.75,
+      "bodyX": 763.44,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -159.53,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 19.917,
+      "anchorX": 818.75,
+      "bodyX": 763.47,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -159.53,
+      "shiftTo": -34.53
+     },
+     {
+      "t": 20.208,
+      "anchorX": 818.88,
+      "bodyX": 757.29,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.6,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.98,
+      "shiftFrom": -34.43,
+      "shiftTo": -34.3
+     },
+     {
+      "t": 21.625,
+      "anchorX": 852.55,
+      "bodyX": 801.91,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": 0.12,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 2.36,
+      "shiftFrom": -2.12,
+      "shiftTo": 0
+     },
+     {
+      "t": 45,
+      "anchorX": 1581.85,
+      "bodyX": 1535.4,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.48,
+      "anchorStepPx": 1.3,
+      "shadowStepPx": 1.3,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 46.5,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 14.958,
+      "anchorX": 818.75,
+      "bodyX": 763.43,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     },
+     {
+      "t": 46.5,
+      "anchorX": 1605.9,
+      "bodyX": 1550.58,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -54.75,
+      "shiftTo": -159.53
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": 0.25
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.73
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 5.04
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.09
+     }
+    },
+    "maxShadowHopPx": 1.81,
+    "maxShadowHopAt": {
+     "t": 20.708,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     16.56
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 2,
+    "name": "ФРЭНК · NORMAL · BUTTERFLY",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.97,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 20.375,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 21.417,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
+     },
+     {
+      "t": 21.708,
+      "anchorX": 816.43,
+      "bodyX": 755.78,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.61,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -0.99,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 23.125,
+      "anchorX": 846.49,
+      "bodyX": 795.85,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 49.5,
+      "anchorX": 1581.22,
+      "bodyX": 1534.77,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 51,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 51,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.51
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 4.09
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 22.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 3,
+    "name": "ФРЭНК · SLOW · BUTTERFLY",
+    "base": 0.88,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.1,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.07,
+      "shiftFrom": 124.72,
+      "shiftTo": 124.36
+     },
+     {
+      "t": 2.083,
+      "anchorX": 432.56,
+      "bodyX": 381.91,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.54,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 0.7,
+      "shiftFrom": 6.41,
+      "shiftTo": 0
+     },
+     {
+      "t": 16.958,
+      "anchorX": 797.21,
+      "bodyX": 750.76,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 18.5,
+      "anchorX": 816.1,
+      "bodyX": 762.72,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 22.375,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -147.8,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 23.417,
+      "anchorX": 816.1,
+      "bodyX": 762.72,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -147.8,
+      "shiftTo": -22.8
+     },
+     {
+      "t": 23.708,
+      "anchorX": 816.21,
+      "bodyX": 756.5,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 0.06,
+      "shadowStepPx": -1.01,
+      "shiftFrom": -22.75,
+      "shiftTo": -22.68
+     },
+     {
+      "t": 25.125,
+      "anchorX": 842.66,
+      "bodyX": 792.02,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.31,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.93,
+      "shiftFrom": -1.17,
+      "shiftTo": 0
+     },
+     {
+      "t": 55.5,
+      "anchorX": 1587.28,
+      "bodyX": 1540.83,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.76,
+      "anchorStepPx": 1.02,
+      "shadowStepPx": 1.02,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 57,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 18.458,
+      "anchorX": 816.1,
+      "bodyX": 762.69,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     },
+     {
+      "t": 57,
+      "anchorX": 1606.18,
+      "bodyX": 1552.77,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -43.02,
+      "shiftTo": -147.8
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.28
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 3.14
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.97
+     }
+    },
+    "maxShadowHopPx": 1.79,
+    "maxShadowHopAt": {
+     "t": 24.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     14.84
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 4,
+    "name": "ФРЭНК · VERY_SLOW · BUTTERFLY",
+    "base": 0.75,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.09,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.05,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.76,
+      "shiftTo": 124.45
+     },
+     {
+      "t": 2.083,
+      "anchorX": 428.63,
+      "bodyX": 377.99,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.55,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.69,
+      "shiftFrom": 5.52,
+      "shiftTo": 0
+     },
+     {
+      "t": 19.958,
+      "anchorX": 802.09,
+      "bodyX": 755.64,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 21.5,
+      "anchorX": 818.2,
+      "bodyX": 765.84,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 25.375,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -141.44,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 26.417,
+      "anchorX": 818.2,
+      "bodyX": 765.85,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -141.44,
+      "shiftTo": -16.44
+     },
+     {
+      "t": 26.708,
+      "anchorX": 818.29,
+      "bodyX": 759.61,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.64,
+      "anchorStepPx": 0.05,
+      "shadowStepPx": -1.02,
+      "shiftFrom": -16.41,
+      "shiftTo": -16.37
+     },
+     {
+      "t": 28.125,
+      "anchorX": 840.83,
+      "bodyX": 790.19,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.53,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 1.7,
+      "shiftFrom": -0.73,
+      "shiftTo": 0
+     },
+     {
+      "t": 63.5,
+      "anchorX": 1579.92,
+      "bodyX": 1533.47,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.91,
+      "anchorStepPx": 0.87,
+      "shadowStepPx": 0.87,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 65,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 21.458,
+      "anchorX": 818.2,
+      "bodyX": 765.82,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     },
+     {
+      "t": 65,
+      "anchorX": 1596.02,
+      "bodyX": 1543.64,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -36.66,
+      "shiftTo": -141.44
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -2.11
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.74
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 2.11
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -1.44
+     }
+    },
+    "maxShadowHopPx": 1.78,
+    "maxShadowHopAt": {
+     "t": 27.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     13.88
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   }
+  ],
+  "PAIR": [
+   {
+    "lane": 1,
+    "name": "ФРЭНК · NORMAL · SNIFF",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.96,
+      "from": "RACE_STAND",
+      "to": "sniffEv1",
+      "bodyStepPx": 0.01,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 24.833,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "sniffEv200",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 26.375,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
+     },
+     {
+      "t": 26.667,
+      "anchorX": 816.47,
+      "bodyX": 755.83,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.59,
+      "anchorStepPx": 0.08,
+      "shadowStepPx": -0.98,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 28.083,
+      "anchorX": 847.01,
+      "bodyX": 796.37,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 54.458,
+      "anchorX": 1581.75,
+      "bodyX": 1535.3,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 55.958,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 55.958,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.62
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "SNIFF_PEE": {
+      "followsSprite": 0.03,
+      "atAnchor": 6.01
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 27.167,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     6.38
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 3,
+    "name": "ФРЭНК · NORMAL · BUTTERFLY",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 16.5,
+      "anchorX": 816.31,
+      "bodyX": 761.97,
+      "from": "RACE_STAND",
+      "to": "bf1",
+      "bodyStepPx": 0.02,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 20.375,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "bf93",
+      "to": "RACE_STAND",
+      "bodyStepPx": -0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": 0,
+      "shiftFrom": -153.66,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 21.417,
+      "anchorX": 816.31,
+      "bodyX": 761.98,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": -153.66,
+      "shiftTo": -28.66
+     },
+     {
+      "t": 21.708,
+      "anchorX": 816.43,
+      "bodyX": 755.78,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.61,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -0.99,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 23.125,
+      "anchorX": 846.49,
+      "bodyX": 795.85,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 49.5,
+      "anchorX": 1581.22,
+      "bodyX": 1534.77,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 51,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 51,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.51
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "BUTTERFLY": {
+      "followsSprite": -1.89,
+      "atAnchor": 4.09
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 22.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [],
+    "labelsMissingFromAtlas": []
+   },
+   {
+    "lane": 4,
+    "name": "ФРЭНК · NORMAL · ROLL (нет клипа)",
+    "base": 1,
+    "seams": [
+     {
+      "t": 0.375,
+      "anchorX": 406,
+      "bodyX": 376.6,
+      "from": "RACE_STAND",
+      "to": "v1f1",
+      "bodyStepPx": 0.03,
+      "anchorStepPx": 0,
+      "shadowStepPx": -0.6,
+      "shiftFrom": 0,
+      "shiftTo": 125
+     },
+     {
+      "t": 0.667,
+      "anchorX": 406.12,
+      "bodyX": 370.25,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.69,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -1.08,
+      "shiftFrom": 124.69,
+      "shiftTo": 124.27
+     },
+     {
+      "t": 2.083,
+      "anchorX": 436.18,
+      "bodyX": 385.53,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -1.51,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 0.72,
+      "shiftFrom": 7.11,
+      "shiftTo": 0
+     },
+     {
+      "t": 14.958,
+      "anchorX": 794.84,
+      "bodyX": 748.39,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 22.708,
+      "anchorX": 816.43,
+      "bodyX": 755.78,
+      "from": "v1f16",
+      "to": "g3f2",
+      "bodyStepPx": -0.61,
+      "anchorStepPx": 0.07,
+      "shadowStepPx": -0.99,
+      "shiftFrom": -28.59,
+      "shiftTo": -28.49
+     },
+     {
+      "t": 24.125,
+      "anchorX": 846.49,
+      "bodyX": 795.85,
+      "from": "g3f35",
+      "to": "run88",
+      "bodyStepPx": -0.1,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 2.14,
+      "shiftFrom": -1.63,
+      "shiftTo": 0
+     },
+     {
+      "t": 50.5,
+      "anchorX": 1581.22,
+      "bodyX": 1534.77,
+      "from": "run96",
+      "to": "v4k38",
+      "bodyStepPx": -0.62,
+      "anchorStepPx": 1.16,
+      "shadowStepPx": 1.16,
+      "shiftFrom": 0,
+      "shiftTo": -20.51
+     },
+     {
+      "t": 52,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "stopEndSwitch": [
+     {
+      "t": 16.458,
+      "anchorX": 816.31,
+      "bodyX": 761.95,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     },
+     {
+      "t": 52,
+      "anchorX": 1602.7,
+      "bodyX": 1548.33,
+      "from": "v4k73",
+      "to": "RACE_STAND",
+      "bodyStepPx": 0,
+      "anchorStepPx": 0.01,
+      "shadowStepPx": 0,
+      "shiftFrom": -48.88,
+      "shiftTo": -153.66
+     }
+    ],
+    "shadowByWindow": {
+     "BASE": {
+      "followsSprite": -1.62,
+      "atAnchor": -0.51
+     },
+     "START": {
+      "followsSprite": -1.62,
+      "atAnchor": -1.75
+     },
+     "STOP": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     },
+     "FINISH_DECELERATE": {
+      "followsSprite": -1.88,
+      "atAnchor": -0.53
+     }
+    },
+    "maxShadowHopPx": 1.8,
+    "maxShadowHopAt": {
+     "t": 23.208,
+     "from": "g3f13",
+     "to": "g3f14"
+    },
+    "shadowMinusBodyPx": [
+     -6.29,
+     2.14
+    ],
+    "anchorShadowMinusBodyPx_forContrast": [
+     -20.6,
+     15.71
+    ],
+    "diagnostics": [
+     "ROLL: клипа Фрэнка нет (MISSING_ASSET) — не подменяется"
+    ],
+    "labelsMissingFromAtlas": []
+   }
+  ]
+ },
+ "roll": {
+  "t0": 16.5,
+  "t1": 22.541666666666668,
+  "diag": [
+   "ROLL: клипа Фрэнка нет (MISSING_ASSET) — не подменяется"
+  ]
+ }
+}
