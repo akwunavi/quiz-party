@@ -664,5 +664,12 @@
   "tests": "T1-T4,T8-T10 PASS; T5 FAIL (BUTTERFLY after STOP -11 frames); T6,T7 PARTIAL; T11 NOT_RUN; T12 PARTIAL",
   "readiness": "architecture ready for integration design; Frenk NOT ready (ROLL missing, SNIFF no alpha, FINISH provisional, START not visually accepted, STOP paw contact fails strict criterion)",
   "readiness_update_2026_10_15": "superseded by integration_v1/ (ROLL, SNIFF alpha, FINISH decision and lab acceptance done)"
+ },
+ "idle_selected_v1": {
+  "path": "idle_selected_v1/",
+  "report": "idle_selected_v1/REPORT.md",
+  "status": "montage candidates awaiting user visual acceptance; no alpha, no generation",
+  "IDLE": "ping-pong loop f8..f118 then f117..f9 (220 frames, 9.17 s) from assets/sources/bulldog_01_idle.mp4",
+  "SELECTED": "f20..f121 (102 frames, 4.25 s) from assets/sources/bulldog_01_selected.mp4; source defect f97-f99 (face smear)"
  }
 }
