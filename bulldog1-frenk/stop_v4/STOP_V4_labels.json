@@ -1,0 +1,13 @@
+{
+ "source": "stop_v4/DOG1_STOP_v4_kling_source.mp4 (unchanged; 1276x720, 24 fps, 73 frames, SHA-256 652dfc18...)",
+ "frames_1_based": {
+  "k1-k37": "gallop in place (Kling repeats the RUN cycle: k33~#93 IoU 0.90, k36-k37~#96 0.85) - NOT used",
+  "k38": "STOP start: first frame after RUN #96 (IoU #96->k38 0.81; RUN neighbours 0.79-0.88); front paws on the ground",
+  "k38-k52": "braking (15 frames, 0.625 s): front legs brace, hind legs come under, head dips k41-k46 (head top y 228-256), no sit/lie",
+  "k53": "four-paw stand reached (first frame with adjacent IoU >= 0.95)",
+  "k53-k57": "settle (adjacent IoU 0.95-0.988)",
+  "k58-k73": "static tail with small head/ear motion (adjacent 0.977-0.998); k73 vs approved RACE_STAND 0.97 (best of the tail)"
+ },
+ "main_montage": "RUN ... #96 -> k38..k73 (36 frames) -> approved RACE_STAND; STOP window = 36 + 1 RACE_STAND frame = 37 frames = canonical STOP 37/24 s",
+ "not_trimmed": "static tail k58-k73 kept: the STOP window is 37 frames anyway, and k73 is the closest frame to the approved RACE_STAND (an earlier cut, e.g. k60 -> RACE_STAND, is a worse seam 0.956)"
+}

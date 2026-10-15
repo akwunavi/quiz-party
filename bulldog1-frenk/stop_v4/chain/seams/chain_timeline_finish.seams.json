@@ -1,0 +1,21 @@
+{
+ "timeline": "chain_timeline_finish.json",
+ "insideClipsIoUMedian": 0.892,
+ "insideClipsIoUP10": 0.76,
+ "seams": [
+  {
+   "k": 30,
+   "from": "run96",
+   "to": "v4k38",
+   "iou": 0.729,
+   "centroidStepCanvasPx": -0.55
+  },
+  {
+   "k": 66,
+   "from": "v4k73",
+   "to": "RACE_STAND",
+   "iou": 0.995,
+   "centroidStepCanvasPx": -0.04
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+ "timeline": "chain_timeline_v1_before.json",
+ "insideClipsIoUMedian": 0.803,
+ "insideClipsIoUP10": 0.75,
+ "seams": [
+  {
+   "k": 30,
+   "from": "run96",
+   "to": "stop1",
+   "iou": 0.782,
+   "centroidStepCanvasPx": -0.6
+  },
+  {
+   "k": 304,
+   "from": "RACE_STAND",
+   "to": "v1f1",
+   "iou": 0.995,
+   "centroidStepCanvasPx": 0.03
+  },
+  {
+   "k": 311,
+   "from": "v1f16",
+   "to": "g3f2",
+   "iou": 0.959,
+   "centroidStepCanvasPx": -0.7
+  },
+  {
+   "k": 345,
+   "from": "g3f35",
+   "to": "run88",
+   "iou": 0.816,
+   "centroidStepCanvasPx": -1.53
+  }
+ ]
+}
