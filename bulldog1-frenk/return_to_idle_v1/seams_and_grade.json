@@ -1,0 +1,1 @@
+{"offsets_rgb_start": [1.808, 2.071, 2.181], "offsets_rgb_end": [2.453, 3.061, 2.838], "seams": {"sel121_to_r2_raw": 2.32, "sel121_to_r2_corr": 0.77, "r121_to_idle9_raw": 2.78, "r121_to_idle9_corr": 0.83, "ref_idle8_to_9": 0.26, "ref_sel120_to_121": 0.21, "r1_vs_sel121_corr": 0.59, "r121_vs_idle8_corr": 0.74}}

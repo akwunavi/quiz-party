@@ -678,5 +678,15 @@
   "first": "KLING_FIRST_SELECTED_f121_1276.png",
   "last": "KLING_LAST_IDLE_f8_1276.png",
   "cost": "5 s = 30 credits (recommended) or 3 s = 18"
+ },
+ "return_to_idle_v1": {
+  "path": "return_to_idle_v1/",
+  "status": "generated (1 attempt, 30 credits), montage candidate r2-r121 graded; awaiting visual acceptance; no alpha",
+  "source": {
+   "path": "return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4",
+   "sha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb"
+  },
+  "generationId": "Ad9a5UlnNQYtFMACvyXgDnYhOkvcZRLE0jjnVANDdc2ZqPUS98WW8Xzh0hp5zp-_KD59xP8p",
+  "chain": "IDLE loop -> SELECTED f20-f121 -> RETURN r2-r121 -> IDLE f9 forward (loop)"
  }
 }

@@ -14,7 +14,7 @@
 | FINISH | ГОТОВО (решение 15.10) | тот же STOP V4, затем RACE_STAND |
 | FRONT_STAND, FIRST_START | не в контракте гонки V3 | alpha есть (приняты как рабочие 13.10), в лаборатории не проверялись |
 | IDLE, SELECTED | УТВЕРЖДЕНЫ (монтаж v1, alpha ещё нет) | `idle_selected_v1/`: IDLE — цикл f8→f118→f9, 9,17 с; SELECTED — f20–f121, 4,25 с |
-| RETURN_TO_IDLE (SELECTED → IDLE) | НЕТ: монтажом невозможен, план одной генерации ждёт решения | `return_to_idle_prep/PLAN.md` |
+| RETURN_TO_IDLE (SELECTED → IDLE) | НА ПРИЁМКЕ (Kling v1, без alpha) | `return_to_idle_v1/`: r2–r121, 5,0 с, поправка тона; дальше IDLE с f9 |
 
 Ниже — история статусов до 15.10.2026 (может расходиться с таблицей выше; верна таблица выше).
 

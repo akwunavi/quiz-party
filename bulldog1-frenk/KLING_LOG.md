@@ -110,3 +110,6 @@ The camera is completely fixed: no zoom, no pan, no shake, no change of angle. T
 
 ## 14. MARKING_MOTION v1 (14.10.2026)
 - `image_to_video`, `kling-video-v3_0`, 720p, 5 с, first=C1b, tail=MARKING_POSE v4 (выровнен +44/+20 px), **30 кредитов** (206 -> 176). generationId ASyPQYqmOQ7MFlj8yZrzTdcxkKlMSpBRANRmBqlvF2q7PUVyaSFkv83tkObh_xp47UHkbOOj. Видео доходит до позы метки и держит её ~2,5 с; alpha не запускалась. `marking_motion_v1/RESULT.md`.
+
+## 15. RETURN_TO_IDLE v1 (15.10.2026)
+- `image_to_video`, `kling-video-v3_0`, 720p, 5 с, audio off, multi-shot off, first = SELECTED f121, tail = IDLE f8; промпт пользователя дословно; **30 кредитов** (3056 -> 3026; общий баланс аккаунта на момент запуска). generationId Ad9a5UlnNQYtFMACvyXgDnYhOkvcZRLE0jjnVANDdc2ZqPUS98WW8Xzh0hp5zp-_KD59xP8p. Готово примерно за 1 минуту. Поза в начале и конце совпала точно (корреляция 1,000), кадры темнее на 2–3 уровня (исправляется поправкой тона при монтаже). Результат — `return_to_idle_v1/RESULT.md`, на приёмке.
