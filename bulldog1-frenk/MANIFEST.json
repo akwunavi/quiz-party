@@ -1,7 +1,139 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-14 (SNIFF_PEE V1 generated)",
+ "as_of": "2026-10-15 (integration package frenk-integration-1.0.0)",
+ "approved_set": {
+  "note": "AUTHORITATIVE list of the approved Frenk versions (2026-10-15). Older sections of this file are history; where they disagree, this section and integration_v1/ win.",
+  "integration_package": {
+   "path": "integration_v1/",
+   "contract": "integration_v1/contract/frenk.contract.integration.json",
+   "contractVersion": "frenk-integration-1.0.0",
+   "readme": "integration_v1/README.md"
+  },
+  "RACE_STAND": {
+   "status": "approved (v3)",
+   "source": {
+    "path": "roll_prep/KLING_FIRST_AND_LAST_RACE_STAND_v3_1276.png",
+    "sha256": "5d873c41408e8d221661242d5fdb11bbd100691cf9d7e8dde09acb56d257c0a6",
+    "note": "1276x720 frame from which the RACE_STAND alpha was made (also first=last image of BUTTERFLY and ROLL)"
+   },
+   "alpha": {
+    "path": "stop_v4/alpha/DOG1_RACE_STAND_v3_alpha_1276.webm",
+    "sha256": "927983b7a3f41239e58749a9b2fd393d63f7deff73265c339062ae6a2d36e1e3"
+   },
+   "used_in_game": "single frame RACE_STAND",
+   "master": {
+    "path": "assets/approved/DOG1_RACE_STAND_v3_2720x1536.png",
+    "sha256": "83214715a108c7c216a567e88a825dcc6a010a509ff440ffae7e6a024ccee07a"
+   }
+  },
+  "RUN": {
+   "status": "approved",
+   "frames": "#87-98 of bulldog_01_run.mp4 (12 frames = 0.5 s)",
+   "alpha": {
+    "path": "git:origin/preview/bulldogs-1235-alpha-20261008@8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c:dog1-run-alpha.webm",
+    "sha256": "d2c2762797a393f03eca8ec28213d39f43783c52cddbaab59bed9f60a3347075"
+   },
+   "used_in_game": "run87..run98"
+  },
+  "RACE_START": {
+   "status": "accepted_working (user; browser lab 2026-10-15)",
+   "composition": "V1 f1,f7-f11,f16 -> gen3 f2-f35 -> RUN #88-98 -> loop #87-98, lead 3",
+   "sources": [
+    {
+     "path": "race_start_v1/DOG1_RACE_START_v1_kling_source.mp4",
+     "sha256": "826c73fd6ff7fd9a1a89f03676887069e8564fa3a75ff28b78df3b64653e6d50"
+    },
+    {
+     "path": "race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4",
+     "sha256": "772d432d0070698e799f30795acdd214ec939d66263f97dd1209bc64affd9d08"
+    }
+   ],
+   "alpha": [
+    {
+     "path": "race_start_v1/DOG1_RACE_START_v1_alpha.webm",
+     "sha256": "8388d401f116a1a1d523cd7d385eb5c48d70e127fdcb1e697ebf32356e24cc77"
+    },
+    {
+     "path": "race_start_gen3/DOG1_RACE_START_gen3_alpha.webm",
+     "sha256": "326e5826d8b565ed20b52d1fc036ab7c85fa936ad82f4c8eb9e665f96db99c1c"
+    }
+   ],
+   "metadata": "native START shift arrays (integration_v1/contract/frenk_start_shift_arrays.json)"
+  },
+  "STOP": {
+   "status": "accepted_working: STOP V4 (user 2026-10-15)",
+   "source": {
+    "path": "stop_v4/DOG1_STOP_v4_kling_source.mp4",
+    "sha256": "652dfc18d32e2fd1daff8a69ac57ab23b8b6766ca89a22eddb54b6ba90e0e395"
+   },
+   "alpha": {
+    "path": "stop_v4/alpha/DOG1_STOP_v4_alpha_k38-k73.webm",
+    "sha256": "2040c95941bcd3a3f956f711de34628e9d1fbc3ce96d8ea62085b20c93bf27f7"
+   },
+   "used_in_game": "v4k38..v4k73 + RACE_STAND (37 frames = canonical STOP)",
+   "metadata": "integration_v1/contract/frenk_stop_v4_shift_arrays.json (= stop_v4/metadata, accepted)",
+   "supersedes": "STOP v1 (assets/approved/DOG1_STOP_v1_*) and STOP v2/v3 are history, not used"
+  },
+  "SNIFF_PEE": {
+   "status": "accepted_working: V3.2 EVENT, alpha v3 ribbonfix",
+   "source": {
+    "path": "sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT.mp4",
+    "sha256": "c6640fb265510823a095b0e40a8dd4b03a10ee77541b1f3cb7bff6101439a0ad"
+   },
+   "alpha": {
+    "path": "sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm",
+    "sha256": "106bba1d16b79c9a96e8030eed05885fb19b8ee44002608797243aacab917029"
+   },
+   "used_in_game": "sniffEv1..200 (8.33 s), RETURN merged"
+  },
+  "BUTTERFLY": {
+   "status": "accepted_working (user 2026-10-14)",
+   "source": {
+    "path": "butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4",
+    "sha256": "694436b69672e265a71e7175dc578538bb92fe7a1b12dac710720e36221f956c"
+   },
+   "alpha": {
+    "path": "butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm",
+    "sha256": "2e189b0f2602fd6a532c116ed283402ee1530ba5fd2d7048a47d0b746e9951f3"
+   },
+   "used_in_game": "bf1..bf93 (3.875 s); butterfly object drawn by the game"
+  },
+  "ROLL": {
+   "status": "accepted_working (user 2026-10-15, commit 481a113)",
+   "source": {
+    "path": "roll_v1/DOG1_ROLL_v1_kling_source.mp4",
+    "sha256": "0ee54757d69b303095d1d074d82cd43c3dc558bcf83576963a0d39d7afe5e97c"
+   },
+   "alpha": {
+    "path": "roll_v1/alpha/DOG1_ROLL_v1_alpha.webm",
+    "sha256": "8c7998df8f49a709b2b5195e5e32bcf3ce5fba9ec6f949c104b1c86a09fbd936"
+   },
+   "used_in_game": "roll10..roll113 (104 frames, 4.33 s)"
+  },
+  "FINISH": {
+   "status": "accepted_working: reuse of STOP V4 (user decision 2026-10-15), no separate clip",
+   "used_in_game": "FINISH_DECELERATE = STOP clip, then BASE = RACE_STAND"
+  },
+  "FRONT_STAND": {
+   "status": "approved still, NOT in the V3 race contract",
+   "path": "assets/approved/DOG1_FRONT_STAND_alpha_frame0.png",
+   "sha256": "37f9b2b95d60d66af02eab6b7f5e4c22bf75cf0da8136a360449ce8b910e8e83"
+  },
+  "FIRST_START": {
+   "status": "accepted as working 2026-10-13 (alpha), NOT in the V3 race contract, not checked in the lab",
+   "path": "assets/approved/DOG1_FIRST_START_alpha_src25-63.webm",
+   "sha256": "eed84f1901d5b2269a8cc4aca1567c518363c60aaf7047f1d96f026b4ac698d5"
+  },
+  "IDLE": {
+   "status": "NOT READY: source only, no alpha, not a seamless loop",
+   "path": "assets/sources/bulldog_01_idle.mp4"
+  },
+  "SELECTED": {
+   "status": "NOT READY: source only, no alpha, ends in an excited pose (exit does not match the next clip)",
+   "path": "assets/sources/bulldog_01_selected.mp4"
+  }
+ },
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
   "bulldog_01_run.mp4": {
@@ -60,8 +192,8 @@
  },
  "clips": {
   "START_first": {
-   "approved": false,
-   "status": "alpha ready, awaiting user approval",
+   "approved": "working",
+   "status": "accepted as working 2026-10-13; not in the V3 race contract (see approved_set.FIRST_START)",
    "frames": "#25-63 of bulldog_01_run.mp4 then loop #87-98",
    "alpha": {
     "path": "assets/approved/DOG1_FIRST_START_alpha_src25-63.webm",
@@ -120,7 +252,8 @@
    "generation_id": "AVCNp1X01jED1Ehwpnk_GAgQ-75EMYVZ9ugNUq-eI8btku1DqOzfCThhlVWJ36CW2FrHOYUg",
    "credits": 18,
    "chain": "RUN loop #87-98 (last pass to #96) -> STOP f1..f73 -> RACE_STAND hold",
-   "known_issues": "KNOWN_ISSUES.md"
+   "known_issues": "KNOWN_ISSUES.md",
+   "superseded_by": "STOP V4 (approved_set.STOP)"
   },
   "RACE_START": {
    "approved": false,
@@ -176,7 +309,7 @@
   "python": "3.13.16",
   "ffmpeg": "6.1.1 (libvpx-vp9)"
  },
- "runtime_integration": "out_of_scope",
+ "runtime_integration": "integration package ready for the next stage: integration_v1/ (not wired into the game; production untouched)",
  "production_status": "untouched",
  "race_start_v1": {
   "status": "generated, NOT accepted (awaiting user decision)",
@@ -410,7 +543,8 @@
    "generation_id": "AYMi4Bjx8sCkpDUjJRUfQyXnlNXGPqCZTwBoQ0-ELZwa8A-DYVQox0pGnXVmUOfwqGXYwEKE",
    "credits": 48,
    "status": "generated, awaiting user viewing; alpha NOT run (user rule)"
-  }
+  },
+  "status_history_note": "V1 rejected; the accepted version is V3.2 (approved_set.SNIFF_PEE)"
  },
  "process_rules": {
   "alpha": "run alpha only after the user has watched and approved the source video (rule 2026-10-14)"
@@ -528,6 +662,7 @@
   "path": "../race-v3-p3-lab/",
   "status": "isolated P3 prototype; V3/production/Dog4/source assets unchanged; no new images/AI video/alpha",
   "tests": "T1-T4,T8-T10 PASS; T5 FAIL (BUTTERFLY after STOP -11 frames); T6,T7 PARTIAL; T11 NOT_RUN; T12 PARTIAL",
-  "readiness": "architecture ready for integration design; Frenk NOT ready (ROLL missing, SNIFF no alpha, FINISH provisional, START not visually accepted, STOP paw contact fails strict criterion)"
+  "readiness": "architecture ready for integration design; Frenk NOT ready (ROLL missing, SNIFF no alpha, FINISH provisional, START not visually accepted, STOP paw contact fails strict criterion)",
+  "readiness_update_2026_10_15": "superseded by integration_v1/ (ROLL, SNIFF alpha, FINISH decision and lab acceptance done)"
  }
 }

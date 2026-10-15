@@ -10,7 +10,7 @@ const [manifest,layout]=await Promise.all([fetch('./dog4assets/manifest.json').t
 const image=url=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=url;});
 const assets={};for(const [clip,meta] of Object.entries(manifest.clips))assets[clip]=await image(meta.file);
 assets.ARENA=await image('./dog4assets/arena.png');
-const F=await loadFrenk('./');
+const F=await loadFrenk('../bulldog1-frenk/integration_v1/');
 const COURSE=layout.finishX-layout.startX+layout.finishControlOffset;
 const BASES=Object.fromEntries(CATEGORIES.map(([n,b])=>[n,b])), CAT_ORDER=['VERY_FAST','FAST','NORMAL','SLOW','VERY_SLOW'];
 
@@ -24,6 +24,7 @@ function labRace(key,lanes){
 const LAB={
   CHAIN_ALL:()=>labRace('CHAIN_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · SNIFF`,base:BASES[c],events:[['SNIFF_PEE',.35]]}))),
   ROLL_ALL:()=>labRace('ROLL_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · ROLL`,base:BASES[c],events:[['ROLL',.35]]}))),
+  ALL_EVENTS:()=>labRace('ALL_EVENTS',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · SNIFF→BF→ROLL`,base:BASES[c],events:[['SNIFF_PEE',.22],['BUTTERFLY',.5],['ROLL',.76]]}))),
   BUTTERFLY_ALL:()=>labRace('BUTTERFLY_ALL',CAT_ORDER.map(c=>({char:'frenk',name:`ФРЭНК · ${c} · BUTTERFLY`,base:BASES[c],events:[['BUTTERFLY',.35]]}))),
   PAIR:()=>labRace('PAIR',[
     {char:'dog4',name:'№4 · NORMAL · SNIFF',base:1,events:[['SNIFF_PEE',.35]]},

@@ -3,12 +3,12 @@
 "cellHeight": 116,
 "columns": 24,
 "sheets": {
-"run": "assets/frenk_run.png",
-"start": "assets/frenk_start.png",
-"stop": "assets/frenk_stop.png",
-"sniff": "assets/frenk_sniff.png",
-"bf": "assets/frenk_bf.png",
-"roll": "assets/frenk_roll.png"
+"run": "atlas/frenk_run.png",
+"start": "atlas/frenk_start.png",
+"stop": "atlas/frenk_stop.png",
+"sniff": "atlas/frenk_sniff.png",
+"bf": "atlas/frenk_bf.png",
+"roll": "atlas/frenk_roll.png"
 },
 "frames": {
 "run87": {

@@ -98,7 +98,7 @@ function analyse(lanes){
   });
 }
 report.lanes={};
-for(const key of ['CHAIN_ALL','BUTTERFLY_ALL','ROLL_ALL','PAIR']){report.lanes[key]=analyse(await sweep(key));}
+for(const key of ['ALL_EVENTS','CHAIN_ALL','BUTTERFLY_ALL','ROLL_ALL','PAIR']){report.lanes[key]=analyse(await sweep(key));}
 // ROLL diagnostic is visible on the canvas: seek into the ROLL window of PAIR lane 5 and read the page diagnostics
 {
   await page.evaluate(()=>window.frenkLab.select('PAIR'));

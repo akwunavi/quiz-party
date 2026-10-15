@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the Frenk sprite atlases for the browser lab from the WORKING ALPHA frames (no new rendering of the dog):
+"""Build the Frenk sprite atlases of the integration package from the WORKING ALPHA frames (no new rendering of the dog):
 every frame (1276x720 RGBA) is resized once to the game sprite size 207x116 (Lanczos) and packed, 24 columns per sheet.
 Also writes frenk_atlas.json: label -> {sheet, index} and the alpha-weighted x-centroid / bottom of each frame in sprite px.
 Sources (decoded with ffmpeg libvpx-vp9 -pix_fmt rgba from these files; see ../README.md):
@@ -10,10 +10,11 @@ Sources (decoded with ffmpeg libvpx-vp9 -pix_fmt rgba from these files; see ../R
   sniffEv1..200  bulldog1-frenk/sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm
   bf1..bf93      bulldog1-frenk/butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm
   roll10..113    bulldog1-frenk/roll_v1/alpha/DOG1_ROLL_v1_alpha.webm (source frame n)
-usage: build_frenk_atlas.py DECDIR (run/ v1f/ g3f/ v4/ stand.png sniff/ bf/)"""
+usage: build_atlas.py DECDIR [OUTDIR]   (DECDIR: run/ v1f/ g3f/ v4/ stand.png sniff/ bf/ roll/, see rebuild_atlas.sh;
+       OUTDIR default ../atlas)"""
 import sys,os,json,numpy as np
 from PIL import Image
-D=sys.argv[1]; OUT=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','assets'); W,H,C=207,116,24
+D=sys.argv[1]; OUT=sys.argv[2] if len(sys.argv)>2 else os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','atlas'); W,H,C=207,116,24
 groups={
  'run':[f'run{n}' for n in range(87,99)],
  'start':['v1f1','v1f7','v1f8','v1f9','v1f10','v1f11','v1f16']+[f'g3f{n}' for n in range(2,36)],
@@ -34,6 +35,6 @@ for g,labs in groups.items():
         im=Image.open(src(lab)).convert('RGBA').resize((W,H),Image.LANCZOS); sheet.paste(im,((i%C)*W,(i//C)*H))
         a=np.asarray(im)[...,3].astype(float); ys,xs=np.nonzero(a>128)
         atlas['frames'][lab]={'sheet':g,'index':i,'cx':round(float((a.sum(0)*np.arange(W)).sum()/a.sum()),3),'bottom':int(ys.max())}
-    sheet.save(f'{OUT}/frenk_{g}.png',optimize=True); atlas['sheets'][g]=f'assets/frenk_{g}.png'
+    sheet.save(f'{OUT}/frenk_{g}.png',optimize=True); atlas['sheets'][g]=f'atlas/frenk_{g}.png'
 json.dump(atlas,open(f'{OUT}/frenk_atlas.json','w'),indent=0)
 print({g:len(l) for g,l in groups.items()})

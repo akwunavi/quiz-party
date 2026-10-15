@@ -1,0 +1,311 @@
+{
+ "contractVersion": "frenk-integration-1.0.0",
+ "generated": "2026-10-15T14:24:03.800Z",
+ "checks": {
+  "p3Validator": {
+   "ok": true,
+   "detail": {
+    "errors": [],
+    "warnings": [],
+    "incomplete": [],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "afterStop": {
+       "window": 121,
+       "body": 93,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 96,
+       "slack": 25,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 121,
+       "sum": 96,
+       "slack": 25,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "afterStop": {
+       "window": 145,
+       "body": 104,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 107,
+       "slack": 38,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 145,
+       "sum": 107,
+       "slack": 38,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "afterStop": {
+       "window": 239.55,
+       "body": 200,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 203,
+       "slack": 36.55,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 239.55,
+       "sum": 203,
+       "slack": 36.55,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     }
+    },
+    "info": {
+     "RETURN": "merged into SNIFF_PEE",
+     "derivedLead": 3,
+     "runFrameBeforeFirstStopAtDeclaredLead": 96,
+     "runFramesBeforeFirstStop": 9
+    }
+   }
+  },
+  "alphaSourceHashes": {
+   "ok": true,
+   "detail": [
+    {
+     "file": "git:origin/preview/bulldogs-1235-alpha-20261008@8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c:dog1-run-alpha.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/race_start_v1/DOG1_RACE_START_v1_alpha.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/race_start_gen3/DOG1_RACE_START_gen3_alpha.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/stop_v4/alpha/DOG1_STOP_v4_alpha_k38-k73.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/stop_v4/alpha/DOG1_RACE_STAND_v3_alpha_1276.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm",
+     "ok": true
+    },
+    {
+     "file": "bulldog1-frenk/roll_v1/alpha/DOG1_ROLL_v1_alpha.webm",
+     "ok": true
+    }
+   ]
+  },
+  "atlasSheetHashes": {
+   "ok": true,
+   "detail": [
+    {
+     "sheet": "run",
+     "ok": true
+    },
+    {
+     "sheet": "start",
+     "ok": true
+    },
+    {
+     "sheet": "stop",
+     "ok": true
+    },
+    {
+     "sheet": "sniff",
+     "ok": true
+    },
+    {
+     "sheet": "bf",
+     "ok": true
+    },
+    {
+     "sheet": "roll",
+     "ok": true
+    }
+   ]
+  },
+  "stopV4ArraysEqualAccepted": {
+   "ok": true
+  },
+  "labelsInAtlas": {
+   "ok": true,
+   "detail": {
+    "labels": 487,
+    "missing": [],
+    "unused": []
+   }
+  },
+  "states": {
+   "ok": true,
+   "detail": {
+    "states": [
+     {
+      "state": "FRONT_STAND",
+      "status": "NOT_IN_V3_CONTRACT",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "IDLE",
+      "status": "NOT_READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "SELECTED",
+      "status": "NOT_READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "FIRST_START",
+      "status": "NOT_IN_V3_CONTRACT",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "RACE_STAND",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "RUN",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "RACE_START",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "STOP",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "SNIFF_PEE",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "BUTTERFLY",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "ROLL",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     },
+     {
+      "state": "FINISH",
+      "status": "READY",
+      "ok": true,
+      "why": ""
+     }
+    ],
+    "missingDescriptions": []
+   }
+  },
+  "runtimeRandomRaces": {
+   "ok": true,
+   "detail": {
+    "seeds": 2000,
+    "dogs": 10000,
+    "ticks": 13819918,
+    "missing": 0,
+    "overflow": 0,
+    "badLabel": 0,
+    "nonFinite": 0,
+    "diag": {},
+    "events": {
+     "BUTTERFLY": 5866,
+     "SNIFF_PEE": 3154,
+     "ROLL": 4962
+    },
+    "segments": {
+     "BASE": 20000,
+     "START": 22929,
+     "RUN": 22929,
+     "STOP": 12929,
+     "BUTTERFLY": 5866,
+     "FINISH_DECELERATE": 10000,
+     "SNIFF_PEE": 3154,
+     "RETURN": 3154,
+     "ROLL": 4962
+    },
+    "categories": {
+     "NORMAL": 4917,
+     "SLOW": 2025,
+     "FAST": 2032,
+     "VERY_SLOW": 486,
+     "VERY_FAST": 540
+    }
+   }
+  },
+  "runtimeCategoryEventGrid": {
+   "ok": true,
+   "detail": {
+    "dogs": 40,
+    "ticks": 56093,
+    "missing": 0,
+    "overflow": 0,
+    "badLabel": 0,
+    "nonFinite": 0,
+    "diag": {},
+    "events": {
+     "SNIFF_PEE": 15,
+     "BUTTERFLY": 20,
+     "ROLL": 20
+    },
+    "segments": {
+     "BASE": 80,
+     "START": 85,
+     "RUN": 85,
+     "STOP": 45,
+     "SNIFF_PEE": 15,
+     "RETURN": 15,
+     "BUTTERFLY": 20,
+     "ROLL": 20,
+     "FINISH_DECELERATE": 40
+    },
+    "categories": {
+     "VERY_FAST": 8,
+     "FAST": 8,
+     "NORMAL": 8,
+     "SLOW": 8,
+     "VERY_SLOW": 8
+    }
+   }
+  }
+ },
+ "ok": true,
+ "failed": []
+}

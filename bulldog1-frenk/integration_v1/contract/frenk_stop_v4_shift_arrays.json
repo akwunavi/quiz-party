@@ -1,6 +1,6 @@
 {
  "generated": "2026-10-15",
- "note": "PROPOSAL. Not part of the contract until accepted. See ../RESULT.md.",
+ "note": "ACCEPTED 2026-10-15 (user, browser lab). Values unchanged from stop_v4/metadata/stop_v4_shift_arrays.json (sha256 bc7b7792...).",
  "units": "source px of the 1276x720 frame; positive = sprite right",
  "canvasPerSrc": 0.16222570532915362,
  "stopFrames": 37,

@@ -1,0 +1,123 @@
+{
+ "what": "race-v3-frenk-lab before (own contract/atlas copies, commit 481a113 + ALL_EVENTS preset) vs after (loads bulldog1-frenk/integration_v1/)",
+ "tool": "race-v3-frenk-lab/tools/dump_visual.mjs",
+ "runs": [
+  {
+   "case": "ALL_EVENTS",
+   "frenkTicks": 10210,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "CHAIN_ALL",
+   "frenkTicks": 8580,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "BUTTERFLY_ALL",
+   "frenkTicks": 7990,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "ROLL_ALL",
+   "frenkTicks": 8110,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "PAIR",
+   "frenkTicks": 4140,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 20261013 lane 1",
+   "frenkTicks": 1549,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 20261013 lane 3",
+   "frenkTicks": 1549,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 20261013 lane 5",
+   "frenkTicks": 1549,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 1069078 lane 1",
+   "frenkTicks": 1488,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 1069078 lane 3",
+   "frenkTicks": 1488,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 1069078 lane 5",
+   "frenkTicks": 1488,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 7 lane 1",
+   "frenkTicks": 1586,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 7 lane 3",
+   "frenkTicks": 1586,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  },
+  {
+   "case": "RANDOM seed 7 lane 5",
+   "frenkTicks": 1586,
+   "ticksIdentical": true,
+   "canvasShotsIdentical": true,
+   "crossingsIdentical": true,
+   "diagnostics": []
+  }
+ ],
+ "pageErrors": [
+  [],
+  []
+ ],
+ "allIdentical": true
+}
