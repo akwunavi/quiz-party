@@ -1,0 +1,960 @@
+{
+ "FINISH5": [
+  {
+   "lane": "№2 · VERY_FAST · финиш",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND",
+   "run_step_px": [
+    0.32,
+    1.43,
+    2.74
+   ],
+   "seam_run_to_stop_px": 2.28,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.74,
+    2.43,
+    2.34,
+    1.74,
+    1.13,
+    0.5,
+    0.2,
+    -0.1,
+    0.06,
+    0.2,
+    1.31,
+    1.83,
+    1.92,
+    2.38,
+    1.31,
+    1.68,
+    2.02,
+    1.72,
+    0.82,
+    -0.17,
+    -1.43,
+    0.14,
+    0.92,
+    0.99,
+    0.46,
+    0.28,
+    -0.03,
+    0.01,
+    -0.23,
+    0.15,
+    0.23,
+    0.19,
+    0.14,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.43,
+   "stop_max_step": 2.74,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.86,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND",
+    "RUN",
+    "STOP B (финиш)"
+   ]
+  },
+  {
+   "lane": "№2 · FAST · финиш",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND",
+   "run_step_px": [
+    0.17,
+    1.28,
+    2.59
+   ],
+   "seam_run_to_stop_px": 2.13,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.59,
+    2.28,
+    2.19,
+    1.59,
+    0.98,
+    0.36,
+    0.06,
+    -0.23,
+    -0.07,
+    0.07,
+    1.19,
+    1.72,
+    1.81,
+    2.27,
+    1.21,
+    1.59,
+    1.93,
+    1.64,
+    0.74,
+    -0.24,
+    -1.49,
+    0.08,
+    0.87,
+    0.94,
+    0.42,
+    0.24,
+    -0.06,
+    -0.02,
+    -0.25,
+    0.13,
+    0.22,
+    0.18,
+    0.14,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.49,
+   "stop_max_step": 2.59,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.76,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND",
+    "RUN",
+    "STOP B (финиш)"
+   ]
+  },
+  {
+   "lane": "№2 · NORMAL · финиш",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND",
+   "run_step_px": [
+    0.03,
+    1.14,
+    2.45
+   ],
+   "seam_run_to_stop_px": 1.99,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.45,
+    2.14,
+    2.05,
+    1.45,
+    0.85,
+    0.23,
+    -0.07,
+    -0.36,
+    -0.19,
+    -0.05,
+    1.08,
+    1.61,
+    1.7,
+    2.17,
+    1.12,
+    1.5,
+    1.85,
+    1.56,
+    0.67,
+    -0.3,
+    -1.55,
+    0.03,
+    0.82,
+    0.9,
+    0.38,
+    0.21,
+    -0.08,
+    -0.04,
+    -0.26,
+    0.11,
+    0.2,
+    0.17,
+    0.13,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.55,
+   "stop_max_step": 2.45,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.67,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND",
+    "RUN",
+    "STOP B (финиш)"
+   ]
+  },
+  {
+   "lane": "№2 · SLOW · финиш",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND",
+   "run_step_px": [
+    -0.11,
+    1.0,
+    2.31
+   ],
+   "seam_run_to_stop_px": 1.85,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.31,
+    2.0,
+    1.91,
+    1.32,
+    0.71,
+    0.09,
+    -0.19,
+    -0.48,
+    -0.31,
+    -0.16,
+    0.96,
+    1.5,
+    1.6,
+    2.08,
+    1.03,
+    1.42,
+    1.77,
+    1.49,
+    0.6,
+    -0.36,
+    -1.61,
+    -0.02,
+    0.77,
+    0.86,
+    0.34,
+    0.18,
+    -0.11,
+    -0.06,
+    -0.28,
+    0.1,
+    0.19,
+    0.16,
+    0.13,
+    0.09,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.61,
+   "stop_max_step": 2.31,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.58,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND",
+    "RUN",
+    "STOP B (финиш)"
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · финиш",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND",
+   "run_step_px": [
+    -0.26,
+    0.85,
+    2.16
+   ],
+   "seam_run_to_stop_px": 1.7,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.16,
+    1.85,
+    1.76,
+    1.17,
+    0.57,
+    -0.05,
+    -0.33,
+    -0.62,
+    -0.44,
+    -0.29,
+    0.84,
+    1.39,
+    1.49,
+    1.97,
+    0.93,
+    1.32,
+    1.69,
+    1.41,
+    0.53,
+    -0.43,
+    -1.67,
+    -0.08,
+    0.72,
+    0.81,
+    0.3,
+    0.15,
+    -0.14,
+    -0.09,
+    -0.3,
+    0.08,
+    0.18,
+    0.15,
+    0.12,
+    0.09,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.67,
+   "stop_max_step": 2.16,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.48,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND",
+    "RUN",
+    "STOP B (финиш)"
+   ]
+  }
+ ],
+ "EVENT5": [
+  {
+   "lane": "№2 · VERY_FAST · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    0.32,
+    1.43,
+    2.74
+   ],
+   "seam_run_to_stop_px": 2.28,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.74,
+    2.43,
+    2.34,
+    1.74,
+    1.13,
+    0.5,
+    0.2,
+    -0.1,
+    0.06,
+    0.2,
+    1.31,
+    1.83,
+    1.92,
+    2.38,
+    1.31,
+    1.68,
+    2.02,
+    1.72,
+    0.82,
+    -0.17,
+    -1.43,
+    0.14,
+    0.92,
+    0.99,
+    0.46,
+    0.28,
+    -0.03,
+    0.01,
+    -0.23,
+    0.15,
+    0.23,
+    0.19,
+    0.14,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.43,
+   "stop_max_step": 2.74,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.86,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · FAST · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    0.17,
+    1.28,
+    2.59
+   ],
+   "seam_run_to_stop_px": 2.13,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.59,
+    2.28,
+    2.19,
+    1.59,
+    0.98,
+    0.36,
+    0.06,
+    -0.23,
+    -0.07,
+    0.07,
+    1.19,
+    1.72,
+    1.81,
+    2.27,
+    1.21,
+    1.59,
+    1.93,
+    1.64,
+    0.74,
+    -0.24,
+    -1.49,
+    0.08,
+    0.87,
+    0.94,
+    0.42,
+    0.24,
+    -0.06,
+    -0.02,
+    -0.25,
+    0.13,
+    0.22,
+    0.18,
+    0.14,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.49,
+   "stop_max_step": 2.59,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.76,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · NORMAL · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    0.03,
+    1.14,
+    2.45
+   ],
+   "seam_run_to_stop_px": 1.99,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.45,
+    2.14,
+    2.05,
+    1.45,
+    0.85,
+    0.23,
+    -0.07,
+    -0.36,
+    -0.19,
+    -0.05,
+    1.08,
+    1.61,
+    1.7,
+    2.17,
+    1.12,
+    1.5,
+    1.85,
+    1.56,
+    0.67,
+    -0.3,
+    -1.55,
+    0.03,
+    0.82,
+    0.9,
+    0.38,
+    0.21,
+    -0.08,
+    -0.04,
+    -0.26,
+    0.11,
+    0.2,
+    0.17,
+    0.13,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.55,
+   "stop_max_step": 2.45,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.67,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · SLOW · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    -0.11,
+    1.0,
+    2.31
+   ],
+   "seam_run_to_stop_px": 1.85,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.31,
+    2.0,
+    1.91,
+    1.32,
+    0.71,
+    0.09,
+    -0.19,
+    -0.48,
+    -0.31,
+    -0.16,
+    0.96,
+    1.5,
+    1.6,
+    2.08,
+    1.03,
+    1.42,
+    1.77,
+    1.49,
+    0.6,
+    -0.36,
+    -1.61,
+    -0.02,
+    0.77,
+    0.86,
+    0.34,
+    0.18,
+    -0.11,
+    -0.06,
+    -0.28,
+    0.1,
+    0.19,
+    0.16,
+    0.13,
+    0.09,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.61,
+   "stop_max_step": 2.31,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.58,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    -0.26,
+    0.85,
+    2.16
+   ],
+   "seam_run_to_stop_px": 1.7,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.16,
+    1.85,
+    1.76,
+    1.17,
+    0.57,
+    -0.05,
+    -0.33,
+    -0.62,
+    -0.44,
+    -0.29,
+    0.84,
+    1.39,
+    1.49,
+    1.97,
+    0.93,
+    1.32,
+    1.69,
+    1.41,
+    0.53,
+    -0.43,
+    -1.67,
+    -0.08,
+    0.72,
+    0.81,
+    0.3,
+    0.15,
+    -0.14,
+    -0.09,
+    -0.3,
+    0.08,
+    0.18,
+    0.15,
+    0.12,
+    0.09,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.67,
+   "stop_max_step": 2.16,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.48,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  }
+ ],
+ "PAIR": [
+  {
+   "lane": "№2 · NORMAL · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    0.03,
+    1.14,
+    2.45
+   ],
+   "seam_run_to_stop_px": 1.99,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.45,
+    2.14,
+    2.05,
+    1.45,
+    0.85,
+    0.23,
+    -0.07,
+    -0.36,
+    -0.19,
+    -0.05,
+    1.08,
+    1.61,
+    1.7,
+    2.17,
+    1.12,
+    1.5,
+    1.85,
+    1.56,
+    0.67,
+    -0.3,
+    -1.55,
+    0.03,
+    0.82,
+    0.9,
+    0.38,
+    0.21,
+    -0.08,
+    -0.04,
+    -0.26,
+    0.11,
+    0.2,
+    0.17,
+    0.13,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.55,
+   "stop_max_step": 2.45,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.67,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · VERY_FAST · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    0.32,
+    1.43,
+    2.74
+   ],
+   "seam_run_to_stop_px": 2.28,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.74,
+    2.43,
+    2.34,
+    1.74,
+    1.13,
+    0.5,
+    0.2,
+    -0.1,
+    0.06,
+    0.2,
+    1.31,
+    1.83,
+    1.92,
+    2.38,
+    1.31,
+    1.68,
+    2.02,
+    1.72,
+    0.82,
+    -0.17,
+    -1.43,
+    0.14,
+    0.92,
+    0.99,
+    0.46,
+    0.28,
+    -0.03,
+    0.01,
+    -0.23,
+    0.15,
+    0.23,
+    0.19,
+    0.14,
+    0.1,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.43,
+   "stop_max_step": 2.74,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.86,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · STOP на 35 %",
+   "last_run_frame": "#88",
+   "first_stop": "RUN#89",
+   "stop_frames": 37,
+   "after_stop": "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+   "run_step_px": [
+    -0.26,
+    0.85,
+    2.16
+   ],
+   "seam_run_to_stop_px": 1.7,
+   "seam_stop_to_stand_px": 0.0,
+   "stop_steps_px": [
+    2.16,
+    1.85,
+    1.76,
+    1.17,
+    0.57,
+    -0.05,
+    -0.33,
+    -0.62,
+    -0.44,
+    -0.29,
+    0.84,
+    1.39,
+    1.49,
+    1.97,
+    0.93,
+    1.32,
+    1.69,
+    1.41,
+    0.53,
+    -0.43,
+    -1.67,
+    -0.08,
+    0.72,
+    0.81,
+    0.3,
+    0.15,
+    -0.14,
+    -0.09,
+    -0.3,
+    0.08,
+    0.18,
+    0.15,
+    0.12,
+    0.09,
+    0.06,
+    0.02
+   ],
+   "stop_min_step": -1.67,
+   "stop_max_step": 2.16,
+   "stand_steps_max_abs": 0.0,
+   "shadow_max_step_stop": 1.48,
+   "paw_minus_line_run": [
+    -25,
+    -19
+   ],
+   "paw_minus_line_stop": [
+    -26,
+    -19
+   ],
+   "paw_minus_line_stand": [
+    -20
+   ],
+   "phases": [
+    "RACE_STAND (окно BUTTERFLY: клипа №2 нет)",
+    "RACE_START B",
+    "RACE_START B (spill)",
+    "RUN",
+    "STOP B"
+   ]
+  }
+ ]
+}

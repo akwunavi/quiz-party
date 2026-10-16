@@ -1,0 +1,15 @@
+{
+ "schema": "dog2-stop-lab/v1",
+ "character": "bulldog2",
+ "status": "LAB CANDIDATE for final visual check: STOP B (approved montage) with pipeline alpha; physics V3 and windows unchanged",
+ "STOP": {
+  "montage": "stop_montage_v2/montage_list.json (37 frames, copy: lab_stop_v1/assets/stopB_montage_list.json)",
+  "alpha": ["race_start_v1/alpha/DOG2_RUN_alpha_src28-100.webm (RUN #89-#96, #30)", "stop_b_alpha/DOG2_STOP_v2_alpha_k27-k40.webm", "stop_b_alpha/DOG2_STOP_v1_alpha_k66-k73.webm"],
+  "atlas": ["lab_start_v1/assets/dog2_atlas.json (labels rN)", "lab_stop_v1/assets/dog2_stopB_atlas.json (labels s27-s40, t66-t73)"],
+  "entry": "previous RUN frame is #88 (START B, lead 0); STOP frame 1 = #89",
+  "sprite_shift": "montage shift_src_px x 207/1276; frames 23-37 eased (smoothstep) by +1.07 sprite px onto the RACE_STAND shift",
+  "then": "RACE_STAND r30 (shift cxRunMean - cx(r30)); during action windows without a No.2 clip the stand is held"
+ },
+ "RACE_START": "B (unchanged, lab_start_v1)",
+ "RACE_STAND": "RUN #30 (unchanged)"
+}

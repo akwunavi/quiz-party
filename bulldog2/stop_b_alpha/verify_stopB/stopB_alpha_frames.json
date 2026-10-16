@@ -1,0 +1,335 @@
+[
+{
+"i": 1,
+"label": "RUN#89",
+"islands": 3,
+"extra_island_px": 15,
+"area": 181915,
+"semi": 12262,
+"corner_max": 0
+},
+{
+"i": 2,
+"label": "RUN#90",
+"islands": 1,
+"extra_island_px": 0,
+"area": 181310,
+"semi": 12255,
+"corner_max": 0
+},
+{
+"i": 3,
+"label": "RUN#91",
+"islands": 2,
+"extra_island_px": 2,
+"area": 189964,
+"semi": 13944,
+"corner_max": 0
+},
+{
+"i": 4,
+"label": "RUN#92",
+"islands": 2,
+"extra_island_px": 2,
+"area": 196198,
+"semi": 15382,
+"corner_max": 0
+},
+{
+"i": 5,
+"label": "RUN#93",
+"islands": 1,
+"extra_island_px": 0,
+"area": 205304,
+"semi": 14419,
+"corner_max": 0
+},
+{
+"i": 6,
+"label": "RUN#94",
+"islands": 1,
+"extra_island_px": 0,
+"area": 212571,
+"semi": 14581,
+"corner_max": 0
+},
+{
+"i": 7,
+"label": "RUN#95",
+"islands": 2,
+"extra_island_px": 1,
+"area": 220598,
+"semi": 15933,
+"corner_max": 0
+},
+{
+"i": 8,
+"label": "RUN#96",
+"islands": 2,
+"extra_island_px": 4,
+"area": 218399,
+"semi": 15295,
+"corner_max": 0
+},
+{
+"i": 9,
+"label": "v2 k27",
+"islands": 3,
+"extra_island_px": 2,
+"area": 209639,
+"semi": 13997,
+"corner_max": 0
+},
+{
+"i": 10,
+"label": "v2 k28",
+"islands": 3,
+"extra_island_px": 1,
+"area": 203748,
+"semi": 13990,
+"corner_max": 0
+},
+{
+"i": 11,
+"label": "v2 k29",
+"islands": 3,
+"extra_island_px": 2,
+"area": 199368,
+"semi": 14862,
+"corner_max": 0
+},
+{
+"i": 12,
+"label": "v2 k30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 191821,
+"semi": 14189,
+"corner_max": 0
+},
+{
+"i": 13,
+"label": "v2 k31",
+"islands": 1,
+"extra_island_px": 0,
+"area": 186503,
+"semi": 13679,
+"corner_max": 0
+},
+{
+"i": 14,
+"label": "v2 k32",
+"islands": 2,
+"extra_island_px": 1,
+"area": 183842,
+"semi": 11949,
+"corner_max": 0
+},
+{
+"i": 15,
+"label": "v2 k33",
+"islands": 1,
+"extra_island_px": 0,
+"area": 181406,
+"semi": 10172,
+"corner_max": 0
+},
+{
+"i": 16,
+"label": "v2 k34",
+"islands": 1,
+"extra_island_px": 0,
+"area": 185876,
+"semi": 11536,
+"corner_max": 0
+},
+{
+"i": 17,
+"label": "v2 k35",
+"islands": 1,
+"extra_island_px": 0,
+"area": 187929,
+"semi": 10986,
+"corner_max": 0
+},
+{
+"i": 18,
+"label": "v2 k36",
+"islands": 2,
+"extra_island_px": 2,
+"area": 196484,
+"semi": 13039,
+"corner_max": 0
+},
+{
+"i": 19,
+"label": "v2 k37",
+"islands": 4,
+"extra_island_px": 3,
+"area": 202057,
+"semi": 13792,
+"corner_max": 0
+},
+{
+"i": 20,
+"label": "v2 k38",
+"islands": 1,
+"extra_island_px": 0,
+"area": 205090,
+"semi": 14790,
+"corner_max": 0
+},
+{
+"i": 21,
+"label": "v2 k39",
+"islands": 4,
+"extra_island_px": 1,
+"area": 204597,
+"semi": 15038,
+"corner_max": 0
+},
+{
+"i": 22,
+"label": "v2 k40",
+"islands": 4,
+"extra_island_px": 2,
+"area": 200768,
+"semi": 15487,
+"corner_max": 0
+},
+{
+"i": 23,
+"label": "v1 k66",
+"islands": 4,
+"extra_island_px": 1,
+"area": 183499,
+"semi": 13874,
+"corner_max": 0
+},
+{
+"i": 24,
+"label": "v1 k67",
+"islands": 4,
+"extra_island_px": 3,
+"area": 185227,
+"semi": 14502,
+"corner_max": 0
+},
+{
+"i": 25,
+"label": "v1 k68",
+"islands": 3,
+"extra_island_px": 1,
+"area": 188261,
+"semi": 14528,
+"corner_max": 0
+},
+{
+"i": 26,
+"label": "v1 k69",
+"islands": 4,
+"extra_island_px": 2,
+"area": 191260,
+"semi": 14545,
+"corner_max": 0
+},
+{
+"i": 27,
+"label": "v1 k70",
+"islands": 6,
+"extra_island_px": 1,
+"area": 193994,
+"semi": 14989,
+"corner_max": 0
+},
+{
+"i": 28,
+"label": "v1 k71",
+"islands": 6,
+"extra_island_px": 4,
+"area": 195316,
+"semi": 15027,
+"corner_max": 0
+},
+{
+"i": 29,
+"label": "v1 k72",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195858,
+"semi": 15025,
+"corner_max": 0
+},
+{
+"i": 30,
+"label": "v1 k73",
+"islands": 7,
+"extra_island_px": 3,
+"area": 196100,
+"semi": 15047,
+"corner_max": 0
+},
+{
+"i": 31,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 32,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 33,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 34,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 35,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 36,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+},
+{
+"i": 37,
+"label": "RACE_STAND #30",
+"islands": 4,
+"extra_island_px": 2,
+"area": 195610,
+"semi": 13896,
+"corner_max": 0
+}
+]

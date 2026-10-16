@@ -1,0 +1,144 @@
+{
+"cellWidth": 207,
+"cellHeight": 116,
+"columns": 24,
+"sheet": "assets/dog2_stopB.png",
+"source": [
+"stop_b_alpha/DOG2_STOP_v2_alpha_k27-k40.webm",
+"stop_b_alpha/DOG2_STOP_v1_alpha_k66-k73.webm"
+],
+"frames": {
+"s27": {
+"index": 0,
+"cx": 105.195,
+"bottom": 110,
+"cxSrc": 651.02
+},
+"s28": {
+"index": 1,
+"cx": 104.003,
+"bottom": 109,
+"cxSrc": 643.7
+},
+"s29": {
+"index": 2,
+"cx": 102.986,
+"bottom": 108,
+"cxSrc": 637.42
+},
+"s30": {
+"index": 3,
+"cx": 103.128,
+"bottom": 108,
+"cxSrc": 638.27
+},
+"s31": {
+"index": 4,
+"cx": 103.844,
+"bottom": 107,
+"cxSrc": 642.69
+},
+"s32": {
+"index": 5,
+"cx": 104.694,
+"bottom": 106,
+"cxSrc": 647.92
+},
+"s33": {
+"index": 6,
+"cx": 106.057,
+"bottom": 103,
+"cxSrc": 656.31
+},
+"s34": {
+"index": 7,
+"cx": 106.412,
+"bottom": 107,
+"cxSrc": 658.53
+},
+"s35": {
+"index": 8,
+"cx": 107.196,
+"bottom": 107,
+"cxSrc": 663.37
+},
+"s36": {
+"index": 9,
+"cx": 108.376,
+"bottom": 107,
+"cxSrc": 670.62
+},
+"s37": {
+"index": 10,
+"cx": 109.313,
+"bottom": 108,
+"cxSrc": 676.42
+},
+"s38": {
+"index": 11,
+"cx": 109.407,
+"bottom": 109,
+"cxSrc": 676.99
+},
+"s39": {
+"index": 12,
+"cx": 108.573,
+"bottom": 109,
+"cxSrc": 671.85
+},
+"s40": {
+"index": 13,
+"cx": 106.538,
+"bottom": 110,
+"cxSrc": 659.32
+},
+"t66": {
+"index": 14,
+"cx": 104.181,
+"bottom": 109,
+"cxSrc": 644.79
+},
+"t67": {
+"index": 15,
+"cx": 104.915,
+"bottom": 109,
+"cxSrc": 649.32
+},
+"t68": {
+"index": 16,
+"cx": 105.585,
+"bottom": 109,
+"cxSrc": 653.4
+},
+"t69": {
+"index": 17,
+"cx": 105.916,
+"bottom": 109,
+"cxSrc": 655.48
+},
+"t70": {
+"index": 18,
+"cx": 106.101,
+"bottom": 109,
+"cxSrc": 656.61
+},
+"t71": {
+"index": 19,
+"cx": 106.015,
+"bottom": 109,
+"cxSrc": 656.09
+},
+"t72": {
+"index": 20,
+"cx": 105.836,
+"bottom": 109,
+"cxSrc": 655.0
+},
+"t73": {
+"index": 21,
+"cx": 105.627,
+"bottom": 109,
+"cxSrc": 653.71
+}
+}
+}
