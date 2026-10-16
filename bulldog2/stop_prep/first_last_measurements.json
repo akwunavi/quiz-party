@@ -1,0 +1,21 @@
+{
+ "first_RUN97": {
+  "cx": 652.8,
+  "bottom": 686,
+  "top": 130,
+  "w": 751,
+  "h": 556,
+  "area": 209098
+ },
+ "last_RUN30_shifted": {
+  "cx": 652.9,
+  "bottom": 679,
+  "top": 64,
+  "w": 631,
+  "h": 615,
+  "area": 195610
+ },
+ "shift_src_px": 44,
+ "silhouette_IoU": 0.635,
+ "background_diff_outside_dogs": 5.45
+}
