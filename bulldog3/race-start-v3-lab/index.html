@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Рокки · RACE_START Race V3</title>
+  <style>
+    body{margin:0;background:#142320;color:#fff5d5;font:16px system-ui,sans-serif}
+    main{max-width:1440px;margin:auto;padding:20px}h1{font-size:25px;margin:0 0 8px}p{line-height:1.4}
+    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}
+    button{font:inherit;padding:8px 16px;background:#e8d2a1;color:#1d2b26;border:0;border-radius:6px;cursor:pointer}
+    input{width:min(700px,60vw)}canvas{width:100%;height:auto;display:block;background:#bdd8c2}
+    .frame{border:2px solid #c5b88a;border-radius:7px;overflow:hidden}#status{min-height:1.5em}
+  </style>
+</head>
+<body><main>
+  <h1>Рокки · RACE_STAND → RACE_START → RUN</h1>
+  <p>Изолированная проверка пяти мировых скоростей при неизменённом окне START Race V3 в 1 секунду. <a href="?compare=1" style="color:#ffe09b">Сравнение масштаба с Bulldog №4</a>.</p>
+  <div class="controls"><button id="play">▶ Play</button><button id="reset">↺ Начало</button>
+    <label>Кадр <input id="scrub" type="range" min="0" max="83" value="0"></label><span id="clock">0.00 с</span></div>
+  <div class="frame"><canvas id="race" width="1920" height="1080" aria-label="RACE_START Рокки"></canvas></div>
+  <p id="status">Загрузка…</p>
+</main><script type="module" src="./app.mjs"></script></body></html>

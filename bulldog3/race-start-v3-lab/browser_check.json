@@ -1,0 +1,81 @@
+{
+  "browser": "Chromium",
+  "model": "Race V3 byte-identical",
+  "checks": [
+    {
+      "output": "DOG3_ROCKY_RACE_START_GAMEPLAY.mp4",
+      "profiles": [
+        {
+          "name": "VERY SLOW",
+          "base": 0.75,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        },
+        {
+          "name": "SLOW",
+          "base": 0.9,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        },
+        {
+          "name": "NORMAL",
+          "base": 1,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        },
+        {
+          "name": "FAST",
+          "base": 1.1,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        },
+        {
+          "name": "VERY FAST",
+          "base": 1.25,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        }
+      ],
+      "playAdvancedSeconds": 0.35770000000298025,
+      "mp4Playback": {
+        "width": 1920,
+        "height": 1080,
+        "currentTime": 0.385421,
+        "error": null
+      },
+      "pageErrors": []
+    },
+    {
+      "output": "DOG3_ROCKY_VS_DOG4_SCALE.mp4",
+      "profiles": [
+        {
+          "name": "NORMAL",
+          "base": 1,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        },
+        {
+          "name": "NORMAL",
+          "base": 1,
+          "startSeconds": 1,
+          "baseStartGap": 0,
+          "startRunGap": 0
+        }
+      ],
+      "playAdvancedSeconds": 0.35809999999105935,
+      "mp4Playback": {
+        "width": 1920,
+        "height": 1080,
+        "currentTime": 0.376553,
+        "error": null
+      },
+      "pageErrors": []
+    }
+  ]
+}

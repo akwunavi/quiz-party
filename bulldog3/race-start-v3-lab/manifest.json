@@ -1,0 +1,19 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "BASE": {
+      "file": "assets/rocky-base.png",
+      "frames": 1
+    },
+    "START": {
+      "file": "assets/rocky-start.png",
+      "frames": 40
+    },
+    "RUN": {
+      "file": "assets/rocky-run.png",
+      "frames": 23
+    }
+  }
+}
