@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulldog №3 · RUN → STOP → RACE_STAND · диагностический просмотр</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #182826; color: #f6f2e5; }
+    header, main { max-width: 1400px; margin: auto; padding: 14px 18px; }
+    h1 { margin: 0 0 9px; font-size: clamp(20px, 2.3vw, 31px); }
+    p { margin: 8px 0 12px; line-height: 1.45; }
+    button { font: inherit; margin: 0 8px 8px 0; border: 0; border-radius: 7px; padding: 9px 14px; background: #e5d49f; color: #1e302c; cursor: pointer; }
+    canvas { display: block; width: 100%; height: auto; background: #bed6c8; }
+    .frame { border: 1px solid #526d62; overflow: hidden; }
+    video { display: block; max-width: 100%; width: 638px; height: auto; background: #eee; }
+    .detail { display: flex; gap: 20px; align-items: start; flex-wrap: wrap; margin-top: 16px; }
+    .detail p { max-width: 510px; }
+    a { color: #e9dfaf; }
+    #phase { color: #d6e6d9; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bulldog №3 · RUN → STOP → RACE_STAND</h1>
+    <p>Диагностический монтаж. Масштаб персонажа на арене соответствует V3: видеокадр 1276×720 показан как спрайт 207×116 на поле 1920×1080. Позиция в дорожке закреплена, чтобы видеть сам шов.</p>
+    <button id="play" type="button">▶ Play / Pause</button>
+    <button id="entry" type="button">К входу RUN → STOP</button>
+    <button id="stand" type="button">К выходу в стойку</button>
+    <span id="phase" aria-live="polite">Загрузка…</span>
+  </header>
+  <main>
+    <div class="frame"><canvas id="arena" width="1920" height="1080" aria-label="Диагностический просмотр в игровом масштабе"></canvas></div>
+    <div class="detail">
+      <video id="clip" controls preload="auto" playsinline></video>
+      <p>Крупный план синхронизирован с ареной. В исходных RUN и STOP сохранены их разные непрозрачные фоны и тени: прямоугольник при смене клипа ожидаем, alpha на этом этапе не создавалась. Оценивайте движения лап, силуэт и положение собаки. Это не подключение к игровой логике.</p>
+    </div>
+    <p><a href="ENTRY_END_COMPARISON.png">Контактный лист входа и конечной стойки</a></p>
+  </main>
+  <script>
+    const canvas = document.getElementById('arena');
+    const ctx = canvas.getContext('2d', {alpha: false});
+    const video = document.getElementById('clip');
+    const label = document.getElementById('phase');
+    const arena = new Image();
+    arena.src = 'assets/arena.png';
+    // A local HTTP server may omit byte-range support. A small Blob allows reliable seeking.
+    fetch('DOG3_RUN_STOP_STAND_BEST.mp4').then(response => {
+      if (!response.ok) throw new Error(`MP4: HTTP ${response.status}`);
+      return response.blob();
+    }).then(blob => { video.src = URL.createObjectURL(blob); video.load(); })
+      .catch(error => { label.textContent = `Ошибка загрузки видео: ${error.message}`; });
+    const W = 1920, H = 1080, lane = 260 + 2 * 159;
+    const entryTime = 32 / 24, standTime = 87 / 24;
+    let started = false;
+    function render() {
+      if (arena.complete && arena.naturalWidth) ctx.drawImage(arena, 0, 0, W, H);
+      else { ctx.fillStyle = '#bed6c8'; ctx.fillRect(0, 0, W, H); }
+      ctx.fillStyle = 'rgba(20,39,40,.32)';
+      ctx.fillRect(0, lane - 111, W, 151);
+      ctx.strokeStyle = 'rgba(255,247,211,.62)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, lane + 19); ctx.lineTo(W, lane + 19); ctx.stroke();
+      ctx.fillStyle = '#fff9dc'; ctx.font = 'bold 27px system-ui';
+      ctx.fillText('03 · DOG3 STOP TEST', 25, lane - 67);
+      if (video.readyState >= 2) ctx.drawImage(video, 960 - 148, lane - 110, 207, 116);
+      const t = Number.isFinite(video.currentTime) ? video.currentTime : 0;
+      const frame = Math.min(110, Math.floor(t * 24));
+      const phase = frame < 32 ? `RUN · source #${61 + frame % 12}` : frame < 87 ? `STOP · source #${18 + frame - 32}` : 'RACE_STAND';
+      label.textContent = `${phase} · ${t.toFixed(2)} с / 4.63 с`;
+      requestAnimationFrame(render);
+    }
+    document.getElementById('play').onclick = () => video.paused ? video.play() : video.pause();
+    document.getElementById('entry').onclick = () => { video.pause(); video.currentTime = entryTime - 0.20; };
+    document.getElementById('stand').onclick = () => { video.pause(); video.currentTime = standTime - 0.20; };
+    function start() { if (!started) { started = true; render(); } }
+    arena.onload = start;
+    setTimeout(start, 500);
+    window.dog3StopReview = {video, canvas, entryTime, standTime};
+  </script>
+</body>
+</html>
