@@ -1,0 +1,187 @@
+[
+{
+"label": "RUN#89",
+"file": "f090.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#90",
+"file": "f091.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#91",
+"file": "f092.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#92",
+"file": "f093.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#93",
+"file": "f094.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#94",
+"file": "f095.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#95",
+"file": "f096.png",
+"shift_src_px": 0
+},
+{
+"label": "RUN#96",
+"file": "f097.png",
+"shift_src_px": 0
+},
+{
+"label": "k27",
+"file": "k027.png",
+"shift_src_px": 0
+},
+{
+"label": "k28",
+"file": "k028.png",
+"shift_src_px": 0
+},
+{
+"label": "k29",
+"file": "k029.png",
+"shift_src_px": 0
+},
+{
+"label": "k30",
+"file": "k030.png",
+"shift_src_px": 0
+},
+{
+"label": "k31",
+"file": "k031.png",
+"shift_src_px": 0
+},
+{
+"label": "k32",
+"file": "k032.png",
+"shift_src_px": -3
+},
+{
+"label": "k33",
+"file": "k033.png",
+"shift_src_px": -6
+},
+{
+"label": "k34",
+"file": "k034.png",
+"shift_src_px": -9
+},
+{
+"label": "k35",
+"file": "k035.png",
+"shift_src_px": -12
+},
+{
+"label": "k36",
+"file": "k036.png",
+"shift_src_px": -15
+},
+{
+"label": "k37",
+"file": "k037.png",
+"shift_src_px": -18
+},
+{
+"label": "k38",
+"file": "k038.png",
+"shift_src_px": -21
+},
+{
+"label": "k39",
+"file": "k039.png",
+"shift_src_px": -24
+},
+{
+"label": "r30(rev)",
+"file": "r030.png",
+"shift_src_px": 24
+},
+{
+"label": "r29(rev)",
+"file": "r029.png",
+"shift_src_px": 23
+},
+{
+"label": "r28(rev)",
+"file": "r028.png",
+"shift_src_px": 21
+},
+{
+"label": "r27(rev)",
+"file": "r027.png",
+"shift_src_px": 19
+},
+{
+"label": "r26(rev)",
+"file": "r026.png",
+"shift_src_px": 18
+},
+{
+"label": "r25(rev)",
+"file": "r025.png",
+"shift_src_px": 16
+},
+{
+"label": "r24(rev)",
+"file": "r024.png",
+"shift_src_px": 14
+},
+{
+"label": "r22(rev)",
+"file": "r022.png",
+"shift_src_px": 12
+},
+{
+"label": "r19(rev)",
+"file": "r019.png",
+"shift_src_px": 10
+},
+{
+"label": "r16(rev)",
+"file": "r016.png",
+"shift_src_px": 9
+},
+{
+"label": "r13(rev)",
+"file": "r013.png",
+"shift_src_px": 7
+},
+{
+"label": "r10(rev)",
+"file": "r010.png",
+"shift_src_px": 5
+},
+{
+"label": "r7(rev)",
+"file": "r007.png",
+"shift_src_px": 4
+},
+{
+"label": "r4(rev)",
+"file": "r004.png",
+"shift_src_px": 2
+},
+{
+"label": "r1(rev)",
+"file": "r001.png",
+"shift_src_px": 0
+},
+{
+"label": "RACE_STAND #30",
+"file": "KLING_LAST_RACE_STAND_RUN30_inplace_shift+44_1276.png",
+"shift_src_px": 0
+}
+]

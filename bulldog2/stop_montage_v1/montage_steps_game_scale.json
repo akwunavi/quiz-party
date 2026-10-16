@@ -1,0 +1,187 @@
+[
+{
+"frm": "RUN#88",
+"to": "RUN#89",
+"step": 11.1
+},
+{
+"frm": "RUN#89",
+"to": "RUN#90",
+"step": 9.7
+},
+{
+"frm": "RUN#90",
+"to": "RUN#91",
+"step": 9.9
+},
+{
+"frm": "RUN#91",
+"to": "RUN#92",
+"step": 10.3
+},
+{
+"frm": "RUN#92",
+"to": "RUN#93",
+"step": 10.6
+},
+{
+"frm": "RUN#93",
+"to": "RUN#94",
+"step": 11.3
+},
+{
+"frm": "RUN#94",
+"to": "RUN#95",
+"step": 12.7
+},
+{
+"frm": "RUN#95",
+"to": "RUN#96",
+"step": 14.4
+},
+{
+"frm": "RUN#96",
+"to": "k27",
+"step": 18.3
+},
+{
+"frm": "k27",
+"to": "k28",
+"step": 14.5
+},
+{
+"frm": "k28",
+"to": "k29",
+"step": 13.5
+},
+{
+"frm": "k29",
+"to": "k30",
+"step": 12.8
+},
+{
+"frm": "k30",
+"to": "k31",
+"step": 12.4
+},
+{
+"frm": "k31",
+"to": "k32",
+"step": 10.7
+},
+{
+"frm": "k32",
+"to": "k33",
+"step": 9.1
+},
+{
+"frm": "k33",
+"to": "k34",
+"step": 9.6
+},
+{
+"frm": "k34",
+"to": "k35",
+"step": 11.4
+},
+{
+"frm": "k35",
+"to": "k36",
+"step": 11.1
+},
+{
+"frm": "k36",
+"to": "k37",
+"step": 10.7
+},
+{
+"frm": "k37",
+"to": "k38",
+"step": 11.4
+},
+{
+"frm": "k38",
+"to": "k39",
+"step": 12.1
+},
+{
+"frm": "k39",
+"to": "r30(rev)",
+"step": 21.4
+},
+{
+"frm": "r30(rev)",
+"to": "r29(rev)",
+"step": 14.9
+},
+{
+"frm": "r29(rev)",
+"to": "r28(rev)",
+"step": 13.9
+},
+{
+"frm": "r28(rev)",
+"to": "r27(rev)",
+"step": 12.0
+},
+{
+"frm": "r27(rev)",
+"to": "r26(rev)",
+"step": 10.5
+},
+{
+"frm": "r26(rev)",
+"to": "r25(rev)",
+"step": 9.4
+},
+{
+"frm": "r25(rev)",
+"to": "r24(rev)",
+"step": 8.7
+},
+{
+"frm": "r24(rev)",
+"to": "r22(rev)",
+"step": 13.3
+},
+{
+"frm": "r22(rev)",
+"to": "r19(rev)",
+"step": 13.1
+},
+{
+"frm": "r19(rev)",
+"to": "r16(rev)",
+"step": 8.7
+},
+{
+"frm": "r16(rev)",
+"to": "r13(rev)",
+"step": 7.0
+},
+{
+"frm": "r13(rev)",
+"to": "r10(rev)",
+"step": 5.8
+},
+{
+"frm": "r10(rev)",
+"to": "r7(rev)",
+"step": 9.9
+},
+{
+"frm": "r7(rev)",
+"to": "r4(rev)",
+"step": 12.7
+},
+{
+"frm": "r4(rev)",
+"to": "r1(rev)",
+"step": 12.3
+},
+{
+"frm": "r1(rev)",
+"to": "RACE_STAND #30",
+"step": 1.9
+}
+]
