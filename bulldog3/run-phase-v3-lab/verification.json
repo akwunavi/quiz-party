@@ -1,0 +1,1230 @@
+{
+  "fps": 24,
+  "races": {
+    "A": {
+      "places": [
+        3,
+        0,
+        1,
+        2,
+        4
+      ],
+      "dogs": [
+        {
+          "index": 0,
+          "base": 1,
+          "crossing": 43.00840336134454,
+          "complete": 45,
+          "runs": [
+            {
+              "cells": 1007,
+              "stopAt": 43.458333333333336,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                156,
+                299,
+                430,
+                573,
+                704,
+                847
+              ],
+              "lastSkipFramesBeforeStop": 159,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0097205548886221
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "base": 1.1,
+          "crossing": 45.30906168825439,
+          "complete": 47.041666666666664,
+          "runs": [
+            {
+              "cells": 239,
+              "stopAt": 11.458333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                83,
+                106,
+                129,
+                164,
+                187
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.27771942110177406
+            },
+            {
+              "cells": 635,
+              "stopAt": 45.5,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                108,
+                191,
+                274,
+                357,
+                440,
+                523
+              ],
+              "lastSkipFramesBeforeStop": 111,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0038704005116899
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "base": 1.23,
+          "crossing": 46.23274825778847,
+          "complete": 47.981249999999996,
+          "runs": [
+            {
+              "cells": 299,
+              "stopAt": 13.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                235
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.3808392857142857
+            },
+            {
+              "cells": 479,
+              "stopAt": 46.43958333333333,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                84,
+                143,
+                214,
+                273,
+                332,
+                391
+              ],
+              "lastSkipFramesBeforeStop": 87,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0048854455797471
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "base": 1.23,
+          "crossing": 42.381152817321095,
+          "complete": 44.041666666666664,
+          "runs": [
+            {
+              "cells": 251,
+              "stopAt": 11.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                83,
+                106,
+                141,
+                164,
+                199
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.3207340759075908
+            },
+            {
+              "cells": 527,
+              "stopAt": 42.5,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                96,
+                155,
+                226,
+                297,
+                368,
+                439
+              ],
+              "lastSkipFramesBeforeStop": 87,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0022602865403587
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "base": 1,
+          "crossing": 56.62478539520619,
+          "complete": 58.58333333333333,
+          "runs": [
+            {
+              "cells": 227,
+              "stopAt": 10.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                71,
+                106,
+                129,
+                152,
+                175
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.2361111111111111
+            },
+            {
+              "cells": 371,
+              "stopAt": 34,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                72,
+                119,
+                166,
+                213,
+                260,
+                295
+              ],
+              "lastSkipFramesBeforeStop": 75,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6319544652877986
+            },
+            {
+              "cells": 347,
+              "stopAt": 57.041666666666664,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                107,
+                154,
+                189,
+                236,
+                283
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0090230178771846
+            }
+          ]
+        }
+      ]
+    },
+    "B": {
+      "places": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "dogs": [
+        {
+          "index": 0,
+          "base": 1,
+          "crossing": 43.00840336134454,
+          "complete": 45,
+          "runs": [
+            {
+              "cells": 1007,
+              "stopAt": 43.458333333333336,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                156,
+                299,
+                430,
+                573,
+                704,
+                847
+              ],
+              "lastSkipFramesBeforeStop": 159,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0097205548886221
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "base": 1.23,
+          "crossing": 48.60289390497514,
+          "complete": 50.58333333333333,
+          "runs": [
+            {
+              "cells": 167,
+              "stopAt": 8.458333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                70,
+                93,
+                104,
+                127
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.21937440476190478
+            },
+            {
+              "cells": 347,
+              "stopAt": 31.5,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                107,
+                154,
+                189,
+                236,
+                283
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6785946741071428
+            },
+            {
+              "cells": 239,
+              "stopAt": 49.041666666666664,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                83,
+                106,
+                129,
+                164,
+                187
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.011862126352814
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "base": 1.23,
+          "crossing": 53.54902436172598,
+          "complete": 55.52291666666666,
+          "runs": [
+            {
+              "cells": 179,
+              "stopAt": 8.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                82,
+                93,
+                116,
+                139
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.23184523809523813
+            },
+            {
+              "cells": 287,
+              "stopAt": 33.43958333333333,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                223
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6228215861344538
+            },
+            {
+              "cells": 287,
+              "stopAt": 53.981249999999996,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                223
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0115521764387574
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "base": 1.1,
+          "crossing": 56.56114502158772,
+          "complete": 58.52291666666667,
+          "runs": [
+            {
+              "cells": 155,
+              "stopAt": 7.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                70,
+                81,
+                104,
+                115
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.18477380952380953
+            },
+            {
+              "cells": 323,
+              "stopAt": 29,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                107,
+                142,
+                177,
+                224,
+                259
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.5725348097572361
+            },
+            {
+              "cells": 371,
+              "stopAt": 56.98125,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                72,
+                119,
+                166,
+                213,
+                260,
+                295
+              ],
+              "lastSkipFramesBeforeStop": 75,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0098123647974042
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "base": 1.2,
+          "crossing": 60.80979166666667,
+          "complete": 62.56458333333333,
+          "runs": [
+            {
+              "cells": 179,
+              "stopAt": 8.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                82,
+                93,
+                116,
+                139
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.22845238095238096
+            },
+            {
+              "cells": 179,
+              "stopAt": 25,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                82,
+                93,
+                116,
+                139
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.47356547619047606
+            },
+            {
+              "cells": 179,
+              "stopAt": 44.98125,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                82,
+                93,
+                116,
+                139
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.7264583333333334
+            },
+            {
+              "cells": 203,
+              "stopAt": 61.02291666666667,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                71,
+                94,
+                117,
+                140,
+                163
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0048988095238096
+            }
+          ]
+        }
+      ]
+    },
+    "C": {
+      "places": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "dogs": [
+        {
+          "index": 0,
+          "base": 1,
+          "crossing": 43.00840336134454,
+          "complete": 45,
+          "runs": [
+            {
+              "cells": 1007,
+              "stopAt": 43.458333333333336,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                156,
+                299,
+                430,
+                573,
+                704,
+                847
+              ],
+              "lastSkipFramesBeforeStop": 159,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0097205548886221
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "base": 1.23,
+          "crossing": 49.76745093208508,
+          "complete": 51.583333333333336,
+          "runs": [
+            {
+              "cells": 167,
+              "stopAt": 8.458333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                70,
+                93,
+                104,
+                127
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.21937440476190478
+            },
+            {
+              "cells": 299,
+              "stopAt": 29.5,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                235
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6193847703222702
+            },
+            {
+              "cells": 287,
+              "stopAt": 50.04166666666667,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                223
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0068103655603655
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "base": 1,
+          "crossing": 55.62892404436522,
+          "complete": 57.58333333333333,
+          "runs": [
+            {
+              "cells": 227,
+              "stopAt": 10.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                71,
+                106,
+                129,
+                152,
+                175
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.2361111111111111
+            },
+            {
+              "cells": 371,
+              "stopAt": 34,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                72,
+                119,
+                166,
+                213,
+                260,
+                295
+              ],
+              "lastSkipFramesBeforeStop": 75,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6345935545935546
+            },
+            {
+              "cells": 347,
+              "stopAt": 56.041666666666664,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                107,
+                154,
+                189,
+                236,
+                283
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0087467903828198
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "base": 1.23,
+          "crossing": 57.48860769505931,
+          "complete": 59.46249999999999,
+          "runs": [
+            {
+              "cells": 179,
+              "stopAt": 8.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                82,
+                93,
+                116,
+                139
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.23184523809523813
+            },
+            {
+              "cells": 287,
+              "stopAt": 33.43958333333333,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                223
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.6228215861344538
+            },
+            {
+              "cells": 287,
+              "stopAt": 57.92083333333333,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                60,
+                95,
+                130,
+                165,
+                200,
+                223
+              ],
+              "lastSkipFramesBeforeStop": 63,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0115521764387574
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "base": 1.1,
+          "crossing": 60.125729618416386,
+          "complete": 62.125,
+          "runs": [
+            {
+              "cells": 155,
+              "stopAt": 7.958333333333334,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                36,
+                59,
+                70,
+                81,
+                104,
+                115
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.18115079365079367
+            },
+            {
+              "cells": 203,
+              "stopAt": 25,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                71,
+                94,
+                117,
+                140,
+                163
+              ],
+              "lastSkipFramesBeforeStop": 39,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.4341026785714286
+            },
+            {
+              "cells": 239,
+              "stopAt": 42.54166666666667,
+              "stopKind": "STOP",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                83,
+                106,
+                129,
+                164,
+                187
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 0.7275342712842714
+            },
+            {
+              "cells": 227,
+              "stopAt": 60.583333333333336,
+              "stopKind": "FINISH_DECELERATE",
+              "oldLastSource": 62,
+              "newLastSource": 68,
+              "skipAfterCells": [
+                48,
+                71,
+                106,
+                129,
+                152,
+                175
+              ],
+              "lastSkipFramesBeforeStop": 51,
+              "unchangedIntro": true,
+              "lastWorldProgress": 1.0110025252525254
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "fiveSpeedCategories": [
+    {
+      "name": "VERY SLOW",
+      "base": 0.75,
+      "seams": [
+        {
+          "from": "BASE",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "STOP",
+          "worldGap": 0
+        },
+        {
+          "from": "STOP",
+          "to": "BUTTERFLY",
+          "worldGap": 0
+        },
+        {
+          "from": "BUTTERFLY",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "FINISH_DECELERATE",
+          "worldGap": 0
+        },
+        {
+          "from": "FINISH_DECELERATE",
+          "to": "BASE",
+          "worldGap": 0
+        },
+        {
+          "from": "BASE",
+          "to": null,
+          "worldGap": 0
+        }
+      ],
+      "runs": [
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        },
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SLOW",
+      "base": 0.9,
+      "seams": [
+        {
+          "from": "BASE",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "STOP",
+          "worldGap": 0
+        },
+        {
+          "from": "STOP",
+          "to": "BUTTERFLY",
+          "worldGap": 0
+        },
+        {
+          "from": "BUTTERFLY",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "FINISH_DECELERATE",
+          "worldGap": 0
+        },
+        {
+          "from": "FINISH_DECELERATE",
+          "to": "BASE",
+          "worldGap": 0
+        },
+        {
+          "from": "BASE",
+          "to": null,
+          "worldGap": 0
+        }
+      ],
+      "runs": [
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        },
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NORMAL",
+      "base": 1,
+      "seams": [
+        {
+          "from": "BASE",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "STOP",
+          "worldGap": 0
+        },
+        {
+          "from": "STOP",
+          "to": "BUTTERFLY",
+          "worldGap": 0
+        },
+        {
+          "from": "BUTTERFLY",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "FINISH_DECELERATE",
+          "worldGap": 0
+        },
+        {
+          "from": "FINISH_DECELERATE",
+          "to": "BASE",
+          "worldGap": 0
+        },
+        {
+          "from": "BASE",
+          "to": null,
+          "worldGap": 0
+        }
+      ],
+      "runs": [
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        },
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FAST",
+      "base": 1.1,
+      "seams": [
+        {
+          "from": "BASE",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "STOP",
+          "worldGap": 0
+        },
+        {
+          "from": "STOP",
+          "to": "BUTTERFLY",
+          "worldGap": 0
+        },
+        {
+          "from": "BUTTERFLY",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "FINISH_DECELERATE",
+          "worldGap": 0
+        },
+        {
+          "from": "FINISH_DECELERATE",
+          "to": "BASE",
+          "worldGap": 0
+        },
+        {
+          "from": "BASE",
+          "to": null,
+          "worldGap": 0
+        }
+      ],
+      "runs": [
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        },
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VERY FAST",
+      "base": 1.25,
+      "seams": [
+        {
+          "from": "BASE",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "STOP",
+          "worldGap": 0
+        },
+        {
+          "from": "STOP",
+          "to": "BUTTERFLY",
+          "worldGap": 0
+        },
+        {
+          "from": "BUTTERFLY",
+          "to": "START",
+          "worldGap": 0
+        },
+        {
+          "from": "START",
+          "to": "RUN",
+          "worldGap": 0
+        },
+        {
+          "from": "RUN",
+          "to": "FINISH_DECELERATE",
+          "worldGap": 0
+        },
+        {
+          "from": "FINISH_DECELERATE",
+          "to": "BASE",
+          "worldGap": 0
+        },
+        {
+          "from": "BASE",
+          "to": null,
+          "worldGap": 0
+        }
+      ],
+      "runs": [
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        },
+        {
+          "cells": 155,
+          "lastSource": 68,
+          "skips": [
+            36,
+            59,
+            70,
+            81,
+            104,
+            115
+          ]
+        }
+      ]
+    }
+  ],
+  "issues": []
+}
