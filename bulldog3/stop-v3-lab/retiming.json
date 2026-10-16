@@ -1,0 +1,63 @@
+{
+  "name": "Rocky",
+  "sourceStopFramesInclusive": [
+    18,
+    72
+  ],
+  "outputStopFrames": 37,
+  "phaseSourceFrames": [
+    18,
+    19,
+    20,
+    22,
+    23,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30,
+    31,
+    32,
+    34,
+    35,
+    36,
+    37,
+    39,
+    40,
+    41,
+    42,
+    43,
+    45,
+    46,
+    47,
+    48,
+    50,
+    52,
+    55,
+    57,
+    59,
+    61,
+    63,
+    65,
+    68,
+    70,
+    72
+  ],
+  "activeSourceFramesInclusive": [
+    18,
+    47
+  ],
+  "activeOutputFrames": 25,
+  "settleSourceFramesInclusive": [
+    48,
+    72
+  ],
+  "settleOutputFrames": 12,
+  "localOffsetStartSourcePx": [
+    -38,
+    17
+  ],
+  "localOffsetEndsAtSourceFrame": 47,
+  "fps": 24
+}

@@ -1,0 +1,19 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "RUN": {
+      "file": "assets/run.png",
+      "frames": 23
+    },
+    "STOP": {
+      "file": "assets/stop.png",
+      "frames": 37
+    },
+    "BASE": {
+      "file": "assets/base.png",
+      "frames": 1
+    }
+  }
+}

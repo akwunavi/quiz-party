@@ -1,0 +1,55 @@
+{
+  "browser": "Chromium",
+  "model": "Race V3 unchanged",
+  "fiveProfiles": [
+    {
+      "name": "VERY SLOW",
+      "base": 0.75,
+      "runStopProgressGap": 0,
+      "stopStandProgressGap": 0,
+      "runStopSpeedBefore": 0.017857142857142856,
+      "stopStandSpeedAfter": 0
+    },
+    {
+      "name": "SLOW",
+      "base": 0.9,
+      "runStopProgressGap": 0,
+      "stopStandProgressGap": 0,
+      "runStopSpeedBefore": 0.02142857142857143,
+      "stopStandSpeedAfter": 0
+    },
+    {
+      "name": "NORMAL",
+      "base": 1,
+      "runStopProgressGap": 0,
+      "stopStandProgressGap": 0,
+      "runStopSpeedBefore": 0.023809523809523808,
+      "stopStandSpeedAfter": 0
+    },
+    {
+      "name": "FAST",
+      "base": 1.1,
+      "runStopProgressGap": 0,
+      "stopStandProgressGap": 0,
+      "runStopSpeedBefore": 0.02619047619047619,
+      "stopStandSpeedAfter": 0
+    },
+    {
+      "name": "VERY FAST",
+      "base": 1.25,
+      "runStopProgressGap": 0,
+      "stopStandProgressGap": 0,
+      "runStopSpeedBefore": 0.02976190476190476,
+      "stopStandSpeedAfter": 0
+    }
+  ],
+  "playAdvancedSeconds": 0.36369999999701974,
+  "mp4Playback": {
+    "width": 1920,
+    "height": 1080,
+    "currentTime": 0.356801,
+    "error": null
+  },
+  "pageErrors": [],
+  "framesRecorded": 93
+}
