@@ -1,0 +1,187 @@
+[
+{
+"frm": "RUN#88",
+"to": "RUN#89",
+"step": 11.1
+},
+{
+"frm": "RUN#89",
+"to": "RUN#90",
+"step": 9.7
+},
+{
+"frm": "RUN#90",
+"to": "RUN#91",
+"step": 9.9
+},
+{
+"frm": "RUN#91",
+"to": "RUN#92",
+"step": 10.3
+},
+{
+"frm": "RUN#92",
+"to": "RUN#93",
+"step": 10.6
+},
+{
+"frm": "RUN#93",
+"to": "RUN#94",
+"step": 11.3
+},
+{
+"frm": "RUN#94",
+"to": "RUN#95",
+"step": 12.7
+},
+{
+"frm": "RUN#95",
+"to": "RUN#96",
+"step": 14.4
+},
+{
+"frm": "RUN#96",
+"to": "v2 k27",
+"step": 18.3
+},
+{
+"frm": "v2 k27",
+"to": "v2 k28",
+"step": 14.5
+},
+{
+"frm": "v2 k28",
+"to": "v2 k29",
+"step": 13.5
+},
+{
+"frm": "v2 k29",
+"to": "v2 k30",
+"step": 12.8
+},
+{
+"frm": "v2 k30",
+"to": "v2 k31",
+"step": 12.4
+},
+{
+"frm": "v2 k31",
+"to": "v2 k32",
+"step": 10.7
+},
+{
+"frm": "v2 k32",
+"to": "v2 k33",
+"step": 9.8
+},
+{
+"frm": "v2 k33",
+"to": "v2 k34",
+"step": 10.5
+},
+{
+"frm": "v2 k34",
+"to": "v2 k35",
+"step": 12.2
+},
+{
+"frm": "v2 k35",
+"to": "v2 k36",
+"step": 11.8
+},
+{
+"frm": "v2 k36",
+"to": "v2 k37",
+"step": 11.2
+},
+{
+"frm": "v2 k37",
+"to": "v2 k38",
+"step": 11.4
+},
+{
+"frm": "v2 k38",
+"to": "v2 k39",
+"step": 11.2
+},
+{
+"frm": "v2 k39",
+"to": "v2 k40",
+"step": 14.6
+},
+{
+"frm": "v2 k40",
+"to": "v1 k66",
+"step": 17.3
+},
+{
+"frm": "v1 k66",
+"to": "v1 k67",
+"step": 10.6
+},
+{
+"frm": "v1 k67",
+"to": "v1 k68",
+"step": 10.7
+},
+{
+"frm": "v1 k68",
+"to": "v1 k69",
+"step": 9.9
+},
+{
+"frm": "v1 k69",
+"to": "v1 k70",
+"step": 9.1
+},
+{
+"frm": "v1 k70",
+"to": "v1 k71",
+"step": 7.7
+},
+{
+"frm": "v1 k71",
+"to": "v1 k72",
+"step": 6.3
+},
+{
+"frm": "v1 k72",
+"to": "v1 k73",
+"step": 5.0
+},
+{
+"frm": "v1 k73",
+"to": "RACE_STAND #30",
+"step": 5.8
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+},
+{
+"frm": "RACE_STAND #30",
+"to": "RACE_STAND #30",
+"step": 0.0
+}
+]
