@@ -1,0 +1,11 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "BUTTERFLY": {
+      "file": "assets/rocky-butterfly.png",
+      "frames": 121
+    }
+  }
+}

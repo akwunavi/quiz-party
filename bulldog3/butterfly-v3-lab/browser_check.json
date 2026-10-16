@@ -1,0 +1,55 @@
+{
+  "browser": "Chromium",
+  "checks": [
+    {
+      "mode": "chain",
+      "output": "DOG3_ROCKY_BUTTERFLY_FULL_CHAIN_GAMEPLAY.mp4",
+      "frames": 326,
+      "playback": {
+        "width": 1920,
+        "height": 1080,
+        "time": 0.346611,
+        "error": null
+      }
+    },
+    {
+      "mode": "action",
+      "output": "DOG3_ROCKY_BUTTERFLY_GAMEPLAY.mp4",
+      "frames": 121,
+      "playback": {
+        "width": 1920,
+        "height": 1080,
+        "time": 0.344664,
+        "error": null
+      }
+    }
+  ],
+  "categoryChecks": [
+    {
+      "segment": "RUN",
+      "progress": 0.11607142857142856,
+      "speed": 0.017857142857142856
+    },
+    {
+      "segment": "RUN",
+      "progress": 0.13928571428571426,
+      "speed": 0.02142857142857143
+    },
+    {
+      "segment": "RUN",
+      "progress": 0.15476190476190477,
+      "speed": 0.023809523809523808
+    },
+    {
+      "segment": "RUN",
+      "progress": 0.17023809523809524,
+      "speed": 0.02619047619047619
+    },
+    {
+      "segment": "RUN",
+      "progress": 0.19345238095238093,
+      "speed": 0.02976190476190476
+    }
+  ],
+  "pageErrors": []
+}

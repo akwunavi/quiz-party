@@ -1,0 +1,206 @@
+{
+  "browser": "Chromium",
+  "playTime": 0.6567000000089407,
+  "modes": {
+    "chain": {
+      "duration": 13.583333333333334,
+      "states": [
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.19924404761904763,
+            "frame": 11
+          }
+        ],
+        [
+          {
+            "segment": "STOP",
+            "progress": 0.298999153616221,
+            "frame": 36
+          }
+        ],
+        [
+          {
+            "segment": "START",
+            "progress": 0.3030302242903425,
+            "frame": 30
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.3895745798319328,
+            "frame": 11
+          }
+        ]
+      ]
+    },
+    "action": {
+      "duration": 5.041666666666668,
+      "states": [
+        [
+          {
+            "segment": "BUTTERFLY",
+            "progress": 0.29899918300653594,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "BUTTERFLY",
+            "progress": 0.29899918300653594,
+            "frame": 40
+          }
+        ],
+        [
+          {
+            "segment": "BUTTERFLY",
+            "progress": 0.29899918300653594,
+            "frame": 90
+          }
+        ],
+        [
+          {
+            "segment": "BUTTERFLY",
+            "progress": 0.29899918300653594,
+            "frame": 120
+          }
+        ]
+      ]
+    },
+    "speeds": {
+      "duration": 25.541666666666668,
+      "states": [
+        [
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "STOP",
+            "progress": 0.13312042197304147,
+            "frame": 13
+          },
+          {
+            "segment": "STOP",
+            "progress": 0.15974450636764978,
+            "frame": 13
+          },
+          {
+            "segment": "STOP",
+            "progress": 0.1774938959640553,
+            "frame": 13
+          },
+          {
+            "segment": "STOP",
+            "progress": 0.19524328556046086,
+            "frame": 13
+          },
+          {
+            "segment": "STOP",
+            "progress": 0.22186736995506917,
+            "frame": 13
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.21149553571428567,
+            "frame": 14
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.2537946428571428,
+            "frame": 14
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.28199404761904756,
+            "frame": 14
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.31019345238095236,
+            "frame": 14
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.35249255952380953,
+            "frame": 14
+          }
+        ],
+        [
+          {
+            "segment": "BASE",
+            "progress": 0.27604166666666663,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0.33125,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0.3680555555555555,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0.4048611111111111,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0.4600694444444445,
+            "frame": 0
+          }
+        ]
+      ]
+    }
+  },
+  "videos": [
+    {
+      "file": "DOG3_ROCKY_BUTTERFLY_FULL_CHAIN_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 13.583333,
+      "played": 13.583333,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_ROCKY_BUTTERFLY_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 5.041667,
+      "played": 5.041667,
+      "ended": true,
+      "error": null
+    }
+  ],
+  "errors": []
+}
