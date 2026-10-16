@@ -6,11 +6,11 @@
 | RACE_START | **утверждён**: вариант B (#30–#71 → #96 → цикл), компенсация раскачки | `lab_start_v1/` (коммит 23dd257) |
 | STOP | **утверждён**: STOP B, 37 кадров, alpha и лаборатория приняты | `stop_montage_v2/APPROVED.md`, `stop_b_alpha/`, `lab_stop_v1/` (коммит 3573f97) |
 | FINISH (FINISH_DECELERATE) | **= STOP B** временно, отдельной анимации в этой итерации нет | как STOP |
-| ROLL | нет материала — нужна генерация | план `roll_prep/PLAN.md`, Kling не запускался |
-| BUTTERFLY | нет материала — нужна генерация | — |
+| ROLL | **исходник утверждён**: ROLL v3 (Kling, first = last = #30), клип r10–r117 (108 кадров) в окне 145; alpha и лаборатория готовы, ждут визуальной приёмки | `roll_v3/`, `lab_roll_v1/` |
+| BUTTERFLY | нет материала — нужна генерация; план одной генерации готов, Kling не запускался | `butterfly_prep/PLAN.md` |
 | SNIFF_PEE (+ RETURN) | нет материала — нужна генерация | — |
 | IDLE, SELECTED (экран выбора) | кандидаты v1, ждут приёмки | `idle_selected_v1/` |
 | RETURN_TO_IDLE | нет | — |
 
-Отклонено и не развивается: STOP v1/v2 целиком, STOP montage v1 (A), обратная связка `stop_bridge_rev_v1/` для STOP, bridge v1.
+Отклонено и не развивается: ROLL v1 (без головы), ROLL v2 (заменён v3); STOP v1/v2 целиком, STOP montage v1 (A), обратная связка `stop_bridge_rev_v1/` для STOP, bridge v1.
 Физика V3 и окна не менялись.

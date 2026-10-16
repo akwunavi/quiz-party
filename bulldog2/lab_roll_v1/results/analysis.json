@@ -1,0 +1,580 @@
+{
+ "EARLY5": [
+  {
+   "lane": "№2 · VERY_FAST · ROLL со стойки",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 0.5,
+     "frm": "RACE_STAND RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 6.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 7.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.87
+    },
+    {
+     "at": 8.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.46
+    }
+   ],
+   "paw_minus_line": [
+    -25,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · FAST · ROLL со стойки",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 0.5,
+     "frm": "RACE_STAND RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 6.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 7.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.72
+    },
+    {
+     "at": 8.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.31
+    }
+   ],
+   "paw_minus_line": [
+    -25,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · NORMAL · ROLL со стойки",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 0.5,
+     "frm": "RACE_STAND RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 6.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 7.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.58
+    },
+    {
+     "at": 8.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.17
+    }
+   ],
+   "paw_minus_line": [
+    -25,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · SLOW · ROLL со стойки",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 0.5,
+     "frm": "RACE_STAND RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 6.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 7.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.44
+    },
+    {
+     "at": 8.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.03
+    }
+   ],
+   "paw_minus_line": [
+    -25,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · ROLL со стойки",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 0.5,
+     "frm": "RACE_STAND RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 6.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 7.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.29
+    },
+    {
+     "at": 8.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": -0.12
+    }
+   ],
+   "paw_minus_line": [
+    -25,
+    -19
+   ]
+  }
+ ],
+ "MID5": [
+  {
+   "lane": "№2 · VERY_FAST · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 13.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 18,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 19.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 20.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.87
+    },
+    {
+     "at": 21.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.46
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · FAST · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 15,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 19.5,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 21.042,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 22.042,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.72
+    },
+    {
+     "at": 22.792,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.31
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · NORMAL · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 16.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 21,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 22.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 23.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.58
+    },
+    {
+     "at": 24.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.17
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · SLOW · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 18.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 23,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 24.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 25.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.44
+    },
+    {
+     "at": 26.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.03
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 21.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 26,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 27.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 28.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.29
+    },
+    {
+     "at": 29.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": -0.12
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  }
+ ],
+ "PAIR": [
+  {
+   "lane": "№2 · NORMAL · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 16.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 21,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 22.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 23.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.58
+    },
+    {
+     "at": 24.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.17
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · VERY_FAST · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 13.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 18,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 19.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 20.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.87
+    },
+    {
+     "at": 21.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": 0.46
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  },
+  {
+   "lane": "№2 · VERY_SLOW · ROLL на 35 %",
+   "roll_window_frames": 145,
+   "clip_frames": 108,
+   "pad_frames": 37,
+   "anchor_x_range_in_roll": 0.0,
+   "max_body_step_inside_roll": 2.21,
+   "phase_changes": [
+    {
+     "at": 21.5,
+     "frm": "STOP B RACE_STAND #30",
+     "to": "ROLL o10",
+     "body_step": -0.0
+    },
+    {
+     "at": 26,
+     "frm": "ROLL o117",
+     "to": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "body_step": -0.01
+    },
+    {
+     "at": 27.542,
+     "frm": "RACE_STAND (pad ROLL) RACE_STAND #30",
+     "to": "RACE_START B #30",
+     "body_step": 0.0
+    },
+    {
+     "at": 28.542,
+     "frm": "RACE_START B #53",
+     "to": "RACE_START B (spill) #54",
+     "body_step": 1.29
+    },
+    {
+     "at": 29.292,
+     "frm": "RACE_START B (spill) #71",
+     "to": "RUN #96",
+     "body_step": -0.12
+    }
+   ],
+   "paw_minus_line": [
+    -26,
+    -19
+   ]
+  }
+ ]
+}

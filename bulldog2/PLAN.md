@@ -110,3 +110,6 @@ STOP B утверждён (`stop_montage_v2/APPROVED.md`). Alpha — `stop_b_alp
 
 ## Статус 16.10.2026 — STOP B утверждён
 STOP B (монтаж, alpha, лаборатория) утверждён; FINISH = STOP B временно. Сводка — `STATUS.md`. Следующий шаг — ROLL: материала нет, план генерации `roll_prep/PLAN.md`, ждёт согласования.
+
+## Статус 16.10.2026 — ROLL
+ROLL v3 утверждён как исходник; alpha и лаборатория `lab_roll_v1/` готовы (все стыки 0,00 px). Следующий — BUTTERFLY: план `butterfly_prep/PLAN.md`, Kling не запускался.
