@@ -1,0 +1,91 @@
+{
+ "candidate": {
+  "top": 47,
+  "bottom": 637,
+  "left": 317,
+  "right": 933,
+  "h": 590,
+  "w": 616,
+  "area": 173233,
+  "fur": [
+   208.8,
+   186.5,
+   179.1
+  ]
+ },
+ "run_36_120_summary": {
+  "height": [
+   543,
+   596
+  ],
+  "height_median": 564,
+  "bottom_floor_y": [
+   649,
+   689
+  ],
+  "fur_rgb_median": [
+   205.4,
+   186.4,
+   178.4
+  ]
+ },
+ "run_frames": {
+  "36": {
+   "top": 105,
+   "bottom": 658,
+   "left": 322,
+   "right": 966,
+   "h": 553,
+   "w": 644,
+   "area": 203600,
+   "fur": [
+    205.5,
+    185.7,
+    177.7
+   ]
+  },
+  "44": {
+   "top": 78,
+   "bottom": 661,
+   "left": 363,
+   "right": 948,
+   "h": 583,
+   "w": 585,
+   "area": 185622,
+   "fur": [
+    203.0,
+    184.2,
+    177.1
+   ]
+  },
+  "57": {
+   "top": 67,
+   "bottom": 660,
+   "left": 344,
+   "right": 962,
+   "h": 593,
+   "w": 618,
+   "area": 197202,
+   "fur": [
+    203.4,
+    185.3,
+    176.4
+   ]
+  },
+  "88": {
+   "top": 120,
+   "bottom": 671,
+   "left": 350,
+   "right": 943,
+   "h": 551,
+   "w": 593,
+   "area": 182984,
+   "fur": [
+    205.8,
+    186.5,
+    178.0
+   ]
+  }
+ },
+ "note": "silhouettes from the alpha pipeline mask (candidate: 1 frame, analysis only; RUN: existing dog2-run-alpha.webm). Candidate resized 1672x941 -> 1276x718."
+}
