@@ -75,3 +75,24 @@ No lying down, no sitting, no falling, no rolling, no getting up again, no extra
 
 ## 7. Урок
 С кадра галопа Kling бежит на месте 1–1,5 с (Фрэнк — 2 раза, Зефир — 1). Если до конца ролика остаётся много времени и не сказано, что делать, модель может вставить отдельное действие («лёг — встал»). Время торможения и «стоит неподвижно до конца» надо писать в промпте явно. Урок записан здесь, а не в `bulldog1-frenk/LESSONS_FOR_NEXT_DOGS.md`: в этом задании Фрэнка не трогаю. Перенесу по твоему слову.
+
+## 8. Пересмотр по урокам Фрэнка (до запуска, 16.10.2026) — заменяет §4
+Сверил с `bulldog1-frenk/LESSONS_FOR_NEXT_DOGS.md` (только чтение) и историей STOP v2 → V4.
+* **Урок 1: Kling не выполняет тайминг.** Значит, «braking takes about one second» бесполезно. Убрано. Длину добираем монтажом.
+* **Урок 3: слова про опускание дают лёжку.** В промпте v1 были «settles into», «decelerates smoothly over … braking steps». В черновике §4 были «dips … on flexed legs», «hind legs gathered», «clear of the ground». Это та же лексика опускания: всё убрано. Вместо неё проверенная у Фрэнка формула «chest and head stay high».
+* **Урок 5: негативы слабые, длинный список хуже.** Нужен короткий позитивный промпт и 4–6 запретов. Было 9–10 запретов, стало 5.
+* **Главный факт.** У Фрэнка та же пара кадров дала лёжку в STOP v2 и чистое торможение в V4. Изменился только промпт: из него убрали присед. Значит, первым рычагом остаётся промпт.
+* **Последний кадр не меняю.**
+  * STOP обязан закончиться ровно в утверждённой RACE_STAND #30, иначе нужен новый стык.
+  * Более высокой боковой стойки в исходнике нет (#24–#29 ниже).
+  * Перерисованная стойка изменила бы утверждённую анатомию.
+  * Если #30 и с чистым промптом даст лёжку, вывод будет такой: виновата сама сжатая поза. Тогда следующий шаг — отдельная стойка, но это решение по RACE_STAND, и принимать его тебе.
+* Первый кадр (#97) и сдвиг +44 не меняются. Файлы те же (SHA-256 adeee4db…, dcfbe0a9…).
+
+### Промпт попытки 2 (итоговый)
+```
+The same white French bulldog, side view, facing right. In the first frame his front paws land on the ground after a gallop. From this frame on he brakes: his front legs plant firmly and hold his weight, his hind legs step forward under his body, and he comes to a stop standing on all four paws. His chest and head stay high the whole time; his body is always carried by his legs. He ends standing exactly as in the last frame, mouth closed, and stays still. Static camera, same place in the frame, same size, same character, lighting and background.
+
+No lying down, no sitting, no extra running strides, no jump, no open mouth.
+```
+Параметры как в §5: `kling-video-v3_0`, 3 с, 720p, 1 видео, без звука, prefer_multi_shots false, 18 кредитов.
