@@ -1,0 +1,610 @@
+[
+ {
+  "lane": 1,
+  "name": "№2 · VERY_FAST · B",
+  "standToStart": {
+   "t": 0.5,
+   "from": "#30",
+   "to": "#30",
+   "bodyStepPx": 0.0,
+   "anchorStepPx": 0.0,
+   "shadowStepPx": 0.0
+  },
+  "join": {
+   "t": 2.25,
+   "from": "#71",
+   "to": "#96",
+   "bodyStepPx": 0.46,
+   "anchorStepPx": 1.45,
+   "shadowStepPx": -0.08
+  },
+  "firstStepsAfterStart": [
+   {
+    "t": 0.5,
+    "from": "#30",
+    "to": "#30",
+    "bodyStepPx": 0.0,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": 0.0
+   },
+   {
+    "t": 0.542,
+    "from": "#30",
+    "to": "#31",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.583,
+    "from": "#31",
+    "to": "#32",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.02,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.625,
+    "from": "#32",
+    "to": "#33",
+    "bodyStepPx": 0.03,
+    "anchorStepPx": 0.04,
+    "shadowStepPx": 0.03
+   },
+   {
+    "t": 0.667,
+    "from": "#33",
+    "to": "#34",
+    "bodyStepPx": 0.1,
+    "anchorStepPx": 0.08,
+    "shadowStepPx": 0.09
+   },
+   {
+    "t": 0.708,
+    "from": "#34",
+    "to": "#35",
+    "bodyStepPx": 0.21,
+    "anchorStepPx": 0.13,
+    "shadowStepPx": 0.17
+   },
+   {
+    "t": 0.75,
+    "from": "#35",
+    "to": "#36",
+    "bodyStepPx": 0.24,
+    "anchorStepPx": 0.19,
+    "shadowStepPx": 0.21
+   },
+   {
+    "t": 0.792,
+    "from": "#36",
+    "to": "#37",
+    "bodyStepPx": 0.24,
+    "anchorStepPx": 0.26,
+    "shadowStepPx": 0.21
+   }
+  ],
+  "rollbackFrames": [],
+  "runLoopBodyMinusAnchorStep_p95": 1.29,
+  "maxBodyLeadOverAnchorPx_start": 1.86,
+  "maxShadowHopPx": 1.53,
+  "physSpeedFractionWhenFullStride": {
+   "t": 0.75,
+   "sinceStart_s": 0.25,
+   "fraction": 0.156
+  },
+  "physSpeedFraction_at": {
+   "+0.25s": 0.156,
+   "+0.5s": 0.5,
+   "+0.75s": 0.844,
+   "+1.0s": 1.0
+  },
+  "paw_bottom_stand_vs_run": [
+   259,
+   [
+    254,
+    255,
+    256,
+    257,
+    258,
+    259,
+    260
+   ]
+  ]
+ },
+ {
+  "lane": 2,
+  "name": "№2 · FAST · B",
+  "standToStart": {
+   "t": 0.5,
+   "from": "#30",
+   "to": "#30",
+   "bodyStepPx": 0.0,
+   "anchorStepPx": 0.0,
+   "shadowStepPx": 0.0
+  },
+  "join": {
+   "t": 2.25,
+   "from": "#71",
+   "to": "#96",
+   "bodyStepPx": 0.31,
+   "anchorStepPx": 1.3,
+   "shadowStepPx": -0.23
+  },
+  "firstStepsAfterStart": [
+   {
+    "t": 0.5,
+    "from": "#30",
+    "to": "#30",
+    "bodyStepPx": 0.0,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": 0.0
+   },
+   {
+    "t": 0.542,
+    "from": "#30",
+    "to": "#31",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.583,
+    "from": "#31",
+    "to": "#32",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.02,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.625,
+    "from": "#32",
+    "to": "#33",
+    "bodyStepPx": 0.02,
+    "anchorStepPx": 0.04,
+    "shadowStepPx": 0.02
+   },
+   {
+    "t": 0.667,
+    "from": "#33",
+    "to": "#34",
+    "bodyStepPx": 0.09,
+    "anchorStepPx": 0.08,
+    "shadowStepPx": 0.08
+   },
+   {
+    "t": 0.708,
+    "from": "#34",
+    "to": "#35",
+    "bodyStepPx": 0.2,
+    "anchorStepPx": 0.12,
+    "shadowStepPx": 0.15
+   },
+   {
+    "t": 0.75,
+    "from": "#35",
+    "to": "#36",
+    "bodyStepPx": 0.22,
+    "anchorStepPx": 0.17,
+    "shadowStepPx": 0.19
+   },
+   {
+    "t": 0.792,
+    "from": "#36",
+    "to": "#37",
+    "bodyStepPx": 0.22,
+    "anchorStepPx": 0.23,
+    "shadowStepPx": 0.18
+   }
+  ],
+  "rollbackFrames": [],
+  "runLoopBodyMinusAnchorStep_p95": 1.29,
+  "maxBodyLeadOverAnchorPx_start": 1.86,
+  "maxShadowHopPx": 1.53,
+  "physSpeedFractionWhenFullStride": {
+   "t": 0.75,
+   "sinceStart_s": 0.25,
+   "fraction": 0.156
+  },
+  "physSpeedFraction_at": {
+   "+0.25s": 0.156,
+   "+0.5s": 0.5,
+   "+0.75s": 0.844,
+   "+1.0s": 1.0
+  },
+  "paw_bottom_stand_vs_run": [
+   418,
+   [
+    413,
+    414,
+    415,
+    416,
+    417,
+    418,
+    419
+   ]
+  ]
+ },
+ {
+  "lane": 3,
+  "name": "№2 · NORMAL · B",
+  "standToStart": {
+   "t": 0.5,
+   "from": "#30",
+   "to": "#30",
+   "bodyStepPx": 0.0,
+   "anchorStepPx": 0.0,
+   "shadowStepPx": 0.0
+  },
+  "join": {
+   "t": 2.25,
+   "from": "#71",
+   "to": "#96",
+   "bodyStepPx": 0.17,
+   "anchorStepPx": 1.16,
+   "shadowStepPx": -0.37
+  },
+  "firstStepsAfterStart": [
+   {
+    "t": 0.5,
+    "from": "#30",
+    "to": "#30",
+    "bodyStepPx": 0.0,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": 0.0
+   },
+   {
+    "t": 0.542,
+    "from": "#30",
+    "to": "#31",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.583,
+    "from": "#31",
+    "to": "#32",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.01,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.625,
+    "from": "#32",
+    "to": "#33",
+    "bodyStepPx": 0.02,
+    "anchorStepPx": 0.04,
+    "shadowStepPx": 0.02
+   },
+   {
+    "t": 0.667,
+    "from": "#33",
+    "to": "#34",
+    "bodyStepPx": 0.09,
+    "anchorStepPx": 0.07,
+    "shadowStepPx": 0.08
+   },
+   {
+    "t": 0.708,
+    "from": "#34",
+    "to": "#35",
+    "bodyStepPx": 0.18,
+    "anchorStepPx": 0.11,
+    "shadowStepPx": 0.14
+   },
+   {
+    "t": 0.75,
+    "from": "#35",
+    "to": "#36",
+    "bodyStepPx": 0.2,
+    "anchorStepPx": 0.16,
+    "shadowStepPx": 0.17
+   },
+   {
+    "t": 0.792,
+    "from": "#36",
+    "to": "#37",
+    "bodyStepPx": 0.19,
+    "anchorStepPx": 0.21,
+    "shadowStepPx": 0.16
+   }
+  ],
+  "rollbackFrames": [
+   {
+    "t": 1.792,
+    "from": "#60",
+    "to": "#61",
+    "bodyStepPx": -0.61,
+    "anchorStepPx": 1.16,
+    "shadowStepPx": 0.07
+   }
+  ],
+  "runLoopBodyMinusAnchorStep_p95": 1.29,
+  "maxBodyLeadOverAnchorPx_start": 1.86,
+  "maxShadowHopPx": 1.53,
+  "physSpeedFractionWhenFullStride": {
+   "t": 0.75,
+   "sinceStart_s": 0.25,
+   "fraction": 0.156
+  },
+  "physSpeedFraction_at": {
+   "+0.25s": 0.156,
+   "+0.5s": 0.5,
+   "+0.75s": 0.844,
+   "+1.0s": 1.0
+  },
+  "paw_bottom_stand_vs_run": [
+   577,
+   [
+    572,
+    573,
+    574,
+    575,
+    576,
+    577,
+    578
+   ]
+  ]
+ },
+ {
+  "lane": 4,
+  "name": "№2 · SLOW · B",
+  "standToStart": {
+   "t": 0.5,
+   "from": "#30",
+   "to": "#30",
+   "bodyStepPx": 0.0,
+   "anchorStepPx": 0.0,
+   "shadowStepPx": 0.0
+  },
+  "join": {
+   "t": 2.25,
+   "from": "#71",
+   "to": "#96",
+   "bodyStepPx": 0.03,
+   "anchorStepPx": 1.02,
+   "shadowStepPx": -0.51
+  },
+  "firstStepsAfterStart": [
+   {
+    "t": 0.5,
+    "from": "#30",
+    "to": "#30",
+    "bodyStepPx": 0.0,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": 0.0
+   },
+   {
+    "t": 0.542,
+    "from": "#30",
+    "to": "#31",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.583,
+    "from": "#31",
+    "to": "#32",
+    "bodyStepPx": -0.02,
+    "anchorStepPx": 0.01,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.625,
+    "from": "#32",
+    "to": "#33",
+    "bodyStepPx": 0.02,
+    "anchorStepPx": 0.03,
+    "shadowStepPx": 0.01
+   },
+   {
+    "t": 0.667,
+    "from": "#33",
+    "to": "#34",
+    "bodyStepPx": 0.08,
+    "anchorStepPx": 0.06,
+    "shadowStepPx": 0.07
+   },
+   {
+    "t": 0.708,
+    "from": "#34",
+    "to": "#35",
+    "bodyStepPx": 0.17,
+    "anchorStepPx": 0.09,
+    "shadowStepPx": 0.13
+   },
+   {
+    "t": 0.75,
+    "from": "#35",
+    "to": "#36",
+    "bodyStepPx": 0.18,
+    "anchorStepPx": 0.14,
+    "shadowStepPx": 0.15
+   },
+   {
+    "t": 0.792,
+    "from": "#36",
+    "to": "#37",
+    "bodyStepPx": 0.17,
+    "anchorStepPx": 0.18,
+    "shadowStepPx": 0.13
+   }
+  ],
+  "rollbackFrames": [
+   {
+    "t": 1.792,
+    "from": "#60",
+    "to": "#61",
+    "bodyStepPx": -0.75,
+    "anchorStepPx": 1.02,
+    "shadowStepPx": -0.07
+   },
+   {
+    "t": 1.833,
+    "from": "#61",
+    "to": "#62",
+    "bodyStepPx": -0.53,
+    "anchorStepPx": 1.02,
+    "shadowStepPx": 0.06
+   }
+  ],
+  "runLoopBodyMinusAnchorStep_p95": 1.29,
+  "maxBodyLeadOverAnchorPx_start": 1.86,
+  "maxShadowHopPx": 1.53,
+  "physSpeedFractionWhenFullStride": {
+   "t": 0.75,
+   "sinceStart_s": 0.25,
+   "fraction": 0.156
+  },
+  "physSpeedFraction_at": {
+   "+0.25s": 0.156,
+   "+0.5s": 0.5,
+   "+0.75s": 0.844,
+   "+1.0s": 1.0
+  },
+  "paw_bottom_stand_vs_run": [
+   736,
+   [
+    731,
+    732,
+    733,
+    734,
+    735,
+    736,
+    737
+   ]
+  ]
+ },
+ {
+  "lane": 5,
+  "name": "№2 · VERY_SLOW · B",
+  "standToStart": {
+   "t": 0.5,
+   "from": "#30",
+   "to": "#30",
+   "bodyStepPx": 0.0,
+   "anchorStepPx": 0.0,
+   "shadowStepPx": 0.0
+  },
+  "join": {
+   "t": 2.25,
+   "from": "#71",
+   "to": "#96",
+   "bodyStepPx": -0.12,
+   "anchorStepPx": 0.87,
+   "shadowStepPx": -0.66
+  },
+  "firstStepsAfterStart": [
+   {
+    "t": 0.5,
+    "from": "#30",
+    "to": "#30",
+    "bodyStepPx": 0.0,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": 0.0
+   },
+   {
+    "t": 0.542,
+    "from": "#30",
+    "to": "#31",
+    "bodyStepPx": -0.01,
+    "anchorStepPx": 0.0,
+    "shadowStepPx": -0.01
+   },
+   {
+    "t": 0.583,
+    "from": "#31",
+    "to": "#32",
+    "bodyStepPx": -0.02,
+    "anchorStepPx": 0.01,
+    "shadowStepPx": -0.02
+   },
+   {
+    "t": 0.625,
+    "from": "#32",
+    "to": "#33",
+    "bodyStepPx": 0.01,
+    "anchorStepPx": 0.03,
+    "shadowStepPx": 0.01
+   },
+   {
+    "t": 0.667,
+    "from": "#33",
+    "to": "#34",
+    "bodyStepPx": 0.07,
+    "anchorStepPx": 0.05,
+    "shadowStepPx": 0.06
+   },
+   {
+    "t": 0.708,
+    "from": "#34",
+    "to": "#35",
+    "bodyStepPx": 0.16,
+    "anchorStepPx": 0.08,
+    "shadowStepPx": 0.11
+   },
+   {
+    "t": 0.75,
+    "from": "#35",
+    "to": "#36",
+    "bodyStepPx": 0.16,
+    "anchorStepPx": 0.12,
+    "shadowStepPx": 0.13
+   },
+   {
+    "t": 0.792,
+    "from": "#36",
+    "to": "#37",
+    "bodyStepPx": 0.14,
+    "anchorStepPx": 0.16,
+    "shadowStepPx": 0.11
+   }
+  ],
+  "rollbackFrames": [
+   {
+    "t": 1.792,
+    "from": "#60",
+    "to": "#61",
+    "bodyStepPx": -0.9,
+    "anchorStepPx": 0.87,
+    "shadowStepPx": -0.23
+   },
+   {
+    "t": 1.833,
+    "from": "#61",
+    "to": "#62",
+    "bodyStepPx": -0.68,
+    "anchorStepPx": 0.87,
+    "shadowStepPx": -0.09
+   }
+  ],
+  "runLoopBodyMinusAnchorStep_p95": 1.29,
+  "maxBodyLeadOverAnchorPx_start": 1.86,
+  "maxShadowHopPx": 1.53,
+  "physSpeedFractionWhenFullStride": {
+   "t": 0.75,
+   "sinceStart_s": 0.25,
+   "fraction": 0.156
+  },
+  "physSpeedFraction_at": {
+   "+0.25s": 0.156,
+   "+0.5s": 0.5,
+   "+0.75s": 0.844,
+   "+1.0s": 1.0
+  },
+  "paw_bottom_stand_vs_run": [
+   895,
+   [
+    890,
+    891,
+    892,
+    893,
+    894,
+    895,
+    896
+   ]
+  ]
+ }
+]
