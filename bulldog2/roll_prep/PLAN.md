@@ -34,3 +34,13 @@ The same white French bulldog, side view facing right, standing on all four paws
 
 ## После приёмки (отдельно)
 Монтаж STOP B → RACE_STAND → ROLL → RACE_STAND (pad) → START B. Alpha тем же конвейером, лаборатория — продолжение `lab_stop_v1`.
+
+## Итоговый промпт запуска (16.10.2026, после разбора промпта пользователя)
+Пользователь согласовал одну генерацию и предложил промпт, попросив сверить его с Фрэнком (различия допустимы, но не сильные). Что поменял относительно предложенного:
+* вернул описание ROLL Фрэнка, которое сработало с первой попытки: на спине, живот вверх; передние лапы парой, задние парой, синхронно; «stays on his back for most of the clip»; перекат на живот, встаёт передними; держит стойку в конце. В предложенном тексте этого нет («wiggles playfully»), а именно парные лапы были главным требованием к ROLL Фрэнка;
+* длинный список запретов (13 пунктов) сократил до 6, по уроку 5 Фрэнка: длинные негативы работают хуже;
+* «no snarling, no baring teeth» заменил позитивным «happy relaxed face with the mouth closed»: упоминание зубов может их и вызвать;
+* от промпта пользователя оставлено: белый французский бульдог, playful and relaxed, неподвижная камера, тот же масштаб и фон, без посадки и шагов в конце.
+```
+The same white French bulldog, side view facing right, standing on all four paws exactly as in the first frame. He quickly drops down and rolls over onto his back, belly up, white chest and belly facing the sky. Lying on his back, he squirms happily, rubbing his back on the floor from side to side. His two front paws move together as a pair, bent at the wrists, paddling up and down in sync, and his two hind legs kick together as a pair in sync, all paws up in the air, stubby tail wagging, ears flopping on the floor, a happy relaxed face with the mouth closed. He stays on his back for most of the clip. Then he rolls back onto his belly, pushes up with his front legs first, stands up on all four paws and settles into exactly the same standing pose and the same spot as in the last frame, holding still at the end. He stays in the same place on the floor at the same size. Static camera, same framing, same plain studio background and lighting. One dog with four legs and one tail. No jumping, no running, no sitting, no extra steps, no dust, no objects.
+```
