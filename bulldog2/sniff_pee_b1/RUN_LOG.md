@@ -5,7 +5,7 @@
 * image_2 = `../sniff_pee_prep/REF_POSE_dog4_marking_f132_1276.png` (SHA f9e1d662…935f) — только образец положения ноги №4.
 * Промпт — дословно `../sniff_pee_prep/PROMPT_B1_pose_image.txt`.
 * generationId `AQe_SDFsLEomI-X40E8qOv923yJqImh9C9mcyDqOy96Yas_3SpWYt-S6xbv1iLGnEgWlZBSX`, creditsConsumed 20 (баланс до 2618).
-* Результат: `DOG2_MARKING_POSE_B1_original.png` (2752×1536, SHA 8205e867…e4ac, без водяного знака Kling-сервиса; угловой знак «KlingAI 3.0» из #30 сохранён моделью), копия `DOG2_MARKING_POSE_B1_1276.png`. Баланс после: 2598.
+* Результат: `DOG2_MARKING_POSE_B1_original.png` (2752×1536, SHA 8205e867…e4ac, без водяного знака Kling-сервиса; угловой знак «KlingAI 3.0» из #30 сохранён моделью), копия `DOG2_MARKING_POSE_B1_1276.png`. Баланс после: 2608 (фактически списано 10, хотя ответ Kling при отправке — creditsConsumed 20).
 
 ## Оценка (замеры наложением на #30, `COMPARE_RUN30_vs_B1.png`, `ZOOM_hind_RUN30_vs_B1.png`)
 * Голова, уши, морда, окрас, ракурс, фон, свет — как у #30 (разница в области головы 2,7/255, сдвиг 0 px).
