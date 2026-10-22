@@ -125,3 +125,6 @@ B1 (картинка позы, Nano Banana Pro) и B2 (Kling 4.0, keyframe = B1)
 
 ## Статус 22.10.2026 — SNIFF_PEE утверждён
 Игровой монтаж SNIFF_PEE = **V1S_SHORT_HOLD** (`lab_sniff_v1/APPROVED.md`): нюх сразу после STOP B, удержание метки 4,1 с, стойка 1,7 с перед RACE_START B, окна V3 без изменений. CURRENT, V1, V2 сохранены как история. Генераций и экспериментов дальше нет.
+
+## Статус 22.10.2026 — IDLE утверждён
+IDLE = MAIN_L1 из присланного исходника, с подъёмом лапы (`idle_v2/APPROVED.md`). Генерация Kling для IDLE не нужна. Дальше: alpha IDLE, SELECTED, точка перехода IDLE → SELECTED, RETURN_TO_IDLE — по отдельным заданиям.
