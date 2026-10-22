@@ -1,16 +1,21 @@
 {
  "schema": "dog2-sniff-lab/v1",
  "character": "bulldog2",
- "status": "LAB CANDIDATE for visual acceptance: SNIFF_PEE v1 (Kling 4.0, source approved) with pipeline alpha; physics V3 and windows unchanged",
+ "status": "ACCEPTED game montage: V1S_SHORT_HOLD (user, 22.10.2026, commit ade4398); source SNIFF_PEE v1 (Kling 4.0) with pipeline alpha; physics V3 and windows unchanged",
  "SNIFF_PEE": {
   "source": "sniff_pee_v1/kling/DOG2_SNIFF_PEE_v1_original.mp4 (1284x724, 193 frames, first = last = RACE_STAND #30, keyframe_1 = B1)",
   "normalise": "uniform scale 0.99375 + 0.25 px y -> 1276x720, audio dropped (sniff_pee_v1/game_source/normalise.py)",
   "alpha": "sniff_pee_v1/alpha/DOG2_SNIFF_PEE_v1_alpha_s1-s193.webm (all 193 frames, one pass, min-area 1500, no audio)",
   "atlas": "lab_sniff_v1/assets/dog2_sniff_atlas.json (labels s1..s193 = k1..k193)",
-  "clip": "s6..s176 = 171 frames (s1-s5, s177-s193 still stand, IoU 0.997 to #30), no retiming, no cuts",
-  "windows": "SNIFF_PEE (174.25 f) + RETURN (65.3 f) played as ONE continuous clip from the SNIFF_PEE start; clip ends at frame 171 inside SNIFF_PEE, the rest (incl. the whole RETURN window) is RACE_STAND #30",
-  "sprite_shift": "RACE_STAND shift for the whole clip; no extra metadata"
+  "clip": "atlas frames s1..s193 unchanged; game montage = rhythm_variants.json selected V1S_SHORT_HOLD: s6-s142, s141->s128, s129->s142, s143-s176 (199 frames), then RACE_STAND #30 41 frames (1.71 s) before RACE_START B",
+  "windows": "SNIFF_PEE (174.25 f) + RETURN (65.3 f) played as ONE continuous clip from the SNIFF_PEE start; window boundary at s152->s153 (end of the leg lowering, not a cut); last 41 frames RACE_STAND #30",
+  "sprite_shift": "RACE_STAND shift for the whole clip; no extra metadata",
+  "history_not_used": "CURRENT (s6-s176 + 69 stand, bab01e3), V1_LONG_HOLD, V2_LEAD_AND_HOLD (839424a) — only via ?v= for comparison"
  },
- "RETURN": "merged into SNIFF_PEE clip (stand pad)",
- "BUTTERFLY": "v2 (approved)", "ROLL": "v3 (lab_roll_v1)", "STOP": "STOP B (approved)", "RACE_START": "B (approved)", "RACE_STAND": "RUN #30 (approved)"
+ "RETURN": "merged into SNIFF_PEE clip (end of the leg lowering, settle, stand 1.71 s)",
+ "BUTTERFLY": "v2 (approved)",
+ "ROLL": "v3 (lab_roll_v1)",
+ "STOP": "STOP B (approved)",
+ "RACE_START": "B (approved)",
+ "RACE_STAND": "RUN #30 (approved)"
 }

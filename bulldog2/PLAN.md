@@ -122,3 +122,6 @@ BUTTERFLY v2 окончательно принята (коммит 1eafd09). SNI
 
 ## Статус 22.10.2026 — SNIFF_PEE
 B1 (картинка позы, Nano Banana Pro) и B2 (Kling 4.0, keyframe = B1) приняты. Alpha `sniff_pee_v1/alpha/`, лаборатория `lab_sniff_v1/` (полная цепочка RUN → STOP B → SNIFF_PEE → RETURN → START B → RUN, все стыки 0,00 px). Ждёт визуальной приёмки.
+
+## Статус 22.10.2026 — SNIFF_PEE утверждён
+Игровой монтаж SNIFF_PEE = **V1S_SHORT_HOLD** (`lab_sniff_v1/APPROVED.md`): нюх сразу после STOP B, удержание метки 4,1 с, стойка 1,7 с перед RACE_START B, окна V3 без изменений. CURRENT, V1, V2 сохранены как история. Генераций и экспериментов дальше нет.

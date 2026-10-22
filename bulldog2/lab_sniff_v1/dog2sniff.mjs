@@ -9,9 +9,11 @@ export async function loadDog2Sniff(base){
   const D=await loadDog2Butterfly(new URL('../lab_butterfly_v1/',base));
   D.sniff=await fetch(new URL('assets/dog2_sniff_atlas.json',base)).then(r=>r.json());
   D.sniffSheet=await img(new URL(D.sniff.sheet,base).href);
-  // Rhythm variant (?v=V1_LONG_HOLD | V2_LEAD_AND_HOLD): another ORDER of the same atlas frames (STAND = RACE_STAND #30); default = accepted clip.
-  const v=new URL(location.href).searchParams.get('v');D.sniffVariant=v||'CURRENT';
-  if(v){const R=await fetch(new URL('assets/rhythm_variants.json',base)).then(r=>r.json());if(!R.variants[v])throw new Error('unknown variant '+v);D.sniff.clip=R.variants[v];}
+  // Game montage = rhythm variant R.selected (V1S_SHORT_HOLD, accepted by the user 22.10.2026): an ORDER of the same atlas frames
+  // (STAND = RACE_STAND #30). History variants (CURRENT, V1_LONG_HOLD, V2_LEAD_AND_HOLD) only via ?v=… for comparison.
+  const R=await fetch(new URL('assets/rhythm_variants.json',base)).then(r=>r.json());
+  const v=new URL(location.href).searchParams.get('v')||R.selected;if(!R.variants[v])throw new Error('unknown variant '+v);
+  D.sniffVariant=v;D.sniff.clip=R.variants[v];
   return D;
 }
 export function dog2SniffVisual(D,dog,t){

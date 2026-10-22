@@ -1,4 +1,11 @@
 {
+"selected": "V1S_SHORT_HOLD",
+"selected_note": "ACCEPTED game montage of SNIFF_PEE v1 (user, 22.10.2026, commit ade4398): 199 clip frames + 41 frames RACE_STAND #30 before RACE_START B in the 240-frame SNIFF_PEE+RETURN window. Do not change the frame order, hold or stand length.",
+"history": [
+"CURRENT",
+"V1_LONG_HOLD",
+"V2_LEAD_AND_HOLD"
+],
 "note": "Rhythm variants of the approved SNIFF_PEE v1 clip inside the unchanged SNIFF_PEE+RETURN windows. Labels refer to assets/dog2_sniff_atlas.json (unchanged); STAND = RACE_STAND #30. Only near-still hold frames s124-s142 (neighbour diff 0.12-0.19/255) are played back and forth; the leg-bob part s74-s113 is never repeated.",
 "variants": {
 "CURRENT": [

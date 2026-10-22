@@ -8,7 +8,7 @@
 | FINISH (FINISH_DECELERATE) | **= STOP B** временно, отдельной анимации в этой итерации нет | как STOP |
 | ROLL | **исходник утверждён**: ROLL v3 (Kling, first = last = #30), клип r10–r117 (108 кадров) в окне 145; alpha и лаборатория **утверждены** (пользователь перечисляет ROLL среди утверждённых, 22.10.2026) | `roll_v3/`, `lab_roll_v1/` |
 | BUTTERFLY | **исходник утверждён**: BUTTERFLY v2 (Kling, first = last = #30, ухо b37–b42 оставлено), клип b8–b109 (102 кадра) в окне 121; alpha (мошка удалена) и лаборатория готовы, **утверждены** (коммит 1eafd09) | `butterfly_v2/`, `lab_butterfly_v1/` |
-| SNIFF_PEE (+ RETURN) | **исходник утверждён**: SNIFF_PEE v1 (Kling 4.0, first = last = #30, keyframe = B1); клип s6–s176 (171 кадр) одним куском через окна SNIFF_PEE + RETURN, остаток — стойка #30; alpha и лаборатория готовы, ждут визуальной приёмки | `sniff_pee_prep/`, `sniff_pee_b1/`, `sniff_pee_v1/`, `lab_sniff_v1/` |
+| SNIFF_PEE (+ RETURN) | **утверждён**: исходник SNIFF_PEE v1 (Kling 4.0, first = last = #30, keyframe = B1), alpha; **игровой монтаж V1S_SHORT_HOLD** (s6–s142, s141→s128, s129→s142, s143–s176 + стойка #30 1,7 с) одним клипом через окна SNIFF_PEE + RETURN. CURRENT/V1/V2 — история, не использовать | `lab_sniff_v1/APPROVED.md`, `sniff_pee_v1/`, `lab_sniff_v1/` (коммит ade4398) |
 | IDLE, SELECTED (экран выбора) | кандидаты v1, ждут приёмки | `idle_selected_v1/` |
 | RETURN_TO_IDLE | нет | — |
 

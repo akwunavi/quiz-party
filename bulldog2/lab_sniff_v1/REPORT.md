@@ -1,4 +1,5 @@
 # SNIFF_PEE Зефира: alpha, монтаж и лаборатория (22.10.2026)
+> **Выбранный игровой монтаж — V1S_SHORT_HOLD** (`APPROVED.md`, `REPORT_RHYTHM.md`). Раздел «Монтаж»/«Окна» ниже описывает первый вариант CURRENT (стойка 2,9 с), он сохранён как история и не используется.
 Без Kling, merge и deploy. Физика V3 (окна SNIFF_PEE 7,2604 с и RETURN 2,7208 с), RUN, RACE_START B, STOP B, RACE_STAND #30, ROLL, BUTTERFLY не менялись. №4, Фрэнк и Рокки только читались.
 
 ## Исходник
