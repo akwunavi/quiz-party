@@ -134,3 +134,6 @@ Alpha цикла MAIN_L1 (`selection_alpha_v1/`) и лаборатория вы�
 
 ## Статус 22.10.2026 — IDLE и переход к SELECTED утверждены
 IDLE MAIN_L1 + alpha и путь IDLE → FRONT_STAND f4 → SELECTED s4 приняты (`lab_select_v1/APPROVED.md`). Решение для всех пяти собак: выбор через завершение движения IDLE и совместимую стойку, без мгновенного переключения. Дальше — отдельная приёмка SELECTED; RETURN_TO_IDLE после неё.
+
+## Статус 22.10.2026 — SELECTED утверждён, RETURN_TO_IDLE подготовлен
+SELECTED принят (7339d70). План RETURN_TO_IDLE — `return_to_idle_prep/PLAN.md` (по образцу принятого RETURN Фрэнка, 30 кр.). Kling не запускался.
