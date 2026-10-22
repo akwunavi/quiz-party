@@ -1,0 +1,66 @@
+{
+  "STOP #36 \u2192 A #0": {
+    "silhouetteIoU": 0.9403,
+    "centroidDeltaPx": [
+      0.04,
+      0.97
+    ],
+    "opaqueRGBMeanAbsError": 9.45
+  },
+  "STOP #36 \u2192 B #0": {
+    "silhouetteIoU": 0.9972,
+    "centroidDeltaPx": [
+      -0.07,
+      0.04
+    ],
+    "opaqueRGBMeanAbsError": 3.05
+  },
+  "B #7 \u2192 B #8": {
+    "silhouetteIoU": 0.9989,
+    "centroidDeltaPx": [
+      -0.01,
+      -0.01
+    ],
+    "opaqueRGBMeanAbsError": 2.51
+  },
+  "B #13 \u2192 B #14": {
+    "silhouetteIoU": 0.9901,
+    "centroidDeltaPx": [
+      0.01,
+      0.14
+    ],
+    "opaqueRGBMeanAbsError": 1.99
+  },
+  "B #127 \u2192 B #128": {
+    "silhouetteIoU": 0.9976,
+    "centroidDeltaPx": [
+      0.03,
+      -0.03
+    ],
+    "opaqueRGBMeanAbsError": 0.39
+  },
+  "B #128 \u2192 B #129": {
+    "silhouetteIoU": 0.9978,
+    "centroidDeltaPx": [
+      0.01,
+      0.02
+    ],
+    "opaqueRGBMeanAbsError": 2.85
+  },
+  "A #112 \u2192 A #113": {
+    "silhouetteIoU": 0.9978,
+    "centroidDeltaPx": [
+      0.01,
+      0.02
+    ],
+    "opaqueRGBMeanAbsError": 2.85
+  },
+  "B #144 \u2192 START #0": {
+    "silhouetteIoU": 0.962,
+    "centroidDeltaPx": [
+      -0.4,
+      -0.07
+    ],
+    "opaqueRGBMeanAbsError": 9.23
+  }
+}

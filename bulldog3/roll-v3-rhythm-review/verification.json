@@ -1,0 +1,176 @@
+{
+  "model": "Unmodified ../race-start-v3-lab/model.mjs",
+  "fps": 24,
+  "maps": {
+    "A": {
+      "firstActive": 0,
+      "lastActive": 112,
+      "standAfter": 32
+    },
+    "B": {
+      "standBefore": 8,
+      "sourceFirst": 8,
+      "sourceLast": 128,
+      "standAfter": 16
+    }
+  },
+  "profiles": [
+    {
+      "name": "ROLL 35% · FAST",
+      "base": 1.23,
+      "preStopRunSource": 68,
+      "stop": [
+        11.958333333333334,
+        13.5
+      ],
+      "roll": [
+        13.5,
+        19.541666666666668
+      ],
+      "restart": [
+        19.541666666666668,
+        20.541666666666668
+      ],
+      "rollProgress": 0.34405282590759073,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 42.381152817321095,
+      "complete": 44.041666666666664
+    },
+    {
+      "name": "VERY SLOW",
+      "base": 0.75,
+      "preStopRunSource": 68,
+      "stop": [
+        19.958333333333332,
+        21.5
+      ],
+      "roll": [
+        21.5,
+        27.541666666666668
+      ],
+      "restart": [
+        27.541666666666668,
+        28.541666666666668
+      ],
+      "rollProgress": 0.35230654761904756,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 64.3125,
+      "complete": 66.04166666666667
+    },
+    {
+      "name": "SLOW",
+      "base": 0.9,
+      "preStopRunSource": 68,
+      "stop": [
+        16.458333333333332,
+        18
+      ],
+      "roll": [
+        18,
+        24.041666666666668
+      ],
+      "restart": [
+        24.041666666666668,
+        25.041666666666668
+      ],
+      "rollProgress": 0.3477678571428571,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 54.97916666666667,
+      "complete": 56.541666666666664
+    },
+    {
+      "name": "NORMAL",
+      "base": 1,
+      "preStopRunSource": 68,
+      "stop": [
+        14.958333333333334,
+        16.5
+      ],
+      "roll": [
+        16.5,
+        22.541666666666668
+      ],
+      "restart": [
+        22.541666666666668,
+        23.541666666666668
+      ],
+      "rollProgress": 0.3506944444444445,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 50.3125,
+      "complete": 52.041666666666664
+    },
+    {
+      "name": "FAST",
+      "base": 1.1,
+      "preStopRunSource": 68,
+      "stop": [
+        13.458333333333334,
+        15
+      ],
+      "roll": [
+        15,
+        21.041666666666668
+      ],
+      "restart": [
+        21.041666666666668,
+        22.041666666666668
+      ],
+      "rollProgress": 0.34647817460317465,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 46.49431818181818,
+      "complete": 48.041666666666664
+    },
+    {
+      "name": "VERY FAST",
+      "base": 1.25,
+      "preStopRunSource": 68,
+      "stop": [
+        11.958333333333334,
+        13.5
+      ],
+      "roll": [
+        13.5,
+        19.541666666666668
+      ],
+      "restart": [
+        19.541666666666668,
+        20.541666666666668
+      ],
+      "rollProgress": 0.3490823412698413,
+      "positionDiscontinuities": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "crossing": 41.9125,
+      "complete": 43.541666666666664
+    }
+  ],
+  "issues": []
+}
