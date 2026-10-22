@@ -128,3 +128,6 @@ B1 (картинка позы, Nano Banana Pro) и B2 (Kling 4.0, keyframe = B1)
 
 ## Статус 22.10.2026 — IDLE утверждён
 IDLE = MAIN_L1 из присланного исходника, с подъёмом лапы (`idle_v2/APPROVED.md`). Генерация Kling для IDLE не нужна. Дальше: alpha IDLE, SELECTED, точка перехода IDLE → SELECTED, RETURN_TO_IDLE — по отдельным заданиям.
+
+## Статус 22.10.2026 — alpha IDLE и переход к SELECTED
+Alpha цикла MAIN_L1 (`selection_alpha_v1/`) и лаборатория выбора (`lab_select_v1/`): выбор в любой момент → IDLE доигрывает до FRONT_STAND f4 → SELECTED s4, ожидание 0,46–2,42 с, стыки 0 px. Ждёт визуальной приёмки. RETURN_TO_IDLE не начат.
