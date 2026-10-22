@@ -12,7 +12,7 @@
 | IDLE (экран выбора) | **утверждён**: MAIN_L1 и его alpha (`selection_alpha_v1/DOG2_IDLE_MAIN_L1_alpha_loop131.webm`) | `idle_v2/APPROVED.md`, `lab_select_v1/APPROVED.md` |
 | Переход IDLE → SELECTED | **утверждён**: доигрывание IDLE до FRONT_STAND f4 → SELECTED s4, ожидание 0,46–2,42 с; логику больше не перерабатываем | `lab_select_v1/selection.mjs`, `lab_select_v1/APPROVED.md` |
 | SELECTED (экран выбора) | **утверждён** (коммит 7339d70): s4–s121 в игре, обрезанные кончики ушей на прыжках допустимы | `selected_review/` |
-| RETURN_TO_IDLE | план одной генерации готов (Kling v3, first = SELECTED s121, last = IDLE f4, 5 с, 30 кр.), Kling не запускался | `return_to_idle_prep/PLAN.md` |
+| RETURN_TO_IDLE | **v1 сгенерирован** (Kling v3, 5 с, 30 кр., first = SELECTED s121, last = IDLE f4), конец совпадает с f4 (сдвиг 0 px, разница только в тоне), ждёт визуальной приёмки; alpha и монтаж не делались | `return_to_idle_v1/RESULT.md` |
 
 Отклонено и не развивается: BUTTERFLY v1 (насекомое на носу), ROLL v1 (без головы), ROLL v2 (заменён v3); STOP v1/v2 целиком, STOP montage v1 (A), обратная связка `stop_bridge_rev_v1/` для STOP, bridge v1.
 Физика V3 и окна не менялись.
