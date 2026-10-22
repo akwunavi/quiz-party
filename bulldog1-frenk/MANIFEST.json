@@ -744,5 +744,33 @@
  "selection_alpha_v1": {
   "path": "selection_alpha_v1/",
   "status": "alpha of the three approved selection animations, verified in the browser"
+ },
+ "selection_anytime_v1": {
+  "status": "technically ready, NOT approved (2026-10-22); awaiting the user's review",
+  "report": "selection_anytime_v1/REPORT.md",
+  "logic": "selection_anytime_v1/selection.mjs",
+  "lab": "selection_anytime_v1/index.html",
+  "uses_approved": [
+   "selection_alpha_v1/DOG1_IDLE_v1_alpha_f8-f118.webm",
+   "selection_alpha_v1/DOG1_SELECTED_v1_alpha_f20-f121.webm",
+   "selection_alpha_v1/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm"
+  ],
+  "entry_B_alpha": {
+   "path": "selection_anytime_v1/alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm",
+   "sha256": "947b7dc270109da5d94510d11d7ed664c3f8dad2f514b4a091f61a061bafb632",
+   "frames": 24,
+   "source": "assets/sources/bulldog_01_selected.mp4 f1-f24, default alpha pipeline"
+  },
+  "gate": "IDLE f12",
+  "max_wait": {
+   "frames": 106,
+   "seconds": 4.42,
+   "click": "IDLE f118 (loop index 110)"
+  },
+  "mean_wait_seconds": 2.13,
+  "entries": {
+   "A": "IDLE f12 -> SELECTED f20 (recommended)",
+   "B": "IDLE f12 -> SELECTED f4..f19 -> f20"
+  }
  }
 }

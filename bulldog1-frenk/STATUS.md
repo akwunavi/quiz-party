@@ -1,104 +1,45 @@
-# Статус Френка (Bulldog №1) на 15.10.2026 — актуально
+# Bulldog №1 «Фрэнк» — итоговый статус библиотеки (22.10.2026)
+**Все гоночные состояния и три клипа экрана выбора утверждены.** Открыт один пункт — **выбор в любой момент IDLE** (правило для всех пяти собак от 22.10). Механизм собран и проверен технически (`selection_anytime_v1/`), художественной приёмки ещё нет.
 
-**Библиотека Фрэнка `frenk-library-1.0.0` (`library_v1/`):** гоночный пакет + IDLE, SELECTED, RETURN_TO_IDLE с alpha.
+Race V3, production и общая синхронизация Quiz Party не менялись; merge и deploy не было. Все пути — от папки `bulldog1-frenk/` (ветка `claude/frenk-audit-20261022`, репозиторий `akwunavi/quiz-party`). Авторитетный список файлов с SHA-256 — `MANIFEST.json → approved_set`, проверка — `python3 library_v1/verify_library.py`. Разбор всех версий — `AUDIT_2026-10-22.md`. Прежний статус 13–15.10 перенесён в `plans/STATUS_history_2026-10-13_15.md`.
 
-**Интеграционный пакет готов к следующему этапу:** `integration_v1/` (контракт `frenk-integration-1.0.0`, атлас, runtime, проверки, инструкция). Полный утверждённый набор с SHA-256 — `MANIFEST.json → approved_set`. Production, физика V3 и Bulldog №4 не менялись.
+## Гонка (Race V3, окна и физика без изменений)
+Интеграционный пакет — `integration_v1/` (контракт `frenk-integration-1.0.0`, runtime `integration_v1/runtime/frenk_visual.mjs`). Атлас всех гоночных клипов — `integration_v1/atlas/frenk_atlas.json` + `frenk_{run,start,stop,sniff,bf,roll}.png`, спрайт 207×116. Лаборатория рядом с №4 — `../race-v3-frenk-lab/` (5 категорий, `results/lab_check.json`, регрессия `integration_v1/results/browser_regression.json`). Клипы — полный кадр 1276×720, 24 к/с, VP9 с alpha.
 
-| Состояние | Статус | Что в игре |
-|---|---|---|
-| RACE_STAND | ГОТОВО (утверждена v3) | BASE и `pad` всех действий |
-| RUN | ГОТОВО | цикл #87–98 |
-| RACE_START | ГОТОВО (принят, лаборатория) | V1 f1,f7–f11,f16 → gen3 f2–f35 → RUN #88, lead 3; и для старта гонки |
-| STOP | ГОТОВО (STOP V4) | k38–k73 + RACE_STAND = 37 кадров |
-| SNIFF_PEE | ГОТОВО (V3.2) | 200 кадров, RETURN не нужен |
-| BUTTERFLY | ГОТОВО | f1–f93; саму бабочку рисует игра |
-| ROLL | ГОТОВО (v1, `481a113`) | r10–r113, 104 кадра |
-| FINISH | ГОТОВО (решение 15.10) | тот же STOP V4, затем RACE_STAND |
-| FRONT_STAND, FIRST_START | не в контракте гонки V3 | alpha есть (приняты как рабочие 13.10), в лаборатории не проверялись |
-| IDLE, SELECTED | **ГОТОВО** (v1, alpha) | `selection_alpha_v1/`: IDLE — цикл 220 кадров (f8→f118→f9), 9,17 с; SELECTED — f20–f121, 102 кадра, 4,25 с |
-| RETURN_TO_IDLE (SELECTED → IDLE) | **ГОТОВО** (v1, alpha) | `selection_alpha_v1/`: r2–r121, 120 кадров, 5,0 с, с утверждённой поправкой тона; дальше IDLE с f9 |
+| Состояние | Финальный ассет | Кадры в игре | Лаборатория / проверка | Статус |
+|---|---|---|---|---|
+| **RACE_STAND** | `stop_v4/alpha/DOG1_RACE_STAND_v3_alpha_1276.webm` (кадр `roll_prep/KLING_FIRST_AND_LAST_RACE_STAND_v3_1276.png`, мастер `assets/approved/DOG1_RACE_STAND_v3_2720x1536.png`) | один кадр; BASE и `pad` всех действий | `race-v3-frenk-lab/` | ✅ утверждён (v3), готов |
+| **RUN** | `git:8e30e51:dog1-run-alpha.webm` (ветка `preview/bulldogs-1235-alpha-20261008`; исходник `bulldog_01_run.mp4`, см. README) | цикл #87–#98 | `race-v3-frenk-lab/results/LAB_FRENK_ALL_EVENTS_5_categories_x1.mp4` | ✅ утверждён, готов |
+| **START** (RACE_START) | `race_start_v1/DOG1_RACE_START_v1_alpha.webm` + `race_start_gen3/DOG1_RACE_START_gen3_alpha.webm`; сдвиги `integration_v1/contract/frenk_start_shift_arrays.json` | V1 f1, f7–f11, f16 → gen3 f2–f35 → RUN #88, lead 3 | там же | ✅ утверждён как рабочий (15.10), готов |
+| **STOP** (STOP V4) | `stop_v4/alpha/DOG1_STOP_v4_alpha_k38-k73.webm` (исходник `stop_v4/DOG1_STOP_v4_kling_source.mp4`); сдвиги `integration_v1/contract/frenk_stop_v4_shift_arrays.json` | k38–k73 + RACE_STAND = 37 кадров = окно STOP | там же | ✅ утверждён как рабочий, готов |
+| **FINISH** | **= STOP V4** (тот же ассет), затем RACE_STAND | 37 кадров | там же | ✅ утверждён (DECISIONS 56), готов |
+| **ROLL** | `roll_v1/alpha/DOG1_ROLL_v1_alpha.webm` (исходник `roll_v1/DOG1_ROLL_v1_kling_source.mp4`) | r10–r113 (104) + стойка = окно 145 | `race-v3-frenk-lab/results/LAB_FRENK_ROLL_5_categories_x1.mp4` | ✅ утверждён (коммит `481a113`), готов |
+| **BUTTERFLY** | `butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm` (исходник `butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4`); траектория `butterfly_v1/butterfly_trajectory_synced.json` | f1–f93; бабочку рисует игра | `race-v3-frenk-lab/results/LAB_FRENK_BUTTERFLY_5_categories_x1.mp4` | ✅ утверждён как рабочий, готов |
+| **SNIFF_PEE** (+ возврат) | **V3.2 EVENT**: `sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm` (монтаж `sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT.mp4` из SNIFF V2 и MARKING_MOTION v1) | 200 кадров = 8,33 с, сам кончается в RACE_STAND; окно 239,55 = lead 3 + 200 + стойка 36,55 | `race-v3-frenk-lab/results/LAB_FRENK_SNIFF_chain_5_categories_x1.mp4`, `sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_REPORT.md` | ✅ **утверждён как рабочий** (15.10, подтверждено 22.10). Не переделывать; известные дефекты — `KNOWN_ISSUES.md`, решение по ним — после проверки общей гонки |
 
-Ниже — история статусов до 15.10.2026 (может расходиться с таблицей выше; верна таблица выше).
+## Экран выбора (полный кадр 1276×720 анфас, лаборатория 638×360)
+Библиотека `frenk-library-1.0.0` (`library_v1/`). Все три клипа — `selection_alpha_v1/`, общая камера и плита, без сдвига и масштаба между клипами.
 
----
+| Состояние | Финальный ассет | Кадры | Проверка | Статус |
+|---|---|---|---|---|
+| **IDLE** | `selection_alpha_v1/DOG1_IDLE_v1_alpha_loop220.webm` (`loop`); кадры для пути выхода — `selection_alpha_v1/DOG1_IDLE_v1_alpha_f8-f118.webm`; исходник `assets/sources/bulldog_01_idle.mp4` | f8 → f118 → f9, 220 = 9,17 с | `selection_alpha_v1/results/BROWSER_sequence_4backgrounds_frame_exact_x1.mp4`, `selection_anytime_v1/results/DOG1_IDLE_LOOP220_3cycles_4bg_x1.mp4` | ✅ утверждён (DECISIONS 61–62), готов |
+| **SELECTED** | `selection_alpha_v1/DOG1_SELECTED_v1_alpha_f20-f121.webm` (исходник `assets/sources/bulldog_01_selected.mp4`) | f20–f121, 102 = 4,25 с | `selection_alpha_v1/results/` | ✅ утверждён (дефекты движения приняты), готов |
+| **RETURN_TO_IDLE** | `selection_alpha_v1/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm` (исходник `return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4`, поправка тона) | r2–r121, 120 = 5,0 с; дальше IDLE с f9 | `selection_alpha_v1/results/BROWSER_sequence_realtime_capture.mp4` | ✅ утверждён, готов |
+| **Цепочка, выбор на границе цикла** | `selection_alpha_v1/player/` | IDLE → SELECTED → RETURN → IDLE с f9 | `selection_alpha_v1/results/BROWSER_sequence_*.mp4` | ✅ утверждена (15.10) |
+| **Цепочка, выбор в любой момент** | `selection_anytime_v1/` (`selection.mjs`, `index.html`, `lab.mjs`, `tools/`); вход B дополнительно — `selection_anytime_v1/alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm` | IDLE → выбор → IDLE своими кадрами до f12 → SELECTED → RETURN r2–r121 → IDLE с f9, бесконечно | `selection_anytime_v1/REPORT.md`, `results/DELAY_MAP.png`, `results/DOG1_SELECT_ANYTIME_CHAIN_*`, `results/COMPARE_entry_A_left_vs_B_right_*` | 🟡 **технически готово, ждёт просмотра.** Ожидание до первого кадра SELECTED — 0–4,42 с (максимум при выборе на f118). Рекомендован вход A (IDLE f12 → SELECTED f20) |
 
-# (история) Статус Френка на 13.10.2026
+Алгоритм выбора в любой момент: цикл IDLE идёт туда-обратно, совместимая стойка — только f8–f13, ворота f12. На спуске IDLE доигрывает спуск до f12. На подъёме IDLE разворачивается и своими кадрами идёт назад к f12, без ускорения и кроссфейда. Максимальная задержка, замеренная в лаборатории, — **106 кадров = 4,42 с** (на 0,02 с выше предварительно допущенных 4,4 с, один момент из 220). До начала движения SELECTED (f28) — 4,75 с при входе A и 5,42 с при входе B.
 
-Архитектура **B**: две опорные стойки. FRONT_STAND (экран выбора, IDLE, SELECTED, самый первый старт) и RACE_STAND (стойка для остановок и событий внутри гонки).
-У Френка свой ракурс: исходная стойка анфас, бег вправо. Геометрия №4 не переносится.
+FRONT_STAND (`assets/approved/DOG1_FRONT_STAND_alpha_frame0.png`, RUN #0 = IDLE f1 = SELECTED f1) и FIRST_START (`assets/approved/DOG1_FIRST_START_alpha_src25-63.webm`) утверждены как рабочие 13.10. Ни в одну цепочку они не входят: переход выбор → гонка не проектируется.
 
-| Состояние | Статус | Файл / источник |
-|---|---|---|
-| FRONT_STAND | утверждён | кадр #0 `bulldog_01_run.mp4` (совпадает с первым кадром IDLE и SELECTED, разница 0,33/255) |
-| IDLE, SELECTED | исходники есть, не менялись | `assets/sources/bulldog_01_idle.mp4`, `bulldog_01_selected.mp4` (IDLE не бесшовный цикл; SELECTED заканчивается возбуждённой позой, а не стойкой) |
-| **RACE_STAND** | **утверждена v3** | `assets/approved/DOG1_RACE_STAND_v3_2720x1536.png` (SHA `83214715…ee07`); стойка на плите для STOP/событий: `assets/approved/DOG1_STOP_END.png` |
-| **START первый** (FRONT_STAND → бег) | **принят как рабочий (13.10.2026)**: alpha, хореография и стык с RUN согласованы; визуальные дефекты остаются в KNOWN_ISSUES | `assets/approved/DOG1_FIRST_START_alpha_src25-63.webm` (кадры #25–63 оригинала) + `DOG1_FRONT_STAND_alpha_frame0.png`; стык #63→#87: IoU 0,796, цвет 25,1. Отчёт `plans/FIRST_START_REPORT.md` |
-| RUN цикл | утверждён **#87–98** (12 кадров = 0,5 с) | `dog1-run-alpha.webm` #87–98 (шов #98→#87 IoU 0,805) |
-| **STOP** | **утверждён v1, вариант A (полный)** | `assets/approved/DOG1_STOP_v1_kling_source.mp4` (SHA `30c05890…edf5`, 73 кадра) и `DOG1_STOP_v1_alpha.webm` (SHA `9b2a45bc…113f`) |
-| **RACE_START (RACE_STAND → RUN)** | **РАБОЧИЙ вариант: gen3 (принят пользователем 13.10.2026 как рабочий, финальная приёмка зависит от проверки на реальной дорожке)** | `race_start_working/RACE_START_WORKING.md` + `.json`; состав: вход V1 f1,f7–f11,f16 → gen3 f2–f37 → RUN #90–98 → цикл #87–98, 43 кадра = 1,79 с; источник gen3 `race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4` (SHA `772d432d…9d08`, не менялся), alpha `DOG1_RACE_START_gen3_alpha.webm` |
-| RACE_START V1 | **архив** (не принят: подкрадывание ≈1,2 с, ритм 9, рывок с тёмным лицом); кадры f1–f16 используются как вход рабочего варианта | `race_start_v1/`, `plans/RACE_START_V1_REPORT.md`, `plans/RACE_START_V1_SALVAGE_REPORT.md`; запасной гибрид V3 (f1–49 → #90) в `race_start_v1_salvage/` |
-| RACE_START V2 | **архив** (не принят: присед и прищур вернулись, лапы скользят) | `race_start_v2/`, `plans/RACE_START_V2_REPORT.md`, подготовка `race_start_v2_prep/` (START f16 используется и в gen3) |
-| Проверка на дорожке | выполнена (диагностика, V3 не менялась) | `track_diag/`, `plans/TRACK_DIAGNOSTIC_REPORT.md`; предложение контракта координат `plans/COORDINATE_CONTRACT_PROPOSAL.md` |
-| **BUTTERFLY** | **ПРИНЯТ как рабочая анимация (14.10.2026)**, повторной генерации нет. Игровая обрезка **f1–f93 = 3,875 с**, стык со стойкой IoU 0,997, смещение 0. Допущено: двойной подъём дальней лапы, слабая читаемость зрачков, вытянутая лапа f63–70, дымка у переносицы (1 кадр) | `plans/BUTTERFLY_V1_REPORT.md`, `butterfly_v1/` (оригинал SHA `694436b6…f956c` и полный alpha — не менялись; сокращённый `DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm` SHA `2e189b0f…51f3`; траектория программной бабочки v2 `butterfly_trajectory_synced.json`) |
-| **SNIFF_PEE** | **V1 ОТКЛОНЁН пользователем (14.10.2026)**: «клюёт мордой землю как курица» (3,3 с ритмичного клевания у пола), подъём задней лапы назад. Файлы сохранены для истории; повторных генераций без отдельного согласования нет | `plans/SNIFF_PEE_V1_REPORT.md`, `sniff_v1/` (оригинал SHA `2e4ff649…cbdb`, alpha, превью) |
-| RETURN, ROLL | не начаты (RETURN нужен только если SNIFF_PEE не вернётся в стойку) | см. контракт `../docs/bulldog-race/ANIMATION_CONTRACT.md` |
-| FINISH | не начат | сначала проверить повторное использование STOP |
-| Alpha-конвейер | восстановлен и сохранён; `--floor-shadow` по умолчанию выключена | `alpha_pipeline/` |
+## Архив (не удалять, в игре не использовать)
+* **SNIFF_PEE:** V1 (`sniff_v1/`, «клевание»), V2 (`sniff_v2/`, его сниф используется в V3.2), позы MARKING_POSE v1–v4 (`marking_pose/`), MARKING_MOTION v1 (`marking_motion_v1/`, вход монтажа V3.2), сборки V3 и V3.1 (`sniff_pee_v3_assembly/`, `sniff_pee_v3_1_assembly/`), alpha V3.2 v1 и v2 floorshadow, поиск референса `sniff_ref_search/`, подготовка `sniff_prep/`.
+* **STOP:** v1 (`assets/approved/DOG1_STOP_v1_*`), v2, v3, lying_fix, landing gen B (`stop_v2/`, `stop_v3/`).
+* **START:** V1 и V2 целиком, salvage, подготовка gen3 (`race_start_v1/`, `race_start_v1_salvage/`, `race_start_v2/`, `race_start_v2_prep/`, `race_start_gen3_prep/`, `race_start_prep/`); рабочая сборка `race_start_working/`, стык с RUN `race_start_run_join_v1/`, `race_start_run_integration_kit/`.
+* **BUTTERFLY:** полный alpha f1–f121 и сырой alpha с остатками насекомого (`butterfly_v1/`), подготовка `butterfly_prep/`.
+* **ROLL:** подготовка `roll_prep/`.
+* **Экран выбора:** монтажи-кандидаты `idle_selected_v1/`, подготовка RETURN `return_to_idle_prep/`, исходник `return_to_idle_v1/`.
+* **Прочее:** `qc_first_start/`, `track_diag/`, `race_v3_character_contract_proposal/`, отвергнутые файлы `assets/rejected_experiments/`.
 
-Цепочка рабочего варианта: `RUN loop (последний проход до #96) → STOP f1–f73 → RACE_STAND → вход V1 f1,f7–f11,f16 → gen3 f2–f37 → RUN #90–98 → цикл #87–98`.
-
-## Известные допустимые недостатки рабочего RACE_START (подробно — `KNOWN_ISSUES.md`)
-прищур и потемнение морды ≈0,3 с (gen3 f7–f13); опорная передняя лапа скользит назад на 14 px холста к толчку и до 22 px к f12; разница оттенка с RUN: ΔE 2,1–3,3 (кратно меньше уже утверждённого шага стойка → RUN, ΔE 6,8; коррекция не нужна); неидеальная фаза шва gen3 f37 → RUN #90 (шаг −2,7 px); STOP несёт +17 px холста запечённого перемещения.
-
-## Потрачено кредитов Kling
-156 из 429 (остаток **273**): RACE_STAND ×3 (по 2), STOP (18), RACE_START V1 (18), V2 (18), gen3 (18), BUTTERFLY V1 (30), SNIFF_PEE V1 (48). Новых генераций RACE_START нет без отдельного согласования. Детали — `KLING_LOG.md`.
-
-## Правило процесса (с 14.10.2026)
-**Alpha-обработку не запускать, пока пользователь не посмотрел исходное видео и не одобрил его.** После генерации сначала сохранить MP4, контактный лист и разбор, показать и остановиться.
-
-## Следующий шаг (ожидает согласования)
-1. SNIFF_PEE: V1 отклонён; решить, как переделывать (см. `plans/SNIFF_PEE_V1_REPORT.md`, раздел «Почему V1 не понравился»); остаток 225 кредита.
-2. Контракт координат принят в принципах и сохранён для Codex; профиль N3 (разгон 0,54 с) предпочтителен для тестов, но не утверждён как настройка физики: смена времени разгона требует отдельной проверки влияния на аналитическое движение и результаты гонки.
-3. Затем ROLL → FINISH, каждый отдельным этапом (автоматически не начинаю; RETURN для Френка не нужен при принятии SNIFF_PEE V1).
-
-
-## SNIFF_PEE V2 (14.10.2026)
-Сгенерирован (48 кредитов, остаток 225), `sniff_v2/`. Сниф исправлен (один плавный наклон, без клевания); лапа снова поднята назад. Alpha не запускалась, ждёт просмотра пользователем.
-
-
-## MARKING_POSE (14.10.2026)
-v1 сгенерирован (2 кредита, остаток 223), `marking_pose/`: не приемлем (ноги назад, дальняя задняя в воздухе). Ждёт решения пользователя.
-
-
-## MARKING_POSE v2 (14.10.2026)
-Не принят (2 кредита, остаток 221). Два провала подряд, повтор того же текста не имеет смысла.
-
-
-## MARKING_POSE v3 GPT-Image2 (14.10.2026)
-Лучший из трёх, 15 кредитов, остаток 206. Ждёт приёмки пользователя.
-
-
-## MARKING_MOTION v1 (14.10.2026)
-Сгенерирован (30 кредитов, остаток 176), `marking_motion_v1/`. Ждёт просмотра пользователя; alpha не запускалась.
-
-
-## SNIFF_PEE V3 сборка (14.10.2026)
-Техническая сборка из существующих клипов (0 кредитов), `sniff_pee_v3_assembly/`. Визуальная приёмка не пройдена.
-
-
-## SNIFF_PEE V3.1 (14.10.2026)
-Монтажная сборка `sniff_pee_v3_1_assembly/` (0 кредитов): скачок головы устранён, 7,83 с. Ждёт визуальной приёмки.
-
-
-## SNIFF_PEE V3.2 (14.10.2026)
-Финальная монтажная сборка `sniff_pee_v3_2_assembly/` (0 кредитов): удержание 0,79 с, 8,33 с. Ждёт визуальной приёмки.
-
-
-## Стык RACE_START -> RUN (14.10.2026)
-Исследован, кандидат f35->#88 (резерв f37->#90), `race_start_run_join_v1/`. Ждёт визуальной приёмки; разгон -2 кадра требует проверки физики.
-
-
-## Интеграционный комплект RACE_START -> RUN (14.10.2026)
-`race_start_run_integration_kit/`: контракты, метаданные, массивы сдвига, видео. Ждёт визуальной приёмки и решения по контракту.
-
-`race_v3_character_contract_proposal/`: архитектурное предложение контракта физика↔анимации пяти собак (P3, `lead 3`, алгебра окон, план проверки T1–T12). Ждёт архитектурной приёмки (решения D1–D5); код V3 не менялся.
+## Kling
+Все генерации Фрэнка шли по отдельному согласованию; журнал с промптами и стоимостью — `KLING_LOG.md`. После 15.10 новых генераций для Фрэнка не было; выбор в любой момент сделан без Kling (0 кредитов, только CPU: alpha SELECTED f1–f24 ≈ 6 минут).

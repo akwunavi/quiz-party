@@ -1,14 +1,18 @@
 # Bulldog №1 — Френк: рабочий архив Claude Code
 
-Точка входа для любого агента или человека, который продолжает работу над Френком. Это снимок на **13.10.2026**.
+Точка входа для любого агента или человека, который продолжает работу над Френком. Обновлено **22.10.2026** (первая версия — 13.10.2026). Что готово и где лежит — `STATUS.md`, разбор всех версий — `AUDIT_2026-10-22.md`, что осталось — `REMAINING_WORK.md`.
 Параллельный архив Bulldog Race/V3/№4 (Codex) — в `../docs/bulldog-race/` (начните с его `README.md` и `RECOVERY.md`). Здесь только Френк и общий alpha-конвейер.
 Эта папка ничего не меняет в игре, production, `docs/`, V3 и ассетах №4.
 
 ## Что где
 | Путь | Что |
 |---|---|
+| `library_v1/` | **библиотека `frenk-library-1.0.0`**: гоночный пакет + экран выбора, индекс `LIBRARY.json`, проверка `verify_library.py` |
+| `selection_alpha_v1/` | экран выбора: утверждённые alpha IDLE (цикл 220), SELECTED f20–f121, RETURN_TO_IDLE r2–r121, плеер |
+| `selection_anytime_v1/` | выбор в любой момент IDLE (22.10): логика, лаборатория, видео, карта задержки, отчёт `REPORT.md` — технически готово, ждёт просмотра |
 | `integration_v1/` | **интеграционный пакет для игры** (контракт `frenk-integration-1.0.0`, атлас, runtime, проверки, инструкция `integration_v1/README.md`) |
-| `STATUS.md` | что готово, что утверждено, что следующее (читать первым) |
+| `STATUS.md` | итоговая инвентаризация: все состояния, финальные ассеты, проверки, архив (читать первым) |
+| `AUDIT_2026-10-22.md`, `REMAINING_WORK.md` | аудит всех версий и план оставшейся работы (22.10) |
 | `DECISIONS.md` | решения пользователя и почему так (чтобы не пересматривать заново) |
 | `KLING_LOG.md` | каждая генерация Kling: модель, параметры, дословные промпты, ID, стоимость, итог |
 | `KNOWN_ISSUES.md` | известные дефекты исходников и открытые риски |
@@ -19,10 +23,14 @@
 | `race_start_working/` | рабочий RACE_START (gen3): состав, параметры переходов, массивы компенсации |
 | `track_diag/` | изолированный проигрыватель Френка на дорожке по физике V3 (адаптер, метрики, видео) |
 | `plans/BUTTERFLY_PLAN.md`, `butterfly_prep/`, `butterfly_v1/`, `plans/BUTTERFLY_V1_REPORT.md` | BUTTERFLY: **V1 принят как рабочий** (оригинал, полный и игровой alpha f1–f93, превью, синхронизированная траектория бабочки) |
-| `plans/SNIFF_PEE_PLAN.md`, `sniff_prep/`, `sniff_v1/`, `plans/SNIFF_PEE_V1_REPORT.md` | SNIFF_PEE: план, референс, **V1 сгенерирован** (оригинал, alpha, обрезка f11–f187, превью, отчёт) |
+| `sniff_pee_v3_2_assembly/` | **SNIFF_PEE V3.2 — утверждённая рабочая версия** (монтаж SNIFF V2 + MARKING_MOTION v1, 200 кадров, alpha v3 ribbonfix) |
+| `plans/SNIFF_PEE_PLAN.md`, `sniff_prep/`, `sniff_v1/`, `sniff_v2/`, `marking_pose/`, `marking_motion_v1/`, `sniff_pee_v3_assembly/`, `sniff_pee_v3_1_assembly/` | история SNIFF_PEE: V1 (отклонён), V2, позы, MARKING_MOTION, сборки V3 и V3.1 |
+| `stop_v4/` | **STOP V4 — утверждённая рабочая версия** (k38–k73) и alpha RACE_STAND v3; `stop_v2/`, `stop_v3/` — история |
+| `roll_v1/`, `roll_prep/` | **ROLL v1 — утверждён** (r10–r113) |
+| `idle_selected_v1/`, `return_to_idle_prep/`, `return_to_idle_v1/` | подготовка экрана выбора: монтажи IDLE/SELECTED, план и исходник RETURN_TO_IDLE |
 | `race_start_v1/`, `race_start_v1_salvage/`, `race_start_v2/`, `race_start_v2_prep/`, `race_start_gen3/`, `race_start_gen3_prep/` | архив генераций RACE_START и их разбор |
 | `alpha_pipeline/` | восстановленный универсальный alpha-конвейер для всех пяти собак |
-| `assets/approved/` | утверждённые файлы Френка (RACE_STAND v3, START/END кадры STOP, STOP v1 исходник и alpha) |
+| `assets/approved/` | утверждённые файлы Френка: мастер RACE_STAND v3, FRONT_STAND, FIRST_START; START/END кадры и STOP v1 — история (в игре STOP V4) |
 | `assets/sources/` | исходники, которых нет в других ветках (IDLE, SELECTED, копия master из чата) |
 | `assets/rejected_experiments/` | отвергнутые/запасные версии (не удалять, чтобы не повторять) |
 | `assets/SHA256SUMS.txt` | контрольные суммы всех файлов выше |
@@ -48,7 +56,7 @@ python verify_alpha.py dogN_клип_alpha.webm --out work/verify_ИМЯ
 Подробности и параметры — `alpha_pipeline/README.md`.
 
 ## Правила работы (действуют сейчас)
-- Kling не запускать без прямого согласования пользователя: каждый запрос платный (картинка 2 кредита, видео 18).
+- Kling не запускать без прямого согласования пользователя: каждый запрос платный (фактические цены каждой генерации — в `KLING_LOG.md`).
 - Оригиналы не перезаписывать; утверждённые файлы не менять, новые версии — под новыми именами.
 - Не копировать позу, масштаб, ракурс и маски Bulldog №4 на Френка.
 - Production, V3, Bulldog №4, merge/deploy — только по отдельному слову пользователя.
