@@ -1,0 +1,50 @@
+{
+  "RUN #16 \u2192 STOP #0": {
+    "silhouetteIoU": 0.8409,
+    "centroidDeltaPx": [
+      0.26,
+      1.88
+    ],
+    "opaqueRGBMeanAbsError": 14.28
+  },
+  "STOP #36 \u2192 ROLL #0": {
+    "silhouetteIoU": 0.9403,
+    "centroidDeltaPx": [
+      0.04,
+      0.97
+    ],
+    "opaqueRGBMeanAbsError": 9.45
+  },
+  "ROLL #111 \u2192 ROLL #112": {
+    "silhouetteIoU": 0.9976,
+    "centroidDeltaPx": [
+      0.03,
+      -0.03
+    ],
+    "opaqueRGBMeanAbsError": 0.39
+  },
+  "ROLL #112 \u2192 ROLL #113": {
+    "silhouetteIoU": 0.9978,
+    "centroidDeltaPx": [
+      0.01,
+      0.02
+    ],
+    "opaqueRGBMeanAbsError": 2.85
+  },
+  "ROLL #144 \u2192 START #0": {
+    "silhouetteIoU": 0.962,
+    "centroidDeltaPx": [
+      -0.4,
+      -0.07
+    ],
+    "opaqueRGBMeanAbsError": 9.23
+  },
+  "START #39 \u2192 RUN #0": {
+    "silhouetteIoU": 0.7769,
+    "centroidDeltaPx": [
+      -0.27,
+      2.54
+    ],
+    "opaqueRGBMeanAbsError": 20.63
+  }
+}

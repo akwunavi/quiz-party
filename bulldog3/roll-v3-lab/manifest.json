@@ -1,0 +1,11 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "ROLL": {
+      "file": "assets/rocky-roll.png",
+      "frames": 145
+    }
+  }
+}

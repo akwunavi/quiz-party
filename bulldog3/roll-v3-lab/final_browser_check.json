@@ -1,0 +1,224 @@
+{
+  "browser": "Chromium",
+  "playTime": 0.6531000000014902,
+  "modes": {
+    "chain": {
+      "duration": 14.583333333333334,
+      "states": [
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.23539613095238093,
+            "frame": 16
+          }
+        ],
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.34405282590759073,
+            "frame": 7
+          }
+        ],
+        [
+          {
+            "segment": "START",
+            "progress": 0.3451020320078662,
+            "frame": 24
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.4433069925742573,
+            "frame": 11
+          }
+        ]
+      ]
+    },
+    "action": {
+      "duration": 6.041666666666668,
+      "states": [
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.34405282590759073,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.34405282590759073,
+            "frame": 48
+          }
+        ],
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.34405282590759073,
+            "frame": 108
+          }
+        ],
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.34405282590759073,
+            "frame": 144
+          }
+        ]
+      ]
+    },
+    "speeds": {
+      "duration": 67.54166666666667,
+      "states": [
+        [
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "ROLL",
+            "progress": 0.35230654761904756,
+            "frame": 24
+          },
+          {
+            "segment": "ROLL",
+            "progress": 0.3477678571428571,
+            "frame": 108
+          },
+          {
+            "segment": "ROLL",
+            "progress": 0.3506944444444445,
+            "frame": 144
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.3719411375661376,
+            "frame": 11
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.4226603835978836,
+            "frame": 11
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.7561383928571428,
+            "frame": 18
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.9073660714285714,
+            "frame": 20
+          },
+          {
+            "segment": "FINISH_DECELERATE",
+            "progress": 1.0081482457180282,
+            "frame": 3
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0203373015873016,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0255456349206347,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "BASE",
+            "progress": 1.0171130952380951,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0169642857142858,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0228174603174602,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0203373015873016,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0255456349206347,
+            "frame": 0
+          }
+        ]
+      ]
+    }
+  },
+  "videos": [
+    {
+      "file": "DOG3_ROCKY_ROLL_V2_FULL_CHAIN_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 14.583333,
+      "played": 14.583333,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_ROCKY_ROLL_V2_ACTION_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 6.041667,
+      "played": 6.041667,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_ROCKY_ROLL_V2_CLOSEUP.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 14.583333,
+      "played": 14.583333,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_ROCKY_ROLL_V2_ALPHA_FOUR_BACKGROUNDS.mp4",
+      "width": 1280,
+      "height": 208,
+      "duration": 6.041667,
+      "played": 6.041667,
+      "ended": true,
+      "error": null
+    }
+  ],
+  "errors": []
+}
