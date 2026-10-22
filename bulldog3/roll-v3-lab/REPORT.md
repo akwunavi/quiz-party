@@ -1,5 +1,7 @@
 # Rocky #3 — ROLL v2, isolated Race V3 integration
 
+**Archive note (22.10.2026):** This report documents variant A. The final user-approved game montage is [variant B](../roll-v3-rhythm-review/APPROVED.md). A assets remain intact for comparison.
+
 The user artistically approved the Kling ROLL v2 source. This package prepares the alpha and a separate gameplay lab for review. The original MP4, approved RUN/STOP/RACE_STAND/RACE_START, Race V3 physics, scoring and production components are unchanged. ROLL v1 is rejected and not used.
 
 ## Source and cut

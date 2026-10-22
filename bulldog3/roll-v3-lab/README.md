@@ -1,5 +1,7 @@
 # Rocky ROLL v2 — isolated Race V3 lab
 
+**ARCHIVED A:** This lab remains available for historical comparison. The user approved [montage B](../roll-v3-rhythm-review/APPROVED.md) as the final Rocky ROLL on 22 Oct 2026. See [ARCHIVED.md](ARCHIVED.md). Do not use this A atlas as the current game asset.
+
 The user approved the source ROLL v2 motion. This lab uses the original Kling MP4 unchanged, the previously approved Rocky RUN, STOP, RACE_STAND and RACE_START, and the unmodified Race V3 `buildDog`/`stateAt` model. Gameplay visual acceptance of this integration is pending.
 
 Open the H.264 MP4 files directly for review. To use the interactive lab locally from the repository root:

@@ -1,5 +1,7 @@
 # ROLL v2 A/B rhythm review
 
+**Final decision, 22.10.2026:** The user approved [variant B](APPROVED.md) as Rocky's game ROLL. The A lab remains archived for comparison. The text below records the earlier review setup.
+
 Use the MP4s listed in [REPORT.md](REPORT.md) for direct viewing. A is the unchanged control in [`../roll-v3-lab/`](../roll-v3-lab/); B is an isolated candidate with the same 145-frame Race V3 window.
 
 For the optional browser lab, run this from the repository root:
