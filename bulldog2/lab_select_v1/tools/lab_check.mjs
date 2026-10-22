@@ -1,6 +1,7 @@
 // Headless Chromium render of Zefir's selection lab, frame exact (seek per frame), for given scenarios:
 //   LOOP3            — 3 full IDLE cycles;
 //   CLICK_<idx>      — 1 IDLE cycle, then click at loop index idx of the 2nd cycle, exit path, SELECTED.
+//   CHAIN_<idx>      — as CLICK, then RETURN_TO_IDLE, IDLE f5-f14 and 2 more IDLE cycles (full selection-screen chain).
 // usage: node tools/lab_check.mjs OUT SCENARIO... -> OUT/<scenario>/frames/f%04d.png + timeline.json
 import {createRequire} from 'node:module';import {createServer} from 'node:http';import {readFile,writeFile,mkdir} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';
 const HERE=path.dirname(fileURLToPath(import.meta.url)),ROOT=path.resolve(HERE,'../..'),OUT=path.resolve(process.argv[2]),KEYS=process.argv.slice(3);
@@ -14,7 +15,7 @@ const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-bro
 const page=await b.newPage({viewport:{width:1300,height:800},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error'&&!/favicon/.test(m.text()))errors.push(m.text());});
 await page.goto(`http://127.0.0.1:${server.address().port}/lab_select_v1/`);await page.waitForFunction(()=>window.zSel?.ready,null,{timeout:120000});
 for(const key of KEYS){const dir=path.join(OUT,key,'frames');await mkdir(dir,{recursive:true});
-  const t=await page.evaluate(k=>k==='LOOP3'?window.zSel.timeline(3,null):window.zSel.timeline(1,Number(k.split('_')[1])),key);
+  const t=await page.evaluate(k=>k==='LOOP3'?window.zSel.timeline(3,null):k.startsWith('CHAIN_')?window.zSel.chain(1,Number(k.split('_')[1]),2):window.zSel.timeline(1,Number(k.split('_')[1])),key);
   for(let i=0;i<t.length;i++){await page.evaluate(st=>window.zSel.show(st),t[i]);const png=await page.evaluate(()=>document.getElementById('c').toDataURL('image/png'));
     await writeFile(path.join(dir,`f${String(i).padStart(4,'0')}.png`),Buffer.from(png.split(',')[1],'base64'));}
   await writeFile(path.join(OUT,key,'timeline.json'),JSON.stringify(t));}

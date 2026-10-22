@@ -26,3 +26,15 @@ export function timeline(cycles,clickIndex){
   SELECTED.forEach(k=>t.push({clip:'sel',f:k,phase:'SELECTED'}));
   return t;
 }
+
+// RETURN_TO_IDLE v1 (accepted source, montage r2-r28, r33-r71, r75-r117 with tone correction): 109 frames of
+// return_to_idle_v1/alpha/DOG2_RETURN_TO_IDLE_v1_alpha_m109.webm ("r" = montage index 1..109). Played ONCE after SELECTED s121;
+// it ends in FRONT_STAND, so IDLE continues with its own source frames f5..f14 and then the accepted loop from f15 (index 0), forever.
+export const RETURN_N=109, RETURN=R(1,RETURN_N), REENTRY=R(5,14);
+export function chain(cyclesBefore,clickIndex,cyclesAfter){                // full selection-screen sequence
+  const t=timeline(cyclesBefore,clickIndex);
+  RETURN.forEach(m=>t.push({clip:'ret',f:m,phase:'RETURN_TO_IDLE'}));
+  REENTRY.forEach(k=>t.push({clip:'idle',f:k,phase:'IDLE (вход в цикл f5–f14)'}));
+  for(let c=0;c<cyclesAfter;c++)IDLE_LOOP.forEach((k,i)=>t.push({clip:'idle',f:k,phase:`IDLE после возврата, цикл ${c+1}`,i}));
+  return t;
+}

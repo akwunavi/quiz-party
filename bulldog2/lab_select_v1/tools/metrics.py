@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Per-frame geometry of the selection-screen alpha (source px, 1276x720): body centre cx/cy (alpha weighted), paw line (lowest row with
 alpha>128 in the lower body), top, height, area; then steps for given timelines (lab_check timeline.json files) with the biggest steps
-and every transition (loop seam, reversals, IDLE->SELECTED). usage: metrics.py IDLE_WEBM SEL_WEBM OUT.json [TIMELINE.json ...]"""
+and every transition (loop seam, reversals, IDLE->SELECTED). usage: metrics.py IDLE_WEBM SEL_WEBM OUT.json [TIMELINE.json ...]; env RET=<return alpha webm> adds clip "ret" """
 import sys,os,json,subprocess,tempfile,numpy as np
 from PIL import Image
 def decode(w):
@@ -12,9 +12,10 @@ def decode(w):
         out[k]=dict(cx=round(float((a.sum(0)*np.arange(a.shape[1])).sum()/a.sum()),2),cy=round(float((a.sum(1)*np.arange(a.shape[0])).sum()/a.sum()),2),
                     bottom=int(ys.max()),top=int(ys.min()),height=int(ys.max()-ys.min()+1),area=int(m.sum()))
     return out
-idle,sel=decode(sys.argv[1]),decode(sys.argv[2]);res={'idle':idle,'sel':sel,'timelines':{}}
+idle,sel=decode(sys.argv[1]),decode(sys.argv[2]);ret=decode(os.environ['RET']) if os.environ.get('RET') else {};res={'idle':idle,'sel':sel,'ret':ret,'timelines':{}}
+CL={'idle':idle,'sel':sel,'ret':ret}
 for tl in sys.argv[4:]:
-    t=json.load(open(tl));G=[(idle if s['clip']=='idle' else sel)[s['f']] for s in t];steps=[]
+    t=json.load(open(tl));G=[CL[s['clip']][s['f']] for s in t];steps=[]
     for i in range(1,len(t)):
         a,b=G[i-1],G[i];steps.append(dict(i=i,frm=f"{t[i-1]['clip']} f{t[i-1]['f']}",to=f"{t[i]['clip']} f{t[i]['f']}",dcx=round(b['cx']-a['cx'],2),dcy=round(b['cy']-a['cy'],2),dbottom=b['bottom']-a['bottom'],dheight=b['height']-a['height']))
     trans=[s for s in steps if s['frm'].split()[0]!=s['to'].split()[0] or abs(int(s['frm'].split('f')[1])-int(s['to'].split('f')[1]))!=1]

@@ -137,3 +137,6 @@ IDLE MAIN_L1 + alpha и путь IDLE → FRONT_STAND f4 → SELECTED s4 при�
 
 ## Статус 22.10.2026 — SELECTED утверждён, RETURN_TO_IDLE подготовлен
 SELECTED принят (7339d70). План RETURN_TO_IDLE — `return_to_idle_prep/PLAN.md` (по образцу принятого RETURN Фрэнка, 30 кр.). Kling не запускался.
+
+## Статус 22.10.2026 — RETURN_TO_IDLE и полная цепочка выбора
+RETURN v1: монтаж 109 кадров с поправкой тона и alpha. Полная цепочка IDLE → выбор → FRONT_STAND → SELECTED → RETURN → IDLE собрана в `lab_select_v1/` (CHAIN_*), стыки ≤ 0,3 px. Ждёт финальной приёмки библиотеки выбора.

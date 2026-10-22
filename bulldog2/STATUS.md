@@ -11,8 +11,8 @@
 | SNIFF_PEE (+ RETURN) | **утверждён**: исходник SNIFF_PEE v1 (Kling 4.0, first = last = #30, keyframe = B1), alpha; **игровой монтаж V1S_SHORT_HOLD** (s6–s142, s141→s128, s129→s142, s143–s176 + стойка #30 1,7 с) одним клипом через окна SNIFF_PEE + RETURN. CURRENT/V1/V2 — история, не использовать | `lab_sniff_v1/APPROVED.md`, `sniff_pee_v1/`, `lab_sniff_v1/` (коммит ade4398) |
 | IDLE (экран выбора) | **утверждён**: MAIN_L1 и его alpha (`selection_alpha_v1/DOG2_IDLE_MAIN_L1_alpha_loop131.webm`) | `idle_v2/APPROVED.md`, `lab_select_v1/APPROVED.md` |
 | Переход IDLE → SELECTED | **утверждён**: доигрывание IDLE до FRONT_STAND f4 → SELECTED s4, ожидание 0,46–2,42 с; логику больше не перерабатываем | `lab_select_v1/selection.mjs`, `lab_select_v1/APPROVED.md` |
-| SELECTED (экран выбора) | **утверждён** (коммит 7339d70): s4–s121 в игре, обрезанные кончики ушей на прыжках допустимы | `selected_review/` |
-| RETURN_TO_IDLE | **v1 сгенерирован** (Kling v3, 5 с, 30 кр., first = SELECTED s121, last = IDLE f4), конец совпадает с f4 (сдвиг 0 px, разница только в тоне), ждёт визуальной приёмки; alpha и монтаж не делались | `return_to_idle_v1/RESULT.md` |
+| SELECTED (экран выбора) | **утверждён** (коммит 7339d70): s4–s121 в игре, обрезанные кончики ушей на прыжках допустимы; alpha `selection_alpha_v1/DOG2_SELECTED_alpha_f1-f121.webm` | `selected_review/` |
+| RETURN_TO_IDLE | исходник v1 **принят как основа**; монтаж r2–r28, r33–r71, r75–r117 (109 кадров, 4,54 с) с поправкой тона, alpha `return_to_idle_v1/alpha/DOG2_RETURN_TO_IDLE_v1_alpha_m109.webm`, полная цепочка экрана выбора в `lab_select_v1/` (стыки ≤ 0,3 px) — ждёт финальной приёмки | `return_to_idle_v1/REPORT_MONTAGE.md` |
 
 Отклонено и не развивается: BUTTERFLY v1 (насекомое на носу), ROLL v1 (без головы), ROLL v2 (заменён v3); STOP v1/v2 целиком, STOP montage v1 (A), обратная связка `stop_bridge_rev_v1/` для STOP, bridge v1.
 Физика V3 и окна не менялись.
