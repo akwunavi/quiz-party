@@ -8,13 +8,18 @@ const FPS=24,img=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>r
 export async function loadDog2Sniff(base){
   const D=await loadDog2Butterfly(new URL('../lab_butterfly_v1/',base));
   D.sniff=await fetch(new URL('assets/dog2_sniff_atlas.json',base)).then(r=>r.json());
-  D.sniffSheet=await img(new URL(D.sniff.sheet,base).href);return D;
+  D.sniffSheet=await img(new URL(D.sniff.sheet,base).href);
+  // Rhythm variant (?v=V1_LONG_HOLD | V2_LEAD_AND_HOLD): another ORDER of the same atlas frames (STAND = RACE_STAND #30); default = accepted clip.
+  const v=new URL(location.href).searchParams.get('v');D.sniffVariant=v||'CURRENT';
+  if(v){const R=await fetch(new URL('assets/rhythm_variants.json',base)).then(r=>r.json());if(!R.variants[v])throw new Error('unknown variant '+v);D.sniff.clip=R.variants[v];}
+  return D;
 }
 export function dog2SniffVisual(D,dog,t){
   const s=dog.segments.find(q=>t>=q.t0-1e-9&&t<q.t1-1e-9);
   if(s&&(s.kind==='SNIFF_PEE'||s.kind==='RETURN')){
     const sp=s.kind==='SNIFF_PEE'?s:dog.segments.find(q=>q.kind==='SNIFF_PEE'&&q.eventIndex===s.eventIndex);
     const k=Math.floor((t-sp.t0)*FPS+1e-9),C=D.sniff.clip,win=s.kind;
+    if(k<C.length&&C[k]==='STAND')return {atlas:'run',key:'r30',shift:D.shiftStand,ref:D.run.frames.r30.cx,phase:'RACE_STAND (lead SNIFF_PEE)',window:win,label:'RACE_STAND #30',idx:k};
     if(k<C.length){const key=C[k];return {atlas:'sniff',key,shift:D.shiftStand,ref:D.sniff.frames[key].cx,phase:'SNIFF_PEE clip',window:win,label:key,idx:k};}
     return {atlas:'run',key:'r30',shift:D.shiftStand,ref:D.run.frames.r30.cx,phase:'RACE_STAND (pad SNIFF_PEE+RETURN)',window:win,label:'RACE_STAND #30',idx:null};}
   return dog2ButterflyVisual(D,dog,t);

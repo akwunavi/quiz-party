@@ -30,7 +30,7 @@ const laneY=i=>layout.laneTop+i*layout.laneStep;
 function draw(ta){
   ctx.drawImage(assets.ARENA,0,0,layout.width,layout.height);
   ctx.fillStyle='rgba(21,38,40,.84)';ctx.fillRect(0,0,layout.width,155);ctx.fillStyle='#fff4cc';ctx.font='bold 39px system-ui';
-  ctx.fillText(`BULLDOG №2 · SNIFF_PEE · LAB · ${race.title}`,28,58);ctx.font='27px system-ui';
+  ctx.fillText(`BULLDOG №2 · SNIFF_PEE · LAB · ${race.title} · ритм ${D.sniffVariant}`,28,58);ctx.font='27px system-ui';
   ctx.fillText(`τ = ${ta>=0?'+':''}${ta.toFixed(2)} с от начала своего окна SNIFF_PEE · физика V3 без изменений · SNIFF_PEE 7,26 с + RETURN 2,72 с, один клип через оба окна`,30,110);
   race.dogs.forEach((dog,i)=>{const lane=laneY(i),l=race.lanes[i],L=laneState(i,ta);
     ctx.fillStyle=i%2?'rgba(20,39,40,.22)':'rgba(20,39,40,.32)';ctx.fillRect(0,lane-111,layout.width,151);

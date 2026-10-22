@@ -8,7 +8,7 @@ const server=createServer(async(req,res)=>{try{const p=decodeURIComponent(new UR
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
 const page=await b.newPage({viewport:{width:1920,height:1140},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error'&&!/favicon/.test(m.text()))errors.push(m.text());});
-await page.goto(`http://127.0.0.1:${server.address().port}/bulldog2/lab_sniff_v1/`);await page.waitForFunction(()=>window.d2Sp?.ready,null,{timeout:120000});
+await page.goto(`http://127.0.0.1:${server.address().port}/bulldog2/lab_sniff_v1/${process.env.VARIANT?'?v='+process.env.VARIANT:''}`);await page.waitForFunction(()=>window.d2Sp?.ready,null,{timeout:120000});
 for(const key of KEYS){const dir=path.join(OUT,key,'frames');await mkdir(dir,{recursive:true});const lanes=await page.evaluate(k=>window.d2Sp.select(k),key);const rows=[];
   const R=await page.evaluate(()=>[window.d2Sp.T0,window.d2Sp.T1]);for(let k=0;k<=Math.round((R[1]-R[0])*24);k++){const t=R[0]+k/24;rows.push({t,lanes:await page.evaluate(t=>{window.d2Sp.draw(t);return window.d2Sp.measure(t);},t)});const png=await page.evaluate(()=>document.getElementById('c').toDataURL('image/png'));await writeFile(path.join(dir,`f${String(k).padStart(4,'0')}.png`),Buffer.from(png.split(',')[1],'base64'));}
   await writeFile(path.join(OUT,key,'measure.json'),JSON.stringify({lanes,rows}));}
