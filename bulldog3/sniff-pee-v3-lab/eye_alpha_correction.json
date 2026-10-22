@@ -1,0 +1,132 @@
+[
+  {
+    "sourceFrame": 20,
+    "eyeHole": {
+      "bbox": [
+        794,
+        423,
+        24,
+        21
+      ],
+      "area": 361
+    },
+    "restoredPixels": 598
+  },
+  {
+    "sourceFrame": 21,
+    "eyeHole": {
+      "bbox": [
+        793,
+        447,
+        32,
+        21
+      ],
+      "area": 474
+    },
+    "restoredPixels": 745
+  },
+  {
+    "sourceFrame": 24,
+    "eyeHole": {
+      "bbox": [
+        791,
+        502,
+        32,
+        21
+      ],
+      "area": 459
+    },
+    "restoredPixels": 748
+  },
+  {
+    "sourceFrame": 47,
+    "eyeHole": {
+      "bbox": [
+        799,
+        420,
+        24,
+        27
+      ],
+      "area": 497
+    },
+    "restoredPixels": 908
+  },
+  {
+    "sourceFrame": 48,
+    "eyeHole": {
+      "bbox": [
+        805,
+        388,
+        23,
+        25
+      ],
+      "area": 459
+    },
+    "restoredPixels": 1144
+  },
+  {
+    "sourceFrame": 49,
+    "eyeHole": {
+      "bbox": [
+        809,
+        352,
+        29,
+        33
+      ],
+      "area": 759
+    },
+    "restoredPixels": 1184
+  },
+  {
+    "sourceFrame": 54,
+    "eyeHole": {
+      "bbox": [
+        814,
+        254,
+        31,
+        30
+      ],
+      "area": 608
+    },
+    "restoredPixels": 1160
+  },
+  {
+    "sourceFrame": 81,
+    "eyeHole": {
+      "bbox": [
+        826,
+        252,
+        35,
+        25
+      ],
+      "area": 476
+    },
+    "restoredPixels": 901
+  },
+  {
+    "sourceFrame": 82,
+    "eyeHole": {
+      "bbox": [
+        827,
+        252,
+        34,
+        26
+      ],
+      "area": 502
+    },
+    "restoredPixels": 997
+  },
+  {
+    "sourceFrame": 86,
+    "eyeHole": {
+      "bbox": [
+        822,
+        239,
+        34,
+        28
+      ],
+      "area": 565
+    },
+    "restoredPixels": 1020
+  }
+]

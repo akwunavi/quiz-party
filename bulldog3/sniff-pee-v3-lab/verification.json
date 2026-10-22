@@ -1,0 +1,266 @@
+{
+  "model": "Unmodified Race V3 buildDog/stateAt in ../race-start-v3-lab/model.mjs",
+  "sourceRunPhase": "../run-phase-v3-lab/phase.mjs",
+  "fps": 24,
+  "profiles": [
+    {
+      "name": "SNIFF 40% · FAST",
+      "base": 1.23,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          13.958333333333334,
+          15.5
+        ],
+        "sniff": [
+          15.5,
+          22.760416666666664
+        ],
+        "return": [
+          22.760416666666664,
+          25.481249999999996
+        ],
+        "restart": [
+          25.481249999999996,
+          26.481249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.40510982142857144,
+        "returnStart": 0.40510982142857144,
+        "start": 0.40510982142857144
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 46.23274825778847,
+      "complete": 47.981249999999996
+    },
+    {
+      "name": "VERY SLOW",
+      "base": 0.75,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          22.458333333333332,
+          24
+        ],
+        "sniff": [
+          24,
+          31.260416666666664
+        ],
+        "return": [
+          31.260416666666664,
+          33.981249999999996
+        ],
+        "restart": [
+          33.981249999999996,
+          34.981249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.39694940476190466,
+        "returnStart": 0.39694940476190466,
+        "start": 0.39694940476190466
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 68.25208333333333,
+      "complete": 69.98125
+    },
+    {
+      "name": "SLOW",
+      "base": 0.9,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          18.958333333333332,
+          20.5
+        ],
+        "sniff": [
+          20.5,
+          27.760416666666664
+        ],
+        "return": [
+          27.760416666666664,
+          30.481249999999996
+        ],
+        "restart": [
+          30.481249999999996,
+          31.481249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.4013392857142857,
+        "returnStart": 0.4013392857142857,
+        "start": 0.4013392857142857
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 58.918749999999996,
+      "complete": 60.481249999999996
+    },
+    {
+      "name": "NORMAL",
+      "base": 1,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          16.958333333333332,
+          18.5
+        ],
+        "sniff": [
+          18.5,
+          25.760416666666664
+        ],
+        "return": [
+          25.760416666666664,
+          28.481249999999996
+        ],
+        "restart": [
+          28.481249999999996,
+          29.481249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.39831349206349204,
+        "returnStart": 0.39831349206349204,
+        "start": 0.39831349206349204
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 54.25208333333333,
+      "complete": 55.981249999999996
+    },
+    {
+      "name": "FAST",
+      "base": 1.1,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          15.458333333333334,
+          17
+        ],
+        "sniff": [
+          17,
+          24.260416666666664
+        ],
+        "return": [
+          24.260416666666664,
+          26.981249999999996
+        ],
+        "restart": [
+          26.981249999999996,
+          27.981249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.398859126984127,
+        "returnStart": 0.398859126984127,
+        "start": 0.398859126984127
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 50.43390151515151,
+      "complete": 51.981249999999996
+    },
+    {
+      "name": "VERY FAST",
+      "base": 1.25,
+      "runToStopSource": 68,
+      "segments": {
+        "stop": [
+          13.458333333333334,
+          15
+        ],
+        "sniff": [
+          15,
+          22.260416666666664
+        ],
+        "return": [
+          22.260416666666664,
+          24.981249999999996
+        ],
+        "restart": [
+          24.981249999999996,
+          25.981249999999996
+        ]
+      },
+      "progress": {
+        "before": 0.39372519841269843,
+        "returnStart": 0.39372519841269843,
+        "start": 0.39372519841269843
+      },
+      "progressDiscontinuities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visualAtBoundary": {
+        "first": 0,
+        "lastSniff": 174,
+        "firstReturn": 174,
+        "lastReturn": 239
+      },
+      "crossing": 45.852083333333326,
+      "complete": 47.481249999999996
+    }
+  ],
+  "issues": []
+}

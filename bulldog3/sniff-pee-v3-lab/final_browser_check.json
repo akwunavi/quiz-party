@@ -1,0 +1,206 @@
+{
+  "browser": "Chromium",
+  "playTime": 0.6903999999996274,
+  "modes": {
+    "chain": {
+      "duration": 18.52291666666666,
+      "states": [
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.29246964285714283,
+            "frame": 16
+          }
+        ],
+        [
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.40510982142857144,
+            "frame": 39
+          }
+        ],
+        [
+          {
+            "segment": "RETURN",
+            "progress": 0.40510982142857144,
+            "frame": 224
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.5081676733193276,
+            "frame": 11
+          }
+        ]
+      ]
+    },
+    "action": {
+      "duration": 9.981249999999996,
+      "states": [
+        [
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.40510982142857144,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.40510982142857144,
+            "frame": 79
+          }
+        ],
+        [
+          {
+            "segment": "RETURN",
+            "progress": 0.40510982142857144,
+            "frame": 179
+          }
+        ],
+        [
+          {
+            "segment": "RETURN",
+            "progress": 0.40510982142857144,
+            "frame": 238
+          }
+        ]
+      ]
+    },
+    "speeds": {
+      "duration": 71.48125,
+      "states": [
+        [
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 0,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "STOP",
+            "progress": 0.3969127376871469,
+            "frame": 32
+          },
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.4013392857142857,
+            "frame": 79
+          },
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.39831349206349204,
+            "frame": 127
+          },
+          {
+            "segment": "SNIFF_PEE",
+            "progress": 0.398859126984127,
+            "frame": 163
+          },
+          {
+            "segment": "RETURN",
+            "progress": 0.39372519841269843,
+            "frame": 211
+          }
+        ],
+        [
+          {
+            "segment": "RUN",
+            "progress": 0.7385509672619048,
+            "frame": 18
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.886261160714286,
+            "frame": 20
+          },
+          {
+            "segment": "RUN",
+            "progress": 0.9847346230158732,
+            "frame": 21
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0203373015873016,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0255456349206349,
+            "frame": 0
+          }
+        ],
+        [
+          {
+            "segment": "BASE",
+            "progress": 1.0171130952380951,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.016964285714286,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0228174603174602,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0203373015873016,
+            "frame": 0
+          },
+          {
+            "segment": "BASE",
+            "progress": 1.0255456349206349,
+            "frame": 0
+          }
+        ]
+      ]
+    }
+  },
+  "videos": [
+    {
+      "file": "DOG3_ROCKY_SNIFF_PEE_FULL_CHAIN_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 18.541667,
+      "played": 18.541667,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_ROCKY_SNIFF_PEE_ACTION_GAMEPLAY.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 10,
+      "played": 10,
+      "ended": true,
+      "error": null
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,11 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "SNIFF_PEE": {
+      "file": "assets/rocky-sniff-pee.png",
+      "frames": 240
+    }
+  }
+}
