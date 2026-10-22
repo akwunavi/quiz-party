@@ -13,7 +13,7 @@
 | BUTTERFLY | Художественный исходник v1, [alpha, монтаж и игровая лаборатория](butterfly-v3-lab/REPORT.md) полностью приняты пользователем. |
 | SNIFF_PEE | [Монтаж](sniff-pee-montage-review/REPORT.md) принят пользователем в игровом масштабе. Alpha, игровой атлас и изолированная [лаборатория SNIFF_PEE + RETURN](sniff-pee-v3-lab/REPORT.md) предварительно приняты; финальная проверка будет в общей гонке. |
 | ROLL | Пользователь окончательно утвердил [исходник v2 и игровой монтаж B](roll-v3-rhythm-review/APPROVED.md): 8 кадров стойки + #0–120 + 16 кадров стойки = 145 кадров. Alpha, атлас и лаборатория B готовы. [A архивирован](roll-v3-lab/ARCHIVED.md); повторная генерация и доработка ROLL не нужны. |
-| FRONT_STAND, IDLE, SELECTED, RETURN_TO_IDLE | FRONT_STAND существует как исходный опорный кадр; IDLE и SELECTED существуют как MP4 без alpha и окончательной художественной приёмки; RETURN_TO_IDLE отсутствует. См. [инвентаризацию](LIBRARY_INVENTORY_20261022.md). |
+| FRONT_STAND, IDLE, SELECTED, RETURN_TO_IDLE | [Предпросмотр IDLE и сравнение стоек](idle-front-review/REPORT.md) подготовлены для художественной приёмки: #0–58, затем петля #34–58. FRONT_STAND #0 побайтно совпадает с IDLE #0; alpha и игровая приёмка ещё не выполнялись. SELECTED пока только исходный MP4, RETURN_TO_IDLE отсутствует. См. [инвентаризацию](LIBRARY_INVENTORY_20261022.md). |
 | Первый переход с выбора на гоночную сцену | Не разработан; утверждённый RACE_START относится к старту из боковой RACE_STAND после остановки. |
 
 Production не менялся; merge и deploy не выполнялись.
