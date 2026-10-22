@@ -1,0 +1,16 @@
+{
+ "schema": "dog2-sniff-lab/v1",
+ "character": "bulldog2",
+ "status": "LAB CANDIDATE for visual acceptance: SNIFF_PEE v1 (Kling 4.0, source approved) with pipeline alpha; physics V3 and windows unchanged",
+ "SNIFF_PEE": {
+  "source": "sniff_pee_v1/kling/DOG2_SNIFF_PEE_v1_original.mp4 (1284x724, 193 frames, first = last = RACE_STAND #30, keyframe_1 = B1)",
+  "normalise": "uniform scale 0.99375 + 0.25 px y -> 1276x720, audio dropped (sniff_pee_v1/game_source/normalise.py)",
+  "alpha": "sniff_pee_v1/alpha/DOG2_SNIFF_PEE_v1_alpha_s1-s193.webm (all 193 frames, one pass, min-area 1500, no audio)",
+  "atlas": "lab_sniff_v1/assets/dog2_sniff_atlas.json (labels s1..s193 = k1..k193)",
+  "clip": "s6..s176 = 171 frames (s1-s5, s177-s193 still stand, IoU 0.997 to #30), no retiming, no cuts",
+  "windows": "SNIFF_PEE (174.25 f) + RETURN (65.3 f) played as ONE continuous clip from the SNIFF_PEE start; clip ends at frame 171 inside SNIFF_PEE, the rest (incl. the whole RETURN window) is RACE_STAND #30",
+  "sprite_shift": "RACE_STAND shift for the whole clip; no extra metadata"
+ },
+ "RETURN": "merged into SNIFF_PEE clip (stand pad)",
+ "BUTTERFLY": "v2 (approved)", "ROLL": "v3 (lab_roll_v1)", "STOP": "STOP B (approved)", "RACE_START": "B (approved)", "RACE_STAND": "RUN #30 (approved)"
+}

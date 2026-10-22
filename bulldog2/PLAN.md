@@ -119,3 +119,6 @@ BUTTERFLY v2 принят как исходник (ухо b37–b42 оставл
 
 ## Статус 16.10.2026 — SNIFF_PEE
 BUTTERFLY v2 окончательно принята (коммит 1eafd09). SNIFF_PEE: разбор №4/Фрэнка/Рокки, сценарий, референсы, промпты A и B, рекомендация B (картинка позы → Kling 4.0 с ключевым кадром) — `sniff_pee_prep/PLAN.md`. Kling не запускался, ждёт согласования.
+
+## Статус 22.10.2026 — SNIFF_PEE
+B1 (картинка позы, Nano Banana Pro) и B2 (Kling 4.0, keyframe = B1) приняты. Alpha `sniff_pee_v1/alpha/`, лаборатория `lab_sniff_v1/` (полная цепочка RUN → STOP B → SNIFF_PEE → RETURN → START B → RUN, все стыки 0,00 px). Ждёт визуальной приёмки.
