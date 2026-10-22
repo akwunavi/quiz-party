@@ -1,7 +1,7 @@
 {
  "schema": "dog2-roll-lab/v1",
  "character": "bulldog2",
- "status": "LAB CANDIDATE for visual acceptance: ROLL v3 (source approved by the user) with pipeline alpha; physics V3 and windows unchanged",
+ "status": "APPROVED: ROLL v3, clip r10-r117 + RACE_STAND pad in the 145-frame window, pipeline alpha (user, 22.10.2026); physics V3 and windows unchanged",
  "ROLL": {
   "source": "roll_v3/kling/DOG2_ROLL_v3_original.mp4 (121 frames, first = last = RACE_STAND #30)",
   "alpha": "roll_v3/alpha/DOG2_ROLL_v3_alpha_r1-r121.webm (all 121 frames, one pass)",
@@ -10,5 +10,7 @@
   "window": "ROLL 145 frames = clip 108 + RACE_STAND pad 37 (START B lead 0)",
   "sprite_shift": "RACE_STAND shift (cxRunMean - cx(#30)) for the whole clip; no extra metadata"
  },
- "STOP": "STOP B (approved, lab_stop_v1)", "RACE_START": "B (approved)", "RACE_STAND": "RUN #30 (approved)"
+ "STOP": "STOP B (approved, lab_stop_v1)",
+ "RACE_START": "B (approved)",
+ "RACE_STAND": "RUN #30 (approved)"
 }

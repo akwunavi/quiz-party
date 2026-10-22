@@ -1,7 +1,7 @@
 {
  "schema": "dog2-start-lab/v1",
  "character": "bulldog2",
- "status": "LAB CANDIDATE (not approved): RACE_STAND = RUN #30 (working), RACE_START = variant B; physics V3 and windows unchanged",
+ "status": "APPROVED: RACE_STAND = RUN #30, RACE_START = variant B (user, 16.10.2026, commit 23dd257); physics V3 and windows unchanged",
  "source": "assets/sources/bulldog_02_run.mp4 (0-based frame #N = label rN)",
  "alpha": "race_start_v1/alpha/DOG2_RUN_alpha_src28-100.webm (one pass, frames #28-#100)",
  "atlas": "lab_start_v1/assets/dog2_atlas.json (207x116, sprite px)",

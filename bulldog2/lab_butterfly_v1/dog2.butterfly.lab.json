@@ -1,7 +1,7 @@
 {
  "schema": "dog2-butterfly-lab/v1",
  "character": "bulldog2",
- "status": "LAB CANDIDATE for visual acceptance: BUTTERFLY v2 (source approved, far ear b37-b42 kept) with pipeline alpha; physics V3 and windows unchanged",
+ "status": "APPROVED: BUTTERFLY v2, clip b8-b109 + RACE_STAND pad in the 121-frame window, pipeline alpha, moth removed (user, commit 1eafd09); physics V3 and windows unchanged",
  "BUTTERFLY": {
   "source": "butterfly_v2/kling/DOG2_BUTTERFLY_v2_original.mp4 (121 frames, first = last = RACE_STAND #30)",
   "alpha": "butterfly_v2/alpha/DOG2_BUTTERFLY_v2_alpha_b1-b121.webm (all 121 frames, one pass, min-area 1500, moth removed)",
@@ -10,5 +10,8 @@
   "window": "BUTTERFLY 121 frames = clip 102 + RACE_STAND pad 19 (START B lead 0)",
   "sprite_shift": "RACE_STAND shift for the whole clip; no extra metadata"
  },
- "ROLL": "ROLL v3 (lab_roll_v1)", "STOP": "STOP B (approved)", "RACE_START": "B (approved)", "RACE_STAND": "RUN #30 (approved)"
+ "ROLL": "ROLL v3 (lab_roll_v1)",
+ "STOP": "STOP B (approved)",
+ "RACE_START": "B (approved)",
+ "RACE_STAND": "RUN #30 (approved)"
 }
