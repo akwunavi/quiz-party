@@ -43,3 +43,10 @@
 * **generationId:** `AVm_OtQn2o2Z4B00nPsin5z-661y0Zj-apv1_ny2i6TWtYv3VbJINaqXuLH7Nbj6VUuxL5qK`.
 * **Стоимость:** 30 кредитов (баланс 2276 → 2246, совпадает).
 * **Результат:** `selected_g2v3/DOG4_SELECTED_G2v3_kling_original.mp4`, 121 кадр, 5,04 с, SHA-256 `484b06eb1942c8854d4f625410cf7cb8343f0b8d95d6f2bb20fc75362004df81`. Разбор — `selected_g2v3/REVIEW.md`. Несмотря на прямой запрет, лапы снова поднимаются. **Отклонён пользователем.**
+
+## 6. G2 SELECTED v4, вариант A (23.10.2026) — ПРИНЯТ
+* **Инструмент:** `image_to_video`, `kling-video-v3_0`, 5 с, 720p, 1 видео, без звука, одна сцена; first = tail = утверждённый G0.
+* **Промпт дословно:** `selected_g2v4/prompt_sent.txt` (= `selection_prep/PROMPT_G2_SELECTED_v4_A_first_tail.txt`, разбор — `selection_prep/SELECTED_PROMPT_ANALYSIS.md`).
+* **generationId:** `AbTpW25G0BoRm1HD5TS-c0AA0nAiXLz-OgH0d_sdqNW2toPRtC12O2931tPZfFvPhHhy43xv`.
+* **Стоимость:** 30 кредитов (баланс 2246 → 2216, совпадает).
+* **Результат:** `selected_g2v4/DOG4_SELECTED_G2v4_kling_original.mp4`, 121 кадр, 5,04 с, без звука, SHA-256 `6c6773b1cbe209ce71c442b57644ac0160076e03342d2748ecb4519e81e67634`. **Принят пользователем** («нормально, забираем»).
