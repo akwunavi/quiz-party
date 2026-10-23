@@ -27,3 +27,11 @@
 * **generationId:** `AT0NS4JLEwXYwkUTEHCcOU5yy75XOgNdp1Q6qEXHjnJkpt1E--XuYbvoqSGgHfyhNlPOmHJE`.
 * **Стоимость:** 30 кредитов (Kling сообщил 30; баланс 2336 → 2306, совпадает).
 * **Результат:** `selected_g2/DOG4_SELECTED_G2_kling_original.mp4` (без логотипа), 1276×720, 24 к/с, 121 кадр, 5,04 с, без аудиодорожки, SHA-256 `f4dc891dd26af4aec857def74ff0e229d7ae11c16a40c629667757003c2d2a95`. Разбор — `selected_g2/REVIEW.md`. Alpha не делалась. **Отклонён пользователем** (`selected_g2/REJECTED.md`).
+
+## 4. G2 SELECTED v2, вариант A (23.10.2026)
+* **Инструмент:** `image_to_video`, `kling-video-v3_0`, 5 с, 720p, 1 видео, `enable_audio=false`, `prefer_multi_shots=false`.
+* **Входы:** first = tail = утверждённый G0 (`front_stand_g0/G0_FRONT_STAND_studio_1276.png`).
+* **Промпт дословно:** `selected_g2v2/prompt_sent.txt` (= `selection_prep/PROMPT_G2_SELECTED_v2_A_first_tail.txt`); написан заново после отклонения G2.
+* **generationId:** `Af4iApaxMpqwCM3Oxc3SHHnRNy0XEtMTaNamdcGyyI8luWI6ZIKcjSffR-SaDfHQFEFR6YhG`.
+* **Стоимость:** 30 кредитов (Kling сообщил 30; баланс 2306 → 2276, совпадает).
+* **Результат:** `selected_g2v2/DOG4_SELECTED_G2v2_kling_original.mp4`, 1276×720, 24 к/с, 121 кадр, 5,04 с, без звука, SHA-256 `3a771cb76d0d95a3a20a356cce33e09145800cb84742caa45d09bb5efbbe2b4a`. Разбор — `selected_g2v2/REVIEW.md`. Alpha не делалась.
