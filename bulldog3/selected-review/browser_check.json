@@ -1,0 +1,52 @@
+{
+  "bulldog3/assets/incoming/bulldog_3_selected.mp4": {
+    "duration": 5.041667,
+    "currentTime": 5.041667,
+    "ended": true,
+    "width": 1276,
+    "height": 720,
+    "error": null,
+    "decodedFrames": 121,
+    "droppedFrames": 0
+  },
+  "bulldog3/selected-review/DOG3_SELECTED_0-120_SOURCE_REVIEW.mp4": {
+    "duration": 5.041667,
+    "currentTime": 5.041667,
+    "ended": true,
+    "width": 1276,
+    "height": 720,
+    "error": null,
+    "decodedFrames": 121,
+    "droppedFrames": 0
+  },
+  "bulldog3/selected-review/DOG3_SELECTED_0-120_SELECTION_SCALE.mp4": {
+    "duration": 5.041667,
+    "currentTime": 5.041667,
+    "ended": true,
+    "width": 1920,
+    "height": 1080,
+    "error": null,
+    "decodedFrames": 121,
+    "droppedFrames": 1
+  },
+  "bulldog3/selected-review/DOG3_FRONT_STAND_TO_SELECTED_REVIEW.mp4": {
+    "duration": 5.375,
+    "currentTime": 5.375,
+    "ended": true,
+    "width": 1276,
+    "height": 720,
+    "error": null,
+    "decodedFrames": 129,
+    "droppedFrames": 0
+  },
+  "bulldog3/selected-review/DOG3_RETURN_REVERSE_DIAGNOSTIC_NOT_FOR_USE.mp4": {
+    "duration": 5.041667,
+    "currentTime": 5.041667,
+    "ended": true,
+    "width": 1276,
+    "height": 720,
+    "error": null,
+    "decodedFrames": 121,
+    "droppedFrames": 0
+  }
+}
