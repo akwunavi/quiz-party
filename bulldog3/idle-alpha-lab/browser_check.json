@@ -1,0 +1,17 @@
+{
+  "chromiumRealTimeSeconds": 30.51,
+  "screenshots": [
+    "BROWSER_WHITE.png",
+    "BROWSER_BLACK.png",
+    "BROWSER_GREEN.png",
+    "BROWSER_BEIGE.png"
+  ],
+  "error": null,
+  "paused": false,
+  "width": 1276,
+  "height": 720,
+  "duration": 10,
+  "currentTime": 0.47159,
+  "loops": 3,
+  "quality": {}
+}

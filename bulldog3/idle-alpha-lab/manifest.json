@@ -1,0 +1,15 @@
+{
+  "source": "assets/incoming/bulldog_3_idle.mp4",
+  "sourceFrameCount": 121,
+  "fps": 24,
+  "approvedMap": "../idle-full-review/frame_map.json#B.sourceFramesPerCycle",
+  "cycleFrames": 240,
+  "previewRepeats": 3,
+  "previewFrameCount": 720,
+  "selectionScaleAssumption": [
+    207,
+    116
+  ],
+  "sourceVideoChanged": false,
+  "selectedVideoChanged": false
+}

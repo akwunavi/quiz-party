@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Рокки — IDLE B alpha, лаборатория выбора</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#202a2c;background:#e8dfcd}
+    body{margin:0;padding:24px;display:grid;gap:18px;justify-items:center}
+    h1,p{margin:0} p{max-width:760px;line-height:1.4}
+    .controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+    button,input{font:inherit} button{padding:8px 13px;border:1px solid #58615b;background:#fff;border-radius:8px;cursor:pointer}
+    label{display:flex;gap:8px;align-items:center}
+    .stage{width:min(90vw,850px);height:470px;display:grid;place-items:center;border:2px solid #777d73;border-radius:18px;background:#ddc9a7;overflow:hidden}
+    video{display:block;width:207px;height:116px;object-fit:fill}
+    .note{font-size:14px;color:#455052}
+  </style>
+</head>
+<body>
+  <h1>Рокки · IDLE B</h1>
+  <p>Прозрачный VP9 WebM. Цикл 240 кадров / 10 секунд: #0–120 вперёд, #119–1 обратно. Проверка позы и контура перед интеграцией экрана выбора.</p>
+  <div class="controls">
+    <button id="play">Пауза</button>
+    <button data-bg="#ffffff">Белый</button>
+    <button data-bg="#000000">Чёрный</button>
+    <button data-bg="#00df36">Зелёный</button>
+    <button data-bg="#ddc9a7">Бежевый</button>
+    <label>Размер кадра <input id="size" type="range" min="150" max="600" value="207"> <span id="size-value">207×116</span></label>
+  </div>
+  <div class="stage" id="stage"><video id="dog" src="assets/DOG3_IDLE_B_ALPHA_240.webm" muted autoplay loop playsinline></video></div>
+  <p class="note" id="status">Предполагаемый размер для выбора — 207×116 px исходного кадра; это изолированная проверка, не разметка production. Исходный пол и тень должны отсутствовать.</p>
+  <script>
+    const video=document.querySelector('#dog'), stage=document.querySelector('#stage');
+    const play=document.querySelector('#play'), size=document.querySelector('#size'), value=document.querySelector('#size-value');
+    play.onclick=()=>{if(video.paused){video.play();play.textContent='Пауза'}else{video.pause();play.textContent='Play'}};
+    document.querySelectorAll('[data-bg]').forEach(button=>button.onclick=()=>stage.style.background=button.dataset.bg);
+    size.oninput=()=>{const w=Number(size.value),h=Math.round(w*720/1276);video.style.width=w+'px';video.style.height=h+'px';value.textContent=w+'×'+h};
+    video.onerror=()=>document.querySelector('#status').textContent='Ошибка декодирования WebM: '+(video.error?.message||'неизвестная');
+  </script>
+</body>
+</html>
