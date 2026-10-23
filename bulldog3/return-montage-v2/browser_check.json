@@ -1,0 +1,50 @@
+[
+  {
+    "file": "DOG3_RETURN_D_SELECTED_ONLY_CLOSE.mp4",
+    "duration": 4.041667,
+    "width": 1276,
+    "height": 720,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_RETURN_E_SHORT_WIDE_CLOSE.mp4",
+    "duration": 4.75,
+    "width": 1276,
+    "height": 720,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_RETURN_F_INTERNAL_BRIDGE_CLOSE.mp4",
+    "duration": 2.208333,
+    "width": 1276,
+    "height": 720,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_D_SELECTED_ONLY_IDLE_GAME.mp4",
+    "duration": 19.083333,
+    "width": 1920,
+    "height": 1080,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_E_SHORT_WIDE_IDLE_GAME.mp4",
+    "duration": 19.791667,
+    "width": 1920,
+    "height": 1080,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_F_INTERNAL_BRIDGE_IDLE_GAME.mp4",
+    "duration": 17.25,
+    "width": 1920,
+    "height": 1080,
+    "ended": true,
+    "error": null
+  }
+]

@@ -1,0 +1,122 @@
+{
+  "fps": 24,
+  "sourceAssetsUnchanged": true,
+  "variants": {
+    "D_SELECTED_ONLY": {
+      "returnFrames": 97,
+      "returnSeconds": 4.041666666666667,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "first": 120,
+          "last": 24,
+          "step": -1,
+          "output": [
+            0,
+            96
+          ]
+        }
+      ],
+      "returnLast": "SELECTED #24",
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          217
+        ],
+        "idleB": [
+          218,
+          457
+        ],
+        "totalFrames": 458
+      }
+    },
+    "E_SHORT_WIDE": {
+      "returnFrames": 114,
+      "returnSeconds": 4.75,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "first": 120,
+          "last": 106,
+          "step": -1,
+          "output": [
+            0,
+            14
+          ]
+        },
+        {
+          "source": "idle",
+          "first": 98,
+          "last": 0,
+          "step": -1,
+          "output": [
+            15,
+            113
+          ]
+        }
+      ],
+      "returnLast": "IDLE #0",
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          234
+        ],
+        "idleB": [
+          235,
+          474
+        ],
+        "totalFrames": 475
+      }
+    },
+    "F_INTERNAL_BRIDGE": {
+      "returnFrames": 53,
+      "returnSeconds": 2.2083333333333335,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "first": 120,
+          "last": 83,
+          "step": -1,
+          "output": [
+            0,
+            37
+          ]
+        },
+        {
+          "source": "selected",
+          "first": 38,
+          "last": 24,
+          "step": -1,
+          "output": [
+            38,
+            52
+          ]
+        }
+      ],
+      "returnLast": "SELECTED #24",
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          173
+        ],
+        "idleB": [
+          174,
+          413
+        ],
+        "totalFrames": 414
+      }
+    }
+  }
+}
