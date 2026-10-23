@@ -1,0 +1,165 @@
+{
+  "fps": 24,
+  "sourceAssetsUnchanged": true,
+  "variants": {
+    "A": {
+      "returnFrames": 131,
+      "returnSeconds": 5.458333333333333,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "sourceStart": 120,
+          "sourceEnd": 80,
+          "step": -1,
+          "returnOutputStart": 0,
+          "returnOutputEnd": 40
+        },
+        {
+          "source": "idle",
+          "sourceStart": 89,
+          "sourceEnd": 0,
+          "step": -1,
+          "returnOutputStart": 41,
+          "returnOutputEnd": 130
+        }
+      ],
+      "join": [
+        "SELECTED #80",
+        "IDLE #89"
+      ],
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          251
+        ],
+        "idleB": [
+          252,
+          491
+        ],
+        "totalFrames": 492
+      },
+      "sourceFramesFirstLastVerified": [
+        "SELECTED #120",
+        "IDLE #0"
+      ]
+    },
+    "B": {
+      "returnFrames": 107,
+      "returnSeconds": 4.458333333333333,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "sourceStart": 120,
+          "sourceEnd": 100,
+          "step": -2,
+          "returnOutputStart": 0,
+          "returnOutputEnd": 10
+        },
+        {
+          "source": "selected",
+          "sourceStart": 99,
+          "sourceEnd": 80,
+          "step": -1,
+          "returnOutputStart": 11,
+          "returnOutputEnd": 30
+        },
+        {
+          "source": "idle",
+          "sourceStart": 89,
+          "sourceEnd": 60,
+          "step": -1,
+          "returnOutputStart": 31,
+          "returnOutputEnd": 60
+        },
+        {
+          "source": "idle",
+          "sourceStart": 59,
+          "sourceEnd": 31,
+          "step": -2,
+          "returnOutputStart": 61,
+          "returnOutputEnd": 75
+        },
+        {
+          "source": "idle",
+          "sourceStart": 30,
+          "sourceEnd": 0,
+          "step": -1,
+          "returnOutputStart": 76,
+          "returnOutputEnd": 106
+        }
+      ],
+      "join": [
+        "SELECTED #80",
+        "IDLE #89"
+      ],
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          227
+        ],
+        "idleB": [
+          228,
+          467
+        ],
+        "totalFrames": 468
+      },
+      "sourceFramesFirstLastVerified": [
+        "SELECTED #120",
+        "IDLE #0"
+      ]
+    },
+    "C": {
+      "returnFrames": 126,
+      "returnSeconds": 5.25,
+      "returnSegments": [
+        {
+          "source": "selected",
+          "sourceStart": 120,
+          "sourceEnd": 76,
+          "step": -1,
+          "returnOutputStart": 0,
+          "returnOutputEnd": 44
+        },
+        {
+          "source": "idle",
+          "sourceStart": 80,
+          "sourceEnd": 0,
+          "step": -1,
+          "returnOutputStart": 45,
+          "returnOutputEnd": 125
+        }
+      ],
+      "join": [
+        "SELECTED #76",
+        "IDLE #80"
+      ],
+      "full": {
+        "selected": [
+          0,
+          120
+        ],
+        "return": [
+          121,
+          246
+        ],
+        "idleB": [
+          247,
+          486
+        ],
+        "totalFrames": 487
+      },
+      "sourceFramesFirstLastVerified": [
+        "SELECTED #120",
+        "IDLE #0"
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "file": "DOG3_RETURN_A_CLOSE.mp4",
+    "duration": 5.458333,
+    "videoWidth": 1276,
+    "videoHeight": 720,
+    "ended": true,
+    "currentTime": 5.458333,
+    "error": null
+  },
+  {
+    "file": "DOG3_RETURN_B_CLOSE.mp4",
+    "duration": 4.458333,
+    "videoWidth": 1276,
+    "videoHeight": 720,
+    "ended": true,
+    "currentTime": 4.458333,
+    "error": null
+  },
+  {
+    "file": "DOG3_RETURN_C_CLOSE.mp4",
+    "duration": 5.25,
+    "videoWidth": 1276,
+    "videoHeight": 720,
+    "ended": true,
+    "currentTime": 5.25,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_A_IDLE_GAME.mp4",
+    "duration": 20.5,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "ended": true,
+    "currentTime": 20.5,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_B_IDLE_GAME.mp4",
+    "duration": 19.5,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "ended": true,
+    "currentTime": 19.5,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_RETURN_C_IDLE_GAME.mp4",
+    "duration": 20.291667,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "ended": true,
+    "currentTime": 20.291667,
+    "error": null
+  }
+]
