@@ -1,10 +1,10 @@
 {
- "libraryVersion": "frenk-library-1.0.0",
+ "libraryVersion": "frenk-library-1.1.0",
  "checks": {
   "sha256_all_files": {
    "ok": true,
    "detail": {
-    "files": 18,
+    "files": 22,
     "mismatch": []
    }
   },
@@ -70,6 +70,19 @@
    "ok": true,
    "detail": {
     "sha256_pixels_r2_r121": "ec5055c98b297777c503ec15bcf558f18b3fbfa9eb037f2fdc72729a16617f24"
+   }
+  },
+  "anytime_selection_logic": {
+   "ok": true,
+   "detail": {
+    "loop": 220,
+    "gate": 12,
+    "maxWait": 106,
+    "entry": 20,
+    "ret": [
+     2,
+     121
+    ]
    }
   },
   "race_package_check": {

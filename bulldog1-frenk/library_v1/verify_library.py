@@ -45,6 +45,12 @@ subprocess.run(['python3',os.path.join(B,'return_to_idle_v1/make_graded_frames.p
 gh=hashlib.sha256(b''.join(np.asarray(Image.open(f'{t}/retg/r{n:03d}.png')).tobytes() for n in range(2,122))).hexdigest()
 exp=json.load(open(os.path.join(B,'selection_alpha_v1/results/graded_input_hash.json')))['sha256_pixels_r2_r121']
 chk('rebuild_return_grade_identical',gh==exp,{'sha256_pixels_r2_r121':gh})
+# anytime selection (approved entry A): every pick reaches the stand f12 and SELECTED f20; max wait as approved; RETURN r2..r121
+any_=lib['selection']['anytime'];js=("import('./selection_anytime_v1/selection.mjs').then(m=>{const w=[];for(let i=0;i<m.IDLE_LOOP.length;i++){const p=m.exitPath(i);"
+  "w.push(p.length);const end=p.length?p[p.length-1]:m.IDLE_LOOP[i];if(end!==m.GATE)throw new Error('gate '+i);}"
+  "console.log(JSON.stringify({loop:m.IDLE_LOOP.length,gate:m.GATE,maxWait:Math.max(...w),entry:m.ENTRY.A.sel[0],ret:[m.RETURN[0],m.RETURN[m.RETURN.length-1]]}))})")
+r=subprocess.run(['node','--input-type=module','-e',js],cwd=B,capture_output=True,text=True);d=json.loads(r.stdout) if r.returncode==0 else {'error':r.stderr[-300:]}
+chk('anytime_selection_logic',r.returncode==0 and d=={'loop':220,'gate':any_['gate'],'maxWait':any_['maxWaitFrames'],'entry':any_['entryFirstSelectedFrame'],'ret':[2,121]},d)
 # race package unchanged + its own check
 cp=os.path.join(B,'integration_v1/results/check_package.json');keep=open(cp,'rb').read()   # the race package must stay byte-identical
 try: r=subprocess.run(['node',os.path.join(B,'integration_v1/tools/check_package.mjs'),'500'],capture_output=True,text=True)

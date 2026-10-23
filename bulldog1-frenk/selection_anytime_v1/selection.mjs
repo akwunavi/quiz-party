@@ -9,7 +9,9 @@
 //   entry A: GATE = f12 -> approved SELECTED f20 (diff 1.17)                       — no new alpha
 //   entry B: GATE = f12 -> SELECTED f4 ... f19 (diff 0.82) -> approved f20 ...     — needs alpha of SELECTED f1-f24 (selection_anytime_v1/alpha)
 // Measured in the lab (results/REPORT.md): wait to the first SELECTED frame 0-106 frames (max 4.42 s, click at f118). SELECTED moves only
-// from f28, so A adds 8 still frames (0.33 s) and B 24 (1.0 s, incl. a blink f11-f14). Recommended: A. Choice is the user's.
+// from f28, so A adds 8 still frames (0.33 s) and B 24 (1.0 s, incl. a blink f11-f14).
+// APPROVED (user, 23.10.2026): entry A, max 4.42 s to SELECTED / 4.75 s to visible reaction, reverse run of IDLE accepted (APPROVED.md).
+// Entry B is archived: kept only for the lab comparison, not developed further. Do not rework.
 // After SELECTED comes RETURN r2..r121 once; r121 takes the place of IDLE f8 (loop index 0), so IDLE resumes at loop index 1 (f9), forever.
 const R=(a,b)=>{const o=[];if(b>=a)for(let k=a;k<=b;k++)o.push(k);else for(let k=a;k>=b;k--)o.push(k);return o;};
 export const IDLE_LOOP=[...R(8,118),...R(117,9)];                 // 220 frames = 9.17 s

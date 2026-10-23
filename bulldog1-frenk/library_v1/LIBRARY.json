@@ -1,5 +1,5 @@
 {
- "libraryVersion": "frenk-library-1.0.0",
+ "libraryVersion": "frenk-library-1.1.0",
  "character": "bulldog1-frenk",
  "race": {
   "package": "integration_v1/",
@@ -77,7 +77,7 @@
  },
  "selection": {
   "canvas": "1276x720, 24 fps, VP9 + alpha (alpha_mode=1, decode with libvpx-vp9), same studio camera for all three clips; the dog is not repositioned or scaled between clips",
-  "sequence": "IDLE (loop, any number of cycles) -> SELECTED (once) -> RETURN_TO_IDLE (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0).",
+  "sequence": "IDLE (loop, any number of cycles) -> pick at ANY moment -> IDLE own frames to f12 (selection_anytime_v1/selection.mjs exitPath) -> SELECTED f20-f121 (once) -> RETURN_TO_IDLE (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0).",
   "IDLE": {
    "status": "approved v1",
    "file": {
@@ -139,6 +139,33 @@
   "alpha": {
    "pipeline": "alpha_pipeline/dog_alpha.py (default settings)",
    "run": "selection_alpha_v1/run_alpha.sh"
+  },
+  "anytime": {
+   "status": "approved (user 2026-10-23): entry A IDLE f12 -> SELECTED f20; entry B archived",
+   "files": [
+    {
+     "path": "selection_anytime_v1/selection.mjs",
+     "sha256": "42bee57c61cbc810424fd742e95cea666c47fd5b29776c8ed00fe51d294f0922"
+    },
+    {
+     "path": "selection_anytime_v1/lab.mjs",
+     "sha256": "bc246afb11984b6e06593a556b1bfa7c391ec7a5c3dbd7ac4029d1060833a585"
+    },
+    {
+     "path": "selection_anytime_v1/index.html",
+     "sha256": "82f9715b8ea77b0f20d453913d66eaa6bab0eb3935507021dcb1220a70b222b2"
+    },
+    {
+     "path": "selection_anytime_v1/APPROVED.md",
+     "sha256": "3b26e855cf095e88b6a3d150731782c1afecd33b4aee51335930613d50a1d249"
+    }
+   ],
+   "gate": 12,
+   "maxWaitFrames": 106,
+   "maxWaitSeconds": 4.42,
+   "maxToVisibleReactionSeconds": 4.75,
+   "entryFirstSelectedFrame": 20,
+   "sequence": "IDLE loop -> pick at any moment -> IDLE own frames to f12 -> SELECTED f20-f121 -> RETURN r2-r121 -> IDLE from loop index 1 (f9)"
   }
  },
  "notInSequences": {
@@ -146,5 +173,5 @@
   "FIRST_START": "accepted-as-working alpha (assets/approved/DOG1_FIRST_START_alpha_src25-63.webm); not part of any sequence",
   "selectionToRace": "not designed (out of scope)"
  },
- "verify": "python3 library_v1/verify_library.py  (hashes, containers, alpha, rebuild of the IDLE loop and the RETURN grade, race package check)"
+ "verify": "python3 library_v1/verify_library.py  (hashes, containers, alpha, rebuild of the IDLE loop and the RETURN grade, race package check) + anytime selection logic (max wait 106 frames, entry A -> SELECTED f20)"
 }

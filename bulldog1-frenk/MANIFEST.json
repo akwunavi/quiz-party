@@ -1,9 +1,9 @@
 {
  "schema": "bulldog1-frenk/1",
  "dog_id": "dog1_frenk",
- "as_of": "2026-10-15 (library frenk-library-1.0.0: race package frenk-integration-1.0.0 + IDLE / SELECTED / RETURN_TO_IDLE alpha)",
+ "as_of": "2026-10-23 (library frenk-library-1.1.0: race package frenk-integration-1.0.0 + IDLE / SELECTED / RETURN_TO_IDLE alpha + selection at any moment, entry A)",
  "approved_set": {
-  "note": "AUTHORITATIVE list of the approved Frenk versions (2026-10-15). Older sections of this file are history; where they disagree, this section and integration_v1/ win.",
+  "note": "AUTHORITATIVE list of the approved Frenk versions (2026-10-15). Older sections of this file are history; where they disagree, this section and integration_v1/ win. Updated 2026-10-23: SELECTION_ANYTIME (entry A) approved; library complete (frenk-library-1.1.0).",
   "integration_package": {
    "path": "integration_v1/",
    "contract": "integration_v1/contract/frenk.contract.integration.json",
@@ -164,7 +164,7 @@
   },
   "library": {
    "path": "library_v1/",
-   "libraryVersion": "frenk-library-1.0.0",
+   "libraryVersion": "frenk-library-1.1.0",
    "index": "library_v1/LIBRARY.json",
    "verify": "python3 library_v1/verify_library.py"
   },
@@ -184,7 +184,19 @@
    "order": "Kling r2..r121 with the approved per-channel brightness grade (return_to_idle_v1/make_graded_frames.py)",
    "next": "IDLE loop index 1 (f9)"
   },
-  "selection_sequence": "IDLE (loop, any number of cycles) -> SELECTED (once) -> RETURN_TO_IDLE (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0)."
+  "selection_sequence": "IDLE (loop) -> pick at ANY moment -> IDLE own frames to f12 -> SELECTED f20-f121 (once) -> RETURN_TO_IDLE r2-r121 (once) -> IDLE loop resumed at index 1 (source f9), forever. RETURN r121 takes the place of IDLE f8 (index 0). Approved 2026-10-23 (entry A).",
+  "SELECTION_ANYTIME": {
+   "status": "approved (user 2026-10-23): entry A",
+   "logic": {
+    "path": "selection_anytime_v1/selection.mjs",
+    "sha256": "42bee57c61cbc810424fd742e95cea666c47fd5b29776c8ed00fe51d294f0922"
+   },
+   "approved_doc": "selection_anytime_v1/APPROVED.md",
+   "chain": "IDLE loop220 -> pick -> IDLE own frames to f12 -> SELECTED f20-f121 -> RETURN_TO_IDLE r2-r121 -> IDLE from f9, forever",
+   "max_wait_to_SELECTED_s": 4.42,
+   "max_to_visible_reaction_s": 4.75,
+   "reverse_run_of_IDLE": "accepted"
+  }
  },
  "architecture": "B: FRONT_STAND (frame #0 of bulldog_01_run.mp4) + RACE_STAND (v3)",
  "sources_in_other_branches": {
@@ -746,7 +758,7 @@
   "status": "alpha of the three approved selection animations, verified in the browser"
  },
  "selection_anytime_v1": {
-  "status": "technically ready, NOT approved (2026-10-22); awaiting the user's review",
+  "status": "approved entry A (user 2026-10-23, commit 1d9e566); entry B archived, not developed further",
   "report": "selection_anytime_v1/REPORT.md",
   "logic": "selection_anytime_v1/selection.mjs",
   "lab": "selection_anytime_v1/index.html",
@@ -769,8 +781,11 @@
   },
   "mean_wait_seconds": 2.13,
   "entries": {
-   "A": "IDLE f12 -> SELECTED f20 (recommended)",
-   "B": "IDLE f12 -> SELECTED f4..f19 -> f20"
-  }
+   "A": "IDLE f12 -> SELECTED f20 (APPROVED)",
+   "B": "IDLE f12 -> SELECTED f4..f19 -> f20 (ARCHIVE)"
+  },
+  "approved": "selection_anytime_v1/APPROVED.md",
+  "max_to_visible_reaction_seconds": 4.75,
+  "logic_sha256": "42bee57c61cbc810424fd742e95cea666c47fd5b29776c8ed00fe51d294f0922"
  }
 }

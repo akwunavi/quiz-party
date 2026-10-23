@@ -1,4 +1,4 @@
-// Frenk selection lab: approved IDLE loop (f8->f118->f9) plays continuously; "Выбрать" at ANY moment -> exitPath to the stand f12 ->
+// Frenk selection lab (APPROVED entry A, 23.10.2026; entry B = archive): approved IDLE loop (f8->f118->f9) plays continuously; "Выбрать" at ANY moment -> exitPath to the stand f12 ->
 // SELECTED (entry A or B) once -> RETURN_TO_IDLE once -> IDLE again from loop index 1 (f9), forever. Approved alpha clips, exact seeking,
 // no crossfade. Drawn at 638x360 on white / black / green / beige. window.fSel = deterministic API for tools/lab_check.mjs.
 import {IDLE_LOOP,exitPath,RETURN,chain,selFrames} from './selection.mjs';
