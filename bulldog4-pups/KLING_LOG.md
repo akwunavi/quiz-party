@@ -42,4 +42,4 @@
 * **Промпт дословно:** `selected_g2v3/prompt_sent.txt` (= `selection_prep/PROMPT_G2_SELECTED_v3_A_first_tail.txt`).
 * **generationId:** `AVm_OtQn2o2Z4B00nPsin5z-661y0Zj-apv1_ny2i6TWtYv3VbJINaqXuLH7Nbj6VUuxL5qK`.
 * **Стоимость:** 30 кредитов (баланс 2276 → 2246, совпадает).
-* **Результат:** `selected_g2v3/DOG4_SELECTED_G2v3_kling_original.mp4`, 121 кадр, 5,04 с, SHA-256 `484b06eb1942c8854d4f625410cf7cb8343f0b8d95d6f2bb20fc75362004df81`. Разбор — `selected_g2v3/REVIEW.md`. Несмотря на прямой запрет, лапы снова поднимаются.
+* **Результат:** `selected_g2v3/DOG4_SELECTED_G2v3_kling_original.mp4`, 121 кадр, 5,04 с, SHA-256 `484b06eb1942c8854d4f625410cf7cb8343f0b8d95d6f2bb20fc75362004df81`. Разбор — `selected_g2v3/REVIEW.md`. Несмотря на прямой запрет, лапы снова поднимаются. **Отклонён пользователем.**
