@@ -1,0 +1,12 @@
+{
+  "source": "../assets/incoming/bulldog_3_selected.mp4",
+  "approvedMap": "../selected-review/frame_map.json",
+  "sourceFrames": 121,
+  "fps": 24,
+  "diagnosticFrontHoldFrames": 8,
+  "selectionScaleAssumption": [
+    207,
+    116
+  ],
+  "alphaAcceptedByUser": false
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "assets/DOG3_SELECTED_ALPHA_121.webm",
+    "duration": 5.042,
+    "videoWidth": 1276,
+    "videoHeight": 720,
+    "currentTime": 5.042,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_ALPHA_FOUR_BACKGROUNDS.mp4",
+    "duration": 5.041667,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "currentTime": 5.041667,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_SELECTED_ALPHA_SELECTION_SCALE.mp4",
+    "duration": 5.041667,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "currentTime": 5.041667,
+    "ended": true,
+    "error": null
+  },
+  {
+    "file": "DOG3_FRONT_STAND_TO_SELECTED_ALPHA.mp4",
+    "duration": 5.375,
+    "videoWidth": 1276,
+    "videoHeight": 720,
+    "currentTime": 5.375,
+    "ended": true,
+    "error": null
+  }
+]
