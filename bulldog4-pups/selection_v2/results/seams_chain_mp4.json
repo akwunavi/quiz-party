@@ -1,0 +1,212 @@
+{
+ "note": "diff = mean |ΔRGB| 0-255 of the lab canvas without the header; percentile = share of ordinary neighbour steps of the same video that are smaller than the seam (low = the seam is calmer than ordinary motion).",
+ "keys": {
+  "CHAIN_0": {
+   "seams": {
+    "idle f0 -> sel f0": {
+     "diff": 0.072,
+     "percentile_among_ordinary_steps": 40.9
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.25,
+     "percentile_among_ordinary_steps": 57.8
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.091,
+    "p90": 1.518,
+    "max": 2.778
+   },
+   "ordinary_sel": {
+    "p50": 0.378,
+    "p90": 5.665,
+    "max": 10.848
+   },
+   "near_identical_neighbours": 52
+  },
+  "CHAIN_24": {
+   "seams": {
+    "idle f29 -> sel f0": {
+     "diff": 0.349,
+     "percentile_among_ordinary_steps": 62.9
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.242,
+     "percentile_among_ordinary_steps": 58.4
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.087,
+    "p90": 1.454,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.366,
+    "p90": 5.666,
+    "max": 10.85
+   },
+   "near_identical_neighbours": 54
+  },
+  "CHAIN_40": {
+   "seams": {
+    "idle f74 -> sel f0": {
+     "diff": 0.51,
+     "percentile_among_ordinary_steps": 68.8
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.24,
+     "percentile_among_ordinary_steps": 57.9
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.095,
+    "p90": 1.454,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.368,
+    "p90": 5.66,
+    "max": 10.848
+   },
+   "near_identical_neighbours": 60
+  },
+  "CHAIN_56": {
+   "seams": {
+    "idle f74 -> sel f0": {
+     "diff": 0.507,
+     "percentile_among_ordinary_steps": 68.5
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.246,
+     "percentile_among_ordinary_steps": 58.8
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.092,
+    "p90": 1.454,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.366,
+    "p90": 5.669,
+    "max": 10.855
+   },
+   "near_identical_neighbours": 59
+  },
+  "CHAIN_94": {
+   "seams": {
+    "idle f181 -> sel f0": {
+     "diff": 0.646,
+     "percentile_among_ordinary_steps": 70.0
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.243,
+     "percentile_among_ordinary_steps": 55.5
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.112,
+    "p90": 1.533,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.367,
+    "p90": 5.659,
+    "max": 10.848
+   },
+   "near_identical_neighbours": 75
+  },
+  "CHAIN_120": {
+   "seams": {
+    "idle f181 -> sel f0": {
+     "diff": 0.645,
+     "percentile_among_ordinary_steps": 70.0
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.243,
+     "percentile_among_ordinary_steps": 55.8
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.111,
+    "p90": 1.532,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.367,
+    "p90": 5.66,
+    "max": 10.85
+   },
+   "near_identical_neighbours": 72
+  },
+  "CHAIN_150": {
+   "seams": {
+    "idle f181 -> sel f0": {
+     "diff": 0.65,
+     "percentile_among_ordinary_steps": 70.0
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.243,
+     "percentile_among_ordinary_steps": 55.8
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.112,
+    "p90": 1.533,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.367,
+    "p90": 5.659,
+    "max": 10.851
+   },
+   "near_identical_neighbours": 72
+  },
+  "CHAIN_199": {
+   "seams": {
+    "idle f206 -> sel f0": {
+     "diff": 0.308,
+     "percentile_among_ordinary_steps": 59.9
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.247,
+     "percentile_among_ordinary_steps": 56.6
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.104,
+    "p90": 1.527,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.392,
+    "p90": 5.674,
+    "max": 10.844
+   },
+   "near_identical_neighbours": 62
+  },
+  "CHAIN_230": {
+   "seams": {
+    "idle f230 -> sel f0": {
+     "diff": 0.194,
+     "percentile_among_ordinary_steps": 55.6
+    },
+    "sel f120 -> idle f1": {
+     "diff": 0.241,
+     "percentile_among_ordinary_steps": 57.2
+    }
+   },
+   "ordinary_idle": {
+    "p50": 0.097,
+    "p90": 1.518,
+    "max": 2.695
+   },
+   "ordinary_sel": {
+    "p50": 0.381,
+    "p90": 5.669,
+    "max": 10.854
+   },
+   "near_identical_neighbours": 63
+  }
+ }
+}

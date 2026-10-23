@@ -1,0 +1,336 @@
+{
+ "keys": {
+  "CHAIN_0": {
+   "frames": 602,
+   "click_idle_frame": 0,
+   "gate": 0,
+   "exit_frames": 0,
+   "delay_s": 0.0,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 0 -> sel 0",
+     "diff": 0.236
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 6,
+     "mean": 0.077,
+     "max": 0.172
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_24": {
+   "frames": 631,
+   "click_idle_frame": 24,
+   "gate": 29,
+   "exit_frames": 5,
+   "delay_s": 0.208,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 29 -> sel 0",
+     "diff": 0.473
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 17,
+     "mean": 0.12,
+     "max": 0.331
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_40": {
+   "frames": 676,
+   "click_idle_frame": 40,
+   "gate": 74,
+   "exit_frames": 34,
+   "delay_s": 1.417,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 74 -> sel 0",
+     "diff": 0.599
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.129,
+     "max": 0.401
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_56": {
+   "frames": 676,
+   "click_idle_frame": 56,
+   "gate": 74,
+   "exit_frames": 18,
+   "delay_s": 0.75,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 74 -> sel 0",
+     "diff": 0.599
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.171,
+     "max": 0.751
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_94": {
+   "frames": 783,
+   "click_idle_frame": 94,
+   "gate": 181,
+   "exit_frames": 87,
+   "delay_s": 3.625,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 181 -> sel 0",
+     "diff": 0.683
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.459,
+     "max": 1.538
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_120": {
+   "frames": 783,
+   "click_idle_frame": 120,
+   "gate": 181,
+   "exit_frames": 61,
+   "delay_s": 2.542,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 181 -> sel 0",
+     "diff": 0.683
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.185,
+     "max": 0.875
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_150": {
+   "frames": 783,
+   "click_idle_frame": 150,
+   "gate": 181,
+   "exit_frames": 31,
+   "delay_s": 1.292,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 181 -> sel 0",
+     "diff": 0.683
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.574,
+     "max": 1.472
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_199": {
+   "frames": 808,
+   "click_idle_frame": 199,
+   "gate": 206,
+   "exit_frames": 7,
+   "delay_s": 0.292,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 206 -> sel 0",
+     "diff": 0.419
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 19,
+     "mean": 0.178,
+     "max": 0.424
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "CHAIN_230": {
+   "frames": 832,
+   "click_idle_frame": 230,
+   "gate": 230,
+   "exit_frames": 0,
+   "delay_s": 0.0,
+   "selected_frames": 121,
+   "reentry_idle_frame": 1,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    },
+    "IDLE->SELECTED": {
+     "pair": "idle 230 -> sel 0",
+     "diff": 0.316
+    },
+    "SELECTED->IDLE": {
+     "pair": "sel 120 -> idle 1",
+     "diff": 0.337
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 12,
+     "mean": 0.075,
+     "max": 0.172
+    },
+    "ordinary sel": {
+     "n": 6,
+     "mean": 0.096,
+     "max": 0.169
+    }
+   }
+  },
+  "LOOP3": {
+   "frames": 720,
+   "seams": {
+    "IDLE wrap f239->f0": {
+     "pair": "idle 239 -> idle 0",
+     "diff": 0.311
+    }
+   },
+   "ordinary_neighbour_diff": {
+    "ordinary idle": {
+     "n": 12,
+     "mean": 0.065,
+     "max": 0.172
+    }
+   }
+  }
+ },
+ "note": "diff = mean |ΔRGB| (0-255) of the whole lab canvas (4 backgrounds, 638x360 each) between neighbouring frames; only frames around transitions are kept by the runner."
+}

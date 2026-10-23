@@ -1,0 +1,59 @@
+{
+ "container": {
+  "codec_name": "vp9",
+  "width": 1276,
+  "height": 720,
+  "pix_fmt": "yuv420p",
+  "r_frame_rate": "24/1",
+  "nb_read_frames": "121",
+  "tags": {
+   "ALPHA_MODE": "1"
+  }
+ },
+ "container_ok": true,
+ "frames_decoded": 121,
+ "corner_alpha_max": 0,
+ "alpha_range": [
+  0,
+  255
+ ],
+ "coverage_min_max": [
+  0.1501,
+  0.1796
+ ],
+ "frames_with_extra_islands_over_20px": [],
+ "largest_extra_island_px": 0,
+ "neighbour_mask_iou_min_mean": [
+  0.752,
+  0.973
+ ],
+ "semi_transparent_px_mean": 15667,
+ "chromium": {
+  "videoWidth": 1276,
+  "error": null,
+  "corner_pixels": [
+   [
+    255,
+    0,
+    255
+   ],
+   [
+    255,
+    0,
+    255
+   ],
+   [
+    255,
+    0,
+    255
+   ],
+   [
+    255,
+    0,
+    255
+   ]
+  ],
+  "corners_are_magenta": true,
+  "non_background_fraction": 0.1849
+ }
+}
