@@ -1,0 +1,163 @@
+{
+ "RUN loop 11-22": {
+  "frames": 13,
+  "contact_steps": 18,
+  "foot_dx_src_median": -39.7,
+  "foot_dx_screen_median": -6.43,
+  "bottom_src": [
+   634,
+   707
+  ],
+  "bottom_screen_range": 11.8,
+  "body_cx_src": [
+   605,
+   646
+  ],
+  "first_last_bottom": [
+   678,
+   678
+  ],
+  "first_last_cx": [
+   618.4,
+   618.4
+  ]
+ },
+ "START 0-39": {
+  "frames": 40,
+  "contact_steps": 40,
+  "foot_dx_src_median": -0.0,
+  "foot_dx_screen_median": -0.0,
+  "bottom_src": [
+   647,
+   709
+  ],
+  "bottom_screen_range": 10.1,
+  "body_cx_src": [
+   595,
+   646
+  ],
+  "first_last_bottom": [
+   689,
+   687
+  ],
+  "first_last_cx": [
+   636.3,
+   630.0
+  ]
+ },
+ "STOP 0-36": {
+  "frames": 37,
+  "contact_steps": 35,
+  "foot_dx_src_median": -0.1,
+  "foot_dx_screen_median": -0.01,
+  "bottom_src": [
+   676,
+   696
+  ],
+  "bottom_screen_range": 3.2,
+  "body_cx_src": [
+   623,
+   648
+  ],
+  "first_last_bottom": [
+   690,
+   689
+  ],
+  "first_last_cx": [
+   625.7,
+   637.3
+  ]
+ },
+ "ROLL 0-144": {
+  "frames": 145,
+  "contact_steps": 144,
+  "foot_dx_src_median": -0.0,
+  "foot_dx_screen_median": -0.0,
+  "bottom_src": [
+   670,
+   696
+  ],
+  "bottom_screen_range": 4.2,
+  "body_cx_src": [
+   630,
+   701
+  ],
+  "first_last_bottom": [
+   692,
+   692
+  ],
+  "first_last_cx": [
+   635.9,
+   635.9
+  ]
+ },
+ "BUTTERFLY 0-120": {
+  "frames": 121,
+  "contact_steps": 118,
+  "foot_dx_src_median": -0.0,
+  "foot_dx_screen_median": -0.0,
+  "bottom_src": [
+   677,
+   693
+  ],
+  "bottom_screen_range": 2.6,
+  "body_cx_src": [
+   635,
+   664
+  ],
+  "first_last_bottom": [
+   692,
+   692
+  ],
+  "first_last_cx": [
+   635.8,
+   635.9
+  ]
+ },
+ "SNIFF 0-228": {
+  "frames": 229,
+  "contact_steps": 250,
+  "foot_dx_src_median": -0.0,
+  "foot_dx_screen_median": -0.0,
+  "bottom_src": [
+   681,
+   689
+  ],
+  "bottom_screen_range": 1.3,
+  "body_cx_src": [
+   628,
+   688
+  ],
+  "first_last_bottom": [
+   689,
+   683
+  ],
+  "first_last_cx": [
+   636.4,
+   629.0
+  ]
+ },
+ "RETURN 0-108": {
+  "frames": 109,
+  "contact_steps": 136,
+  "foot_dx_src_median": -0.4,
+  "foot_dx_screen_median": -0.07,
+  "bottom_src": [
+   660,
+   707
+  ],
+  "bottom_screen_range": 7.6,
+  "body_cx_src": [
+   588,
+   650
+  ],
+  "first_last_bottom": [
+   687,
+   692
+  ],
+  "first_last_cx": [
+   632.1,
+   635.6
+  ]
+ }
+}

@@ -1,0 +1,159 @@
+{
+ "joins": {
+  "START f39 → RUN f0": {
+   "iou": 0.791,
+   "dcx": -11.6,
+   "dcy": -0.9,
+   "dbottom": -12,
+   "rgb": 22.2,
+   "dcx_screen": -1.88,
+   "dbottom_screen": -1.95
+  },
+  "RUN f10 → f11 (вход в цикл)": {
+   "iou": 0.799,
+   "dcx": -8.7,
+   "dcy": -4.5,
+   "dbottom": -13,
+   "rgb": 19.1,
+   "dcx_screen": -1.42,
+   "dbottom_screen": -2.11
+  },
+  "RUN шов цикла f22 → f11": {
+   "iou": 0.855,
+   "dcx": -7.9,
+   "dcy": -0.8,
+   "dbottom": -7,
+   "rgb": 17.9,
+   "dcx_screen": -1.29,
+   "dbottom_screen": -1.14
+  },
+  "RUN f22 → STOP f0": {
+   "iou": 0.852,
+   "dcx": -0.6,
+   "dcy": 6.6,
+   "dbottom": 5,
+   "rgb": 20.1,
+   "dcx_screen": -0.09,
+   "dbottom_screen": 0.81
+  },
+  "STOP f36 → BASE (= START f0)": {
+   "iou": 0.988,
+   "dcx": -0.9,
+   "dcy": 0.1,
+   "dbottom": 0,
+   "rgb": 7.6,
+   "dcx_screen": -0.15,
+   "dbottom_screen": 0.0
+  },
+  "STOP f36 → SNIFF f0": {
+   "iou": 0.99,
+   "dcx": -0.8,
+   "dcy": -0.0,
+   "dbottom": 0,
+   "rgb": 6.2,
+   "dcx_screen": -0.13,
+   "dbottom_screen": 0.0
+  },
+  "SNIFF f228 → RETURN f0": {
+   "iou": 0.936,
+   "dcx": 3.2,
+   "dcy": -0.1,
+   "dbottom": 4,
+   "rgb": 7.1,
+   "dcx_screen": 0.52,
+   "dbottom_screen": 0.65
+  },
+  "RETURN f108 → START f0": {
+   "iou": 0.959,
+   "dcx": 0.7,
+   "dcy": -0.7,
+   "dbottom": -3,
+   "rgb": 4.4,
+   "dcx_screen": 0.12,
+   "dbottom_screen": -0.49
+  },
+  "STOP f36 → BUTTERFLY f0": {
+   "iou": 0.963,
+   "dcx": -1.4,
+   "dcy": 0.6,
+   "dbottom": 3,
+   "rgb": 5.8,
+   "dcx_screen": -0.23,
+   "dbottom_screen": 0.49
+  },
+  "BUTTERFLY f120 → START f0": {
+   "iou": 0.96,
+   "dcx": 0.5,
+   "dcy": -0.5,
+   "dbottom": -3,
+   "rgb": 3.6,
+   "dcx_screen": 0.08,
+   "dbottom_screen": -0.49
+  },
+  "STOP f36 → ROLL f0": {
+   "iou": 0.963,
+   "dcx": -1.4,
+   "dcy": 0.5,
+   "dbottom": 3,
+   "rgb": 5.8,
+   "dcx_screen": -0.23,
+   "dbottom_screen": 0.49
+  },
+  "ROLL f144 → START f0": {
+   "iou": 0.96,
+   "dcx": 0.5,
+   "dcy": -0.5,
+   "dbottom": -3,
+   "rgb": 4.1,
+   "dcx_screen": 0.07,
+   "dbottom_screen": -0.49
+  }
+ },
+ "reference_steps": {
+  "RUN step f21→f22": {
+   "iou": 0.789,
+   "dcx": -11.3,
+   "dcy": 1.0,
+   "dbottom": -12,
+   "rgb": 21.4,
+   "dcx_screen": -1.83,
+   "dbottom_screen": -1.95
+  },
+  "RUN step f11→f12": {
+   "iou": 0.813,
+   "dcx": -7.2,
+   "dcy": -8.4,
+   "dbottom": -11,
+   "rgb": 17.8,
+   "dcx_screen": -1.16,
+   "dbottom_screen": -1.78
+  },
+  "STOP step f35→f36": {
+   "iou": 0.987,
+   "dcx": -0.3,
+   "dcy": -0.9,
+   "dbottom": 0,
+   "rgb": 6.1,
+   "dcx_screen": -0.05,
+   "dbottom_screen": 0.0
+  },
+  "START step f0→f1": {
+   "iou": 1.0,
+   "dcx": -0.0,
+   "dcy": 0.0,
+   "dbottom": 0,
+   "rgb": 0.3,
+   "dcx_screen": -0.0,
+   "dbottom_screen": 0.0
+  },
+  "SNIFF step f227→228": {
+   "iou": 0.997,
+   "dcx": -0.0,
+   "dcy": -0.1,
+   "dbottom": 0,
+   "rgb": 1.0,
+   "dcx_screen": -0.0,
+   "dbottom_screen": 0.0
+  }
+ }
+}

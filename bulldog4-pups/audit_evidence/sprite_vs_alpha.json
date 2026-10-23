@@ -1,0 +1,85 @@
+{
+ "method": "each 178x100 atlas cell vs the alpha frame with the same index, alpha decoded with libvpx-vp9 and scaled 1276x720 -> 178x100 (area); metric = mean|alpha diff| + mean|RGB diff| inside both masks, /255. Best-matching frame for every cell is the same index (monotone), except static runs at the start/end of BUTTERFLY and START where neighbouring frames are identical.",
+ "result": [
+  {
+   "atlas": "stop.png",
+   "cells": 37,
+   "alpha": "dog4_stop_alpha.webm",
+   "alpha_frames": 37,
+   "max_cell_diff": 2.97,
+   "identity": true
+  },
+  {
+   "atlas": "butterfly.png",
+   "cells": 121,
+   "alpha": "dog4_butterfly_alpha.webm",
+   "alpha_frames": 121,
+   "max_cell_diff": 3.18,
+   "identity": true
+  },
+  {
+   "atlas": "roll.png",
+   "cells": 145,
+   "alpha": "dog4_roll_alpha.webm",
+   "alpha_frames": 145,
+   "max_cell_diff": 3.04,
+   "identity": true
+  },
+  {
+   "atlas": "run.png",
+   "cells": 23,
+   "alpha": "dog4-run-alpha.webm (frames 0-22 of 81)",
+   "alpha_frames": 81,
+   "max_cell_diff": 2.85,
+   "identity": true
+  },
+  {
+   "atlas": "start.png",
+   "cells": 40,
+   "alpha": "dog4-start-alpha.webm",
+   "alpha_frames": 40,
+   "max_cell_diff": 2.97,
+   "identity": true
+  },
+  {
+   "atlas": "start.png",
+   "cells": 40,
+   "alpha": "dog4_start_optimized_alpha.webm (+1 VFR repeat)",
+   "alpha_frames": 41,
+   "max_cell_diff": 2.97,
+   "identity": true
+  },
+  {
+   "atlas": "return.png",
+   "cells": 109,
+   "alpha": "dog4_return_A_alpha.webm",
+   "alpha_frames": 109,
+   "max_cell_diff": 3.05,
+   "identity": true
+  },
+  {
+   "atlas": "return.png",
+   "cells": 109,
+   "alpha": "dog4_return_optimized_alpha.webm (+1 VFR repeat)",
+   "alpha_frames": 110,
+   "max_cell_diff": 3.05,
+   "identity": true
+  },
+  {
+   "atlas": "sniff_pee.png",
+   "cells": 229,
+   "alpha": "dog4_sniff_pee_optimized_alpha.webm (+1 VFR repeat)",
+   "alpha_frames": 230,
+   "max_cell_diff": 2.89,
+   "identity": true
+  },
+  {
+   "atlas": "base.png",
+   "cells": 1,
+   "alpha": "= start.png cell 0 (RUN source #0)",
+   "alpha_frames": 1,
+   "max_cell_diff": 0.44,
+   "identity": true
+  }
+ ]
+}
