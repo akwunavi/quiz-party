@@ -9,3 +9,11 @@
 * **generationId:** `AUy0xaFMjFx2170txrsdyD1bYHuUR_rSlmzR2KmvGxreK9u7mQcr6Dj5G6oQ27YsXaJIyeZM`.
 * **Стоимость:** 20 кредитов (Kling сообщил 20; баланс 2416 → 2396, совпадает).
 * **Результат:** `front_stand_g0/G0_kling_original_nowm.png`, 2752×1536, SHA-256 `0b7abea44316d3bead411527c3aaa0b8e5434ef1462d08de5a1e705b51577e2a`. Разбор — `front_stand_g0/REVIEW.md`. На приёмке.
+
+## 2. G1 IDLE (23.10.2026)
+* **Инструмент:** `image_to_video`, модель `kling-video-v3_0`, 10 с, 720p, 1 видео, `enable_audio=false`, `prefer_multi_shots=false`.
+* **Входы:** first = tail = `front_stand_g0/G0_FRONT_STAND_studio_1276.png` (утверждённый G0, SHA-256 `e5b256e1…`).
+* **Промпт дословно:** `idle_g1/prompt_sent.txt` (= `selection_prep/PROMPT_G1_IDLE_video.txt`).
+* **generationId:** `AdVcqBNw-JlGwca0dNrFIKyiSghCwP5Avc-sjPNgoey3_Bpc_1FyxjmTMUHOxv17ZlV-TukM`.
+* **Стоимость:** 60 кредитов (Kling сообщил 60; баланс 2396 → 2336, совпадает). Готово примерно за 2 минуты.
+* **Результат:** `idle_g1/DOG4_IDLE_G1_kling_original.mp4` (без логотипа Kling), 1276×720, 24 к/с, 241 кадр, 10,04 с, без аудиодорожки, SHA-256 `a60c29df16b3bb881cb886310f324bb1a94ce4567012f50e7e85d1667143150e`. Разбор — `idle_g1/REVIEW.md`. На приёмке; alpha не делалась.
