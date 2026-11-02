@@ -12,7 +12,7 @@ import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { installAudioKeepAlive } from '../lib/audioKeepAlive'
-import { navFrom, quietStale } from '../lib/navGuard'
+import { navFrom, quietStale, type NavFrom } from '../lib/navGuard'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
@@ -23,10 +23,10 @@ import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState, type
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
+  selectPackAndStart, startGame, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   gotoQuestionShown,
   startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
-  startCounting, startIntro,
+  startCounting,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { isNyTheme, isPlainQuestion } from '../ny/density'
@@ -54,6 +54,8 @@ import { room } from '../lib/transport'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
+import { RulesFrame } from '../components/RulesFrame'
+import { FinMedal } from '../components/FinMedal'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, InfoSlide, ThemeKey } from '../types/quiz'
@@ -70,13 +72,14 @@ import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
 import { ForestCrosswordAnswers, ForestCrosswordQuestion, crosswordGridOf } from './rounds/ForestCrossword'
 import { ForestAnswers } from './rounds/ForestAnswers'
-import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
+import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun, anagramAllAnswered } from '../lib/anagram'
 import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { choicesLenClass } from '../lib/questionLayout'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
+import { serverNow } from '../lib/serverClock'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -225,9 +228,8 @@ function HostInner({ gameState, pack }: {
       <button className="ghost dark" onClick={() => {
         if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
       }}>⟲ Сменить пакет</button>
-      <button onClick={() => void (pack?.settings?.show_intro
-        ? startIntro()
-        : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
+      <button onClick={() => void startGame({ intro: !!pack?.settings?.show_intro,
+        slide: slideForRound(pack?.settings?.info_slides, 0) ?? undefined }, navFrom(gameState)).catch(quietStale)}>
         К первому раунду →</button>
     </div>
   )
@@ -429,21 +431,11 @@ function HostInner({ gameState, pack }: {
           {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
               а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
-            <div className="rules-frame" data-count={round.rules.length}>
-              <div className="rules-frame-label">ПРАВИЛА</div>
-              {round.rules.map((r, i) => (
-                <div key={i} className="rule-item" style={{
-                  /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход
-                     сначала отыгрывает заставку раунда, и только затем — с
-                     паузой около секунды — проступают правила. Другие темы
-                     не трогаем — их тайминг согласован раньше и отдельно. */
-                  animationDelay: `${(pack.theme === 'classic' ? 1.3
-                    : pack.theme === 'potter' ? 1.7 : 0.5) + i * 0.7}s`,
-                }}>
-                  <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
-                </div>
-              ))}
-            </div>
+            <RulesFrame rules={round.rules}
+              /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход сначала отыгрывает заставку раунда, и только
+                 затем — с паузой около секунды — проступают правила. Другие темы не трогаем — их тайминг
+                 согласован раньше и отдельно. */
+              delay={i => (pack.theme === 'classic' ? 1.3 : pack.theme === 'potter' ? 1.7 : 0.5) + i * 0.7} />
           )}
         </>)}
         {introActions}
@@ -539,7 +531,7 @@ function HostInner({ gameState, pack }: {
             <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />}
           <AutoAdvance round={round} gameState={gameState} isLast={isLast} />
           <AutoReveal enabled={!gameState.reveal}
-            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} from={navFrom(gameState)} />
         </>}
         actionsSlot={<AnagramNav pack={pack} round={round} gameState={gameState} />} />
     )
@@ -548,7 +540,7 @@ function HostInner({ gameState, pack }: {
   // ── Вопрос ──
   if (gameState.phase === 'question' && q) {
     const timeLow = !!gameState.timer_started_at &&
-      (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
+      (serverNow() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
     // Показ ответов после каждого вопроса переопределяет настройку раунда
     // общей настройкой пакета — та же формула, что и в QuestionScreen, нужна
     // здесь для кнопки «Показать ответ» / «Время ответов →».
@@ -559,7 +551,7 @@ function HostInner({ gameState, pack }: {
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
-            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} from={navFrom(gameState)} />
         </>
     const actionsSlot = (
           <div className="host-actions">
@@ -650,8 +642,11 @@ function AnagramNav({ pack, round, gameState }: {
   const hint = useHint()
   const shownMap = useQuestionShown(gameState.game_id)
   const wasRun = anagramWasRun(shownMap, round.questions)
+  const aTeams = useTeams(gameState.game_id)
+  const aAnswers = useAnswers(gameState.game_id, gameState.round_number)
+  const allAnswered = anagramAllAnswered(aTeams, aAnswers, round.questions[gameState.question_index]?.id ?? '', pack.settings?.play_mode === 'paper')
   const step = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-    index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+    index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
   const back = () => {
     const b = anagramBack(gameState.question_index)
     const from = navFrom(gameState)
@@ -659,7 +654,7 @@ function AnagramNav({ pack, round, gameState }: {
   }
   const next = () => {
     const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-      index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+      index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
     if (st.kind === 'wait') return hint.show(st.text)
     const from = navFrom(gameState)
     if (st.kind === 'reveal') return void revealAnswer(from).catch(quietStale)
@@ -670,7 +665,7 @@ function AnagramNav({ pack, round, gameState }: {
     <div className="host-actions">
       <Hint text={hint.text} />
       <button className="ghost" onClick={back}>{gameState.question_index > 0 ? '← Назад' : '← К титулу'}</button>
-      {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+      {!gameState.reveal && <button onClick={() => void revealAnswer(navFrom(gameState)).catch(quietStale)}>Показать ответ</button>}
       {step.kind === 'afterRound'
         ? <AfterRoundNav pack={pack} gameState={gameState} />
         : <button onClick={next}>Дальше →</button>}
@@ -1255,7 +1250,7 @@ function BlitzScreen({ pack, round, gameState }: {
       const next = pickNext(bank, state.used)
       if (!next) return void push(finishNoQuestions(state))
       void markPlayed(next.id).catch(() => {})
-      void push(showQuestion(state, next.id, Date.now()))
+      void push(showQuestion(state, next.id, serverNow()))
     }, NEXT_DELAY_MS)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1277,11 +1272,11 @@ function BlitzScreen({ pack, round, gameState }: {
     // Скип приходит обычным ответом с меткой: команда сама решает, когда
     // сдаться. Проверять его нечего — сразу минус очко и ход дальше.
     if (mine.answer_text === SKIP_MARK) {
-      void push(skip(resumeAfterCheck(state, Date.now()), Date.now()))
+      void push(skip(resumeAfterCheck(state, serverNow()), serverNow()))
       return
     }
     const ok = autocheck(q.answer, mine.answer_text) === true
-    void push(pauseForCheck(state, Date.now(), ok ? 'ok' : 'no', mine.answer_text))
+    void push(pauseForCheck(state, serverNow(), ok ? 'ok' : 'no', mine.answer_text))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers, cur?.questionId, cur?.lastAnswer])
 
@@ -1299,9 +1294,9 @@ function BlitzScreen({ pack, round, gameState }: {
     // отправляя правки каждые четыре секунды, держала бы свой таймер
     // остановленным сколько угодно: время на проверку не списывается.
     const delay = isFinalWrong ? FINAL_WRONG_DELAY_MS : NEXT_DELAY_MS
-    const wait = Math.max(0, delay - (Date.now() - (cur.pausedAt ?? Date.now())))
+    const wait = Math.max(0, delay - (serverNow() - (cur.pausedAt ?? serverNow())))
     const t = setTimeout(() => {
-      const now = Date.now()
+      const now = serverNow()
       const resumed = resumeAfterCheck(state, now)
       // Оценку проставляем и самому ответу: иначе он остаётся
       // «неоценённым» и портит сводку по раунду.
@@ -1328,13 +1323,13 @@ function BlitzScreen({ pack, round, gameState }: {
           {state?.finished ? <AfterRoundNav pack={pack} gameState={gameState} /> : state && <>
             {cur?.verdict && (
               <button className="ghost" onClick={() => {
-                const now = Date.now()
+                const now = serverNow()
                 const r = resumeAfterCheck(state, now)
                 void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
               }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
             )}
             {cur && cur.verdict !== 'ok' && (
-              <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>Скип −1</button>
+              <button className="ghost" onClick={() => void push(skip(state, serverNow()))}>Скип −1</button>
             )}
             <button className="ghost dark" onClick={() => {
               if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state))
@@ -1415,7 +1410,7 @@ function BlitzScreen({ pack, round, gameState }: {
       <div className="host-actions">
         {cur?.verdict && (
           <button className="ghost" onClick={() => {
-            const now = Date.now()
+            const now = serverNow()
             const r = resumeAfterCheck(state, now)
             void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
           }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
@@ -1424,7 +1419,7 @@ function BlitzScreen({ pack, round, gameState }: {
             `!cur.verdict`, и кнопка исчезала на первой же ошибке — вернуть
             ход было нечем, кроме завершения раунда. */}
         {cur && cur.verdict !== 'ok' && (
-          <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>
+          <button className="ghost" onClick={() => void push(skip(state, serverNow()))}>
             Скип −1
           </button>
         )}
@@ -1623,7 +1618,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     // по истечении таймера музыка играет ЕЩЁ 3 СЕК и мягко глохнет
     let fade: number | undefined
     const total = (seconds ?? round.timer_seconds ?? 60) * 1000
-    const msLeft = startedAt ? total - (Date.now() - new Date(startedAt).getTime()) : total
+    const msLeft = startedAt ? total - (serverNow() - new Date(startedAt).getTime()) : total
     const stop = window.setTimeout(() => {
       fade = window.setInterval(() => {
         a.volume = Math.max(0, a.volume - 0.1)
@@ -1741,10 +1736,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const step = gameState.question_index
 
   // подстраховка из старого: авто-раскрытие через 3 сек
+  // document.hidden здесь убран (FLOW-03): эффект срабатывает ОДИН раз на вопрос, и если в этот момент вкладка была
+  // скрыта, ответ не раскрывался вообще — даже когда вкладка снова становилась видимой. Таймер в скрытой вкладке
+  // лишь замедляется, но срабатывает. Запись — с `from`: уже раскрытый ответ повторно не пишется (navGuard).
   useEffect(() => {
-    if (revealed || document.hidden) return
-    const t = setTimeout(() => { void revealAnswer() }, 3000)
+    if (revealed) return
+    const from = navFrom(gameState)
+    const t = setTimeout(() => { void revealAnswer(from).catch(quietStale) }, 3000)
     return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [revealed, step])
 
   // Автопроверка идёт ВМЕСТЕ с показом ответа. Раньше она срабатывала
@@ -1796,7 +1796,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
       <div className="host-actions">
         {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
         {!revealed
-          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
+          ? <button onClick={() => void revealAnswer(navFrom(gameState)).catch(quietStale)}>Показать ответ →</button>
           : step < total - 1
             ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
             : <AfterRoundNav pack={pack} gameState={gameState} />}
@@ -1837,6 +1837,22 @@ function ShowAnswers({ pack, round, q, gameState }: {
       revealed={revealed} checked={checked} paper={paper} revealMs={revealDoneMs(q)} answerText={displayAnswer(q)}
       effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
       video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
+  }
+
+  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука), а вместо колонки команд —
+  // компактный счётчик «Ответили N из M». Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает
+  // (у него своя доска), лес рисует это сам (ForestAnswers выше).
+  if (!revealed && round.mechanic !== 'anagram' && q.answer.mode !== 'anagram') {
+    const answeredIds = new Set(rows.filter(a => a.answer_text !== '' && a.answer_text != null).map(a => a.team_id))
+    return (
+      <>
+        <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+          q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
+          timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
+        {!paper && teams.length > 0 &&
+          <div className="answered-chip" role="status">Ответили <b>{answeredIds.size}</b> из <b>{teams.length}</b></div>}
+      </>
+    )
   }
 
   return (
@@ -2056,13 +2072,18 @@ function MagicCheck() {
   )
 }
 
-function AutoReveal({ enabled, startedAt, seconds }: {
+function AutoReveal({ enabled, startedAt, seconds, from }: {
   enabled: boolean; startedAt: string | null; seconds: number
+  /** Откуда авто-раскрытие: если ведущий за это время уже раскрыл/ушёл дальше — ничего не пишем (GAME-03). */
+  from: NavFrom
 }) {
+  const fromRef = useRef(from)
+  fromRef.current = from
   useEffect(() => {
     if (!enabled || !startedAt) return
-    const ms = new Date(startedAt).getTime() + seconds * 1000 - Date.now()
-    const t = setTimeout(() => { void revealAnswer() }, Math.max(0, ms))
+    const ms = new Date(startedAt).getTime() + seconds * 1000 - serverNow()
+    const f = fromRef.current
+    const t = setTimeout(() => { void revealAnswer(f).catch(quietStale) }, Math.max(0, ms))
     return () => clearTimeout(t)
   }, [enabled, startedAt, seconds])
   return null
@@ -2083,7 +2104,7 @@ function AutoAdvance({ round, gameState, isLast }: {
     const fireAt = started + (round.timer_seconds + sec) * 1000
     // если время уже вышло (вернулись на вопрос), листаем почти сразу,
     // а не молчим — раньше при ms <= 0 эффект просто выходил
-    const ms = Math.max(500, fireAt - Date.now())
+    const ms = Math.max(500, fireAt - serverNow())
     // 9.78: таймер мог сработать на устаревшем снимке (ведущий уже ушёл
     // дальше с пульта) — листаем, только если игра всё ещё на ЭТОМ вопросе
     const from = navFrom(gameState)
@@ -2308,8 +2329,8 @@ function BreakScreen({ pack, round, gameState }: {
   const minutes = (round.settings as { break_after_minutes?: number }).break_after_minutes ?? 10
   const [left, setLeft] = useState(minutes * 60)
   useEffect(() => {
-    const started = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : Date.now()
-    const tick = () => setLeft(Math.max(0, Math.round(minutes * 60 - (Date.now() - started) / 1000)))
+    const started = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : serverNow()
+    const tick = () => setLeft(Math.max(0, Math.round(minutes * 60 - (serverNow() - started) / 1000)))
     tick()
     const t = setInterval(tick, 500)
     return () => clearInterval(t)
@@ -2357,8 +2378,8 @@ function CountingScreen({ pack, gameState }: {
   const [left, setLeft] = useState(MINUTES * 60)
   useEffect(() => {
     const started = gameState.timer_started_at
-      ? new Date(gameState.timer_started_at).getTime() : Date.now()
-    const tick = () => setLeft(Math.max(0, Math.round(MINUTES * 60 - (Date.now() - started) / 1000)))
+      ? new Date(gameState.timer_started_at).getTime() : serverNow()
+    const tick = () => setLeft(Math.max(0, Math.round(MINUTES * 60 - (serverNow() - started) / 1000)))
     tick()
     const t = setInterval(tick, 500)
     return () => clearInterval(t)
@@ -2587,9 +2608,9 @@ function Finale({ pack, gameId, gameState }: {
           {rows.map(({ team: t, place, shared }, idx) => {
             const isIn = idx >= rows.length - revealedFin
             return (
-            <tr key={t.id} className={`fin-row${place <= 3 ? ' top3' : ''}${
+            <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
-              <td className="fin-pos">{place}{shared && <span className="sb-eq">=</span>}</td>
+              <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color }}><span className="sb-name">{t.name}</span></td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>

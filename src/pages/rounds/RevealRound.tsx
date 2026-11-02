@@ -8,7 +8,7 @@
 // Автопереход по таймеру — ТОЛЬКО здесь (на проекторе). Админка двигает
 // фазу вручную кнопкой — если бы оба экрана дёргали переход одновременно,
 // фаза могла бы перепрыгнуть.
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode, type CSSProperties } from 'react'
 import { room } from '../../lib/transport'
 import { autocheck } from '../../lib/autocheck'
 import { gotoQuestion } from '../../lib/gameActions'
@@ -31,6 +31,7 @@ import type { PreviewCtx } from '../../lib/previewState'
 import { isForestTheme } from '../../forest/config'
 import { ForestReveal } from '../../forest/rounds/ForestRounds'
 import { teamTone } from '../../forest/rounds/views'
+import { serverNow } from '../../lib/serverClock'
 
 export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -81,7 +82,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
     const switchAt = revealSwitchAt(rv)
     if (!switchAt) return
     const tick = () => {
-      if (document.hidden || Date.now() < switchAt || advancedRef.current === key) return
+      if (document.hidden || serverNow() < switchAt || advancedRef.current === key) return
       advancedRef.current = key
       const allAnswered = rv.phase === 1 && !paperMode
         && revealAllAnswered(teams.map(t => t.id), rows)
@@ -206,7 +207,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
         <div className="rv-teams">
           {rows.map(a => {
             const team = teams.find(t => t.id === a.team_id)
-            return <span key={a.id} style={{ color: team?.color }}>
+            return <span key={a.id} style={{ color: team?.color, '--tc': team?.color } as CSSProperties}>
               {team?.name ?? '—'}: {a.answer_text || '—'}
               {a.stake != null && ` · фаза ${a.stake}`}
               {a.is_correct === true ? ' ✓' : a.is_correct === false ? ' ✗' : ''}

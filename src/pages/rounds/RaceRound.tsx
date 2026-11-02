@@ -16,6 +16,7 @@ import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, RaceSettings } from '../../types/quiz'
 import { createAudio } from '../../lib/audioSource'
 import type { PreviewCtx } from '../../lib/previewState'
+import { serverNow } from '../../lib/serverClock'
 
 const DOG_COLORS = [
   { body: '#f2e3c9', mask: '#b99a7d', name: 'кремовый' },   // Френк — как на фото
@@ -135,8 +136,8 @@ export function RaceBoard({ pack, round, gameState, preview }: {
     return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
   }, [preview, race.stage])
 
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 66); return () => clearInterval(t) }, [])
+  const [now, setNow] = useState(serverNow())
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 66); return () => clearInterval(t) }, [])
 
   const scenario = useMemo(
     () => (race.seed != null ? buildRace(race.seed, raceSec) : null),

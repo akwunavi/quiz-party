@@ -315,3 +315,10 @@
 .adm-an-btns { grid-area: btns; display: flex; gap: 6px; }
 .adm-an-btns .adm-grade { flex: 0 0 auto; width: 48px; padding: 10px 0; font-size: 16px; }
 .adm-an-warn { color: var(--danger); font-size: 12px; }
+
+/* ADM-03: статус звука проектора на пульте мелодии */
+.adm-audio-chip { font-size: 13px; line-height: 1.3; padding: 6px 10px; border-radius: 8px; text-align: center;
+  border: 1px solid var(--dim, #888); color: var(--dim, #aaa); transition: color .2s, border-color .2s, background-color .2s; }
+.adm-audio-chip.ok { color: #6fdc8c; border-color: #6fdc8c; }
+.adm-audio-chip.wait { color: #ffd700; border-color: #ffd700; }
+.adm-audio-chip.bad { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, .08); }

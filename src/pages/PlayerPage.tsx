@@ -25,6 +25,7 @@ import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
 import { Hint, useHint } from '../components/Hint'
+import { serverNow } from '../lib/serverClock'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -355,12 +356,12 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, letters.length])
 
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    setNow(Date.now())
-    if (!startedAt || gameState.reveal || !(Date.now() < endMs)) return
+    setNow(serverNow())
+    if (!startedAt || gameState.reveal || !(serverNow() < endMs)) return
     const t = setInterval(() => {
-      const n = Date.now()
+      const n = serverNow()
       setNow(n)
       if (n >= endMs) clearInterval(t)
     }, 500)
@@ -669,9 +670,32 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   const isCrossword = round.mechanic === 'crossword'
   const grid = (round.settings as { grid?: CrosswordGrid }).grid ?? null
 
-  const [openIdx, setOpenIdx] = useState<number | null>(gameState.question_index)
+  // GAME-01 (10.29): в кроссворде «какой вопрос ведущий читает» (gameState.question_index — общее) и «какой открыт
+  // у этой команды» (openIdx — локальное) — разные вещи. Пока команда сама ничего не выбирала — следуем за ведущим;
+  // после первого её выбора смена вопроса ведущим выбор НЕ сбрасывает (и переживает обновление страницы).
+  // Остальные механики с карточками (тест, ставки) ведут себя как раньше: открыта читаемая сейчас.
+  const openKey = `qp-open-${gameState.game_id}-${round.id}`
+  const readOpen = (): { idx: number | null; picked: boolean } | null => {
+    if (!isCrossword) return null
+    try { const v = JSON.parse(localStorage.getItem(openKey) ?? ''); return v && v.picked ? v : null } catch { return null }
+  }
+  const [openIdx, setOpenIdxRaw] = useState<number | null>(() => readOpen()?.idx ?? gameState.question_index)
+  const picked = useRef<boolean>(!!readOpen())
+  const pickOpen = (idx: number | null) => {
+    setOpenIdxRaw(idx)
+    if (!isCrossword) return
+    picked.current = true
+    try { localStorage.setItem(openKey, JSON.stringify({ idx, picked: true })) } catch { /* без хранилища — работает в памяти */ }
+  }
   useEffect(() => {
-    if (collapsible) setOpenIdx(gameState.question_index)
+    // новый раунд/игра — выбор команды начинается заново
+    const saved = readOpen()
+    picked.current = !!saved
+    if (collapsible) setOpenIdxRaw(saved ? saved.idx : gameState.question_index)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openKey])
+  useEffect(() => {
+    if (collapsible && !picked.current) setOpenIdxRaw(gameState.question_index)
   }, [collapsible, gameState.question_index])
 
   const storageKey = `qp-answers-${gameState.game_id}-${round.id}`
@@ -695,7 +719,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   // но после окончания таймера форма блокируется.
   const isSprint = round.mechanic === 'sprint'
   const sprintOver = isSprint && !!gameState.timer_started_at &&
-    Date.now() > new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
+    serverNow() > new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
   const unlocked = (i: number) =>
     isSprint ? !sprintOver
     : gameState.phase === 'answer_time' ? true : i <= gameState.question_index
@@ -758,8 +782,10 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       <div className="pl-wait-sub">Сообщите ведущему</div></div>
   )
 
-  const currentPlacement = grid && questions[gameState.question_index]?.answer.mode === 'crossword_word'
-    ? grid.words.find(w => w.word === (questions[gameState.question_index].answer as { word: string }).word
+  // подсвечиваем слово, ОТКРЫТОЕ этой командой (openIdx), а не то, что читает ведущий (GAME-01)
+  const hlQ = openIdx != null ? questions[openIdx] : undefined
+  const currentPlacement = grid && hlQ?.answer.mode === 'crossword_word'
+    ? grid.words.find(w => w.word === (hlQ.answer as { word: string }).word
         .toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, ''))
     : undefined
 
@@ -785,17 +811,19 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
           const placement = grid?.words.find(w => q.answer.mode === 'crossword_word' &&
             w.word === q.answer.word.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, ''))
           return (
-            <div key={q.id} className="pl-card"
+            <div key={q.id} className={`pl-card${isCrossword && openIdx === i ? ' pl-card-open' : ''}`}
               style={{
                 borderLeftColor: state.answers[i] ? 'var(--ok)' : isUnlocked ? 'var(--dim)' : 'transparent',
                 opacity: isUnlocked ? 1 : .45,
               }}>
               <div className="pl-card-head"
-                onClick={() => collapsible && isUnlocked && setOpenIdx(isOpen ? null : i)}>
+                onClick={() => collapsible && isUnlocked && pickOpen(isOpen ? null : i)}>
                 <span className="pl-qlabel">
                   {placement
                     ? <>№{placement.number} {placement.dir === 'across' ? 'ПО ГОРИЗОНТАЛИ' : 'ПО ВЕРТИКАЛИ'}</>
                     : <>ВОПРОС {i + 1}</>}
+                  {isCrossword && i === gameState.question_index && isUnlocked &&
+                    <span className="pl-live"> · сейчас читает ведущий</span>}
                   {!isUnlocked && <span className="dim"> · ещё не зачитан</span>}
                   {isLocked && <span className="err"> · 🔒</span>}
                 </span>
@@ -1036,9 +1064,9 @@ function BlitzPlayer({ team, gameState, round }: {
   const [skipSent, setSkipSent] = useState(false)
   // Секунды окна на исправление тикают локально: состояние в базе
   // опрашивается раз в секунду, и отсчёт по нему дёргался бы.
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 250)
+    const t = setInterval(() => setNow(serverNow()), 250)
     return () => clearInterval(t)
   }, [])
 

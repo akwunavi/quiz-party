@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MagicCircleTimer } from './MagicCircleTimer'
 import { Rosette } from '../ny/book/BookScene'
 import { Dial } from '../ny/home/HomeScene'
+import { serverNow } from '../lib/serverClock'
 
 /** Сигнал окончания таймера: ПЯТЬ коротких пиков и длинный финальный тон —
  *  как на кухонном/спортивном таймере. Синтезируем на месте: не нужен файл,
@@ -60,7 +61,7 @@ export function Timer({ startedAt, seconds, theme, chime = true, variant }: {
   useEffect(() => {
     if (!startedAt) { setLeft(seconds); setFrac(1); rang.current = false; return }
     const tick = () => {
-      const elapsed = (Date.now() - new Date(startedAt).getTime()) / 1000
+      const elapsed = (serverNow() - new Date(startedAt).getTime()) / 1000
       const l = Math.max(0, Math.ceil(seconds - elapsed))
       setLeft(l)
       if (nyTheme) setFrac(Math.max(0, Math.min(1, (seconds - elapsed) / seconds)))

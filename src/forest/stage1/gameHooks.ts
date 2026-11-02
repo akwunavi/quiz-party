@@ -5,6 +5,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import gsap from 'gsap'
 import { FALLBACK_SIZE, type Size } from './layout'
+import { serverNow } from '../../lib/serverClock'
 
 const sizeCache = new Map<string, Size>()
 
@@ -56,8 +57,8 @@ export function useStageTl(root: RefObject<HTMLElement>, key: string | null,
 
 /** Текущее время с шагом `ms` — для таймеров, которые считаются из состояния (блиц), а не из timer_started_at. */
 export function useNow(ms = 250): number {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), ms); return () => clearInterval(t) }, [ms])
+  const [now, setNow] = useState(() => serverNow())
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), ms); return () => clearInterval(t) }, [ms])
   return now
 }
 

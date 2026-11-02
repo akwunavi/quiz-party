@@ -282,6 +282,12 @@ describe('навигация ведущего (ревью 9.74)', () => {
     expect(anagramAdvance({ ...base, timerStartedAt: null }).kind).toBe('wait')
     expect(anagramAdvance({ ...base, nowMs: t0 + ANAGRAM_REVEAL_GUARD_MS - 1 }).kind).toBe('wait')
     expect(anagramAdvance({ ...base, nowMs: t0 + ANAGRAM_REVEAL_GUARD_MS }).kind).toBe('reveal')
+    // GAME-03: часы телефона отстают от проектора — «прошло» отрицательное, это не «только что открыт»
+    expect(anagramAdvance({ ...base, nowMs: t0 - 120_000 }).kind).toBe('reveal')
+    // все команды ответили — защита от двойного тапа не нужна
+    expect(anagramAdvance({ ...base, nowMs: t0 + 500, allAnswered: true }).kind).toBe('reveal')
+    // но без ответов ранний тап по-прежнему ждёт
+    expect(anagramAdvance({ ...base, nowMs: t0 + 500 }).kind).toBe('wait')
   })
   it('после показа — следующий, на последнем — после раунда', () => {
     expect(anagramAdvance({ ...base, reveal: true })).toEqual({ kind: 'next', index: 1, shown: false })

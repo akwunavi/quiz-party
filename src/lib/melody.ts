@@ -20,9 +20,10 @@
 //   reveal        — угадали, показываем ответ и кто забрал баллы
 //   done          — трек закрыт, назад к доске
 import type { MelodyState } from '../types/quiz'
+import { serverNow } from './serverClock'
 
 /** Дедлайн через N секунд в том же формате, что читают все экраны. */
-export const melodyDeadline = (sec: number, now = Date.now()) =>
+export const melodyDeadline = (sec: number, now = serverNow()) =>
   new Date(now + sec * 1000).toISOString()
 
 /** Ключи всех треков раунда в порядке «тема-трек». */
@@ -76,7 +77,7 @@ export function melodyIdle(m: MelodyState): boolean {
  *  показа, потому что рулетку дёргают И проектор, И пульт в админке
  *  (AdminPage.tsx) — общая точка входа не даёт им разойтись. */
 export function melodySpin(m: MelodyState, key: string, freeCount: number,
-  spinSec: number, trackSec: number, now = Date.now()): MelodyState {
+  spinSec: number, trackSec: number, now = serverNow()): MelodyState {
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   const base = { ...m, key, order: undefined, turn: 0, chooser: undefined, startSec }
   if (freeCount <= 1) return { ...base, stage: 'listen', deadline: melodyDeadline(3, now) }
@@ -89,7 +90,7 @@ export function melodySpin(m: MelodyState, key: string, freeCount: number,
  *  инлайном прямо в обработчике кнопки на проекторе — вынесена сюда, чтобы
  *  не плодить вторую копию формулы `melodyPreviewCeiling`. */
 export function melodyPick(m: MelodyState, key: string, trackSec: number,
-  now = Date.now()): MelodyState {
+  now = serverNow()): MelodyState {
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   return {
     ...m, key, startSec, stage: 'listen', deadline: melodyDeadline(3, now),
@@ -104,7 +105,7 @@ export function melodyPlaySnippet(m: MelodyState, bidSec: number): MelodyState {
 
 /** Отрывок отыграл (или звук не пошёл) — открываем окно на ответ. */
 export function melodyAcceptAnswer(m: MelodyState, answerSec: number,
-  now = Date.now()): MelodyState {
+  now = serverNow()): MelodyState {
   return { ...m, stage: 'answering', deadline: melodyDeadline(answerSec, now) }
 }
 
@@ -338,4 +339,31 @@ export function melodyEmergencyClose(
   return cur => (
     cur.key === key && !melodyIdle(cur) && cur.stage !== 'reveal' ? melodyClose(cur) : null
   )
+}
+
+/** Сколько секунд длится стадия (для защиты от сдвига часов, ADM-03). null — у стадии нет дедлайна. */
+export function melodyStageMaxSec(m: MelodyState, s: {
+  bidSec?: number; answerSec?: number; passAnswerSec?: number }): number | null {
+  switch (m.stage) {
+    case 'spinning': return (m.spinMs ?? 8000) / 1000
+    case 'listen': return 3
+    case 'bidding': return s.bidSec ?? 10
+    case 'answering': return s.answerSec ?? 30
+    case 'passed': return s.passAnswerSec ?? 10
+    default: return null
+  }
+}
+
+/** Дедлайн, записанный ДРУГИМ устройством (пульт), прочитан часами ЭТОГО (проектор).
+ *  Часы телефона убежали вперёд — рулетка «крутилась» бы минуту; отстали — стадия
+ *  кончалась бы мгновенно. Если при первом взгляде остаток заведомо не из диапазона
+ *  [-допуск, длительность+допуск] — это расхождение часов: пересчитываем дедлайн от
+ *  момента, когда мы увидели стадию. `live` — стадия возникла на наших глазах (а не
+ *  экран открыт посреди неё): только тогда «давно истёк» считается расхождением. */
+export function melodyRebaseDeadline(deadlineMs: number, nowMs: number, maxSec: number,
+  live: boolean, tolMs = 4000): number {
+  const rem = deadlineMs - nowMs
+  if (rem > maxSec * 1000 + tolMs) return nowMs + maxSec * 1000
+  if (live && rem < -tolMs) return nowMs + maxSec * 1000
+  return deadlineMs
 }

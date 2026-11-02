@@ -113,6 +113,8 @@ type QuestionScreenProps = {
   actionsSlot?: ReactNode
   /** Начало отсчёта таймера (gameState.timer_started_at) — для тем с собственным таймером («Волшебный лес»). */
   timerStartedAt?: string | null
+  /** Тихий режим (FLOW-01): тот же экран вопроса перед раскрытием ответа — без запуска видео/звука вопроса. */
+  quiet?: boolean
 }
 
 export function QuestionScreen(props: QuestionScreenProps) {
@@ -127,7 +129,7 @@ export function QuestionScreen(props: QuestionScreenProps) {
 
 function ClassicQuestionScreen({
   pack, round, roundIdx, q, qIndex, qCount, timeLow, reveal, timerRunning,
-  timerSlot, effectsSlot, actionsSlot,
+  timerSlot, effectsSlot, actionsSlot, quiet,
 }: QuestionScreenProps) {
   const media = q.media.question ?? []
   const imgs = media.filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
@@ -246,7 +248,7 @@ function ClassicQuestionScreen({
 
       {/* Медиа вопроса ждёт озвучку: пока её читают, видео молчит.
           Запуск привязан к таймеру — они стартуют одновременно. */}
-      {avs.map((m, i) => /\.(mp4|webm)$/i.test(m)
+      {!quiet && avs.map((m, i) => /\.(mp4|webm)$/i.test(m)
         ? <QuestionVideo key={i} src={mediaUrl(m)} hidden={!!q.media.hidden}
             waitFor={!!q.media.voice} go={timerRunning} />
         : null)}

@@ -4,6 +4,7 @@
 // отступами из CSS (41/43-файлы тем). Снег и ели — canvas из ny/engine.
 import { useEffect, useState } from 'react'
 import { Stage } from './engine/stage'
+import { Atmosphere } from './engine/Atmosphere'
 import { BookFx, BookWorld } from './book/BookScene'
 import { HomeBackdrop, HomeFx } from './home/HomeScene'
 import { nyDensity, type NyThemeKey } from './density'
@@ -32,6 +33,7 @@ export function NyBackdrop({ theme, phase, plain }: { theme: NyThemeKey; phase?:
         {theme === 'ny_book'
           ? <BookWorld density={density} scene={phase ?? 'lobby'}><div id={NY_SLOT_BG} className="ny-slot" /></BookWorld>
           : <HomeBackdrop density={density}><div id={NY_SLOT_BG} className="ny-slot" /></HomeBackdrop>}
+        <Atmosphere theme={theme} />
       </Stage>
     </div>
   )

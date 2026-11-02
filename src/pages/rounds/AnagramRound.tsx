@@ -22,7 +22,7 @@ import { mediaScaleVar, mediaUrl } from '../../lib/media'
 import {
   anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramHintTile, anagramMaxHints,
   anagramWinner, anagramStartIso, anagramElapsedMs, formatRaceTime, isAnagramCorrect, hashStr,
-  anagramFlightPlan,
+  anagramFlightPlan, anagramTeamRows,
 } from '../../lib/anagram'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { AnagramSettings, Answer, GameState, Question, Team } from '../../types/quiz'
@@ -31,6 +31,7 @@ import { ScrambleGame } from '../../forest/stage3/ScrambleGame'
 import { useRealTimer } from '../../forest/useTimer'
 import { hueOf, tcol } from '../../forest/util'
 import type { PreviewCtx } from '../../lib/previewState'
+import { serverNow } from '../../lib/serverClock'
 
 /** Страховка посадки плитки, если `transitionend` не придёт (вкладка в
  *  фоне, переход отключён чужим правилом). Отсчёт — от `transitionstart`
@@ -96,14 +97,14 @@ function useAnagramHints(q: Question, round: LoadedRound, gameState: GameState) 
 
   // Тик — только пока таймер идёт и ответ не показан: после этого экран
   // «успокаивается» (подсказки после конца таймера замирают сами).
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    setNow(Date.now())
+    setNow(serverNow())
     if (!startedAt || reveal) return
     const end = Date.parse(startedAt) + timerSec * 1000
-    if (!(Date.now() < end)) return
+    if (!(serverNow() < end)) return
     const t = setInterval(() => {
-      const n = Date.now()
+      const n = serverNow()
       setNow(n)
       if (n >= end) clearInterval(t)
     }, 250)
@@ -131,6 +132,45 @@ function anagramOutcome(p: { rows: Answer[]; teams: Team[]; phrase: string; race
     .map(a => teams.find(t => t.id === a.team_id))
     .filter((t): t is NonNullable<typeof t> => !!t)
   return { winnerTeam, start, winnerMs, rightTeams }
+}
+
+
+/** GAME-02 (10.30): панель команд справа от доски. До показа ответа — только название, статус («думает» /
+ *  «ответил») и время ответа по СЕРВЕРНЫМ часам (accepted_at − shown_at); ТЕКСТ чужого ответа скрыт, чтобы
+ *  зал не подсматривал. После показа — текст (длинные переносятся) и вердикт (когда доска собрана).
+ *  Порядок — как у списка команд: строки не прыгают. Вне `.host-screen`: свой fixed, доску не двигает
+ *  (экрану резервируется padding-right классом `.has-teams`). */
+function AnagramTeamsPanel({ teams, rows, start, phrase, reveal, verdicts }: {
+  teams: Team[]; rows: Answer[]; start: { iso: string | null; approx: boolean }
+  phrase: string; reveal: boolean; verdicts: boolean
+}) {
+  const list = anagramTeamRows(teams, rows, start.iso, phrase)
+  const sent = list.filter(r => r.sent).length
+  return (
+    <aside className={`an-teams${teams.length > 8 ? ' dense' : ''}`} aria-label="Команды">
+      <div className="an-teams-head">КОМАНДЫ <b>{sent}</b> / {teams.length}</div>
+      <ul>
+        {teams.map((t, i) => {
+          const r = list[i]
+          const mark = reveal && verdicts && r.sent && r.verdict != null ? (r.verdict ? 'ok' : 'no') : ''
+          return (
+            <li key={t.id} className={`an-team${r.sent ? ' sent' : ''}${mark ? ' ' + mark : ''}`}
+              style={{ borderLeftColor: t.color }}>
+              <div className="an-team-top">
+                <span className="an-team-name" style={{ color: t.color }}>{t.icon ? `${t.icon} ` : ''}{t.name}</span>
+                <span className="an-team-st">
+                  {r.sent
+                    ? <>{Number.isFinite(r.ms) && r.ms >= 0 ? `${start.approx ? '≈ ' : ''}${formatRaceTime(r.ms)}` : 'ответил'}</>
+                    : 'думает…'}
+                </span>
+              </div>
+              {reveal && r.sent && <div className="an-team-text">{r.text}{mark && <b className="an-team-mark">{mark === 'ok' ? ' ✓' : ' ✗'}</b>}</div>}
+            </li>
+          )
+        })}
+      </ul>
+    </aside>
+  )
 }
 
 function AnagramBoardClassic({
@@ -270,9 +310,11 @@ function AnagramBoardClassic({
   // на бумаге ответов в базе нет — результат зачитывает ведущий по бланкам
   const showResult = allLanded && !paperMode
 
+  const showTeams = !paperMode && !preview && teams.length > 0
   return (
+    <>
     <div className={`host-screen grid-bg an-screen mode-${race ? 'race' : 'standard'}${
-      imgs.length ? ' has-media' : ''}${clue ? '' : ' no-clue'}`}>
+      imgs.length ? ' has-media' : ''}${clue ? '' : ' no-clue'}${showTeams ? ' has-teams' : ''}`}>
       <AudioGate />
       {effectsSlot}
       <div className="host-topbar">
@@ -341,6 +383,9 @@ function AnagramBoardClassic({
 
       {actionsSlot}
     </div>
+    {showTeams && <AnagramTeamsPanel teams={teams} rows={rows} start={start} phrase={phrase}
+      reveal={reveal} verdicts={allLanded} />}
+    </>
   )
 }
 
@@ -386,6 +431,8 @@ function ForestAnagramBoard({ pack, round, q, qIndex, qCount, gameState, effects
         clue={q.question_text.trim()} img={img ? mediaUrl(img) : null} template={template} letters={letters} order={order}
         hinted={hinted} reveal={reveal} n={timerOff || reveal ? null : startedAt ? tm.left : round.timer_seconds}
         total={round.timer_seconds} result={result} resultLines={resultLines} />
+      {!paperMode && teams.length > 0 && <AnagramTeamsPanel teams={teams} rows={rows} start={start} phrase={phrase}
+        reveal={reveal} verdicts={reveal} />}
       {actionsSlot}
     </>
   )

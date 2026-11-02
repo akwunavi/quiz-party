@@ -6,6 +6,7 @@
 import { getRoomId } from './room'
 import { room } from './transport'
 import type { GameState } from '../types/quiz'
+import { serverIso } from './serverClock'
 
 /** Открыть ставки — тот же переход, что уже случается сам при заходе на
  *  экран забега (RaceRound.tsx), просто доступный отдельной кнопкой. */
@@ -21,6 +22,6 @@ export async function openRaceBets(gameState: GameState) {
 export async function startRace(gameState: GameState) {
   const seed = (crypto.getRandomValues(new Uint32Array(1))[0]) >>> 0
   await room.patchSession(getRoomId(), {
-    melody: { ...gameState.melody, race: { seed, stage: 'running', startedAt: new Date().toISOString() } },
+    melody: { ...gameState.melody, race: { seed, stage: 'running', startedAt: serverIso() } },
   })
 }

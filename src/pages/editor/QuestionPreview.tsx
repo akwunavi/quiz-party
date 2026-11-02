@@ -24,6 +24,7 @@ import { AnagramBoard } from '../rounds/AnagramRound'
 import { initBlitz, showQuestion } from '../../lib/blitzState'
 import { previewTeams, previewAnswers, previewGameState, previewStages } from '../../lib/previewState'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
+import { serverNow } from '../../lib/serverClock'
 
 export function QuestionPreview({ pack, round, qIndex, onClose }: {
   pack: LoadedPack; round: LoadedRound
@@ -145,7 +146,7 @@ function BlitzPreview({ round, teams }: { round: LoadedRound; teams: ReturnType<
   const teamSeconds = (round.settings as { teamSeconds?: number }).teamSeconds ?? 60
   let state = initBlitz(order, teamSeconds)
   const firstQ = round.questions.find(x => !x.hidden)
-  if (firstQ) state = showQuestion(state, firstQ.id, Date.now())
+  if (firstQ) state = showQuestion(state, firstQ.id, serverNow())
   return (
     <BlitzBoard teams={teams} state={state} bank={round.questions}
       questionText={firstQ?.question_text} />

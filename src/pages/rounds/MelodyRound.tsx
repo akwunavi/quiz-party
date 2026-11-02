@@ -26,8 +26,9 @@ import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/me
 import {
   melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyRevealMiss, melodyPass, melodySpinPath, melodySpinAt, melodySpinSeed,
   melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
-  melodyEmergencyClose, MELODY_MAX_BID_SEC,
+  melodyEmergencyClose, MELODY_MAX_BID_SEC, melodyStageMaxSec, melodyRebaseDeadline,
 } from '../../lib/melody'
+import { useAudioUnlock } from '../../components/AudioGate'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -39,6 +40,7 @@ import { useEntrance } from '../../forest/stage1/common'
 import { MelodyScene, MelPanel, melBuild, MEL_STAGE, type MelView, type MelPanelData, type MelTeamV } from '../../forest/stage2/Melody'
 import { melLayout, melBellPos } from '../../forest/stage2/layout'
 import { melodyPoints } from '../../lib/melody'
+import { serverNow } from '../../lib/serverClock'
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
@@ -61,7 +63,7 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
 // (HANDOFF.md §3bu), чтобы regression-тест гонки импортировал РЕАЛЬНЫЙ код,
 // а не копию.
 
-const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
+const inSec = (s: number) => new Date(serverNow() + s * 1000).toISOString()
 
 /** Длина трека на показе ответа — одно число на RevealTrack и на автопереход
  *  дальше, к доске. Раньше было продублировано как магическая константа
@@ -121,10 +123,36 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const answers = preview ? preview.answers : liveAnswers
   const played = m.played ?? []
   const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
+  const [now, setNow] = useState(serverNow())
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 200); return () => clearInterval(t) }, [])
 
-  const deadline = m.deadline ? new Date(m.deadline).getTime() : 0
+  // Дедлайн записал ДРУГОЙ экран (пульт) по своим часам — сверяем с нашими (ADM-03, 10.27).
+  const rawDeadline = m.deadline ? new Date(m.deadline).getTime() : 0
+  const maxSec = melodyStageMaxSec(m, s)
+  const dlSeen = useRef<{ sig: string; adj: number } | null>(null)
+  const mounted = useRef(false)
+  useEffect(() => { mounted.current = true }, [])
+  const dlSig = `${m.key}|${m.stage}|${m.deadline}`
+  if (!rawDeadline || maxSec == null) dlSeen.current = null
+  else if (dlSeen.current?.sig !== dlSig) {
+    dlSeen.current = { sig: dlSig, adj: melodyRebaseDeadline(rawDeadline, serverNow(), maxSec, mounted.current) }
+  }
+  const deadline = dlSeen.current ? dlSeen.current.adj : rawDeadline
+  // Вкладка проектора вернулась из фона: эффекты ниже на скрытой вкладке молчат и сами
+  // не просыпаются — стадия застревала. Тик заставляет их перепроверить условия.
+  // Перезапускаем ТОЛЬКО эффекты, которые молча пропустили запуск из-за скрытой вкладки (ревью 10.39: общий тик
+  // перезапускал уже игравший отрывок — команда слышала его дважды). `skipped` пополняют сами эффекты.
+  const skipped = useRef(new Set<string>())
+  const [vt, setVt] = useState<Record<string, number>>({})
+  useEffect(() => {
+    const on = () => {
+      if (document.hidden || skipped.current.size === 0) return
+      const keys = [...skipped.current]; skipped.current.clear()
+      setVt(prev => { const n = { ...prev }; keys.forEach(k => { n[k] = (n[k] ?? 0) + 1 }); return n })
+    }
+    document.addEventListener('visibilitychange', on)
+    return () => document.removeEventListener('visibilitychange', on)
+  }, [])
   const left = deadline ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0
   // максимум, который видели в этой фазе → доля остатка для песочных часов
   const phaseMax = useRef(0)
@@ -175,6 +203,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   }, [preview, m.stage, m.key, m.snippetSec])
 
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'snippet' && track?.audio) skipped.current.add('snippet')
     if (preview || m.stage !== 'snippet' || !track?.audio || document.hidden) return
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
@@ -221,10 +250,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       offPlaying()
       h.stop()
     }
-  }, [preview, m.stage, m.key])
+  }, [preview, m.stage, m.key, vt.snippet])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
+    if (document.hidden && !preview && expired) skipped.current.add('expired')
     if (preview || !expired || document.hidden) return
     if (m.stage === 'spinning') {
       void updateMelody(gameState, guardMelody(
@@ -267,10 +297,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
         ))
       }
     }
-  }, [preview, expired, m.stage, answers])
+  }, [preview, expired, m.stage, answers, vt.expired])
 
   // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'listen' && track?.audio) skipped.current.add('listen')
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
     // keepTail: после точки старта должно остаться место под самый длинный
@@ -322,26 +353,28 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       // путём, трек не должен утечь в следующую стадию (bidding).
       h.stop()
     }
-  }, [preview, m.stage, m.key])
+  }, [preview, m.stage, m.key, vt.listen])
 
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
+    if (document.hidden && !preview && (m.stage === 'answering' || m.stage === 'bidding') && bgMusic) skipped.current.add('bg')
     if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bgMusic || document.hidden) return
     const h = playShared(mediaUrl(bgMusic), { loop: true, volume: .45 })
     return () => h.stop()
-  }, [preview, m.stage, bgMusic])
+  }, [preview, m.stage, bgMusic, vt.bg])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'passed' && !m.deadline && track?.audio) skipped.current.add('passed')
     if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
     const h = playShared(mediaUrl(track.audio))
     const off = h.on('ended', () => void updateMelody(gameState, guardMelody(
       { key: m.key, stage: 'passed' }, cur => (cur.deadline ? null : { ...cur, deadline: inSec(s.passAnswerSec ?? 10) }),
     )))
     return () => { off(); h.stop() }
-  }, [preview, m.stage])
+  }, [preview, m.stage, vt.passed])
 
   // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
   // spinning/listen — самый ранний момент, когда ключ трека уже известен, но
@@ -364,6 +397,34 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     return preloadAudioAll(trackUrls, setLoadState)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, trackSig])
+
+  // ── Состояние звука проектора → общий мешок, пульт его показывает (ADM-03, 10.27) ──
+  // Пишет ТОЛЬКО проектор и только когда значение изменилось. Мешок стирают
+  // Подпись — БЕЗ счётчика скачанных (он менялся каждую секунду и давал поток CAS-записей, ревью 10.39): «скачивает» пишется
+  // один раз, итог (готово/ошибка с числом упавших) — один раз. Несколько вкладок проектора не перезаписывают друг друга:
+  // если в мешке чужая подпись, а свою эта вкладка уже писала — молчим (иначе вечный пинг-понг).
+  const unlocked = useAudioUnlock()
+  const audioNow: NonNullable<MelodyState['audio']> =
+    loadState && loadState.total > 0 && loadState.done + loadState.failed < loadState.total
+      ? { state: 'loading', total: loadState.total }
+      : loadState && loadState.failed > 0
+        ? { state: 'error', failed: loadState.failed, total: loadState.total }
+        : !unlocked ? { state: 'locked' } : { state: 'ready' }
+  const sigOf = (a?: MelodyState['audio']) => a ? `${a.state}|${a.failed ?? ''}|${a.total ?? ''}` : ''
+  const audioSig = sigOf(audioNow)
+  const storedSig = sigOf(m.audio)
+  const wroteSig = useRef<string | null>(null)
+  useEffect(() => {
+    if (document.hidden && !preview) skipped.current.add('audio')
+    if (preview || document.hidden || audioSig === storedSig) return
+    if (storedSig && wroteSig.current === audioSig) return      // чужая подпись поверх нашей — не воюем
+    const t = window.setTimeout(() => {
+      wroteSig.current = audioSig
+      void updateMelody(gameState, cur => (sigOf(cur.audio) === audioSig ? null : { ...cur, audio: audioNow }))
+    }, 600)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, audioSig, storedSig, vt.audio])
 
   // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
   useEffect(() => {
@@ -457,7 +518,7 @@ const EmptyMelody = () => (
 
 function ClassicMelodyBoard(props: BoardProps) {
   const { pack, gameState, preview } = props
-  const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
+  const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, manualPick, setManualPick,
     freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade } = useMelodyBoard(props)
   if (themes.length === 0) return <EmptyMelody />
 
@@ -471,17 +532,7 @@ function ClassicMelodyBoard(props: BoardProps) {
           живую сессию. В предпросмотре не рендерятся вовсе (HANDOFF.md). */}
       {!preview && idle && (
         <div className="host-actions">
-          {/* прогресс скачивания треков раунда (9.85): пока не 100% — можно
-              потянуть время; ошибки — трек доиграет сетью, но предупреждаем */}
-          {loadState && loadState.total > 0 && (
-            <span className={`mel-load${loadState.done + loadState.failed >= loadState.total ? ' ready' : ''}${loadState.failed ? ' warn' : ''}`}>
-              {loadState.done + loadState.failed < loadState.total
-                ? `♪ треки ${loadState.done}/${loadState.total}…`
-                : loadState.failed
-                  ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}`
-                  : '♪ все треки загружены'}
-            </span>
-          )}
+          {/* прогресс скачивания треков с проектора убран (10.34): статус звука — только на пульте (melody.audio) */}
           {freeKeys.length > 0
             ? (manualPick
                 ? <>
@@ -694,13 +745,13 @@ function useMelodySpin(themes: MelodyTheme[], played: string[], spinning: boolea
     if (!spinning || !spinKey || free.length === 0) { setCursor(-1); setLanded(false); return }
     const target = free.indexOf(spinKey)
     if (target < 0) { setCursor(-1); setLanded(false); return }
-    const end = spinDeadline || Date.now() + spinTotalMs
+    const end = spinDeadline || serverNow() + spinTotalMs
     const start = end - spinTotalMs
     const spin = melodySpinPath(free.length, target, spinTotalMs, melodySpinSeed(`${spinKey}|${end}`))
     const lastJump = spin.times[spin.times.length - 1] ?? 0
     let raf = 0
     const tick = () => {
-      const elapsed = Date.now() - start
+      const elapsed = serverNow() - start
       setCursor(melodySpinAt(spin, elapsed))
       setLanded(elapsed >= lastJump)
       if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
@@ -750,7 +801,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
     const x = t.left - b.left + t.width / 2, y = t.top - b.top + t.height / 2
     marker.style.transform = `translate(${x}px, ${y}px)`
   }, [theme, spinning, highlighted])
-  const nearEnd = spinning && !!spinDeadline && Date.now() >= spinDeadline - 1000
+  const nearEnd = spinning && !!spinDeadline && serverNow() >= spinDeadline - 1000
 
   return (
     <div className={`mel-board${spinning ? ' spinning' : ''}`} ref={boardRef} style={{

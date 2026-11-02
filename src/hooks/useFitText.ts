@@ -35,6 +35,9 @@ export type UseFitTextOpts = {
    *  ужимается ОН — это освобождает высоту соседу через flex (оба лежат в
    *  одной колонке), без отдельного пересчёта раскладки в этом хуке. */
   shrinkBefore?: RefObject<HTMLElement | null>
+  /** CSS-селектор потомков, у которых кегль задан СВОИМИ правилами (например `.rule-item` с размером от темы):
+   *  масштабируются они, а не сам элемент. Измеряется по-прежнему высота самого элемента (UI-01, 10.32). */
+  items?: string
 }
 
 /**
@@ -56,7 +59,7 @@ export function useFitText<T extends HTMLElement>(
   deps: unknown[] = [], opts: UseFitTextOpts = {},
 ) {
   const ref = useRef<T | null>(null)
-  const { minScale = MIN_SCALE, shrinkBefore } = opts
+  const { minScale = MIN_SCALE, shrinkBefore, items } = opts
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -70,8 +73,16 @@ export function useFitText<T extends HTMLElement>(
       // текст, мы бы никогда не вернули его обратно при смене вопроса.
       el.style.fontSize = ''
       if (shrinkBefore?.current) shrinkBefore.current.style.fontSize = ''
+      const kids = items ? Array.from(el.querySelectorAll<HTMLElement>(items)) : null
+      kids?.forEach(k => { k.style.fontSize = '' })
       const base = parseFloat(getComputedStyle(el).fontSize)
       if (!base) return
+      const kidBases = kids ? kids.map(k => parseFloat(getComputedStyle(k).fontSize)) : []
+      /** масштаб k от исходного кегля: у самого элемента или у его `items` */
+      const setScale = (k: number) => {
+        if (kids) kids.forEach((c, i) => { c.style.fontSize = `${kidBases[i] * k}px` })
+        else el.style.fontSize = `${base * k}px`
+      }
 
       // Место, реально доступное тексту, — это внутренняя область рамки
       // МИНУС её собственные поля. Две ловушки, на которых подгон уже
@@ -108,10 +119,10 @@ export function useFitText<T extends HTMLElement>(
         let lo = minScale, hi = 1
         for (let i = 0; i < 8; i++) {
           const mid = (lo + hi) / 2
-          el.style.fontSize = `${base * mid}px`
+          setScale(mid)
           if (fits()) lo = mid; else hi = mid
         }
-        el.style.fontSize = `${base * lo}px`
+        setScale(lo)
         return fits()
       }
       if (fitSelf() || !shrinkBefore?.current) return

@@ -393,6 +393,9 @@ export type AnagramStep =
  *  AdminPage — раньше проектор уходил дальше без показа (ревью 9.74). */
 export function anagramAdvance(p: {
   reveal: boolean; timerStartedAt: string | null; index: number; count: number; nowMs: number
+  /** Все команды уже ответили — защита от случайного двойного тапа не нужна:
+   *  ведущий закрывает приём осознанно (GAME-03, 10.26). */
+  allAnswered?: boolean
   /** Уже запускался ли вопрос с этим индексом в этой игре (есть запись в
    *  question_shown). Такой вопрос открывается ПОКАЗАННЫМ (gotoQuestionShown),
    *  а не заново вживую — ревью 9.75: «Назад», затем «Дальше» перезапускал
@@ -402,7 +405,13 @@ export function anagramAdvance(p: {
   if (!p.reveal) {
     const start = p.timerStartedAt ? Date.parse(p.timerStartedAt) : NaN
     if (!Number.isFinite(start)) return { kind: 'wait', text: 'Время по вопросу ещё не пошло — ответ показывать рано' }
-    if (p.nowMs - start < ANAGRAM_REVEAL_GUARD_MS)
+    // Защита от двойного тапа меряется ЧАСАМИ ЭТОГО устройства против времени,
+    // записанного другим (проектором). Часы телефона отстают → «прошло»
+    // получается отрицательным или малым и блокировало показ ответа на
+    // минуты (GAME-03, 10.26). Отрицательное = расхождение часов, не «только
+    // что открыт»: не блокируем. Все ответили — не блокируем вовсе.
+    const elapsed = p.nowMs - start
+    if (!p.allAnswered && elapsed >= 0 && elapsed < ANAGRAM_REVEAL_GUARD_MS)
       return { kind: 'wait', text: 'Вопрос только что открыт — нажми ещё раз через пару секунд, чтобы показать ответ' }
     return { kind: 'reveal' }
   }
@@ -470,4 +479,42 @@ export function anagramPlayerVerdict(p: {
   }
   if (!p.sent) return null
   return p.loaded ? 'lost' : 'checking'
+}
+
+// ── Панель команд на проекторе (GAME-02, 10.30) ─────────
+
+export interface AnagramTeamRow {
+  teamId: string
+  /** ответ отправлен */
+  sent: boolean
+  /** текст ответа — показывать ТОЛЬКО после показа ответа (до этого чужие ответы скрыты) */
+  text: string
+  /** мс от старта вопроса до принятия ответа сервером (accepted_at − shown_at); NaN — нет */
+  ms: number
+  /** верно/неверно/нет вердикта (ручная оценка → иначе точная проверка) */
+  verdict: boolean | null
+}
+
+/** Строки панели: порядок — как у списка команд (стабильный, не прыгает по мере прихода ответов), одна строка
+ *  на команду, при нескольких записях берётся поздняя по серверному времени. Время — от серверного старта вопроса. */
+export function anagramTeamRows(teams: readonly { id: string }[], rows: readonly Answer[],
+  startIso: string | null | undefined, phrase: string): AnagramTeamRow[] {
+  return teams.map(t => {
+    const mine = rows.filter(a => a.team_id === t.id && (a.answer_text ?? '').trim() !== '')
+      .sort((x, y) => isoMicros(anagramAcceptedAt(y)) - isoMicros(anagramAcceptedAt(x)))
+    const a = mine[0]
+    if (!a) return { teamId: t.id, sent: false, text: '', ms: NaN, verdict: null }
+    return {
+      teamId: t.id, sent: true, text: a.answer_text ?? '', ms: anagramElapsedMs(a, startIso),
+      verdict: a.is_correct ?? isAnagramCorrect(a.answer_text ?? '', phrase),
+    }
+  })
+}
+
+/** Все команды онлайн-игры уже отправили ответ на этот вопрос — одна формула для пульта и проектора (ревью 10.39). */
+export function anagramAllAnswered(teams: readonly { id: string }[], answers: readonly Answer[],
+  qid: string, paper: boolean): boolean {
+  if (paper || teams.length === 0) return false
+  const ids = new Set(answers.filter(a => a.question_ref === `q-${qid}` && (a.answer_text ?? '').trim() !== '').map(a => a.team_id))
+  return teams.every(t => ids.has(t.id))
 }

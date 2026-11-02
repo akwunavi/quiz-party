@@ -88,6 +88,8 @@ export interface RoomTransport {
    *  `patch` заменяет мешок ЦЕЛИКОМ на ОБОИХ транспортах (облако и
    *  локальный сервер — см. server.mjs, 9.60), не сливается по ключам. */
   casSession(roomId: string | null, expectedRev: number, patch: SessionPatch): Promise<CasResult>
+  /** Время базы (мс от эпохи) — для поправки часов устройств, src/lib/serverClock.ts (миграция 0016). */
+  serverNow(): Promise<number>
 
   listTeams(gameId: string): Promise<Team[]>
   upsertTeam(row: TeamUpsert): Promise<Team>

@@ -78,11 +78,18 @@ export function Stage({ children, paused, reduced, className, style, fit = 'widt
   const clock = useClockSource(paused)
   const ctx = useMemo(() => ({ k: kq, paused, reduced, clock }), [kq, paused, reduced, clock])
   const cover = fit === 'cover'
+  // VIS-02 (10.37): `cover` обрезает сцену по краям, когда экран не 16:9. Рамке телевизора (она внутри сцены) нужно знать,
+  // сколько обрезано с каждой стороны (в пикселях сцены), чтобы держаться видимого прямоугольника, а не краёв сцены.
+  const crop = (cover && wrap.current ? (() => {
+    const w = wrap.current.clientWidth, h = wrap.current.clientHeight
+    const c = (v: number) => `${Math.max(0, Math.round(v))}px`
+    return { '--cx0': c(-off.x / scale), '--cx1': c(STAGE_W - (w - off.x) / scale), '--cy0': c(-off.y / scale), '--cy1': c(STAGE_H - (h - off.y) / scale) }
+  })() : {}) as CSSProperties
   return (
     <div className={cover ? 'ny-stage-cover' : 'nyl-stage-wrap'} ref={wrap} style={cover ? undefined : { aspectRatio: '16 / 9' }}>
       <div
         className={`nyl-stage${paused ? ' is-paused' : ''}${reduced ? ' is-reduced' : ''} ${className ?? ''}`}
-        style={{ width: STAGE_W, height: STAGE_H, transform: `translate(${off.x}px, ${off.y}px) scale(${scale})`, ...style }}
+        style={{ width: STAGE_W, height: STAGE_H, transform: `translate(${off.x}px, ${off.y}px) scale(${scale})`, ...crop, ...style }}
       >
         <Ctx.Provider value={ctx}>{children}</Ctx.Provider>
       </div>

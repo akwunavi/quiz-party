@@ -63,9 +63,17 @@
 .rv-note { color: var(--fg); opacity: .8; font-size: clamp(15px, 1.5vw, 30px); flex: 1 1 auto; min-width: 0; }
 .rv-teams {
   display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
-  font-family: var(--font-mono); font-size: 14px; color: var(--muted); margin-top: 10px;
+  font-family: var(--font-mono); font-size: clamp(16px, 1.5vw, 32px); color: var(--muted); margin-top: 10px;
 }
 
 @media (max-width: 1100px) {
   .rv-review { flex-direction: column; }
 }
+
+/* FLOW-01: счётчик «Ответили N из M» на экране вопроса перед раскрытием (вне .grid-bg, поэтому свой fixed) */
+.answered-chip { position: fixed; left: 28px; bottom: 24px; z-index: 30; padding: 10px 18px; border-radius: 999px;
+  font-size: clamp(16px, 1.3vw, 30px); letter-spacing: .04em; color: var(--accent2, var(--accent));
+  background: rgba(0, 0, 0, .55); border: 1px solid var(--accent); box-shadow: 0 0 14px var(--glow);
+  transition: transform .2s, box-shadow .2s; }
+.answered-chip b { color: var(--accent); font-size: 1.15em; }
+.theme-potter .answered-chip, .theme-potter button.answered-chip { position: fixed; }
