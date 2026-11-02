@@ -1801,7 +1801,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
       <div className="host-actions">
         {step > 0 && <button className="ghost" onClick={() => void gotoAnswers(step - 1, true, navFrom(gameState)).catch(quietStale)}>← Назад</button>}
         {!revealed
-          ? <button onClick={() => void revealAnswer()}>Показать ответ →</button>
+          ? <button onClick={() => void revealAnswer(navFrom(gameState)).catch(quietStale)}>Показать ответ →</button>
           : step < total - 1
             ? <button onClick={() => void gotoAnswers(step + 1, false, navFrom(gameState)).catch(quietStale)}>Следующий вопрос →</button>
             : <AfterRoundNav pack={pack} gameState={gameState} />}
@@ -1842,6 +1842,22 @@ function ShowAnswers({ pack, round, q, gameState }: {
       revealed={revealed} checked={checked} paper={paper} revealMs={revealDoneMs(q)} answerText={displayAnswer(q)}
       effects={revealed && answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null}
       video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
+  }
+
+  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука), а вместо колонки команд —
+  // компактный счётчик «Ответили N из M». Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает
+  // (у него своя доска), лес рисует это сам (ForestAnswers выше).
+  if (!revealed && round.mechanic !== 'anagram' && q.answer.mode !== 'anagram') {
+    const answeredIds = new Set(rows.filter(a => a.answer_text !== '' && a.answer_text != null).map(a => a.team_id))
+    return (
+      <>
+        <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+          q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
+          timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
+        {!paper && teams.length > 0 &&
+          <div className="answered-chip" role="status">Ответили <b>{answeredIds.size}</b> из <b>{teams.length}</b></div>}
+      </>
+    )
   }
 
   return (
