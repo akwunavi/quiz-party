@@ -2,6 +2,8 @@
 // the final camera transform changes. The 24-Hz source poses follow wall time.
 const canvas=document.getElementById('stage');let ctx=canvas.getContext('2d',{alpha:false});
 const W=1920,H=1080,S=37;
+const LAYOUTS={before:{top:390,step:120,foot:98,height:i=>132+i*10},after:{top:330,step:148,foot:95,height:i=>128+i*9}};
+let layoutMode='after',scenarioMode='race';
 const mainCtx=ctx,worldCanvas=document.createElement('canvas');
 worldCanvas.width=1280;worldCanvas.height=720;
 const worldCtx=worldCanvas.getContext('2d',{alpha:false});
@@ -18,6 +20,14 @@ let time=0,playing=false,base=0,start=0,last=0,measure=[];
 const color={ink:'#1d3542',snow:'#f5f7ef',gold:'#f3c776',pine:'#215b59'};
 function racerX(t,i){let d=dogs[i],pause=i===2?Math.max(0,Math.min(1.2,t-6)):0;return d.lead+d.speed*(t-pause)+Math.min(t,1.2)*.4}
 function median(a){return [...a].sort((x,y)=>x-y)[2]}
+function positionFor(t,i,scenario=scenarioMode){
+  if(scenario==='race'||scenario==='different_speeds')return racerX(t,i);
+  const m=median(dogs.map((_,j)=>racerX(t,j)));
+  if(scenario==='all_same_x')return m;
+  if(scenario==='adjacent_overtake')return [m,m+(t-8)*.65,m-1,m+1.7,m-.5][i];
+  if(scenario==='one_lags')return [m,m,m-5,m,m][i];
+  return racerX(t,i);
+}
 const cameraPath=[13];let cameraVelocity=0;
 for(let k=1;k<=18*120+1;k++){
   const t=k/120,target=13+.70*median(dogs.map((_,i)=>racerX(t,i))),previous=cameraPath.at(-1);
@@ -110,7 +120,12 @@ function grandstand(wx,width,style,c,t){
   fillPoly([[x-32,y-17],[x+w+29,y-17],[x+w-5,y-174],[x+6,y-174]],'#533d34');
   fillPoly([[x-45,y-162],[x+w+44,y-162],[x+w+23,y-187],[x-29,y-187]],'#f2f2e8');
   line(x-29,y-186,x+w+24,y-186,'#c9dedf',8);
+  for(let k=0;k<Math.floor(w/52);k++){
+    const xx=x+10+k*52;line(xx,y-155,xx+17,y-29,'rgba(212,165,107,.25)',2);
+    line(xx,y-157,xx+27,y-159,'rgba(255,250,233,.38)',2);
+  }
   for(let k=0;k<5;k++){let xx=x+k*w/4;rect(xx-7,y-145,14,193,base);rect(xx-4,y-138,8,177,face)}
+  for(let k=0;k<4;k++){const xx=x+k*w/4;line(xx+8,y-118,xx+w/4-8,y-15,'rgba(36,45,43,.26)',5)}
   for(let row=0;row<2;row++){
     const yy=y-4-row*58;fillPoly([[x,yy],[x+w,yy],[x+w+13,yy+15],[x-13,yy+15]],row?'#9d6e4d':'#b17c51');
     line(x-9,yy+12,x+w+9,yy+12,'#e0b778',5);
@@ -135,15 +150,18 @@ function cachedStand(wx,width,style,c,t){
   }
   ctx.drawImage(standCache.get(key),x-55,0);
   for(let k=0;k<Math.floor(width/2.3);k++){
-    const xx=x+45+k*78;if(xx>x+w-40)break;fanNear(xx,368,k+style*11,t);
+    const xx=x+45+k*78+((k*37)%23-11);if(xx>x+w-40)break;fanNear(xx,338,k+style*11,t);
   }
 }
 function lodge(wx,c){
   const x=sx(wx,c);if(x<-420||x>W+420)return;const y=331;
   rect(x-140,y-95,280,113,'#6c4b3e');for(let j=0;j<5;j++)rect(x-135+j*55,y-93,11,110,'#9a6f4c');
+  for(let j=0;j<8;j++)line(x-134,y-75+j*12,x+134,y-75+j*12,'rgba(205,158,101,.25)',2);
   fillPoly([[x-172,y-92],[x,y-208],[x+172,y-92]],'#794940');fillPoly([[x-182,y-99],[x,y-223],[x+182,y-99],[x+158,y-98],[x,y-200],[x-158,y-98]],'#f2f1e8');
   round(x-38,y-75,76,83,8,'#2e535a');round(x-22,y-65,44,53,4,'#ffcf85');
   for(let j=-1;j<=1;j+=2){round(x+j*95-23,y-68,46,47,4,'#2e535a');rect(x+j*95-17,y-61,34,31,'#efc57d');line(x+j*95,y-61,x+j*95,y-30,'#624b3e',4)}
+  ctx.strokeStyle='#346c5c';ctx.lineWidth=8;ctx.beginPath();ctx.arc(x,y-89,15,0,Math.PI*2);ctx.stroke();
+  for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ellipse(x+15*Math.sin(a),y-89+15*Math.cos(a),2.5,2.5,'#c7534a')}
   ctx.font='bold 24px Georgia,serif';ctx.textAlign='center';ctx.fillStyle='#f4d79e';ctx.fillText('СНЕЖНЫЙ КУБОК',x,y-108);ctx.textAlign='left';
 }
 function clockTower(wx,c){
@@ -159,8 +177,10 @@ function clockTower(wx,c){
   for(let side of [-1,1]){ctx.save();ctx.shadowColor='#ffd38d';ctx.shadowBlur=18;ellipse(x+side*45,y-87,7,11,'#ffe0a3');ctx.restore()}
 }
 function forest(c){
-  const positions=[24,27,30,33,36,39,42,46,49,52,55,58,61];
-  for(let i=0;i<positions.length;i++){let x=sx(positions[i]+((i*7)%3)*.35,c);if(x<-100||x>W+100)continue;cachedTree(x,388+(i%3)*10,124+(i*17)%65,i)}
+  const back=[23,26,30,34,38,42,46,50,54,58,61];
+  for(let i=0;i<back.length;i++){let x=sx(back[i],c);if(x<-100||x>W+100)continue;cachedTree(x,338+(i%3)*5,84+(i*11)%36,i+20)}
+  const front=[25,29,34,39,44,49,54,59];
+  for(let i=0;i<front.length;i++){let x=sx(front[i]+((i*7)%3)*.35,c);if(x<-100||x>W+100)continue;cachedTree(x,387+(i%3)*9,151+(i*19)%57,i)}
   for(let i=0;i<6;i++){let x=sx(31+i*4.3,c);if(x<0||x>W)continue;fillPoly([[x-38,407],[x,380],[x+35,407]],'#edf6ef');ellipse(x,405,45,8,'#c9dfe2')}
 }
 function scenery(c,t){
@@ -173,12 +193,17 @@ function scenery(c,t){
 function track(c,t){
   // Five continuous beveled snow/ice lanes; each has upper surface, exposed
   // front lip, packed-snow edging and independent world-space seams.
-  const top=390,step=120;
+  const {top,step}=LAYOUTS[layoutMode];
   ctx.save();ctx.transform(1,-.025,0,1,0,24);
   rect(0,top-18,W,630,'#a1c3c8');
   for(let lane=0;lane<5;lane++){
     const y=top+lane*step;
     rect(0,y,W,step,gradient(y,y+step,[[0,'#dce9e7'],[.25,'#c5dcdf'],[.75,'#abd0d5'],[1,'#8cb8c0']]));
+    for(let wx=-10;wx<110;wx+=7.2){let x=sx(wx,c,S*(.87+lane*.03));if(x<-140||x>W+140)continue;
+      const yy=y+29+(Math.sin(wx*1.7+lane)*.5+.5)*(step-73);
+      fillPoly([[x-70,yy+6],[x-21,yy-3],[x+40,yy-6],[x+91,yy+2],[x+20,yy+8]],'rgba(239,252,250,.10)');
+      line(x-38,yy+10,x+58,yy+6,'rgba(70,123,135,.10)',2);
+    }
     rect(0,y+step-17,W,17,gradient(y+step-17,y+step,[[0,'#8caeb6'],[1,'#638e99']]));
     line(0,y+3,W,y+3,'#f8ffff',4);line(0,y+step-17,W,y+step-17,'#719da5',2);
     for(let wx=-10;wx<=110;wx+=3.4){let x=sx(wx,c,S*(.87+lane*.03));if(x<-70||x>W+70)continue;
@@ -196,18 +221,36 @@ function track(c,t){
   ctx.restore();
 }
 function frontRail(lane,c){
-  const y=390+(lane+1)*120-8;
+  const {top,step}=LAYOUTS[layoutMode],y=top+(lane+1)*step-8;
   ctx.save();ctx.transform(1,-.025,0,1,0,24);
-  line(0,y,W,y,'rgba(239,249,243,.76)',5);
-  line(0,y+7,W,y+7,'rgba(91,139,148,.65)',3);
+  const points=[];
+  for(let wx=Math.floor((c-34)/2.4)*2.4;wx<c+35;wx+=2.4){
+    const x=sx(wx,c),crest=y-2-3*Math.sin(wx*.83+lane*.9)-2*Math.sin(wx*1.91);
+    points.push([x,crest]);
+  }
+  ctx.beginPath();ctx.moveTo(points[0][0],y+11);for(const p of points)ctx.lineTo(p[0],p[1]);
+  ctx.lineTo(points.at(-1)[0],y+11);ctx.closePath();ctx.fillStyle='#91b6bb';ctx.fill();
+  ctx.beginPath();ctx.moveTo(...points[0]);for(let k=1;k<points.length;k++)ctx.lineTo(...points[k]);
+  ctx.strokeStyle='#eaf3ed';ctx.lineWidth=7;ctx.lineJoin='round';ctx.stroke();
+  line(0,y+10,W,y+10,'rgba(73,115,124,.35)',3);
   for(let wx=-10;wx<110;wx+=7.5){const x=sx(wx,c);if(x<-15||x>W+15)continue;
-    rect(x-4,y-5,8,16,'#a9d0d1');round(x-6,y-8,12,5,2,'#f5faf2');
+    rect(x-4,y-3,8,14,'#a9d0d1');round(x-6,y-6,12,5,2,'#f5faf2');
   }
   ctx.restore();
 }
-function drawDog(i,t,c){
-  const d=dogs[i],frame=Math.floor(t*24+i*2)%12,img=images[d.key],x=sx(racerX(t,i),c),ground=390+i*120+98-.025*x+24;
-  const height=132+i*10,width=height*384/216,dy=ground-height*d.bottom/216;
+function drawTrackMarks(t,c,scenario){
+  const layout=LAYOUTS[layoutMode];
+  for(let i=0;i<5;i++)for(let age=.18;age<=1.62;age+=.24){
+    if(t<age)continue;
+    const x=sx(positionFor(t-age,i,scenario),c),ground=layout.top+i*layout.step+layout.foot-.025*x+24;
+    const opacity=.17*(1-age/1.8);ctx.save();ctx.globalAlpha=opacity;
+    ellipse(x-13,ground+3,10,3,'#407584');ellipse(x+10,ground+5,8,2.5,'#407584');
+    ctx.restore();
+  }
+}
+function drawDog(i,t,c,wx){
+  const layout=LAYOUTS[layoutMode],d=dogs[i],frame=Math.floor(t*24+i*2)%12,img=images[d.key],x=sx(wx,c),ground=layout.top+i*layout.step+layout.foot-.025*x+24;
+  const height=layout.height(i),width=height*384/216,dy=ground-height*d.bottom/216;
   // Contact shadow is attached to the same world anchor as the feet.
   ctx.save();ctx.shadowColor='#315f69';ctx.shadowBlur=22;ctx.globalAlpha=.16;ellipse(x+4,ground+4,width*.34,12,'#24424b');ctx.shadowBlur=0;ctx.globalAlpha=.25;ellipse(x,ground+2,width*.22,5,'#2b4c53');ctx.restore();
   if(img.complete&&img.naturalWidth)ctx.drawImage(img,(frame%4)*384,Math.floor(frame/4)*216,384,216,x-width/2,dy,width,height);
@@ -216,7 +259,7 @@ function drawDog(i,t,c){
   ellipse(x-width*.30-puff*20,ground-2-puff*8,6+puff*9,2+puff*4,'#f8ffff');
   ellipse(x-width*.34-puff*28,ground-8-puff*12,3+puff*4,3+puff*4,'#f8ffff');ctx.restore();
   frontRail(i,c);
-  return {name:d.name,x:racerX(t,i),screenX:x,frame};
+  return {name:d.name,x:wx,screenX:x,frame};
 }
 function overlay(t,c,participants){
   const bar=gradient(0,94,[[0,'rgba(10,31,42,.92)'],[1,'rgba(16,48,60,.75)']]);rect(0,0,W,94,bar);
@@ -235,12 +278,12 @@ function snowfall(t){ctx.save();for(let i=0;i<52;i++){
   const x=((i*211+Math.floor(t*16)*(i%3+1))%2040)-60,y=((i*97+Math.floor(t*(16+i%5*3)))%970)+85;
   ctx.globalAlpha=.28+(i%5)*.09;ellipse(x,y,i%8===0?2.6:1.3,i%8===0?2.6:1.3,'#f5fbfa');
 }ctx.restore()}
-function renderAt(t){time=Math.min(18,Math.max(0,t));const c=cameraX(time);
+function renderAt(t,scenario=scenarioMode){time=Math.min(18,Math.max(0,t));const c=cameraX(time);
   // Depth scenery is painted at 720p; alpha dogs, feet, snow and HUD remain
   // crisp at 1080p. Both layers use the exact same world camera and clock.
   ctx=worldCtx;ctx.setTransform(2/3,0,0,2/3,0,0);scenery(c,time);track(c,time);
-  ctx=mainCtx;ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(worldCanvas,0,0,W,H);
-  const participants=[];for(let i=0;i<5;i++)participants.push(drawDog(i,time,c));
+  ctx=mainCtx;ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(worldCanvas,0,0,W,H);drawTrackMarks(time,c,scenario);
+  const participants=[];for(let i=0;i<5;i++)participants.push(drawDog(i,time,c,positionFor(time,i,scenario)));
   snowfall(time);overlay(time,c,participants);
   const sample=measure.slice(-120),fps=sample.length>1?1000*(sample.length-1)/(sample.at(-1).at-sample[0].at):0;
   stats.textContent=`t=${time.toFixed(2)} c · camera X=${c.toFixed(2)} · browser FPS≈${fps.toFixed(1)} · ${participants.map(p=>`${p.name} ${p.x.toFixed(1)} / RUN ${p.frame}`).join(' | ')}`;
@@ -250,4 +293,4 @@ function tick(now){if(playing){const next=Math.min(18,base+(now-start)/1000);mea
 play.onclick=()=>{playing=!playing;if(playing){base=time;start=performance.now();measure=[];last=0}play.textContent=playing?'Ⅱ Пауза':'▶ Старт'};
 document.getElementById('reset').onclick=()=>{playing=false;play.textContent='▶ Старт';renderAt(0)};
 Promise.all(Object.values(images).map(i=>i.decode())).then(()=>renderAt(0));requestAnimationFrame(tick);
-window.winterRace={renderAt,canvas,get time(){return time},get measure(){return measure},get ready(){return Object.values(images).every(i=>i.complete&&i.naturalWidth)}};
+window.winterRace={renderAt,canvas,setLayout(v){if(!LAYOUTS[v])throw Error(`unknown layout ${v}`);layoutMode=v;renderAt(time)},setScenario(v){scenarioMode=v;renderAt(time)},get layout(){return layoutMode},get scenario(){return scenarioMode},get time(){return time},get measure(){return measure},get ready(){return Object.values(images).every(i=>i.complete&&i.naturalWidth)}};

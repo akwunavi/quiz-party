@@ -1,0 +1,9 @@
+{
+  "rendered_frames": 768,
+  "seconds": 18.016,
+  "fps": 42.573268206039074,
+  "run_frames_skipped": 1,
+  "intervals_gt50ms": 1,
+  "max_interval_ms": 50.099999999998545,
+  "sim_time": 18
+}

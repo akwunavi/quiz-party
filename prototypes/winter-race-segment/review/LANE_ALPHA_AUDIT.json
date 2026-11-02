@@ -1,0 +1,102 @@
+{
+  "before": {
+    "all_same_x": {
+      "max_adjacent_overlap_pixels": 612,
+      "min_vertical_bbox_gap_px": -28,
+      "worst_case": {
+        "t": 0,
+        "phase": 4,
+        "lanes": [
+          3,
+          4
+        ],
+        "positions": [
+          40,
+          40,
+          40,
+          40,
+          40
+        ]
+      }
+    },
+    "adjacent_overtake": {
+      "max_adjacent_overlap_pixels": 624,
+      "min_vertical_bbox_gap_px": -27,
+      "worst_case": {
+        "t": 1.5,
+        "phase": 6,
+        "lanes": [
+          3,
+          4
+        ],
+        "positions": [
+          40,
+          40.35,
+          39,
+          42,
+          41
+        ]
+      }
+    },
+    "one_lags": {
+      "max_adjacent_overlap_pixels": 612,
+      "min_vertical_bbox_gap_px": -28,
+      "worst_case": {
+        "t": 0,
+        "phase": 4,
+        "lanes": [
+          3,
+          4
+        ],
+        "positions": [
+          40,
+          40,
+          34,
+          40,
+          40
+        ]
+      }
+    },
+    "independent_speeds": {
+      "max_adjacent_overlap_pixels": 792,
+      "min_vertical_bbox_gap_px": -28,
+      "worst_case": {
+        "t": 0,
+        "phase": 7,
+        "lanes": [
+          3,
+          4
+        ],
+        "positions": [
+          0.0,
+          0.35,
+          -0.25,
+          0.85,
+          -0.7
+        ]
+      }
+    }
+  },
+  "after": {
+    "all_same_x": {
+      "max_adjacent_overlap_pixels": 0,
+      "min_vertical_bbox_gap_px": 7,
+      "worst_case": null
+    },
+    "adjacent_overtake": {
+      "max_adjacent_overlap_pixels": 0,
+      "min_vertical_bbox_gap_px": 8,
+      "worst_case": null
+    },
+    "one_lags": {
+      "max_adjacent_overlap_pixels": 0,
+      "min_vertical_bbox_gap_px": 7,
+      "worst_case": null
+    },
+    "independent_speeds": {
+      "max_adjacent_overlap_pixels": 0,
+      "min_vertical_bbox_gap_px": 7,
+      "worst_case": null
+    }
+  }
+}
