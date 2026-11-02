@@ -29,7 +29,7 @@ const fakeRoom = {
 }
 vi.mock('../transport', () => ({ get room() { return fakeRoom } }))
 
-const { gotoQuestion, startAnswerTime, gotoRound, revealAnswer } = await import('../gameActions')
+const { gotoQuestion, startAnswerTime, gotoRound, revealAnswer, startGame } = await import('../gameActions')
 const { StaleNavError, navFrom } = await import('../navGuard')
 
 const base = (over: Partial<GameState> = {}): GameState => ({
@@ -96,6 +96,15 @@ describe('переходы «откуда жали» (9.78)', () => {
     const rev = session.state_rev
     await expect(revealAnswer(snap)).resolves.toBeUndefined()
     expect(session.state_rev).toBe(rev)
+  })
+
+  it('«Начать игру»: замёрзший снимок лобби не сбрасывает уже идущий раунд (ревью 10.39)', async () => {
+    const lobbySnap = navFrom(base({ phase: 'lobby', round_number: 0, question_index: 0 }))
+    session = base({ phase: 'question', round_number: 0, question_index: 3 })
+    await expect(startGame({ intro: false }, lobbySnap)).rejects.toBeInstanceOf(StaleNavError)
+    await expect(startGame({ intro: true }, lobbySnap)).rejects.toBeInstanceOf(StaleNavError)
+    expect(session.phase).toBe('question')
+    expect(session.question_index).toBe(3)
   })
 
   it('ответ на запись потерялся, повтор видит конфликт — но цель уже достигнута, ошибки нет', async () => {

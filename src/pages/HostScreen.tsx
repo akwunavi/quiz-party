@@ -23,10 +23,10 @@ import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState, type
 import { useGameState } from '../hooks/useGameState'
 import { listPacks, loadPack, metaLine, displayRoundNumber, type LoadedPack } from '../lib/packLoader'
 import {
-  selectPackAndStart, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
+  selectPackAndStart, startGame, gotoRound, slideForRound, gotoQuestion, revealAnswer, finishGame, resetGame, setPhase,
   gotoQuestionShown,
   startTimer, gotoAnswers, startAnswerTime, setFinaleStep,
-  startCounting, startIntro,
+  startCounting,
 } from '../lib/gameActions'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { isNyTheme, isPlainQuestion } from '../ny/density'
@@ -72,7 +72,7 @@ import { RevealBoard } from './rounds/RevealRound'
 import { AnagramBoard } from './rounds/AnagramRound'
 import { ForestCrosswordAnswers, ForestCrosswordQuestion, crosswordGridOf } from './rounds/ForestCrossword'
 import { ForestAnswers } from './rounds/ForestAnswers'
-import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun } from '../lib/anagram'
+import { anagramAdvance, anagramBack, anagramFirst, anagramWasRun, anagramAllAnswered } from '../lib/anagram'
 import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
@@ -228,9 +228,8 @@ function HostInner({ gameState, pack }: {
       <button className="ghost dark" onClick={() => {
         if (confirm('Сбросить игру и выбрать другой пакет?')) void resetGame()
       }}>⟲ Сменить пакет</button>
-      <button onClick={() => void (pack?.settings?.show_intro
-        ? startIntro()
-        : gotoRound(0, slideForRound(pack?.settings?.info_slides, 0) ?? undefined))}>
+      <button onClick={() => void startGame({ intro: !!pack?.settings?.show_intro,
+        slide: slideForRound(pack?.settings?.info_slides, 0) ?? undefined }, navFrom(gameState)).catch(quietStale)}>
         К первому раунду →</button>
     </div>
   )
@@ -643,8 +642,11 @@ function AnagramNav({ pack, round, gameState }: {
   const hint = useHint()
   const shownMap = useQuestionShown(gameState.game_id)
   const wasRun = anagramWasRun(shownMap, round.questions)
+  const aTeams = useTeams(gameState.game_id)
+  const aAnswers = useAnswers(gameState.game_id, gameState.round_number)
+  const allAnswered = anagramAllAnswered(aTeams, aAnswers, round.questions[gameState.question_index]?.id ?? '', pack.settings?.play_mode === 'paper')
   const step = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-    index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun })
+    index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
   const back = () => {
     const b = anagramBack(gameState.question_index)
     const from = navFrom(gameState)
@@ -652,7 +654,7 @@ function AnagramNav({ pack, round, gameState }: {
   }
   const next = () => {
     const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-      index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun })
+      index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
     if (st.kind === 'wait') return hint.show(st.text)
     const from = navFrom(gameState)
     if (st.kind === 'reveal') return void revealAnswer(from).catch(quietStale)

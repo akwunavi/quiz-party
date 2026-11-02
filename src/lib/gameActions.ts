@@ -51,10 +51,15 @@ export { slideForRound, slideBeforeFinale } from './slides'
 /** Заставка «Интро» перед первым раундом — см. HostScreen phase 'intro'.
  *  Сама заставка, доиграв, вызывает gotoRound(0, ...) — тот же переход,
  *  что случился бы по кнопке «К первому раунду», если бы интро не было. */
-export async function startIntro() {
-  await room.patchSession(getRoomId(), {
-    phase: 'intro', timer_started_at: null, reveal: false,
-  })
+export async function startIntro(from?: NavFrom) {
+  await nav({ phase: 'intro', timer_started_at: null, reveal: false }, from)
+}
+
+/** Старт игры из лобби — ОДНА функция для проектора и пульта (ревью 10.39): с интро или сразу в 1-й раунд.
+ *  `from` — «откуда жали»: повторный тап или замёрзший снимок лобби не сбросят уже идущую игру (§3cc). */
+export async function startGame(o: { intro: boolean; slide?: number }, from?: NavFrom) {
+  if (o.intro) await startIntro(from)
+  else await gotoRound(0, o.slide, from)
 }
 
 /** Показать слайд-брифинг, не трогая номер раунда. */

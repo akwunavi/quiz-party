@@ -140,9 +140,16 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const deadline = dlSeen.current ? dlSeen.current.adj : rawDeadline
   // Вкладка проектора вернулась из фона: эффекты ниже на скрытой вкладке молчат и сами
   // не просыпаются — стадия застревала. Тик заставляет их перепроверить условия.
-  const [visTick, setVisTick] = useState(0)
+  // Перезапускаем ТОЛЬКО эффекты, которые молча пропустили запуск из-за скрытой вкладки (ревью 10.39: общий тик
+  // перезапускал уже игравший отрывок — команда слышала его дважды). `skipped` пополняют сами эффекты.
+  const skipped = useRef(new Set<string>())
+  const [vt, setVt] = useState<Record<string, number>>({})
   useEffect(() => {
-    const on = () => { if (!document.hidden) setVisTick(n => n + 1) }
+    const on = () => {
+      if (document.hidden || skipped.current.size === 0) return
+      const keys = [...skipped.current]; skipped.current.clear()
+      setVt(prev => { const n = { ...prev }; keys.forEach(k => { n[k] = (n[k] ?? 0) + 1 }); return n })
+    }
     document.addEventListener('visibilitychange', on)
     return () => document.removeEventListener('visibilitychange', on)
   }, [])
@@ -196,6 +203,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   }, [preview, m.stage, m.key, m.snippetSec])
 
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'snippet' && track?.audio) skipped.current.add('snippet')
     if (preview || m.stage !== 'snippet' || !track?.audio || document.hidden) return
     const sec = m.snippetSec ?? 5
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
@@ -242,10 +250,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       offPlaying()
       h.stop()
     }
-  }, [preview, m.stage, m.key, visTick])
+  }, [preview, m.stage, m.key, vt.snippet])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
+    if (document.hidden && !preview && expired) skipped.current.add('expired')
     if (preview || !expired || document.hidden) return
     if (m.stage === 'spinning') {
       void updateMelody(gameState, guardMelody(
@@ -288,10 +297,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
         ))
       }
     }
-  }, [preview, expired, m.stage, answers, visTick])
+  }, [preview, expired, m.stage, answers, vt.expired])
 
   // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'listen' && track?.audio) skipped.current.add('listen')
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
     const requested = m.startSec ?? 0
     // keepTail: после точки старта должно остаться место под самый длинный
@@ -343,26 +353,28 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       // путём, трек не должен утечь в следующую стадию (bidding).
       h.stop()
     }
-  }, [preview, m.stage, m.key, visTick])
+  }, [preview, m.stage, m.key, vt.listen])
 
 
   // ── фоновая музыка на время размышления ──
   useEffect(() => {
     // stopAfterTimer: по истечении времени музыка играет ещё 3 сек и глохнет
+    if (document.hidden && !preview && (m.stage === 'answering' || m.stage === 'bidding') && bgMusic) skipped.current.add('bg')
     if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bgMusic || document.hidden) return
     const h = playShared(mediaUrl(bgMusic), { loop: true, volume: .45 })
     return () => h.stop()
-  }, [preview, m.stage, bgMusic, visTick])
+  }, [preview, m.stage, bgMusic, vt.bg])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
+    if (document.hidden && !preview && m.stage === 'passed' && !m.deadline && track?.audio) skipped.current.add('passed')
     if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
     const h = playShared(mediaUrl(track.audio))
     const off = h.on('ended', () => void updateMelody(gameState, guardMelody(
       { key: m.key, stage: 'passed' }, cur => (cur.deadline ? null : { ...cur, deadline: inSec(s.passAnswerSec ?? 10) }),
     )))
     return () => { off(); h.stop() }
-  }, [preview, m.stage, visTick])
+  }, [preview, m.stage, vt.passed])
 
   // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
   // spinning/listen — самый ранний момент, когда ключ трека уже известен, но
@@ -388,26 +400,31 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
 
   // ── Состояние звука проектора → общий мешок, пульт его показывает (ADM-03, 10.27) ──
   // Пишет ТОЛЬКО проектор и только когда значение изменилось. Мешок стирают
-  // жёсткие сбросы между раундами — тогда эффект (зависит от m.audio) допишет заново.
+  // Подпись — БЕЗ счётчика скачанных (он менялся каждую секунду и давал поток CAS-записей, ревью 10.39): «скачивает» пишется
+  // один раз, итог (готово/ошибка с числом упавших) — один раз. Несколько вкладок проектора не перезаписывают друг друга:
+  // если в мешке чужая подпись, а свою эта вкладка уже писала — молчим (иначе вечный пинг-понг).
   const unlocked = useAudioUnlock()
   const audioNow: NonNullable<MelodyState['audio']> =
     loadState && loadState.total > 0 && loadState.done + loadState.failed < loadState.total
-      ? { state: 'loading', done: loadState.done, failed: loadState.failed, total: loadState.total }
+      ? { state: 'loading', total: loadState.total }
       : loadState && loadState.failed > 0
-        ? { state: 'error', done: loadState.done, failed: loadState.failed, total: loadState.total }
+        ? { state: 'error', failed: loadState.failed, total: loadState.total }
         : !unlocked ? { state: 'locked' } : { state: 'ready' }
-  const audioSig = `${audioNow.state}|${audioNow.done ?? ''}|${audioNow.failed ?? ''}|${audioNow.total ?? ''}`
-  const storedSig = `${m.audio?.state}|${m.audio?.done ?? ''}|${m.audio?.failed ?? ''}|${m.audio?.total ?? ''}`
+  const sigOf = (a?: MelodyState['audio']) => a ? `${a.state}|${a.failed ?? ''}|${a.total ?? ''}` : ''
+  const audioSig = sigOf(audioNow)
+  const storedSig = sigOf(m.audio)
+  const wroteSig = useRef<string | null>(null)
   useEffect(() => {
+    if (document.hidden && !preview) skipped.current.add('audio')
     if (preview || document.hidden || audioSig === storedSig) return
+    if (storedSig && wroteSig.current === audioSig) return      // чужая подпись поверх нашей — не воюем
     const t = window.setTimeout(() => {
-      void updateMelody(gameState, cur => (
-        `${cur.audio?.state}|${cur.audio?.done ?? ''}|${cur.audio?.failed ?? ''}|${cur.audio?.total ?? ''}` === audioSig
-          ? null : { ...cur, audio: audioNow }))
-    }, 600)        // не чаще раза в долю секунды: прогресс скачивания меняется часто
+      wroteSig.current = audioSig
+      void updateMelody(gameState, cur => (sigOf(cur.audio) === audioSig ? null : { ...cur, audio: audioNow }))
+    }, 600)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, audioSig, storedSig, visTick])
+  }, [preview, audioSig, storedSig, vt.audio])
 
   // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
   useEffect(() => {

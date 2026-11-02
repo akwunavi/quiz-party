@@ -510,3 +510,11 @@ export function anagramTeamRows(teams: readonly { id: string }[], rows: readonly
     }
   })
 }
+
+/** Все команды онлайн-игры уже отправили ответ на этот вопрос — одна формула для пульта и проектора (ревью 10.39). */
+export function anagramAllAnswered(teams: readonly { id: string }[], answers: readonly Answer[],
+  qid: string, paper: boolean): boolean {
+  if (paper || teams.length === 0) return false
+  const ids = new Set(answers.filter(a => a.question_ref === `q-${qid}` && (a.answer_text ?? '').trim() !== '').map(a => a.team_id))
+  return teams.every(t => ids.has(t.id))
+}

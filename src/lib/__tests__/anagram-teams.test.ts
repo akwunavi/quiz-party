@@ -1,6 +1,6 @@
 // GAME-02 (10.30): строки панели команд «Скрэмбла» — порядок, время по серверным часам, вердикт.
 import { describe, it, expect } from 'vitest'
-import { anagramTeamRows } from '../anagram'
+import { anagramTeamRows, anagramAllAnswered } from '../anagram'
 import type { Answer } from '../../types/quiz'
 
 const ans = (team: string, text: string, at: string, extra: Partial<Answer> = {}): Answer =>
@@ -35,5 +35,19 @@ describe('anagramTeamRows', () => {
     expect(rows[0].text).toBe('ВТОРОЙ')
     const none = anagramTeamRows([{ id: 'a' }], [ans('a', ' ', START)], START, 'X')
     expect(none[0].sent).toBe(false)
+  })
+})
+
+describe('anagramAllAnswered', () => {
+  const rows = [ans('a', 'КОТ', '2026-01-01T10:00:01.000Z'), ans('b', '  ', '2026-01-01T10:00:02.000Z')]
+  it('не все ответили / пустой ответ не считается', () => {
+    expect(anagramAllAnswered([{ id: 'a' }, { id: 'b' }], rows, 'x', false)).toBe(false)
+  })
+  it('все ответили', () => {
+    expect(anagramAllAnswered([{ id: 'a' }], rows, 'x', false)).toBe(true)
+  })
+  it('бумага и пустой список команд — никогда', () => {
+    expect(anagramAllAnswered([{ id: 'a' }], rows, 'x', true)).toBe(false)
+    expect(anagramAllAnswered([], rows, 'x', false)).toBe(false)
   })
 })

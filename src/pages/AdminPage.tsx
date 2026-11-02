@@ -15,7 +15,7 @@ import {
   gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
-  gotoQuestionShown, startIntro,
+  gotoQuestionShown, startGame,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { runAction } from '../lib/actionStatus'
@@ -67,7 +67,7 @@ import { revealNext, revealAllAnswered } from '../lib/reveal'
 import { revealPointsFor } from '../lib/scoring'
 import {
   anagramQuestion, anagramHintsOpen, anagramMaxHints, anagramWinner, anagramStartIso,
-  anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack,
+  anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack, anagramAllAnswered,
   anagramFirst, anagramWasRun,
 } from '../lib/anagram'
 import { serverNow } from '../lib/serverClock'
@@ -156,9 +156,9 @@ export function AdminPage() {
               лишь выбор раунда; в Лесу и ny-темах кнопки проектора скрыты — ведущий не знал, как начать. */}
           <button className="adm-btn primary" onClick={() => {
             if (teams.length === 0 && !confirm('Пока ни одна команда не подключилась. Всё равно начать игру?')) return
-            void runAction('старт игры', () => pack.settings?.show_intro
-              ? startIntro()
-              : gotoRound(0, slideForRound(pack.settings?.info_slides, 0) ?? undefined))
+            const from = navFrom(gameState)
+            void runAction('старт игры', () => startGame({ intro: !!pack.settings?.show_intro,
+              slide: slideForRound(pack.settings?.info_slides, 0) ?? undefined }, from))
           }}>▶ НАЧАТЬ ИГРУ → К ПЕРВОМУ РАУНДУ</button>
           <TeamRandomizer />
           <RoundPicker pack={pack} current={gameState.round_number} />
@@ -387,9 +387,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
       // ответу ведёт дальше, а не пишет reveal второй раз.
       if (isAnagram) {
         // то же решение, что у кнопки «Дальше →» на проекторе (lib/anagram.ts)
-        const qRef = `q-${round.questions[step]?.id}`
-        const answeredIds = new Set(answers.filter(a => a.question_ref === qRef && a.answer_text).map(a => a.team_id))
-        const allAnswered = !paperMode && teams.length > 0 && teams.every(t => answeredIds.has(t.id))
+        const allAnswered = anagramAllAnswered(teams, answers, round.questions[step]?.id ?? '', paperMode)
         const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
           index: step, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
         if (st.kind === 'wait') return navHint.show(st.text)
@@ -2035,6 +2033,8 @@ function MelodyControls({ round, gameState, onFinish }: {
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const [manualPick, setManualPick] = useState(false)
+  // предупреждение о звуке — один раз за раунд (иначе при одном не скачавшемся треке спрашивало бы перед каждой рулеткой)
+  const audioAsked = useRef(false)
 
   const m: MelodyState = gameState.melody ?? {}
   const played = m.played ?? []
@@ -2058,7 +2058,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   const audioChip = (() => {
     if (!au) return { cls: 'wait', text: '🔈 Проектор: статус звука ещё не пришёл (откройте проектор)' }
     if (au.state === 'locked') return { cls: 'bad', text: '🔇 Проектор: звук заблокирован браузером — кликните по экрану проектора один раз' }
-    if (au.state === 'loading') return { cls: 'wait', text: `⏳ Проектор: скачивает треки ${au.done ?? 0}/${au.total ?? '?'}` }
+    if (au.state === 'loading') return { cls: 'wait', text: `⏳ Проектор: скачивает треки (всего ${au.total ?? '?'})` }
     if (au.state === 'error') return { cls: 'bad', text: `⚠ Проектор: не скачалось ${au.failed ?? '?'} из ${au.total ?? '?'} треков` }
     return playingNow ? { cls: 'ok', text: '🔊 Проектор: играет' } : { cls: 'ok', text: '✓ Проектор: звук готов' }
   })()
@@ -2099,7 +2099,10 @@ function MelodyControls({ round, gameState, onFinish }: {
               того же действия путали бы */}
           <button className="adm-btn primary" onClick={() => {
             // не блокируем, а предупреждаем: заблокированный звук = трек не заиграет (ADM-03)
-            if (audioProblem && !confirm(`${audioChip.text}\n\nТрек может не зазвучать. Всё равно запустить?`)) return
+            if (audioProblem && !audioAsked.current) {
+              if (!confirm(`${audioChip.text}\n\nТрек может не зазвучать. Всё равно запустить?`)) return
+              audioAsked.current = true
+            }
             const initialTarget = free[Math.floor(Math.random() * free.length)]
             void runAction('рулетка мелодии', () => melodyClick(gameState, cur => {
               if (!melodyIdle(cur)) return null

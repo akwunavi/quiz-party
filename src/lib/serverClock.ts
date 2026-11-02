@@ -7,6 +7,7 @@
 // Не получилось (миграция не прогнана, офлайн) — поправка 0, всё как раньше.
 let offsetMs = 0
 let synced = false
+let bestRtt = Infinity     // задержка лучшего замера — одиночный плохой замер при возврате вкладки его не затирает
 let started = false
 
 /** «Сейчас» по часам базы (или по своим, пока синхронизации не было). */
@@ -40,7 +41,11 @@ export async function syncServerClock(attempts = 3): Promise<boolean> {
   }
   const off = estimateOffset(samples)
   if (off == null) return false
+  const rtt = Math.min(...samples.filter(s => s.t1 >= s.t0).map(s => s.t1 - s.t0))
+  // принимаем, если замер не заметно хуже прежнего лучшего (запас 300 мс); иначе оставляем прежнюю поправку
+  if (synced && rtt > bestRtt * 2 + 300) return false
   offsetMs = off
+  bestRtt = Math.min(bestRtt * 1.5 + 50, rtt)   // лучший замер «устаревает» плавно, чтобы поправка могла обновляться
   synced = true
   return true
 }

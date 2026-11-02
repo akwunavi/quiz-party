@@ -18,6 +18,7 @@
 import { teamColor } from './teamColors'
 import type { LoadedPack, LoadedRound } from './packLoader'
 import type { Answer, GameState, MechanicKey, MelodyState, Team } from '../types/quiz'
+import { serverNow, serverIso } from './serverClock'
 
 export interface PreviewCtx {
   teams: Team[]
@@ -34,7 +35,7 @@ export function previewTeams(n = 4): Team[] {
     color: teamColor(i),
     icon: null,
     game_id: '',
-    last_seen_at: new Date().toISOString(),
+    last_seen_at: serverIso(),
   }))
 }
 
@@ -92,7 +93,7 @@ export function previewStages(mech: MechanicKey): { key: string; label: string }
  *  «3 попыток», ставки мелодии, счётчик ставок скачек. Текст правдоподобный,
  *  но однозначно ненастоящий — не должен выглядеть как реальный ответ игрока. */
 export function previewAnswers(round: LoadedRound, qIndex: number, stage: string, teams: Team[]): Answer[] {
-  const now = new Date().toISOString()
+  const now = serverIso()
   const mk = (ref: string, text: string, i: number): Answer => ({
     id: `pv-a-${i}`, team_id: teams[i % teams.length]?.id ?? `pv-${i + 1}`,
     game_id: '', question_ref: ref, round_number: round.position,
@@ -110,7 +111,7 @@ export function previewAnswers(round: LoadedRound, qIndex: number, stage: string
   if (round.mechanic === 'anagram' && stage === 'answer') {
     const q = round.questions[qIndex]
     const phrase = q?.answer.mode === 'anagram' ? q.answer.phrase : ''
-    const at = (msAgo: number) => new Date(Date.now() - msAgo).toISOString()
+    const at = (msAgo: number) => new Date(serverNow() - msAgo).toISOString()
     const ref = `q-${q?.id ?? 'pv'}`
     const start = anagramPreviewElapsed(round)
     return [
@@ -143,8 +144,8 @@ function anagramPreviewElapsed(round: LoadedRound): number {
 function previewTimerStart(round: LoadedRound, stage?: string): string | null {
   if (round.mechanic !== 'anagram') return null
   const interval = (round.settings as { hintIntervalSec?: number }).hintIntervalSec ?? 10
-  if (stage === 'hints') return new Date(Date.now() - (2 * Math.max(1, interval) + 0.5) * 1000).toISOString()
-  if (stage === 'answer') return new Date(Date.now() - anagramPreviewElapsed(round)).toISOString()
+  if (stage === 'hints') return new Date(serverNow() - (2 * Math.max(1, interval) + 0.5) * 1000).toISOString()
+  if (stage === 'answer') return new Date(serverNow() - anagramPreviewElapsed(round)).toISOString()
   return null
 }
 
@@ -163,7 +164,7 @@ export function previewGameState(
     timer_started_at: previewTimerStart(round, stage),
     reveal: stage === 'answer',
     completed_rounds: [],
-    updated_at: new Date().toISOString(),
+    updated_at: serverIso(),
     melody,
   }
 }
@@ -180,9 +181,9 @@ function previewMelody(round: LoadedRound, qid: string | undefined, stage?: stri
     return { jp: { tile: null } }
   }
   if (round.mechanic === 'race') {
-    if (stage === 'running') return { race: { stage: 'running', seed: 12345, startedAt: new Date().toISOString() } }
+    if (stage === 'running') return { race: { stage: 'running', seed: 12345, startedAt: serverIso() } }
     if (stage === 'done')
-      return { race: { stage: 'done', seed: 12345, startedAt: new Date(Date.now() - 60_000).toISOString() } }
+      return { race: { stage: 'done', seed: 12345, startedAt: new Date(serverNow() - 60_000).toISOString() } }
     return { race: { stage: 'betting' } }
   }
   if (round.mechanic === 'melody' && stage && stage !== 'board') {
@@ -190,7 +191,7 @@ function previewMelody(round: LoadedRound, qid: string | undefined, stage?: stri
     return {
       key: '0-0', stage: (stage === 'reveal-miss' ? 'reveal' : stage) as MelodyState['stage'],
       order: [teams[0].id, teams[1].id], turn: 0, snippetSec: 5, startSec: 0, played: [],
-      deadline: new Date(Date.now() + 10_000).toISOString(),
+      deadline: new Date(serverNow() + 10_000).toISOString(),
       ...(stage === 'reveal' ? { wonPts: 2, wonTeam: teams[0].id } : {}),
       // 9.76: разбор без победителя — тот же экран, «Никто не угадал»
       ...(stage === 'reveal-miss' ? { wonPts: 0, deadline: undefined } : {}),
