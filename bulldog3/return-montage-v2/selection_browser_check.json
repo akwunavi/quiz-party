@@ -1,0 +1,53 @@
+{
+  "htmlControlPhase1": true,
+  "videoResults": [
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_000_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_001_GAME.mp4",
+      "duration": 30.041667,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_060_GAME.mp4",
+      "duration": 27.583333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_120_GAME.mp4",
+      "duration": 25.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_180_GAME.mp4",
+      "duration": 22.583333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_SELECTION_CHAIN_TRIGGER_239_GAME.mp4",
+      "duration": 20.125,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    }
+  ]
+}

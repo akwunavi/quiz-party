@@ -1,0 +1,379 @@
+{
+  "fps": 24,
+  "selectionScalePx": [
+    207,
+    116
+  ],
+  "sourceAssetsUnchanged": true,
+  "scenarios": {
+    "0": {
+      "preIdleSourceFrames": [
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [],
+      "pendingFrames": 0,
+      "selectedOutputFrames": [
+        24,
+        144
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        145,
+        241
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        242,
+        481
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 482,
+      "durationSeconds": 20.083333333333332,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_000_GAME.mp4"
+    },
+    "1": {
+      "preIdleSourceFrames": [
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        0
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [
+        1,
+        239
+      ],
+      "pendingFrames": 239,
+      "selectedOutputFrames": [
+        263,
+        383
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        384,
+        480
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        481,
+        720
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 721,
+      "durationSeconds": 30.041666666666668,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_001_GAME.mp4"
+    },
+    "60": {
+      "preIdleSourceFrames": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [
+        60,
+        239
+      ],
+      "pendingFrames": 180,
+      "selectedOutputFrames": [
+        204,
+        324
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        325,
+        421
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        422,
+        661
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 662,
+      "durationSeconds": 27.583333333333332,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_060_GAME.mp4"
+    },
+    "120": {
+      "preIdleSourceFrames": [
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [
+        120,
+        239
+      ],
+      "pendingFrames": 120,
+      "selectedOutputFrames": [
+        144,
+        264
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        265,
+        361
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        362,
+        601
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 602,
+      "durationSeconds": 25.083333333333332,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_120_GAME.mp4"
+    },
+    "180": {
+      "preIdleSourceFrames": [
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [
+        180,
+        239
+      ],
+      "pendingFrames": 60,
+      "selectedOutputFrames": [
+        84,
+        204
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        205,
+        301
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        302,
+        541
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 542,
+      "durationSeconds": 22.583333333333332,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_180_GAME.mp4"
+    },
+    "239": {
+      "preIdleSourceFrames": [
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238
+      ],
+      "triggerOutputFrame": 24,
+      "pendingIdleSourceFrames": [
+        239,
+        239
+      ],
+      "pendingFrames": 1,
+      "selectedOutputFrames": [
+        25,
+        145
+      ],
+      "selectedSourceFrames": [
+        0,
+        120
+      ],
+      "returnOutputFrames": [
+        146,
+        242
+      ],
+      "returnSourceFrames": [
+        120,
+        24,
+        -1
+      ],
+      "finalIdleOutputFrames": [
+        243,
+        482
+      ],
+      "finalIdleSourceFrames": [
+        0,
+        239
+      ],
+      "totalFrames": 483,
+      "durationSeconds": 20.125,
+      "output": "DOG3_SELECTION_CHAIN_TRIGGER_239_GAME.mp4"
+    }
+  }
+}

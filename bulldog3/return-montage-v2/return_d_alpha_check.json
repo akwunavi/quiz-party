@@ -1,0 +1,19 @@
+{
+  "sourceAlpha": "selected-alpha-lab/assets/DOG3_SELECTED_ALPHA_121.webm",
+  "frameMap": "SELECTED #120..24 inclusive, reverse order",
+  "frames": 97,
+  "fps": 24,
+  "resolution": [
+    1276,
+    720
+  ],
+  "allFrameCornersTransparent": true,
+  "checkedFrames": 97,
+  "qaFrames": [
+    0,
+    24,
+    48,
+    72,
+    96
+  ]
+}

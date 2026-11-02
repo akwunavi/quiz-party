@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Рокки — лаборатория выбора</title>
+  <style>
+    body{margin:0;background:#e2d9c6;color:#20302c;font:18px/1.4 system-ui,Arial,sans-serif}
+    main{max-width:1200px;margin:auto;padding:28px}
+    h1{font-size:28px;margin:0 0 12px}
+    p{max-width:900px}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+    button{font:inherit;padding:10px 16px;border:1px solid #697c6e;border-radius:9px;background:#f5f1e8;cursor:pointer}
+    button[aria-pressed="true"]{background:#314a3b;color:white}
+    video{width:100%;height:auto;display:block;background:#e2d9c6;border-radius:12px}
+    small{display:block;margin-top:12px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Рокки: IDLE B → SELECTED → RETURN D → IDLE B</h1>
+  <p>Шесть проверок подтверждения выбора на разных кадрах IDLE. После подтверждения
+    текущее движение заканчивается в совместимой стойке; затем начинается SELECTED.
+    Это изолированная лаборатория, а не экран игры.</p>
+  <div class="buttons" id="choices"></div>
+  <video id="preview" controls playsinline preload="metadata"></video>
+  <small id="details"></small>
+</main>
+<script>
+const phases=[0,1,60,120,180,239];
+const video=document.getElementById('preview');
+const buttons=document.getElementById('choices');
+const details=document.getElementById('details');
+for(const phase of phases){
+  const button=document.createElement('button');
+  button.textContent=`Выбор на IDLE #${phase}`;
+  button.type='button';
+  button.onclick=()=>{
+    video.src=`DOG3_SELECTION_CHAIN_TRIGGER_${String(phase).padStart(3,'0')}_GAME.mp4`;
+    video.load();
+    video.play().catch(()=>{});
+    for(const other of buttons.children) other.setAttribute('aria-pressed',String(other===button));
+    const wait=phase===0?0:(240-phase)/24;
+    details.textContent=`Подтверждение через 1,00 с · ожидание стойки ${wait.toFixed(3)} с · затем полные SELECTED, RETURN D и IDLE B.`;
+  };
+  buttons.append(button);
+}
+buttons.firstElementChild.click();
+</script>
+</body>
+</html>
