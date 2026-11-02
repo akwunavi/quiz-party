@@ -501,7 +501,7 @@ const EmptyMelody = () => (
 
 function ClassicMelodyBoard(props: BoardProps) {
   const { pack, gameState, preview } = props
-  const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
+  const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, manualPick, setManualPick,
     freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade } = useMelodyBoard(props)
   if (themes.length === 0) return <EmptyMelody />
 
@@ -515,17 +515,7 @@ function ClassicMelodyBoard(props: BoardProps) {
           живую сессию. В предпросмотре не рендерятся вовсе (HANDOFF.md). */}
       {!preview && idle && (
         <div className="host-actions">
-          {/* прогресс скачивания треков раунда (9.85): пока не 100% — можно
-              потянуть время; ошибки — трек доиграет сетью, но предупреждаем */}
-          {loadState && loadState.total > 0 && (
-            <span className={`mel-load${loadState.done + loadState.failed >= loadState.total ? ' ready' : ''}${loadState.failed ? ' warn' : ''}`}>
-              {loadState.done + loadState.failed < loadState.total
-                ? `♪ треки ${loadState.done}/${loadState.total}…`
-                : loadState.failed
-                  ? `♪ ${loadState.done}/${loadState.total} · не скачалось ${loadState.failed}`
-                  : '♪ все треки загружены'}
-            </span>
-          )}
+          {/* прогресс скачивания треков с проектора убран (10.34): статус звука — только на пульте (melody.audio) */}
           {freeKeys.length > 0
             ? (manualPick
                 ? <>

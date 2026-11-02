@@ -55,14 +55,10 @@ export function useAudioUnlock() {
   return ready
 }
 
-/** Подсказка ведущему, пока звук заблокирован. Исчезает после первого клика. */
+/** Раньше — плашка «Звук заблокирован браузером» на проекторе. Убрана по решению ведущего (10.34): на проекторе про звук
+ *  ничего не показываем, статус звука виден только на пульте мелодии (melody.audio, HANDOFF §3de). Компонент оставлен
+ *  пустым, чтобы не трогать десятки мест подключения; разблокировку звука по клику делает `useAudioUnlock`. */
 export function AudioGate() {
-  const ready = useAudioUnlock()
-  if (ready) return null
-  return (
-    <div className="audio-gate" onClick={() => {}}>
-      <span>🔇 Звук заблокирован браузером</span>
-      <b>кликните по экрану один раз</b>
-    </div>
-  )
+  useAudioUnlock()
+  return null
 }

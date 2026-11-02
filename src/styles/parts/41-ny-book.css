@@ -337,15 +337,15 @@
 /* ═══ UI-02 + FLOW-04 (10.32): «Книга» — вопрос без картинок в БЕЗОПАСНОЙ ОБЛАСТИ ═══
    Основа — экран «ёлки и домик». Ёлки закрывали текст (замер: строки 3–4 длинного вопроса лежали на кронах), поэтому
    текст стоит в области между кронами и выше крыши домика (≈1180×400 при 1920×1080) на мягкой бумажной подложке с
-   растушёванным краем. Высота рамки ограничена → useFitText ужимает кегль, если длинный вопрос не влез. */
+   растушёванным краем (скруглённая плашка + тень того же цвета). Высота рамки ограничена → useFitText ужимает кегль, если длинный вопрос не влез. */
 .theme-ny_book .host-screen:not(.has-media):not(.has-choices) > div:has(> .q-text) { flex: none; box-sizing: border-box;
-  width: calc(1180 * var(--u)); height: calc(400 * var(--u)); max-width: 100%; margin: calc(150 * var(--u)) auto calc(400 * var(--u));
-  padding: calc(26 * var(--u)) calc(60 * var(--u)); display: flex; align-items: center; justify-content: center; position: relative; isolation: isolate; }
+  width: calc(1520 * var(--u)); height: calc(410 * var(--u)); max-width: 100%; margin: calc(170 * var(--u)) auto calc(400 * var(--u));
+  padding: calc(20 * var(--u)) calc(90 * var(--u)); display: flex; align-items: center; justify-content: center; position: relative; isolation: isolate; }
 /* подложка — отдельным слоем с растушёванным краем (маска режет только её, не текст) */
 .theme-ny_book .host-screen:not(.has-media):not(.has-choices) > div:has(> .q-text)::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: rgba(247, 240, 224, .94);
-  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%); }
-.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text { font-size: calc(92 * var(--u)); }
-.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: calc(76 * var(--u)); }
-.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: calc(58 * var(--u)); }
-.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: calc(48 * var(--u)); }
+  inset: calc(10 * var(--u)); border-radius: calc(70 * var(--u)); background: rgba(247, 240, 224, .985);
+  box-shadow: 0 0 calc(34 * var(--u)) calc(26 * var(--u)) rgba(247, 240, 224, .985); }
+.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text { font-size: calc(100 * var(--u)); }
+.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: calc(84 * var(--u)); }
+.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: calc(68 * var(--u)); }
+.theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: calc(58 * var(--u)); }
