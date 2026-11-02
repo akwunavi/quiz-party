@@ -480,3 +480,33 @@ export function anagramPlayerVerdict(p: {
   if (!p.sent) return null
   return p.loaded ? 'lost' : 'checking'
 }
+
+// ── Панель команд на проекторе (GAME-02, 10.30) ─────────
+
+export interface AnagramTeamRow {
+  teamId: string
+  /** ответ отправлен */
+  sent: boolean
+  /** текст ответа — показывать ТОЛЬКО после показа ответа (до этого чужие ответы скрыты) */
+  text: string
+  /** мс от старта вопроса до принятия ответа сервером (accepted_at − shown_at); NaN — нет */
+  ms: number
+  /** верно/неверно/нет вердикта (ручная оценка → иначе точная проверка) */
+  verdict: boolean | null
+}
+
+/** Строки панели: порядок — как у списка команд (стабильный, не прыгает по мере прихода ответов), одна строка
+ *  на команду, при нескольких записях берётся поздняя по серверному времени. Время — от серверного старта вопроса. */
+export function anagramTeamRows(teams: readonly { id: string }[], rows: readonly Answer[],
+  startIso: string | null | undefined, phrase: string): AnagramTeamRow[] {
+  return teams.map(t => {
+    const mine = rows.filter(a => a.team_id === t.id && (a.answer_text ?? '').trim() !== '')
+      .sort((x, y) => isoMicros(anagramAcceptedAt(y)) - isoMicros(anagramAcceptedAt(x)))
+    const a = mine[0]
+    if (!a) return { teamId: t.id, sent: false, text: '', ms: NaN, verdict: null }
+    return {
+      teamId: t.id, sent: true, text: a.answer_text ?? '', ms: anagramElapsedMs(a, startIso),
+      verdict: a.is_correct ?? isAnagramCorrect(a.answer_text ?? '', phrase),
+    }
+  })
+}
