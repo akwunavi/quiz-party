@@ -70,6 +70,7 @@ import {
   anagramElapsedMs, anagramAcceptedAt, isoMicros, formatRaceTime, anagramAdvance, anagramBack,
   anagramFirst, anagramWasRun,
 } from '../lib/anagram'
+import { serverNow } from '../lib/serverClock'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
 // ВЕДУЩИЙ: шапка со ссылками → строка статуса → экран по фазе →
@@ -390,7 +391,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         const answeredIds = new Set(answers.filter(a => a.question_ref === qRef && a.answer_text).map(a => a.team_id))
         const allAnswered = !paperMode && teams.length > 0 && teams.every(t => answeredIds.has(t.id))
         const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-          index: step, count: round.questions.length, nowMs: Date.now(), wasRun, allAnswered })
+          index: step, count: round.questions.length, nowMs: serverNow(), wasRun, allAnswered })
         if (st.kind === 'wait') return navHint.show(st.text)
         if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer(from))
         if (st.kind === 'next') return void runAction('следующий вопрос',
@@ -1054,8 +1055,8 @@ function AnswerTimeBoard({ round, gameState, answers, teams, showTally }: {
   showTally: boolean
 }) {
   const seconds = (round.settings as { answerTimeSeconds?: number }).answerTimeSeconds ?? 60
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t) }, [])
+  const [now, setNow] = useState(serverNow())
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 500); return () => clearInterval(t) }, [])
   const startedAt = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : null
   const left = startedAt ? Math.max(0, Math.ceil(seconds - (now - startedAt) / 1000)) : seconds
   const mm = String(Math.floor(left / 60)).padStart(2, '0')
@@ -1807,12 +1808,12 @@ function AnagramControls({ pack, round, gameState, teams, answers }: {
   const shown = useQuestionShown(gameState.game_id)
   const startedAt = gameState.timer_started_at
   const endMs = startedAt ? Date.parse(startedAt) + round.timer_seconds * 1000 : NaN
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    setNow(Date.now())
-    if (!startedAt || gameState.reveal || !(Date.now() < endMs)) return
+    setNow(serverNow())
+    if (!startedAt || gameState.reveal || !(serverNow() < endMs)) return
     const t = setInterval(() => {
-      const n = Date.now()
+      const n = serverNow()
       setNow(n)
       if (n >= endMs) clearInterval(t)
     }, 1000)
@@ -1924,9 +1925,9 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const clipSeconds = (round.settings as { clipSeconds?: number }).clipSeconds ?? 30
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(serverNow())
   // хуки — все до ранних return (React #310, см. CLAUDE.md)
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t) }, [])
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 500); return () => clearInterval(t) }, [])
 
   const opened = jeopardyOpened(gameState)
   const flat = jpOpenTile(gameState.melody)
@@ -2276,9 +2277,9 @@ function RevealControls({ pack, round, gameState, isLast, onFinish }: {
   const rawRv = bag.rv ?? {}
   const rv = q && rawRv.qid === q.id ? rawRv : {}
   const rows = q ? answers.filter(a => a.question_ref === `q-${q.id}`) : []
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(serverNow())
   // хуки — все до ранних return (React #310, см. CLAUDE.md)
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 250); return () => clearInterval(t) }, [])
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 250); return () => clearInterval(t) }, [])
 
   const grade = (a: Answer, correct: boolean) =>
     void runAction('оценка ответа', () => room.patchAnswer(a.id, { is_correct: correct }))
@@ -2474,7 +2475,7 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
             // Отметка «отыгран» ставится в момент ПОКАЗА и переживает игру:
             // ведущий увидит её в редакторе и решит, убирать ли вопрос.
             void markPlayed(next.id).catch(() => {})
-            void push(showQuestion(state, next.id, Date.now()))
+            void push(showQuestion(state, next.id, serverNow()))
           }}>
           {left === 0 ? 'ВОПРОСЫ КОНЧИЛИСЬ' : 'ПОКАЗАТЬ ВОПРОС СЕЙЧАС'}
         </button>
@@ -2500,17 +2501,17 @@ function BlitzControls({ pack, round, gameState, onFinished }: {
               подтвердить его. */}
           <div className="adm-dev-row">
             <button className={`adm-grade ok${cur.verdict === 'ok' ? ' on' : ''}`} disabled={busy}
-              onClick={() => void push(answerCorrect(state, Date.now()))}>✓ ВЕРНО</button>
+              onClick={() => void push(answerCorrect(state, serverNow()))}>✓ ВЕРНО</button>
             <button className={`adm-grade no${cur.verdict === 'no' ? ' on' : ''}`} disabled={busy}
-              onClick={() => void push(answerWrong(state, Date.now()))}>✗ НЕВЕРНО</button>
+              onClick={() => void push(answerWrong(state, serverNow()))}>✗ НЕВЕРНО</button>
           </div>
           <div className="adm-dev-row">
             <button className="adm-btn" disabled={busy}
-              onClick={() => void push(skip(state, Date.now()))}>СКИП −1</button>
+              onClick={() => void push(skip(state, serverNow()))}>СКИП −1</button>
             <button className="adm-btn" disabled={busy}
-              onClick={() => void push(pauseForCheck(state, Date.now()))}>⏸ ПАУЗА</button>
+              onClick={() => void push(pauseForCheck(state, serverNow()))}>⏸ ПАУЗА</button>
             <button className="adm-btn" disabled={busy}
-              onClick={() => void push(resumeAfterCheck(state, Date.now()))}>▶ ДАЛЬШЕ</button>
+              onClick={() => void push(resumeAfterCheck(state, serverNow()))}>▶ ДАЛЬШЕ</button>
           </div>
         </>
       )}

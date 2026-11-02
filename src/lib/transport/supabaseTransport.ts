@@ -90,6 +90,14 @@ export const supabaseTransport: RoomTransport = {
     })
   },
 
+  async serverNow() {
+    const { data, error } = await supabase.rpc('server_now')
+    if (error) throw error
+    const ms = Date.parse(String(data))
+    if (!Number.isFinite(ms)) throw new Error('server_now: непонятный ответ')
+    return ms
+  },
+
   async listTeams(gameId) {
     // Бросаем на error (а не молча отдаём []): хук useTeams различает
     // «пришёл пустой список» (перезаписать состояние) и «запрос не

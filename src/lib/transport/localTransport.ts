@@ -96,6 +96,12 @@ export const localTransport: RoomTransport = {
     return data
   },
 
+  async serverNow() {
+    const r = await requestJson<{ now: number }>('/api/server-now')
+    if (!r || !Number.isFinite(r.now)) throw new Error('server-now: пустой ответ')
+    return r.now
+  },
+
   async patchSession(_roomId, patch: SessionPatch) {
     await requestJson('/api/session', { method: 'PATCH', body: JSON.stringify(patch) })
   },

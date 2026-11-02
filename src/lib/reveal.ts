@@ -1,7 +1,7 @@
 // ═══ «3 попытки»: 2–4 картинки → слово ═══
 //
 // Переходы фаз — общие для проектора и админки, ЧИСТЫЕ (без сети, без
-// Date.now() по умолчанию — параметр `now`), тот же приём, что у мелодии
+// serverNow() по умолчанию — параметр `now`), тот же приём, что у мелодии
 // (lib/melody.ts) и «Своей игры» (lib/jeopardyRef.ts): если бы каждый
 // экран считал следующую фазу по-своему, они рано или поздно разошлись бы
 // (см. HANDOFF.md про блиц). Автопереход по таймеру — ТОЛЬКО на проекторе
@@ -12,6 +12,7 @@
 // Фазы 2/3 укорачиваются (`short`), если ВСЕ команды успели ответить ещё
 // на фазе 1 — ждать полное время незачем.
 import type { RevealSettings, RevealState } from '../types/quiz'
+import { serverNow } from './serverClock'
 
 /** Запас между истечением времени фазы и реальным переключением: даёт
  *  ведущему/залу увидеть «00» на таймере, а не прыжок в пустоту. */
@@ -27,7 +28,7 @@ export function revealPhaseSec(s: RevealSettings, phase: 1 | 2 | 3, short: boole
 }
 
 /** Старт вопроса: всегда с фазы 1, не укорочена. */
-export function revealStart(qid: string, s: RevealSettings, now = Date.now()): RevealState {
+export function revealStart(qid: string, s: RevealSettings, now = serverNow()): RevealState {
   return {
     qid, phase: 1, startedAt: new Date(now).toISOString(),
     phaseSec: revealPhaseSec(s, 1, false),
@@ -49,7 +50,7 @@ export function revealSwitchAt(rv: RevealState): number {
 /** Следующая фаза. `allAnswered` учитывается только на переходе 1→2 (решает,
  *  укорачивать ли фазы 2/3) — дальше `short` просто переносится как было. */
 export function revealNext(
-  rv: RevealState, s: RevealSettings, allAnswered: boolean, now = Date.now(),
+  rv: RevealState, s: RevealSettings, allAnswered: boolean, now = serverNow(),
 ): RevealState {
   if (rv.phase === 1) {
     const short = allAnswered

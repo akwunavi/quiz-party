@@ -294,6 +294,12 @@ function createApiHandler(store) {
     }
 
     try {
+      // ── серверное время: поправка часов устройств (src/lib/serverClock.ts) ──
+      if (seg[0] === 'server-now' && method === 'GET') {
+        sendJson(res, 200, { now: Date.now() })
+        return
+      }
+
       // ── health ──
       if (seg[0] === 'health' && method === 'GET') {
         sendJson(res, 200, { ok: true, version: VERSION, rev: st.rev, armed: st.armed, gameId: st.gameId })

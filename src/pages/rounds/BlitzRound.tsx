@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { currentTeam, liveLeft, remainingCount, type BlitzState, type BlitzQuestion } from '../../lib/blitzState'
 import type { Team } from '../../types/quiz'
+import { serverNow } from '../../lib/serverClock'
 
 // ═══ БЛИЦ НА ПРОЕКТОРЕ ═══
 //
@@ -71,9 +72,9 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
 }) {
   // Таймер перерисовываем сами: состояние в базе меняется редко, а секунды
   // на экране обязаны идти ровно.
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 250)
+    const t = setInterval(() => setNow(serverNow()), 250)
     return () => clearInterval(t)
   }, [])
 

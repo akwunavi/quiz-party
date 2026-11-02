@@ -20,9 +20,10 @@
 //   reveal        — угадали, показываем ответ и кто забрал баллы
 //   done          — трек закрыт, назад к доске
 import type { MelodyState } from '../types/quiz'
+import { serverNow } from './serverClock'
 
 /** Дедлайн через N секунд в том же формате, что читают все экраны. */
-export const melodyDeadline = (sec: number, now = Date.now()) =>
+export const melodyDeadline = (sec: number, now = serverNow()) =>
   new Date(now + sec * 1000).toISOString()
 
 /** Ключи всех треков раунда в порядке «тема-трек». */
@@ -76,7 +77,7 @@ export function melodyIdle(m: MelodyState): boolean {
  *  показа, потому что рулетку дёргают И проектор, И пульт в админке
  *  (AdminPage.tsx) — общая точка входа не даёт им разойтись. */
 export function melodySpin(m: MelodyState, key: string, freeCount: number,
-  spinSec: number, trackSec: number, now = Date.now()): MelodyState {
+  spinSec: number, trackSec: number, now = serverNow()): MelodyState {
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   const base = { ...m, key, order: undefined, turn: 0, chooser: undefined, startSec }
   if (freeCount <= 1) return { ...base, stage: 'listen', deadline: melodyDeadline(3, now) }
@@ -89,7 +90,7 @@ export function melodySpin(m: MelodyState, key: string, freeCount: number,
  *  инлайном прямо в обработчике кнопки на проекторе — вынесена сюда, чтобы
  *  не плодить вторую копию формулы `melodyPreviewCeiling`. */
 export function melodyPick(m: MelodyState, key: string, trackSec: number,
-  now = Date.now()): MelodyState {
+  now = serverNow()): MelodyState {
   const startSec = melodyRandomStart(melodyPreviewCeiling(trackSec))
   return {
     ...m, key, startSec, stage: 'listen', deadline: melodyDeadline(3, now),
@@ -104,7 +105,7 @@ export function melodyPlaySnippet(m: MelodyState, bidSec: number): MelodyState {
 
 /** Отрывок отыграл (или звук не пошёл) — открываем окно на ответ. */
 export function melodyAcceptAnswer(m: MelodyState, answerSec: number,
-  now = Date.now()): MelodyState {
+  now = serverNow()): MelodyState {
   return { ...m, stage: 'answering', deadline: melodyDeadline(answerSec, now) }
 }
 

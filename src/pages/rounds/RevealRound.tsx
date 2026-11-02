@@ -31,6 +31,7 @@ import type { PreviewCtx } from '../../lib/previewState'
 import { isForestTheme } from '../../forest/config'
 import { ForestReveal } from '../../forest/rounds/ForestRounds'
 import { teamTone } from '../../forest/rounds/views'
+import { serverNow } from '../../lib/serverClock'
 
 export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -81,7 +82,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
     const switchAt = revealSwitchAt(rv)
     if (!switchAt) return
     const tick = () => {
-      if (document.hidden || Date.now() < switchAt || advancedRef.current === key) return
+      if (document.hidden || serverNow() < switchAt || advancedRef.current === key) return
       advancedRef.current = key
       const allAnswered = rv.phase === 1 && !paperMode
         && revealAllAnswered(teams.map(t => t.id), rows)

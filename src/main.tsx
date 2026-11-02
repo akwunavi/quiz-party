@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { App } from './App'
 import { registerServiceWorker } from './lib/sw'
+import { startServerClock } from './lib/serverClock'
 
 // возврат на глубокий маршрут после 404-редиректа GitHub Pages
 const saved = sessionStorage.getItem('qp-redirect')
@@ -23,3 +24,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // не только медиа/данные игры (шаги 1–7). Регистрация — best-effort, ничего
 // не блокирует; подробности стратегии — `public/sw.js`.
 registerServiceWorker()
+
+// Общее «сейчас» по часам базы (миграция 0016): без неё — свои часы, как раньше.
+startServerClock()

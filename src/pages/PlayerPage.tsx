@@ -25,6 +25,7 @@ import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
 import { Hint, useHint } from '../components/Hint'
+import { serverNow } from '../lib/serverClock'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -355,12 +356,12 @@ export function AnagramPlayer({ team, gameState, round, roundLabel }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, letters.length])
 
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    setNow(Date.now())
-    if (!startedAt || gameState.reveal || !(Date.now() < endMs)) return
+    setNow(serverNow())
+    if (!startedAt || gameState.reveal || !(serverNow() < endMs)) return
     const t = setInterval(() => {
-      const n = Date.now()
+      const n = serverNow()
       setNow(n)
       if (n >= endMs) clearInterval(t)
     }, 500)
@@ -718,7 +719,7 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   // но после окончания таймера форма блокируется.
   const isSprint = round.mechanic === 'sprint'
   const sprintOver = isSprint && !!gameState.timer_started_at &&
-    Date.now() > new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
+    serverNow() > new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
   const unlocked = (i: number) =>
     isSprint ? !sprintOver
     : gameState.phase === 'answer_time' ? true : i <= gameState.question_index
@@ -1063,9 +1064,9 @@ function BlitzPlayer({ team, gameState, round }: {
   const [skipSent, setSkipSent] = useState(false)
   // Секунды окна на исправление тикают локально: состояние в базе
   // опрашивается раз в секунду, и отсчёт по нему дёргался бы.
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 250)
+    const t = setInterval(() => setNow(serverNow()), 250)
     return () => clearInterval(t)
   }, [])
 

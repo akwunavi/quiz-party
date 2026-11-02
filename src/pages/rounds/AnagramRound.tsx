@@ -31,6 +31,7 @@ import { ScrambleGame } from '../../forest/stage3/ScrambleGame'
 import { useRealTimer } from '../../forest/useTimer'
 import { hueOf, tcol } from '../../forest/util'
 import type { PreviewCtx } from '../../lib/previewState'
+import { serverNow } from '../../lib/serverClock'
 
 /** Страховка посадки плитки, если `transitionend` не придёт (вкладка в
  *  фоне, переход отключён чужим правилом). Отсчёт — от `transitionstart`
@@ -96,14 +97,14 @@ function useAnagramHints(q: Question, round: LoadedRound, gameState: GameState) 
 
   // Тик — только пока таймер идёт и ответ не показан: после этого экран
   // «успокаивается» (подсказки после конца таймера замирают сами).
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => serverNow())
   useEffect(() => {
-    setNow(Date.now())
+    setNow(serverNow())
     if (!startedAt || reveal) return
     const end = Date.parse(startedAt) + timerSec * 1000
-    if (!(Date.now() < end)) return
+    if (!(serverNow() < end)) return
     const t = setInterval(() => {
-      const n = Date.now()
+      const n = serverNow()
       setNow(n)
       if (n >= end) clearInterval(t)
     }, 250)

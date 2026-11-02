@@ -77,6 +77,7 @@ import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { choicesLenClass } from '../lib/questionLayout'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
+import { serverNow } from '../lib/serverClock'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -548,7 +549,7 @@ function HostInner({ gameState, pack }: {
   // ── Вопрос ──
   if (gameState.phase === 'question' && q) {
     const timeLow = !!gameState.timer_started_at &&
-      (Date.now() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
+      (serverNow() - new Date(gameState.timer_started_at).getTime()) / 1000 > round.timer_seconds - 10
     // Показ ответов после каждого вопроса переопределяет настройку раунда
     // общей настройкой пакета — та же формула, что и в QuestionScreen, нужна
     // здесь для кнопки «Показать ответ» / «Время ответов →».
@@ -651,7 +652,7 @@ function AnagramNav({ pack, round, gameState }: {
   const shownMap = useQuestionShown(gameState.game_id)
   const wasRun = anagramWasRun(shownMap, round.questions)
   const step = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-    index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+    index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun })
   const back = () => {
     const b = anagramBack(gameState.question_index)
     const from = navFrom(gameState)
@@ -659,7 +660,7 @@ function AnagramNav({ pack, round, gameState }: {
   }
   const next = () => {
     const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-      index: gameState.question_index, count: round.questions.length, nowMs: Date.now(), wasRun })
+      index: gameState.question_index, count: round.questions.length, nowMs: serverNow(), wasRun })
     if (st.kind === 'wait') return hint.show(st.text)
     const from = navFrom(gameState)
     if (st.kind === 'reveal') return void revealAnswer(from).catch(quietStale)
@@ -1255,7 +1256,7 @@ function BlitzScreen({ pack, round, gameState }: {
       const next = pickNext(bank, state.used)
       if (!next) return void push(finishNoQuestions(state))
       void markPlayed(next.id).catch(() => {})
-      void push(showQuestion(state, next.id, Date.now()))
+      void push(showQuestion(state, next.id, serverNow()))
     }, NEXT_DELAY_MS)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1277,11 +1278,11 @@ function BlitzScreen({ pack, round, gameState }: {
     // Скип приходит обычным ответом с меткой: команда сама решает, когда
     // сдаться. Проверять его нечего — сразу минус очко и ход дальше.
     if (mine.answer_text === SKIP_MARK) {
-      void push(skip(resumeAfterCheck(state, Date.now()), Date.now()))
+      void push(skip(resumeAfterCheck(state, serverNow()), serverNow()))
       return
     }
     const ok = autocheck(q.answer, mine.answer_text) === true
-    void push(pauseForCheck(state, Date.now(), ok ? 'ok' : 'no', mine.answer_text))
+    void push(pauseForCheck(state, serverNow(), ok ? 'ok' : 'no', mine.answer_text))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers, cur?.questionId, cur?.lastAnswer])
 
@@ -1299,9 +1300,9 @@ function BlitzScreen({ pack, round, gameState }: {
     // отправляя правки каждые четыре секунды, держала бы свой таймер
     // остановленным сколько угодно: время на проверку не списывается.
     const delay = isFinalWrong ? FINAL_WRONG_DELAY_MS : NEXT_DELAY_MS
-    const wait = Math.max(0, delay - (Date.now() - (cur.pausedAt ?? Date.now())))
+    const wait = Math.max(0, delay - (serverNow() - (cur.pausedAt ?? serverNow())))
     const t = setTimeout(() => {
-      const now = Date.now()
+      const now = serverNow()
       const resumed = resumeAfterCheck(state, now)
       // Оценку проставляем и самому ответу: иначе он остаётся
       // «неоценённым» и портит сводку по раунду.
@@ -1328,13 +1329,13 @@ function BlitzScreen({ pack, round, gameState }: {
           {state?.finished ? <AfterRoundNav pack={pack} gameState={gameState} /> : state && <>
             {cur?.verdict && (
               <button className="ghost" onClick={() => {
-                const now = Date.now()
+                const now = serverNow()
                 const r = resumeAfterCheck(state, now)
                 void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
               }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
             )}
             {cur && cur.verdict !== 'ok' && (
-              <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>Скип −1</button>
+              <button className="ghost" onClick={() => void push(skip(state, serverNow()))}>Скип −1</button>
             )}
             <button className="ghost dark" onClick={() => {
               if (confirm('Завершить блиц досрочно?')) void push(finishNoQuestions(state))
@@ -1415,7 +1416,7 @@ function BlitzScreen({ pack, round, gameState }: {
       <div className="host-actions">
         {cur?.verdict && (
           <button className="ghost" onClick={() => {
-            const now = Date.now()
+            const now = serverNow()
             const r = resumeAfterCheck(state, now)
             void push(cur.verdict === 'ok' ? answerWrong(r, now) : answerCorrect(r, now))
           }}>Исправить на «{cur.verdict === 'ok' ? 'неверно' : 'верно'}»</button>
@@ -1424,7 +1425,7 @@ function BlitzScreen({ pack, round, gameState }: {
             `!cur.verdict`, и кнопка исчезала на первой же ошибке — вернуть
             ход было нечем, кроме завершения раунда. */}
         {cur && cur.verdict !== 'ok' && (
-          <button className="ghost" onClick={() => void push(skip(state, Date.now()))}>
+          <button className="ghost" onClick={() => void push(skip(state, serverNow()))}>
             Скип −1
           </button>
         )}
@@ -1623,7 +1624,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     // по истечении таймера музыка играет ЕЩЁ 3 СЕК и мягко глохнет
     let fade: number | undefined
     const total = (seconds ?? round.timer_seconds ?? 60) * 1000
-    const msLeft = startedAt ? total - (Date.now() - new Date(startedAt).getTime()) : total
+    const msLeft = startedAt ? total - (serverNow() - new Date(startedAt).getTime()) : total
     const stop = window.setTimeout(() => {
       fade = window.setInterval(() => {
         a.volume = Math.max(0, a.volume - 0.1)
@@ -2086,7 +2087,7 @@ function AutoReveal({ enabled, startedAt, seconds, from }: {
   fromRef.current = from
   useEffect(() => {
     if (!enabled || !startedAt) return
-    const ms = new Date(startedAt).getTime() + seconds * 1000 - Date.now()
+    const ms = new Date(startedAt).getTime() + seconds * 1000 - serverNow()
     const f = fromRef.current
     const t = setTimeout(() => { void revealAnswer(f).catch(quietStale) }, Math.max(0, ms))
     return () => clearTimeout(t)
@@ -2109,7 +2110,7 @@ function AutoAdvance({ round, gameState, isLast }: {
     const fireAt = started + (round.timer_seconds + sec) * 1000
     // если время уже вышло (вернулись на вопрос), листаем почти сразу,
     // а не молчим — раньше при ms <= 0 эффект просто выходил
-    const ms = Math.max(500, fireAt - Date.now())
+    const ms = Math.max(500, fireAt - serverNow())
     // 9.78: таймер мог сработать на устаревшем снимке (ведущий уже ушёл
     // дальше с пульта) — листаем, только если игра всё ещё на ЭТОМ вопросе
     const from = navFrom(gameState)
@@ -2334,8 +2335,8 @@ function BreakScreen({ pack, round, gameState }: {
   const minutes = (round.settings as { break_after_minutes?: number }).break_after_minutes ?? 10
   const [left, setLeft] = useState(minutes * 60)
   useEffect(() => {
-    const started = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : Date.now()
-    const tick = () => setLeft(Math.max(0, Math.round(minutes * 60 - (Date.now() - started) / 1000)))
+    const started = gameState.timer_started_at ? new Date(gameState.timer_started_at).getTime() : serverNow()
+    const tick = () => setLeft(Math.max(0, Math.round(minutes * 60 - (serverNow() - started) / 1000)))
     tick()
     const t = setInterval(tick, 500)
     return () => clearInterval(t)
@@ -2383,8 +2384,8 @@ function CountingScreen({ pack, gameState }: {
   const [left, setLeft] = useState(MINUTES * 60)
   useEffect(() => {
     const started = gameState.timer_started_at
-      ? new Date(gameState.timer_started_at).getTime() : Date.now()
-    const tick = () => setLeft(Math.max(0, Math.round(MINUTES * 60 - (Date.now() - started) / 1000)))
+      ? new Date(gameState.timer_started_at).getTime() : serverNow()
+    const tick = () => setLeft(Math.max(0, Math.round(MINUTES * 60 - (serverNow() - started) / 1000)))
     tick()
     const t = setInterval(tick, 500)
     return () => clearInterval(t)

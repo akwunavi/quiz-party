@@ -11,6 +11,7 @@ import { createAudio } from '../../lib/audioSource'
 import type { PreviewCtx } from '../../lib/previewState'
 import { isForestTheme } from '../../forest/config'
 import { ForestSprintBoard } from '../../forest/rounds/ForestRounds'
+import { serverNow } from '../../lib/serverClock'
 
 export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -53,7 +54,7 @@ export function SprintBoard({ pack, round, gameState, timerNode, preview }: {
   useEffect(() => {
     if (preview || !gameState.timer_started_at || document.hidden) return
     const endsAt = new Date(gameState.timer_started_at).getTime() + round.timer_seconds * 1000
-    const ms = endsAt - Date.now() + afterTimer * 1000
+    const ms = endsAt - serverNow() + afterTimer * 1000
     // 9.78: только если игра всё ещё на спринте — таймер мог пережить уход с пульта
     const from = navFrom(gameState)
     const t = setTimeout(() => { void gotoAnswers(0, false, from).catch(quietStale) }, Math.max(0, ms))

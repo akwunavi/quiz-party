@@ -6,6 +6,7 @@ import { supabase } from './supabase'
 import { uuid } from './uuid'
 import { patchSessionFrom, type NavFrom } from './navGuard'
 import type { SessionPatch } from './transport/types'
+import { serverIso } from './serverClock'
 
 /** Переход по игре: с `from` — только если игра всё ещё там, откуда жали
  *  (lib/navGuard.ts, 9.78); без — как раньше, слепо. */
@@ -109,7 +110,7 @@ export async function gotoQuestionShown(question_index: number, from?: NavFrom) 
 export async function startTimer(question?: {
   gameId: string; roundNumber: number; questionRef: string
 }) {
-  const now = new Date().toISOString()
+  const now = serverIso()
   await room.patchSession(getRoomId(), { timer_started_at: now })
   if (question) {
     // не блокируем игру, если это не записалось — markQuestionShown сама
@@ -125,7 +126,7 @@ export async function startTimer(question?: {
 /** «Время ответов»: минута на подумать перед разбором (как в старом проекте). */
 export async function startAnswerTime(from?: NavFrom) {
   await nav({
-    phase: 'answer_time', timer_started_at: new Date().toISOString(), reveal: false,
+    phase: 'answer_time', timer_started_at: serverIso(), reveal: false,
   }, from)
 }
 
@@ -142,7 +143,7 @@ export async function showScoreboard(from?: NavFrom) {
 
 export async function startBreak(from?: NavFrom) {
   await nav({
-    phase: 'break', timer_started_at: new Date().toISOString(),
+    phase: 'break', timer_started_at: serverIso(),
   }, from)
 }
 
@@ -161,7 +162,7 @@ export async function markRoundCompleted(completed: number[]) {
  *  только к итогам, и уводит с неё ведущий, когда закончит считать. */
 export async function startCounting(from?: NavFrom) {
   await nav({
-    phase: 'counting', timer_started_at: new Date().toISOString(), reveal: false,
+    phase: 'counting', timer_started_at: serverIso(), reveal: false,
   }, from)
 }
 
@@ -208,12 +209,12 @@ export async function finishGame(packId: string | null, bar = false, from?: NavF
 }
 
 export async function registerTeam(name: string, color: string, game_id: string, icon: string | null = null) {
-  return room.upsertTeam({ name, color, icon, game_id, last_seen_at: new Date().toISOString() })
+  return room.upsertTeam({ name, color, icon, game_id, last_seen_at: serverIso() })
 }
 
 /** Heartbeat игрока — раз в полинг обновляем last_seen_at. */
 export async function heartbeat(teamId: string) {
-  await room.patchTeam(teamId, { last_seen_at: new Date().toISOString() })
+  await room.patchTeam(teamId, { last_seen_at: serverIso() })
 }
 
 /** Полный сброс игры: активный пакет возвращается в ready, состояние — в лобби без пакета. */

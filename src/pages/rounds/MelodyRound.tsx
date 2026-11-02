@@ -40,6 +40,7 @@ import { useEntrance } from '../../forest/stage1/common'
 import { MelodyScene, MelPanel, melBuild, MEL_STAGE, type MelView, type MelPanelData, type MelTeamV } from '../../forest/stage2/Melody'
 import { melLayout, melBellPos } from '../../forest/stage2/layout'
 import { melodyPoints } from '../../lib/melody'
+import { serverNow } from '../../lib/serverClock'
 
 /** Завершение раунда мелодии: дальше по пакету или в финал. */
 async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
@@ -62,7 +63,7 @@ async function finishMelodyRound(gameState: GameState, pack: LoadedPack) {
 // (HANDOFF.md §3bu), чтобы regression-тест гонки импортировал РЕАЛЬНЫЙ код,
 // а не копию.
 
-const inSec = (s: number) => new Date(Date.now() + s * 1000).toISOString()
+const inSec = (s: number) => new Date(serverNow() + s * 1000).toISOString()
 
 /** Длина трека на показе ответа — одно число на RevealTrack и на автопереход
  *  дальше, к доске. Раньше было продублировано как магическая константа
@@ -122,8 +123,8 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const answers = preview ? preview.answers : liveAnswers
   const played = m.played ?? []
   const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
+  const [now, setNow] = useState(serverNow())
+  useEffect(() => { const t = setInterval(() => setNow(serverNow()), 200); return () => clearInterval(t) }, [])
 
   // Дедлайн записал ДРУГОЙ экран (пульт) по своим часам — сверяем с нашими (ADM-03, 10.27).
   const rawDeadline = m.deadline ? new Date(m.deadline).getTime() : 0
@@ -134,7 +135,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const dlSig = `${m.key}|${m.stage}|${m.deadline}`
   if (!rawDeadline || maxSec == null) dlSeen.current = null
   else if (dlSeen.current?.sig !== dlSig) {
-    dlSeen.current = { sig: dlSig, adj: melodyRebaseDeadline(rawDeadline, Date.now(), maxSec, mounted.current) }
+    dlSeen.current = { sig: dlSig, adj: melodyRebaseDeadline(rawDeadline, serverNow(), maxSec, mounted.current) }
   }
   const deadline = dlSeen.current ? dlSeen.current.adj : rawDeadline
   // Вкладка проектора вернулась из фона: эффекты ниже на скрытой вкладке молчат и сами
@@ -737,13 +738,13 @@ function useMelodySpin(themes: MelodyTheme[], played: string[], spinning: boolea
     if (!spinning || !spinKey || free.length === 0) { setCursor(-1); setLanded(false); return }
     const target = free.indexOf(spinKey)
     if (target < 0) { setCursor(-1); setLanded(false); return }
-    const end = spinDeadline || Date.now() + spinTotalMs
+    const end = spinDeadline || serverNow() + spinTotalMs
     const start = end - spinTotalMs
     const spin = melodySpinPath(free.length, target, spinTotalMs, melodySpinSeed(`${spinKey}|${end}`))
     const lastJump = spin.times[spin.times.length - 1] ?? 0
     let raf = 0
     const tick = () => {
-      const elapsed = Date.now() - start
+      const elapsed = serverNow() - start
       setCursor(melodySpinAt(spin, elapsed))
       setLanded(elapsed >= lastJump)
       if (elapsed < spinTotalMs) raf = requestAnimationFrame(tick)
@@ -793,7 +794,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
     const x = t.left - b.left + t.width / 2, y = t.top - b.top + t.height / 2
     marker.style.transform = `translate(${x}px, ${y}px)`
   }, [theme, spinning, highlighted])
-  const nearEnd = spinning && !!spinDeadline && Date.now() >= spinDeadline - 1000
+  const nearEnd = spinning && !!spinDeadline && serverNow() >= spinDeadline - 1000
 
   return (
     <div className={`mel-board${spinning ? ' spinning' : ''}`} ref={boardRef} style={{
