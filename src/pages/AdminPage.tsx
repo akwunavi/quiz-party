@@ -2050,6 +2050,21 @@ function MelodyControls({ round, gameState, onFinish }: {
   const trackCorrect = themes[ti]?.tracks?.[i || 0]?.correct?.trim()
   const first = (m.turn ?? 0) === 0
   const hasSecond = (m.order?.length ?? 0) > 1
+  // ADM-03: состояние звука на проекторе (пишет проектор, см. MelodyRound.useMelodyBoard).
+  // Играющий трек виден по стадии: listen/snippet/passed.
+  const au = m.audio
+  const playingNow = m.stage === 'listen' || m.stage === 'snippet' || m.stage === 'passed'
+  const audioChip = (() => {
+    if (!au) return { cls: 'wait', text: '🔈 Проектор: статус звука ещё не пришёл (откройте проектор)' }
+    if (au.state === 'locked') return { cls: 'bad', text: '🔇 Проектор: звук заблокирован браузером — кликните по экрану проектора один раз' }
+    if (au.state === 'loading') return { cls: 'wait', text: `⏳ Проектор: скачивает треки ${au.done ?? 0}/${au.total ?? '?'}` }
+    if (au.state === 'error') return { cls: 'bad', text: `⚠ Проектор: не скачалось ${au.failed ?? '?'} из ${au.total ?? '?'} треков` }
+    return playingNow ? { cls: 'ok', text: '🔊 Проектор: играет' } : { cls: 'ok', text: '✓ Проектор: звук готов' }
+  })()
+  const audioProblem = !au || au.state !== 'ready'
+  const audioLine = (
+    <div className={`adm-audio-chip ${audioChip.cls}`} role="status">{audioChip.text}</div>
+  )
 
   // Аварийный выход: доступен на любой активной стадии, кроме показа
   // результата — интернет у команд отваливается, ответы не долетают, и
@@ -2073,6 +2088,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   if (melodyIdle(m)) {
     return (
       <div className="adm-blitz">
+        {audioLine}
         {free.length > 0 ? (<>
           <div className="adm-qtext" style={{ textAlign: 'center' }}>
             🎵 Отыграно {played.length} из {total} треков.
@@ -2081,6 +2097,8 @@ function MelodyControls({ round, gameState, onFinish }: {
               «Стартуем!», дальше «Рулетка» — разные подписи для одного и
               того же действия путали бы */}
           <button className="adm-btn primary" onClick={() => {
+            // не блокируем, а предупреждаем: заблокированный звук = трек не заиграет (ADM-03)
+            if (audioProblem && !confirm(`${audioChip.text}\n\nТрек может не зазвучать. Всё равно запустить?`)) return
             const initialTarget = free[Math.floor(Math.random() * free.length)]
             void runAction('рулетка мелодии', () => melodyClick(gameState, cur => {
               if (!melodyIdle(cur)) return null
@@ -2128,6 +2146,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   return (
     <div className="adm-blitz">
       <div className="adm-dim">{trackLine}</div>
+      {audioLine}
       {trackCorrect && <div className="adm-correct" style={{ textAlign: 'center' }}>Ответ: <b>{trackCorrect}</b></div>}
 
       {/* рулетка и секунда трека — короткие автошаги, доступного действия

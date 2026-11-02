@@ -339,3 +339,30 @@ export function melodyEmergencyClose(
     cur.key === key && !melodyIdle(cur) && cur.stage !== 'reveal' ? melodyClose(cur) : null
   )
 }
+
+/** Сколько секунд длится стадия (для защиты от сдвига часов, ADM-03). null — у стадии нет дедлайна. */
+export function melodyStageMaxSec(m: MelodyState, s: {
+  bidSec?: number; answerSec?: number; passAnswerSec?: number }): number | null {
+  switch (m.stage) {
+    case 'spinning': return (m.spinMs ?? 8000) / 1000
+    case 'listen': return 3
+    case 'bidding': return s.bidSec ?? 10
+    case 'answering': return s.answerSec ?? 30
+    case 'passed': return s.passAnswerSec ?? 10
+    default: return null
+  }
+}
+
+/** Дедлайн, записанный ДРУГИМ устройством (пульт), прочитан часами ЭТОГО (проектор).
+ *  Часы телефона убежали вперёд — рулетка «крутилась» бы минуту; отстали — стадия
+ *  кончалась бы мгновенно. Если при первом взгляде остаток заведомо не из диапазона
+ *  [-допуск, длительность+допуск] — это расхождение часов: пересчитываем дедлайн от
+ *  момента, когда мы увидели стадию. `live` — стадия возникла на наших глазах (а не
+ *  экран открыт посреди неё): только тогда «давно истёк» считается расхождением. */
+export function melodyRebaseDeadline(deadlineMs: number, nowMs: number, maxSec: number,
+  live: boolean, tolMs = 4000): number {
+  const rem = deadlineMs - nowMs
+  if (rem > maxSec * 1000 + tolMs) return nowMs + maxSec * 1000
+  if (live && rem < -tolMs) return nowMs + maxSec * 1000
+  return deadlineMs
+}

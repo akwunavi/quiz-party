@@ -26,8 +26,9 @@ import { updateMelody, melodyClick, gradeMelody, passMelody } from '../../lib/me
 import {
   melodySpin, melodyPick, melodyPlaySnippetIfFresh, melodyAcceptAnswer, melodyRevealMiss, melodyPass, melodySpinPath, melodySpinAt, melodySpinSeed,
   melodyToBoard, melodyIdle, melodyFree, guardMelody, melodyOrderFromBids, melodyBidSec,
-  melodyEmergencyClose, MELODY_MAX_BID_SEC,
+  melodyEmergencyClose, MELODY_MAX_BID_SEC, melodyStageMaxSec, melodyRebaseDeadline,
 } from '../../lib/melody'
+import { useAudioUnlock } from '../../components/AudioGate'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -124,7 +125,26 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 200); return () => clearInterval(t) }, [])
 
-  const deadline = m.deadline ? new Date(m.deadline).getTime() : 0
+  // Дедлайн записал ДРУГОЙ экран (пульт) по своим часам — сверяем с нашими (ADM-03, 10.27).
+  const rawDeadline = m.deadline ? new Date(m.deadline).getTime() : 0
+  const maxSec = melodyStageMaxSec(m, s)
+  const dlSeen = useRef<{ sig: string; adj: number } | null>(null)
+  const mounted = useRef(false)
+  useEffect(() => { mounted.current = true }, [])
+  const dlSig = `${m.key}|${m.stage}|${m.deadline}`
+  if (!rawDeadline || maxSec == null) dlSeen.current = null
+  else if (dlSeen.current?.sig !== dlSig) {
+    dlSeen.current = { sig: dlSig, adj: melodyRebaseDeadline(rawDeadline, Date.now(), maxSec, mounted.current) }
+  }
+  const deadline = dlSeen.current ? dlSeen.current.adj : rawDeadline
+  // Вкладка проектора вернулась из фона: эффекты ниже на скрытой вкладке молчат и сами
+  // не просыпаются — стадия застревала. Тик заставляет их перепроверить условия.
+  const [visTick, setVisTick] = useState(0)
+  useEffect(() => {
+    const on = () => { if (!document.hidden) setVisTick(n => n + 1) }
+    document.addEventListener('visibilitychange', on)
+    return () => document.removeEventListener('visibilitychange', on)
+  }, [])
   const left = deadline ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0
   // максимум, который видели в этой фазе → доля остатка для песочных часов
   const phaseMax = useRef(0)
@@ -221,7 +241,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       offPlaying()
       h.stop()
     }
-  }, [preview, m.stage, m.key])
+  }, [preview, m.stage, m.key, visTick])
 
   // ── единственный обработчик переходов: сработал дедлайн — двигаем стадию ──
   useEffect(() => {
@@ -267,7 +287,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
         ))
       }
     }
-  }, [preview, expired, m.stage, answers])
+  }, [preview, expired, m.stage, answers, visTick])
 
   // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
@@ -322,7 +342,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       // путём, трек не должен утечь в следующую стадию (bidding).
       h.stop()
     }
-  }, [preview, m.stage, m.key])
+  }, [preview, m.stage, m.key, visTick])
 
 
   // ── фоновая музыка на время размышления ──
@@ -331,7 +351,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     if (preview || (m.stage !== 'answering' && m.stage !== 'bidding') || !bgMusic || document.hidden) return
     const h = playShared(mediaUrl(bgMusic), { loop: true, volume: .45 })
     return () => h.stop()
-  }, [preview, m.stage, bgMusic])
+  }, [preview, m.stage, bgMusic, visTick])
 
   // ── вторая команда: трек целиком, по окончании — окно на ответ ──
   useEffect(() => {
@@ -341,7 +361,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       { key: m.key, stage: 'passed' }, cur => (cur.deadline ? null : { ...cur, deadline: inSec(s.passAnswerSec ?? 10) }),
     )))
     return () => { off(); h.stop() }
-  }, [preview, m.stage])
+  }, [preview, m.stage, visTick])
 
   // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
   // spinning/listen — самый ранний момент, когда ключ трека уже известен, но
@@ -364,6 +384,29 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     return preloadAudioAll(trackUrls, setLoadState)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, trackSig])
+
+  // ── Состояние звука проектора → общий мешок, пульт его показывает (ADM-03, 10.27) ──
+  // Пишет ТОЛЬКО проектор и только когда значение изменилось. Мешок стирают
+  // жёсткие сбросы между раундами — тогда эффект (зависит от m.audio) допишет заново.
+  const unlocked = useAudioUnlock()
+  const audioNow: NonNullable<MelodyState['audio']> =
+    loadState && loadState.total > 0 && loadState.done + loadState.failed < loadState.total
+      ? { state: 'loading', done: loadState.done, failed: loadState.failed, total: loadState.total }
+      : loadState && loadState.failed > 0
+        ? { state: 'error', done: loadState.done, failed: loadState.failed, total: loadState.total }
+        : !unlocked ? { state: 'locked' } : { state: 'ready' }
+  const audioSig = `${audioNow.state}|${audioNow.done ?? ''}|${audioNow.failed ?? ''}|${audioNow.total ?? ''}`
+  const storedSig = `${m.audio?.state}|${m.audio?.done ?? ''}|${m.audio?.failed ?? ''}|${m.audio?.total ?? ''}`
+  useEffect(() => {
+    if (preview || document.hidden || audioSig === storedSig) return
+    const t = window.setTimeout(() => {
+      void updateMelody(gameState, cur => (
+        `${cur.audio?.state}|${cur.audio?.done ?? ''}|${cur.audio?.failed ?? ''}|${cur.audio?.total ?? ''}` === audioSig
+          ? null : { ...cur, audio: audioNow }))
+    }, 600)        // не чаще раза в долю секунды: прогресс скачивания меняется часто
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, audioSig, storedSig, visTick])
 
   // фоновая музыка размышления — прогреваем при монтировании доски, не ждём стадии
   useEffect(() => {
