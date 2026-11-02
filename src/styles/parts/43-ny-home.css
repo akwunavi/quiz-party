@@ -218,3 +218,26 @@
 .theme-ny_home .host-screen .answer-note.n-m { font-size: calc(30 * var(--u)); }
 .theme-ny_home .host-screen .answer-note.n-l { font-size: calc(28 * var(--u)); }
 .theme-ny_home .host-screen .answer-note.n-xl { font-size: calc(26 * var(--u)); }
+
+/* ═══ DESIGN-01 (10.38): итоговое ТАБЛО в «Тёплом доме» — как на табло телевизора: полоса команды, медали, итог золотом ═══ */
+.theme-ny_home .fin-screen :is(.fw-burst, .fw-flash, .fw-spark) { display: none; }
+.theme-ny_home .fin-table-wrap { width: min(94%, calc(1500 * var(--u))); margin-inline: auto; padding: calc(14 * var(--u)) calc(30 * var(--u)) calc(18 * var(--u)); }
+.theme-ny_home .fin-table { width: 100%; border-collapse: separate; border-spacing: 0 calc(4 * var(--u)); }
+.theme-ny_home .fin-table th { font-weight: 700; letter-spacing: .14em; color: var(--nh-gold); text-align: center; }
+.theme-ny_home .fin-table :is(th, td):nth-child(2) { text-align: left; }
+.theme-ny_home .fin-table td { text-align: center; border-bottom: 1px solid rgba(217, 178, 92, .3); vertical-align: middle; color: var(--fg); }
+.theme-ny_home .fin-table td:first-child { text-align: right; white-space: nowrap; width: calc(150 * var(--u)); padding-right: calc(18 * var(--u)); border-bottom-color: transparent; color: var(--nh-gold); }
+.theme-ny_home .fin-table td:nth-child(2) { border-left: calc(12 * var(--u)) solid var(--tc, var(--nh-gold)); padding-left: calc(20 * var(--u)); font-weight: 700; color: var(--fg) !important; }
+.theme-ny_home .fin-medal { display: inline-block; height: 1.75em; width: auto; vertical-align: middle; margin-right: .4em; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)); }
+.theme-ny_home .fin-row.top3 td:not(:first-child) { background: rgba(217, 178, 92, .12); }
+.theme-ny_home .fin-row.fin-first td:not(:first-child) { background: rgba(217, 178, 92, .26); border-bottom-color: var(--nh-gold); }
+.theme-ny_home .fin-table td:last-child { font-size: calc(36 * var(--u)); }
+.theme-ny_home .fin-table td:last-child b { color: var(--nh-gold); }
+
+/* кегль таблицы задаёт ОДНО место (таблица) — его ужимает useFitText при многих командах; ячейки наследуют */
+.theme-ny_home .fin-screen .fin-table { font-size: calc(28 * var(--u)); }
+.theme-ny_home .fin-screen .fin-table-wrap :is(td, th, .total, .pos) { font-size: inherit; }
+.theme-ny_home .fin-screen .fin-table th { font-size: .72em; }
+.theme-ny_home .fin-screen .fin-table td:last-child { font-size: 1.28em; }
+.theme-ny_home .fin-screen .fin-table-wrap tr { height: auto; }
+.theme-ny_home .fin-screen .fin-table .sb-name { font-size: 1.2em; }

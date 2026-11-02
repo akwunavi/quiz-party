@@ -55,6 +55,7 @@ import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
 import { RulesFrame } from '../components/RulesFrame'
+import { FinMedal } from '../components/FinMedal'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, InfoSlide, ThemeKey } from '../types/quiz'
@@ -2605,9 +2606,9 @@ function Finale({ pack, gameId, gameState }: {
           {rows.map(({ team: t, place, shared }, idx) => {
             const isIn = idx >= rows.length - revealedFin
             return (
-            <tr key={t.id} className={`fin-row${place <= 3 ? ' top3' : ''}${
+            <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
-              <td className="fin-pos">{place}{shared && <span className="sb-eq">=</span>}</td>
+              <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color }}><span className="sb-name">{t.name}</span></td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>

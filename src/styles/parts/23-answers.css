@@ -595,3 +595,4 @@
    идут плитки. */
 .answer-block > .choices-grid + .answer-note,
 .answer-block > .order-answer + .answer-note { margin-top: clamp(10px, 1.6vh, 22px); }
+.fin-medal { display: none; }

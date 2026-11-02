@@ -374,3 +374,28 @@
 .theme-ny_book .an-res-label { color: var(--nb-ink); }
 .theme-ny_book .an-res-chip { color: var(--nb-ink) !important; background: var(--nb-card); }
 .theme-ny_book .an-res-team { color: var(--nb-ink) !important; }
+
+/* ═══ DESIGN-01 (10.38): итоговое ТАБЛО в «Книге» — таблица результатов, не пьедестал ═══
+   Табличный лист: полоса цвета команды слева, медали у 1–3 мест, итог крупно красным, призовые строки подкрашены. */
+.theme-ny_book .fin-screen :is(.fw-burst, .fw-flash, .fw-spark) { display: none; }
+.theme-ny_book .fin-screen .neon-title { font-family: var(--nb-serif); font-weight: 800; text-transform: none; color: var(--nb-ink) !important; }
+.theme-ny_book .fin-table-wrap { width: min(94%, calc(1500 * var(--u))); margin-inline: auto; padding: calc(14 * var(--u)) calc(30 * var(--u)) calc(18 * var(--u)); }
+.theme-ny_book .fin-table { width: 100%; border-collapse: separate; border-spacing: 0 calc(4 * var(--u)); }
+.theme-ny_book .fin-table th { font-weight: 800; letter-spacing: .14em; color: var(--muted); text-align: center; }
+.theme-ny_book .fin-table :is(th, td):nth-child(2) { text-align: left; }
+.theme-ny_book .fin-table td { text-align: center; border-bottom: 2px solid var(--nb-shade); vertical-align: middle; }
+.theme-ny_book .fin-table td:first-child { text-align: right; white-space: nowrap; width: calc(150 * var(--u)); padding-right: calc(18 * var(--u)); border-bottom-color: transparent; }
+.theme-ny_book .fin-table td:nth-child(2) { border-left: calc(12 * var(--u)) solid var(--tc, var(--nb-ink)); padding-left: calc(20 * var(--u)); font-weight: 700; }
+.theme-ny_book .fin-medal { display: inline-block; height: 1.75em; width: auto; vertical-align: middle; margin-right: .4em; filter: drop-shadow(0 2px 2px rgba(60, 30, 10, .35)); }
+.theme-ny_book .fin-row.top3 td:not(:first-child) { background: rgba(217, 164, 65, .16); }
+.theme-ny_book .fin-row.fin-first td:not(:first-child) { background: rgba(217, 164, 65, .36); border-bottom-color: var(--nb-mustard); }
+.theme-ny_book .fin-table td:last-child { font-size: calc(36 * var(--u)); }
+.theme-ny_book .fin-table td:last-child b { color: var(--nb-red); }
+
+/* кегль таблицы задаёт ОДНО место (таблица) — его ужимает useFitText при многих командах; ячейки наследуют */
+.theme-ny_book .fin-screen .fin-table { font-size: calc(28 * var(--u)); }
+.theme-ny_book .fin-screen .fin-table-wrap :is(td, th, .total, .pos) { font-size: inherit; }
+.theme-ny_book .fin-screen .fin-table th { font-size: .72em; }
+.theme-ny_book .fin-screen .fin-table td:last-child { font-size: 1.28em; }
+.theme-ny_book .fin-screen .fin-table-wrap tr { height: auto; }
+.theme-ny_book .fin-screen .fin-table .sb-name { font-size: 1.2em; }
