@@ -212,3 +212,9 @@
 .theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: calc(72 * var(--u)); }
 .theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: calc(60 * var(--u)); }
 .theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: calc(50 * var(--u)); }
+
+/* UI-03 (10.35): пояснение к ответу — длинное не мельчает «ступенью», а занимает свободное место экрана */
+.theme-ny_home .host-screen .answer-note { font-size: calc(32 * var(--u)); }
+.theme-ny_home .host-screen .answer-note.n-m { font-size: calc(30 * var(--u)); }
+.theme-ny_home .host-screen .answer-note.n-l { font-size: calc(28 * var(--u)); }
+.theme-ny_home .host-screen .answer-note.n-xl { font-size: calc(26 * var(--u)); }

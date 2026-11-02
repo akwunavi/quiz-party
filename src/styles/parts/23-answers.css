@@ -160,9 +160,9 @@
   padding: clamp(6px, 1vh, 12px) clamp(14px, 1.6vw, 26px);
   border-left: 3px solid var(--ok); background: rgba(255,255,255,.04);
   font-size: clamp(22px, 2.4vw, 42px); }
-.answer-note.n-m { font-size: clamp(19px, 2vw, 34px); }
-.answer-note.n-l { font-size: clamp(17px, 1.7vw, 28px); }
-.answer-note.n-xl { font-size: clamp(15px, 1.45vw, 23px); line-height: 1.4; }
+.answer-note.n-m { font-size: clamp(20px, 2.2vw, 38px); }
+.answer-note.n-l { font-size: clamp(18px, 2vw, 34px); }
+.answer-note.n-xl { font-size: clamp(17px, 1.75vw, 30px); line-height: 1.4; }
 /* пояснение сбоку (бумага, картинка справа) — тоже крупнее */
 
 /* ── п.3: «РАУНД» в теме ГП не читался — тонкая золотая надпись на тёмном ── */

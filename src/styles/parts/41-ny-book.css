@@ -349,3 +349,28 @@
 .theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: calc(84 * var(--u)); }
 .theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: calc(68 * var(--u)); }
 .theme-ny_book .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: calc(58 * var(--u)); }
+
+/* UI-03 (10.35): пояснение к ответу — длинное не мельчает «ступенью», а занимает свободное место экрана */
+.theme-ny_book .host-screen .answer-note { font-size: calc(32 * var(--u)); }
+.theme-ny_book .host-screen .answer-note.n-m { font-size: calc(30 * var(--u)); }
+.theme-ny_book .host-screen .answer-note.n-l { font-size: calc(28 * var(--u)); }
+.theme-ny_book .host-screen .answer-note.n-xl { font-size: calc(26 * var(--u)); }
+
+/* ═══ UI-04 / UI-05 (10.35): «Книга» — читаемые буквы «Скрэмбла» и «Трёх попыток» ═══
+   Декоративный display-шрифт (Ruslan) на плитках и в слове ломал начертание («Л» → «Λ», мелкие строчные в ответе), а
+   ответы команд шли мелким моно-шрифтом ЦВЕТОМ КОМАНДЫ на бумаге (жёлтая/голубая — почти не видны). Ориентир —
+   плашки результата «Скрэмбла»: чернила на бумаге, цвет команды — только полоской/рамкой. */
+.theme-ny_book :is(.an-tile, .an-cell, .rv-word, .rv-cell, .rv-answer) { font-family: var(--nb-serif); font-weight: 800; text-transform: uppercase; }
+.theme-ny_book .rv-cell { background: var(--nb-card); border-color: var(--nb-red); }
+.theme-ny_book .rv-answer { color: var(--nb-ink); font-size: calc(64 * var(--u)); }
+.theme-ny_book .rv-note { color: var(--muted); font-style: italic; font-size: calc(28 * var(--u)); }
+.theme-ny_book .rv-teams { gap: calc(14 * var(--u)); font-family: var(--nb-serif); font-weight: 700; font-size: calc(30 * var(--u)); margin-top: calc(14 * var(--u)); }
+.theme-ny_book .rv-teams > span { color: var(--nb-ink) !important; background: var(--nb-card); border: 2px solid var(--nb-shade);
+  border-left: calc(12 * var(--u)) solid var(--tc, var(--nb-ink)); border-radius: 6px; padding: calc(6 * var(--u)) calc(16 * var(--u)); box-shadow: 0 3px 0 var(--nb-shade); }
+.theme-ny_book .rv-word-wrap { margin-top: calc(14 * var(--u)); }
+/* «Скрэмбл»: имена команд — чернилами (цвет команды остаётся полоской/рамкой), подпись результата — читаемой гарнитурой */
+.theme-ny_book .an-team-name { color: var(--nb-ink) !important; }
+.theme-ny_book :is(.an-res-label, .an-res-team, .an-res-chip, .an-res-time) { font-family: var(--nb-serif); font-weight: 800; }
+.theme-ny_book .an-res-label { color: var(--nb-ink); }
+.theme-ny_book .an-res-chip { color: var(--nb-ink) !important; background: var(--nb-card); }
+.theme-ny_book .an-res-team { color: var(--nb-ink) !important; }
