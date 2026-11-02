@@ -1,0 +1,80 @@
+{
+ "date": "2026-11-02",
+ "where": "копия race-v3-p3-lab + dog4-v3-lab во временной папке (файлы results/ в репозитории не перезаписывались)",
+ "dog4_v3_validate": "node dog4-v3-lab/validate.mjs — exit 0",
+ "p3": [
+  {
+   "id": "T1",
+   "status": "PASS",
+   "title": "physics independent of characters / metadata",
+   "concernsDog4": true
+  },
+  {
+   "id": "T2",
+   "status": "PASS",
+   "title": "Bulldog 4 golden: P3 identity metadata == legacy frameFor/stateAt",
+   "concernsDog4": true
+  },
+  {
+   "id": "T3",
+   "status": "PASS",
+   "title": "independence from FPS / evaluation order",
+   "concernsDog4": true
+  },
+  {
+   "id": "T4",
+   "status": "PASS",
+   "title": "phase: RUN frame before STOP == STOP entry, on every real STOP and FINISH",
+   "concernsDog4": true
+  },
+  {
+   "id": "T5",
+   "status": "FAIL",
+   "title": "no truncation: every clip fits its window",
+   "concernsDog4": false
+  },
+  {
+   "id": "T6",
+   "status": "PARTIAL",
+   "title": "no sliding while the sprite stands (pre push-off) / paw contact",
+   "concernsDog4": false
+  },
+  {
+   "id": "T7",
+   "status": "PARTIAL",
+   "title": "phase jumps at joins (START -> RUN #88)",
+   "concernsDog4": false
+  },
+  {
+   "id": "T8",
+   "status": "PASS",
+   "title": "no advantage from clip length (mixed lane assignment)",
+   "concernsDog4": true
+  },
+  {
+   "id": "T9",
+   "status": "PASS",
+   "title": "leash and finish: visual offset bounded, zero at crossing",
+   "concernsDog4": true
+  },
+  {
+   "id": "T10",
+   "status": "PASS",
+   "title": "contract validator",
+   "concernsDog4": true
+  },
+  {
+   "id": "T11",
+   "status": "NOT_RUN",
+   "title": "eye acceptance (retimed BUTTERFLY, joins at game scale, STOP tail)",
+   "concernsDog4": false
+  },
+  {
+   "id": "T12",
+   "status": "PARTIAL",
+   "title": "local mixed race: Frenk + 4 x Bulldog 4 on real V3 physics",
+   "concernsDog4": false
+  }
+ ],
+ "note": "T5, T6, T7, T11, T12 — про старый контракт Фрэнка (BUTTERFLY/ROLL/START Фрэнка) и просмотр глазами; к Пупсу не относятся, совпадают с закоммиченным race-v3-p3-lab/results/test_results.json"
+}
