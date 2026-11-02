@@ -669,9 +669,32 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
   const isCrossword = round.mechanic === 'crossword'
   const grid = (round.settings as { grid?: CrosswordGrid }).grid ?? null
 
-  const [openIdx, setOpenIdx] = useState<number | null>(gameState.question_index)
+  // GAME-01 (10.29): в кроссворде «какой вопрос ведущий читает» (gameState.question_index — общее) и «какой открыт
+  // у этой команды» (openIdx — локальное) — разные вещи. Пока команда сама ничего не выбирала — следуем за ведущим;
+  // после первого её выбора смена вопроса ведущим выбор НЕ сбрасывает (и переживает обновление страницы).
+  // Остальные механики с карточками (тест, ставки) ведут себя как раньше: открыта читаемая сейчас.
+  const openKey = `qp-open-${gameState.game_id}-${round.id}`
+  const readOpen = (): { idx: number | null; picked: boolean } | null => {
+    if (!isCrossword) return null
+    try { const v = JSON.parse(localStorage.getItem(openKey) ?? ''); return v && v.picked ? v : null } catch { return null }
+  }
+  const [openIdx, setOpenIdxRaw] = useState<number | null>(() => readOpen()?.idx ?? gameState.question_index)
+  const picked = useRef<boolean>(!!readOpen())
+  const pickOpen = (idx: number | null) => {
+    setOpenIdxRaw(idx)
+    if (!isCrossword) return
+    picked.current = true
+    try { localStorage.setItem(openKey, JSON.stringify({ idx, picked: true })) } catch { /* без хранилища — работает в памяти */ }
+  }
   useEffect(() => {
-    if (collapsible) setOpenIdx(gameState.question_index)
+    // новый раунд/игра — выбор команды начинается заново
+    const saved = readOpen()
+    picked.current = !!saved
+    if (collapsible) setOpenIdxRaw(saved ? saved.idx : gameState.question_index)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openKey])
+  useEffect(() => {
+    if (collapsible && !picked.current) setOpenIdxRaw(gameState.question_index)
   }, [collapsible, gameState.question_index])
 
   const storageKey = `qp-answers-${gameState.game_id}-${round.id}`
@@ -758,8 +781,10 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       <div className="pl-wait-sub">Сообщите ведущему</div></div>
   )
 
-  const currentPlacement = grid && questions[gameState.question_index]?.answer.mode === 'crossword_word'
-    ? grid.words.find(w => w.word === (questions[gameState.question_index].answer as { word: string }).word
+  // подсвечиваем слово, ОТКРЫТОЕ этой командой (openIdx), а не то, что читает ведущий (GAME-01)
+  const hlQ = openIdx != null ? questions[openIdx] : undefined
+  const currentPlacement = grid && hlQ?.answer.mode === 'crossword_word'
+    ? grid.words.find(w => w.word === (hlQ.answer as { word: string }).word
         .toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, ''))
     : undefined
 
@@ -785,17 +810,19 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
           const placement = grid?.words.find(w => q.answer.mode === 'crossword_word' &&
             w.word === q.answer.word.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, ''))
           return (
-            <div key={q.id} className="pl-card"
+            <div key={q.id} className={`pl-card${isCrossword && openIdx === i ? ' pl-card-open' : ''}`}
               style={{
                 borderLeftColor: state.answers[i] ? 'var(--ok)' : isUnlocked ? 'var(--dim)' : 'transparent',
                 opacity: isUnlocked ? 1 : .45,
               }}>
               <div className="pl-card-head"
-                onClick={() => collapsible && isUnlocked && setOpenIdx(isOpen ? null : i)}>
+                onClick={() => collapsible && isUnlocked && pickOpen(isOpen ? null : i)}>
                 <span className="pl-qlabel">
                   {placement
                     ? <>№{placement.number} {placement.dir === 'across' ? 'ПО ГОРИЗОНТАЛИ' : 'ПО ВЕРТИКАЛИ'}</>
                     : <>ВОПРОС {i + 1}</>}
+                  {isCrossword && i === gameState.question_index && isUnlocked &&
+                    <span className="pl-live"> · сейчас читает ведущий</span>}
                   {!isUnlocked && <span className="dim"> · ещё не зачитан</span>}
                   {isLocked && <span className="err"> · 🔒</span>}
                 </span>

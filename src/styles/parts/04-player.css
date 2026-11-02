@@ -221,3 +221,7 @@
 @media (hover: hover) and (pointer: fine) {
   .pl-an-tiles .pl-an-tile:hover { border-color: var(--accent2); }
 }
+
+/* GAME-01: карточка кроссворда, открытая ЭТОЙ командой, и пометка «читает ведущий» */
+.pl-card.pl-card-open { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 12px var(--glow); transition: box-shadow .2s, border-color .2s; }
+.pl-live { color: var(--accent2, var(--accent)); font-weight: 600; font-size: .85em; }
