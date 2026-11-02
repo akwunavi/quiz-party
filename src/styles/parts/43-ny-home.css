@@ -204,3 +204,11 @@
 .theme-ny_home .fin-table-wrap { max-height: none; }
 .theme-ny_home .fin-table-wrap [style*="color"] { color: var(--nh-ink) !important; }
 .theme-ny_home .fin-screen { padding-bottom: calc(90 * var(--u)); }
+
+/* ═══ UI-02 (10.32): вопрос без картинок — крупнее; рамка текста ограничена по высоте, чтобы useFitText мог ужать ═══ */
+.theme-ny_home .host-screen:not(.has-media):not(.has-choices) > div:has(> .q-text) { flex: 1 1 0; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center; }
+.theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text { font-size: calc(88 * var(--u)); }
+.theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: calc(72 * var(--u)); }
+.theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: calc(60 * var(--u)); }
+.theme-ny_home .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: calc(50 * var(--u)); }

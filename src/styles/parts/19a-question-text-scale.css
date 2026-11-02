@@ -49,3 +49,15 @@
 .answers-layout .q-text { font-size: clamp(26px, 2.8vw, 50px); }
 .answers-layout .q-text.len-l { font-size: clamp(22px, 2.3vw, 40px); }
 .answers-layout .q-text.len-xl { font-size: clamp(19px, 1.9vw, 32px); }
+
+/* ═══ UI-02 (10.32): текст-только вопросы — крупнее и по длине ═══
+   Раньше лестница len-* была одна для всех раскладок и берегла место под картинки; на экране БЕЗ картинок рамка
+   пустовала (замер 1920×1080: «длинный» вопрос занимал 295 из 740 px). Здесь лестница для вопросов без медиа:
+   короткий — крупный, длинный — заметно мельче, но тоже крупнее прежнего. Запас по высоте страхует useFitText
+   (ужимает, если не влезло). Темы «Книга»/«Тёплый дом» — в своих файлах (41/43). */
+.host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: clamp(34px, 4.5vw, 92px); }
+.host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: clamp(30px, 3.8vw, 78px); }
+.host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: clamp(26px, 3.2vw, 66px); }
+.theme-potter .host-screen:not(.has-media):not(.has-choices) .q-text.len-m { font-size: clamp(38px, 5vw, 102px); }
+.theme-potter .host-screen:not(.has-media):not(.has-choices) .q-text.len-l { font-size: clamp(33px, 4.2vw, 86px); }
+.theme-potter .host-screen:not(.has-media):not(.has-choices) .q-text.len-xl { font-size: clamp(29px, 3.5vw, 72px); }
