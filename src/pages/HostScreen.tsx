@@ -1741,10 +1741,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const step = gameState.question_index
 
   // подстраховка из старого: авто-раскрытие через 3 сек
+  // document.hidden здесь убран (FLOW-03): эффект срабатывает ОДИН раз на вопрос, и если в этот момент вкладка была
+  // скрыта, ответ не раскрывался вообще — даже когда вкладка снова становилась видимой. Таймер в скрытой вкладке
+  // лишь замедляется, но срабатывает. Запись — с `from`: уже раскрытый ответ повторно не пишется (navGuard).
   useEffect(() => {
-    if (revealed || document.hidden) return
-    const t = setTimeout(() => { void revealAnswer() }, 3000)
+    if (revealed) return
+    const from = navFrom(gameState)
+    const t = setTimeout(() => { void revealAnswer(from).catch(quietStale) }, 3000)
     return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [revealed, step])
 
   // Автопроверка идёт ВМЕСТЕ с показом ответа. Раньше она срабатывала

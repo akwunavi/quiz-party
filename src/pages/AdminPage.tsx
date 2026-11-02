@@ -15,7 +15,7 @@ import {
   gotoQuestion, revealAnswer, finishGame, resetGame, startCounting,
   gotoAnswers, showScoreboard, startAnswerTime, setPhase, selectPackAndStart, startBreak,
   setFinaleStep, setFinaleMode, registerTeam, deleteTeam, renameTeam, startTimer, resetGameHard,
-  gotoQuestionShown,
+  gotoQuestionShown, startIntro,
 } from '../lib/gameActions'
 import { afterRoundStep } from '../lib/flow'
 import { runAction } from '../lib/actionStatus'
@@ -42,7 +42,7 @@ import { startRace } from '../lib/raceActions'
 // проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
 import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
-import { navFrom } from '../lib/navGuard'
+import { navFrom, quietStale } from '../lib/navGuard'
 import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { casEnabled } from '../lib/sessionBag'
 import {
@@ -151,6 +151,14 @@ export function AdminPage() {
           недоступный из лобби ящик. Тупик, живой баг с 22.09.2026. */}
       {gameState.pack_id && phase === 'lobby' && pack && (
         <div className="adm-pad">
+          {/* Старт игры с пульта: раньше кнопка «К первому раунду →» была только на проекторе, а в админке —
+              лишь выбор раунда; в Лесу и ny-темах кнопки проектора скрыты — ведущий не знал, как начать. */}
+          <button className="adm-btn primary" onClick={() => {
+            if (teams.length === 0 && !confirm('Пока ни одна команда не подключилась. Всё равно начать игру?')) return
+            void runAction('старт игры', () => pack.settings?.show_intro
+              ? startIntro()
+              : gotoRound(0, slideForRound(pack.settings?.info_slides, 0) ?? undefined))
+          }}>▶ НАЧАТЬ ИГРУ → К ПЕРВОМУ РАУНДУ</button>
           <TeamRandomizer />
           <RoundPicker pack={pack} current={gameState.round_number} />
           <ResultsPanel pack={pack} gameState={gameState} teams={teams} />
@@ -359,6 +367,11 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
     // 9.78: переход пишется, только если игра всё ещё там, где её видит
     // пульт (lib/navGuard.ts) — замороженный в кармане телефон не откатит раунд
     const from = navFrom(gameState)
+    // заставка «Интро» перед первым раундом: на проекторе она сама доигрывает и идёт к раунду, а с пульта
+    // «Дальше» раньше молчала — ветки для этой фазы не было
+    if (phase === 'intro') {
+      return void runAction('к первому раунду', () => gotoRound(0, slideForRound(pack.settings?.info_slides, 0) ?? undefined, from))
+    }
     if (phase === 'round_intro') {
       // «Скрэмбл»: вернулись «← К титулу» — первый вопрос уже сыгран,
       // открываем его показанным, а не заново вживую (ревью 9.75)
@@ -429,6 +442,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
     // 9.78: переход пишется, только если игра всё ещё там, где её видит
     // пульт (lib/navGuard.ts) — замороженный в кармане телефон не откатит раунд
     const from = navFrom(gameState)
+    if (phase === 'intro') return void runAction('назад в лобби', () => setPhase('lobby', from))
     if (phase === 'question' && isAnagram) {
       const b = anagramBack(step)
       if (b.kind === 'shown') return void runAction('предыдущий вопрос', () => gotoQuestionShown(b.index, from))
@@ -565,8 +579,12 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
                 вопрос, ни разу не пустив по нему время. */}
             {/* показанный вопрос «Скрэмбла» (в т.ч. возвращённый «Назад») на
                 бумаге таймера не имеет — «Дальше» не блокируем */}
-            <button className="adm-btn primary" disabled={paperMode && phase === 'question'
-              && !gameState.timer_started_at && !(isAnagram && gameState.reveal)} onClick={advance}>
+            <button className="adm-btn primary" onClick={() => {
+              // серая кнопка молчит — вместо неё живая, которая говорит, чего не хватает (CLAUDE.md §4)
+              if (paperMode && phase === 'question' && !gameState.timer_started_at && !(isAnagram && gameState.reveal))
+                return navHint.show('Сначала прочитайте вопрос залу и нажмите «▶ ПРОЧИТАЛ — ПУСКАЕМ ВРЕМЯ»')
+              advance()
+            }}>
               {phase === 'answer_time' ? 'К ОТВЕТАМ →'
                 : isAnagram && phase === 'question' && !gameState.reveal ? 'ПОКАЗАТЬ ОТВЕТ →' : 'ДАЛЬШЕ →'}
             </button>
@@ -614,7 +632,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
             !isInteractive — без этой строки с табло после «Своей игры»,
             мелодии, блица и скачек не было НИ ОДНОЙ кнопки вперёд. */}
         {isInteractive && phase !== 'round_intro' && phase !== 'question'
-          && phase !== 'info' && (
+          && phase !== 'info' && phase !== 'show_answers' && (
           <div className="adm-row-btns">
             <button className="adm-btn" onClick={goBack}>← НАЗАД</button>
             <button className="adm-btn primary" onClick={advance}>ДАЛЬШЕ →</button>
@@ -627,7 +645,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
             есть своё аудио/видео — оно само «читает» вопрос залу, кнопка не
             нужна вовсе: таймер и трек стартуют сами (HostScreen.tsx:
             QuestionAudio), как в обычном режиме. */}
-        {isAnagram && phase === 'question' && <Hint text={navHint.text} />}
+        <Hint text={navHint.text} />
         {paperMode && phase === 'question' && !gameState.timer_started_at
           && !(isAnagram && gameState.reveal)
           && !(round.questions[step]?.media.question ?? []).some(m => /\.(mp3|mp4|webm|wav)$/i.test(m)) && (
@@ -648,19 +666,21 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
             была лишней — реагировать на «Показать ответ» там нечему. На
             фазе «info» (слайд-брифинг) — тоже нечего показывать/оценивать,
             эти кнопки там просто лишние. */}
-        {!isInteractive && !isSprint && phase !== 'show_answers' && phase !== 'question'
-          && phase !== 'info' && (
+        {!isInteractive && !isSprint && (phase === 'answer_time' || phase === 'recap'
+          || ((phase === 'scoreboard' || phase === 'break') && paperMode && gameState.round_number + 1 >= pack.rounds.length)) && (
           <div className="adm-row-btns">
-            <button className="adm-btn" onClick={() => void runAction('показ табло', () => showScoreboard())}>ТАБЛО</button>
+            {/* «Табло» вручную — только там, где оно действительно может понадобиться посреди маршрута:
+                на «времени ответов» и повторе. «Показать ответ» отсюда убран: на этих экранах ответа нет,
+                а нажатие писало reveal впустую (разбор открывается своей кнопкой на самом разборе). */}
+            {(phase === 'answer_time' || phase === 'recap') && (
+              <button className="adm-btn" onClick={() => void runAction('показ табло', () => showScoreboard(navFrom(gameState)))}>ТАБЛО</button>
+            )}
             {/* «Подсчёт» уводит на заставку, из которой пути назад в раунд
-                нет — только вперёд, к финалу. Случайный тап посреди игры
-                раньше уносил на финальный слайд без возможности вернуться;
-                кнопка нужна ровно один раз, после последнего раунда. */}
+                нет — только вперёд, к финалу. Нужна ровно один раз, после последнего раунда на бумаге. */}
             {paperMode && gameState.round_number + 1 >= pack.rounds.length && (
-              <button className="adm-btn" onClick={() => void runAction('заставка подсчёта', () => startCounting())}
+              <button className="adm-btn" onClick={() => void runAction('заставка подсчёта', () => startCounting(navFrom(gameState)))}
                 title="Заставка «считаем баллы» на проекторе">⏳ ПОДСЧЁТ</button>
             )}
-            <button className="adm-btn" onClick={() => void runAction('показ ответа', () => revealAnswer())}>ПОКАЗАТЬ ОТВЕТ</button>
           </div>
         )}
 
@@ -836,6 +856,18 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
   const showSb = !!(round.settings as { show_scoreboard_after?: boolean }).show_scoreboard_after
   const recapOn = !!(round.settings as { recap_before_answers?: boolean }).recap_before_answers
 
+  // Запасное автораскрытие. Основной таймер (3 с) — на проекторе (ShowAnswers); если его вкладка спит/скрыта, ответ
+  // раньше не раскрывался вообще. Пульт ведущего дублирует его с запасом (6 с): запись идёт с `from`, а уже
+  // достигнутое состояние navGuard не пишет повторно — двойного раскрытия и повторных анимаций нет.
+  const revealed = gameState.reveal
+  useEffect(() => {
+    if (revealed || !q) return
+    const from = navFrom(gameState)
+    const t = setTimeout(() => { void revealAnswer(from).catch(quietStale) }, 6000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealed, step, gameState.round_number, q?.id])
+
   return (
     <div className="adm-answers">
       <div className="adm-answers-head">
@@ -891,6 +923,13 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           if (recapOn) void runAction('назад к повтору вопросов', () => setPhase('recap', from))
           else void runAction('назад ко времени ответов', () => startAnswerTime(from))
         }}>← НАЗАД</button>
+        {/* Пока ответ не раскрыт, главное действие — раскрыть его (раньше кнопки на пульте не было вовсе:
+            раскрытие зависело от авто-таймера на проекторе). Повторное нажатие безопасно: патч уже достигнутого
+            состояния ничего не пишет (navGuard.targetReached), анимации не перезапускаются. */}
+        {!gameState.reveal ? (
+          <button className="adm-btn primary" onClick={() => void runAction('показ ответа', () => revealAnswer(navFrom(gameState)))}>
+            ПОКАЗАТЬ ОТВЕТ</button>
+        ) : (
         <button className="adm-btn primary" onClick={() => {
           if (step < total - 1) {
             void runAction('следующий ответ', () => gotoAnswers(step + 1, false, navFrom(gameState))); return
@@ -912,6 +951,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
             slideForRound(pack.settings?.info_slides, gameState.round_number + 1) ?? undefined, from))
         }}>{step < total - 1 ? 'СЛЕД. ВОПРОС →'
           : showSb ? 'К ТАБЛО →' : last ? (paperMode ? 'К ПОДСЧЁТУ →' : 'ФИНАЛ →') : 'СЛЕД. РАУНД →'}</button>
+        )}
       </div>
     </div>
   )
@@ -2003,6 +2043,8 @@ function MelodyControls({ round, gameState, onFinish }: {
   const ans = answers.find(a => a.question_ref === `q-mel-${m.key}` && a.team_id === currentId)
   const [ti, i] = (m.key ?? '0-0').split('-').map(Number)
   const trackLine = `${themes[ti]?.name ?? '—'} · трек ${(i || 0) + 1}`
+  // ADM-02: правильное название — только на пульте ведущего (игрокам оно открывается на проекторе на разборе)
+  const trackCorrect = themes[ti]?.tracks?.[i || 0]?.correct?.trim()
   const first = (m.turn ?? 0) === 0
   const hasSecond = (m.order?.length ?? 0) > 1
 
@@ -2083,6 +2125,7 @@ function MelodyControls({ round, gameState, onFinish }: {
   return (
     <div className="adm-blitz">
       <div className="adm-dim">{trackLine}</div>
+      {trackCorrect && <div className="adm-correct" style={{ textAlign: 'center' }}>Ответ: <b>{trackCorrect}</b></div>}
 
       {/* рулетка и секунда трека — короткие автошаги, доступного действия
           нет ни здесь, ни на проекторе: экран сменится сам */}
