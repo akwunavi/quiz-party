@@ -12,7 +12,7 @@ import { saveBlitz, saveBlitzResults } from '../lib/blitzApi'
 import { markPlayed } from '../lib/editorApi'
 import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { installAudioKeepAlive } from '../lib/audioKeepAlive'
-import { navFrom, quietStale } from '../lib/navGuard'
+import { navFrom, quietStale, type NavFrom } from '../lib/navGuard'
 import { blitzResults } from '../lib/blitz'
 import { getRoomId } from '../lib/room'
 import { mediaUrl, lenClass, primeMedia, releaseMedia, mediaScaleVar } from '../lib/media'
@@ -539,7 +539,7 @@ function HostInner({ gameState, pack }: {
             <QuestionAudio startedAt={gameState.timer_started_at} seconds={round.timer_seconds} q={q} round={round} pack={pack} timerRunning={!!gameState.timer_started_at} manual={paperMode} gameId={gameState.game_id} roundNumber={gameState.round_number} />}
           <AutoAdvance round={round} gameState={gameState} isLast={isLast} />
           <AutoReveal enabled={!gameState.reveal}
-            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} from={navFrom(gameState)} />
         </>}
         actionsSlot={<AnagramNav pack={pack} round={round} gameState={gameState} />} />
     )
@@ -559,7 +559,7 @@ function HostInner({ gameState, pack }: {
           <AutoAdvance round={round} gameState={gameState}
             isLast={gameState.question_index + 1 >= round.questions.length} />
           <AutoReveal enabled={revealMode === 'after_question' && !gameState.reveal}
-            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} />
+            startedAt={gameState.timer_started_at} seconds={round.timer_seconds} from={navFrom(gameState)} />
         </>
     const actionsSlot = (
           <div className="host-actions">
@@ -670,7 +670,7 @@ function AnagramNav({ pack, round, gameState }: {
     <div className="host-actions">
       <Hint text={hint.text} />
       <button className="ghost" onClick={back}>{gameState.question_index > 0 ? '← Назад' : '← К титулу'}</button>
-      {!gameState.reveal && <button onClick={() => void revealAnswer()}>Показать ответ</button>}
+      {!gameState.reveal && <button onClick={() => void revealAnswer(navFrom(gameState)).catch(quietStale)}>Показать ответ</button>}
       {step.kind === 'afterRound'
         ? <AfterRoundNav pack={pack} gameState={gameState} />
         : <button onClick={next}>Дальше →</button>}
@@ -2061,13 +2061,18 @@ function MagicCheck() {
   )
 }
 
-function AutoReveal({ enabled, startedAt, seconds }: {
+function AutoReveal({ enabled, startedAt, seconds, from }: {
   enabled: boolean; startedAt: string | null; seconds: number
+  /** Откуда авто-раскрытие: если ведущий за это время уже раскрыл/ушёл дальше — ничего не пишем (GAME-03). */
+  from: NavFrom
 }) {
+  const fromRef = useRef(from)
+  fromRef.current = from
   useEffect(() => {
     if (!enabled || !startedAt) return
     const ms = new Date(startedAt).getTime() + seconds * 1000 - Date.now()
-    const t = setTimeout(() => { void revealAnswer() }, Math.max(0, ms))
+    const f = fromRef.current
+    const t = setTimeout(() => { void revealAnswer(f).catch(quietStale) }, Math.max(0, ms))
     return () => clearTimeout(t)
   }, [enabled, startedAt, seconds])
   return null

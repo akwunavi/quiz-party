@@ -386,8 +386,11 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
       // ответу ведёт дальше, а не пишет reveal второй раз.
       if (isAnagram) {
         // то же решение, что у кнопки «Дальше →» на проекторе (lib/anagram.ts)
+        const qRef = `q-${round.questions[step]?.id}`
+        const answeredIds = new Set(answers.filter(a => a.question_ref === qRef && a.answer_text).map(a => a.team_id))
+        const allAnswered = !paperMode && teams.length > 0 && teams.every(t => answeredIds.has(t.id))
         const st = anagramAdvance({ reveal: gameState.reveal, timerStartedAt: gameState.timer_started_at,
-          index: step, count: round.questions.length, nowMs: Date.now(), wasRun })
+          index: step, count: round.questions.length, nowMs: Date.now(), wasRun, allAnswered })
         if (st.kind === 'wait') return navHint.show(st.text)
         if (st.kind === 'reveal') return void runAction('показ ответа', () => revealAnswer(from))
         if (st.kind === 'next') return void runAction('следующий вопрос',

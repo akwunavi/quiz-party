@@ -393,6 +393,9 @@ export type AnagramStep =
  *  AdminPage — раньше проектор уходил дальше без показа (ревью 9.74). */
 export function anagramAdvance(p: {
   reveal: boolean; timerStartedAt: string | null; index: number; count: number; nowMs: number
+  /** Все команды уже ответили — защита от случайного двойного тапа не нужна:
+   *  ведущий закрывает приём осознанно (GAME-03, 10.26). */
+  allAnswered?: boolean
   /** Уже запускался ли вопрос с этим индексом в этой игре (есть запись в
    *  question_shown). Такой вопрос открывается ПОКАЗАННЫМ (gotoQuestionShown),
    *  а не заново вживую — ревью 9.75: «Назад», затем «Дальше» перезапускал
@@ -402,7 +405,13 @@ export function anagramAdvance(p: {
   if (!p.reveal) {
     const start = p.timerStartedAt ? Date.parse(p.timerStartedAt) : NaN
     if (!Number.isFinite(start)) return { kind: 'wait', text: 'Время по вопросу ещё не пошло — ответ показывать рано' }
-    if (p.nowMs - start < ANAGRAM_REVEAL_GUARD_MS)
+    // Защита от двойного тапа меряется ЧАСАМИ ЭТОГО устройства против времени,
+    // записанного другим (проектором). Часы телефона отстают → «прошло»
+    // получается отрицательным или малым и блокировало показ ответа на
+    // минуты (GAME-03, 10.26). Отрицательное = расхождение часов, не «только
+    // что открыт»: не блокируем. Все ответили — не блокируем вовсе.
+    const elapsed = p.nowMs - start
+    if (!p.allAnswered && elapsed >= 0 && elapsed < ANAGRAM_REVEAL_GUARD_MS)
       return { kind: 'wait', text: 'Вопрос только что открыт — нажми ещё раз через пару секунд, чтобы показать ответ' }
     return { kind: 'reveal' }
   }
