@@ -1,0 +1,32 @@
+{
+  "environment": "headless Chromium, software rendering in cloud VM; browser wall-clock playback",
+  "results": {
+    "1280x720": {
+      "rendered_frames": 389,
+      "sampled_seconds": 6.483100000000002,
+      "effective_fps": 60.002159460751784,
+      "frame_gaps_gt_50ms": 0,
+      "skipped_run_frame_steps": 0,
+      "repeated_run_frame_steps": 234,
+      "max_gap_ms": 16.80000000000291
+    },
+    "1920x1080": {
+      "rendered_frames": 390,
+      "sampled_seconds": 6.4998,
+      "effective_fps": 60.001846210652644,
+      "frame_gaps_gt_50ms": 0,
+      "skipped_run_frame_steps": 0,
+      "repeated_run_frame_steps": 234,
+      "max_gap_ms": 16.80000000000291
+    }
+  },
+  "errors": [],
+  "full_18s_1920x1080": {
+    "rendered_frames": 1080,
+    "effective_fps": 59.94710876038935,
+    "skipped_run_frame_steps": 0,
+    "frame_gaps_gt_50ms": 0,
+    "max_gap_ms": 33.3,
+    "sim_time_s": 18
+  }
+}
