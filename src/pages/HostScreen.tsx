@@ -54,6 +54,7 @@ import { room } from '../lib/transport'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
+import { RulesFrame } from '../components/RulesFrame'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
 import type { Pack, Question, CrosswordGrid, InfoSlide, ThemeKey } from '../types/quiz'
@@ -430,21 +431,11 @@ function HostInner({ gameState, pack }: {
           {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
               а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
-            <div className="rules-frame" data-count={round.rules.length}>
-              <div className="rules-frame-label">ПРАВИЛА</div>
-              {round.rules.map((r, i) => (
-                <div key={i} className="rule-item" style={{
-                  /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход
-                     сначала отыгрывает заставку раунда, и только затем — с
-                     паузой около секунды — проступают правила. Другие темы
-                     не трогаем — их тайминг согласован раньше и отдельно. */
-                  animationDelay: `${(pack.theme === 'classic' ? 1.3
-                    : pack.theme === 'potter' ? 1.7 : 0.5) + i * 0.7}s`,
-                }}>
-                  <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
-                </div>
-              ))}
-            </div>
+            <RulesFrame rules={round.rules}
+              /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход сначала отыгрывает заставку раунда, и только
+                 затем — с паузой около секунды — проступают правила. Другие темы не трогаем — их тайминг
+                 согласован раньше и отдельно. */
+              delay={i => (pack.theme === 'classic' ? 1.3 : pack.theme === 'potter' ? 1.7 : 0.5) + i * 0.7} />
           )}
         </>)}
         {introActions}

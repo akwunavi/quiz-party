@@ -85,10 +85,10 @@
 .round-intro { padding-bottom: clamp(96px, 13vh, 150px) !important; }
 .rules-frame { max-height: 62vh; overflow: hidden; }
 /* Размер правил ужимается ступенями по количеству (ниже), а каждое правило
-   не длиннее ТРЁХ строк: длинная формулировка сокращается многоточием,
+   не длиннее ШЕСТИ строк (UI-01: сперва ужимается кегль, это последний рубеж): длинное сокращается многоточием,
    иначе панель превращается в простыню текста. */
 .rules-frame .rule-item { font-size: clamp(15px, 1.5vw, 26px); line-height: 1.28;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
   overflow: hidden; }
 .rules-frame .rule-item .idx { font-size: .7em; flex: 0 0 auto; }
 
@@ -501,3 +501,9 @@
   .theme-new_year .info-block, .theme-new_year .info-media,
   .info-note-corner { animation: none; opacity: 1; }
 }
+
+/* UI-01 (10.32): пункты не сжимаются flex-ом и не режутся — рамка растёт по содержимому до max-height,
+   дальше кегль ужимает useFitText (components/RulesFrame.tsx). Строки — только последний рубеж (line-clamp 6). */
+.rules-frame > .rules-fit { min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.rules-body { display: flex; flex-direction: column; gap: clamp(6px, 1vh, 14px); }
+.rules-body > .rule-item { flex: 0 0 auto; }
