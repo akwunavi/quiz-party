@@ -1,6 +1,6 @@
 # RETURN_TO_IDLE Рокки: рабочий D и игровая лаборатория
 
-Вариант D [принят пользователем как рабочий](WORKING.md). Для финальной оценки полных цепочек смотрите [лабораторный отчёт](SELECTION_LAB_REPORT.md) и MP4 с подтверждением выбора на фазах [#0](DOG3_SELECTION_CHAIN_TRIGGER_000_GAME.mp4), [#1](DOG3_SELECTION_CHAIN_TRIGGER_001_GAME.mp4), [#60](DOG3_SELECTION_CHAIN_TRIGGER_060_GAME.mp4), [#120](DOG3_SELECTION_CHAIN_TRIGGER_120_GAME.mp4), [#180](DOG3_SELECTION_CHAIN_TRIGGER_180_GAME.mp4), [#239](DOG3_SELECTION_CHAIN_TRIGGER_239_GAME.mp4).
+Вариант D [принят пользователем как рабочий](WORKING.md). Лаборатория полного ожидания IDLE из этого каталога отклонена из-за задержки SELECTED. Для финальной оценки цепочек смотрите [новую лабораторию совместимых точек выхода](../idle-exit-lab/REPORT.md). Старые MP4 и [отчёт](SELECTION_LAB_REPORT.md) сохранены как история.
 
 Прозрачный [RETURN D WebM](assets/DOG3_RETURN_D_ALPHA_97.webm) и [проверка на четырёх фонах](DOG3_RETURN_D_ALPHA_FOUR_BACKGROUNDS.png) подготовлены из уже принятой alpha SELECTED. [HTML-лаборатория](index.html) запускается из этой папки командой `python -m http.server 8000`; адрес: `http://localhost:8000/`. Обычные MP4 открываются без сервера.
 

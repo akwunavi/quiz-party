@@ -1,0 +1,3362 @@
+[
+  {
+    "phase": 0,
+    "sourceFrame": 0,
+    "silhouetteIoUWithSelected0": 0.99786,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.094,
+    "pawMeanAbsRgbDifference": 0.783,
+    "previousFrameMeanAbsRgbDifference": null
+  },
+  {
+    "phase": 1,
+    "sourceFrame": 1,
+    "silhouetteIoUWithSelected0": 0.99789,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.124,
+    "pawMeanAbsRgbDifference": 0.791,
+    "previousFrameMeanAbsRgbDifference": 0.128
+  },
+  {
+    "phase": 2,
+    "sourceFrame": 2,
+    "silhouetteIoUWithSelected0": 0.99715,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.465,
+    "pawMeanAbsRgbDifference": 0.971,
+    "previousFrameMeanAbsRgbDifference": 0.462
+  },
+  {
+    "phase": 3,
+    "sourceFrame": 3,
+    "silhouetteIoUWithSelected0": 0.99706,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.359,
+    "pawMeanAbsRgbDifference": 0.924,
+    "previousFrameMeanAbsRgbDifference": 0.463
+  },
+  {
+    "phase": 4,
+    "sourceFrame": 4,
+    "silhouetteIoUWithSelected0": 0.99703,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.402,
+    "pawMeanAbsRgbDifference": 0.954,
+    "previousFrameMeanAbsRgbDifference": 0.245
+  },
+  {
+    "phase": 5,
+    "sourceFrame": 5,
+    "silhouetteIoUWithSelected0": 0.9961,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.646,
+    "pawMeanAbsRgbDifference": 1.073,
+    "previousFrameMeanAbsRgbDifference": 0.347
+  },
+  {
+    "phase": 6,
+    "sourceFrame": 6,
+    "silhouetteIoUWithSelected0": 0.99544,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.948,
+    "pawMeanAbsRgbDifference": 1.16,
+    "previousFrameMeanAbsRgbDifference": 0.343
+  },
+  {
+    "phase": 7,
+    "sourceFrame": 7,
+    "silhouetteIoUWithSelected0": 0.99255,
+    "bbox": [
+      440,
+      43,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 3.641,
+    "pawMeanAbsRgbDifference": 1.406,
+    "previousFrameMeanAbsRgbDifference": 1.864
+  },
+  {
+    "phase": 8,
+    "sourceFrame": 8,
+    "silhouetteIoUWithSelected0": 0.98274,
+    "bbox": [
+      440,
+      46,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 7.967,
+    "pawMeanAbsRgbDifference": 2.309,
+    "previousFrameMeanAbsRgbDifference": 2.379
+  },
+  {
+    "phase": 9,
+    "sourceFrame": 9,
+    "silhouetteIoUWithSelected0": 0.97292,
+    "bbox": [
+      440,
+      48,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 11.752,
+    "pawMeanAbsRgbDifference": 3.079,
+    "previousFrameMeanAbsRgbDifference": 2.628
+  },
+  {
+    "phase": 10,
+    "sourceFrame": 10,
+    "silhouetteIoUWithSelected0": 0.96786,
+    "bbox": [
+      439,
+      50,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 13.085,
+    "pawMeanAbsRgbDifference": 3.426,
+    "previousFrameMeanAbsRgbDifference": 1.395
+  },
+  {
+    "phase": 11,
+    "sourceFrame": 11,
+    "silhouetteIoUWithSelected0": 0.96136,
+    "bbox": [
+      438,
+      52,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.601,
+    "pawMeanAbsRgbDifference": 3.783,
+    "previousFrameMeanAbsRgbDifference": 1.612
+  },
+  {
+    "phase": 12,
+    "sourceFrame": 12,
+    "silhouetteIoUWithSelected0": 0.95461,
+    "bbox": [
+      436,
+      53,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.016,
+    "pawMeanAbsRgbDifference": 4.298,
+    "previousFrameMeanAbsRgbDifference": 1.629
+  },
+  {
+    "phase": 13,
+    "sourceFrame": 13,
+    "silhouetteIoUWithSelected0": 0.95173,
+    "bbox": [
+      434,
+      53,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.162,
+    "pawMeanAbsRgbDifference": 4.259,
+    "previousFrameMeanAbsRgbDifference": 1.291
+  },
+  {
+    "phase": 14,
+    "sourceFrame": 14,
+    "silhouetteIoUWithSelected0": 0.95741,
+    "bbox": [
+      431,
+      52,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.301,
+    "pawMeanAbsRgbDifference": 3.568,
+    "previousFrameMeanAbsRgbDifference": 2.941
+  },
+  {
+    "phase": 15,
+    "sourceFrame": 15,
+    "silhouetteIoUWithSelected0": 0.96539,
+    "bbox": [
+      431,
+      50,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 10.176,
+    "pawMeanAbsRgbDifference": 2.551,
+    "previousFrameMeanAbsRgbDifference": 3.185
+  },
+  {
+    "phase": 16,
+    "sourceFrame": 16,
+    "silhouetteIoUWithSelected0": 0.96925,
+    "bbox": [
+      432,
+      46,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 9.613,
+    "pawMeanAbsRgbDifference": 2.754,
+    "previousFrameMeanAbsRgbDifference": 3.807
+  },
+  {
+    "phase": 17,
+    "sourceFrame": 17,
+    "silhouetteIoUWithSelected0": 0.96942,
+    "bbox": [
+      435,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 12.667,
+    "pawMeanAbsRgbDifference": 3.167,
+    "previousFrameMeanAbsRgbDifference": 3.708
+  },
+  {
+    "phase": 18,
+    "sourceFrame": 18,
+    "silhouetteIoUWithSelected0": 0.96281,
+    "bbox": [
+      439,
+      35,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.102,
+    "pawMeanAbsRgbDifference": 3.567,
+    "previousFrameMeanAbsRgbDifference": 3.608
+  },
+  {
+    "phase": 19,
+    "sourceFrame": 19,
+    "silhouetteIoUWithSelected0": 0.95657,
+    "bbox": [
+      442,
+      31,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.235,
+    "pawMeanAbsRgbDifference": 3.931,
+    "previousFrameMeanAbsRgbDifference": 2.878
+  },
+  {
+    "phase": 20,
+    "sourceFrame": 20,
+    "silhouetteIoUWithSelected0": 0.95089,
+    "bbox": [
+      446,
+      29,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 18.89,
+    "pawMeanAbsRgbDifference": 4.316,
+    "previousFrameMeanAbsRgbDifference": 2.445
+  },
+  {
+    "phase": 21,
+    "sourceFrame": 21,
+    "silhouetteIoUWithSelected0": 0.94682,
+    "bbox": [
+      447,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.925,
+    "pawMeanAbsRgbDifference": 4.608,
+    "previousFrameMeanAbsRgbDifference": 1.854
+  },
+  {
+    "phase": 22,
+    "sourceFrame": 22,
+    "silhouetteIoUWithSelected0": 0.94599,
+    "bbox": [
+      446,
+      27,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 20.255,
+    "pawMeanAbsRgbDifference": 4.754,
+    "previousFrameMeanAbsRgbDifference": 1.059
+  },
+  {
+    "phase": 23,
+    "sourceFrame": 23,
+    "silhouetteIoUWithSelected0": 0.94813,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.894,
+    "pawMeanAbsRgbDifference": 4.546,
+    "previousFrameMeanAbsRgbDifference": 0.908
+  },
+  {
+    "phase": 24,
+    "sourceFrame": 24,
+    "silhouetteIoUWithSelected0": 0.94976,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.491,
+    "pawMeanAbsRgbDifference": 4.427,
+    "previousFrameMeanAbsRgbDifference": 0.891
+  },
+  {
+    "phase": 25,
+    "sourceFrame": 25,
+    "silhouetteIoUWithSelected0": 0.95031,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.249,
+    "pawMeanAbsRgbDifference": 4.31,
+    "previousFrameMeanAbsRgbDifference": 0.5
+  },
+  {
+    "phase": 26,
+    "sourceFrame": 26,
+    "silhouetteIoUWithSelected0": 0.95157,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.075,
+    "pawMeanAbsRgbDifference": 4.146,
+    "previousFrameMeanAbsRgbDifference": 0.655
+  },
+  {
+    "phase": 27,
+    "sourceFrame": 27,
+    "silhouetteIoUWithSelected0": 0.95488,
+    "bbox": [
+      445,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 18.567,
+    "pawMeanAbsRgbDifference": 3.813,
+    "previousFrameMeanAbsRgbDifference": 0.996
+  },
+  {
+    "phase": 28,
+    "sourceFrame": 28,
+    "silhouetteIoUWithSelected0": 0.95943,
+    "bbox": [
+      445,
+      30,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.742,
+    "pawMeanAbsRgbDifference": 3.318,
+    "previousFrameMeanAbsRgbDifference": 1.389
+  },
+  {
+    "phase": 29,
+    "sourceFrame": 29,
+    "silhouetteIoUWithSelected0": 0.96206,
+    "bbox": [
+      444,
+      30,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.156,
+    "pawMeanAbsRgbDifference": 3.04,
+    "previousFrameMeanAbsRgbDifference": 0.936
+  },
+  {
+    "phase": 30,
+    "sourceFrame": 30,
+    "silhouetteIoUWithSelected0": 0.96462,
+    "bbox": [
+      444,
+      31,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.522,
+    "pawMeanAbsRgbDifference": 2.831,
+    "previousFrameMeanAbsRgbDifference": 1.045
+  },
+  {
+    "phase": 31,
+    "sourceFrame": 31,
+    "silhouetteIoUWithSelected0": 0.96789,
+    "bbox": [
+      444,
+      32,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.65,
+    "pawMeanAbsRgbDifference": 2.655,
+    "previousFrameMeanAbsRgbDifference": 1.28
+  },
+  {
+    "phase": 32,
+    "sourceFrame": 32,
+    "silhouetteIoUWithSelected0": 0.96994,
+    "bbox": [
+      444,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.139,
+    "pawMeanAbsRgbDifference": 2.746,
+    "previousFrameMeanAbsRgbDifference": 1.159
+  },
+  {
+    "phase": 33,
+    "sourceFrame": 33,
+    "silhouetteIoUWithSelected0": 0.97038,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.0,
+    "pawMeanAbsRgbDifference": 2.659,
+    "previousFrameMeanAbsRgbDifference": 0.526
+  },
+  {
+    "phase": 34,
+    "sourceFrame": 34,
+    "silhouetteIoUWithSelected0": 0.97051,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.008,
+    "pawMeanAbsRgbDifference": 2.644,
+    "previousFrameMeanAbsRgbDifference": 0.287
+  },
+  {
+    "phase": 35,
+    "sourceFrame": 35,
+    "silhouetteIoUWithSelected0": 0.97068,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.952,
+    "pawMeanAbsRgbDifference": 2.595,
+    "previousFrameMeanAbsRgbDifference": 0.258
+  },
+  {
+    "phase": 36,
+    "sourceFrame": 36,
+    "silhouetteIoUWithSelected0": 0.97089,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.872,
+    "pawMeanAbsRgbDifference": 2.557,
+    "previousFrameMeanAbsRgbDifference": 0.35
+  },
+  {
+    "phase": 37,
+    "sourceFrame": 37,
+    "silhouetteIoUWithSelected0": 0.9711,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.875,
+    "pawMeanAbsRgbDifference": 2.533,
+    "previousFrameMeanAbsRgbDifference": 0.167
+  },
+  {
+    "phase": 38,
+    "sourceFrame": 38,
+    "silhouetteIoUWithSelected0": 0.9709,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.868,
+    "pawMeanAbsRgbDifference": 2.54,
+    "previousFrameMeanAbsRgbDifference": 0.204
+  },
+  {
+    "phase": 39,
+    "sourceFrame": 39,
+    "silhouetteIoUWithSelected0": 0.97129,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.625,
+    "pawMeanAbsRgbDifference": 2.545,
+    "previousFrameMeanAbsRgbDifference": 0.285
+  },
+  {
+    "phase": 40,
+    "sourceFrame": 40,
+    "silhouetteIoUWithSelected0": 0.97145,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.476,
+    "pawMeanAbsRgbDifference": 2.546,
+    "previousFrameMeanAbsRgbDifference": 0.493
+  },
+  {
+    "phase": 41,
+    "sourceFrame": 41,
+    "silhouetteIoUWithSelected0": 0.97142,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.484,
+    "pawMeanAbsRgbDifference": 2.544,
+    "previousFrameMeanAbsRgbDifference": 0.065
+  },
+  {
+    "phase": 42,
+    "sourceFrame": 42,
+    "silhouetteIoUWithSelected0": 0.97144,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.504,
+    "pawMeanAbsRgbDifference": 2.609,
+    "previousFrameMeanAbsRgbDifference": 0.406
+  },
+  {
+    "phase": 43,
+    "sourceFrame": 43,
+    "silhouetteIoUWithSelected0": 0.97131,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.507,
+    "pawMeanAbsRgbDifference": 2.519,
+    "previousFrameMeanAbsRgbDifference": 0.43
+  },
+  {
+    "phase": 44,
+    "sourceFrame": 44,
+    "silhouetteIoUWithSelected0": 0.97114,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.53,
+    "pawMeanAbsRgbDifference": 2.519,
+    "previousFrameMeanAbsRgbDifference": 0.212
+  },
+  {
+    "phase": 45,
+    "sourceFrame": 45,
+    "silhouetteIoUWithSelected0": 0.97084,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.558,
+    "pawMeanAbsRgbDifference": 2.541,
+    "previousFrameMeanAbsRgbDifference": 0.147
+  },
+  {
+    "phase": 46,
+    "sourceFrame": 46,
+    "silhouetteIoUWithSelected0": 0.97088,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.581,
+    "pawMeanAbsRgbDifference": 2.54,
+    "previousFrameMeanAbsRgbDifference": 0.135
+  },
+  {
+    "phase": 47,
+    "sourceFrame": 47,
+    "silhouetteIoUWithSelected0": 0.97096,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.585,
+    "pawMeanAbsRgbDifference": 2.524,
+    "previousFrameMeanAbsRgbDifference": 0.073
+  },
+  {
+    "phase": 48,
+    "sourceFrame": 48,
+    "silhouetteIoUWithSelected0": 0.97093,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.624,
+    "pawMeanAbsRgbDifference": 2.549,
+    "previousFrameMeanAbsRgbDifference": 0.375
+  },
+  {
+    "phase": 49,
+    "sourceFrame": 49,
+    "silhouetteIoUWithSelected0": 0.97078,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.659,
+    "pawMeanAbsRgbDifference": 2.574,
+    "previousFrameMeanAbsRgbDifference": 0.071
+  },
+  {
+    "phase": 50,
+    "sourceFrame": 50,
+    "silhouetteIoUWithSelected0": 0.97058,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.724,
+    "pawMeanAbsRgbDifference": 2.573,
+    "previousFrameMeanAbsRgbDifference": 0.195
+  },
+  {
+    "phase": 51,
+    "sourceFrame": 51,
+    "silhouetteIoUWithSelected0": 0.9705,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.752,
+    "pawMeanAbsRgbDifference": 2.553,
+    "previousFrameMeanAbsRgbDifference": 0.122
+  },
+  {
+    "phase": 52,
+    "sourceFrame": 52,
+    "silhouetteIoUWithSelected0": 0.97036,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.803,
+    "pawMeanAbsRgbDifference": 2.625,
+    "previousFrameMeanAbsRgbDifference": 0.423
+  },
+  {
+    "phase": 53,
+    "sourceFrame": 53,
+    "silhouetteIoUWithSelected0": 0.97052,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.775,
+    "pawMeanAbsRgbDifference": 2.55,
+    "previousFrameMeanAbsRgbDifference": 0.405
+  },
+  {
+    "phase": 54,
+    "sourceFrame": 54,
+    "silhouetteIoUWithSelected0": 0.97045,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.79,
+    "pawMeanAbsRgbDifference": 2.562,
+    "previousFrameMeanAbsRgbDifference": 0.141
+  },
+  {
+    "phase": 55,
+    "sourceFrame": 55,
+    "silhouetteIoUWithSelected0": 0.97064,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.739,
+    "pawMeanAbsRgbDifference": 2.572,
+    "previousFrameMeanAbsRgbDifference": 0.153
+  },
+  {
+    "phase": 56,
+    "sourceFrame": 56,
+    "silhouetteIoUWithSelected0": 0.97071,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.719,
+    "pawMeanAbsRgbDifference": 2.59,
+    "previousFrameMeanAbsRgbDifference": 0.316
+  },
+  {
+    "phase": 57,
+    "sourceFrame": 57,
+    "silhouetteIoUWithSelected0": 0.97069,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.68,
+    "pawMeanAbsRgbDifference": 2.611,
+    "previousFrameMeanAbsRgbDifference": 0.134
+  },
+  {
+    "phase": 58,
+    "sourceFrame": 58,
+    "silhouetteIoUWithSelected0": 0.97061,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.812,
+    "pawMeanAbsRgbDifference": 2.637,
+    "previousFrameMeanAbsRgbDifference": 0.225
+  },
+  {
+    "phase": 59,
+    "sourceFrame": 59,
+    "silhouetteIoUWithSelected0": 0.97058,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.844,
+    "pawMeanAbsRgbDifference": 2.632,
+    "previousFrameMeanAbsRgbDifference": 0.297
+  },
+  {
+    "phase": 60,
+    "sourceFrame": 60,
+    "silhouetteIoUWithSelected0": 0.97053,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.61,
+    "pawMeanAbsRgbDifference": 2.568,
+    "previousFrameMeanAbsRgbDifference": 0.934
+  },
+  {
+    "phase": 61,
+    "sourceFrame": 61,
+    "silhouetteIoUWithSelected0": 0.97145,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.509,
+    "pawMeanAbsRgbDifference": 2.465,
+    "previousFrameMeanAbsRgbDifference": 1.143
+  },
+  {
+    "phase": 62,
+    "sourceFrame": 62,
+    "silhouetteIoUWithSelected0": 0.96153,
+    "bbox": [
+      447,
+      37,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.345,
+    "pawMeanAbsRgbDifference": 2.223,
+    "previousFrameMeanAbsRgbDifference": 4.687
+  },
+  {
+    "phase": 63,
+    "sourceFrame": 63,
+    "silhouetteIoUWithSelected0": 0.91192,
+    "bbox": [
+      455,
+      32,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 23.318,
+    "pawMeanAbsRgbDifference": 2.164,
+    "previousFrameMeanAbsRgbDifference": 7.539
+  },
+  {
+    "phase": 64,
+    "sourceFrame": 64,
+    "silhouetteIoUWithSelected0": 0.85965,
+    "bbox": [
+      458,
+      29,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 30.221,
+    "pawMeanAbsRgbDifference": 3.278,
+    "previousFrameMeanAbsRgbDifference": 6.46
+  },
+  {
+    "phase": 65,
+    "sourceFrame": 65,
+    "silhouetteIoUWithSelected0": 0.82504,
+    "bbox": [
+      461,
+      27,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 36.058,
+    "pawMeanAbsRgbDifference": 3.74,
+    "previousFrameMeanAbsRgbDifference": 6.123
+  },
+  {
+    "phase": 66,
+    "sourceFrame": 66,
+    "silhouetteIoUWithSelected0": 0.80915,
+    "bbox": [
+      462,
+      24,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 38.926,
+    "pawMeanAbsRgbDifference": 3.76,
+    "previousFrameMeanAbsRgbDifference": 4.734
+  },
+  {
+    "phase": 67,
+    "sourceFrame": 67,
+    "silhouetteIoUWithSelected0": 0.80166,
+    "bbox": [
+      463,
+      22,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.992,
+    "pawMeanAbsRgbDifference": 3.881,
+    "previousFrameMeanAbsRgbDifference": 3.345
+  },
+  {
+    "phase": 68,
+    "sourceFrame": 68,
+    "silhouetteIoUWithSelected0": 0.79764,
+    "bbox": [
+      464,
+      20,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.803,
+    "pawMeanAbsRgbDifference": 4.056,
+    "previousFrameMeanAbsRgbDifference": 2.089
+  },
+  {
+    "phase": 69,
+    "sourceFrame": 69,
+    "silhouetteIoUWithSelected0": 0.79622,
+    "bbox": [
+      464,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.949,
+    "pawMeanAbsRgbDifference": 4.085,
+    "previousFrameMeanAbsRgbDifference": 0.958
+  },
+  {
+    "phase": 70,
+    "sourceFrame": 70,
+    "silhouetteIoUWithSelected0": 0.79346,
+    "bbox": [
+      464,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.089,
+    "pawMeanAbsRgbDifference": 4.084,
+    "previousFrameMeanAbsRgbDifference": 1.876
+  },
+  {
+    "phase": 71,
+    "sourceFrame": 71,
+    "silhouetteIoUWithSelected0": 0.79002,
+    "bbox": [
+      465,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.763,
+    "pawMeanAbsRgbDifference": 4.152,
+    "previousFrameMeanAbsRgbDifference": 1.965
+  },
+  {
+    "phase": 72,
+    "sourceFrame": 72,
+    "silhouetteIoUWithSelected0": 0.78976,
+    "bbox": [
+      465,
+      19,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.367,
+    "pawMeanAbsRgbDifference": 4.296,
+    "previousFrameMeanAbsRgbDifference": 1.67
+  },
+  {
+    "phase": 73,
+    "sourceFrame": 73,
+    "silhouetteIoUWithSelected0": 0.78861,
+    "bbox": [
+      466,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.464,
+    "pawMeanAbsRgbDifference": 4.231,
+    "previousFrameMeanAbsRgbDifference": 1.181
+  },
+  {
+    "phase": 74,
+    "sourceFrame": 74,
+    "silhouetteIoUWithSelected0": 0.78788,
+    "bbox": [
+      466,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.543,
+    "pawMeanAbsRgbDifference": 4.238,
+    "previousFrameMeanAbsRgbDifference": 0.679
+  },
+  {
+    "phase": 75,
+    "sourceFrame": 75,
+    "silhouetteIoUWithSelected0": 0.78523,
+    "bbox": [
+      466,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.792,
+    "pawMeanAbsRgbDifference": 4.313,
+    "previousFrameMeanAbsRgbDifference": 0.792
+  },
+  {
+    "phase": 76,
+    "sourceFrame": 76,
+    "silhouetteIoUWithSelected0": 0.77793,
+    "bbox": [
+      468,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.803,
+    "pawMeanAbsRgbDifference": 4.706,
+    "previousFrameMeanAbsRgbDifference": 2.532
+  },
+  {
+    "phase": 77,
+    "sourceFrame": 77,
+    "silhouetteIoUWithSelected0": 0.76373,
+    "bbox": [
+      471,
+      22,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 44.25,
+    "pawMeanAbsRgbDifference": 6.146,
+    "previousFrameMeanAbsRgbDifference": 4.618
+  },
+  {
+    "phase": 78,
+    "sourceFrame": 78,
+    "silhouetteIoUWithSelected0": 0.73975,
+    "bbox": [
+      474,
+      26,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 47.402,
+    "pawMeanAbsRgbDifference": 11.273,
+    "previousFrameMeanAbsRgbDifference": 6.272
+  },
+  {
+    "phase": 79,
+    "sourceFrame": 79,
+    "silhouetteIoUWithSelected0": 0.71508,
+    "bbox": [
+      478,
+      35,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 51.865,
+    "pawMeanAbsRgbDifference": 16.441,
+    "previousFrameMeanAbsRgbDifference": 7.795
+  },
+  {
+    "phase": 80,
+    "sourceFrame": 80,
+    "silhouetteIoUWithSelected0": 0.70569,
+    "bbox": [
+      474,
+      43,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 53.91,
+    "pawMeanAbsRgbDifference": 20.956,
+    "previousFrameMeanAbsRgbDifference": 5.958
+  },
+  {
+    "phase": 81,
+    "sourceFrame": 81,
+    "silhouetteIoUWithSelected0": 0.7206,
+    "bbox": [
+      467,
+      50,
+      901,
+      691
+    ],
+    "faceMeanAbsRgbDifference": 53.574,
+    "pawMeanAbsRgbDifference": 18.795,
+    "previousFrameMeanAbsRgbDifference": 5.572
+  },
+  {
+    "phase": 82,
+    "sourceFrame": 82,
+    "silhouetteIoUWithSelected0": 0.74571,
+    "bbox": [
+      464,
+      54,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 51.04,
+    "pawMeanAbsRgbDifference": 16.507,
+    "previousFrameMeanAbsRgbDifference": 5.903
+  },
+  {
+    "phase": 83,
+    "sourceFrame": 83,
+    "silhouetteIoUWithSelected0": 0.77977,
+    "bbox": [
+      458,
+      57,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 46.858,
+    "pawMeanAbsRgbDifference": 15.65,
+    "previousFrameMeanAbsRgbDifference": 7.441
+  },
+  {
+    "phase": 84,
+    "sourceFrame": 84,
+    "silhouetteIoUWithSelected0": 0.81038,
+    "bbox": [
+      448,
+      58,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 43.218,
+    "pawMeanAbsRgbDifference": 15.508,
+    "previousFrameMeanAbsRgbDifference": 7.592
+  },
+  {
+    "phase": 85,
+    "sourceFrame": 85,
+    "silhouetteIoUWithSelected0": 0.8324,
+    "bbox": [
+      441,
+      59,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 40.336,
+    "pawMeanAbsRgbDifference": 15.76,
+    "previousFrameMeanAbsRgbDifference": 7.3
+  },
+  {
+    "phase": 86,
+    "sourceFrame": 86,
+    "silhouetteIoUWithSelected0": 0.83148,
+    "bbox": [
+      433,
+      58,
+      901,
+      682
+    ],
+    "faceMeanAbsRgbDifference": 38.301,
+    "pawMeanAbsRgbDifference": 20.542,
+    "previousFrameMeanAbsRgbDifference": 8.024
+  },
+  {
+    "phase": 87,
+    "sourceFrame": 87,
+    "silhouetteIoUWithSelected0": 0.82752,
+    "bbox": [
+      427,
+      61,
+      901,
+      677
+    ],
+    "faceMeanAbsRgbDifference": 36.835,
+    "pawMeanAbsRgbDifference": 21.802,
+    "previousFrameMeanAbsRgbDifference": 7.018
+  },
+  {
+    "phase": 88,
+    "sourceFrame": 88,
+    "silhouetteIoUWithSelected0": 0.81694,
+    "bbox": [
+      422,
+      64,
+      901,
+      687
+    ],
+    "faceMeanAbsRgbDifference": 35.885,
+    "pawMeanAbsRgbDifference": 24.513,
+    "previousFrameMeanAbsRgbDifference": 6.857
+  },
+  {
+    "phase": 89,
+    "sourceFrame": 89,
+    "silhouetteIoUWithSelected0": 0.79661,
+    "bbox": [
+      422,
+      68,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 35.742,
+    "pawMeanAbsRgbDifference": 31.034,
+    "previousFrameMeanAbsRgbDifference": 5.342
+  },
+  {
+    "phase": 90,
+    "sourceFrame": 90,
+    "silhouetteIoUWithSelected0": 0.79027,
+    "bbox": [
+      422,
+      73,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 35.755,
+    "pawMeanAbsRgbDifference": 32.705,
+    "previousFrameMeanAbsRgbDifference": 3.34
+  },
+  {
+    "phase": 91,
+    "sourceFrame": 91,
+    "silhouetteIoUWithSelected0": 0.78417,
+    "bbox": [
+      424,
+      77,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 36.571,
+    "pawMeanAbsRgbDifference": 33.658,
+    "previousFrameMeanAbsRgbDifference": 3.86
+  },
+  {
+    "phase": 92,
+    "sourceFrame": 92,
+    "silhouetteIoUWithSelected0": 0.78906,
+    "bbox": [
+      429,
+      76,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 36.013,
+    "pawMeanAbsRgbDifference": 34.139,
+    "previousFrameMeanAbsRgbDifference": 4.5
+  },
+  {
+    "phase": 93,
+    "sourceFrame": 93,
+    "silhouetteIoUWithSelected0": 0.79886,
+    "bbox": [
+      422,
+      67,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 32.946,
+    "pawMeanAbsRgbDifference": 34.389,
+    "previousFrameMeanAbsRgbDifference": 5.952
+  },
+  {
+    "phase": 94,
+    "sourceFrame": 94,
+    "silhouetteIoUWithSelected0": 0.81274,
+    "bbox": [
+      415,
+      59,
+      901,
+      688
+    ],
+    "faceMeanAbsRgbDifference": 29.075,
+    "pawMeanAbsRgbDifference": 34.812,
+    "previousFrameMeanAbsRgbDifference": 6.99
+  },
+  {
+    "phase": 95,
+    "sourceFrame": 95,
+    "silhouetteIoUWithSelected0": 0.8283,
+    "bbox": [
+      413,
+      52,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.667,
+    "pawMeanAbsRgbDifference": 35.084,
+    "previousFrameMeanAbsRgbDifference": 7.51
+  },
+  {
+    "phase": 96,
+    "sourceFrame": 96,
+    "silhouetteIoUWithSelected0": 0.83721,
+    "bbox": [
+      416,
+      44,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.789,
+    "pawMeanAbsRgbDifference": 35.016,
+    "previousFrameMeanAbsRgbDifference": 7.156
+  },
+  {
+    "phase": 97,
+    "sourceFrame": 97,
+    "silhouetteIoUWithSelected0": 0.84327,
+    "bbox": [
+      422,
+      37,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.636,
+    "pawMeanAbsRgbDifference": 34.774,
+    "previousFrameMeanAbsRgbDifference": 5.574
+  },
+  {
+    "phase": 98,
+    "sourceFrame": 98,
+    "silhouetteIoUWithSelected0": 0.84588,
+    "bbox": [
+      427,
+      30,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.323,
+    "pawMeanAbsRgbDifference": 34.416,
+    "previousFrameMeanAbsRgbDifference": 4.739
+  },
+  {
+    "phase": 99,
+    "sourceFrame": 99,
+    "silhouetteIoUWithSelected0": 0.84731,
+    "bbox": [
+      433,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.031,
+    "pawMeanAbsRgbDifference": 34.143,
+    "previousFrameMeanAbsRgbDifference": 3.682
+  },
+  {
+    "phase": 100,
+    "sourceFrame": 100,
+    "silhouetteIoUWithSelected0": 0.84831,
+    "bbox": [
+      438,
+      24,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.776,
+    "pawMeanAbsRgbDifference": 33.777,
+    "previousFrameMeanAbsRgbDifference": 3.145
+  },
+  {
+    "phase": 101,
+    "sourceFrame": 101,
+    "silhouetteIoUWithSelected0": 0.8484,
+    "bbox": [
+      440,
+      24,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 26.52,
+    "pawMeanAbsRgbDifference": 33.669,
+    "previousFrameMeanAbsRgbDifference": 2.361
+  },
+  {
+    "phase": 102,
+    "sourceFrame": 102,
+    "silhouetteIoUWithSelected0": 0.84799,
+    "bbox": [
+      441,
+      25,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 26.638,
+    "pawMeanAbsRgbDifference": 33.717,
+    "previousFrameMeanAbsRgbDifference": 1.723
+  },
+  {
+    "phase": 103,
+    "sourceFrame": 103,
+    "silhouetteIoUWithSelected0": 0.85054,
+    "bbox": [
+      442,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.8,
+    "pawMeanAbsRgbDifference": 33.868,
+    "previousFrameMeanAbsRgbDifference": 1.749
+  },
+  {
+    "phase": 104,
+    "sourceFrame": 104,
+    "silhouetteIoUWithSelected0": 0.85158,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.239,
+    "pawMeanAbsRgbDifference": 34.071,
+    "previousFrameMeanAbsRgbDifference": 1.591
+  },
+  {
+    "phase": 105,
+    "sourceFrame": 105,
+    "silhouetteIoUWithSelected0": 0.85178,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.786,
+    "pawMeanAbsRgbDifference": 34.243,
+    "previousFrameMeanAbsRgbDifference": 1.043
+  },
+  {
+    "phase": 106,
+    "sourceFrame": 106,
+    "silhouetteIoUWithSelected0": 0.85169,
+    "bbox": [
+      441,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.523,
+    "pawMeanAbsRgbDifference": 34.24,
+    "previousFrameMeanAbsRgbDifference": 0.868
+  },
+  {
+    "phase": 107,
+    "sourceFrame": 107,
+    "silhouetteIoUWithSelected0": 0.85243,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.021,
+    "pawMeanAbsRgbDifference": 34.265,
+    "previousFrameMeanAbsRgbDifference": 1.219
+  },
+  {
+    "phase": 108,
+    "sourceFrame": 108,
+    "silhouetteIoUWithSelected0": 0.85363,
+    "bbox": [
+      438,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.413,
+    "pawMeanAbsRgbDifference": 34.319,
+    "previousFrameMeanAbsRgbDifference": 1.32
+  },
+  {
+    "phase": 109,
+    "sourceFrame": 109,
+    "silhouetteIoUWithSelected0": 0.85388,
+    "bbox": [
+      438,
+      28,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.132,
+    "pawMeanAbsRgbDifference": 34.301,
+    "previousFrameMeanAbsRgbDifference": 0.714
+  },
+  {
+    "phase": 110,
+    "sourceFrame": 110,
+    "silhouetteIoUWithSelected0": 0.85409,
+    "bbox": [
+      437,
+      28,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.868,
+    "pawMeanAbsRgbDifference": 34.353,
+    "previousFrameMeanAbsRgbDifference": 0.813
+  },
+  {
+    "phase": 111,
+    "sourceFrame": 111,
+    "silhouetteIoUWithSelected0": 0.85544,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.425,
+    "pawMeanAbsRgbDifference": 34.378,
+    "previousFrameMeanAbsRgbDifference": 0.973
+  },
+  {
+    "phase": 112,
+    "sourceFrame": 112,
+    "silhouetteIoUWithSelected0": 0.85623,
+    "bbox": [
+      436,
+      30,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.212,
+    "pawMeanAbsRgbDifference": 34.357,
+    "previousFrameMeanAbsRgbDifference": 0.96
+  },
+  {
+    "phase": 113,
+    "sourceFrame": 113,
+    "silhouetteIoUWithSelected0": 0.85606,
+    "bbox": [
+      436,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.175,
+    "pawMeanAbsRgbDifference": 34.33,
+    "previousFrameMeanAbsRgbDifference": 0.501
+  },
+  {
+    "phase": 114,
+    "sourceFrame": 114,
+    "silhouetteIoUWithSelected0": 0.85563,
+    "bbox": [
+      436,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.196,
+    "pawMeanAbsRgbDifference": 34.364,
+    "previousFrameMeanAbsRgbDifference": 0.257
+  },
+  {
+    "phase": 115,
+    "sourceFrame": 115,
+    "silhouetteIoUWithSelected0": 0.85557,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.169,
+    "pawMeanAbsRgbDifference": 34.356,
+    "previousFrameMeanAbsRgbDifference": 0.148
+  },
+  {
+    "phase": 116,
+    "sourceFrame": 116,
+    "silhouetteIoUWithSelected0": 0.85549,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.158,
+    "pawMeanAbsRgbDifference": 34.352,
+    "previousFrameMeanAbsRgbDifference": 0.282
+  },
+  {
+    "phase": 117,
+    "sourceFrame": 117,
+    "silhouetteIoUWithSelected0": 0.85528,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.161,
+    "pawMeanAbsRgbDifference": 34.376,
+    "previousFrameMeanAbsRgbDifference": 0.137
+  },
+  {
+    "phase": 118,
+    "sourceFrame": 118,
+    "silhouetteIoUWithSelected0": 0.85534,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.13,
+    "pawMeanAbsRgbDifference": 34.376,
+    "previousFrameMeanAbsRgbDifference": 0.162
+  },
+  {
+    "phase": 119,
+    "sourceFrame": 119,
+    "silhouetteIoUWithSelected0": 0.85533,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.098,
+    "pawMeanAbsRgbDifference": 34.365,
+    "previousFrameMeanAbsRgbDifference": 0.218
+  },
+  {
+    "phase": 120,
+    "sourceFrame": 120,
+    "silhouetteIoUWithSelected0": 0.85525,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.078,
+    "pawMeanAbsRgbDifference": 34.382,
+    "previousFrameMeanAbsRgbDifference": 0.42
+  },
+  {
+    "phase": 121,
+    "sourceFrame": 119,
+    "silhouetteIoUWithSelected0": 0.85531,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.098,
+    "pawMeanAbsRgbDifference": 34.377,
+    "previousFrameMeanAbsRgbDifference": 0.106
+  },
+  {
+    "phase": 122,
+    "sourceFrame": 118,
+    "silhouetteIoUWithSelected0": 0.85535,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.142,
+    "pawMeanAbsRgbDifference": 34.389,
+    "previousFrameMeanAbsRgbDifference": 0.219
+  },
+  {
+    "phase": 123,
+    "sourceFrame": 117,
+    "silhouetteIoUWithSelected0": 0.85531,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.15,
+    "pawMeanAbsRgbDifference": 34.405,
+    "previousFrameMeanAbsRgbDifference": 0.109
+  },
+  {
+    "phase": 124,
+    "sourceFrame": 116,
+    "silhouetteIoUWithSelected0": 0.85554,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.156,
+    "pawMeanAbsRgbDifference": 34.352,
+    "previousFrameMeanAbsRgbDifference": 0.235
+  },
+  {
+    "phase": 125,
+    "sourceFrame": 115,
+    "silhouetteIoUWithSelected0": 0.85556,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.16,
+    "pawMeanAbsRgbDifference": 34.361,
+    "previousFrameMeanAbsRgbDifference": 0.14
+  },
+  {
+    "phase": 126,
+    "sourceFrame": 114,
+    "silhouetteIoUWithSelected0": 0.85561,
+    "bbox": [
+      436,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.177,
+    "pawMeanAbsRgbDifference": 34.366,
+    "previousFrameMeanAbsRgbDifference": 0.205
+  },
+  {
+    "phase": 127,
+    "sourceFrame": 113,
+    "silhouetteIoUWithSelected0": 0.85602,
+    "bbox": [
+      436,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.161,
+    "pawMeanAbsRgbDifference": 34.328,
+    "previousFrameMeanAbsRgbDifference": 0.203
+  },
+  {
+    "phase": 128,
+    "sourceFrame": 112,
+    "silhouetteIoUWithSelected0": 0.85621,
+    "bbox": [
+      436,
+      30,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.2,
+    "pawMeanAbsRgbDifference": 34.367,
+    "previousFrameMeanAbsRgbDifference": 0.881
+  },
+  {
+    "phase": 129,
+    "sourceFrame": 111,
+    "silhouetteIoUWithSelected0": 0.85546,
+    "bbox": [
+      437,
+      29,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.413,
+    "pawMeanAbsRgbDifference": 34.4,
+    "previousFrameMeanAbsRgbDifference": 0.88
+  },
+  {
+    "phase": 130,
+    "sourceFrame": 110,
+    "silhouetteIoUWithSelected0": 0.85413,
+    "bbox": [
+      437,
+      28,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 22.855,
+    "pawMeanAbsRgbDifference": 34.362,
+    "previousFrameMeanAbsRgbDifference": 1.007
+  },
+  {
+    "phase": 131,
+    "sourceFrame": 109,
+    "silhouetteIoUWithSelected0": 0.85386,
+    "bbox": [
+      438,
+      28,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.106,
+    "pawMeanAbsRgbDifference": 34.35,
+    "previousFrameMeanAbsRgbDifference": 0.622
+  },
+  {
+    "phase": 132,
+    "sourceFrame": 108,
+    "silhouetteIoUWithSelected0": 0.8536,
+    "bbox": [
+      438,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.39,
+    "pawMeanAbsRgbDifference": 34.338,
+    "previousFrameMeanAbsRgbDifference": 0.83
+  },
+  {
+    "phase": 133,
+    "sourceFrame": 107,
+    "silhouetteIoUWithSelected0": 0.85247,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.974,
+    "pawMeanAbsRgbDifference": 34.282,
+    "previousFrameMeanAbsRgbDifference": 1.245
+  },
+  {
+    "phase": 134,
+    "sourceFrame": 106,
+    "silhouetteIoUWithSelected0": 0.85164,
+    "bbox": [
+      441,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.488,
+    "pawMeanAbsRgbDifference": 34.265,
+    "previousFrameMeanAbsRgbDifference": 1.229
+  },
+  {
+    "phase": 135,
+    "sourceFrame": 105,
+    "silhouetteIoUWithSelected0": 0.85176,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.759,
+    "pawMeanAbsRgbDifference": 34.263,
+    "previousFrameMeanAbsRgbDifference": 0.831
+  },
+  {
+    "phase": 136,
+    "sourceFrame": 104,
+    "silhouetteIoUWithSelected0": 0.85156,
+    "bbox": [
+      440,
+      27,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.236,
+    "pawMeanAbsRgbDifference": 34.08,
+    "previousFrameMeanAbsRgbDifference": 1.231
+  },
+  {
+    "phase": 137,
+    "sourceFrame": 103,
+    "silhouetteIoUWithSelected0": 0.85054,
+    "bbox": [
+      442,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.801,
+    "pawMeanAbsRgbDifference": 33.858,
+    "previousFrameMeanAbsRgbDifference": 1.482
+  },
+  {
+    "phase": 138,
+    "sourceFrame": 102,
+    "silhouetteIoUWithSelected0": 0.84796,
+    "bbox": [
+      441,
+      25,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 26.665,
+    "pawMeanAbsRgbDifference": 33.723,
+    "previousFrameMeanAbsRgbDifference": 1.848
+  },
+  {
+    "phase": 139,
+    "sourceFrame": 101,
+    "silhouetteIoUWithSelected0": 0.84837,
+    "bbox": [
+      440,
+      24,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 26.531,
+    "pawMeanAbsRgbDifference": 33.675,
+    "previousFrameMeanAbsRgbDifference": 1.715
+  },
+  {
+    "phase": 140,
+    "sourceFrame": 100,
+    "silhouetteIoUWithSelected0": 0.84832,
+    "bbox": [
+      438,
+      24,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.79,
+    "pawMeanAbsRgbDifference": 33.771,
+    "previousFrameMeanAbsRgbDifference": 2.415
+  },
+  {
+    "phase": 141,
+    "sourceFrame": 99,
+    "silhouetteIoUWithSelected0": 0.84733,
+    "bbox": [
+      433,
+      26,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 25.046,
+    "pawMeanAbsRgbDifference": 34.107,
+    "previousFrameMeanAbsRgbDifference": 3.094
+  },
+  {
+    "phase": 142,
+    "sourceFrame": 98,
+    "silhouetteIoUWithSelected0": 0.84587,
+    "bbox": [
+      427,
+      30,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.321,
+    "pawMeanAbsRgbDifference": 34.393,
+    "previousFrameMeanAbsRgbDifference": 3.68
+  },
+  {
+    "phase": 143,
+    "sourceFrame": 97,
+    "silhouetteIoUWithSelected0": 0.84328,
+    "bbox": [
+      422,
+      37,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.668,
+    "pawMeanAbsRgbDifference": 34.757,
+    "previousFrameMeanAbsRgbDifference": 4.711
+  },
+  {
+    "phase": 144,
+    "sourceFrame": 96,
+    "silhouetteIoUWithSelected0": 0.83722,
+    "bbox": [
+      416,
+      44,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 23.795,
+    "pawMeanAbsRgbDifference": 35.016,
+    "previousFrameMeanAbsRgbDifference": 5.646
+  },
+  {
+    "phase": 145,
+    "sourceFrame": 95,
+    "silhouetteIoUWithSelected0": 0.82831,
+    "bbox": [
+      413,
+      52,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 24.687,
+    "pawMeanAbsRgbDifference": 35.089,
+    "previousFrameMeanAbsRgbDifference": 7.127
+  },
+  {
+    "phase": 146,
+    "sourceFrame": 94,
+    "silhouetteIoUWithSelected0": 0.81275,
+    "bbox": [
+      415,
+      59,
+      901,
+      688
+    ],
+    "faceMeanAbsRgbDifference": 29.082,
+    "pawMeanAbsRgbDifference": 34.804,
+    "previousFrameMeanAbsRgbDifference": 7.525
+  },
+  {
+    "phase": 147,
+    "sourceFrame": 93,
+    "silhouetteIoUWithSelected0": 0.79881,
+    "bbox": [
+      422,
+      67,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 32.938,
+    "pawMeanAbsRgbDifference": 34.395,
+    "previousFrameMeanAbsRgbDifference": 6.973
+  },
+  {
+    "phase": 148,
+    "sourceFrame": 92,
+    "silhouetteIoUWithSelected0": 0.78903,
+    "bbox": [
+      429,
+      76,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 36.01,
+    "pawMeanAbsRgbDifference": 34.144,
+    "previousFrameMeanAbsRgbDifference": 5.979
+  },
+  {
+    "phase": 149,
+    "sourceFrame": 91,
+    "silhouetteIoUWithSelected0": 0.7842,
+    "bbox": [
+      424,
+      77,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 36.572,
+    "pawMeanAbsRgbDifference": 33.706,
+    "previousFrameMeanAbsRgbDifference": 4.474
+  },
+  {
+    "phase": 150,
+    "sourceFrame": 90,
+    "silhouetteIoUWithSelected0": 0.79022,
+    "bbox": [
+      422,
+      73,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 35.742,
+    "pawMeanAbsRgbDifference": 32.731,
+    "previousFrameMeanAbsRgbDifference": 3.9
+  },
+  {
+    "phase": 151,
+    "sourceFrame": 89,
+    "silhouetteIoUWithSelected0": 0.79664,
+    "bbox": [
+      422,
+      69,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 35.733,
+    "pawMeanAbsRgbDifference": 31.063,
+    "previousFrameMeanAbsRgbDifference": 3.352
+  },
+  {
+    "phase": 152,
+    "sourceFrame": 88,
+    "silhouetteIoUWithSelected0": 0.81693,
+    "bbox": [
+      422,
+      64,
+      901,
+      687
+    ],
+    "faceMeanAbsRgbDifference": 35.867,
+    "pawMeanAbsRgbDifference": 24.525,
+    "previousFrameMeanAbsRgbDifference": 5.381
+  },
+  {
+    "phase": 153,
+    "sourceFrame": 87,
+    "silhouetteIoUWithSelected0": 0.82758,
+    "bbox": [
+      427,
+      61,
+      901,
+      677
+    ],
+    "faceMeanAbsRgbDifference": 36.808,
+    "pawMeanAbsRgbDifference": 21.828,
+    "previousFrameMeanAbsRgbDifference": 6.855
+  },
+  {
+    "phase": 154,
+    "sourceFrame": 86,
+    "silhouetteIoUWithSelected0": 0.83149,
+    "bbox": [
+      433,
+      58,
+      901,
+      682
+    ],
+    "faceMeanAbsRgbDifference": 38.296,
+    "pawMeanAbsRgbDifference": 20.547,
+    "previousFrameMeanAbsRgbDifference": 7.035
+  },
+  {
+    "phase": 155,
+    "sourceFrame": 85,
+    "silhouetteIoUWithSelected0": 0.83247,
+    "bbox": [
+      441,
+      59,
+      901,
+      689
+    ],
+    "faceMeanAbsRgbDifference": 40.352,
+    "pawMeanAbsRgbDifference": 15.764,
+    "previousFrameMeanAbsRgbDifference": 8.012
+  },
+  {
+    "phase": 156,
+    "sourceFrame": 84,
+    "silhouetteIoUWithSelected0": 0.81036,
+    "bbox": [
+      448,
+      58,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 43.201,
+    "pawMeanAbsRgbDifference": 15.509,
+    "previousFrameMeanAbsRgbDifference": 7.315
+  },
+  {
+    "phase": 157,
+    "sourceFrame": 83,
+    "silhouetteIoUWithSelected0": 0.77978,
+    "bbox": [
+      458,
+      57,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 46.859,
+    "pawMeanAbsRgbDifference": 15.668,
+    "previousFrameMeanAbsRgbDifference": 7.586
+  },
+  {
+    "phase": 158,
+    "sourceFrame": 82,
+    "silhouetteIoUWithSelected0": 0.74568,
+    "bbox": [
+      464,
+      54,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 51.049,
+    "pawMeanAbsRgbDifference": 16.515,
+    "previousFrameMeanAbsRgbDifference": 7.449
+  },
+  {
+    "phase": 159,
+    "sourceFrame": 81,
+    "silhouetteIoUWithSelected0": 0.72057,
+    "bbox": [
+      467,
+      50,
+      901,
+      691
+    ],
+    "faceMeanAbsRgbDifference": 53.61,
+    "pawMeanAbsRgbDifference": 18.816,
+    "previousFrameMeanAbsRgbDifference": 5.901
+  },
+  {
+    "phase": 160,
+    "sourceFrame": 80,
+    "silhouetteIoUWithSelected0": 0.70569,
+    "bbox": [
+      474,
+      43,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 53.916,
+    "pawMeanAbsRgbDifference": 20.965,
+    "previousFrameMeanAbsRgbDifference": 5.633
+  },
+  {
+    "phase": 161,
+    "sourceFrame": 79,
+    "silhouetteIoUWithSelected0": 0.715,
+    "bbox": [
+      478,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 51.886,
+    "pawMeanAbsRgbDifference": 16.458,
+    "previousFrameMeanAbsRgbDifference": 5.912
+  },
+  {
+    "phase": 162,
+    "sourceFrame": 78,
+    "silhouetteIoUWithSelected0": 0.7397,
+    "bbox": [
+      474,
+      26,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 47.416,
+    "pawMeanAbsRgbDifference": 11.312,
+    "previousFrameMeanAbsRgbDifference": 7.795
+  },
+  {
+    "phase": 163,
+    "sourceFrame": 77,
+    "silhouetteIoUWithSelected0": 0.76376,
+    "bbox": [
+      471,
+      22,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 44.251,
+    "pawMeanAbsRgbDifference": 6.185,
+    "previousFrameMeanAbsRgbDifference": 6.268
+  },
+  {
+    "phase": 164,
+    "sourceFrame": 76,
+    "silhouetteIoUWithSelected0": 0.77796,
+    "bbox": [
+      468,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.821,
+    "pawMeanAbsRgbDifference": 4.751,
+    "previousFrameMeanAbsRgbDifference": 4.636
+  },
+  {
+    "phase": 165,
+    "sourceFrame": 75,
+    "silhouetteIoUWithSelected0": 0.78524,
+    "bbox": [
+      466,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.794,
+    "pawMeanAbsRgbDifference": 4.359,
+    "previousFrameMeanAbsRgbDifference": 2.49
+  },
+  {
+    "phase": 166,
+    "sourceFrame": 74,
+    "silhouetteIoUWithSelected0": 0.7878,
+    "bbox": [
+      466,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.557,
+    "pawMeanAbsRgbDifference": 4.276,
+    "previousFrameMeanAbsRgbDifference": 0.997
+  },
+  {
+    "phase": 167,
+    "sourceFrame": 73,
+    "silhouetteIoUWithSelected0": 0.78855,
+    "bbox": [
+      466,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.467,
+    "pawMeanAbsRgbDifference": 4.285,
+    "previousFrameMeanAbsRgbDifference": 0.679
+  },
+  {
+    "phase": 168,
+    "sourceFrame": 72,
+    "silhouetteIoUWithSelected0": 0.78977,
+    "bbox": [
+      465,
+      19,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.36,
+    "pawMeanAbsRgbDifference": 4.327,
+    "previousFrameMeanAbsRgbDifference": 1.285
+  },
+  {
+    "phase": 169,
+    "sourceFrame": 71,
+    "silhouetteIoUWithSelected0": 0.79007,
+    "bbox": [
+      465,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 40.743,
+    "pawMeanAbsRgbDifference": 4.225,
+    "previousFrameMeanAbsRgbDifference": 1.586
+  },
+  {
+    "phase": 170,
+    "sourceFrame": 70,
+    "silhouetteIoUWithSelected0": 0.79346,
+    "bbox": [
+      464,
+      17,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.053,
+    "pawMeanAbsRgbDifference": 4.136,
+    "previousFrameMeanAbsRgbDifference": 1.959
+  },
+  {
+    "phase": 171,
+    "sourceFrame": 69,
+    "silhouetteIoUWithSelected0": 0.79617,
+    "bbox": [
+      464,
+      18,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.909,
+    "pawMeanAbsRgbDifference": 4.156,
+    "previousFrameMeanAbsRgbDifference": 1.69
+  },
+  {
+    "phase": 172,
+    "sourceFrame": 68,
+    "silhouetteIoUWithSelected0": 0.79765,
+    "bbox": [
+      464,
+      20,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.807,
+    "pawMeanAbsRgbDifference": 4.106,
+    "previousFrameMeanAbsRgbDifference": 1.139
+  },
+  {
+    "phase": 173,
+    "sourceFrame": 67,
+    "silhouetteIoUWithSelected0": 0.80169,
+    "bbox": [
+      463,
+      22,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 41.012,
+    "pawMeanAbsRgbDifference": 3.958,
+    "previousFrameMeanAbsRgbDifference": 2.035
+  },
+  {
+    "phase": 174,
+    "sourceFrame": 66,
+    "silhouetteIoUWithSelected0": 0.80914,
+    "bbox": [
+      462,
+      24,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 38.927,
+    "pawMeanAbsRgbDifference": 3.818,
+    "previousFrameMeanAbsRgbDifference": 3.37
+  },
+  {
+    "phase": 175,
+    "sourceFrame": 65,
+    "silhouetteIoUWithSelected0": 0.82501,
+    "bbox": [
+      461,
+      27,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 36.059,
+    "pawMeanAbsRgbDifference": 3.797,
+    "previousFrameMeanAbsRgbDifference": 4.727
+  },
+  {
+    "phase": 176,
+    "sourceFrame": 64,
+    "silhouetteIoUWithSelected0": 0.85965,
+    "bbox": [
+      458,
+      29,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 30.215,
+    "pawMeanAbsRgbDifference": 3.309,
+    "previousFrameMeanAbsRgbDifference": 6.178
+  },
+  {
+    "phase": 177,
+    "sourceFrame": 63,
+    "silhouetteIoUWithSelected0": 0.91191,
+    "bbox": [
+      455,
+      32,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 23.338,
+    "pawMeanAbsRgbDifference": 2.213,
+    "previousFrameMeanAbsRgbDifference": 6.417
+  },
+  {
+    "phase": 178,
+    "sourceFrame": 62,
+    "silhouetteIoUWithSelected0": 0.96147,
+    "bbox": [
+      447,
+      37,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.348,
+    "pawMeanAbsRgbDifference": 2.236,
+    "previousFrameMeanAbsRgbDifference": 7.533
+  },
+  {
+    "phase": 179,
+    "sourceFrame": 61,
+    "silhouetteIoUWithSelected0": 0.97145,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.514,
+    "pawMeanAbsRgbDifference": 2.474,
+    "previousFrameMeanAbsRgbDifference": 4.651
+  },
+  {
+    "phase": 180,
+    "sourceFrame": 60,
+    "silhouetteIoUWithSelected0": 0.97057,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.613,
+    "pawMeanAbsRgbDifference": 2.569,
+    "previousFrameMeanAbsRgbDifference": 1.258
+  },
+  {
+    "phase": 181,
+    "sourceFrame": 59,
+    "silhouetteIoUWithSelected0": 0.9706,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.876,
+    "pawMeanAbsRgbDifference": 2.637,
+    "previousFrameMeanAbsRgbDifference": 0.765
+  },
+  {
+    "phase": 182,
+    "sourceFrame": 58,
+    "silhouetteIoUWithSelected0": 0.97056,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.868,
+    "pawMeanAbsRgbDifference": 2.662,
+    "previousFrameMeanAbsRgbDifference": 0.561
+  },
+  {
+    "phase": 183,
+    "sourceFrame": 57,
+    "silhouetteIoUWithSelected0": 0.97076,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.736,
+    "pawMeanAbsRgbDifference": 2.622,
+    "previousFrameMeanAbsRgbDifference": 0.189
+  },
+  {
+    "phase": 184,
+    "sourceFrame": 56,
+    "silhouetteIoUWithSelected0": 0.9707,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.73,
+    "pawMeanAbsRgbDifference": 2.595,
+    "previousFrameMeanAbsRgbDifference": 0.287
+  },
+  {
+    "phase": 185,
+    "sourceFrame": 55,
+    "silhouetteIoUWithSelected0": 0.97056,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.778,
+    "pawMeanAbsRgbDifference": 2.585,
+    "previousFrameMeanAbsRgbDifference": 0.071
+  },
+  {
+    "phase": 186,
+    "sourceFrame": 54,
+    "silhouetteIoUWithSelected0": 0.97043,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.826,
+    "pawMeanAbsRgbDifference": 2.568,
+    "previousFrameMeanAbsRgbDifference": 0.19
+  },
+  {
+    "phase": 187,
+    "sourceFrame": 53,
+    "silhouetteIoUWithSelected0": 0.97044,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.823,
+    "pawMeanAbsRgbDifference": 2.559,
+    "previousFrameMeanAbsRgbDifference": 0.094
+  },
+  {
+    "phase": 188,
+    "sourceFrame": 52,
+    "silhouetteIoUWithSelected0": 0.97038,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.826,
+    "pawMeanAbsRgbDifference": 2.631,
+    "previousFrameMeanAbsRgbDifference": 0.414
+  },
+  {
+    "phase": 189,
+    "sourceFrame": 51,
+    "silhouetteIoUWithSelected0": 0.97051,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.778,
+    "pawMeanAbsRgbDifference": 2.552,
+    "previousFrameMeanAbsRgbDifference": 0.426
+  },
+  {
+    "phase": 190,
+    "sourceFrame": 50,
+    "silhouetteIoUWithSelected0": 0.97051,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.744,
+    "pawMeanAbsRgbDifference": 2.566,
+    "previousFrameMeanAbsRgbDifference": 0.133
+  },
+  {
+    "phase": 191,
+    "sourceFrame": 49,
+    "silhouetteIoUWithSelected0": 0.9707,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.693,
+    "pawMeanAbsRgbDifference": 2.562,
+    "previousFrameMeanAbsRgbDifference": 0.11
+  },
+  {
+    "phase": 192,
+    "sourceFrame": 48,
+    "silhouetteIoUWithSelected0": 0.97092,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.642,
+    "pawMeanAbsRgbDifference": 2.55,
+    "previousFrameMeanAbsRgbDifference": 0.361
+  },
+  {
+    "phase": 193,
+    "sourceFrame": 47,
+    "silhouetteIoUWithSelected0": 0.97099,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.623,
+    "pawMeanAbsRgbDifference": 2.53,
+    "previousFrameMeanAbsRgbDifference": 0.087
+  },
+  {
+    "phase": 194,
+    "sourceFrame": 46,
+    "silhouetteIoUWithSelected0": 0.97092,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.611,
+    "pawMeanAbsRgbDifference": 2.544,
+    "previousFrameMeanAbsRgbDifference": 0.08
+  },
+  {
+    "phase": 195,
+    "sourceFrame": 45,
+    "silhouetteIoUWithSelected0": 0.97085,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.595,
+    "pawMeanAbsRgbDifference": 2.537,
+    "previousFrameMeanAbsRgbDifference": 0.079
+  },
+  {
+    "phase": 196,
+    "sourceFrame": 44,
+    "silhouetteIoUWithSelected0": 0.97116,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.546,
+    "pawMeanAbsRgbDifference": 2.513,
+    "previousFrameMeanAbsRgbDifference": 0.167
+  },
+  {
+    "phase": 197,
+    "sourceFrame": 43,
+    "silhouetteIoUWithSelected0": 0.97134,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.529,
+    "pawMeanAbsRgbDifference": 2.51,
+    "previousFrameMeanAbsRgbDifference": 0.098
+  },
+  {
+    "phase": 198,
+    "sourceFrame": 42,
+    "silhouetteIoUWithSelected0": 0.97139,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.496,
+    "pawMeanAbsRgbDifference": 2.602,
+    "previousFrameMeanAbsRgbDifference": 0.43
+  },
+  {
+    "phase": 199,
+    "sourceFrame": 41,
+    "silhouetteIoUWithSelected0": 0.97133,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.463,
+    "pawMeanAbsRgbDifference": 2.533,
+    "previousFrameMeanAbsRgbDifference": 0.443
+  },
+  {
+    "phase": 200,
+    "sourceFrame": 40,
+    "silhouetteIoUWithSelected0": 0.97143,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.487,
+    "pawMeanAbsRgbDifference": 2.543,
+    "previousFrameMeanAbsRgbDifference": 0.373
+  },
+  {
+    "phase": 201,
+    "sourceFrame": 39,
+    "silhouetteIoUWithSelected0": 0.97125,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.619,
+    "pawMeanAbsRgbDifference": 2.533,
+    "previousFrameMeanAbsRgbDifference": 0.198
+  },
+  {
+    "phase": 202,
+    "sourceFrame": 38,
+    "silhouetteIoUWithSelected0": 0.97088,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.86,
+    "pawMeanAbsRgbDifference": 2.532,
+    "previousFrameMeanAbsRgbDifference": 0.37
+  },
+  {
+    "phase": 203,
+    "sourceFrame": 37,
+    "silhouetteIoUWithSelected0": 0.97103,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.836,
+    "pawMeanAbsRgbDifference": 2.517,
+    "previousFrameMeanAbsRgbDifference": 0.167
+  },
+  {
+    "phase": 204,
+    "sourceFrame": 36,
+    "silhouetteIoUWithSelected0": 0.97086,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.862,
+    "pawMeanAbsRgbDifference": 2.539,
+    "previousFrameMeanAbsRgbDifference": 0.245
+  },
+  {
+    "phase": 205,
+    "sourceFrame": 35,
+    "silhouetteIoUWithSelected0": 0.97068,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.913,
+    "pawMeanAbsRgbDifference": 2.553,
+    "previousFrameMeanAbsRgbDifference": 0.213
+  },
+  {
+    "phase": 206,
+    "sourceFrame": 34,
+    "silhouetteIoUWithSelected0": 0.97052,
+    "bbox": [
+      443,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.004,
+    "pawMeanAbsRgbDifference": 2.605,
+    "previousFrameMeanAbsRgbDifference": 0.307
+  },
+  {
+    "phase": 207,
+    "sourceFrame": 33,
+    "silhouetteIoUWithSelected0": 0.97048,
+    "bbox": [
+      443,
+      34,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.962,
+    "pawMeanAbsRgbDifference": 2.617,
+    "previousFrameMeanAbsRgbDifference": 0.248
+  },
+  {
+    "phase": 208,
+    "sourceFrame": 32,
+    "silhouetteIoUWithSelected0": 0.96992,
+    "bbox": [
+      444,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.14,
+    "pawMeanAbsRgbDifference": 2.737,
+    "previousFrameMeanAbsRgbDifference": 0.721
+  },
+  {
+    "phase": 209,
+    "sourceFrame": 31,
+    "silhouetteIoUWithSelected0": 0.96789,
+    "bbox": [
+      444,
+      33,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.645,
+    "pawMeanAbsRgbDifference": 2.638,
+    "previousFrameMeanAbsRgbDifference": 1.076
+  },
+  {
+    "phase": 210,
+    "sourceFrame": 30,
+    "silhouetteIoUWithSelected0": 0.96467,
+    "bbox": [
+      444,
+      31,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.487,
+    "pawMeanAbsRgbDifference": 2.807,
+    "previousFrameMeanAbsRgbDifference": 1.288
+  },
+  {
+    "phase": 211,
+    "sourceFrame": 29,
+    "silhouetteIoUWithSelected0": 0.9622,
+    "bbox": [
+      444,
+      30,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.114,
+    "pawMeanAbsRgbDifference": 3.024,
+    "previousFrameMeanAbsRgbDifference": 0.888
+  },
+  {
+    "phase": 212,
+    "sourceFrame": 28,
+    "silhouetteIoUWithSelected0": 0.95943,
+    "bbox": [
+      445,
+      30,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.768,
+    "pawMeanAbsRgbDifference": 3.327,
+    "previousFrameMeanAbsRgbDifference": 1.109
+  },
+  {
+    "phase": 213,
+    "sourceFrame": 27,
+    "silhouetteIoUWithSelected0": 0.95487,
+    "bbox": [
+      445,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 18.546,
+    "pawMeanAbsRgbDifference": 3.814,
+    "previousFrameMeanAbsRgbDifference": 1.375
+  },
+  {
+    "phase": 214,
+    "sourceFrame": 26,
+    "silhouetteIoUWithSelected0": 0.95163,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.04,
+    "pawMeanAbsRgbDifference": 4.146,
+    "previousFrameMeanAbsRgbDifference": 1.016
+  },
+  {
+    "phase": 215,
+    "sourceFrame": 25,
+    "silhouetteIoUWithSelected0": 0.95038,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.209,
+    "pawMeanAbsRgbDifference": 4.303,
+    "previousFrameMeanAbsRgbDifference": 0.627
+  },
+  {
+    "phase": 216,
+    "sourceFrame": 24,
+    "silhouetteIoUWithSelected0": 0.94977,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.482,
+    "pawMeanAbsRgbDifference": 4.444,
+    "previousFrameMeanAbsRgbDifference": 0.732
+  },
+  {
+    "phase": 217,
+    "sourceFrame": 23,
+    "silhouetteIoUWithSelected0": 0.94823,
+    "bbox": [
+      446,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.852,
+    "pawMeanAbsRgbDifference": 4.577,
+    "previousFrameMeanAbsRgbDifference": 0.713
+  },
+  {
+    "phase": 218,
+    "sourceFrame": 22,
+    "silhouetteIoUWithSelected0": 0.94601,
+    "bbox": [
+      446,
+      27,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 20.241,
+    "pawMeanAbsRgbDifference": 4.784,
+    "previousFrameMeanAbsRgbDifference": 0.912
+  },
+  {
+    "phase": 219,
+    "sourceFrame": 21,
+    "silhouetteIoUWithSelected0": 0.9468,
+    "bbox": [
+      447,
+      28,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 19.91,
+    "pawMeanAbsRgbDifference": 4.644,
+    "previousFrameMeanAbsRgbDifference": 1.016
+  },
+  {
+    "phase": 220,
+    "sourceFrame": 20,
+    "silhouetteIoUWithSelected0": 0.95095,
+    "bbox": [
+      446,
+      29,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 18.873,
+    "pawMeanAbsRgbDifference": 4.326,
+    "previousFrameMeanAbsRgbDifference": 1.851
+  },
+  {
+    "phase": 221,
+    "sourceFrame": 19,
+    "silhouetteIoUWithSelected0": 0.95659,
+    "bbox": [
+      443,
+      31,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 17.246,
+    "pawMeanAbsRgbDifference": 3.98,
+    "previousFrameMeanAbsRgbDifference": 2.326
+  },
+  {
+    "phase": 222,
+    "sourceFrame": 18,
+    "silhouetteIoUWithSelected0": 0.96285,
+    "bbox": [
+      439,
+      35,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 15.14,
+    "pawMeanAbsRgbDifference": 3.605,
+    "previousFrameMeanAbsRgbDifference": 2.965
+  },
+  {
+    "phase": 223,
+    "sourceFrame": 17,
+    "silhouetteIoUWithSelected0": 0.96942,
+    "bbox": [
+      435,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 12.69,
+    "pawMeanAbsRgbDifference": 3.19,
+    "previousFrameMeanAbsRgbDifference": 3.632
+  },
+  {
+    "phase": 224,
+    "sourceFrame": 16,
+    "silhouetteIoUWithSelected0": 0.96922,
+    "bbox": [
+      432,
+      46,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 9.609,
+    "pawMeanAbsRgbDifference": 2.777,
+    "previousFrameMeanAbsRgbDifference": 3.755
+  },
+  {
+    "phase": 225,
+    "sourceFrame": 15,
+    "silhouetteIoUWithSelected0": 0.96534,
+    "bbox": [
+      431,
+      50,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 10.191,
+    "pawMeanAbsRgbDifference": 2.593,
+    "previousFrameMeanAbsRgbDifference": 3.748
+  },
+  {
+    "phase": 226,
+    "sourceFrame": 14,
+    "silhouetteIoUWithSelected0": 0.95741,
+    "bbox": [
+      431,
+      52,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.305,
+    "pawMeanAbsRgbDifference": 3.603,
+    "previousFrameMeanAbsRgbDifference": 3.203
+  },
+  {
+    "phase": 227,
+    "sourceFrame": 13,
+    "silhouetteIoUWithSelected0": 0.95169,
+    "bbox": [
+      434,
+      53,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.141,
+    "pawMeanAbsRgbDifference": 4.299,
+    "previousFrameMeanAbsRgbDifference": 2.923
+  },
+  {
+    "phase": 228,
+    "sourceFrame": 12,
+    "silhouetteIoUWithSelected0": 0.95461,
+    "bbox": [
+      436,
+      53,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 16.024,
+    "pawMeanAbsRgbDifference": 4.323,
+    "previousFrameMeanAbsRgbDifference": 1.337
+  },
+  {
+    "phase": 229,
+    "sourceFrame": 11,
+    "silhouetteIoUWithSelected0": 0.96133,
+    "bbox": [
+      438,
+      52,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 14.598,
+    "pawMeanAbsRgbDifference": 3.858,
+    "previousFrameMeanAbsRgbDifference": 1.583
+  },
+  {
+    "phase": 230,
+    "sourceFrame": 10,
+    "silhouetteIoUWithSelected0": 0.96786,
+    "bbox": [
+      439,
+      50,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 13.067,
+    "pawMeanAbsRgbDifference": 3.47,
+    "previousFrameMeanAbsRgbDifference": 1.604
+  },
+  {
+    "phase": 231,
+    "sourceFrame": 9,
+    "silhouetteIoUWithSelected0": 0.97283,
+    "bbox": [
+      440,
+      48,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 11.757,
+    "pawMeanAbsRgbDifference": 3.156,
+    "previousFrameMeanAbsRgbDifference": 1.293
+  },
+  {
+    "phase": 232,
+    "sourceFrame": 8,
+    "silhouetteIoUWithSelected0": 0.98274,
+    "bbox": [
+      440,
+      46,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 7.965,
+    "pawMeanAbsRgbDifference": 2.351,
+    "previousFrameMeanAbsRgbDifference": 2.694
+  },
+  {
+    "phase": 233,
+    "sourceFrame": 7,
+    "silhouetteIoUWithSelected0": 0.99252,
+    "bbox": [
+      440,
+      43,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 3.676,
+    "pawMeanAbsRgbDifference": 1.499,
+    "previousFrameMeanAbsRgbDifference": 2.33
+  },
+  {
+    "phase": 234,
+    "sourceFrame": 6,
+    "silhouetteIoUWithSelected0": 0.99545,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 2.098,
+    "pawMeanAbsRgbDifference": 1.257,
+    "previousFrameMeanAbsRgbDifference": 1.847
+  },
+  {
+    "phase": 235,
+    "sourceFrame": 5,
+    "silhouetteIoUWithSelected0": 0.99609,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.843,
+    "pawMeanAbsRgbDifference": 1.187,
+    "previousFrameMeanAbsRgbDifference": 0.266
+  },
+  {
+    "phase": 236,
+    "sourceFrame": 4,
+    "silhouetteIoUWithSelected0": 0.99702,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.562,
+    "pawMeanAbsRgbDifference": 1.057,
+    "previousFrameMeanAbsRgbDifference": 0.426
+  },
+  {
+    "phase": 237,
+    "sourceFrame": 3,
+    "silhouetteIoUWithSelected0": 0.997,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.566,
+    "pawMeanAbsRgbDifference": 1.045,
+    "previousFrameMeanAbsRgbDifference": 0.098
+  },
+  {
+    "phase": 238,
+    "sourceFrame": 2,
+    "silhouetteIoUWithSelected0": 0.99714,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.623,
+    "pawMeanAbsRgbDifference": 1.076,
+    "previousFrameMeanAbsRgbDifference": 0.465
+  },
+  {
+    "phase": 239,
+    "sourceFrame": 1,
+    "silhouetteIoUWithSelected0": 0.99784,
+    "bbox": [
+      440,
+      41,
+      901,
+      690
+    ],
+    "faceMeanAbsRgbDifference": 1.343,
+    "pawMeanAbsRgbDifference": 0.921,
+    "previousFrameMeanAbsRgbDifference": 0.444
+  }
+]

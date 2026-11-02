@@ -1,0 +1,117 @@
+{
+  "htmlControlsWorked": true,
+  "playedVideoResults": [
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_000_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_001_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_008_GAME.mp4",
+      "duration": 21.25,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_036_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_058_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_059_GAME.mp4",
+      "duration": 20.125,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_077_GAME.mp4",
+      "duration": 23.875,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_080_GAME.mp4",
+      "duration": 23.75,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_100_GAME.mp4",
+      "duration": 22.916667,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_119_GAME.mp4",
+      "duration": 22.625,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_120_GAME.mp4",
+      "duration": 22.666667,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_150_GAME.mp4",
+      "duration": 21.416667,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_205_GAME.mp4",
+      "duration": 21.25,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    },
+    {
+      "file": "DOG3_IDLE_EXIT_TRIGGER_239_GAME.mp4",
+      "duration": 20.083333,
+      "width": 1920,
+      "height": 1080,
+      "ended": true,
+      "error": null
+    }
+  ]
+}
