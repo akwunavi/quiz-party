@@ -103,8 +103,8 @@
 .h-tvbody { position: absolute; z-index: 15; inset: 0; padding: 0; transition: inset 1.5s cubic-bezier(.55,.05,.25,1), padding 1.5s cubic-bezier(.55,.05,.25,1), border-radius 1.5s; }
 .h-tvbody::before { content: ''; position: absolute; inset: 0; border-radius: 40px; background: repeating-linear-gradient(92deg, rgba(0,0,0,.05) 0 3px, rgba(255,255,255,.03) 3px 7px), var(--h-wood);
   box-shadow: 0 30px 70px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,220,180,.3), inset 0 0 0 6px #4a2412; opacity: 0; transition: opacity 1.2s; }
-.h-d-medium .h-tvbody { inset: 36px 110px 52px; padding: 34px; }
-.h-d-dense .h-tvbody { inset: 0; padding: 28px; }
+.h-d-medium .h-tvbody { inset: calc(36px + var(--cy0, 0px)) calc(110px + var(--cx1, 0px)) calc(52px + var(--cy1, 0px)) calc(110px + var(--cx0, 0px)); padding: 34px; }
+.h-d-dense .h-tvbody { inset: var(--cy0, 0px) var(--cx1, 0px) var(--cy1, 0px) var(--cx0, 0px); padding: 28px; }
 .h-d-medium .h-tvbody::before, .h-d-dense .h-tvbody::before { opacity: 1; }
 .h-screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 0; transition: border-radius 1.5s; isolation: isolate; }
 .h-screen::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 1.2s; background: radial-gradient(ellipse at 50% 42%, var(--h-blue2), var(--h-blue) 62%, #040b1c); }
@@ -162,7 +162,7 @@
 @keyframes h-osd { 0% { opacity: 1; } 99% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes h-collapse { 0% { transform: none; filter: none; } 70% { transform: scaleY(.012) scaleX(1.02); filter: brightness(3); } 100% { transform: scaleY(.003) scaleX(.15); filter: brightness(6); } }
 @keyframes h-expand { 0% { transform: scale(.15, .003); filter: brightness(6); } 40% { transform: scale(1, .02); filter: brightness(3); } 100% { transform: none; filter: none; } }
-.h-d-medium .h-tvbody { inset: 22px 90px 34px; padding: 30px; }
+.h-d-medium .h-tvbody { inset: calc(22px + var(--cy0, 0px)) calc(90px + var(--cx1, 0px)) calc(34px + var(--cy1, 0px)) calc(90px + var(--cx0, 0px)); padding: 30px; }
 .h-dial.is-top { --d: 156px; margin: 0 4px 0 0; }
 .h-dial.is-mini { --d: 128px; }
 .h-dial-win { height: 32%; transform: translate(-50%, 4%); }
