@@ -42,7 +42,7 @@
    {
     "window": "SNIFF_PEE",
     "clip": "SNIFF_PEE",
-    "status": "missing: placeholder 198 frames (leg-lift phase to be replaced)"
+    "status": "candidate: SNIFF_PEE+RETURN fixed build, 193 frames (orig #24-#93 + leg-lift insert 1-96 + orig #179-#205)"
    }
   ]
  },

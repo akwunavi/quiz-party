@@ -4,7 +4,7 @@
  "name": "Луна",
  "number": 5,
  "notDog4": "Собака №5 «Луна»; не путать с №4 «Пупс» (dog4).",
- "version": "luna-0.4-draft",
+ "version": "luna-0.5-draft",
  "date": "2026-11-08",
  "fps": 24,
  "statusLegend": {
@@ -75,8 +75,8 @@
   "sprite": "207×116, anchor x−148 / laneY−110 (as Race V3); scale 100% (decision 2026-11-08)",
   "contractDraft": {
    "path": "bulldog5-luna/stage6_batch/contract/luna.contract.draft.json",
-   "sha256": "33684c86a1d028a3d31194047be5d19bfb13be301b4f8465f7d198e8bc3d05fd",
-   "bytes": 10676
+   "sha256": "1bc31d5999f2017b7fe5ca35028dcd3fc78e754dbf45b7e43f4026311c6f47eb",
+   "bytes": 9811
   },
   "states": {
    "RACE_STAND": {
@@ -130,19 +130,32 @@
     "note": "= STOP + tail, then BASE"
    },
    "SNIFF_PEE+RETURN": {
-    "status": "PROBLEM",
+    "status": "CANDIDATE",
     "source": {
      "path": "bulldog5-luna/stage6_batch/sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4",
      "sha256": "2349013ce11c29bb442ef3ff0a4c0d39396515af53a8e53b199ccbd64c37fbfb",
      "bytes": 2103748
     },
-    "defect": "#99–#177 near hind leg goes backward",
-    "fix": "bulldog5-luna/stage7_fix/sniff/SNIFF_AUDIT_AND_FIX_TZ.md",
     "insertAttempt1": {
      "result": "FAILED: leg goes backward again (#32-#92)",
      "file": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G1_kling_original.mp4",
      "report": "bulldog5-luna/stage7_fix/sniff/INSERT_G1_RESULT.md"
-    }
+    },
+    "asset": {
+     "path": "bulldog5-luna/stage7_fix/sniff/alpha/DOG5_SNIFF_PEE_RETURN_FIXED_alpha_193f.webm",
+     "sha256": "f26cb0c06a2e5c74446cbb2d125798f39777f5828ef0b8f48ad7dd0298775a8a",
+     "bytes": 2269414
+    },
+    "frames": 193,
+    "order": "orig #24-#93, insert 1-96, orig #179-#205",
+    "insert": {
+     "path": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G2K_kling_original.mp4",
+     "sha256": "e9fc5c57b3320edc137dc34a9f38e03e45b762e2728711d4edc040dfca0b53a8",
+     "bytes": 1010870
+    },
+    "poseKeyframe": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G1_1276.png",
+    "report": "bulldog5-luna/stage7_fix/sniff/FIXED_BUILD_REPORT.md",
+    "note": "leg bent, silhouette back-up like Zefir/Pups; head dip in the insert (see report)"
    },
    "ROLL": {
     "status": "ACCEPTED",
@@ -175,8 +188,11 @@
    "RACE_STAND": 20,
    "RUN": 30,
    "batch_2026-11-08": 174,
-   "sniff_insert_G1": 24
+   "sniff_insert_G1": 24,
+   "sniff_pose_G1": 20,
+   "sniff_pose_G2": 20,
+   "sniff_insert_keyframe_v4": 40
   },
-  "balanceAfter": 1968
+  "balanceAfter": 1888
  }
 }

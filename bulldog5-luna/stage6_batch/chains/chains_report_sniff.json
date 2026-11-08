@@ -1,0 +1,40 @@
+{
+ "DOG5_CHAIN_race_RUN_STOP_SNIFF_RETURN_START_RUN": {
+  "ticks": 372,
+  "seconds": 15.5,
+  "joins": [
+   {
+    "tick": 24,
+    "from": "RUN цикл #71",
+    "to": "STOP #0",
+    "step": 8.68
+   },
+   {
+    "tick": 83,
+    "from": "STOP #68 (хвост)",
+    "to": "SNIFF_PEE+RETURN 1/193",
+    "step": 0.78
+   },
+   {
+    "tick": 276,
+    "from": "SNIFF_PEE+RETURN 193/193",
+    "to": "RACE_STAND (добивка окна)",
+    "step": 0.35
+   },
+   {
+    "tick": 294,
+    "from": "RACE_STAND (добивка окна)",
+    "to": "START #18 (lead)",
+    "step": 0.9
+   },
+   {
+    "tick": 336,
+    "from": "START #59",
+    "to": "RUN цикл #60",
+    "step": 8.28
+   }
+  ],
+  "stepMedian": 2.28,
+  "stepP90": 9.8
+ }
+}
