@@ -1,0 +1,30 @@
+{
+ "R69": {
+  "frames": 109,
+  "RS_to_first": 0.29,
+  "last_to_RS": 0.43,
+  "turn_steps": [
+   3.14,
+   1.88,
+   1.88,
+   3.14
+  ],
+  "maxStep": 9.71,
+  "medianStep": 3.17,
+  "framesTouchingEdge": []
+ },
+ "R81": {
+  "frames": 133,
+  "RS_to_first": 0.29,
+  "last_to_RS": 0.43,
+  "turn_steps": [
+   2.62,
+   1.77,
+   1.77,
+   2.62
+  ],
+  "maxStep": 9.71,
+  "medianStep": 3.225,
+  "framesTouchingEdge": []
+ }
+}

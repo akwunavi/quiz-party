@@ -1,0 +1,59 @@
+{
+ "validator": {
+  "ok": true,
+  "errors": [],
+  "info": {
+   "RETURN": "merged into SNIFF_PEE",
+   "derivedLead": 7,
+   "runFrameBeforeFirstStopAtDeclaredLead": 71,
+   "runFramesBeforeFirstStop": 12
+  },
+  "incomplete": [
+   {
+    "window": "START",
+    "clip": "START",
+    "status": "candidate: RUN G1 #18-#71 (takeoff from RACE_STAND, spill into loop), lead 7"
+   },
+   {
+    "window": "RUN",
+    "clip": "START",
+    "status": "candidate: RUN G1 #18-#71 (takeoff from RACE_STAND, spill into loop), lead 7"
+   },
+   {
+    "window": "STOP",
+    "clip": "STOP",
+    "status": "candidate: STOP G1 #0-#7,#18-#46 (stride #8-#17 removed), entry after RUN #71"
+   },
+   {
+    "window": "FINISH_DECELERATE",
+    "clip": "STOP",
+    "status": "candidate: STOP G1 #0-#7,#18-#46 (stride #8-#17 removed), entry after RUN #71"
+   },
+   {
+    "window": "BUTTERFLY",
+    "clip": "BUTTERFLY",
+    "status": "candidate: BUTTERFLY G1 #18-#90"
+   },
+   {
+    "window": "ROLL",
+    "clip": "ROLL",
+    "status": "candidate: ROLL G1 reverse build R69 (#6->#69->#24)"
+   },
+   {
+    "window": "SNIFF_PEE",
+    "clip": "SNIFF_PEE",
+    "status": "missing: placeholder 198 frames (leg-lift phase to be replaced)"
+   }
+  ]
+ },
+ "sweep": {
+  "races": 2000,
+  "stopsAndFinishes": 23012,
+  "ofWhichFinish": 10000,
+  "phaseMismatches": 0,
+  "firstMismatch": null,
+  "startsChecked": 23012,
+  "startLeadMismatches": 0,
+  "firstStartMismatch": null
+ }
+}

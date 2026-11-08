@@ -13,3 +13,18 @@
 * generation_id: `AR07i02aJUsXQ-WTpRYuXcSi4kvN3A8HJYRoT0xjZxezXinkAOiok3fXFXV9qZ9H7OUYE7ld`.
 * Промпт — `stage5_run/PROMPT.txt` (= заготовка `stage4_race_stand/RUN_PREP.md`).
 * Результат: `stage5_run/DOG5_RUN_G1_kling_original.mp4` (1276×720, 24 к/с, 121 кадр, SHA `135dbad1b9a99bd7…`). Шаг ровно 12 кадров, честный цикл #60–#71 (и #99–#110). Пыль из-под лап в alpha не попала. Баланс после — 2166.
+
+## 3. Партия из пяти генераций (08.11.2026) — разрешено по одной попытке на состояние
+Все: `kling-video-v3_0`, image-to-video, first + tail, 720p, `prefer_multi_shots = false`, без звука. Входы — `stage6_batch/inputs/` (SHA в `stage6_batch/inputs/SHA256SUMS`). Промпты — `stage6_batch/PROMPTS.md`. Отправлены одной партией; баланс до — 2166.
+
+| состояние | first | tail | длит. | кредиты | generation_id |
+|---|---|---|---|---|---|
+| RETURN_TO_IDLE | SELECTED s120 | FRONT_STAND f0 | 5 с | 30 | `AYhq0wk9T0k1Y0Sc52g9kADZJo2HvLy9gg7WFEDcRKZWpktGEpgFgL60HqwYhDYjtZZP4cRA` |
+| STOP / FINISH | RUN G1 #72 (кадр после конца цикла #71 — его V3 всегда показывает перед STOP, правило T4) | RACE_STAND G1 | 3 с | 18 | `AdtAWmoRz1XMufrkkLJAseSmd1S4RmKOzg35hNFezoGsD_aXoDbws2lBH791LzcWfbwVKd-K` |
+| SNIFF_PEE + RETURN | RACE_STAND G1 | RACE_STAND G1 | 10 с | 60 | `Adjco7c4kw97kN0KScl5Xs2RJt9r0AC1B1RBUEay1eC5g7YeSf_2YmMMgg022oNJw6RE9pZL` |
+| ROLL | RACE_STAND G1 | RACE_STAND G1 | 6 с | 36 | `AVcH0YRV9K_n6h-gqrm1ftbrNMolmbECBhwstACOQB-0HRnbWdeB8pCbfLCr5W9rdnzAzdVy` |
+| BUTTERFLY | RACE_STAND G1 | RACE_STAND G1 | 5 с | 30 | `AVZmOr8KqfWgsAdEScmACZed0AyhQY7yZpoopV13ehRa_oL8ibsCK08-2hDVQep_zeX-6dMK` |
+| **итого** | | | | **174** | |
+* Результат: все пять готовы; оригиналы (без водяного знака) — `stage6_batch/sources/`, SHA — `stage6_batch/sources/SHA256SUMS`. Баланс после — **1992**.
+* Аудит пользователя: RETURN_TO_IDLE, STOP, BUTTERFLY — довольны; **ROLL** — деформация таза при вставании (исправляется реверсом без генерации, `stage7_fix/roll/`); **SNIFF_PEE** — лапа уходит назад (нужна короткая вставка, ТЗ `stage7_fix/sniff/`, не запускалась).
+

@@ -1,0 +1,22 @@
+{
+ "DOG5_CHAIN_race_RACE_STAND_BUTTERFLY_RACE_STAND": {
+  "ticks": 121,
+  "seconds": 5.04,
+  "joins": [
+   {
+    "tick": 12,
+    "from": "RACE_STAND",
+    "to": "BUTTERFLY #18 (реакция; бабочку рисует движок)",
+    "step": 0.32
+   },
+   {
+    "tick": 85,
+    "from": "BUTTERFLY #90 (реакция; бабочку рисует движок)",
+    "to": "RACE_STAND",
+    "step": 0.37
+   }
+  ],
+  "stepMedian": 0.08,
+  "stepP90": 1.56
+ }
+}
