@@ -16,6 +16,7 @@ module is for review, not an approved arena or a complete route.
 | GPU | No NVIDIA tooling or `/dev/dri` device exposed |
 | CPU / memory | 5 AMD EPYC 9V74 vCPUs; 33 GiB RAM |
 | Disk | About 22 GiB free at start |
+| Public model library | Poly Haven API request failed through this environment's proxy (HTTP 403 tunnel failure) |
 | Browser | Chromium with Canvas 2D; screenshot at 1920×1080 |
 | Export | Blender source `.blend`; transparent PNG props; H.264 MP4 review |
 
@@ -68,10 +69,13 @@ the requested final artistic bar and natural dog integration are **not**.
 The strongest automated improvement would be to replace the simple authored
 crowd and fir geometry with detailed reusable, properly licensed source
 models, give them consistent texture/light treatment in the existing `.blend`,
-and rerender only the independent layers. Then inspect an animated dog under
-matching contact light at the actual projector size. This needs no Unreal,
-cloud GPU, manual Blender work by the user, or Race V3 changes. Licensing and
-download sources must be verified before incorporating third-party models.
+and rerender only the independent layers. A Poly Haven API fetch was attempted
+but this cloud proxy rejected the connection, so no third-party model was
+silently substituted. A practical next pass is an automated importer pointed
+at a reachable CC0 model source, followed by the same CPU Cycles bake and a
+projector-scale review with an animated dog and matching contact light. The
+user would not need to install Blender or move files manually. This needs no
+Unreal, cloud GPU or Race V3 change.
 
 ## Scope
 
