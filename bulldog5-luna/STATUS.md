@@ -1,15 +1,14 @@
 # Луна (№5) — статус (08.11.2026)
-**Внешность решена: как у существующего №5** (белая с чёрно-серыми пятнами, тёмное пятно вокруг глаза, тёмная маска). Исходники IDLE и SELECTED получены от пользователя и сохранены. Kling не запускался; ни один клип ещё не обработан и не утверждён.
+**Этап 2 готов к визуальной приёмке** — `stage2/REPORT.md`. Kling не запускался; исходники не менялись.
 
 | состояние | что есть | статус |
 |---|---|---|
-| FRONT_STAND | f0 исходников (общий для IDLE, SELECTED, RUN v1) — `sources/DOG5_FRONT_STAND_candidate_f0_1276.png` | кандидат, ждёт приёмки |
-| IDLE | `sources/DOG5_IDLE_kling_original.mp4` | исходник; не замыкается — нужна сборка цикла |
-| SELECTED | `sources/DOG5_SELECTED_kling_original.mp4` | исходник; кончается не в стойке, уши у верха кадра f72–f77 |
-| RETURN_TO_IDLE | — | нужен (генерация по согласованию) |
-| RUN | `sources/DOG5_RUN_vs2_kling_original.mp4` #41–120 + старая alpha v2 | кандидат; цикл не выбран |
-| RACE_STAND, START, STOP / FINISH, SNIFF_PEE + RETURN, ROLL, BUTTERFLY | — | создавать |
+| FRONT_STAND | `stage2/front_stand/DOG5_FRONT_STAND_alpha_f0_1276.png` (f0, alpha) | кандидат; масштаб и лапы совпадают с №1–№4 |
+| IDLE | alpha f0–f120 + варианты A (4 с) и B (10 с) «туда-обратно» | ждёт выбора |
+| SELECTED | alpha s0–s120 | ждёт приёмки; уши за верхом s71–s78; конец не в стойке |
+| RETURN_TO_IDLE | монтажом не собрать | нужна 1 генерация, ТЗ готово, не запускалась |
+| RUN | vs2 + alpha v2, цикл 10 кадров → 12 | пригоден при решении по растяжке и стилю галопа |
+| RACE_STAND, START, STOP / FINISH, SNIFF_PEE + RETURN, ROLL, BUTTERFLY | — | генерации по согласованию |
 
-Подробно — `sources/README.md`, `stage1/AUDIT.md`, `stage1/PRODUCTION_PLAN.md` (оценка Kling после обновления ≈ 260 минимум, ≈ 400–500 реалистично).
-
-Race V3, библиотеки №1–№4, новогодняя арена Codex и production не менялись; merge и deploy не было.
+Kling: обязательно ≈ 230 кредитов (7 позиций), реалистично ≈ 350; +30, если RUN не примут.
+Race V3, библиотеки №1–№4, арена Codex и production не менялись; merge и deploy не было.

@@ -1,0 +1,44 @@
+{
+ "ordinaryStep": {
+  "median": 0.88,
+  "p90": 4.19
+ },
+ "s120_vs_FRONT_STAND_f0": 9.88,
+ "nearestIDLE": [
+  {
+   "frame": 58,
+   "diff": 8.68
+  },
+  {
+   "frame": 57,
+   "diff": 8.74
+  },
+  {
+   "frame": 59,
+   "diff": 8.76
+  }
+ ],
+ "nearestSELECTED_before_s90": [
+  {
+   "frame": 87,
+   "diff": 3.83
+  },
+  {
+   "frame": 88,
+   "diff": 3.93
+  },
+  {
+   "frame": 89,
+   "diff": 4.59
+  },
+  {
+   "frame": 86,
+   "diff": 5.44
+  }
+ ],
+ "calmSmile_s32_s56_vs_IDLE_best": {
+  "sel": 56,
+  "idle": 31,
+  "diff": 5.36
+ }
+}

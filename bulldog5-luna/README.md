@@ -11,3 +11,5 @@
 * `stage1/KLING_PROMPT_DRAFTS.md` — черновики промптов (не отправлялись).
 * `stage1/evidence/` — контактные листы старых материалов №5.
 * `stage1/tools/` — скрипты эскизов.
+* `sources/` — исходники Kling от пользователя (IDLE, SELECTED, RUN v1 / vs2), не меняются.
+* `stage2/` — этап 2: FRONT_STAND, IDLE (варианты A / B), SELECTED alpha, проверка RETURN_TO_IDLE, проверка RUN; отчёт `stage2/REPORT.md`.

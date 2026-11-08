@@ -1,0 +1,111 @@
+{
+ "source": "alpha v2 = vs2 source frames #40-#120 (0-based), 81 frames",
+ "stepMedian": 7.0,
+ "stepP90": 7.51,
+ "periods": {
+  "8": {
+   "bestSeamDiff": 8.61,
+   "start": 34
+  },
+  "9": {
+   "bestSeamDiff": 6.41,
+   "start": 23
+  },
+  "10": {
+   "bestSeamDiff": 2.35,
+   "start": 13
+  },
+  "11": {
+   "bestSeamDiff": 5.11,
+   "start": 56
+  },
+  "12": {
+   "bestSeamDiff": 8.23,
+   "start": 47
+  },
+  "13": {
+   "bestSeamDiff": 9.59,
+   "start": 37
+  },
+  "14": {
+   "bestSeamDiff": 9.68,
+   "start": 36
+  },
+  "15": {
+   "bestSeamDiff": 10.47,
+   "start": 35
+  },
+  "16": {
+   "bestSeamDiff": 9.89,
+   "start": 35
+  }
+ },
+ "loop10": {
+  "frames_alpha": [
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22
+  ],
+  "frames_source": [
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62
+  ],
+  "seamDiff": 2.35,
+  "centerXrange": [
+   632.4,
+   652.1
+  ]
+ },
+ "loop12_best_native": {
+  "frames_alpha": [
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58
+  ],
+  "seamDiff": 8.23
+ },
+ "retime10to12": {
+  "order_alpha": [
+   13,
+   13,
+   14,
+   15,
+   16,
+   17,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22
+  ],
+  "held": [
+   13,
+   17
+  ]
+ }
+}
