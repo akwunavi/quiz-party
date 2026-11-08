@@ -1,0 +1,53 @@
+{
+  "without_recording": {
+    "frames": 224,
+    "wall_seconds": 18.232599999999998,
+    "raf_fps": 12.230839265930257,
+    "gaps_over_50ms": 218,
+    "max_gap_ms": 150,
+    "sim_seconds": 18,
+    "camera_x": 54.14,
+    "js_heap_bytes": 42759840,
+    "webgl": {
+      "geometries": 185,
+      "textures": 4,
+      "render": {
+        "frame": 228,
+        "calls": 77,
+        "triangles": 103434,
+        "points": 140,
+        "lines": 0
+      }
+    },
+    "batching": {
+      "sources": 3382,
+      "batches": 227
+    }
+  },
+  "with_recording": {
+    "frames": 225,
+    "wall_seconds": 18.1493,
+    "raf_fps": 12.342073798989492,
+    "gaps_over_50ms": 220,
+    "max_gap_ms": 100.09999999999854,
+    "sim_seconds": 18,
+    "camera_x": 54.14,
+    "js_heap_bytes": 19980978,
+    "webgl": {
+      "geometries": 185,
+      "textures": 4,
+      "render": {
+        "frame": 450,
+        "calls": 77,
+        "triangles": 103434,
+        "points": 140,
+        "lines": 0
+      }
+    },
+    "batching": {
+      "sources": 3382,
+      "batches": 227
+    }
+  },
+  "page_errors": []
+}
