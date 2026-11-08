@@ -4,14 +4,15 @@
  "name": "Луна",
  "number": 5,
  "notDog4": "Собака №5 «Луна»; не путать с №4 «Пупс» (dog4).",
- "version": "luna-0.3-draft",
+ "version": "luna-0.4-draft",
  "date": "2026-11-08",
  "fps": 24,
  "statusLegend": {
   "ACCEPTED": "принято пользователем",
   "WORKING": "рабочее, принято для дальнейшей работы, не финальное",
   "CANDIDATE": "собрано и проверено технически, ждёт визуальной приёмки",
-  "PROBLEM": "есть дефект, не утверждается"
+  "PROBLEM": "есть дефект, не утверждается",
+  "ACCEPTED_WORKING": "принято пользователем в текущем виде (не переделывать без конкретной проблемы)"
  },
  "selection": {
   "frame": {
@@ -54,7 +55,7 @@
     "frames": 121
    },
    "RETURN_TO_IDLE": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED_WORKING",
     "asset": {
      "path": "bulldog5-luna/stage6_batch/alpha/DOG5_RETURN_TO_IDLE_G1_alpha_graded.webm",
      "sha256": "3e28b97fea72beda5f861b2a40e977a01b45e82271e411319fb6b573cec149bd",
@@ -88,7 +89,7 @@
     "gameFrame": "RUN G1 f0 alpha"
    },
    "START": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED_WORKING",
     "asset": {
      "path": "bulldog5-luna/stage5_run/alpha/DOG5_RUN_G1_alpha_f0-f120.webm",
      "sha256": "501f8bc60ef08c80d6dacba5509c8a00bbae1f9bf46515aec1a053287b136ef0",
@@ -110,7 +111,7 @@
     "stopEntryPreviousRunFrame": 71
    },
    "STOP": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED_WORKING",
     "asset": {
      "path": "bulldog5-luna/stage6_batch/alpha/DOG5_STOP_G1_alpha.webm",
      "sha256": "7b5fe67f7c36b9fdb839d7d9e5715b1e253aeff9ad33d25aab269638bbbea753",
@@ -125,7 +126,7 @@
     }
    },
    "FINISH": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED_WORKING",
     "note": "= STOP + tail, then BASE"
    },
    "SNIFF_PEE+RETURN": {
@@ -136,10 +137,15 @@
      "bytes": 2103748
     },
     "defect": "#99–#177 near hind leg goes backward",
-    "fix": "bulldog5-luna/stage7_fix/sniff/SNIFF_AUDIT_AND_FIX_TZ.md"
+    "fix": "bulldog5-luna/stage7_fix/sniff/SNIFF_AUDIT_AND_FIX_TZ.md",
+    "insertAttempt1": {
+     "result": "FAILED: leg goes backward again (#32-#92)",
+     "file": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G1_kling_original.mp4",
+     "report": "bulldog5-luna/stage7_fix/sniff/INSERT_G1_RESULT.md"
+    }
    },
    "ROLL": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED",
     "asset": {
      "path": "bulldog5-luna/stage7_fix/roll/DOG5_ROLL_R69_alpha_109f.webm",
      "sha256": "58ad3a01bfe8bc7da6e2fea3a8db09fd953a47883bc61ffa46bb69dc24475fbb",
@@ -153,7 +159,7 @@
     "order": "#6→#69 forward, #68→#24 backward (109); source #91–#108 (pelvis deformation) unused"
    },
    "BUTTERFLY": {
-    "status": "CANDIDATE",
+    "status": "ACCEPTED_WORKING",
     "asset": {
      "path": "bulldog5-luna/stage6_batch/alpha/DOG5_BUTTERFLY_G1_alpha.webm",
      "sha256": "31bf6e7eb35b08b7d395a9c898cd218dd3696d316045599e76deb9d458984d25",
@@ -168,8 +174,9 @@
   "spentCredits": {
    "RACE_STAND": 20,
    "RUN": 30,
-   "batch_2026-11-08": 174
+   "batch_2026-11-08": 174,
+   "sniff_insert_G1": 24
   },
-  "balanceAfter": 1992
+  "balanceAfter": 1968
  }
 }
