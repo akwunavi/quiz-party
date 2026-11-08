@@ -1,0 +1,302 @@
+[
+  {
+    "path": "Ice002_1K-PNG_Color.ktx2",
+    "bytes": 295401,
+    "sha256": "8202b37073df8bb45b86decfaa18bc9257845cfbd3cfed076d9427c1f4d93c69",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Ice002_1K-PNG_NormalGL.ktx2",
+    "bytes": 208979,
+    "sha256": "2c6729d18084013f0af8eeaaba3b55ab1794c22cadfe13e10ee776cc101509b1",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Ice002_1K-PNG_NormalGL.png",
+    "bytes": 283764,
+    "sha256": "5797933cacd7092a20e6ce0efdfe063a72da49fd6e297d476a7c86013b9b1709",
+    "signature": "PNG"
+  },
+  {
+    "path": "Ice002_1K-PNG_Roughness.ktx2",
+    "bytes": 249445,
+    "sha256": "e2bf5ddb8c6eb9fc90b686ab429dc15ec3190ed36842bf5e954cbbdfc83de38f",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Ice002_1K-PNG_Roughness.png",
+    "bytes": 183681,
+    "sha256": "e1b6211fe38dbbf66d0033d4bc1b868a772d6f23ec17ab1500d6dac73bb2ee56",
+    "signature": "PNG"
+  },
+  {
+    "path": "Ice002_color.png",
+    "bytes": 421016,
+    "sha256": "0f5f1b316aa24d87caa1ced87d8d46b624f641119b9e2e1799e680a7d61a4523",
+    "signature": "PNG"
+  },
+  {
+    "path": "Ice002_color_preview.png",
+    "bytes": 120721,
+    "sha256": "c0f2a946ebf40db9d1c805cd316eb8543a649e21a136940864c30a346a51f236",
+    "signature": "PNG"
+  },
+  {
+    "path": "Kenney_mini_forest_tree.glb",
+    "bytes": 23476,
+    "sha256": "0075d5059c1ea855fecc1dba3c6262c3a01924c50b971ddde2eb8b0b5a62851a",
+    "signature": "glTF2"
+  },
+  {
+    "path": "Khronos_Lantern.glb",
+    "bytes": 9564264,
+    "sha256": "a79458c4b02d695187a952f23a63b8bf278e7bc3d316a3c2a314f2d6974181f1",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_asphalt_snow_albedo.ktx2",
+    "bytes": 347685,
+    "sha256": "a577bf55e944ea7768ba21ed0d5745b128dbf34be5d9cfd3ac393fe1ee9043cb",
+    "signature": "KTX2"
+  },
+  {
+    "path": "PolyHaven_asphalt_snow_normal.ktx2",
+    "bytes": 334044,
+    "sha256": "b23e2a519518bc2181743dc4d829d3fb97cceb0d01167ee36847d95a2d26b9fe",
+    "signature": "KTX2"
+  },
+  {
+    "path": "PolyHaven_fir_sapling.glb",
+    "bytes": 25420464,
+    "sha256": "70c7b1562ffc64c382b473ac8c2c3e9eaf8762cdf8ce8a490d0df47d4f9482a1",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_lantern_01.glb",
+    "bytes": 1419208,
+    "sha256": "9adf3f7ada6a8ecfba7bf01e9c0ab429088f91c9c664ebe41b531bd973d1f2dd",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_large_iron_gate.glb",
+    "bytes": 3126104,
+    "sha256": "0f06c3759fbcc011e05edb4f045d6854f47ef753953b37cd4e9251fd6638b152",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_megaphone_01.glb",
+    "bytes": 775592,
+    "sha256": "6a724ca3fbb39205465150bcdea0f50e54dd25107d8817569eab788e8fd9fd0e",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_modular_urban_apartments_facade.glb",
+    "bytes": 16401664,
+    "sha256": "242f3d6462c85f2179642fb244e71e3ba6ff2b7d9b80f923b2f12b8e966f20fb",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_pine_sapling_small.glb",
+    "bytes": 21888032,
+    "sha256": "f6193a44986f1270976406384bd76164106cd37d64245261baa5ba64b5d609ee",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolyHaven_wooden_lantern_01.glb",
+    "bytes": 3766200,
+    "sha256": "c46e90b1633bcad3efec0980173737934e11222babb8a5e03c66123608f2cfa7",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_ExteriorWall.glb",
+    "bytes": 395572,
+    "sha256": "6102cbd9a9d492022d475bc5a5f243718983f41607858272d80c39bdb2a4cc68",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_Fence.glb",
+    "bytes": 45072,
+    "sha256": "8626e45637365313c1bc24b4ac542664a00a16d3219cb02f7a09dff61e6563a8",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_Lamp01.glb",
+    "bytes": 158992,
+    "sha256": "8448ea614b6c7c9682f2fae8357f4c56af11cea18bca0ec40ab0975683f539e4",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_MiniTree.glb",
+    "bytes": 116496,
+    "sha256": "093732f34ceb2d7921917dc7dafc2ae9b763a55d943be91b9b3d79aa563c788f",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_WoodArc.glb",
+    "bytes": 443248,
+    "sha256": "7ef61d5784ff8668893129cc1e0b375ca225fba63d2e98d12ea6505740212784",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_Wreath01.glb",
+    "bytes": 396176,
+    "sha256": "e011ec1920626ddf295848162eca7cc3e64702d6cb8d6b61fed7fb54182c2e83",
+    "signature": "glTF2"
+  },
+  {
+    "path": "PolygonalMind_XmasTree.glb",
+    "bytes": 617868,
+    "sha256": "355c14fed6aa8a1070ab74f69d823376d2bbacddda76f5d6f7c2cd6656eaadc2",
+    "signature": "glTF2"
+  },
+  {
+    "path": "Quaternius_female_sitting_cheering.glb",
+    "bytes": 101704,
+    "sha256": "f70e8f3db1c872689e15e3432c1217652fc57a63468d6462eceb8c87754fda73",
+    "signature": "glTF2"
+  },
+  {
+    "path": "Quaternius_male_sitting_cheering.glb",
+    "bytes": 69460,
+    "sha256": "64ab1afcb9de4ed56309ee5e109867bb2a27566bd7232d2eca20669ebe9db6fe",
+    "signature": "glTF2"
+  },
+  {
+    "path": "Quaternius_male_standing_covering_eyes.glb",
+    "bytes": 69472,
+    "sha256": "2abcf67a9420529269c85bb184fbbd25dc50f451a78bbe971a8f3e58b6ab6d28",
+    "signature": "glTF2"
+  },
+  {
+    "path": "Snow003_1K-PNG_Color.ktx2",
+    "bytes": 157115,
+    "sha256": "c106dc60782e68781612b6dd6228c7d2fcfb8277b39a3eba1fb22cf355a1ecf8",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Snow003_1K-PNG_Color.png",
+    "bytes": 205496,
+    "sha256": "002fb27ecab510a820bb866711e9f9b009d2fcedfc0729c1988049bcbb91539b",
+    "signature": "PNG"
+  },
+  {
+    "path": "Snow003_1K-PNG_NormalGL.ktx2",
+    "bytes": 252092,
+    "sha256": "1e503aba2be071e932709fa0cd0658e8b946435c7c56099ae3ab317ba6cebb93",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Snow003_1K-PNG_NormalGL.png",
+    "bytes": 364949,
+    "sha256": "8c8e1753635d51ea98df14b5c53b776a2cd80178cea0c2d3a9b8409e069cbce5",
+    "signature": "PNG"
+  },
+  {
+    "path": "Snow003_1K-PNG_Roughness.ktx2",
+    "bytes": 263636,
+    "sha256": "21ce79a70e0e3e392117e6b390da8979d3610b1ed03b723fff88a99a28d8e4a5",
+    "signature": "KTX2"
+  },
+  {
+    "path": "Snow003_1K-PNG_Roughness.png",
+    "bytes": 168994,
+    "sha256": "d302ae4e6781bcb6e5d92a5e8c966c743448ef21c8840af9aed43f95af9adaea",
+    "signature": "PNG"
+  },
+  {
+    "path": "Textures/colormap.png",
+    "bytes": 10659,
+    "sha256": "319f1087d8ed50a8794f9a8179f64671d5595f2365fdf3e47ec2d4eb74dba20f",
+    "signature": "PNG"
+  },
+  {
+    "path": "roof_planks_albedo.ktx2",
+    "bytes": 223363,
+    "sha256": "0582c8de5b2b993909a976b2877f85f08c565a09f8b289c84798ad217f8dc383",
+    "signature": "KTX2"
+  },
+  {
+    "path": "roof_planks_albedo.png",
+    "bytes": 300312,
+    "sha256": "aa156ce7c02cf41bb656246911acc1ff2f8574f4548b990848058b732999c6a5",
+    "signature": "PNG"
+  },
+  {
+    "path": "roof_planks_normal.ktx2",
+    "bytes": 92746,
+    "sha256": "b84044bb1f215df371737a3082f557905ef9c8617c6439801652225780e1a662",
+    "signature": "KTX2"
+  },
+  {
+    "path": "roof_planks_normal.png",
+    "bytes": 98027,
+    "sha256": "cb0896da5ed26efad434dbf599229472b3f1167b885cd1ffb880c16aa4de93ed",
+    "signature": "PNG"
+  },
+  {
+    "path": "roof_planks_roughness.ktx2",
+    "bytes": 125613,
+    "sha256": "fd2ffbba5c6ccd1e7266eef757171aa512703a1b79f724b5785271ee002128b0",
+    "signature": "KTX2"
+  },
+  {
+    "path": "roof_planks_roughness.png",
+    "bytes": 68963,
+    "sha256": "31afaf1f0eda77d9c965d08d89fb242f9a41520484a64a90926c238216fa3d7f",
+    "signature": "PNG"
+  },
+  {
+    "path": "snow_02_albedo.ktx2",
+    "bytes": 198325,
+    "sha256": "5e45c6302ab573ac0600927e282d00c5e2e2672c6787571feb629a48de47fe3e",
+    "signature": "KTX2"
+  },
+  {
+    "path": "snow_02_albedo.png",
+    "bytes": 277254,
+    "sha256": "13db58fdf9578a36c55e3b604acb29af7e0ce152f36966491eda0e6c0ddbf3d8",
+    "signature": "PNG"
+  },
+  {
+    "path": "snow_02_normal.ktx2",
+    "bytes": 327910,
+    "sha256": "f9463e7d6cea7cca4663af134c2ae277b78bae3a44d1463ce80c3acf841cb9dd",
+    "signature": "KTX2"
+  },
+  {
+    "path": "snow_02_normal.png",
+    "bytes": 496540,
+    "sha256": "47e12353e76f1ce98968a8575b135293afaf7b63009bb186daf971f6f4d1929a",
+    "signature": "PNG"
+  },
+  {
+    "path": "snow_02_roughness.ktx2",
+    "bytes": 172766,
+    "sha256": "c6c0f0a55e09c9b8543b6c3ec84daa061d246cf56c0d58db638f65e49ecf4509",
+    "signature": "KTX2"
+  },
+  {
+    "path": "snow_02_roughness.png",
+    "bytes": 106542,
+    "sha256": "420502ab3b184ba793836dc2ff4729e356a7896e9b7c6792bde12b787a5f27cf",
+    "signature": "PNG"
+  },
+  {
+    "path": "snow_floor_albedo.ktx2",
+    "bytes": 326994,
+    "sha256": "2ad99eb80dfb3b8ec76585e8272cd450957ec14a841674a65e20b4bf7716dce8",
+    "signature": "KTX2"
+  },
+  {
+    "path": "snow_floor_normal.ktx2",
+    "bytes": 332380,
+    "sha256": "d0e5127a13ddfd8b7ef76fa3a500e48a25e6a64f840e6a485371d764ffc5465b",
+    "signature": "KTX2"
+  },
+  {
+    "path": "snow_floor_roughness.ktx2",
+    "bytes": 214895,
+    "sha256": "16bbd64d55bbf5e873d665422b88d6a33942a3842a38ae8576f899b12ab8c625",
+    "signature": "KTX2"
+  }
+]
