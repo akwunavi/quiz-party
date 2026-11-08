@@ -12,7 +12,7 @@
 | **START** | RUN G1 (без Kling) | #18–#59 1:1, затем цикл; **lead 7** | `../stage5_run/alpha/DOG5_RUN_G1_alpha_f0-f120.webm` | **кандидат** |
 | RUN | RUN G1 | цикл #60–#71 | то же | принят |
 | **STOP / FINISH** | `sources/DOG5_STOP_G1_kling_original.mp4` | движение 37: #0–#7 + #18–#46 (вырезан один шаг #8–#17), хвост #47–#68 (22) на стойке, shift-массив | `alpha/DOG5_STOP_G1_alpha.webm` | **кандидат** — пользователь доволен |
-| SNIFF_PEE + RETURN | `sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4` | — | (обрабатывается) | **проблема**: лапа назад (#99–#177), см. `../stage7_fix/sniff/` |
+| SNIFF_PEE + RETURN | `sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4` | — (ждёт вставки) | `alpha/DOG5_SNIFF_PEE_RETURN_G1_alpha.webm` (весь клип; годные части #0–#93 и #178–#240) | **проблема**: лапа назад (#99–#177), см. `../stage7_fix/sniff/` |
 | **ROLL** | `sources/DOG5_ROLL_G1_kling_original.mp4` | реверс R69: #6→#69→#24 (109) | `../stage7_fix/roll/DOG5_ROLL_R69_alpha_109f.webm` | **кандидат после исправления**; исходный — деформация таза #91–#108 |
 | **BUTTERFLY** | `sources/DOG5_BUTTERFLY_G1_kling_original.mp4` | #18–#90 (73) | `alpha/DOG5_BUTTERFLY_G1_alpha.webm` | **кандидат** — пользователь доволен; нарисованная Kling «бабочка» в alpha не попала |
 
@@ -33,7 +33,7 @@
 * Ограничение действий после STOP (с lead 7 и хвостом 22): BUTTERFLY ≤ 92, ROLL ≤ 116, SNIFF_PEE + RETURN ≤ 210 кадров. Все текущие отрезки входят (валидатор P3: ok).
 
 ## 5. Alpha — `alpha/`, `alpha/verify/`
-Общий конвейер, по одному клипу (память), с возобновлением; оригиналы только читались. STOP, BUTTERFLY, RETURN_TO_IDLE: VP9 + alpha, углы прозрачные, лишних островков > 20 px нет, Chromium показывает прозрачность; листы на 4 фонах — `alpha/verify/*.sheet_backgrounds.png`. Водяной знак и пыль из-под лап в alpha не попали. ROLL — полный клип + собранный R69. SNIFF_PEE — в обработке (нужен для сохраняемых частей).
+Общий конвейер, по одному клипу (память), с возобновлением; оригиналы только читались. STOP, BUTTERFLY, RETURN_TO_IDLE: VP9 + alpha, углы прозрачные, лишних островков > 20 px нет, Chromium показывает прозрачность; листы на 4 фонах — `alpha/verify/*.sheet_backgrounds.png`. Водяной знак и пыль из-под лап в alpha не попали. ROLL — полный клип + собранный R69; SNIFF_PEE — весь клип (для сохраняемых частей), та же проверка пройдена.
 
 ## 6. Переходы — `chains/` (реальное время; гонка — в масштабе игры и ×2, на месте, без движения по трассе)
 | цепочка | стыки (средняя разница кадра; обычный шаг: стойка < 1, галоп ≈ 9) |
