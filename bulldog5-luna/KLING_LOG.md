@@ -37,3 +37,8 @@
 * `gemini-3-pro-image` (Nano Banana Pro) через Kling, image-to-image, вход = исходный SNIFF #93, 16:9, 2k. Списано 20 кредитов (баланс до — 1968).
 * generation_id: `Aaiyd9xBR_fjzpb1w33WPeDk_TDd_6KjW1x9GcoMQkUn36m8fJt1mJJNeDHqfkS7XewNBWiE`. Промпт — `stage7_fix/sniff/POSE_PROMPT.txt`. Видео — только после приёмки картинки.
 * Результат: `stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G1_kling_original.png` (SHA `90f39e152f2976ac…`). Лапа согнута и поднята, но колено направлено назад. Ждёт приёмки. Баланс после — 1948.
+
+## 6. SNIFF_PEE — поза лапы, исправление колена (08.11.2026) — по плану пользователя
+* `gemini-3-pro-image`, вход = `stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G1_1276.png`, 16:9, 2k. Списано 20 кредитов (баланс до — 1948). generation_id: `AfZkGc8Q5UJQuzroPhJItjnSdc1g31KPYzFNaduBE044zcsow6Zsd4pQNYpdGpMwlp9lpApk`.
+* Цель: колено вперёд, голень свисает от него; дальше — три опорных позы (подъём / удержание / опускание) и два коротких клипа.* Результат: `stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G2_kling_original.png` (SHA `97b60533b5d3c1ec…`) — колено вперёд, лапа поднята невысоко. Ждёт приёмки. Баланс после — 1928.
+
