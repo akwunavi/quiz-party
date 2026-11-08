@@ -1,0 +1,12 @@
+{
+  "resolution": [
+    1920,
+    1080
+  ],
+  "fps": 54.13696652530905,
+  "p95FrameMs": 33.30000000000018,
+  "droppedIntervals": 3,
+  "frames": 240,
+  "time": 11.016200000000007,
+  "ready": true
+}
