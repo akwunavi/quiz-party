@@ -1,4 +1,5 @@
-# Луна (собака №5) — аудит материалов, этап 1 (02.11.2026)
+# Луна (собака №5) — аудит материалов, этап 1 (02.11.2026, дополнено 08.11.2026)
+> 08.11: внешность — как у существующего №5; пользователь передал исходники IDLE и SELECTED (`../sources/`).
 Технический id — `dog5`, имя — «Луна». Это самостоятельный персонаж; с Пупсом (№4, `dog4`) не связан. Kling не запускался, ничего не генерировалось. Чужие библиотеки, Race V3, новогодняя арена Codex и production не менялись.
 
 ## 1. Что существует у №5
@@ -11,7 +12,10 @@
 | RUN alpha v1 | `preview/bulldogs-1235-alpha-20261008:dog5-run-alpha.webm` (SHA `2d4607fa…`) | VP9 + alpha, 47 кадров (1,96 с) из RUN v1 | **устарел** |
 | RUN alpha v2 | `preview/bulldog-03-05-alpha-v2-20261008:prototypes/bulldog-racing/reviews/alpha-v2/bulldog_05_run_alpha_v2.webm` (SHA `0deb2c0c…`) + маски `bulldog_05_alpha_masks_v2.tar.gz`, отчёт `report.md` | VP9 + alpha, 81 кадр (vs2 #41–121), прозрачность проверена Codex на 4 фонах | экспериментальный; технически исправен, художественно не принимался, **цикл RUN не выбран** |
 | проверочные картинки | `dog5-review.jpg` (обе ветки), `dog5-frame-*`, архив `four-alpha/dog5/*` (кадры, маски, статистика) | диагностика alpha | только справка |
-| FRONT_STAND, RACE_STAND, IDLE, SELECTED, START, STOP, SNIFF_PEE, ROLL, BUTTERFLY | — | **нет** | создавать |
+| IDLE, исходник Kling (передан 08.11) | `bulldog5-luna/sources/DOG5_IDLE_kling_original.mp4` (SHA `284ee485…`) | анфас, 121 кадр, начинается со стойки f0; не замыкается | **есть, не утверждён** (`sources/README.md`) |
+| SELECTED, исходник Kling (передан 08.11) | `bulldog5-luna/sources/DOG5_SELECTED_kling_original.mp4` (SHA `3f2c13d2…`) | анфас, 121 кадр, со стойки f0, подскок ≈ f64–f80, кончается не в стойке | **есть, не утверждён**; нужен RETURN_TO_IDLE |
+| FRONT_STAND | кадр f0 IDLE / SELECTED / RUN v1 (один и тот же) | `sources/DOG5_FRONT_STAND_candidate_f0_1276.png` | **кандидат** |
+| RACE_STAND, START, STOP, SNIFF_PEE, ROLL, BUTTERFLY, RETURN_TO_IDLE | — | **нет** | создавать |
 
 Контактные листы — `stage1/evidence/`.
 

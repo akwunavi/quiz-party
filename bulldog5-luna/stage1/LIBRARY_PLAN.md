@@ -7,7 +7,7 @@
 | FRONT_STAND (G0) | картинка | — | — | — | опорная поза: = IDLE f0 = ворота = SELECTED s0 |
 | IDLE | клип-цикл | G0 | G0 | 10 с (как у Пупса) | цикл; ворота — кадры, совпадающие с G0; выход только вперёд |
 | SELECTED | клип | G0 | G0 | ≈ 5 с | ворота IDLE → SELECTED → IDLE f1 |
-| RETURN_TO_IDLE | **только если** SELECTED не вернётся в G0 | конец SELECTED | G0 | ≤ 5 с | SELECTED → RETURN → IDLE |
+| RETURN_TO_IDLE | **нужен** (08.11: исходный SELECTED кончается в широкой улыбке, не в стойке) | конец SELECTED | G0 | ≤ 5 с | SELECTED → RETURN → IDLE |
 
 ## Гонка (профиль вправо, спрайт 207×116)
 | состояние | окно Race V3 | нужно | первый → последний кадр | примечание |
@@ -26,5 +26,5 @@
 
 ## Итого
 * Картинки: FRONT_STAND, RACE_STAND (2).
-* Клипы: IDLE, SELECTED, (RETURN_TO_IDLE — не планируется), START, RUN, STOP, SNIFF_PEE (+ RETURN), ROLL, BUTTERFLY (8; RUN — 0, если подойдёт старый vs2 при варианте A).
+* Клипы: IDLE, SELECTED, RETURN_TO_IDLE, START, RUN, STOP, SNIFF_PEE (+ RETURN), ROLL, BUTTERFLY. **08.11:** IDLE, SELECTED и кандидат RUN уже есть в `sources/`; генерировать — RETURN_TO_IDLE, RACE_STAND (картинка), START, STOP, SNIFF_PEE + RETURN, ROLL, BUTTERFLY.
 * Пакет: атлас 207×116, контракт V3 для `dog5`, `MANIFEST.json`, модуль выбора — по образцу пакета Пупса.
