@@ -1,0 +1,233 @@
+{
+ "N10": {
+  "frames": 10,
+  "loopSeconds": 0.417,
+  "legMotionPerTick": [
+   10.05,
+   8.99,
+   10.24,
+   10.41,
+   10.4,
+   10.53,
+   9.71,
+   8.36,
+   10.15,
+   10.85
+  ],
+  "legMin": 8.36,
+  "legMedian": 10.19,
+  "microFreezes": 0,
+  "legUnevennessCV": 0.07,
+  "seamLeg": 10.85,
+  "bodyCenterYrange": 16.2,
+  "bodyCenterXrange": 32.8,
+  "seamCenterJump": [
+   -2.1,
+   6.7
+  ],
+  "lowestPointRange": [
+   661,
+   681
+  ],
+  "lowestPointPerTick": [
+   676,
+   673,
+   661,
+   681,
+   681,
+   680,
+   679,
+   661,
+   674,
+   675
+  ]
+ },
+ "H12": {
+  "frames": 12,
+  "loopSeconds": 0.5,
+  "legMotionPerTick": [
+   0.0,
+   10.05,
+   8.99,
+   10.24,
+   10.41,
+   0.0,
+   10.4,
+   10.53,
+   9.71,
+   8.36,
+   10.15,
+   10.85
+  ],
+  "legMin": 0.0,
+  "legMedian": 10.1,
+  "microFreezes": 2,
+  "legUnevennessCV": 0.45,
+  "seamLeg": 10.85,
+  "bodyCenterYrange": 16.2,
+  "bodyCenterXrange": 32.8,
+  "seamCenterJump": [
+   -2.1,
+   6.7
+  ],
+  "lowestPointRange": [
+   661,
+   681
+  ],
+  "lowestPointPerTick": [
+   676,
+   676,
+   673,
+   661,
+   681,
+   681,
+   681,
+   680,
+   679,
+   661,
+   674,
+   675
+  ]
+ },
+ "I12": {
+  "frames": 12,
+  "loopSeconds": 0.5,
+  "legMotionPerTick": [
+   9.13,
+   7.79,
+   7.97,
+   8.57,
+   9.31,
+   9.65,
+   9.49,
+   7.33,
+   7.34,
+   6.83,
+   8.09,
+   9.81
+  ],
+  "legMin": 6.83,
+  "legMedian": 8.33,
+  "microFreezes": 0,
+  "legUnevennessCV": 0.12,
+  "seamLeg": 9.81,
+  "bodyCenterYrange": 15.6,
+  "bodyCenterXrange": 32.2,
+  "seamCenterJump": [
+   -1.5,
+   5.4
+  ],
+  "lowestPointRange": [
+   654,
+   681
+  ],
+  "lowestPointPerTick": [
+   676,
+   674,
+   656,
+   669,
+   681,
+   681,
+   680,
+   679,
+   654,
+   659,
+   674,
+   677
+  ]
+ },
+ "M12": {
+  "frames": 12,
+  "loopSeconds": 0.5,
+  "legMotionPerTick": [
+   7.49,
+   7.22,
+   8.99,
+   10.24,
+   10.41,
+   7.02,
+   7.42,
+   10.53,
+   9.71,
+   8.36,
+   10.15,
+   10.85
+  ],
+  "legMin": 7.02,
+  "legMedian": 9.35,
+  "microFreezes": 0,
+  "legUnevennessCV": 0.15,
+  "seamLeg": 10.85,
+  "bodyCenterYrange": 16.2,
+  "bodyCenterXrange": 32.8,
+  "seamCenterJump": [
+   -2.1,
+   6.7
+  ],
+  "lowestPointRange": [
+   661,
+   681
+  ],
+  "lowestPointPerTick": [
+   676,
+   670,
+   673,
+   661,
+   681,
+   681,
+   681,
+   680,
+   679,
+   661,
+   674,
+   675
+  ]
+ },
+ "C12": {
+  "frames": 12,
+  "loopSeconds": 0.5,
+  "legMotionPerTick": [
+   9.41,
+   9.98,
+   8.47,
+   7.89,
+   8.12,
+   9.28,
+   9.19,
+   9.23,
+   9.43,
+   9.12,
+   9.03,
+   7.93
+  ],
+  "legMin": 7.89,
+  "legMedian": 9.16,
+  "microFreezes": 0,
+  "legUnevennessCV": 0.07,
+  "seamLeg": 7.93,
+  "bodyCenterYrange": 15.8,
+  "bodyCenterXrange": 34.0,
+  "seamCenterJump": [
+   -12.2,
+   1.8
+  ],
+  "lowestPointRange": [
+   661,
+   681
+  ],
+  "lowestPointPerTick": [
+   680,
+   680,
+   678,
+   669,
+   661,
+   675,
+   677,
+   675,
+   672,
+   678,
+   681,
+   679
+  ]
+ }
+}

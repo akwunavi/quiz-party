@@ -13,3 +13,4 @@
 * `stage1/tools/` — скрипты эскизов.
 * `sources/` — исходники Kling от пользователя (IDLE, SELECTED, RUN v1 / vs2), не меняются.
 * `stage2/` — этап 2: FRONT_STAND, IDLE (варианты A / B), SELECTED alpha, проверка RETURN_TO_IDLE, проверка RUN; отчёт `stage2/REPORT.md`.
+* `stage3_run/` — выбор RUN-петли: 5 вариантов из исходника в одном ролике рядом с Фрэнком, Зефиром и Пупсом; отчёт `stage3_run/REPORT.md`.
