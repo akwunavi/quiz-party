@@ -1,0 +1,68 @@
+{
+ "Frenk": {
+  "height": 87.8,
+  "length": 108.4,
+  "area": 5121,
+  "lowest": [
+   94,
+   110
+  ],
+  "centreXrange": 8.4,
+  "centreYrange": 7.9
+ },
+ "Zefir": {
+  "height": 91.8,
+  "length": 109.0,
+  "area": 5210,
+  "lowest": [
+   104,
+   110
+  ],
+  "centreXrange": 4.5,
+  "centreYrange": 8.7
+ },
+ "Pups": {
+  "height": 94.2,
+  "length": 85.3,
+  "area": 4317,
+  "lowest": [
+   101,
+   113
+  ],
+  "centreXrange": 6.6,
+  "centreYrange": 6.3
+ },
+ "Luna_L60": {
+  "height": 92.0,
+  "length": 127.6,
+  "area": 5698,
+  "lowest": [
+   93,
+   110
+  ],
+  "centreXrange": 7.4,
+  "centreYrange": 5.0
+ },
+ "Luna_L99": {
+  "height": 92.2,
+  "length": 126.8,
+  "area": 5714,
+  "lowest": [
+   93,
+   110
+  ],
+  "centreXrange": 7.5,
+  "centreYrange": 4.9
+ },
+ "Luna_old_vs2_N10": {
+  "height": 96.1,
+  "length": 117.5,
+  "area": 5007,
+  "lowest": [
+   106,
+   109
+  ],
+  "centreXrange": 3.2,
+  "centreYrange": 4.8
+ }
+}
