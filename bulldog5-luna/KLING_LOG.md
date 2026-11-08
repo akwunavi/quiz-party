@@ -32,3 +32,8 @@
 * `kling-video-v3_0`, first = исходный SNIFF #93 (`stage7_fix/sniff/SNIFF_f93_first.png`, SHA `91d6ec3045712a12…`), tail = исходный #178 (`SNIFF_f178_tail.png`, SHA `e127ff38a70aa7ae…`), 4 с, 720p, одна сцена, без звука. Списано 24 кредита (баланс до — 1992).
 * generation_id: `AVG52TIrCdYW-SGFMIYwn-5vsxqjZhyNAZKuQkBZjyhw2j5Ys34urPo_w4rrkB8pxynyIYXb`. Промпт — `stage7_fix/sniff/SNIFF_AUDIT_AND_FIX_TZ.md`.
 * Результат: `stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G1_kling_original.mp4` (97 кадров, SHA `fd4e6a3285859e7f…`). **Не удалось**: лапа снова уходит назад (#32–#92). Повтора не было. Баланс после — 1968.
+
+## 5. SNIFF_PEE — поза поднятой лапы картинкой (08.11.2026) — путь 1, шаг 1
+* `gemini-3-pro-image` (Nano Banana Pro) через Kling, image-to-image, вход = исходный SNIFF #93, 16:9, 2k. Списано 20 кредитов (баланс до — 1968).
+* generation_id: `Aaiyd9xBR_fjzpb1w33WPeDk_TDd_6KjW1x9GcoMQkUn36m8fJt1mJJNeDHqfkS7XewNBWiE`. Промпт — `stage7_fix/sniff/POSE_PROMPT.txt`. Видео — только после приёмки картинки.
+* Результат: `stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G1_kling_original.png` (SHA `90f39e152f2976ac…`). Лапа согнута и поднята, но колено направлено назад. Ждёт приёмки. Баланс после — 1948.
