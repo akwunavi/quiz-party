@@ -1,0 +1,19 @@
+{
+  "schema": "race-v3-approved-files/v1",
+  "note": "Файлы физики Race V3 и ЕДИНСТВЕННОЕ согласованное расширение. T1 сверяет sha256 текущих файлов с этим списком: любая другая правка физики (даже на символ) — FAIL; осознанное новое расширение требует нового решения и новой записи здесь.",
+  "baselineCommit": "921f0fe",
+  "baseline": {
+    "dog4-v3-lab/model.mjs": "3fa4a72f59bfaee9bfeb4bdd5e6165c122dda76be3945ffa164acebe8b215515",
+    "dog4-v3-lab/scenario.mjs": "ea3e562f9129b59693c110a4f59533979525ecf2e10ff1e7d086f298d0c42d7a"
+  },
+  "extension": {
+    "name": "courseSeconds",
+    "approvedBy": "ведущий (решение 2026-11), приём T1 — этап 3 технической стабилизации",
+    "what": "Необязательный параметр resolveRace(seed,{courseSeconds}) / generateRace(seed,options) / buildDog(preset,index,{courseSeconds}): время дистанции собаки с темпом 1.00, диапазон 10..600 с (вне диапазона RangeError). Без параметра BASE_SPEED=1/42 — поведение побитно прежнее. Больше ничего в физике не менялось.",
+    "allowedWayToChangeDuration": "ТОЛЬКО этим параметром (в приложении — D, записывается в game_state вместе с seed). Подмена BASE_SPEED текстом файла запрещена."
+  },
+  "approved": {
+    "dog4-v3-lab/model.mjs": "ab22a87ea4974c4c62f72315eb0c27878ccebf3cc0fc1a96355a58d198d8cd20",
+    "dog4-v3-lab/scenario.mjs": "732dfc527c9ab575b04db96c6a8da852fe5ccda80fa31fc90b5d23fd51e5ac85"
+  }
+}

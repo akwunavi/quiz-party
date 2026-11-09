@@ -2,13 +2,21 @@
 // status: PASS | FAIL | PARTIAL | NOT_RUN. `scope` says exactly what the result does and does not prove.
 import {readFileSync,readdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';import {mkdtempSync,writeFileSync,mkdirSync} from 'node:fs';import {tmpdir} from 'node:os';import {pathToFileURL} from 'node:url';
 import {RACES,stateAt,frameFor} from '../../dog4-v3-lab/model.mjs';
+import {resolveRace as curResolve} from '../../dog4-v3-lab/scenario.mjs';
 import {visualAt,timelineOf} from '../src/visual.mjs';
 import {validateContract} from '../src/validator.mjs';
 import {CANON} from '../src/canonical.mjs';
 import {dog4Contract,frenkContract} from '../src/loader.mjs';
 import {races,rng,deepFreeze,signature,cloneContract,clone,retimeVariant,framesMeta,categoryDogs,startWorldSeries,smoothBox,fmt,layout,SC,seedsOf,REPO} from './lib.mjs';
 const here=u=>new URL(u,import.meta.url);
+// Базовая (до courseSeconds) физика V3 из git — чтобы T1 доказывал: без параметра результат побитно прежний. Нет git/коммита → null (честно «не проверено»).
+const APPROVED=JSON.parse(readFileSync(here('./approved_v3.json')));
+const BASE=await (async()=>{try{
+  const d=mkdtempSync(`${tmpdir()}/v3base-`),cwd=new URL('.',REPO);
+  for(const f of ['model','scenario'])writeFileSync(`${d}/${f}.mjs`,execFileSync('git',['show',`${APPROVED.baselineCommit}:dog4-v3-lab/${f}.mjs`],{cwd,maxBuffer:1<<26}));
+  return await import(pathToFileURL(`${d}/scenario.mjs`).href);}catch{return null;}})();
 
 export function t1(N){
   const rs=races(N),before=rs.map(signature);
@@ -22,12 +30,21 @@ export function t1(N){
   for(const f of readdirSync(v3dir).filter(f=>/\.(mjs|html)$/.test(f))){const s=readFileSync(new URL(f,v3dir),'utf8');if(/race-v3-p3-lab|visual\.mjs|character-visual/.test(s))bad.push(f);}
   const scen=readFileSync(new URL('dog4-v3-lab/scenario.mjs',REPO),'utf8')+readFileSync(new URL('dog4-v3-lab/model.mjs',REPO),'utf8');
   const charInPhysics=/character|contract|frenk/i.test(scen);
-  let gitClean=null;
-  try{const out=execFileSync('git',['status','--porcelain','--','dog4-v3-lab','docs/bulldog-race/APPROVED_RULES.md'],{cwd:new URL('.',REPO),encoding:'utf8'});gitClean=out.trim()==='';}catch{gitClean=null;}
-  const ok=mism===0&&bad.length===0&&!charInPhysics&&gitClean!==false;
+  // ФИЗИКА: sha256 файлов V3 == список принятых (базовая версия + согласованный courseSeconds). Любая иная правка → FAIL.
+  const sha=f=>createHash('sha256').update(readFileSync(new URL(f,REPO))).digest('hex');
+  const files=Object.fromEntries(Object.keys(APPROVED.approved).map(f=>[f,sha(f)]));
+  const filesApproved=Object.entries(APPROVED.approved).every(([f,h])=>files[f]===h);
+  // БЕЗ параметра результат побитно равен базовой версии из git; с одинаковыми (seed,D) — детерминирован; D=42 явно == по умолчанию
+  let defaultMism=null,detMism=null,explicit42Mism=null;
+  if(BASE){defaultMism=0;detMism=0;explicit42Mism=0;const cr=curResolve;
+    for(let i=0;i<300;i++){const seed=(i*7919+13)>>>0;
+      if(signature(BASE.resolveRace(seed))!==signature(cr(seed)))defaultMism++;
+      if(signature(cr(seed,{courseSeconds:42}))!==signature(cr(seed)))explicit42Mism++;
+      const D=[20,30,60,120][i%4];if(signature(cr(seed,{courseSeconds:D}))!==signature(cr(seed,{courseSeconds:D})))detMism++;}}
+  const ok=mism===0&&bad.length===0&&!charInPhysics&&filesApproved&&(BASE==null||(defaultMism===0&&detMism===0&&explicit42Mism===0));
   return {id:'T1',title:'physics independent of characters / metadata',status:ok?'PASS':'FAIL',
-    scope:'STRUCTURAL: segments/crossing/places/effectiveSeed hashes of real V3 races before vs after 2 contracts were applied to frozen (read-only) segments; V3 files do not import the lab; no character words in physics sources; V3 files unmodified in git. Does not exercise a model change (none exists).',
-    details:{races:N,visualCalls:calls,signatureMismatches:mism,v3FilesReferencingLab:bad,characterWordsInPhysicsSources:charInPhysics,v3GitClean:gitClean}};
+    scope:'STRUCTURAL: segments/crossing/places/effectiveSeed hashes of real V3 races before vs after 2 contracts were applied to frozen (read-only) segments; V3 files do not import the lab; no character words in physics sources; V3 files == approved sha256 list (baseline + the one agreed extension `courseSeconds`, tests/approved_v3.json; any other edit fails); without the option resolveRace is bit-identical to the git baseline; same (seed,D) is deterministic; D=42 == default. Does not prove the physics itself is correct (golden tests T2-T10 do).',
+    details:{races:N,visualCalls:calls,signatureMismatches:mism,v3FilesReferencingLab:bad,characterWordsInPhysicsSources:charInPhysics,v3FilesApprovedSha256:filesApproved,v3FileHashes:files,approvedExtension:APPROVED.extension.name,defaultBehaviourVsBaselineMismatches:defaultMism,sameSeedAndDMismatches:detMism,explicitD42VsDefaultMismatches:explicit42Mism,baselineFromGit:BASE!=null}};
 }
 
 export function t2(){
