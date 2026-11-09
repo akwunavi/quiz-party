@@ -33,15 +33,19 @@ export const SLOTS: SlotSpec[] = [
   { id: 'village_mid', file: 'village_mid.webp', title: 'Зимняя деревня (один цельный кадр 1920×819): шале, рынок, часовая башня, ели, дым', parallax: VILLAGE_PARALLAX, bottomY: VILLAGE_BOTTOM, tileW: VILLAGE_W, tileH: Math.round(VILLAGE_SRC_H * VILLAGE_W / 1920), mode: 'sequence', modules: 1,
     route: [{ x: 1880, module: 0 }], fadeBottom: { from: 636, to: 690 }, contentH: VILLAGE_SRC_H, dim: 0.1,
     note: 'готовый ассет 1920×819 RGBA, один экземпляр на маршруте; собственный забор и сугробы внизу кадра садятся ЗА ограждение арены (не двойной забор); дым статичный, горы по бокам остаются видны' },
+  { id: 'village_2', file: 'village_2.webp', title: 'Вторая деревня: другой силуэт и ритм домов', parallax: VILLAGE_PARALLAX, bottomY: VILLAGE_BOTTOM, tileW: 1080, tileH: 450, mode: 'sequence', modules: 1,
+    route: [{ x: 4950, module: 0 }],
+    note: 'ЖДЁТ АССЕТА (arena-brief/P2_VILLAGE2_SPRUCES_PLAN.md): RGBA ≈1920×800, тот же свет/стиль/боковой ракурс, ДРУГОЙ силуэт (например низкая длинная линия домов с рынком и каток-павильоном, без часовой башни), без собственного забора внизу или с гасимой кромкой; рисуется ширина 1080 px' },
   { id: 'stands_crowd', file: 'stands_crowd.webp', title: 'Трибуна с публикой (вариант A)', parallax: 0.92, bottomY: BERM_Y + 30, tileW: 1596, tileH: 365, mode: 'sequence', modules: 2,
-    dim: 0.1, route: [{ x: 250, module: 0, scale: 0.9 }, { x: 3162, module: 1, scale: 0.74 }],
+    dim: 0.1, route: [{ x: 250, module: 0, scale: 0.9 }, { x: 3162, module: 1, scale: 0.74 }, { x: 6650, module: 0, scale: 0.84 }, { x: 8450, module: 1, scale: 0.95 }],
     note: 'модуль 2282×522 исходных px (≈1596×365 при 1×; трибуна ≈1300 px + зазор ≈290 px, в котором видны горы): низкая фронтальная трибуна с публикой, снежная крыша, гирлянды, баннеры; файл = обычный и зеркальный модули; нижние ~30 px прячет борт, публика остаётся над перилами ограждения' },
   { id: 'stands', file: 'stands.webp', title: 'Трибуны/навесы (без зрителей)', parallax: 0.92, bottomY: BERM_Y + 2, tileW: 2400, tileH: 340, mode: 'sequence', modules: 3,
     note: '3 модуля стыкуются в любом порядке; многоуровневые деревянные трибуны B (тёмно-синие металлические элементы, световые панели), навесы с гирляндами C; ярусы пустые — зрители отдельным слоем' },
   { id: 'crowd', file: 'crowd.webp', title: 'Зрители: три ряда отдельными слоями', parallax: 0.92, bottomY: BERM_Y + 2, tileW: 2400, tileH: 340, mode: 'sequence', modules: 3,
     note: 'те же 3 модуля по ширине, что и трибуны; КАЖДЫЙ из 3 рядов — отдельный PNG (rows 1–3), чтобы код качал ряды независимо; 2 позы на ряд (руки вниз / руки вверх)' },
-  { id: 'spruce_set', file: 'spruce_set.webp', title: 'Крупные ели (спрайты)', parallax: 0.80, bottomY: BERM_Y + 2, tileW: 2400, tileH: 640, mode: 'sequence', modules: 6,
-    note: '6–8 отдельных елей разной высоты на прозрачном фоне; ставятся кодом за ограждением; никогда не перед дорожками' },
+  { id: 'spruce_set', file: 'spruce_set.webp', title: 'Крупные заснеженные ели: отдельные группы-разделители', parallax: 0.94, bottomY: BERM_Y - 8, tileW: 520, tileH: 420, mode: 'sequence', modules: 4,
+    route: [{ x: 1465, module: 0, scale: 0.7 }, { x: 2950, module: 1, scale: 0.75 }, { x: 4400, module: 2, scale: 0.9 }, { x: 6070, module: 3, scale: 0.9 }, { x: 7800, module: 1 }],
+    note: 'ЖДЁТ АССЕТА: лист из 4 модулей по горизонтали (2–3 крупные заснеженные ели разной высоты на группу, тёплые лампочки на нижних ветвях, прозрачный фон); на экране модуль 520×420 px, верхушка ниже крыши трибуны; стоят за ограждением, дорожек не касаются (низ у борта)' },
 ]
 export interface LoadedSlot { spec: SlotSpec; img: HTMLImageElement | HTMLCanvasElement }
 /** Готовит слой: мягко гасит низ по `fadeBottom` (альфа-маска на копии; файл не меняется). */

@@ -57,7 +57,7 @@ describe('слоты авторской графики', () => {
   })
   it('маршрут: трибуна → открытый участок → деревня → открытый участок → трибуна, без наложений и без старой трибуны', () => {
     const st = SLOTS.find(x => x.id === 'stands_crowd')!, vi = SLOTS.find(x => x.id === 'village_mid')!
-    const items = [...st.route!.map(r => ({ id: 'st', x: r.x, w: st.tileW * (r.scale ?? 1) })), ...vi.route!.map(r => ({ id: 'vi', x: r.x, w: vi.tileW }))].sort((a, b) => a.x - b.x)
+    const items = [...st.route!.slice(0, 2).map(r => ({ id: 'st', x: r.x, w: st.tileW * (r.scale ?? 1) })), ...vi.route!.map(r => ({ id: 'vi', x: r.x, w: vi.tileW }))].sort((a, b) => a.x - b.x)
     expect(items.map(i => i.id)).toEqual(['st', 'vi', 'st'])
     expect(st.parallax).toBe(vi.parallax)                                    // идут по одной «линии» маршрута — взаимный сдвиг не плывёт
     // объекты (у трибуны ≈ 82% модуля, у деревни весь кадр) не налезают друг на друга; между ними — открытый участок с горами ≥ 300 px
@@ -66,6 +66,19 @@ describe('слоты авторской графики', () => {
     expect(SLOTS.some(x => x.id === 'stands')).toBe(true)                    // старая двухъярусная в маршрут не входит (её нет в файлах public/arena)
     expect(slotPlacements(vi, 0).length + slotPlacements(vi, 2687).length).toBeGreaterThan(0)
     expect(slotPlacements(vi, 0).length).toBeLessThanOrEqual(1)
+  })
+  it('полный маршрут длинной гонки (с ожидающими ассетами): без наложений, горы между объектами, трибуны/деревни не повторяются подряд', () => {
+    type It = { id: string; a: number; b: number }
+    const items: It[] = []
+    for (const sp of SLOTS) for (const r of sp.route ?? []) { const k = r.scale ?? 1; const w = sp.tileW * k
+      const a = sp.id === 'stands_crowd' ? (r.module === 1 ? r.x + 294 * k : r.x) : r.x, b = sp.id === 'stands_crowd' ? (r.module === 1 ? r.x + w : r.x + 1303 * k) : r.x + w; items.push({ id: sp.id, a, b }) }
+    items.sort((p, q) => p.a - q.a)
+    for (let i = 1; i < items.length; i++) { expect(items[i].a - items[i - 1].b).toBeGreaterThanOrEqual(24)   // не наезжают друг на друга
+      if (items[i].id !== 'spruce_set' && items[i - 1].id !== 'spruce_set') expect(items[i].a - items[i - 1].b).toBeGreaterThanOrEqual(300)  // между крупными — открытые горы
+      expect(items[i].id === items[i - 1].id && items[i].id !== 'spruce_set').toBe(false) }
+    const big = items.filter(x => x.id !== 'spruce_set').map(x => x.id)
+    for (let i = 2; i < big.length; i++) expect(big[i] === big[i - 2] && big[i] === big[i - 1]).toBe(false)
+    expect(new Set(big).size).toBeGreaterThanOrEqual(3)
   })
   it('модули идут без одинакового подряд и используют все варианты', () => {
     for (const m of [2, 3, 4, 6]) { const seq = Array.from({ length: 200 }, (_, i) => moduleOf(i, m)); for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1]); expect(new Set(seq).size).toBe(m) }
