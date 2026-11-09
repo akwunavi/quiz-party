@@ -347,4 +347,17 @@ describe('локальный сервер: статика приложения',
     await post({ team_id: 't1', answer_text: '3', stake: 4, is_correct: true })
     expect(await text('t1')).toMatchObject({ stake: 4 })
   })
+
+  it('ставки гонки: личность строки не переопределяется (ref/раунд/команда), ref обязан совпадать с раундом', async () => {
+    await api('arm', { method: 'POST' })
+    await api('session', { method: 'PATCH', body: JSON.stringify({ round_number: 2, melody: { race: { stage: 'betting' } } }) })
+    const post = row => api('answers', { method: 'POST', body: JSON.stringify([row]) })
+    await post({ team_id: 't1', game_id: 'g', question_ref: 'q-race-2', round_number: 2, answer_text: '3' })
+    await post({ team_id: 't2', game_id: 'g', question_ref: 'q-race-2', round_number: 3, answer_text: '5' })   // ref раунда 2 под round_number 3
+    const rows = () => api('answers').then(r => r.body)
+    expect((await rows()).map(a => a.team_id)).toEqual(['t1'])
+    const row = (await rows())[0]
+    await api(`answers/${row.id}`, { method: 'PATCH', body: JSON.stringify({ question_ref: 'q-x', team_id: 't9', round_number: 7, stake: 4 }) })
+    expect((await rows())[0]).toMatchObject({ question_ref: 'q-race-2', team_id: 't1', round_number: 2, stake: 4 })   // очки (stake) ведущий пишет, личность — нет
+  })
 })
