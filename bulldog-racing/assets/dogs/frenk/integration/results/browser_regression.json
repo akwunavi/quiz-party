@@ -1,0 +1,485 @@
+{
+ "date": "2026-10-15",
+ "browser": "141.0.7390.37",
+ "tool": "race-v3-frenk-lab/tools/lab_check.mjs (full data: race-v3-frenk-lab/results/lab_check.json)",
+ "pageErrors": [],
+ "dog4Reproducibility": {
+  "cases": 10,
+  "allIdentical": true,
+  "note": "5 seeds x (without Frenk, Frenk on lane 3): finishes in the lab = resolveRace of dog4-v3-lab in Node"
+ },
+ "dog4PixelsVsOriginalPage": [
+  {
+   "seed": 20261013,
+   "time": 12.3,
+   "diffPxTrackArea": 0
+  },
+  {
+   "seed": 20261013,
+   "time": 30.1,
+   "diffPxTrackArea": 0
+  },
+  {
+   "seed": 1069078,
+   "time": 22,
+   "diffPxTrackArea": 0
+  }
+ ],
+ "presets": {
+  "ALL_EVENTS": "SNIFF_PEE 22% -> BUTTERFLY 50% -> ROLL 76%, 5 categories",
+  "CHAIN_ALL": "SNIFF_PEE 35%, 5 categories",
+  "BUTTERFLY_ALL": "BUTTERFLY 35%, 5 categories",
+  "ROLL_ALL": "ROLL 35%, 5 categories",
+  "PAIR": "Bulldog 4 and Frenk side by side, NORMAL"
+ },
+ "seamsByType": {
+  "RACE_STAND -> bf": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.03,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "RACE_STAND -> roll": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.02,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "RACE_STAND -> sniffEv": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.01,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "RACE_STAND -> v1f": {
+   "n": 56,
+   "maxAbsBodyMinusAnchorPx": 0.03,
+   "maxAbsShadowStepMinusAnchorPx": 0.6
+  },
+  "bf -> RACE_STAND": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.03,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "g3f -> run": {
+   "n": 56,
+   "maxAbsBodyMinusAnchorPx": 2.81,
+   "maxAbsShadowStepMinusAnchorPx": 1.14
+  },
+  "roll -> RACE_STAND": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.05,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "run -> v4k": {
+   "n": 56,
+   "maxAbsBodyMinusAnchorPx": 1.78,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "sniffEv -> RACE_STAND": {
+   "n": 11,
+   "maxAbsBodyMinusAnchorPx": 0.03,
+   "maxAbsShadowStepMinusAnchorPx": 0
+  },
+  "v1f -> g3f": {
+   "n": 56,
+   "maxAbsBodyMinusAnchorPx": 0.77,
+   "maxAbsShadowStepMinusAnchorPx": 1.16
+  },
+  "v4k -> RACE_STAND": {
+   "n": 56,
+   "maxAbsBodyMinusAnchorPx": 0.01,
+   "maxAbsShadowStepMinusAnchorPx": 0.01
+  }
+ },
+ "lanes": [
+  {
+   "preset": "ALL_EVENTS",
+   "lane": 1,
+   "name": "ФРЭНК · VERY_FAST · SNIFF→BF→ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 19.667,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 26
+  },
+  {
+   "preset": "ALL_EVENTS",
+   "lane": 2,
+   "name": "ФРЭНК · FAST · SNIFF→BF→ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 20.667,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 26
+  },
+  {
+   "preset": "ALL_EVENTS",
+   "lane": 3,
+   "name": "ФРЭНК · NORMAL · SNIFF→BF→ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 21.667,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 26
+  },
+  {
+   "preset": "ALL_EVENTS",
+   "lane": 4,
+   "name": "ФРЭНК · SLOW · SNIFF→BF→ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.79,
+   "maxShadowHopAt": {
+    "t": 23.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 26
+  },
+  {
+   "preset": "ALL_EVENTS",
+   "lane": 5,
+   "name": "ФРЭНК · VERY_SLOW · SNIFF→BF→ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.78,
+   "maxShadowHopAt": {
+    "t": 24.667,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 26
+  },
+  {
+   "preset": "CHAIN_ALL",
+   "lane": 1,
+   "name": "ФРЭНК · VERY_FAST · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 24.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "CHAIN_ALL",
+   "lane": 2,
+   "name": "ФРЭНК · FAST · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 25.667,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "CHAIN_ALL",
+   "lane": 3,
+   "name": "ФРЭНК · NORMAL · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 27.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "CHAIN_ALL",
+   "lane": 4,
+   "name": "ФРЭНК · SLOW · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.79,
+   "maxShadowHopAt": {
+    "t": 29.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "CHAIN_ALL",
+   "lane": 5,
+   "name": "ФРЭНК · VERY_SLOW · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.78,
+   "maxShadowHopAt": {
+    "t": 32.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "BUTTERFLY_ALL",
+   "lane": 1,
+   "name": "ФРЭНК · VERY_FAST · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 19.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "BUTTERFLY_ALL",
+   "lane": 2,
+   "name": "ФРЭНК · FAST · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 20.708,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "BUTTERFLY_ALL",
+   "lane": 3,
+   "name": "ФРЭНК · NORMAL · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 22.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "BUTTERFLY_ALL",
+   "lane": 4,
+   "name": "ФРЭНК · SLOW · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.79,
+   "maxShadowHopAt": {
+    "t": 24.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "BUTTERFLY_ALL",
+   "lane": 5,
+   "name": "ФРЭНК · VERY_SLOW · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.78,
+   "maxShadowHopAt": {
+    "t": 27.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "ROLL_ALL",
+   "lane": 1,
+   "name": "ФРЭНК · VERY_FAST · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 20.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "ROLL_ALL",
+   "lane": 2,
+   "name": "ФРЭНК · FAST · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.81,
+   "maxShadowHopAt": {
+    "t": 21.708,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "ROLL_ALL",
+   "lane": 3,
+   "name": "ФРЭНК · NORMAL · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 23.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "ROLL_ALL",
+   "lane": 4,
+   "name": "ФРЭНК · SLOW · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.79,
+   "maxShadowHopAt": {
+    "t": 25.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "ROLL_ALL",
+   "lane": 5,
+   "name": "ФРЭНК · VERY_SLOW · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.78,
+   "maxShadowHopAt": {
+    "t": 28.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "PAIR",
+   "lane": 2,
+   "name": "ФРЭНК · NORMAL · SNIFF",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 27.167,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    6.38
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "PAIR",
+   "lane": 4,
+   "name": "ФРЭНК · NORMAL · BUTTERFLY",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 22.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  },
+  {
+   "preset": "PAIR",
+   "lane": 5,
+   "name": "ФРЭНК · NORMAL · ROLL",
+   "diagnostics": [],
+   "maxShadowHopPx": 1.8,
+   "maxShadowHopAt": {
+    "t": 23.208,
+    "from": "g3f13",
+    "to": "g3f14"
+   },
+   "shadowMinusBodyPx": [
+    -6.29,
+    2.14
+   ],
+   "seams": 12
+  }
+ ]
+}

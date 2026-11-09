@@ -1,0 +1,642 @@
+{
+ "dog": "frenk",
+ "files": [
+  {
+   "dest": "alpha/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm",
+   "role": "alpha",
+   "bytes": 2202081,
+   "sha256": "2e189b0f2602fd6a532c116ed283402ee1530ba5fd2d7048a47d0b746e9951f3",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/butterfly_v1/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm"
+   },
+   "expectedSha256": "2e189b0f2602fd6a532c116ed283402ee1530ba5fd2d7048a47d0b746e9951f3",
+   "shaMatchesApproved": true,
+   "note": "approved_set/BUTTERFLY/alpha"
+  },
+  {
+   "dest": "alpha/DOG1_FIRST_START_alpha_src25-63.webm",
+   "role": "alpha",
+   "bytes": 790980,
+   "sha256": "eed84f1901d5b2269a8cc4aca1567c518363c60aaf7047f1d96f026b4ac698d5",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/assets/approved/DOG1_FIRST_START_alpha_src25-63.webm"
+   },
+   "expectedSha256": "eed84f1901d5b2269a8cc4aca1567c518363c60aaf7047f1d96f026b4ac698d5",
+   "shaMatchesApproved": true,
+   "note": "approved_set/FIRST_START"
+  },
+  {
+   "dest": "alpha/DOG1_IDLE_v1_alpha_f8-f118.webm",
+   "role": "alpha",
+   "bytes": 1330587,
+   "sha256": "40dbb708e61ccdb01488d9c426bfcd56925f300f45c3ceba8912a541894ed3aa",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_alpha_v1/DOG1_IDLE_v1_alpha_f8-f118.webm"
+   },
+   "expectedSha256": "40dbb708e61ccdb01488d9c426bfcd56925f300f45c3ceba8912a541894ed3aa",
+   "shaMatchesApproved": true,
+   "note": "approved_set/IDLE/builtFrom"
+  },
+  {
+   "dest": "alpha/DOG1_IDLE_v1_alpha_loop220.webm",
+   "role": "alpha",
+   "bytes": 2647317,
+   "sha256": "26f11b74ec5168f5e688c001677ceb36b0e9c1216dd2b9f30ddd09d674794867",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_alpha_v1/DOG1_IDLE_v1_alpha_loop220.webm"
+   },
+   "expectedSha256": "26f11b74ec5168f5e688c001677ceb36b0e9c1216dd2b9f30ddd09d674794867",
+   "shaMatchesApproved": true,
+   "note": "approved_set/IDLE/file"
+  },
+  {
+   "dest": "alpha/DOG1_RACE_STAND_v3_alpha_1276.webm",
+   "role": "alpha",
+   "bytes": 106857,
+   "sha256": "927983b7a3f41239e58749a9b2fd393d63f7deff73265c339062ae6a2d36e1e3",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/stop_v4/alpha/DOG1_RACE_STAND_v3_alpha_1276.webm"
+   },
+   "expectedSha256": "927983b7a3f41239e58749a9b2fd393d63f7deff73265c339062ae6a2d36e1e3",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_STAND/alpha"
+  },
+  {
+   "dest": "alpha/DOG1_RACE_START_gen3_alpha.webm",
+   "role": "alpha",
+   "bytes": 1941155,
+   "sha256": "326e5826d8b565ed20b52d1fc036ab7c85fa936ad82f4c8eb9e665f96db99c1c",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/race_start_gen3/DOG1_RACE_START_gen3_alpha.webm"
+   },
+   "expectedSha256": "326e5826d8b565ed20b52d1fc036ab7c85fa936ad82f4c8eb9e665f96db99c1c",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_START/alpha[1]"
+  },
+  {
+   "dest": "alpha/DOG1_RACE_START_v1_alpha.webm",
+   "role": "alpha",
+   "bytes": 1736968,
+   "sha256": "8388d401f116a1a1d523cd7d385eb5c48d70e127fdcb1e697ebf32356e24cc77",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/race_start_v1/DOG1_RACE_START_v1_alpha.webm"
+   },
+   "expectedSha256": "8388d401f116a1a1d523cd7d385eb5c48d70e127fdcb1e697ebf32356e24cc77",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_START/alpha[0]"
+  },
+  {
+   "dest": "alpha/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm",
+   "role": "alpha",
+   "bytes": 1279851,
+   "sha256": "866a33aa5b07f95254aedde9c838af62dd11b0db0dbe070dfb69b115e49cecf0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_alpha_v1/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm"
+   },
+   "expectedSha256": "866a33aa5b07f95254aedde9c838af62dd11b0db0dbe070dfb69b115e49cecf0",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RETURN_TO_IDLE/file"
+  },
+  {
+   "dest": "alpha/DOG1_ROLL_v1_alpha.webm",
+   "role": "alpha",
+   "bytes": 2271091,
+   "sha256": "8c7998df8f49a709b2b5195e5e32bcf3ce5fba9ec6f949c104b1c86a09fbd936",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/roll_v1/alpha/DOG1_ROLL_v1_alpha.webm"
+   },
+   "expectedSha256": "8c7998df8f49a709b2b5195e5e32bcf3ce5fba9ec6f949c104b1c86a09fbd936",
+   "shaMatchesApproved": true,
+   "note": "approved_set/ROLL/alpha"
+  },
+  {
+   "dest": "alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm",
+   "role": "selection_anytime",
+   "bytes": 210816,
+   "sha256": "947b7dc270109da5d94510d11d7ed664c3f8dad2f514b4a091f61a061bafb632",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_anytime_v1/alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm"
+   }
+  },
+  {
+   "dest": "alpha/DOG1_SELECTED_v1_alpha_f20-f121.webm",
+   "role": "alpha",
+   "bytes": 1426699,
+   "sha256": "1aab817a0df74ef3e88620b1c03bee4f05efa139826168538538c3fd57f66126",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_alpha_v1/DOG1_SELECTED_v1_alpha_f20-f121.webm"
+   },
+   "expectedSha256": "1aab817a0df74ef3e88620b1c03bee4f05efa139826168538538c3fd57f66126",
+   "shaMatchesApproved": true,
+   "note": "approved_set/SELECTED/file"
+  },
+  {
+   "dest": "alpha/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm",
+   "role": "alpha",
+   "bytes": 3731809,
+   "sha256": "106bba1d16b79c9a96e8030eed05885fb19b8ee44002608797243aacab917029",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm"
+   },
+   "expectedSha256": "106bba1d16b79c9a96e8030eed05885fb19b8ee44002608797243aacab917029",
+   "shaMatchesApproved": true,
+   "note": "approved_set/SNIFF_PEE/alpha"
+  },
+  {
+   "dest": "alpha/DOG1_STOP_v4_alpha_k38-k73.webm",
+   "role": "alpha",
+   "bytes": 662141,
+   "sha256": "2040c95941bcd3a3f956f711de34628e9d1fbc3ce96d8ea62085b20c93bf27f7",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/stop_v4/alpha/DOG1_STOP_v4_alpha_k38-k73.webm"
+   },
+   "expectedSha256": "2040c95941bcd3a3f956f711de34628e9d1fbc3ce96d8ea62085b20c93bf27f7",
+   "shaMatchesApproved": true,
+   "note": "approved_set/STOP/alpha"
+  },
+  {
+   "dest": "alpha/dog1-run-alpha.webm",
+   "role": "alpha",
+   "bytes": 8617279,
+   "sha256": "d2c2762797a393f03eca8ec28213d39f43783c52cddbaab59bed9f60a3347075",
+   "source": {
+    "ref": "8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c",
+    "commit": "8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c",
+    "path": "dog1-run-alpha.webm"
+   },
+   "expectedSha256": "d2c2762797a393f03eca8ec28213d39f43783c52cddbaab59bed9f60a3347075",
+   "shaMatchesApproved": true,
+   "note": "RUN alpha; ветка origin/preview/bulldogs-1235-alpha-20261008 (коммит закреплён)"
+  },
+  {
+   "dest": "docs/APPROVED.md",
+   "role": "selection_anytime",
+   "bytes": 4606,
+   "sha256": "3b26e855cf095e88b6a3d150731782c1afecd33b4aee51335930613d50a1d249",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_anytime_v1/APPROVED.md"
+   }
+  },
+  {
+   "dest": "integration/README.md",
+   "role": "docs",
+   "bytes": 11503,
+   "sha256": "86138d2df6e1e199aa8f0361e89dc0984045ae61528f771c7a8dd6b10e0f03e3",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/README.md"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_atlas.json",
+   "role": "atlas",
+   "bytes": 36701,
+   "sha256": "97f08e5047af772edee08081edc090a94a1c07b1002bd2fc9eafff4ed29a49db",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_atlas.json"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_bf.png",
+   "role": "atlas",
+   "bytes": 1250055,
+   "sha256": "6494b4be0c56c9a3cbfed66b025da77c80700ad99f9a67c9ba230d452a8f24e0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_bf.png"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_roll.png",
+   "role": "atlas",
+   "bytes": 1454406,
+   "sha256": "059b1f24695ff5da69723bae3ff7ac845255943533fe85fe786bfa2270afc24d",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_roll.png"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_run.png",
+   "role": "atlas",
+   "bytes": 190955,
+   "sha256": "36e7c191912eaa006d29c29d0f0e606014a5f912b72dbb5960e947f91fdd517c",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_run.png"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_sniff.png",
+   "role": "atlas",
+   "bytes": 3147088,
+   "sha256": "51562d389ac23d2fb9164077805a9aff9bfe417f34e1e2b6031cf306781eda7f",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_sniff.png"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_start.png",
+   "role": "atlas",
+   "bytes": 684608,
+   "sha256": "0d4ec915d7f44bbe948271b8968a24668ceb161b696e513987347c374c61b53a",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_start.png"
+   }
+  },
+  {
+   "dest": "integration/atlas/frenk_stop.png",
+   "role": "atlas",
+   "bytes": 553877,
+   "sha256": "628076c97f9c1e63da70a5dd6d628466556b51d117ae8c54828a0cf478efa14e",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/atlas/frenk_stop.png"
+   }
+  },
+  {
+   "dest": "integration/contract/frenk.contract.integration.json",
+   "role": "contract",
+   "bytes": 19023,
+   "sha256": "be99b188d3ac8433a95ae726b6df1cd2a4d915e6f32aaf49015b0f73a8e61f12",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/contract/frenk.contract.integration.json"
+   }
+  },
+  {
+   "dest": "integration/contract/frenk_start_shift_arrays.json",
+   "role": "contract",
+   "bytes": 9225,
+   "sha256": "c2cf47e847ff390d9125d9c96b77039f483fa04c1599cc8cd0d1a1c0a5d44698",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/contract/frenk_start_shift_arrays.json"
+   }
+  },
+  {
+   "dest": "integration/contract/frenk_stop_v4_shift_arrays.json",
+   "role": "contract",
+   "bytes": 6418,
+   "sha256": "766e2ac8a45a6b279327d7b2f11bc9dee0750f6c66f8de3fa139176dae9b40ba",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/contract/frenk_stop_v4_shift_arrays.json"
+   }
+  },
+  {
+   "dest": "integration/results/browser_regression.json",
+   "role": "results",
+   "bytes": 9042,
+   "sha256": "c3b6f3fa333a96bd9c18e879d65607e84657521eb9e40a2d5d199c97ec58fbda",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/results/browser_regression.json"
+   }
+  },
+  {
+   "dest": "integration/results/check_package.json",
+   "role": "results",
+   "bytes": 5744,
+   "sha256": "b0b926c4986ef2eeee059e67561690b9be4881f6efd8c8435eac3f277bbf3b71",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/results/check_package.json"
+   }
+  },
+  {
+   "dest": "integration/results/migration_identity.json",
+   "role": "results",
+   "bytes": 2762,
+   "sha256": "41522b459193bec6377c31c42dbe881660d481028cb775acb899b03ddba0c0e8",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/results/migration_identity.json"
+   }
+  },
+  {
+   "dest": "integration/runtime/frenk_visual.mjs",
+   "role": "runtime",
+   "bytes": 8088,
+   "sha256": "85f6e41ed7c434f561aa9e74b5518599bdaa5fee60331dc2a88d00ec7ecf0619",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/runtime/frenk_visual.mjs"
+   }
+  },
+  {
+   "dest": "integration/tools/build_atlas.py",
+   "role": "tools",
+   "bytes": 3058,
+   "sha256": "bb8b0a0a0e27eacb2565ffd5e52570d418a9d1960a5cfb8e2f3d81bcf983ee3f",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/tools/build_atlas.py"
+   }
+  },
+  {
+   "dest": "integration/tools/check_package.mjs",
+   "role": "tools",
+   "bytes": 7240,
+   "sha256": "4e13d27994e01a3fdc8e1cadffd3945bb1ef2c8b5cb2ed969ebfc8f46a37161c",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/tools/check_package.mjs"
+   }
+  },
+  {
+   "dest": "integration/tools/rebuild_atlas.sh",
+   "role": "tools",
+   "bytes": 2199,
+   "sha256": "049f56a347b1156fd8c14178f231931fcbf7f9efaac65277451fd38c14db8fce",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/integration_v1/tools/rebuild_atlas.sh"
+   }
+  },
+  {
+   "dest": "library_v1/LIBRARY.json",
+   "role": "frenk_library",
+   "bytes": 6612,
+   "sha256": "8346703b79f01cfc4dbbde4e3c3989e0d2b5f5cbe503f9cb4365d4fb4b5e93ed",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/library_v1/LIBRARY.json"
+   }
+  },
+  {
+   "dest": "library_v1/README.md",
+   "role": "frenk_library",
+   "bytes": 9844,
+   "sha256": "42d6156572fc26c52ed53c42e019127398eb035a85f4d10b1c2506d27cf207ed",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/library_v1/README.md"
+   }
+  },
+  {
+   "dest": "library_v1/make_library.py",
+   "role": "frenk_library",
+   "bytes": 3822,
+   "sha256": "4e0c2a295b0860276fb9cfa8f55f03b406eae4a65373bd2a30a62d4b15df743b",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/library_v1/make_library.py"
+   }
+  },
+  {
+   "dest": "library_v1/results/verify_library.json",
+   "role": "frenk_library",
+   "bytes": 2069,
+   "sha256": "2db90ed59c9cd4e12ae8294945a2fa0a0518b8fb3b1d6580ed79aa091c83d5d0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/library_v1/results/verify_library.json"
+   }
+  },
+  {
+   "dest": "library_v1/verify_library.py",
+   "role": "frenk_library",
+   "bytes": 5569,
+   "sha256": "dc65d839e878184b9bcd3fdaa5e2349648fd570d2ef792e8a3b65cec783f5469",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/library_v1/verify_library.py"
+   }
+  },
+  {
+   "dest": "runtime/selection.mjs",
+   "role": "selection_anytime",
+   "bytes": 3217,
+   "sha256": "42bee57c61cbc810424fd742e95cea666c47fd5b29776c8ed00fe51d294f0922",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/selection_anytime_v1/selection.mjs"
+   }
+  },
+  {
+   "dest": "sources/DOG1_BUTTERFLY_v1_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 1870824,
+   "sha256": "694436b69672e265a71e7175dc578538bb92fe7a1b12dac710720e36221f956c",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/butterfly_v1/DOG1_BUTTERFLY_v1_kling_source.mp4"
+   },
+   "expectedSha256": "694436b69672e265a71e7175dc578538bb92fe7a1b12dac710720e36221f956c",
+   "shaMatchesApproved": true,
+   "note": "approved_set/BUTTERFLY/source"
+  },
+  {
+   "dest": "sources/DOG1_RACE_START_gen3_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 2635384,
+   "sha256": "772d432d0070698e799f30795acdd214ec939d66263f97dd1209bc64affd9d08",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/race_start_gen3/DOG1_RACE_START_gen3_kling_source.mp4"
+   },
+   "expectedSha256": "772d432d0070698e799f30795acdd214ec939d66263f97dd1209bc64affd9d08",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_START/sources[1]"
+  },
+  {
+   "dest": "sources/DOG1_RACE_START_v1_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 2084344,
+   "sha256": "826c73fd6ff7fd9a1a89f03676887069e8564fa3a75ff28b78df3b64653e6d50",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/race_start_v1/DOG1_RACE_START_v1_kling_source.mp4"
+   },
+   "expectedSha256": "826c73fd6ff7fd9a1a89f03676887069e8564fa3a75ff28b78df3b64653e6d50",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_START/sources[0]"
+  },
+  {
+   "dest": "sources/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 1785791,
+   "sha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/return_to_idle_v1/DOG1_RETURN_TO_IDLE_v1_kling_source.mp4"
+   },
+   "expectedSha256": "f720b349a47a7ee440b3aaff59633737a58a8f56c82c7be0a40829a6555428cb",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RETURN_TO_IDLE/source"
+  },
+  {
+   "dest": "sources/DOG1_ROLL_v1_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 2735463,
+   "sha256": "0ee54757d69b303095d1d074d82cd43c3dc558bcf83576963a0d39d7afe5e97c",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/roll_v1/DOG1_ROLL_v1_kling_source.mp4"
+   },
+   "expectedSha256": "0ee54757d69b303095d1d074d82cd43c3dc558bcf83576963a0d39d7afe5e97c",
+   "shaMatchesApproved": true,
+   "note": "approved_set/ROLL/source"
+  },
+  {
+   "dest": "sources/DOG1_SNIFF_PEE_V3_2_EVENT.mp4",
+   "role": "kling_source",
+   "bytes": 3432947,
+   "sha256": "c6640fb265510823a095b0e40a8dd4b03a10ee77541b1f3cb7bff6101439a0ad",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/sniff_pee_v3_2_assembly/DOG1_SNIFF_PEE_V3_2_EVENT.mp4"
+   },
+   "expectedSha256": "c6640fb265510823a095b0e40a8dd4b03a10ee77541b1f3cb7bff6101439a0ad",
+   "shaMatchesApproved": true,
+   "note": "approved_set/SNIFF_PEE/source"
+  },
+  {
+   "dest": "sources/DOG1_STOP_v4_kling_source.mp4",
+   "role": "kling_source",
+   "bytes": 1829638,
+   "sha256": "652dfc18d32e2fd1daff8a69ac57ab23b8b6766ca89a22eddb54b6ba90e0e395",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/stop_v4/DOG1_STOP_v4_kling_source.mp4"
+   },
+   "expectedSha256": "652dfc18d32e2fd1daff8a69ac57ab23b8b6766ca89a22eddb54b6ba90e0e395",
+   "shaMatchesApproved": true,
+   "note": "approved_set/STOP/source"
+  },
+  {
+   "dest": "sources/bulldog_01_idle.mp4",
+   "role": "kling_source",
+   "bytes": 2031122,
+   "sha256": "2311906d92b62357e77f3c662e28976c85a98d9f53b2afec7bf3bf9f86761e1f",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/assets/sources/bulldog_01_idle.mp4"
+   },
+   "expectedSha256": "2311906d92b62357e77f3c662e28976c85a98d9f53b2afec7bf3bf9f86761e1f",
+   "shaMatchesApproved": true,
+   "note": "approved_set/IDLE/source"
+  },
+  {
+   "dest": "sources/bulldog_01_selected.mp4",
+   "role": "kling_source",
+   "bytes": 2232871,
+   "sha256": "ffd5c25a71c8bf6cf825f43407aed282873c417f9662eefbff8032127a2998d4",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/assets/sources/bulldog_01_selected.mp4"
+   },
+   "expectedSha256": "ffd5c25a71c8bf6cf825f43407aed282873c417f9662eefbff8032127a2998d4",
+   "shaMatchesApproved": true,
+   "note": "approved_set/SELECTED/source"
+  },
+  {
+   "dest": "stills/DOG1_FRONT_STAND_alpha_frame0.png",
+   "role": "still",
+   "bytes": 496169,
+   "sha256": "37f9b2b95d60d66af02eab6b7f5e4c22bf75cf0da8136a360449ce8b910e8e83",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/assets/approved/DOG1_FRONT_STAND_alpha_frame0.png"
+   },
+   "expectedSha256": "37f9b2b95d60d66af02eab6b7f5e4c22bf75cf0da8136a360449ce8b910e8e83",
+   "shaMatchesApproved": true,
+   "note": "approved_set/FRONT_STAND"
+  },
+  {
+   "dest": "stills/DOG1_RACE_STAND_v3_2720x1536.png",
+   "role": "still",
+   "bytes": 3967500,
+   "sha256": "83214715a108c7c216a567e88a825dcc6a010a509ff440ffae7e6a024ccee07a",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/assets/approved/DOG1_RACE_STAND_v3_2720x1536.png"
+   },
+   "expectedSha256": "83214715a108c7c216a567e88a825dcc6a010a509ff440ffae7e6a024ccee07a",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_STAND/master"
+  },
+  {
+   "dest": "stills/KLING_FIRST_AND_LAST_RACE_STAND_v3_1276.png",
+   "role": "still",
+   "bytes": 869064,
+   "sha256": "5d873c41408e8d221661242d5fdb11bbd100691cf9d7e8dde09acb56d257c0a6",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog1-frenk/roll_prep/KLING_FIRST_AND_LAST_RACE_STAND_v3_1276.png"
+   },
+   "expectedSha256": "5d873c41408e8d221661242d5fdb11bbd100691cf9d7e8dde09acb56d257c0a6",
+   "shaMatchesApproved": true,
+   "note": "approved_set/RACE_STAND/source"
+  }
+ ],
+ "unresolved": []
+}
