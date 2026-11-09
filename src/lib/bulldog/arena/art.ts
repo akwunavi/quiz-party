@@ -8,6 +8,7 @@ export const PAL = {                         // «B+C»: спортивная я
   iceFar: '#b9a6e6', iceNear: '#4c4aa6', snowLit: '#f7ecff', snowShade: '#8d86cf', warm: '#ffc27a', warmDeep: '#ff8f4a',
 }
 export const HZ = 468                        // линия горизонта (низ гор, начало озера)
+export const FENCE_H = 340                  // высота холста ограждения: фонарь с колпаком и свечением целиком внутри (раньше 150 px резало колпак и свечение по прямой линии)
 export const BERM_Y = 566                    // дальний снежный борт: верхняя кромка трассы
 export const rng = (seed: number) => { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 } }
 export const cv = (w: number, h: number) => { const c = document.createElement('canvas'); c.width = Math.ceil(w); c.height = Math.ceil(h); return c }
@@ -82,7 +83,7 @@ export function buildLake(sky: HTMLCanvasElement, mtnFar: HTMLCanvasElement, mtn
   x.globalAlpha = 0.55; x.drawImage(t, 0, 0); x.globalAlpha = 1
   x.fillStyle = lin(x, 0, 0, 0, H, [[0, 'rgba(255,190,150,.0)'], [0.4, 'rgba(60,40,120,.0)'], [1, 'rgba(25,22,80,.55)']]); x.fillRect(0, 0, W, H)
   x.globalCompositeOperation = 'lighter'; for (let i = 0; i < W / 14; i++) { const py = r() * H * r(), px = r() * W, w = 20 + r() * 90 * (0.3 + py / H); x.fillStyle = `rgba(255,${200 + r() * 40 | 0},${200 + r() * 40 | 0},${0.05 + r() * 0.14})`; x.fillRect(px, py, w, 1) }
-  x.globalCompositeOperation = 'source-over'; return c
+  x.globalCompositeOperation = 'destination-in'; x.fillStyle = lin(x, 0, 0, 0, H, [[0, 'rgba(0,0,0,0)'], [0.16, 'rgba(0,0,0,1)'], [1, 'rgba(0,0,0,1)']]); x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'source-over'; return c
 }
 
 // ── ледяная трасса (мировые координаты, параллакс 1): отражение огней, царапины, трещины, снежные гребни между дорожками, дальний и ближний борт
@@ -90,7 +91,7 @@ export interface TrackArt { canvas: HTMLCanvasElement; lanternsX: number[]; y0: 
 export function buildTrack(): TrackArt {
   const WW = ARENA.START_X + ARENA.TRACK_LEN + 1700, y0 = BERM_Y - 20, H = ARENA.H - y0, c = cv(WW, H), x = c.getContext('2d')!, r = rng(77), Y = (y: number) => y - y0
   // базовый лёд: ближе к горизонту отражает закат, ближе к камере — глубокий индиго
-  x.fillStyle = lin(x, 0, Y(BERM_Y), 0, H, [[0, '#cfa9dd'], [0.08, '#a98ad6'], [0.3, '#7f74c7'], [0.7, '#5a56b3'], [1, '#413f95']]); x.fillRect(0, 0, WW, H)
+  x.fillStyle = lin(x, 0, Y(BERM_Y), 0, H, [[0, '#cfa9dd'], [0.08, '#a98ad6'], [0.3, '#8478cb'], [0.7, '#6862bd'], [1, '#5d58b6']]); x.fillRect(0, 0, WW, H)
   // фонари (мировые X) — теплый свет ложится на лёд длинными вертикальными бликами
   const lanternsX: number[] = []; for (let wx = 260; wx < WW; wx += 520) lanternsX.push(wx)
   x.globalCompositeOperation = 'lighter'
@@ -113,19 +114,26 @@ export function buildTrack(): TrackArt {
     x.fillStyle = 'rgba(255,255,255,.55)'; for (let i = 0; i < WW / 9; i++) x.fillRect(r() * WW, Y(by) - 3.5 - r() * 1.5, 2 + r() * 3, 1)
   }
   // дальний борт (снежный вал) с мягкой верхней кромкой и тенью на льду; ближний край — низкий вал без громоздкости
-  const berm = (yy: number, hh: number, top: boolean) => { for (let px = 0; px < WW; px += 4) { const h = hh + Math.sin(px * 0.013) * hh * 0.25 + Math.sin(px * 0.047 + 2) * hh * 0.12 + r() * 2; const a = x.createLinearGradient(0, Y(yy) - h, 0, Y(yy) + 6); a.addColorStop(0, '#fdf4ff'); a.addColorStop(0.45, '#cdbcf0'); a.addColorStop(1, '#8a7fd0'); x.fillStyle = a; x.fillRect(px, Y(yy) - h, 4.2, h + 6) } x.fillStyle = lin(x, 0, Y(yy) + 6, 0, Y(yy) + 40, [[0, top ? 'rgba(30,24,100,.5)' : 'rgba(30,24,100,.0)'], [1, 'rgba(30,24,100,0)']]); x.fillRect(0, Y(yy) + 6, WW, 34) }
+  const berm = (yy: number, hh: number, top: boolean) => {
+    const pts: number[] = []; for (let px = 0; px <= WW; px += 8) pts.push(Y(yy) - (hh + Math.sin(px * 0.013) * hh * 0.25 + Math.sin(px * 0.047 + 2) * hh * 0.12 + Math.sin(px * 0.19) * 1.2 + r() * 1.6))
+    x.beginPath(); x.moveTo(0, Y(yy) + 6); x.lineTo(0, pts[0]); for (let i = 1; i < pts.length; i++) { const mx = (i * 8 - 4), my = (pts[i - 1] + pts[i]) / 2; x.quadraticCurveTo((i - 1) * 8, pts[i - 1], mx, my) } x.lineTo(WW, pts[pts.length - 1]); x.lineTo(WW, Y(yy) + 6); x.closePath()
+    const a = x.createLinearGradient(0, Y(yy) - hh - 8, 0, Y(yy) + 6); a.addColorStop(0, '#fdf4ff'); a.addColorStop(0.45, '#cdbcf0'); a.addColorStop(1, '#8a7fd0'); x.fillStyle = a; x.fill()
+    x.fillStyle = lin(x, 0, Y(yy) + 6, 0, Y(yy) + 40, [[0, top ? 'rgba(30,24,100,.5)' : 'rgba(30,24,100,.0)'], [1, 'rgba(30,24,100,0)']]); x.fillRect(0, Y(yy) + 6, WW, 34)
+  }
   berm(BERM_Y + 4, 20, true)
-  const fy = ARENA.H + 6; for (let px = 0; px < WW; px += 4) { const h = 20 + Math.sin(px * 0.017) * 6 + r() * 3, a = x.createLinearGradient(0, Y(fy) - h, 0, Y(fy)); a.addColorStop(0, 'rgba(245,235,255,.0)'); a.addColorStop(0.35, 'rgba(235,225,255,.9)'); a.addColorStop(1, '#ffffff'); x.fillStyle = a; x.fillRect(px, Y(fy) - h, 4.2, h + 2) }
+  { const fy = ARENA.H + 6, pts: number[] = []; for (let px = 0; px <= WW; px += 8) pts.push(Y(fy) - (11 + Math.sin(px * 0.017) * 3 + Math.sin(px * 0.21) * 1 + r() * 1.5))
+    x.beginPath(); x.moveTo(0, Y(fy) + 2); x.lineTo(0, pts[0]); for (let i = 1; i < pts.length; i++) x.quadraticCurveTo((i - 1) * 8, pts[i - 1], i * 8 - 4, (pts[i - 1] + pts[i]) / 2); x.lineTo(WW, pts[pts.length - 1]); x.lineTo(WW, Y(fy) + 2); x.closePath()
+    const a = x.createLinearGradient(0, Y(fy) - 16, 0, Y(fy)); a.addColorStop(0, 'rgba(245,235,255,0)'); a.addColorStop(0.35, 'rgba(235,225,255,.9)'); a.addColorStop(1, '#ffffff'); x.fillStyle = a; x.fill() }
   return { canvas: c, lanternsX, y0 }
 }
 
 // ── ограждение дальнего борта: деревянные столбы, перила, гирлянда с лампочками, фонари (вторичный декор; без зрителей и построек)
 export function buildFence(lanternsX: number[]): HTMLCanvasElement {
-  const WW = ARENA.START_X + ARENA.TRACK_LEN + 1700, H = 150, c = cv(WW, H), x = c.getContext('2d')!, r = rng(91), base = H - 4
+  const WW = ARENA.START_X + ARENA.TRACK_LEN + 1700, H = FENCE_H, c = cv(WW, H), x = c.getContext('2d')!, r = rng(91), base = H - 4
   const wood = (px: number, py: number, w: number, h: number) => { const g = x.createLinearGradient(px, 0, px + w, 0); g.addColorStop(0, '#9a6a45'); g.addColorStop(0.5, '#6b4430'); g.addColorStop(1, '#3d2622'); x.fillStyle = g; x.fillRect(px, py, w, h); x.fillStyle = 'rgba(0,0,0,.18)'; for (let k = 0; k < h / 7; k++) x.fillRect(px + r() * w, py + k * 7, 1, 3 + r() * 5) }
   const posts: number[] = []; for (let px = 40; px < WW; px += 170) posts.push(px)
   x.fillStyle = 'rgba(30,20,90,.32)'; x.fillRect(0, base - 3, WW, 6)
-  for (const ry of [base - 44, base - 78]) { wood(0, ry, WW, 7); x.fillStyle = 'rgba(255,240,255,.85)'; for (let px = 0; px < WW; px += 3) x.fillRect(px, ry - 2 - r() * 3 - (ry === base - 78 ? 2 : 0), 3.2, 3 + r() * 3) }
+  for (const ry of [base - 44, base - 78]) { wood(0, ry, WW, 7); x.fillStyle = 'rgba(255,242,255,.92)'; for (let px = 0; px < WW; px += 5) { x.beginPath(); x.ellipse(px + r() * 3, ry - 0.5 - r() * 1.5, 4.5 + r() * 3, 2.2 + r() * 1.8, 0, 0, 7); x.fill() } }
   for (const px of posts) { wood(px - 5, base - 92, 10, 90); x.fillStyle = '#fff4ff'; x.beginPath(); x.ellipse(px, base - 92, 8, 4.5, 0, 0, 7); x.fill() }
   // гирлянда: хвойная лента с красной ягодой и тёплыми лампочками между столбами
   for (let i = 0; i < posts.length - 1; i++) { const a = posts[i], b = posts[i + 1], my = base - 74 + 16; x.strokeStyle = '#1d4a3d'; x.lineWidth = 6; x.lineCap = 'round'; x.beginPath(); x.moveTo(a, base - 80); x.quadraticCurveTo((a + b) / 2, my + 14, b, base - 80); x.stroke(); x.strokeStyle = '#2f7a56'; x.lineWidth = 2.4; x.stroke()
@@ -134,6 +142,7 @@ export function buildFence(lanternsX: number[]): HTMLCanvasElement {
   x.globalCompositeOperation = 'source-over'
   // фонари: высокий столб, рамка, тёплое стекло, свечение
   for (const lx of lanternsX) { const px = lx; wood(px - 4, base - 128, 8, 126); x.fillStyle = '#2a1e2e'; x.fillRect(px - 11, base - 150, 22, 6); const g = x.createLinearGradient(0, base - 144, 0, base - 116); g.addColorStop(0, '#fff0c0'); g.addColorStop(1, '#ff9a4a'); x.fillStyle = g; x.beginPath(); x.roundRect(px - 8, base - 144, 16, 28, 3); x.fill(); x.strokeStyle = '#2a1e2e'; x.lineWidth = 2; x.stroke(); x.fillStyle = '#2a1e2e'; x.beginPath(); x.moveTo(px - 12, base - 144); x.lineTo(px, base - 154); x.lineTo(px + 12, base - 144); x.closePath(); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.ellipse(px, base - 155, 9, 3.5, 0, 0, 7); x.fill() }
-  x.globalCompositeOperation = 'lighter'; for (const lx of lanternsX) { glow(x, lx, base - 130, 120, 'rgb(255,170,100)', 0.5); glow(x, lx, base - 130, 38, 'rgb(255,225,170)', 0.9) }
-  x.globalCompositeOperation = 'source-over'; return c
+  x.globalCompositeOperation = 'lighter'; for (const lx of lanternsX) { glow(x, lx, base - 130, 46, 'rgb(255,225,170)', 0.85) }                      // только тугое ядро; широкий ореол рисуется на лету (drawLanternBloom) без обрезки
+  x.globalCompositeOperation = 'source-over'
+  const o = cv(WW, H), ox = o.getContext('2d')!; ox.filter = 'blur(0.55px)'; ox.drawImage(c, 0, 0); return o
 }

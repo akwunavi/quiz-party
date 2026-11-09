@@ -1,7 +1,7 @@
 // Арена: камера, раскладка дорожек и слоты авторской графики — без холста (чистая математика). Гонка — Race V3 того же движка (seed 328, D=42).
 import { describe, expect, it } from 'vitest'
 import { ARENA, buildCameraTrack, worldX } from '../camera'
-import { SLOTS, slotPlacements } from '../slots'
+import { SLOTS, slotPlacements, moduleOf } from '../slots'
 import { BERM_Y } from '../art'
 import { raceFor, stateAt } from '../../engine'
 
@@ -47,10 +47,14 @@ describe('дорожки', () => {
 
 describe('слоты авторской графики', () => {
   it('раскладка по параллаксу: при камере 0 слой начинается с 0; сдвиг = камера × параллакс; кадр закрыт целиком', () => {
-    const s = SLOTS[1]
+    const s = SLOTS.find(x => x.id === 'village_mid')!
     expect(slotPlacements(s, 0)[0].x).toBe(0)
     expect(slotPlacements(s, 1000)[0].x).toBeCloseTo(-1000 * s.parallax + Math.floor(1000 * s.parallax / s.tileW) * s.tileW, 6)
     for (const cx of [0, 777, 3210]) { const p = slotPlacements(s, cx); expect(p[0].x).toBeLessThanOrEqual(0); expect(p[p.length - 1].x + s.tileW).toBeGreaterThanOrEqual(ARENA.W) }
+  })
+  it('модули идут без одинакового подряд и используют все варианты', () => {
+    for (const m of [2, 3, 4, 6]) { const seq = Array.from({ length: 200 }, (_, i) => moduleOf(i, m)); for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1]); expect(new Set(seq).size).toBe(m) }
+    expect(moduleOf(5, 1)).toBe(0)
   })
   it('нижние кромки слоёв не заходят на трассу, у всех есть описание для художника', () => {
     for (const s of SLOTS) { expect(s.bottomY).toBeLessThanOrEqual(BERM_Y + 2); expect(s.note.length).toBeGreaterThan(20); expect(s.file).toMatch(/\.webp$/) }

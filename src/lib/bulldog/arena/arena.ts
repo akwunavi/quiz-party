@@ -1,7 +1,7 @@
 // Рендер арены: бесшовная трасса в мировых координатах, сопровождающая камера, слои параллакса, настоящие собаки Race V3, свет и частицы.
 // Дорожки, скорость и тайминги — из Race V3 без изменений; здесь только «картинка» (прогресс → мировые пиксели, см. camera.ts).
 import { ARENA, buildCameraTrack, worldX } from './camera'
-import { HZ, BERM_Y, STARS, buildSky, buildMountains, buildFarShore, buildLake, buildTrack, buildFence, rng, cv, type TrackArt } from './art'
+import { HZ, BERM_Y, FENCE_H, STARS, buildSky, buildMountains, buildFarShore, buildLake, buildTrack, buildFence, rng, cv, type TrackArt } from './art'
 import { SLOTS, loadSlots, slotPlacements, type LoadedSlot, type SlotSpec } from './slots'
 import { LAYOUT as L, DOG_IDS } from '../config'
 import { raceFor, stateAt, loadDogData, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from '../engine'
@@ -56,7 +56,7 @@ export class ArenaRenderer {
     this.drawLakeGlints(T, X)
     // авторские слои деревни/леса/трибун — только если файлы есть
     for (const s of this.slots) if (s.spec.parallax < 0.85) this.drawSlot(s, X, T)
-    c.drawImage(A.fence, -X, BERM_Y - 146 + 2 + sw(0.9))
+    c.drawImage(A.fence, -X, BERM_Y + 2 - FENCE_H + sw(0.9))
     for (const s of this.slots) if (s.spec.parallax >= 0.85) this.drawSlot(s, X, T)
     c.drawImage(A.track.canvas, -X, A.track.y0)
     this.drawIceSparkle(T, X)
@@ -81,7 +81,8 @@ export class ArenaRenderer {
   private drawLakeGlints(T: number, X: number) { const c = this.ctx, r = rng(3); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 70; i++) { const wx = r() * 3600, y = HZ + 6 + r() * (BERM_Y - HZ - 40), a = 0.25 * Math.abs(Math.sin(T * (0.8 + r()) + r() * 6)), x = ((wx - X * 0.2) % (ARENA.W + 200) + ARENA.W + 200) % (ARENA.W + 200) - 100; c.fillStyle = `rgba(255,220,230,${a})`; c.fillRect(x, y, 10 + r() * 24, 1) } c.restore() }
   private drawIceSparkle(T: number, X: number) { const c = this.ctx, r = rng(8); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 90; i++) { const wx = r() * 3000, y = BERM_Y + 30 + r() * (ARENA.H - BERM_Y - 60), ph = r() * 9, a = Math.pow(Math.max(0, Math.sin(T * (1.2 + r() * 2) + ph)), 12), x = ((wx - X) % 3000 + 3000) % 3000 - 500; if (x < -20 || x > ARENA.W + 20) continue; c.fillStyle = `rgba(255,255,255,${a * 0.9})`; c.fillRect(x - 3, y, 7, 1); c.fillRect(x, y - 3, 1, 7) } c.restore() }
   private drawSlot(s: LoadedSlot, X: number, T: number) {
-    const c = this.ctx, sp = s.spec, pl = slotPlacements(sp, X); for (const p of pl) { const idx = sp.mode === 'sequence' ? p.index % Math.max(1, Math.round(s.img.width / sp.tileW)) : 0; c.drawImage(s.img, idx * sp.tileW * (s.img.width / (sp.tileW * Math.max(1, Math.round(s.img.width / sp.tileW)))), 0, sp.tileW * (s.img.width / (sp.tileW * Math.max(1, Math.round(s.img.width / sp.tileW)))), s.img.height, p.x, sp.bottomY - sp.tileH, sp.tileW, sp.tileH) }
+    const c = this.ctx, sp = s.spec, mw = s.img.width / sp.modules
+    for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, s.img.height, p.x, sp.bottomY - sp.tileH, sp.tileW, sp.tileH)
     void T
   }
   private noseOf(id: string, d: DogData, v: { sheet: string | null; index: number | null }, bm: ImageBitmap) {
@@ -152,7 +153,7 @@ export class ArenaRenderer {
   }
   private drawLanternBloom(T: number, X: number) {
     const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'
-    for (const lx of this.art.track.lanternsX) { const x = lx - X; if (x < -200 || x > ARENA.W + 200) continue; const f = 0.88 + 0.12 * Math.sin(T * 7 + lx * 0.13); const g = c.createRadialGradient(x, BERM_Y - 144 + 14, 0, x, BERM_Y - 130, 170); g.addColorStop(0, `rgba(255,190,120,${0.16 * f})`); g.addColorStop(1, 'rgba(255,170,100,0)'); c.fillStyle = g; c.fillRect(x - 170, BERM_Y - 300, 340, 340) }
+    for (const lx of this.art.track.lanternsX) { const x = lx - X; if (x < -200 || x > ARENA.W + 200) continue; const f = 0.88 + 0.12 * Math.sin(T * 7 + lx * 0.13); const cy = BERM_Y - 130, g = c.createRadialGradient(x, cy, 0, x, cy, 190); g.addColorStop(0, `rgba(255,190,120,${0.30 * f})`); g.addColorStop(0.35, `rgba(255,170,100,${0.12 * f})`); g.addColorStop(1, 'rgba(255,170,100,0)'); c.fillStyle = g; c.fillRect(x - 190, cy - 190, 380, 380) }
     c.restore()
   }
   private drawSnow(T: number, X: number) {
@@ -166,8 +167,8 @@ export class ArenaRenderer {
   }
   private drawGrade() {
     const c = this.ctx; c.save()
-    const v = c.createRadialGradient(ARENA.W / 2, ARENA.H * 0.55, ARENA.H * 0.45, ARENA.W / 2, ARENA.H * 0.55, ARENA.W * 0.72); v.addColorStop(0, 'rgba(20,10,70,0)'); v.addColorStop(1, 'rgba(20,10,70,.42)'); c.fillStyle = v; c.fillRect(0, 0, ARENA.W, ARENA.H)
-    c.globalCompositeOperation = 'soft-light'; c.fillStyle = lin(c, 0, 0, 0, ARENA.H, [[0, 'rgba(120,90,255,.18)'], [0.5, 'rgba(255,160,160,.10)'], [1, 'rgba(60,50,170,.22)']]); c.fillRect(0, 0, ARENA.W, ARENA.H)
+    const v = c.createRadialGradient(ARENA.W / 2, ARENA.H * 0.68, ARENA.H * 0.5, ARENA.W / 2, ARENA.H * 0.68, ARENA.W * 0.74); v.addColorStop(0, 'rgba(20,10,70,0)'); v.addColorStop(1, 'rgba(20,10,70,.34)'); c.fillStyle = v; c.fillRect(0, 0, ARENA.W, ARENA.H)
+    c.globalCompositeOperation = 'soft-light'; c.fillStyle = lin(c, 0, 0, 0, ARENA.H, [[0, 'rgba(120,90,255,.18)'], [0.5, 'rgba(255,160,160,.10)'], [1, 'rgba(120,110,230,.06)']]); c.fillRect(0, 0, ARENA.W, ARENA.H)
     c.restore()
   }
   private drawHud(T: number) {
