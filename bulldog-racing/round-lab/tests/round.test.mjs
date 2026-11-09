@@ -10,6 +10,7 @@ const J = p => JSON.parse(readFileSync(p, 'utf8'));
 const readText = async p => readFileSync(path.join(REPO, p), 'utf8');
 const SRC = p => path.join(REPO, 'bulldog-racing/round-lab/src', p);
 const { loadRaceV3 } = await import(SRC('raceV3.mjs'));
+const { loadRaceV3 : loadSubstituted } = await import(path.join(REPO, 'bulldog-racing/round-lab/tests/oracle_substitution.mjs'));
 const { createBetting, distribute, scoreBets, podium } = await import(SRC('rules.mjs'));
 const { createSelectionPlayer, dogRule } = await import(SRC('selection.mjs'));
 const { ButterflyManager } = await import(SRC('butterfly.mjs'));
@@ -87,7 +88,7 @@ test('выбор: SELECTED проигрывается целиком и в по�
 // ------------------------------------------------------------------ Race V3: длительность, воспроизводимость
 test('Race V3: длительность D от 20 до 240 с, воспроизводимость по seed, выбор собак исход не меняет', async () => {
   for (const D of [20, 30, 42, 90, 180, 240]) {
-    const V = await loadRaceV3(readText, D); let lastEnd = 0;
+    const V = await loadRaceV3(D); let lastEnd = 0;
     for (let s = 1; s <= 120; s++) {
       const seed = s * 7919 + 13, a = V.resolveRace(seed), b = V.resolveRace(seed);
       assert.equal(sig(a), sig(b), `D=${D} seed=${seed} не воспроизводится`);
@@ -97,7 +98,7 @@ test('Race V3: длительность D от 20 до 240 с, воспроиз�
     }
     assert.ok(lastEnd / 120 > D, 'средняя длительность растёт с D');
   }
-  const V = await loadRaceV3(readText, 60);
+  const V = await loadRaceV3(60);
   const mk = () => createGame({ V3: V, selectionData: selData, teamCount: 6, seed: 4242 }), g1 = mk(), g2 = mk();
   for (let t = 1; t <= 6; t++) g2.choose(t, 1 + (t % 5));
   g1.finishSelection(); g2.finishSelection();
@@ -105,7 +106,7 @@ test('Race V3: длительность D от 20 до 240 с, воспроиз�
   assert.equal(sig(g1.race), sig(g2.race), 'ставки не влияют на гонку');
 });
 test('длительность задаётся ведущим: больше D → дольше гонка; без искусственного потолка 40 с', async () => {
-  const ends = {}; for (const D of [30, 60, 120, 240]) { const V = await loadRaceV3(readText, D); ends[D] = V.resolveRace(777).end; }
+  const ends = {}; for (const D of [30, 60, 120, 240]) { const V = await loadRaceV3(D); ends[D] = V.resolveRace(777).end; }
   assert.ok(ends[30] < ends[60] && ends[60] < ends[120] && ends[120] < ends[240], JSON.stringify(ends)); assert.ok(ends[240] > 200);
 });
 
@@ -114,7 +115,7 @@ test('фазы RUN → STOP → действие → START → RUN, кадры �
   const V = visuals(), atlas = Object.fromEntries(IDS.map(id => [id, J(LIBD + id + '/atlas/atlas.json')]));
   const stats = {};
   for (const D of [20, 42, 90, 180]) {
-    const V3 = await loadRaceV3(readText, D);
+    const V3 = await loadRaceV3(D);
     for (let s = 1; s <= 60; s++) {
       const race = V3.resolveRace(s * 7919 + 13);
       race.dogs.forEach((dog, i) => {
@@ -142,7 +143,7 @@ test('фазы RUN → STOP → действие → START → RUN, кадры �
   for (const [id, j] of Object.entries(stats)) assert.ok(j < 30, `${id}: максимальный скачок сдвига спрайта ${j.toFixed(1)} px за кадр`);
 });
 test('старт: каждая собака стоит в RACE_STAND (окно BASE), а не в случайной фазе RUN', async () => {
-  const V = visuals(), V3 = await loadRaceV3(readText, 42), race = V3.resolveRace(4242);
+  const V = visuals(), V3 = await loadRaceV3(42), race = V3.resolveRace(4242);
   race.dogs.forEach((dog, i) => { const x = V[IDS[i]].at(dog.segments, 0); assert.equal(x.window, 'BASE'); assert.equal(x.role, 'hold');
     const c = x.clip; assert.ok(['RACE_STAND', 'BASE'].includes(c), IDS[i] + ' ' + c); });
 });
@@ -150,7 +151,7 @@ test('старт: каждая собака стоит в RACE_STAND (окно B
 // ------------------------------------------------------------------ бабочка
 test('бабочка: один объект на каждое событие BUTTERFLY, создаётся и исчезает вместе с телом клипа, без событий — нет', async () => {
   const V = visuals(); let events = 0;
-  for (const D of [30, 60]) { const V3 = await loadRaceV3(readText, D);
+  for (const D of [30, 60]) { const V3 = await loadRaceV3(D);
     for (let s = 1; s <= 80; s++) { const race = V3.resolveRace(s * 31 + 5);
       race.dogs.forEach((dog, i) => { const id = IDS[i], bf = new ButterflyManager(), c = V[id].contract.clips.BUTTERFLY, n = c.sampler === 'table' ? c.labels.length : c.count;
         const expected = dog.segments.filter(x => x.kind === 'BUTTERFLY').length; events += expected; let seen = 0, maxAlive = 0;
@@ -164,7 +165,7 @@ test('бабочка: один объект на каждое событие BUT
 // ------------------------------------------------------------------ полный сценарий
 test('сценарий: выбор → завершение → переход → отсчёт → гонка → финиш → пьедестал; места из Race V3; одинаковый seed — одинаковый результат', async () => {
   const run = async (seed, D, teams) => {
-    const V3 = await loadRaceV3(readText, D), g = createGame({ V3, selectionData: selData, teamCount: teams, seed, D });
+    const V3 = await loadRaceV3(D), g = createGame({ V3, selectionData: selData, teamCount: teams, seed, D });
     for (const [t, d] of distribute(teams, 'even')) g.choose(t, d);
     for (let i = 0; i < 24 * 8; i++) g.update(1 / 24);                          // собаки реагируют на выбор
     assert.ok(g.finishSelection()); assert.equal(g.betting.state, 'locked'); assert.throws(() => g.choose(1, 2));
@@ -183,10 +184,26 @@ test('сценарий: выбор → завершение → переход �
 });
 test('сценарий: все собаки выбраны одной командой/никем — сценарий не ломается', async () => {
   for (const mode of ['all-one', 'none', 'skewed']) {
-    const V3 = await loadRaceV3(readText, 30), g = createGame({ V3, selectionData: selData, teamCount: 9, seed: 99 });
+    const V3 = await loadRaceV3(30), g = createGame({ V3, selectionData: selData, teamCount: 9, seed: 99 });
     for (const [t, d] of distribute(9, mode)) g.choose(t, d);
     g.finishSelection(); let n = 0; while (g.phase !== 'podium' && n++ < 100000) g.update(1 / 6);
     assert.equal(g.phase, 'podium', mode);
     if (mode === 'none') assert.ok(g.results.scores.every(s => s.points === 0));
   }
+});
+
+// ------------------------------------------------------------------ параметр D без подмены текста
+test('D как параметр: результат побитно равен прежней подмене константы (оракул) и не зависит от порядка вызовов', async () => {
+  for (const D of [20, 30, 42, 60, 120, 240]) {
+    const P = await loadRaceV3(D), O = await loadSubstituted(readText, D);
+    for (let s = 1; s <= 100; s++) { const seed = s * 7919 + 13; assert.equal(sig(P.resolveRace(seed)), sig(O.resolveRace(seed)), `D=${D} seed=${seed}`); }
+  }
+  const A = await loadRaceV3(30), B = await loadRaceV3(90);
+  const a1 = sig(A.resolveRace(5)), b1 = sig(B.resolveRace(5)), a2 = sig(A.resolveRace(5)), b2 = sig(B.resolveRace(5));
+  assert.equal(a1, a2); assert.equal(b1, b2); assert.notEqual(a1, b1);
+});
+test('D по умолчанию: оригинальный resolveRace без опций (как в старых тестах) не изменился', async () => {
+  const M = await import(path.join(REPO, 'dog4-v3-lab/scenario.mjs')), P = await loadRaceV3(42);
+  for (let s = 1; s <= 100; s++) assert.equal(sig(M.resolveRace(s * 31)), sig(P.resolveRace(s * 31)));
+  const mod = await import(path.join(REPO, 'dog4-v3-lab/model.mjs')); assert.throws(() => mod.buildDog('A', 0, { courseSeconds: 5 }), RangeError);
 });

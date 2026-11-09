@@ -1,0 +1,86 @@
+[
+ {
+  "label": "0 пустая страница",
+  "browserRssMB": 342,
+  "jsHeapMB": 1
+ },
+ {
+  "label": "атласы",
+  "imagesLoaded": 45,
+  "raceSheetsDecodedMB": 258,
+  "selectionSheetsDecodedMB": 459,
+  "frames": 1657
+ },
+ {
+  "label": "1 экран выбора загружен, 5 IDLE играют",
+  "browserRssMB": 793,
+  "jsHeapMB": 3,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ },
+ {
+  "label": "2 все пять реагируют (SELECTED/RETURN)",
+  "browserRssMB": 1020,
+  "jsHeapMB": 2,
+  "fps": 57.3,
+  "p95ms": 17,
+  "maxMs": 83
+ },
+ {
+  "label": "3 переход к старту",
+  "browserRssMB": 1106,
+  "jsHeapMB": 3,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ },
+ {
+  "label": "4 гонка (D=60, ×1), середина",
+  "browserRssMB": 1114,
+  "jsHeapMB": 2,
+  "fps": 59,
+  "p95ms": 17,
+  "maxMs": 50
+ },
+ {
+  "label": "5.1 длинная гонка D=240 ×8, +8 с (t=64)",
+  "browserRssMB": 1143,
+  "jsHeapMB": 6,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ },
+ {
+  "label": "5.2 длинная гонка D=240 ×8, +16 с (t=157)",
+  "browserRssMB": 1108,
+  "jsHeapMB": 3,
+  "fps": 59.7,
+  "p95ms": 17,
+  "maxMs": 33
+ },
+ {
+  "label": "5.3 длинная гонка D=240 ×8, +24 с (t=250)",
+  "browserRssMB": 1132,
+  "jsHeapMB": 3,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ },
+ {
+  "label": "6 пьедестал",
+  "browserRssMB": 1126,
+  "jsHeapMB": 3,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ },
+ {
+  "label": "7 после трёх полных перезапусков раунда",
+  "browserRssMB": 1134,
+  "jsHeapMB": 3,
+  "fps": 60,
+  "p95ms": 17,
+  "maxMs": 17
+ }
+]

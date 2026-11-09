@@ -1,0 +1,1507 @@
+{
+ "frenk": {
+  "maxWaitFrames": 106,
+  "pairs": 470,
+  "baselineIdleMinIoU": 0.944,
+  "flagged": [
+   {
+    "from": [
+     "sel",
+     58
+    ],
+    "to": [
+     "sel",
+     59
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.872,
+    "dCx": -1.46,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     59
+    ],
+    "to": [
+     "sel",
+     60
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.827,
+    "dCx": -1.37,
+    "dBottom": -6,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     60
+    ],
+    "to": [
+     "sel",
+     61
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.843,
+    "dCx": -0.5,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     61
+    ],
+    "to": [
+     "sel",
+     62
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.841,
+    "dCx": 0.04,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     62
+    ],
+    "to": [
+     "sel",
+     63
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.846,
+    "dCx": 0.77,
+    "dBottom": -3,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     63
+    ],
+    "to": [
+     "sel",
+     64
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.697,
+    "dCx": 0.69,
+    "dBottom": -6,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     64
+    ],
+    "to": [
+     "sel",
+     65
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.774,
+    "dCx": 1.2,
+    "dBottom": 20,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     65
+    ],
+    "to": [
+     "sel",
+     66
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.858,
+    "dCx": 0.29,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     66
+    ],
+    "to": [
+     "sel",
+     67
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.854,
+    "dCx": -1.49,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     67
+    ],
+    "to": [
+     "sel",
+     68
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.846,
+    "dCx": -3.9,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     68
+    ],
+    "to": [
+     "sel",
+     69
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.824,
+    "dCx": -1.34,
+    "dBottom": -11,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     69
+    ],
+    "to": [
+     "sel",
+     70
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.799,
+    "dCx": 0.8,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     70
+    ],
+    "to": [
+     "sel",
+     71
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.85,
+    "dCx": 1.14,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     71
+    ],
+    "to": [
+     "sel",
+     72
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.864,
+    "dCx": 1.57,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     72
+    ],
+    "to": [
+     "sel",
+     73
+    ],
+    "kinds": "sel>sel",
+    "count": 220,
+    "iou": 0.733,
+    "dCx": 0.7,
+    "dBottom": -4,
+    "edge": false
+   }
+  ],
+  "flaggedCount": 32,
+  "edgeTouchPairs": 0,
+  "joinsWorst": [
+   {
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "exit>sel",
+    "count": 218,
+    "iou": 0.988,
+    "dCx": 0.19,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 2,
+    "iou": 0.988,
+    "dCx": 0.19,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     101
+    ],
+    "to": [
+     "ret",
+     0
+    ],
+    "kinds": "sel>ret",
+    "count": 220,
+    "iou": 0.996,
+    "dCx": 0.01,
+    "dBottom": 1,
+    "edge": false
+   }
+  ],
+  "joinsMinIoU": 0.988,
+  "minIoU": 0.697
+ },
+ "zefir": {
+  "maxWaitFrames": 58,
+  "pairs": 464,
+  "baselineIdleMinIoU": 0.972,
+  "flagged": [
+   {
+    "from": [
+     "sel",
+     59
+    ],
+    "to": [
+     "sel",
+     60
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.893,
+    "dCx": -0.6,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     60
+    ],
+    "to": [
+     "sel",
+     61
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.916,
+    "dCx": -1.81,
+    "dBottom": 1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     62
+    ],
+    "to": [
+     "sel",
+     63
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.861,
+    "dCx": -0.99,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     63
+    ],
+    "to": [
+     "sel",
+     64
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.858,
+    "dCx": 0.78,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     64
+    ],
+    "to": [
+     "sel",
+     65
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.815,
+    "dCx": 1.3,
+    "dBottom": -14,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     65
+    ],
+    "to": [
+     "sel",
+     66
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.801,
+    "dCx": 1.64,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     66
+    ],
+    "to": [
+     "sel",
+     67
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.872,
+    "dCx": 1.35,
+    "dBottom": -6,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     67
+    ],
+    "to": [
+     "sel",
+     68
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.803,
+    "dCx": 0.67,
+    "dBottom": -17,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     68
+    ],
+    "to": [
+     "sel",
+     69
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.73,
+    "dCx": -0.82,
+    "dBottom": 41,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     69
+    ],
+    "to": [
+     "sel",
+     70
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.894,
+    "dCx": 0.73,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     70
+    ],
+    "to": [
+     "sel",
+     71
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.886,
+    "dCx": 1.23,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     71
+    ],
+    "to": [
+     "sel",
+     72
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.901,
+    "dCx": -3.04,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     72
+    ],
+    "to": [
+     "sel",
+     73
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.893,
+    "dCx": -3.69,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     73
+    ],
+    "to": [
+     "sel",
+     74
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.855,
+    "dCx": -1.92,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     74
+    ],
+    "to": [
+     "sel",
+     75
+    ],
+    "kinds": "sel>sel",
+    "count": 131,
+    "iou": 0.849,
+    "dCx": 0.49,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "flaggedCount": 41,
+  "edgeTouchPairs": 23,
+  "joinsWorst": [
+   {
+    "from": [
+     "ret",
+     108
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "kinds": "ret>reent",
+    "count": 131,
+    "iou": 0.997,
+    "dCx": -0.09,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "exit>sel",
+    "count": 131,
+    "iou": 0.998,
+    "dCx": 0.05,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     117
+    ],
+    "to": [
+     "ret",
+     0
+    ],
+    "kinds": "sel>ret",
+    "count": 131,
+    "iou": 0.998,
+    "dCx": -0.01,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "joinsMinIoU": 0.997,
+  "minIoU": 0.73
+ },
+ "rocky": {
+  "maxWaitFrames": 91,
+  "pairs": 607,
+  "baselineIdleMinIoU": 0.981,
+  "flagged": [
+   {
+    "from": [
+     "sel",
+     35
+    ],
+    "to": [
+     "sel",
+     36
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.952,
+    "dCx": 0.44,
+    "dBottom": -5,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     37
+    ],
+    "to": [
+     "sel",
+     38
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.918,
+    "dCx": 0.76,
+    "dBottom": 5,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     38
+    ],
+    "to": [
+     "sel",
+     39
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.916,
+    "dCx": 0.29,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     39
+    ],
+    "to": [
+     "sel",
+     40
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.914,
+    "dCx": 0.11,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     40
+    ],
+    "to": [
+     "sel",
+     41
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.925,
+    "dCx": 0.58,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     79
+    ],
+    "to": [
+     "sel",
+     80
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.916,
+    "dCx": -1.87,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     86
+    ],
+    "to": [
+     "sel",
+     87
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.913,
+    "dCx": -1.53,
+    "dBottom": 3,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     87
+    ],
+    "to": [
+     "sel",
+     88
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.905,
+    "dCx": -2.71,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     88
+    ],
+    "to": [
+     "sel",
+     89
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.909,
+    "dCx": -1.97,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     31
+    ],
+    "to": [
+     "ret",
+     32
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.909,
+    "dCx": 1.97,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     32
+    ],
+    "to": [
+     "ret",
+     33
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.905,
+    "dCx": 2.72,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     33
+    ],
+    "to": [
+     "ret",
+     34
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.913,
+    "dCx": 1.54,
+    "dBottom": -3,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     40
+    ],
+    "to": [
+     "ret",
+     41
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.916,
+    "dCx": 1.87,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     79
+    ],
+    "to": [
+     "ret",
+     80
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.925,
+    "dCx": -0.58,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     80
+    ],
+    "to": [
+     "ret",
+     81
+    ],
+    "kinds": "ret>ret",
+    "count": 240,
+    "iou": 0.914,
+    "dCx": -0.12,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "flaggedCount": 22,
+  "edgeTouchPairs": 4,
+  "joinsWorst": [
+   {
+    "from": [
+     "idle",
+     52
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 2,
+    "iou": 0.97,
+    "dCx": 0.29,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     53
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 2,
+    "iou": 0.97,
+    "dCx": 0.31,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "ret",
+     96
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "kinds": "ret>idle",
+    "count": 240,
+    "iou": 0.971,
+    "dCx": -0.14,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "joinsMinIoU": 0.97,
+  "minIoU": 0.905
+ },
+ "pups": {
+  "maxWaitFrames": 87,
+  "pairs": 525,
+  "baselineIdleMinIoU": 0.998,
+  "flagged": [
+   {
+    "from": [
+     "sel",
+     55
+    ],
+    "to": [
+     "sel",
+     56
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.893,
+    "dCx": -1.16,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     56
+    ],
+    "to": [
+     "sel",
+     57
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.892,
+    "dCx": -0.9,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     57
+    ],
+    "to": [
+     "sel",
+     58
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.918,
+    "dCx": 0.44,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     58
+    ],
+    "to": [
+     "sel",
+     59
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.93,
+    "dCx": 0.98,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     60
+    ],
+    "to": [
+     "sel",
+     61
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.806,
+    "dCx": -0.26,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     61
+    ],
+    "to": [
+     "sel",
+     62
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.762,
+    "dCx": 0.22,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     62
+    ],
+    "to": [
+     "sel",
+     63
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.757,
+    "dCx": -0.16,
+    "dBottom": -11,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     63
+    ],
+    "to": [
+     "sel",
+     64
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.806,
+    "dCx": -1.31,
+    "dBottom": -5,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     64
+    ],
+    "to": [
+     "sel",
+     65
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.865,
+    "dCx": 0.0,
+    "dBottom": -12,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     65
+    ],
+    "to": [
+     "sel",
+     66
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.915,
+    "dCx": 0.8,
+    "dBottom": -13,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     66
+    ],
+    "to": [
+     "sel",
+     67
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.948,
+    "dCx": 0.44,
+    "dBottom": -11,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     67
+    ],
+    "to": [
+     "sel",
+     68
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.962,
+    "dCx": 0.23,
+    "dBottom": -5,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     68
+    ],
+    "to": [
+     "sel",
+     69
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.935,
+    "dCx": -0.18,
+    "dBottom": 1,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     69
+    ],
+    "to": [
+     "sel",
+     70
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.812,
+    "dCx": -1.21,
+    "dBottom": 13,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     70
+    ],
+    "to": [
+     "sel",
+     71
+    ],
+    "kinds": "sel>sel",
+    "count": 240,
+    "iou": 0.752,
+    "dCx": -1.7,
+    "dBottom": 32,
+    "edge": true
+   }
+  ],
+  "flaggedCount": 24,
+  "edgeTouchPairs": 9,
+  "joinsWorst": [
+   {
+    "from": [
+     "idle",
+     181
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "exit>sel",
+    "count": 87,
+    "iou": 0.993,
+    "dCx": -0.03,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     181
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 1,
+    "iou": 0.993,
+    "dCx": -0.03,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     182
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 1,
+    "iou": 0.995,
+    "dCx": -0.03,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "joinsMinIoU": 0.993,
+  "minIoU": 0.752
+ },
+ "luna": {
+  "maxWaitFrames": 89,
+  "pairs": 452,
+  "baselineIdleMinIoU": 0.953,
+  "flagged": [
+   {
+    "from": [
+     "sel",
+     19
+    ],
+    "to": [
+     "sel",
+     20
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.886,
+    "dCx": -0.98,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     20
+    ],
+    "to": [
+     "sel",
+     21
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.892,
+    "dCx": -0.34,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     62
+    ],
+    "to": [
+     "sel",
+     63
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.859,
+    "dCx": -1.2,
+    "dBottom": -8,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     63
+    ],
+    "to": [
+     "sel",
+     64
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.869,
+    "dCx": -0.75,
+    "dBottom": -2,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     64
+    ],
+    "to": [
+     "sel",
+     65
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.847,
+    "dCx": 1.19,
+    "dBottom": 14,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     67
+    ],
+    "to": [
+     "sel",
+     68
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.867,
+    "dCx": -0.27,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     68
+    ],
+    "to": [
+     "sel",
+     69
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.722,
+    "dCx": 1.4,
+    "dBottom": -1,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     69
+    ],
+    "to": [
+     "sel",
+     70
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.78,
+    "dCx": 2.09,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     70
+    ],
+    "to": [
+     "sel",
+     71
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.837,
+    "dCx": 2.93,
+    "dBottom": -11,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     71
+    ],
+    "to": [
+     "sel",
+     72
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.881,
+    "dCx": 1.83,
+    "dBottom": 0,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     77
+    ],
+    "to": [
+     "sel",
+     78
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.77,
+    "dCx": -2.84,
+    "dBottom": -11,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     78
+    ],
+    "to": [
+     "sel",
+     79
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.71,
+    "dCx": -0.67,
+    "dBottom": 25,
+    "edge": true
+   },
+   {
+    "from": [
+     "sel",
+     79
+    ],
+    "to": [
+     "sel",
+     80
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.85,
+    "dCx": -0.72,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     80
+    ],
+    "to": [
+     "sel",
+     81
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.901,
+    "dCx": -1.15,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "sel",
+     84
+    ],
+    "to": [
+     "sel",
+     85
+    ],
+    "kinds": "sel>sel",
+    "count": 96,
+    "iou": 0.895,
+    "dCx": -0.32,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "flaggedCount": 15,
+  "edgeTouchPairs": 9,
+  "joinsWorst": [
+   {
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 2,
+    "iou": 0.99,
+    "dCx": 0.21,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "exit>sel",
+    "count": 89,
+    "iou": 0.99,
+    "dCx": 0.21,
+    "dBottom": 0,
+    "edge": false
+   },
+   {
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "sel",
+     0
+    ],
+    "kinds": "idle>sel",
+    "count": 2,
+    "iou": 0.994,
+    "dCx": 0.18,
+    "dBottom": 0,
+    "edge": false
+   }
+  ],
+  "joinsMinIoU": 0.99,
+  "minIoU": 0.71
+ }
+}

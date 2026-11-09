@@ -4,6 +4,7 @@ import { loadRaceV3 } from './raceV3.mjs';
 import { loadLibrary, IDS } from './library.mjs';
 import { createGame, DOGS, TIMING } from './game.mjs';
 import { distribute } from './rules.mjs';
+import { createSelectionPlayer } from './selection.mjs';
 import { ButterflyManager } from './butterfly.mjs';
 
 const $ = id => document.getElementById(id);
@@ -15,9 +16,11 @@ const lib = await loadLibrary(p => { $('status').textContent = `Загрузка
 const { D, data, layout } = lib;
 const NAMES = DOGS.map(d => d[1]);
 const TEAM_COLORS = ['#d94f4f', '#3f7fd0', '#3aa35a', '#c9962a', '#8e5bc4', '#2aa7a7', '#d4639a', '#6d7a8a', '#b5651d', '#4a4a9a', '#7aa32a', '#a33a3a', '#2f6b8a', '#9a7b2f', '#5f3a8a', '#3a8a6b', '#8a3a5f', '#6b8a3a', '#3a5f8a', '#8a6b3a', '#3a8a8a', '#8a3a3a', '#5a8a3a', '#3a3a8a'];
-let V3 = await loadRaceV3(readText, 42);
+let V3 = await loadRaceV3(42);
 const G = createGame({ V3, selectionData: data, teamCount: 6, seed: null, D: 42 });
 const bf = new ButterflyManager();
+// Диагностические условия отображения (для сравнительных роликов; по умолчанию — как в лаборатории): cam 'fixed'|'follow', zoom, label
+const OPTS = { cam: 'fixed', zoom: 1, label: '', focus: null, cardLabel: null };
 const SW = layout.spriteWidth, SH = layout.spriteHeight;
 
 // ---------------------------------------------------------------- вспомогательное рисование
@@ -62,6 +65,7 @@ function drawSelectScene(alpha = 1, yOff = 0, counts = G.betting.counts()) {
     chips.slice(0, 12).forEach((t, j) => { const cx = x + 30 + (j % 6) * 48, cy = y + h - 58 + Math.floor(j / 6) * 38; ctx.fillStyle = TEAM_COLORS[(t - 1) % 24]; ctx.beginPath(); ctx.arc(cx + 14, cy, 16, 0, 7); ctx.fill(); text(String(t), cx + 14, cy + 6, 16, '#fff', 'center', 'bold'); });
     const st = G.players[i].busy() ? (G.frames[i].kind === 'sel' ? 'SELECTED' : G.frames[i].kind === 'ret' ? 'возврат' : 'выход к стойке…') : '';
     if (st) text(st, x + cw / 2, y + 120, 20, '#b87a00', 'center', 'bold');
+    if (OPTS.cardLabel && OPTS.cardLabel.i === i) text(OPTS.cardLabel.text, x + cw / 2, y + h + 34, 24, '#2d2a24', 'center', 'bold');
   });
   ctx.restore();
 }
@@ -73,10 +77,13 @@ function drawTrackScene(t, race, mode = 'race', fade = 1, standOnly = false) {
   for (const x of [layout.startX, layout.finishX]) { ctx.beginPath(); ctx.moveTo(x, 150); ctx.lineTo(x, 1000); ctx.stroke(); }
   for (let r = 0; r < 12; r++) { ctx.fillStyle = r % 2 ? '#222' : '#eee'; ctx.fillRect(layout.finishX + 2, 150 + r * 71, 14, 71); }
   text('СТАРТ', layout.startX, 140, 22, '#444', 'center', 'bold'); text('ФИНИШ', layout.finishX, 140, 22, '#444', 'center', 'bold');
+  let cam = null;
+  if (OPTS.cam === 'follow' && race) { const xs = race.dogs.map(dg => layout.startX + stateOf(dg, t).progress * (layout.finishX - layout.startX + layout.finishControlOffset)), lead = OPTS.focus != null ? OPTS.focus : xs.indexOf(Math.max(...xs)); cam = { z: OPTS.zoom, x: (OPTS.focus != null ? xs[lead] + 40 : Math.max(...xs)) - 960 / OPTS.zoom * (OPTS.focus != null ? 1 : 0.8), y: laneY(lead) - 540 / OPTS.zoom * (OPTS.focus != null ? 1.05 : 0.9) }; ctx.save(); ctx.setTransform(cam.z, 0, 0, cam.z, -cam.x * cam.z, -cam.y * cam.z); }
   const order = race ? race.dogs.map((d, i) => [stateOf(d, t).progress, i]).sort((a, b) => b[0] - a[0]).map(a => a[1]) : [0, 1, 2, 3, 4];
   DOGS.forEach(([id, name], i) => {
     const ly = laneY(i), d = D[id], dog = race?.dogs[i];
     ctx.fillStyle = i % 2 ? 'rgba(0,0,0,.05)' : 'rgba(0,0,0,.09)'; ctx.fillRect(0, ly - 111, 1920, 151);
+    if (cam) { ctx.fillStyle = 'rgba(0,0,0,.07)'; const x0 = Math.floor((cam.x - 100) / 160) * 160; for (let gx = x0; gx < cam.x + 1920 / cam.z + 200; gx += 160) if ((gx / 160) % 2 === 0) ctx.fillRect(gx, ly - 111, 80, 151); ctx.strokeStyle = 'rgba(0,0,0,.3)'; ctx.lineWidth = 1; for (let gx = x0; gx < cam.x + 1920 / cam.z + 200; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, ly + 14); ctx.lineTo(gx, ly + 26); ctx.stroke(); } }
     ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; for (let k = 0; k <= 10; k++) { const x = layout.startX + k * (layout.finishX - layout.startX) / 10; ctx.beginPath(); ctx.moveTo(x, ly + 14); ctx.lineTo(x, ly + 26); ctx.stroke(); }
     ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.moveTo(layout.startX, ly + 20); ctx.lineTo(layout.finishX, ly + 20); ctx.stroke();
     ctx.fillStyle = '#2d2a24'; rr(24, ly - 100, 52, 52, 12); ctx.fill(); text(String(i + 1), 50, ly - 62, 34, '#fff', 'center', 'bold'); text(name, 90, ly - 62, 30, '#2d2a24', 'left', 'bold');
@@ -92,11 +99,10 @@ function drawTrackScene(t, race, mode = 'race', fade = 1, standOnly = false) {
       const b = bf.update(i, v, bodyFramesOf(d), t, () => { const n = noseOf(d, v); return { x: x - layout.spriteAnchorX + v.shiftPx + n.x, y: ly - layout.spriteTopOffset + n.y }; });
       if (b) drawButterfly(b);
       const rank = order.indexOf(i) + 1, done = t >= dog.crossing;
-      ctx.font = '19px system-ui'; ctx.fillStyle = '#444'; ctx.textAlign = 'left';
-      ctx.fillText(`${v.window}${v.role === 'body' || v.role === 'move' ? '' : ''}`, 1650, ly - 66);
       text(done ? `${G.race.places.indexOf(i) + 1} МЕСТО` : `${rank}-й · ${(st.progress * 100).toFixed(0)}%`, 1650, ly - 36, 24, done ? '#b87a00' : '#2d2a24', 'left', 'bold');
     }
   });
+  if (cam) ctx.restore();
   ctx.restore();
 }
 const stateOf = (dog, t) => G.V3.stateAt(dog, t);
@@ -139,21 +145,25 @@ function drawFinishOverlay() {
 // ---------------------------------------------------------------- кадр
 function render() {
   const t = G.raceT, ph = G.phase;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (ph === 'select' || ph === 'locking') { drawSelectScene(); if (ph === 'locking') { ctx.fillStyle = 'rgba(30,28,22,.18)'; ctx.fillRect(0, 0, 1920, 1080); text('Выбор завершён — выбранные собаки реагируют…', 960, 1030, 34, '#2d2a24', 'center', 'bold'); } }
   else if (ph === 'transition') {
     const u = G.phaseT / TIMING.transition, a = ease(u / 0.4);
-    drawTrackScene(0, null, 'stand', 1, true);
-    if (u < 0.45) drawSelectScene(1 - a, a * 500);
-    ctx.fillStyle = `rgba(228,224,211,${Math.max(0, 1 - ease((u - 0.3) / 0.35))})`; if (u > 0.3 && u < 0.65) ctx.fillRect(0, 0, 1920, 1080);
-    text('К СТАРТОВОЙ ЛИНИИ', 960, 60, 30, `rgba(45,42,36,${ease((u - 0.4) / 0.2)})`, 'center', 'bold');
+    if (u < 0.4) { bgNeutral(); drawSelectScene(1 - a, a * 500); }                         // 1) карточки уходят вниз и гаснут на нейтральном фоне
+    else {                                                                                 // 2) нейтральная вуаль расходится, видна трасса; собаки проявляются по дорожкам
+      drawTrackScene(0, null, 'stand', 1, true);
+      const v = 1 - ease((u - 0.4) / 0.25); if (v > 0) { ctx.fillStyle = `rgba(228,224,211,${v})`; ctx.fillRect(0, 0, 1920, 1080); }
+      text('К СТАРТОВОЙ ЛИНИИ', 960, 60, 30, `rgba(45,42,36,${ease((u - 0.4) / 0.2)})`, 'center', 'bold');
+    }
   }
   else if (ph === 'countdown') {
     drawTrackScene(0, G.race, 'stand'); const c = Math.ceil(TIMING.countdown - G.phaseT); text(c > 0 ? String(c) : 'СТАРТ!', 960, 560, 220, 'rgba(45,42,36,.8)', 'center', 'bold');
   }
-  else if (ph === 'race') { drawTrackScene(t, G.race, 'race'); text(`t = ${t.toFixed(1)} с  ·  seed ${G.seed}${G.race.effectiveSeed !== Number(G.seed) ? '→' + G.race.effectiveSeed : ''}  ·  D=${G.D} с  ·  ×${G.raceSpeed}`, 960, 62, 26, '#2d2a24', 'center'); }
+  else if (ph === 'race') { drawTrackScene(t, G.race, 'race'); if (G.raceSpeed !== 1) { ctx.fillStyle = '#b02a2a'; ctx.fillRect(1120, 28, 640, 44); text(`ЛАБОРАТОРНОЕ УСКОРЕНИЕ ×${G.raceSpeed}: анимации идут быстрее утверждённых 24 к/с`, 1440, 60, 22, '#fff', 'center', 'bold'); } text(`t = ${t.toFixed(1)} с  ·  seed ${G.seed}${G.race.effectiveSeed !== Number(G.seed) ? '→' + G.race.effectiveSeed : ''}  ·  D=${G.D} с  ·  ×${G.raceSpeed}`, 960, 62, 26, '#2d2a24', 'center'); }
   else if (ph === 'finish') { drawTrackScene(G.race.end, G.race, 'race'); drawFinishOverlay(); }
   else if (ph === 'podiumTransition') { const u = G.phaseT / TIMING.podiumTransition; drawTrackScene(G.race.end, G.race, 'race'); drawFinishOverlay(); drawPodium(ease(u)); }
   else if (ph === 'podium') drawPodium(1);
+  if (OPTS.label) { ctx.fillStyle = 'rgba(30,28,22,.85)'; ctx.fillRect(0, 1000, 1920, 80); text(OPTS.label, 960, 1052, 38, '#fff', 'center', 'bold'); }
 }
 
 // ---------------------------------------------------------------- панель управления (тестовый режим)
@@ -182,11 +192,11 @@ $('go').onclick = () => { G.D = +$('D').value; G.raceSpeed = +$('speed').value; 
 $('skip').onclick = () => G.skip();
 $('restart').onclick = () => { bf.reset(); G.restart(); $('teams')._built = false; };
 $('speed').onchange = () => { G.raceSpeed = +$('speed').value; };
-async function prepare() { if (!G.V3 || G.V3.D !== G.D) G.V3 = await loadRaceV3(readText, G.D); }
+async function prepare() { if (!G.V3 || G.V3.D !== G.D) G.V3 = await loadRaceV3(G.D); }
 
 let last = performance.now();
 function frame(now) { const dt = Math.min(0.5, (now - last) / 1000); last = now; if (!window.__paused) G.update(dt); render(); requestAnimationFrame(frame); }
 setInterval(panel, 150); panel();
 $('status').textContent = 'Готово: выберите собак за команды и нажмите «Завершить выбор»';
-window.round = { G, D, bf, loadRaceV3: d => loadRaceV3(readText, d), prepare, setTeamCount, ready: true, step: dt => { G.update(dt); render(); }, pause: v => { window.__paused = v; }, render };
+window.round = { OPTS, G, D, bf, setPlayer: (i, pos) => { G.players[i] = createSelectionPlayer(DOGS[i][0], data, pos); G.frames[i] = G.players[i].tick(); }, loadRaceV3: d => loadRaceV3(d), prepare, setTeamCount, ready: true, step: dt => { G.update(dt); render(); }, pause: v => { window.__paused = v; }, render };
 requestAnimationFrame(frame);

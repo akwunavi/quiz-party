@@ -37,7 +37,7 @@ const smooth=u=>u*u*(3-2*u);
 const smoothIntegral=u=>u*u*u-.5*u*u*u*u;
 const brakingIntegral=u=>u-u*u*u+.5*u*u*u*u;
 const band=p=>Math.max(0,Math.min(3,Math.floor((Math.max(0,p)+EPS)*4)));
-const speedAt=(dog,p,base=dog.base)=>BASE_SPEED*base*dog.variations[band(p)];
+const speedAt=(dog,p,base=dog.base)=>(dog.baseSpeed??BASE_SPEED)*base*dog.variations[band(p)];   // dog.baseSpeed задаётся только параметром courseSeconds (по умолчанию — BASE_SPEED)
 function advance(dog,p,dt,base=dog.base){
   let left=dt;
   while(left>EPS){
@@ -69,9 +69,11 @@ function nextStopTime(runStart,crossing){
   const first=runStart+RUN_JOIN;
   return first+Math.max(0,Math.ceil((crossing-first-EPS)/LOOP))*LOOP;
 }
-export function buildDog(preset,index){
+export function buildDog(preset,index,options={}){
   const config=PRESETS[preset].dogs[index];
   const dog={index,preset,...config,segments:[],eventsActual:[]};
+  // options.courseSeconds — время дистанции собаки с темпом 1.00 (по умолчанию 42 с = 1/BASE_SPEED). Больше ничего в физике не меняется.
+  if(options.courseSeconds!=null){if(!(options.courseSeconds>=10&&options.courseSeconds<=600))throw new RangeError('courseSeconds must be 10..600');dog.baseSpeed=1/options.courseSeconds;}
   let p=0,base=dog.base;
   add(dog.segments,'BASE',.5,p,p);
   add(dog.segments,'START',START,p,p+speedAt(dog,p,base)*START/2,-1,{initial:true,base});

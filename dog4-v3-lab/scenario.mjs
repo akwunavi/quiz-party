@@ -27,7 +27,7 @@ export function planSeed(seed){
   }
   return plans;
 }
-export function generateRace(seed){
+export function generateRace(seed,options={}){
   const plans=planSeed(seed),rejections={fit:0,vertical:0,allStopped:0},previous=PRESETS.RANDOM;
   for(let attempt=0;attempt<MAX_ATTEMPTS;attempt++){
     const random=rng((seed^Math.imul(attempt+1,0x9e3779b9)^0x51c0ffee)>>>0);
@@ -35,7 +35,7 @@ export function generateRace(seed){
     const positionsByDog=plans.map(plan=>positions(random,plan.kinds.length));
     PRESETS.RANDOM={name:`SEED ${seed}`,dogs:plans.map((plan,i)=>({...plan,events:plan.kinds.map((kind,j)=>[kind,positionsByDog[i][j]])}))};
     let dogs;
-    try{dogs=[0,1,2,3,4].map(i=>buildDog('RANDOM',i));}catch{rejections.fit++;continue;}
+    try{dogs=[0,1,2,3,4].map(i=>buildDog('RANDOM',i,options));}catch{rejections.fit++;continue;}
     const spans=dogs.map(stationary);
     let vertical=false;
     for(let i=0;i<5;i++)for(let j=i+1;j<5;j++)for(const a of spans[i])for(const b of spans[j]){
@@ -53,7 +53,7 @@ export function generateRace(seed){
   const error=new Error(`Unable to schedule seed ${seed} in ${MAX_ATTEMPTS} position attempts: ${JSON.stringify(rejections)}`);
   error.code='POSITION_EXHAUSTED';error.seed=seed;error.rejections=rejections;throw error;
 }
-export function resolveRace(requestedSeed,{maxCandidates=MAX_SEED_CANDIDATES}={}){
+export function resolveRace(requestedSeed,{maxCandidates=MAX_SEED_CANDIDATES,courseSeconds}={}){
   // Validate before arithmetic, so neither Number coercion nor uint32 wrap changes a request.
   if(!Number.isSafeInteger(requestedSeed)||requestedSeed<0||requestedSeed>0xffffffff)throw new RangeError('requestedSeed must be a uint32');
   if(!Number.isSafeInteger(maxCandidates)||maxCandidates<1)throw new RangeError('maxCandidates must be a positive integer');
@@ -61,7 +61,7 @@ export function resolveRace(requestedSeed,{maxCandidates=MAX_SEED_CANDIDATES}={}
   for(let offset=0;offset<maxCandidates&&requestedSeed+offset<=0xffffffff;offset++){
     const effectiveSeed=requestedSeed+offset;
     try{
-      const race=generateRace(effectiveSeed);
+      const race=generateRace(effectiveSeed,courseSeconds==null?{}:{courseSeconds});
       return {...race,requestedSeed,effectiveSeed,candidatesChecked:offset+1,rejectedCandidates:rejected};
     }catch(error){
       if(error.code!=='POSITION_EXHAUSTED')throw error;
