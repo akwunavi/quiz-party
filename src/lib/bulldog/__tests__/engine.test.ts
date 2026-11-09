@@ -18,6 +18,21 @@ const sha = (p: string) => createHash('sha256').update(readFileSync(p)).digest('
 describe('Race V3: результаты совпадают с лабораторными (golden)', () => {
   const GOLD: [number, number, number[]][] = [[777, 42, [0, 4, 2, 3, 1]], [1, 30, [0, 3, 2, 1, 4]], [11, 20, [2, 0, 1, 4, 3]], [12, 42, [3, 4, 1, 0, 2]], [13, 120, [0, 3, 2, 4, 1]], [14, 30, [3, 0, 4, 2, 1]]]
   for (const [seed, D, places] of GOLD) it(`seed ${seed}, D=${D}`, () => { expect(raceFor(seed, D).places).toEqual(places) })
+  // courseSeconds принят (этап 3): единственный способ менять длительность — параметр D; поведение без параметра прежнее
+  it('одинаковые (seed, D) — одинаковая гонка до последнего сегмента; другой D — другая', () => {
+    const sig = (r: ReturnType<typeof raceFor>) => JSON.stringify([r.places, r.end, r.dogs.map(d => d.segments)])
+    for (const [seed, D] of [[777, 42], [1, 30], [13, 120]] as const) expect(sig(raceFor(seed, D))).toBe(sig(raceFor(seed, D)))
+    expect(sig(raceFor(777, 30))).not.toBe(sig(raceFor(777, 90)))
+  })
+  it('D = 42 == гонка БЕЗ параметра (прежняя физика), побитно, на 200 сидах', async () => {
+    const { resolveRace } = await import('../vendor/scenario.mjs')
+    const sig = (r: { effectiveSeed: number; places: number[]; dogs: { crossing: unknown; segments: unknown }[] }) => JSON.stringify([r.effectiveSeed, r.places, r.dogs.map(d => [d.crossing, d.segments])])
+    for (let i = 0; i < 200; i++) { const seed = (i * 7919 + 13) >>> 0; expect(sig(raceFor(seed, 42) as never)).toBe(sig(resolveRace(seed) as never)) }
+  })
+  it('D вне 10..600 отвергается (исключение), а не молча искажает гонку', async () => {
+    const { resolveRace } = await import('../vendor/scenario.mjs')
+    expect(() => resolveRace(5, { courseSeconds: 5 })).toThrow(); expect(() => resolveRace(5, { courseSeconds: 601 })).toThrow()
+  })
   it('воспроизводимость и рост длительности с D', () => {
     expect(JSON.stringify(raceFor(5, 42).dogs.map(d => d.crossing))).toBe(JSON.stringify(raceFor(5, 42).dogs.map(d => d.crossing)))
     const e = [30, 60, 120].map(D => raceFor(777, D).end); expect(e[0]).toBeLessThan(e[1]); expect(e[1]).toBeLessThan(e[2])

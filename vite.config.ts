@@ -1,5 +1,11 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+
+// Версия библиотеки собак = sha256 её MANIFEST.json (первые 12 знаков). Дописывается к адресам файлов ?v=… (config.ts) и дублируется в public/sw.js
+// (тест swBulldog.test.ts сверяет): новые листы/атласы никогда не смешиваются со старым кодом и со старым кешем Service Worker.
+const BULLDOG_V = createHash('sha256').update(readFileSync(new URL('./public/bulldog/MANIFEST.json', import.meta.url))).digest('hex').slice(0, 12)
 
 // Стили темы «Волшебный лес» (src/forest/**.css) написаны под лабораторию без префиксов. Чтобы они НИКОГДА не задели другие
 // темы (в сборке все стили общие), каждому их селектору автоматически добавляется префикс `.theme-enchanted_forest`.
@@ -23,6 +29,7 @@ export default defineConfig({
   plugins: [react()],
   css: { postcss: { plugins: [forestScope()] } },
   base: '/quiz-party/',
+  define: { __BULLDOG_V__: JSON.stringify(BULLDOG_V) },
 
   build: {
     rollupOptions: {

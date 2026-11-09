@@ -12,6 +12,10 @@ export const COURSE_SEC_MIN = 20, COURSE_SEC_MAX = 120
 /** Тайминги сцен ПОСЛЕ нажатия «Старт» (все экраны считают их от одного startedAt, поэтому не расходятся). */
 export const T = { transition: 3.2, countdown: 3, finishHold: 3.5, podiumTransition: 2.6, podiumStep: 1.3 } as const
 export const BULLDOG_BASE = `${import.meta.env.BASE_URL}bulldog/`
+declare const __BULLDOG_V__: string | undefined
+/** Версия библиотеки собак (sha MANIFEST.json, подставляется сборкой). Дописывается к адресу файла: `…/idle.webp?v=<версия>`. */
+export const BULLDOG_V: string = typeof __BULLDOG_V__ === 'string' ? __BULLDOG_V__ : 'dev'
+export const versionedUrl = (u: string) => `${u}${u.includes('?') ? '&' : '?'}v=${BULLDOG_V}`
 export function courseSeconds(s: Partial<RaceSettings> | undefined): number {
   const v = Number(s?.courseSec)
   return Number.isFinite(v) && v >= COURSE_SEC_MIN && v <= COURSE_SEC_MAX ? v : DEFAULT_COURSE_SEC
@@ -23,4 +27,4 @@ export function dogNames(s: Partial<RaceSettings> | undefined): string[] {
   return d.map((x, i) => (x && x.trim()) || DOG_NAMES[i])
 }
 export const selectSheetUrl = (id: DogId, sheet: string) => `${BULLDOG_BASE}${id}/${sheet}`
-export const stillUrl = (id: DogId) => `${BULLDOG_BASE}${id}/still.webp`
+export const stillUrl = (id: DogId) => versionedUrl(`${BULLDOG_BASE}${id}/still.webp`)

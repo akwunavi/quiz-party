@@ -6,7 +6,7 @@ import { createVisual } from './vendor/dogVisual.mjs'
 import * as rockyPhase from './vendor/rockyPhaseV2.mjs'
 import { createSelectionPlayer, type SelectionData } from './vendor/selectionRules.mjs'
 import type { DogVisualFn, RaceV3, Segment } from './v3types'
-import { BULLDOG_BASE, DOG_IDS, type DogId } from './config'
+import { BULLDOG_BASE, DOG_IDS, versionedUrl, type DogId } from './config'
 
 // ── гонка: детерминированна по (seed, D); кеш, чтобы 15 кадров в секунду не пересчитывали планировщик
 const raceCache = new Map<string, RaceV3>()
@@ -35,8 +35,8 @@ export interface DogData { id: DogId; visual: DogVisualFn; atlas: SheetAtlas; co
 export interface AssetSource { json<T>(url: string): Promise<T>; blob(url: string): Promise<Blob>; prefetch: boolean }
 const netSource: AssetSource = {
   prefetch: true,
-  async json<T>(u: string) { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json() as Promise<T> },
-  async blob(u: string) { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.blob() },
+  async json<T>(u: string) { const r = await fetch(versionedUrl(u)); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json() as Promise<T> },
+  async blob(u: string) { const r = await fetch(versionedUrl(u)); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.blob() },
 }
 let source: AssetSource = netSource
 export function setAssetSource(s: AssetSource) { source = s; dogCache.clear(); selData = null }

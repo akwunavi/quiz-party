@@ -4,10 +4,9 @@
 // Честность прежняя: сид рождается в момент «Старт» (raceActions.startRace) и пишется в game_state вместе с D; из (seed, D) детерминированно
 // считается вся гонка, поэтому любой экран и перезагрузка страницы видят одну и ту же гонку.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getRoomId } from '../../lib/room'
 import { room } from '../../lib/transport'
 import type { AnswerUpsert } from '../../lib/transport'
-import { openRaceBets, startRace } from '../../lib/raceActions'
+import { openRaceBets, startRace, finishRace } from '../../lib/raceActions'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { BulldogStage } from '../../components/BulldogStage'
 import type { StageStats } from '../../lib/bulldog/stage'
@@ -21,7 +20,7 @@ import type { PreviewCtx } from '../../lib/previewState'
 import { serverNow } from '../../lib/serverClock'
 import { courseSeconds, dogNames } from '../../lib/bulldog/config'
 import { raceClock, gradeAt } from '../../lib/bulldog/phases'
-import { countsByDog, pointsFor, raceRef, scoreRows } from '../../lib/bulldog/bets'
+import { countsByDog, gradingRows, raceRef, scoreRows } from '../../lib/bulldog/bets'
 import { raceFor } from '../../lib/bulldog/engine'
 import type { RaceV3 } from '../../lib/bulldog/v3types'
 
@@ -104,20 +103,24 @@ export function RaceBoard({ pack, round, gameState, preview, onStats }: {
     // между попытками (jsonb `melody` заменяется целиком при записи — HANDOFF
     // §3bv/CLAUDE.md). cancelled выставляется в cleanup эффекта.
     let cancelled = false
-    const rows: AnswerUpsert[] = bets.map(b => ({
-      team_id: b.team_id, game_id: b.game_id, question_ref: b.question_ref,
-      round_number: b.round_number, answer_text: b.answer_text,
-      stake: pointsFor(b.answer_text, raceObj.places).points, is_correct: true, updated_at: new Date().toISOString(),
-    }))
+    const seed = race.seed as number
+    const places = raceObj.places
+    const ref = raceRef(gameState.round_number)
     void (async () => {
       for (let attempt = 0; attempt < 3; attempt++) {
         if (cancelled) return
         try {
+          // Ставки читаем ЗАНОВО из базы перед начислением, а не берём снимок экрана: выбор закрыт на сервере с момента «Старт»
+          // (миграция 0017), так что это окончательные данные. Пишем только строки, где очки реально отличаются, — повторный
+          // вызов (перезагрузка проектора, второй экран, ретрай после сбоя) ничего не меняет и не начисляет второй раз.
+          const fresh = (await room.listAnswers(gameState.game_id, gameState.round_number)).filter(a => a.question_ref === ref)
+          const rows: AnswerUpsert[] = gradingRows(fresh, places).map(b => ({
+            team_id: b.team_id, game_id: b.game_id, question_ref: b.question_ref, round_number: b.round_number,
+            answer_text: b.answer_text, stake: b.stake, is_correct: true, updated_at: new Date().toISOString() }))
+          if (cancelled) return
           if (rows.length > 0) await room.upsertAnswers(rows)
           if (cancelled) return
-          await room.patchSession(getRoomId(), {
-            melody: { ...gameState.melody, race: { ...race, stage: 'done' } },
-          })
+          await finishRace(gameState, seed)
           return
         } catch {
           if (attempt === 2) {

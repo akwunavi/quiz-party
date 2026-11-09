@@ -15,7 +15,7 @@ import type { GameState, Team, Answer } from '../../src/types/quiz'
 
 // ── встроенный набор файлов (data/*.js кладут их в window.__BD), вместо fetch, который file:// запрещает
 const BD = ((window as unknown as { __BD?: Record<string, unknown> }).__BD ??= {})
-const key = (u: string) => u.replace(/^.*?bulldog\//, '')
+const key = (u: string) => u.replace(/^.*?bulldog\//, '').replace(/\?.*$/, '')
 const blobs = new Map<string, Blob>()
 setAssetSource({
   prefetch: false,

@@ -31,6 +31,11 @@ import crypto from 'node:crypto'
 import os from 'node:os'
 import { fileURLToPath } from 'node:url'
 
+// ставки гонки: ref 'q-race-<раунд>'; выбор открыт только в стадии betting своего раунда
+const isRaceRef = ref => typeof ref === 'string' && ref.startsWith('q-race-')
+const raceBetsOpen = (st, round) => st.session?.melody?.race?.stage === 'betting' && String(st.session.round_number) === String(round)
+
+
 export const PORT = Number(process.env.QP_LOCAL_PORT) || 7331
 // База путей приложения — ДОЛЖНА совпадать с `base` в vite.config.ts.
 // Сейчас там '/quiz-party/'. Если поменяется там — поменять и здесь.
@@ -426,6 +431,13 @@ function createApiHandler(store) {
               // всегда (иначе Object.assign затёр бы его клиентским).
               const { accepted_at: _ignored, ...clean } = row
               const existing = st.answers.find(a => a.team_id === row.team_id && a.question_ref === row.question_ref)
+              // ставки «Скачек бульдогов» (зеркало миграции 0017): выбор меняется только пока race.stage = 'betting' в ЭТОМ раунде.
+              // Здесь нет ролей (локальная сеть бара доверенная), поэтому закрывается именно текст ставки: после старта новая
+              // ставка не создаётся, чужая не меняется. Очки (stake/is_correct) проектор пишет и после старта.
+              if (isRaceRef(row.question_ref) && !raceBetsOpen(st, row.round_number)) {
+                if (!existing) continue
+                if (clean.answer_text !== undefined && clean.answer_text !== existing.answer_text) delete clean.answer_text
+              }
               if (existing) {
                 if (clean.answer_text !== undefined && clean.answer_text !== existing.answer_text) {
                   existing.accepted_at = new Date().toISOString()
@@ -451,6 +463,7 @@ function createApiHandler(store) {
           // accepted_at ставит только сервер (зеркало триггера 0015); смена
           // текста через PATCH двигает его так же, как upsert.
           const { accepted_at: _ignored, ...cleanPatch } = patch ?? {}
+          if (isRaceRef(found.question_ref) && !raceBetsOpen(st, found.round_number) && cleanPatch.answer_text !== undefined) delete cleanPatch.answer_text
           store.mutate('answers.patch', { id, patch: cleanPatch }, () => {
             if (cleanPatch.answer_text !== undefined && cleanPatch.answer_text !== found.answer_text) {
               found.accepted_at = new Date().toISOString()

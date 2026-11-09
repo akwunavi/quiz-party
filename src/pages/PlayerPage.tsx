@@ -6,7 +6,8 @@ import { registerTeam, heartbeat } from '../lib/gameActions'
 import { rateQuestion, saveRoundComment } from '../lib/ratings'
 import { useBlitz } from '../lib/blitzApi'
 import { currentTeam, MAX_ATTEMPTS, SKIP_MARK, NEXT_DELAY_MS } from '../lib/blitzState'
-import { enqueueAnswer } from '../lib/answerQueue'
+import { effectiveBet } from '../lib/bulldog/bets'
+import { enqueueAnswer, dropPending } from '../lib/answerQueue'
 import { jeopardyRef } from '../lib/jeopardyRef'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
@@ -614,16 +615,25 @@ function RacePlayer({ team, gameState, round, roundLabel }: {
   const race = gameState.melody?.race ?? {}
   const names = dogNames(round.settings as RaceSettings)
   const ref = raceRef(gameState.round_number)
-  // чужие и свои ответы читаем только пока выбор открыт (счётчики) и после финиша (свои очки) — не нагружаем сеть на бегу
+  // Ответы читаем всегда: пока выбор открыт — счётчики и своя ставка, дальше (бег, финиш) — только чтобы показать ставку, ЗАФИКСИРОВАННУЮ
+  // на сервере (реже, 4 с). Локальная память телефона ставкой не считается после закрытия выбора: перезагрузка не «оживляет» выбор,
+  // который до сервера не дошёл (сервер принимает ставку только до «Старта», миграция 0017).
   const stage = race.stage
-  const answers = useAnswers(!stage || stage === 'betting' || stage === 'done' ? gameState.game_id : null, gameState.round_number)
+  const betting = stage === 'betting'
+  const answers = useAnswers(gameState.game_id, gameState.round_number, betting || !stage ? 2000 : 4000)
   const all = answers.filter(a => a.question_ref === ref)
   const mine = all.find(a => a.team_id === team.id)
-  const [local, setLocal] = useState<number | null>(() => { const n = Number(localStorage.getItem(`qp-race-${gameState.game_id}-${ref}-${team.id}`)); return n >= 1 && n <= 5 ? n : null })
-  const bet = local ?? (mine ? Number(mine.answer_text) || null : null)
+  const lsKey = `qp-race-${gameState.game_id}-${ref}-${team.id}`
+  const [local, setLocal] = useState<number | null>(() => { const n = Number(localStorage.getItem(lsKey)); return n >= 1 && n <= 5 ? n : null })
+  const serverBet = mine ? Number(mine.answer_text) || null : null
+  const bet = effectiveBet(stage, local, serverBet)
   const counts = countsByDog(all)
+  useEffect(() => {
+    if (stage && !betting) { dropPending(team.id, ref); try { localStorage.removeItem(lsKey) } catch { /* приватный режим */ } }
+  }, [stage, betting, team.id, ref, lsKey])
   const pick = (n: number) => {
-    setLocal(n); localStorage.setItem(`qp-race-${gameState.game_id}-${ref}-${team.id}`, String(n))
+    if (!betting) return
+    setLocal(n); localStorage.setItem(lsKey, String(n))
     void enqueueAnswer({
       team_id: team.id, game_id: gameState.game_id, question_ref: ref,
       round_number: gameState.round_number, answer_text: String(n),
@@ -644,7 +654,7 @@ function RacePlayer({ team, gameState, round, roundLabel }: {
           </div>
         )}
         {stage === 'running' && <div className="pl-wait" style={{ padding: 30 }}>
-          БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁{bet && <div style={{ marginTop: 10, fontSize: '.7em' }}>Ваш бульдог: №{bet} {names[bet - 1]}</div>}</div>}
+          БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁<div style={{ marginTop: 10, fontSize: '.7em' }}>{bet ? <>Ваш бульдог: №{bet} {names[bet - 1]}</> : all.length > 0 ? 'Ваш выбор не успел дойти до старта' : null}</div></div>}
         {stage === 'done' && <div className="pl-wait" style={{ padding: 30 }}>
           ЗАБЕГ ОКОНЧЕН — БАЛЛЫ НАЧИСЛЕНЫ
           {mine && Number(mine.stake) > 0 && <div style={{ marginTop: 10, fontSize: '.7em' }}>Ваш бульдог №{mine.answer_text} {names[Number(mine.answer_text) - 1]}: +{mine.stake}</div>}</div>}

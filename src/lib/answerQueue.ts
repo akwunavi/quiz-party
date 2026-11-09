@@ -43,6 +43,13 @@ export async function enqueueAnswer(a: PendingAnswer) {
   void flush()
 }
 
+/** Убрать из очереди неотправленный ответ на вопрос (например ставку гонки, выбор по которой уже закрыт): иначе после перезагрузки
+ *  телефона он снова полетел бы на сервер. Сервер такую запись всё равно не примет (миграция 0017), это — чтобы не слать зря. */
+export function dropPending(team_id: string, question_ref: string) {
+  const q = read(); const rest = q.filter(x => !(x.team_id === team_id && x.question_ref === question_ref))
+  if (rest.length !== q.length) { write(rest); notify(false) }
+}
+
 export async function flush() {
   if (flushing) return
   flushing = true

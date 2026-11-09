@@ -35,8 +35,16 @@
 // src/version.ts — синхронно бампай и константу ниже (см. CLAUDE.md,
 // раздел 4). Разъедутся — старый кеш не инвалидируется, и на проде долго
 // живёт версия, которую уже никто не собирал.
-const VERSION = '10.42'
+const VERSION = '10.43'
 const CACHE = 'qp-' + VERSION
+// ─── Библиотека собак «Скачек бульдогов» (public/bulldog, ~48 МБ) — СВОЙ кеш, со своей версией ───
+// BULLDOG_V = первые 12 знаков sha256 файла public/bulldog/MANIFEST.json (тест swBulldog.test.ts сверяет — забыл бампнуть, красный прогон).
+// Адреса файлов приложение просит с ?v=<та же версия> (src/lib/bulldog/config.ts): новый лист/атлас = новый адрес, поэтому старый
+// кеш НЕ может подсунуть старый атлас новому коду, даже пока страница ещё под старым SW (новый SW ждёт закрытия вкладок — без skipWaiting).
+// Отдельный кеш нужен, чтобы КАЖДЫЙ деплой приложения (бамп VERSION) не сбрасывал 48 МБ, которые не менялись: кеш живёт, пока не сменится BULLDOG_V.
+const BULLDOG_V = 'ddfeee77f2bd'
+const BULLDOG_CACHE = 'qp-bd-' + BULLDOG_V
+const BULLDOG_PATH = '/quiz-party/bulldog/'
 const BASE = '/quiz-party/'
 const NETWORK_TIMEOUT_MS = 3500
 
@@ -85,7 +93,7 @@ self.addEventListener('activate', event => {
     // проектора/телефона ведущего.
     const keys = await caches.keys()
     await Promise.all(
-      keys.filter(k => k !== CACHE && k.startsWith('qp-')).map(k => caches.delete(k)),
+      keys.filter(k => k !== CACHE && k !== BULLDOG_CACHE && k.startsWith('qp-')).map(k => caches.delete(k)),
     )
     await self.clients.claim()
   })())
@@ -117,8 +125,8 @@ async function networkFirst(request) {
   }
 }
 
-async function cacheFirst(request) {
-  const cache = await caches.open(CACHE)
+async function cacheFirst(request, cacheName = CACHE) {
+  const cache = await caches.open(cacheName)
   const cached = await cache.match(request)
   if (cached) return cached
   const response = await fetch(request)
@@ -134,6 +142,13 @@ self.addEventListener('fetch', event => {
   // вообще не проходят через классификацию ниже — и так не должны, это
   // либо другой origin (Supabase/локальный сервер), либо не GET.
   if (req.method !== 'GET') return
+
+  // Библиотека собак: ВСЁ (и .json, и .webp) — cache-first в её собственном кеше; запрос с чужой версией ?v= в кеше не найдётся → сеть.
+  // Телефоны игроков просят только still.webp (5 файлов ≈ 100 КБ): листы выбора/гонки грузит один проектор.
+  if (new URL(req.url, self.location.origin).pathname.startsWith(BULLDOG_PATH) && new URL(req.url).origin === self.location.origin) {
+    event.respondWith(cacheFirst(req, BULLDOG_CACHE))
+    return
+  }
 
   const strategy = classifyRequest(req.url, self.location.origin, BASE, req.mode)
   if (strategy === 'bypass') return // не вызываем respondWith — запрос идёт мимо SW как обычно

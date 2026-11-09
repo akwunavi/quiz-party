@@ -1,7 +1,7 @@
 // Сцена раунда «Скачки бульдогов» на canvas 1920×1080: выбор → переход → отсчёт → гонка Race V3 → финиш → пьедестал.
 // Порт лабораторной сцены (bulldog-racing/round-lab) под продукт: время ИЗ ЧАСОВ (startedAt), цвета из CSS-переменных темы, ресурсы с освобождением.
 // Не знает про React и сеть: снаружи вызывают setInput() и draw(nowMs).
-import { LAYOUT as L, DOG_IDS, T, type DogId } from './config'
+import { LAYOUT as L, DOG_IDS, T, versionedUrl, type DogId } from './config'
 import { raceClock, type RacePhase } from './phases'
 import { raceFor, stateAt, canPrefetch, loadDogData, loadSelectionData, createSelectionPlayer, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from './engine'
 import { ButterflyManager } from './vendor/butterfly.mjs'
@@ -54,7 +54,11 @@ export class StageRenderer {
       if (!key) { this.players = [null, null, null, null, null]; this.frames = [null, null, null, null, null]; this.wantPick.clear() }       // новый раунд: выбор начинается заново
     }
   }
-  destroy() { this.dead = true; this.pool.release() }
+  /** Уход с экрана: закрыть все ImageBitmap и ОТДАТЬ видеопамять canvas (размер 0) — иначе буфер 1920×1080 и временный холст живут до сборщика мусора. */
+  destroy() {
+    this.dead = true; this.pool.release(); this.noseCache.clear()
+    this.canvas.width = 0; this.canvas.height = 0; this.tmp.width = 0; this.tmp.height = 0
+  }
   private async boot() {
     try {
       this.selData = await loadSelectionData()
@@ -89,7 +93,7 @@ export class StageRenderer {
     // прогрев сетевого кеша гонки (без декодирования), пока идёт выбор: к старту листы уже скачаны (SW кеширует их cache-first)
     if (!this.prefetched && canPrefetch() && phase === 'select' && !loading && this.dogs.every(Boolean)) {
       this.prefetched = true
-      void (async () => { for (const d of this.dogs) { if (!d) continue; for (const u of raceSheetUrls(d, [{ kind: 'BUTTERFLY' }, { kind: 'ROLL' }, { kind: 'SNIFF_PEE' }, { kind: 'RETURN' }] as never)) { try { await (await fetch(u)).blob() } catch { /* не критично */ } } } })()
+      void (async () => { for (const d of this.dogs) { if (!d) continue; for (const u of raceSheetUrls(d, [{ kind: 'BUTTERFLY' }, { kind: 'ROLL' }, { kind: 'SNIFF_PEE' }, { kind: 'RETURN' }] as never)) { try { await (await fetch(versionedUrl(u))).blob() } catch { /* не критично */ } } } })()
     }
     this.stats = { ...this.stats, phase, decodedMB: Math.round(this.pool.decodedBytes / 1048576), bitmaps: this.pool.count, loading }
   }

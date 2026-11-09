@@ -21,3 +21,19 @@ export function scoreRows(teams: { id: string; name: string }[], bets: BetRow[],
   const by = new Map<string, string>(); for (const b of bets) by.set(b.team_id, b.answer_text)
   return teams.map(t => ({ team: t.name, ...pointsFor(by.get(t.id) ?? '', places) }))
 }
+
+/** Строки для начисления: только те ставки, где очки ещё не записаны правильно. Повторный вызов на уже начисленном даёт [] —
+ *  начисление идемпотентно (перезагрузка проектора, второй экран, ретрай после сбоя ничего не меняют и не задваивают). */
+export function gradingRows<T extends { answer_text: string; stake?: number | string | null; is_correct?: boolean | null }>(fresh: T[], places: number[]): (T & { stake: number; is_correct: true })[] {
+  return fresh.flatMap(b => {
+    const points = pointsFor(b.answer_text, places).points
+    return b.is_correct === true && Number(b.stake) === points ? [] : [{ ...b, stake: points, is_correct: true as const }]
+  })
+}
+
+/** Какую ставку показывать на телефоне. Пока выбор открыт — локальный (ещё не подтверждённый) выбор побеждает, чтобы кнопка отзывалась сразу.
+ *  Когда выбор закрыт (бег, финиш) — ТОЛЬКО то, что зафиксировано на сервере: локальная память телефона (в т.ч. не дошедший до сервера выбор
+ *  или остаток от прошлой игры) ставкой не считается, перезагрузка её «не оживляет». */
+export function effectiveBet(stage: string | undefined, local: number | null, server: number | null): number | null {
+  return stage === 'betting' || !stage ? (local ?? server) : server
+}

@@ -8,6 +8,7 @@ export default defineConfig({
   publicDir: false,
   resolve: { alias: { '@supabase/supabase-js': new URL('./demo/bulldog/supabaseStub.ts', import.meta.url).pathname } },
   define: {
+    __BULLDOG_V__: JSON.stringify('demo'),
     'process.env.NODE_ENV': JSON.stringify('production'),
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify('http://127.0.0.1:1'),   // демо не ходит в сеть; значения нужны только чтобы модуль клиента не упал при импорте
     'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify('demo'),
