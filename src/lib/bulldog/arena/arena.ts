@@ -9,7 +9,7 @@ import { ButterflyManager } from '../vendor/butterfly.mjs'
 import type { RaceV3 } from '../v3types'
 
 const SW = L.spriteWidth, SH = L.spriteHeight
-export interface ArenaOptions { slotBase?: string; names?: string[]; guide?: boolean }
+export interface ArenaOptions { slotBase?: string; slotFiles?: string[]; names?: string[]; guide?: boolean }
 export class ArenaRenderer {
   private ctx: CanvasRenderingContext2D
   private pool = new BitmapPool()
@@ -36,7 +36,7 @@ export class ArenaRenderer {
     this.art = { sky, mtnFar, mtnNear, shore, lake, track, fence, ray }
     this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur)
     await Promise.all(DOG_IDS.map(async (id, i) => { const d = await loadDogData(id); this.dogs[i] = d; await Promise.all(raceSheetUrls(d, this.race!.dogs[i].segments).map(u => this.pool.get(u))) }))
-    if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase); this.slots = r.loaded; this.missing = r.missing }
+    if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase, this.opt.slotFiles); this.slots = r.loaded; this.missing = r.missing }
     this.buildMs = performance.now() - s
   }
   destroy() { this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }

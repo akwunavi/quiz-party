@@ -36,12 +36,17 @@ ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}
 <script src="demo.js"></script></body></html>
 `)
 writeFileSync(join(out, 'arena.js'), readFileSync(join(R, 'dist-demo/app-arena/arena.js')))
+// авторские слои арены (public/arena) — рядом, и список для загрузчика
+mkdirSync(join(out, 'arena'), { recursive: true }); const artFiles = existsSync(join(R, 'public/arena')) ? readdirSync(join(R, 'public/arena')).filter(f => /\.(webp|png)$/.test(f)) : []
+for (const f of artFiles) writeFileSync(join(out, 'arena', f), readFileSync(join(R, 'public/arena', f)))
+writeFileSync(join(out, 'arena', 'slots.js'), `window.__ARENA_SLOTS=${JSON.stringify(artFiles)};\n`)
 writeFileSync(join(out, 'arena.html'), `<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зимняя арена — сегмент</title>
 <style>html,body{margin:0;height:100%;background:#000;color:#ddd;font:14px system-ui,sans-serif}#root{display:flex;flex-direction:column;height:100vh}#stage{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center}
 #cv{max-width:100%;max-height:100%;aspect-ratio:16/9;background:#000}#bar{display:flex;gap:12px;align-items:center;padding:8px 14px;background:#15171c;border-top:1px solid #333}#bar input[type=range]{flex:1}button{padding:6px 12px;cursor:pointer;border:1px solid #555;background:#262a33;color:#eee;border-radius:6px}</style></head>
 <body><div id="root"><p style="padding:24px">Загрузка собак…</p></div>
 ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}
+<script src="arena/slots.js"></script>
 <script src="arena.js"></script></body></html>
 `)
 writeFileSync(join(out, 'КАК ОТКРЫТЬ.txt'), `1. Распакуйте архив (правая кнопка → «Извлечь всё…»).

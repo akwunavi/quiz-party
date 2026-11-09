@@ -7,8 +7,9 @@ const root = document.getElementById('root')!
 root.innerHTML = `<div id="stage"><canvas id="cv"></canvas></div><div id="bar"><button id="pp">⏸ Пауза</button><button id="rs">↺ С начала</button>
 <input id="sl" type="range" min="0" max="${DUR}" step="0.01" value="0"><span id="tm">0.0 / ${DUR} c</span><label><input id="gd" type="checkbox"> Разметка слоёв и дорожек</label><span id="st">Загрузка…</span></div>`
 const cv = document.getElementById('cv') as HTMLCanvasElement
-// файлы авторских слоёв лежат рядом в папке arena/; пока их нет, не опрашиваем (иначе консоль полна 404). Для проверки готовых слоёв: arena.html?slots
-const r = new ArenaRenderer(cv, { slotBase: location.search.includes('slots') ? './arena/' : undefined })
+// авторские слои лежат рядом в папке arena/ (список — arena/slots.js, его пишет сборка): грузим только перечисленные, без опроса отсутствующих (иначе 404 в консоли)
+const files = (window as unknown as { __ARENA_SLOTS?: string[] }).__ARENA_SLOTS
+const r = new ArenaRenderer(cv, { slotBase: files?.length ? './arena/' : undefined, slotFiles: files })
 const $ = (id: string) => document.getElementById(id) as HTMLInputElement
 let playing = true, t = 0, last = performance.now()
 void r.init({ seed: 328, D: 42 }, 8, DUR).then(() => {

@@ -22,8 +22,8 @@ export const SLOTS: SlotSpec[] = [
     note: 'бесшовно по горизонтали; плотные заснеженные ели + крыши и тёплые окна далёких шале в просветах; воздушная дымка (мягче и светлее переднего плана); фон прозрачный сверху (небо и горы за ним)' },
   { id: 'village_mid', file: 'village_mid.webp', title: 'Зимняя деревня: шале, колокольня, дым из труб', parallax: 0.55, bottomY: BERM_Y - 10, tileW: 2752, tileH: 400, mode: 'sequence', modules: 3,
     note: '3 модуля (вариант A) или 4 (вариант B); края каждого модуля свободны (120 px) — стык закрывают ели/фонари спрайтами; шале с тёплыми окнами, балконы, гирлянды, колокольня, ели между домами; без зрителей' },
-  { id: 'stands_crowd', file: 'stands_crowd.webp', title: 'Трибуна с публикой (вариант A)', parallax: 0.92, bottomY: BERM_Y + 30, tileW: 1000, tileH: 480, mode: 'sequence', modules: 2,
-    note: 'модуль 1000×480 при 1×: отдельно стоящая двухъярусная трибуна с публикой (≈845 px) и зазор; файл = модули по горизонтали (обычный, зеркальный); нижние ~30 px прячутся за бортом' },
+  { id: 'stands_crowd', file: 'stands_crowd.webp', title: 'Трибуна с публикой (вариант A)', parallax: 0.92, bottomY: BERM_Y + 30, tileW: 1596, tileH: 365, mode: 'sequence', modules: 2,
+    note: 'модуль 2282×522 исходных px (≈1596×365 при 1×; трибуна ≈1300 px + зазор ≈290 px, в котором видны горы): низкая фронтальная трибуна с публикой, снежная крыша, гирлянды, баннеры; файл = обычный и зеркальный модули; нижние ~30 px прячет борт, публика остаётся над перилами ограждения' },
   { id: 'stands', file: 'stands.webp', title: 'Трибуны/навесы (без зрителей)', parallax: 0.92, bottomY: BERM_Y + 2, tileW: 2400, tileH: 340, mode: 'sequence', modules: 3,
     note: '3 модуля стыкуются в любом порядке; многоуровневые деревянные трибуны B (тёмно-синие металлические элементы, световые панели), навесы с гирляндами C; ярусы пустые — зрители отдельным слоем' },
   { id: 'crowd', file: 'crowd.webp', title: 'Зрители: три ряда отдельными слоями', parallax: 0.92, bottomY: BERM_Y + 2, tileW: 2400, tileH: 340, mode: 'sequence', modules: 3,
@@ -33,9 +33,10 @@ export const SLOTS: SlotSpec[] = [
 ]
 export interface LoadedSlot { spec: SlotSpec; img: HTMLImageElement }
 /** Грузит доступные слои; отсутствующие возвращает списком (их просто нет в кадре). */
-export async function loadSlots(base: string): Promise<{ loaded: LoadedSlot[]; missing: SlotSpec[] }> {
+export async function loadSlots(base: string, files?: string[]): Promise<{ loaded: LoadedSlot[]; missing: SlotSpec[] }> {
   const loaded: LoadedSlot[] = [], missing: SlotSpec[] = []
-  await Promise.all(SLOTS.map(spec => new Promise<void>(res => { const img = new Image(); img.onload = () => { loaded.push({ spec, img }); res() }; img.onerror = () => { missing.push(spec); res() }; img.src = `${base}${spec.file}` })))
+  await Promise.all(SLOTS.map(spec => new Promise<void>(res => {
+    if (files && !files.includes(spec.file)) { missing.push(spec); res(); return } const img = new Image(); img.onload = () => { loaded.push({ spec, img }); res() }; img.onerror = () => { missing.push(spec); res() }; img.src = `${base}${spec.file}` })))
   loaded.sort((a, b) => a.spec.parallax - b.spec.parallax); return { loaded, missing }
 }
 /** Какой модуль файла стоит в плитке i: детерминированно, без одного и того же модуля подряд (при ≥ 2 модулях). */
