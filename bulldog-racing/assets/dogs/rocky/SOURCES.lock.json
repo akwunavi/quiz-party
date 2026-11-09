@@ -1,0 +1,585 @@
+{
+ "dog": "rocky",
+ "files": [
+  {
+   "dest": "alpha/DOG3_IDLE_B_ALPHA_240.webm",
+   "role": "alpha",
+   "bytes": 2544396,
+   "sha256": "8e69045bd6393bae9348d4a3ff360e89e56870848e418ab900999377de210767",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-alpha-lab/assets/DOG3_IDLE_B_ALPHA_240.webm"
+   },
+   "note": "IDLE B (принят 23.10)"
+  },
+  {
+   "dest": "alpha/DOG3_IDLE_SOURCE_ALPHA_121.webm",
+   "role": "alpha",
+   "bytes": 1280566,
+   "sha256": "d9f8029003abd32f5612e9db6cbd890d13d1de23397fd2a410f9cd734fb9728f",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-alpha-lab/assets/DOG3_IDLE_SOURCE_ALPHA_121.webm"
+   },
+   "note": "IDLE исходные 121"
+  },
+  {
+   "dest": "alpha/DOG3_RETURN_D_ALPHA_97.webm",
+   "role": "alpha",
+   "bytes": 1228432,
+   "sha256": "303ce2671b4434722bd5ae158947c23fa0e819a0c51382f53fdf079e435adaf6",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/return-montage-v2/assets/DOG3_RETURN_D_ALPHA_97.webm"
+   },
+   "note": "RETURN_TO_IDLE D (рабочий)"
+  },
+  {
+   "dest": "alpha/DOG3_ROLL_V2_B_ALPHA_145.webm",
+   "role": "alpha",
+   "bytes": 1853579,
+   "sha256": "1d207e4bd57aa739c20178ae993c3eb612fd8a09cabcc95060f3ff528327f791",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-v3-rhythm-review/assets/DOG3_ROLL_V2_B_ALPHA_145.webm"
+   },
+   "note": "ROLL B 145"
+  },
+  {
+   "dest": "alpha/DOG3_SELECTED_ALPHA_121.webm",
+   "role": "alpha",
+   "bytes": 1357403,
+   "sha256": "bce878ba91efd5a53c716441c7e99aa8ca6b12016999998ed47d5d9580bc7cc6",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/selected-alpha-lab/assets/DOG3_SELECTED_ALPHA_121.webm"
+   },
+   "note": "SELECTED (принят)"
+  },
+  {
+   "dest": "alpha/DOG3_SNIFF_PEE_ALPHA_240.webm",
+   "role": "alpha",
+   "bytes": 1958678,
+   "sha256": "102692b101c81c69d24ae74d827418821a369579cb48e8325d69b1e7c5c2f23c",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/sniff-pee-v3-lab/assets/DOG3_SNIFF_PEE_ALPHA_240.webm"
+   },
+   "note": "SNIFF_PEE+RETURN 240"
+  },
+  {
+   "dest": "alpha/bulldog_03_run_alpha_v2.webm",
+   "role": "alpha",
+   "bytes": 9272249,
+   "sha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+   "source": {
+    "ref": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+    "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+    "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_run_alpha_v2.webm"
+   },
+   "expectedSha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+   "shaMatchesApproved": true,
+   "note": "RUN alpha v2; ветка preview/bulldog-03-05-alpha-v2-20261008"
+  },
+  {
+   "dest": "alpha/rocky-butterfly-alpha-121.webm",
+   "role": "alpha",
+   "bytes": 784075,
+   "sha256": "dcb9025468f41b0b3a083ae9ea4fe288c5382d1b743c9e8da098f6fe9e9e9b87",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/butterfly-v3-lab/assets/rocky-butterfly-alpha-121.webm"
+   },
+   "note": "BUTTERFLY 121"
+  },
+  {
+   "dest": "alpha/rocky-race-stand-alpha.png",
+   "role": "still",
+   "bytes": 631144,
+   "sha256": "d9f38d9009f4b8fd9dd9056abc501eeeedf5922995e2fefc66ab0950bb9c215f",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/assets/rocky-race-stand-alpha.png"
+   },
+   "note": "RACE_STAND alpha"
+  },
+  {
+   "dest": "alpha/rocky-race-start-alpha-24.webm",
+   "role": "alpha",
+   "bytes": 439118,
+   "sha256": "c7eb35db2a1d93c3530c3fab280dae5c18d2eaf68345fd2b95afe67d3ea29c60",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/assets/rocky-race-start-alpha-24.webm"
+   },
+   "note": "START #18-41"
+  },
+  {
+   "dest": "alpha/rocky-stop-alpha-37.webm",
+   "role": "alpha",
+   "bytes": 532357,
+   "sha256": "b9865fdcbd96a97e8040a32bea25ba2eca21670ccce17f6fff2a5446636dff2d",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/assets/rocky-stop-alpha-37.webm"
+   },
+   "note": "STOP 37"
+  },
+  {
+   "dest": "atlas/base.png",
+   "role": "still",
+   "bytes": 18994,
+   "sha256": "88fe2d8be1913c5d5b6787667a87814d97e3db1fe193fbd63dd5ba82bc3bc886",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/assets/base.png"
+   },
+   "note": "атлас RACE_STAND (1 кадр)"
+  },
+  {
+   "dest": "atlas/butterfly.png",
+   "role": "still",
+   "bytes": 1053421,
+   "sha256": "a57b2ba9375ad8f52a409f4e5a534fa123a8a08de8ac62d3094b3127eec0aebc",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/butterfly-v3-lab/assets/rocky-butterfly.png"
+   },
+   "note": "BUTTERFLY 121"
+  },
+  {
+   "dest": "atlas/roll.png",
+   "role": "still",
+   "bytes": 1426289,
+   "sha256": "baf6805baf7f8065d019ae09c342648dcd043c73fb949f4868277e2da7c5bc3f",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-v3-rhythm-review/assets/rocky-roll-B.png"
+   },
+   "note": "ROLL B 145"
+  },
+  {
+   "dest": "atlas/run.png",
+   "role": "still",
+   "bytes": 281032,
+   "sha256": "dead4826e918fb476243515e0e992969a5c2a7fd7b49ad50d13eb36ed237db4d",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/assets/rocky-run.png"
+   },
+   "note": "RUN, текущий (inventory 22.10; используется лабораторией фазировки)"
+  },
+  {
+   "dest": "atlas/run_stoplab_variant.png",
+   "role": "still",
+   "bytes": 167985,
+   "sha256": "3caab1d410ecb1dbbcfcb960f2f2cc68f2f3424ec9170c9f333ba9c829d80936",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/assets/run.png"
+   },
+   "note": "вариант RUN из STOP-лаборатории (НЕ основной)"
+  },
+  {
+   "dest": "atlas/sniff_pee.png",
+   "role": "still",
+   "bytes": 2211540,
+   "sha256": "ffb0ad95d7d02f21156060244dee9e6cb2c29ef4b39e78d8f30a5077060da38c",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/sniff-pee-v3-lab/assets/rocky-sniff-pee.png"
+   },
+   "note": "SNIFF_PEE+RETURN 240"
+  },
+  {
+   "dest": "atlas/start.png",
+   "role": "still",
+   "bytes": 336910,
+   "sha256": "7a9ac4bc6cc064f37d2b7399ec78816731078ce8bdb1a5cea6f7e7f73a910800",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/assets/rocky-start.png"
+   },
+   "note": "START 40"
+  },
+  {
+   "dest": "atlas/stop.png",
+   "role": "still",
+   "bytes": 479300,
+   "sha256": "018bb9cdf2d2b7387f2a6bf0a17b0b05478a11e18cad02d6072f36a8b599aa14",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/assets/stop.png"
+   },
+   "note": "STOP 37"
+  },
+  {
+   "dest": "docs/IDLE_APPROVED.md",
+   "role": "other",
+   "bytes": 1246,
+   "sha256": "8f9ad2b2ffa2222917fa2e2843c3570fdca32d8572a9cf7d7c521348de28ed86",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-alpha-lab/APPROVED.md"
+   }
+  },
+  {
+   "dest": "docs/IDLE_EXIT_REPORT.md",
+   "role": "other",
+   "bytes": 8635,
+   "sha256": "403d7d4b3045506b647615b1fe5836c4965af72542d7dacdeec5ca93f574a7c5",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-exit-lab/REPORT.md"
+   }
+  },
+  {
+   "dest": "docs/LIBRARY_INVENTORY_20261022.md",
+   "role": "other",
+   "bytes": 12397,
+   "sha256": "a42b870e3cfc1291954823196e1a401b08d665fe71382833c302d0d4d2b154f9",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/LIBRARY_INVENTORY_20261022.md"
+   }
+  },
+  {
+   "dest": "docs/MANIFEST.source.json",
+   "role": "meta",
+   "bytes": 20325,
+   "sha256": "6185107d668220cfe0b0bc2e280c4e6a3bb18a0c362d8821915d9934659f94fc",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/MANIFEST.json"
+   }
+  },
+  {
+   "dest": "docs/RETURN_WORKING.md",
+   "role": "other",
+   "bytes": 2790,
+   "sha256": "b16e1031a60da1e20f082fca3814a5ac08ffbd57403f1b108520c16ae06e8a2b",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/return-montage-v2/WORKING.md"
+   }
+  },
+  {
+   "dest": "docs/ROLL_APPROVED.md",
+   "role": "other",
+   "bytes": 3413,
+   "sha256": "cec207abae74d82037d6893a6b62b30a6bde9c041eacf93a95fb49ec70780232",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-v3-rhythm-review/APPROVED.md"
+   }
+  },
+  {
+   "dest": "docs/RUN_PHASE_REPORT.md",
+   "role": "other",
+   "bytes": 8383,
+   "sha256": "43fbcfb38ba60834e65b2716f5d1d732beb05a78d3825358545d2be7bfd2df36",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/run-phase-v3-lab/REPORT.md"
+   }
+  },
+  {
+   "dest": "docs/STATUS.md",
+   "role": "other",
+   "bytes": 10061,
+   "sha256": "b2863e9c3a58dd7cb4e6d21c503bd9c2783ccb0c77ea89bfa36d488a9f5301a2",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/STATUS.md"
+   }
+  },
+  {
+   "dest": "meta/idle_exit_DELAY_MAP.json",
+   "role": "meta",
+   "bytes": 73888,
+   "sha256": "bb2bab44f2158ea70f013478d6a7645fac957d64f593006772f2facb58fbdb83",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-exit-lab/DELAY_MAP.json"
+   },
+   "note": "лаборатория, НЕ принята"
+  },
+  {
+   "dest": "meta/idle_exit_ENTRY_METRICS.json",
+   "role": "meta",
+   "bytes": 67312,
+   "sha256": "152b9648fb365ed5a9cc40c8f87c72812d81922a0fad19d307f2af84f4af9151",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-exit-lab/ENTRY_METRICS.json"
+   },
+   "note": "лаборатория, НЕ принята"
+  },
+  {
+   "dest": "meta/retiming_butterfly.json",
+   "role": "meta",
+   "bytes": 1437,
+   "sha256": "2e3ad812ae1e1c9e22277ebe832f34521a8c9634969e791d59f9f111ba306194",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/butterfly-v3-lab/retiming.json"
+   }
+  },
+  {
+   "dest": "meta/retiming_roll.json",
+   "role": "meta",
+   "bytes": 1568,
+   "sha256": "ecb3042f359de849bb026cd19eeab48eaa4056580566d78f50a094328534b745",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-v3-rhythm-review/retiming.json"
+   }
+  },
+  {
+   "dest": "meta/retiming_sniff.json",
+   "role": "meta",
+   "bytes": 2410,
+   "sha256": "b9985b22cf85dc79202ecb81a05095a151906a4e487457d5ae30c1102921c4f7",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/sniff-pee-v3-lab/retiming.json"
+   }
+  },
+  {
+   "dest": "meta/retiming_start.json",
+   "role": "meta",
+   "bytes": 900,
+   "sha256": "7f584381775645fb5c1db97bfc59e9eb947d259b4978a775d9a0009dd0e5e79c",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/retiming.json"
+   }
+  },
+  {
+   "dest": "meta/retiming_stop.json",
+   "role": "meta",
+   "bytes": 696,
+   "sha256": "5dc91c6e34a01593cdc94b0b05e66f50a77261822458c0300bc282dcb480637e",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/retiming.json"
+   }
+  },
+  {
+   "dest": "runtime/phase.mjs",
+   "role": "runtime",
+   "bytes": 2427,
+   "sha256": "4361fe44864c9b11215a7514e26781a37e6710523252e19c6118d0ae5cb8f770",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/run-phase-v3-lab/phase.mjs"
+   },
+   "note": "RUN-фазировка (принята); P3 это не выражает"
+  },
+  {
+   "dest": "sources/DOG3_BUTTERFLY_KLING_V3_ORIGINAL.mp4",
+   "role": "kling_source",
+   "bytes": 1135480,
+   "sha256": "ff3976679bdbda495bfaa9401d9a0c20ef142d5552c35eff66de250148457171",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/butterfly-v3-lab/assets/DOG3_BUTTERFLY_KLING_V3_ORIGINAL.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG3_RACE_START_KLING_V3_ORIGINAL.mp4",
+   "role": "kling_source",
+   "bytes": 1540538,
+   "sha256": "0cfc25deb0896fa31eb7f6b93fd8c13ac510b12f5406618cab04193959f22ffc",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/assets/DOG3_RACE_START_KLING_V3_ORIGINAL.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG3_ROLL_V2_KLING_V3_ORIGINAL.mp4",
+   "role": "kling_source",
+   "bytes": 2377206,
+   "sha256": "7902405bfaae9b36fae0fd7b18307fe9b8a77122a073c62607668bebe28c8846",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-generation-v2/DOG3_ROLL_V2_KLING_V3_ORIGINAL.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG3_SNIFF_PEE_CLIP1_STAND_TO_POSE_ORIGINAL.mp4",
+   "role": "kling_source",
+   "bytes": 2097791,
+   "sha256": "223e6b65b115262b4803c638fb879a15d6446ed44ecb0a241fdfd8fc582ada06",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/sniff-pee-montage-review/assets/DOG3_SNIFF_PEE_CLIP1_STAND_TO_POSE_ORIGINAL.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG3_STOP_KLING_V3_ORIGINAL.mp4",
+   "role": "kling_source",
+   "bytes": 1449803,
+   "sha256": "29ff6aefcbb2dacdf402121c51316790df641e183ff9e07058f31e39b2d73d9f",
+   "source": {
+    "ref": "origin/claude/nifty-johnson-assbj5",
+    "commit": "28dc74268d2c116dc4361bf3869a8592a034e458",
+    "path": "bulldog3/stop-generation-v1/DOG3_STOP_KLING_V3_ORIGINAL.mp4"
+   },
+   "expectedSha256": "29ff6aefcbb2dacdf402121c51316790df641e183ff9e07058f31e39b2d73d9f",
+   "shaMatchesApproved": true,
+   "note": "восстановлен с ветки claude/nifty-johnson-assbj5 (inventory просил архивировать)"
+  },
+  {
+   "dest": "sources/bulldog_3_idle.mp4",
+   "role": "kling_source",
+   "bytes": 1713078,
+   "sha256": "61a80f28bcc2b5503627056620813dc78a8c44693ba86fb1e9181ece54a30bb5",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/assets/incoming/bulldog_3_idle.mp4"
+   }
+  },
+  {
+   "dest": "sources/bulldog_3_run.mp4",
+   "role": "kling_source",
+   "bytes": 3053419,
+   "sha256": "fc563e55df8caf9bc76680a46c7d1bd8ea3d08713f834b00f0eccf084583aca2",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/assets/incoming/bulldog_3_run.mp4"
+   }
+  },
+  {
+   "dest": "sources/bulldog_3_selected.mp4",
+   "role": "kling_source",
+   "bytes": 1898596,
+   "sha256": "a323e95ded9ee9a5cb5aaf6b1e8ca5b5f1580c46c13960e58cacde16ecd88384",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/assets/incoming/bulldog_3_selected.mp4"
+   }
+  },
+  {
+   "dest": "stills/DOG3_FRONT_STAND_ALPHA.png",
+   "role": "still",
+   "bytes": 455435,
+   "sha256": "42b7e1a25efd768f9a1ab3eabc4d904fae4a9f383b5c777bfb9f9c57960b8284",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/idle-alpha-lab/assets/DOG3_FRONT_STAND_ALPHA.png"
+   },
+   "note": "FRONT_STAND alpha (принят)"
+  },
+  {
+   "dest": "stills/DOG3_RACE_STAND_GENERATED_01.png",
+   "role": "still",
+   "bytes": 1446175,
+   "sha256": "4b53252c44971186e758c79ebfcc1ba31bea1617e7855897d574879ab60e28ce",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-stand-generation-v1/DOG3_RACE_STAND_GENERATED_01.png"
+   },
+   "note": "RACE_STAND исходник"
+  },
+  {
+   "dest": "tools/build_butterfly_assets.py",
+   "role": "other",
+   "bytes": 3121,
+   "sha256": "d038a4177b5d3657c969ef01fc5a589eb83f933b2ea7a9aae5eed3cf3c95436b",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/butterfly-v3-lab/build_assets.py"
+   }
+  },
+  {
+   "dest": "tools/build_roll_B.py",
+   "role": "other",
+   "bytes": 3319,
+   "sha256": "8301907f3232053f83ae22b1b1e98b7d62bcacb2e098a9ed245c21c9230835e2",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/roll-v3-rhythm-review/build_variant_b.py"
+   }
+  },
+  {
+   "dest": "tools/build_sniff_assets.py",
+   "role": "other",
+   "bytes": 3002,
+   "sha256": "a1bc73e38b8c21aea020afecc55801dc954564635889304eed612ff26d230fdb",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/sniff-pee-v3-lab/build_assets.py"
+   }
+  },
+  {
+   "dest": "tools/build_start_assets.py",
+   "role": "other",
+   "bytes": 3291,
+   "sha256": "b6627d0f9111f5bee9eee84d59133fe48097fa4d7344d64c017bef4a4f60dc85",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/race-start-v3-lab/build_assets.py"
+   }
+  },
+  {
+   "dest": "tools/build_stop_assets.py",
+   "role": "other",
+   "bytes": 3473,
+   "sha256": "9828951a8fb9018a63ea628765f697ceda605b564ea04429a84b3ea4be5b136b",
+   "source": {
+    "ref": "origin/codex/dog3-idle-exit-lab-20261102",
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "path": "bulldog3/stop-v3-lab/build_assets.py"
+   }
+  }
+ ],
+ "unresolved": []
+}

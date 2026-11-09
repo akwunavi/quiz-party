@@ -1,0 +1,539 @@
+{
+  "schemaVersion": 1,
+  "scope": "Bulldog #3 research; comprehensive frame-by-frame historical inventory remains in docs/bulldog-race/ASSET_MANIFEST.json",
+  "runFrameMapping": "alpha_v2 output frame n = source MP4 frame n+36 (zero-based), n=0..84",
+  "items": [
+    {
+      "id": "asset-008175",
+      "role": "RUN source",
+      "name": "bulldog_3_run.mp4",
+      "sha256": "fc563e55df8caf9bc76680a46c7d1bd8ea3d08713f834b00f0eccf084583aca2",
+      "bytes": 3053419,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 121,
+        "durationSeconds": 5.041667,
+        "codec": "h264",
+        "alpha": false
+      },
+      "source": "user-upload",
+      "originalPath": "/workspace/attachments/62d126c0-798f-432f-b53c-0b1a7cba1b13/bulldog_3_run.mp4",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-real-dogs-20261007",
+        "commit": "1c652ce822455469101f5f4740653db3f12e8868",
+        "path": "assets/bulldog_03_run.mp4",
+        "gitBlob": "cbfef17e623bbbfffdf2c129f7e564a7a59096d0"
+      },
+      "approvalStatus": "UNKNOWN",
+      "statusEvidence": "Original Kling RUN; visual appearance/reference needs approval",
+      "relatedTo": []
+    },
+    {
+      "id": "asset-008150",
+      "role": "RUN alpha v1",
+      "name": "bulldog_03_run_alpha_v1.webm",
+      "sha256": "b96248b11f58ee713eb2185aa5cdd6eb497d64a3dd9a4606060df819001d5060",
+      "bytes": 9415022,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 85,
+        "durationSeconds": 3.542,
+        "codec": "vp9",
+        "alpha": true
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_run_alpha_v1.webm",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_run_alpha_v1.webm",
+        "gitBlob": "3a47b2df7edb3beebe83cd7452eff896c74b57dc"
+      },
+      "approvalStatus": "SUPERSEDED",
+      "statusEvidence": "Historical report records background/eye/floor defects fixed in v2",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008151",
+      "role": "RUN alpha v2",
+      "name": "bulldog_03_run_alpha_v2.webm",
+      "sha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+      "bytes": 9272249,
+      "media": {
+        "width": 1276,
+        "height": 720,
+        "fps": 24.0,
+        "frames": 85,
+        "durationSeconds": 3.542,
+        "codec": "vp9",
+        "alpha": true
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_run_alpha_v2.webm",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_run_alpha_v2.webm",
+        "gitBlob": "592a9f9998aa80a511511db7b9f8cbcda8f5d592"
+      },
+      "approvalStatus": "CANDIDATE",
+      "statusEvidence": "Technical transparency verified; loop and library use not visually approved",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008149",
+      "role": "v2 alpha masks",
+      "name": "bulldog_03_alpha_masks_v2.tar.gz",
+      "sha256": "980507abe953cc04bff5c8ddfa984b3ea05c391f6d345d6eae56af6ff86b7dc6",
+      "bytes": 17280034,
+      "media": {},
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/bulldog_03_alpha_masks_v2.tar.gz",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/bulldog_03_alpha_masks_v2.tar.gz",
+        "gitBlob": "a150c3c04c465f4900525302d769d3662efe7398"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical intermediate masks for repair/reproduction",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008158",
+      "role": "v2 processing report",
+      "name": "report.md",
+      "sha256": "51c7ab3cd19ceea5f2841e183d13f5eac16fa3c98f6b68a795e9eaa1e8d7f580",
+      "bytes": 5251,
+      "media": {},
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/report.md",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/report.md",
+        "gitBlob": "cc4d0e92076045994588299ec2ffb2355aeffb86"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical evidence for ranges, repairs and browser QA",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008155",
+      "role": "v2 multi-background review",
+      "name": "dog3-review.jpg",
+      "sha256": "9bd76c0c9f8f044dc486658541d8bc6b6888f450de2282af41150c0defb00a5f",
+      "bytes": 211756,
+      "media": {
+        "width": 1595,
+        "height": 816,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/dog3-review.jpg",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/dog3-review.jpg",
+        "gitBlob": "7f48c0f09f5a67834b3ea98bd9d5a9d3d7e4b2ab"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical stills on white, black, green and track",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-008154",
+      "role": "v1 vs v2 comparison",
+      "name": "dog3-before-after.jpg",
+      "sha256": "3313a5daacc5813c672fc1742c8b78725df64c4740abec3927234c9f17f617ae",
+      "bytes": 154687,
+      "media": {
+        "width": 1276,
+        "height": 1164,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/v2-dog3-dog5/published/dog3-before-after.jpg",
+      "archive": {
+        "kind": "git-blob",
+        "branch": "origin/preview/bulldog-03-05-alpha-v2-20261008",
+        "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+        "path": "prototypes/bulldog-racing/reviews/alpha-v2/dog3-before-after.jpg",
+        "gitBlob": "08ed2b6c1eead0867b74975a2c0ede34e087dd0b"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical visual explanation of fixed background contamination",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "asset-004922",
+      "role": "source contact sheet",
+      "name": "source-contact.jpg",
+      "sha256": "4b23532e2fe7b58505ab202d41766f4b663ebe0f7416779d8ab3c3aa48764de5",
+      "bytes": 227130,
+      "media": {
+        "width": 1600,
+        "height": 820,
+        "alpha": false
+      },
+      "source": "workspace-artifact",
+      "originalPath": "/workspace/artifacts/bulldog-racing/four-alpha/dog3/source-contact.jpg",
+      "archive": {
+        "kind": "tar-member",
+        "path": "docs/bulldog-race/archive/parts/part-011.tar",
+        "member": "sha256/4b/4b23532e2fe7b58505ab202d41766f4b663ebe0f7416779d8ab3c3aa48764de5"
+      },
+      "approvalStatus": "REFERENCE",
+      "statusEvidence": "Historical contact of full original RUN",
+      "relatedTo": [
+        "asset-008175"
+      ]
+    },
+    {
+      "id": "missing-dog3-09",
+      "role": "original MASTER image (if one exists)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-10",
+      "role": "IDLE source; alpha pending",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "User supplied source on 2026-10-13; full loop rejected, #34–58 is an internal candidate",
+      "currentPath": "bulldog3/assets/incoming/bulldog_3_idle.mp4"
+    },
+    {
+      "id": "missing-dog3-11",
+      "role": "SELECTED source; alpha pending",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "User supplied source on 2026-10-13; one-shot reaction, final exit needs testing",
+      "currentPath": "bulldog3/assets/incoming/bulldog_3_selected.mp4"
+    },
+    {
+      "id": "missing-dog3-12",
+      "role": "FRONT_STAND source frame",
+      "approvalStatus": "TECHNICAL_CANDIDATE",
+      "statusEvidence": "IDLE #0 matches SELECTED/RUN #0 visually; original background remains",
+      "currentPath": "bulldog3/reviews/asset-intake/DOG3_FRONT_STAND_SOURCE_000.png"
+    },
+    {
+      "id": "missing-dog3-13",
+      "role": "RACE_STAND approved reference",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-14",
+      "role": "INITIAL_START",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-15",
+      "role": "STOP",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-16",
+      "role": "RACE_START (if distinct)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-17",
+      "role": "BUTTERFLY",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-18",
+      "role": "SNIFF_PEE",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-19",
+      "role": "RETURN (if needed)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-20",
+      "role": "ROLL",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-21",
+      "role": "FINISH (if STOP cannot be reused)",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    },
+    {
+      "id": "missing-dog3-22",
+      "role": "original Kling RUN prompt/settings",
+      "approvalStatus": "MISSING",
+      "statusEvidence": "No matching verified Bulldog #3 material in accessible Git refs, archived manifest, or inspected ZIP contents; ask user before production."
+    }
+  ],
+  "visualAcceptance20261013": {
+    "report": "bulldog3/VISUAL_ACCEPTANCE.md",
+    "sourceFrameNumbersZeroBased": [
+      0,
+      12,
+      23,
+      36,
+      48,
+      61,
+      72,
+      90,
+      110,
+      120
+    ],
+    "primary": {
+      "source": [
+        61,
+        72
+      ],
+      "alphaV2": [
+        25,
+        36
+      ]
+    },
+    "alternative": {
+      "source": [
+        48,
+        59
+      ],
+      "alphaV2": [
+        12,
+        23
+      ]
+    },
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_ALTERNATIVE_FRAME_SEQUENCE.png",
+        "sha256": "57ababf93cbc8725378eaaf8194a5bd5eea0efa66a5752b702921f84bebad962",
+        "bytes": 362862
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_PRIMARY_FRAME_SEQUENCE.png",
+        "sha256": "984d71c2ad820035280274c55edfe120bd19e6584e4fccc9542b9ea06a7ddbfe",
+        "bytes": 363970
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_LOOP_ALTERNATIVE_12X.mp4",
+        "sha256": "09cd4340c4aa83c83ca08f0b56359f39d035bf20858eff389c354335a7b1cb7a",
+        "bytes": 1141068
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_LOOP_PRIMARY_12X.mp4",
+        "sha256": "dfcebf9c1c5ef44a9af393bdd91b1253f22d23c45c2a21fff81bf926053477d4",
+        "bytes": 1155886
+      },
+      {
+        "path": "bulldog3/reviews/run-acceptance/DOG3_RUN_SOURCE_APPEARANCE.png",
+        "sha256": "ee377767ce79e5ab207ddf36acb68ce2e236ac2bf446e92812f662b8eef4fb2a",
+        "bytes": 728516
+      }
+    ]
+  },
+  "userUploads20261013": {
+    "scope": "New user attachments after historical search; originals copied without changes",
+    "report": "bulldog3/ASSET_ACCEPTANCE.md",
+    "items": [
+      {
+        "name": "bulldog_3_idle.mp4",
+        "role": "IDLE original; FRONT_STAND source #0",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_idle.mp4",
+        "bytes": 1713078,
+        "sha256": "61a80f28bcc2b5503627056620813dc78a8c44693ba86fb1e9181ece54a30bb5",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": null,
+        "approvalStatus": "TECHNICAL_CANDIDATE"
+      },
+      {
+        "name": "bulldog_3_selected.mp4",
+        "role": "SELECTED original",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_selected.mp4",
+        "bytes": 1898596,
+        "sha256": "a323e95ded9ee9a5cb5aaf6b1e8ca5b5f1580c46c13960e58cacde16ecd88384",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": null,
+        "approvalStatus": "TECHNICAL_CANDIDATE"
+      },
+      {
+        "name": "bulldog_3_run.mp4",
+        "role": "RUN original; byte-identical historical source",
+        "repositoryPath": "bulldog3/assets/incoming/bulldog_3_run.mp4",
+        "bytes": 3053419,
+        "sha256": "fc563e55df8caf9bc76680a46c7d1bd8ea3d08713f834b00f0eccf084583aca2",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 121,
+          "durationSeconds": 5.041667,
+          "codec": "h264",
+          "alpha": false
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": "asset-008175",
+        "approvalStatus": "KNOWN_DUPLICATE"
+      },
+      {
+        "name": "dog3-run-alpha.webm",
+        "role": "RUN alpha-v1; byte-identical historical v1",
+        "repositoryPath": "bulldog3/assets/incoming/dog3-run-alpha.webm",
+        "bytes": 9415022,
+        "sha256": "b96248b11f58ee713eb2185aa5cdd6eb497d64a3dd9a4606060df819001d5060",
+        "media": {
+          "width": 1276,
+          "height": 720,
+          "fps": 24,
+          "frames": 85,
+          "durationSeconds": 3.542,
+          "codec": "vp9",
+          "alpha": true
+        },
+        "provenance": "User attachment supplied after historical inventory on 2026-10-13",
+        "historicalIdentity": "asset-008150",
+        "approvalStatus": "KNOWN_DUPLICATE"
+      }
+    ],
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_FIRST_FRAMES.png",
+        "bytes": 422053,
+        "sha256": "134d9f76db70a02ef65efe392507467e2947b10d762223eef8b6faf8ec363165"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_FRONT_STAND_SOURCE_000.png",
+        "bytes": 401133,
+        "sha256": "182a9dad2b9c7b949e32c1c80614da444bc413eed54bd3f710feae93dce46e1e"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_CONTACT.png",
+        "bytes": 968542,
+        "sha256": "6086b7d09da9f14bd96ff0cc5f9501c46c0cc5491607b4fefa138d30cc8caff0"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_LOOP_34-58_8X.mp4",
+        "bytes": 939213,
+        "sha256": "2dab4ad86433c75d960b49e1eb4ae47b797d40be56bd02a773f8049b3aeaf3d0"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_IDLE_LOOP_CANDIDATES.png",
+        "bytes": 623663,
+        "sha256": "ec500f5700c85c684f169b61d0bf7a7f08893d12c0879a50fc44ccc8d0d62f45"
+      },
+      {
+        "path": "bulldog3/reviews/asset-intake/DOG3_SELECTED_CONTACT.png",
+        "bytes": 971214,
+        "sha256": "a874034f42fb3741ca86915fb280909d04197562a5dabdb5628fe48adb9a72d6"
+      }
+    ]
+  },
+  "raceStandReference20261014": {
+    "status": "REFERENCE_ONLY_NOT_A_FOUR_PAW_STAND",
+    "source": "bulldog3/assets/incoming/bulldog_3_run.mp4",
+    "sourceFrameZeroBased": 63,
+    "sourceTimeSeconds": 2.625,
+    "alphaV2FrameZeroBased": 27,
+    "existingAlphaV2Sha256": "66da682f1eb5b34e084ac502f7c13cfffd82844678b7391cdaa3c88651a6e58d",
+    "report": "bulldog3/RACE_STAND_PLAN.md",
+    "diagnostics": [
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RACE_STAND_REFERENCE_COMPARISON.png",
+        "bytes": 396959,
+        "sha256": "be49e34e8c474dc0e605f742374ac49d6890d8f0b1f3829a97a849cbc4ea5690"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_61-72_POSES.png",
+        "bytes": 959936,
+        "sha256": "8e7e533e8c99e8d788aa90af7ade76e4e8c4ffb6f9eeaf1d93dd94789e7b6d9e"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_BODY_REF_063_NEUTRAL.png",
+        "bytes": 213251,
+        "sha256": "ecb7b76fc94d97298f89968acde1dd66dde17847c7c9548dcc3ae8b3ba3cd9fe"
+      },
+      {
+        "path": "bulldog3/reviews/race-stand/DOG3_RUN_SOURCE_063.png",
+        "bytes": 311918,
+        "sha256": "b2f3b666b3ead4d3107b058b136d0b938e8bcd8da458b65ca436543bb96eba46"
+      }
+    ]
+  },
+  "raceStandImageV1_20261014": {
+    "status": "GENERATED_CANDIDATE_AWAITING_USER_REVIEW",
+    "method": "one image_gen__imagegen image-to-image invocation with one reference image",
+    "cost": "not exposed by tool; user explicitly authorized one invocation despite unknown price",
+    "source": "bulldog3/reviews/race-stand/DOG3_RUN_BODY_REF_063_NEUTRAL.png",
+    "sourceFrameZeroBased": 63,
+    "report": "bulldog3/race-stand-generation-v1/RESULT_REVIEW.md",
+    "files": [
+      {
+        "path": "bulldog3/race-stand-generation-v1/INPUT_RUN_063.png",
+        "bytes": 213251,
+        "sha256": "ecb7b76fc94d97298f89968acde1dd66dde17847c7c9548dcc3ae8b3ba3cd9fe"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/REF_RUN_069.png",
+        "bytes": 447608,
+        "sha256": "1cdae66ef8b8a78853655204d8e1eadbf1f3b7460637088f565ae3107a5db5af"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/DOG3_RACE_STAND_GENERATED_01.png",
+        "bytes": 1446175,
+        "sha256": "4b53252c44971186e758c79ebfcc1ba31bea1617e7855897d574879ab60e28ce"
+      },
+      {
+        "path": "bulldog3/race-stand-generation-v1/DOG3_RACE_STAND_V1_COMPARISON.png",
+        "bytes": 1268617,
+        "sha256": "5f4091bf0c2f6a5492b084c8a341404543c5fb991abc704cf81c3dbc082529d1"
+      }
+    ]
+  }
+}
