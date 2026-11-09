@@ -1,0 +1,499 @@
+{
+ "dog": "pups",
+ "files": [
+  {
+   "dest": "alpha/DOG4_IDLE_v1_alpha_loop240.webm",
+   "role": "alpha",
+   "bytes": 1556920,
+   "sha256": "cedd340aa1269cf6f7a097ac659c6c8ab5259ed5a3a40369bfe057010d1bb1b8",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/idle_loop_v1/alpha/DOG4_IDLE_v1_alpha_loop240.webm"
+   },
+   "expectedSha256": "cedd340aa1269cf6f7a097ac659c6c8ab5259ed5a3a40369bfe057010d1bb1b8",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/IDLE/asset"
+  },
+  {
+   "dest": "alpha/DOG4_SELECTED_v4_alpha_s0-s120.webm",
+   "role": "alpha",
+   "bytes": 1159040,
+   "sha256": "2797f7b7c9a150d35ebf073c73a8138842ec014490384497dcbda74840afab0f",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/selected_v4_game/alpha/DOG4_SELECTED_v4_alpha_s0-s120.webm"
+   },
+   "expectedSha256": "2797f7b7c9a150d35ebf073c73a8138842ec014490384497dcbda74840afab0f",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/SELECTED/asset"
+  },
+  {
+   "dest": "alpha/race_BUTTERFLY__dog4_butterfly_alpha.webm",
+   "role": "alpha",
+   "bytes": 9361443,
+   "sha256": "a16c203fd773f0edad0be71760f28c065395bf8e6689f338420b067d4675865a",
+   "source": {
+    "ref": "3147f9a907884acc688c614adfe74a81844059c9",
+    "commit": "3147f9a907884acc688c614adfe74a81844059c9",
+    "path": "dog4_butterfly_alpha.webm"
+   },
+   "expectedSha256": "a16c203fd773f0edad0be71760f28c065395bf8e6689f338420b067d4675865a",
+   "shaMatchesApproved": true,
+   "note": "мастер BUTTERFLY; ветка codex/dog4-butterfly-20261013"
+  },
+  {
+   "dest": "alpha/race_RACE_STAND__DOG4_BASE_STAND.png",
+   "role": "alpha",
+   "bytes": 209653,
+   "sha256": "b4588f89232be9181fb856cde572f87bb80d49bd86664a303d0d9be41e9eb659",
+   "source": {
+    "ref": "aa92582d57a55b428faf2210076ed1acc4e5584b",
+    "commit": "aa92582d57a55b428faf2210076ed1acc4e5584b",
+    "path": "DOG4_BASE_STAND.png"
+   },
+   "expectedSha256": "b4588f89232be9181fb856cde572f87bb80d49bd86664a303d0d9be41e9eb659",
+   "shaMatchesApproved": true,
+   "note": "мастер RACE_STAND; ветка codex/dog4-run-reference-20261012"
+  },
+  {
+   "dest": "alpha/race_RETURN__dog4_return_A_alpha.webm",
+   "role": "alpha",
+   "bytes": 10907495,
+   "sha256": "3d47a385154eed86965a1d088d13164d2963f60e08075e60b6253c06d511bacd",
+   "source": {
+    "ref": "e8a7588b2ff54545b9c8df62499a209160bef067",
+    "commit": "e8a7588b2ff54545b9c8df62499a209160bef067",
+    "path": "dog4_return_A_alpha.webm"
+   },
+   "expectedSha256": "3d47a385154eed86965a1d088d13164d2963f60e08075e60b6253c06d511bacd",
+   "shaMatchesApproved": true,
+   "note": "мастер RETURN; ветка codex/dog4-return-montage-20261012"
+  },
+  {
+   "dest": "alpha/race_ROLL__dog4_roll_alpha.webm",
+   "role": "alpha",
+   "bytes": 13157466,
+   "sha256": "e5ef85acf46a0d8a607483e6a86ec7734a19c161baecb7eea5bd9b8944fd0ee7",
+   "source": {
+    "ref": "b2f77160da79eddf86183e1a6decf46fcae8d0ad",
+    "commit": "b2f77160da79eddf86183e1a6decf46fcae8d0ad",
+    "path": "dog4_roll_alpha.webm"
+   },
+   "expectedSha256": "e5ef85acf46a0d8a607483e6a86ec7734a19c161baecb7eea5bd9b8944fd0ee7",
+   "shaMatchesApproved": true,
+   "note": "мастер ROLL; ветка codex/dog4-roll-alpha-20261013"
+  },
+  {
+   "dest": "alpha/race_RUN__dog4-run-alpha.webm",
+   "role": "alpha",
+   "bytes": 7633888,
+   "sha256": "1a26ccd66ed780b75564a9fdb2fab5fc5cd0cd0b8b4d0e24e7d169d84fec045f",
+   "source": {
+    "ref": "bfa8f12f44cd55e38d25dcf94067211df7fe507d",
+    "commit": "bfa8f12f44cd55e38d25dcf94067211df7fe507d",
+    "path": "dog4-run-alpha.webm"
+   },
+   "expectedSha256": "1a26ccd66ed780b75564a9fdb2fab5fc5cd0cd0b8b4d0e24e7d169d84fec045f",
+   "shaMatchesApproved": true,
+   "note": "мастер RUN; ветка preview/bulldog-04-alpha-20261008"
+  },
+  {
+   "dest": "alpha/race_SNIFF_PEE__dog4_sniff_pee_optimized_alpha.webm",
+   "role": "alpha",
+   "bytes": 21103903,
+   "sha256": "5c6e476d4a2bf8a933665082b46f7134f42f4a6da8643c6c7f96b335646b8218",
+   "source": {
+    "ref": "e1aa45f870e9ff09933eacd55da2414be3e1cb9c",
+    "commit": "e1aa45f870e9ff09933eacd55da2414be3e1cb9c",
+    "path": "dog4_sniff_pee_optimized_alpha.webm"
+   },
+   "expectedSha256": "5c6e476d4a2bf8a933665082b46f7134f42f4a6da8643c6c7f96b335646b8218",
+   "shaMatchesApproved": true,
+   "note": "мастер SNIFF_PEE; ветка codex/dog4-final-timing-20261012"
+  },
+  {
+   "dest": "alpha/race_START__dog4-start-alpha.webm",
+   "role": "alpha",
+   "bytes": 2965184,
+   "sha256": "2eb5537a8efcfaeed86b4010ad6eebb6e791646bd690a6d7b3da23bf933b5783",
+   "source": {
+    "ref": "4a41f98a560f3fe122695c5ada633cb03e2bfde6",
+    "commit": "4a41f98a560f3fe122695c5ada633cb03e2bfde6",
+    "path": "dog4-start-alpha.webm"
+   },
+   "expectedSha256": "2eb5537a8efcfaeed86b4010ad6eebb6e791646bd690a6d7b3da23bf933b5783",
+   "shaMatchesApproved": true,
+   "note": "мастер START; ветка codex/bulldog4-technical-audit-20261009"
+  },
+  {
+   "dest": "alpha/race_STOP__dog4_stop_alpha.webm",
+   "role": "alpha",
+   "bytes": 400179,
+   "sha256": "630c4e942cfd880f3e58174579d3cf6d76cd1ca27aa2ff1354c025a8752f2673",
+   "source": {
+    "ref": "53526d2142ee1c920b7113f3c5feab11b6009727",
+    "commit": "53526d2142ee1c920b7113f3c5feab11b6009727",
+    "path": "dog4_stop_alpha.webm"
+   },
+   "expectedSha256": "630c4e942cfd880f3e58174579d3cf6d76cd1ca27aa2ff1354c025a8752f2673",
+   "shaMatchesApproved": true,
+   "note": "мастер STOP; ветка codex/dog4-stop-asset-20261012"
+  },
+  {
+   "dest": "atlas/base.png",
+   "role": "still",
+   "bytes": 16137,
+   "sha256": "61e88b93921b29a756dea9b70b4d2d900a359dc67e2e5b468257db5e05723057",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/base.png"
+   },
+   "expectedSha256": "61e88b93921b29a756dea9b70b4d2d900a359dc67e2e5b468257db5e05723057",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/RACE_STAND/atlas"
+  },
+  {
+   "dest": "atlas/butterfly.png",
+   "role": "still",
+   "bytes": 1254291,
+   "sha256": "3aaee7cc6e7a4422c0de73213990a1c915664805e2be9254d3fa7049a7a657f2",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/butterfly.png"
+   },
+   "expectedSha256": "3aaee7cc6e7a4422c0de73213990a1c915664805e2be9254d3fa7049a7a657f2",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/BUTTERFLY/atlas"
+  },
+  {
+   "dest": "atlas/layout.json",
+   "role": "meta",
+   "bytes": 190,
+   "sha256": "7ee678bd9bcbd642e3c4c9bc15da263947c2bc68288f099662fc9dcd3236b56d",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/layout.json"
+   },
+   "expectedSha256": "7ee678bd9bcbd642e3c4c9bc15da263947c2bc68288f099662fc9dcd3236b56d",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/layout"
+  },
+  {
+   "dest": "atlas/manifest.json",
+   "role": "meta",
+   "bytes": 689,
+   "sha256": "aa315f526e9c5c5cb4129eff0c97c2342e3d29e47e087210f3e44178af79de04",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/manifest.json"
+   },
+   "expectedSha256": "aa315f526e9c5c5cb4129eff0c97c2342e3d29e47e087210f3e44178af79de04",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/atlas/manifest"
+  },
+  {
+   "dest": "atlas/return.png",
+   "role": "still",
+   "bytes": 1276063,
+   "sha256": "b95e2548de4da20c4d4a0cb0b61500b95b2f82da279580ff310f48696b3cd401",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/return.png"
+   },
+   "expectedSha256": "b95e2548de4da20c4d4a0cb0b61500b95b2f82da279580ff310f48696b3cd401",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/RETURN/atlas"
+  },
+  {
+   "dest": "atlas/roll.png",
+   "role": "still",
+   "bytes": 1535991,
+   "sha256": "46e18ab3d51473bc96ed2dd9abfc22ba41b15c8425d9437a8bca7aebd1269445",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/roll.png"
+   },
+   "expectedSha256": "46e18ab3d51473bc96ed2dd9abfc22ba41b15c8425d9437a8bca7aebd1269445",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/ROLL/atlas"
+  },
+  {
+   "dest": "atlas/run.png",
+   "role": "still",
+   "bytes": 255999,
+   "sha256": "ddad697b005838271abfc73423b95785bf70dd5a47a73c9e8f31eb841db9c0e7",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/run.png"
+   },
+   "expectedSha256": "ddad697b005838271abfc73423b95785bf70dd5a47a73c9e8f31eb841db9c0e7",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/RUN/atlas"
+  },
+  {
+   "dest": "atlas/sniff_pee.png",
+   "role": "still",
+   "bytes": 2413859,
+   "sha256": "4a9907a0c0fcf666bafa901069d839532009fa4e9bdc9b93db0e26f377bf241e",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/sniff_pee.png"
+   },
+   "expectedSha256": "4a9907a0c0fcf666bafa901069d839532009fa4e9bdc9b93db0e26f377bf241e",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/SNIFF_PEE/atlas"
+  },
+  {
+   "dest": "atlas/start.png",
+   "role": "still",
+   "bytes": 417793,
+   "sha256": "279ebc6d12ae685cbf3b3a5afb11a00df04a3b34769c24f3702427d413a1373e",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/start.png"
+   },
+   "expectedSha256": "279ebc6d12ae685cbf3b3a5afb11a00df04a3b34769c24f3702427d413a1373e",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/START/atlas"
+  },
+  {
+   "dest": "atlas/stop.png",
+   "role": "still",
+   "bytes": 397092,
+   "sha256": "4cb596b90078636be683a834efb13689e58a58ba45097f31ec6b8f5658228eec",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/assets/stop.png"
+   },
+   "expectedSha256": "4cb596b90078636be683a834efb13689e58a58ba45097f31ec6b8f5658228eec",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/STOP/atlas"
+  },
+  {
+   "dest": "contract/dog4.contract.json",
+   "role": "meta",
+   "bytes": 1497,
+   "sha256": "86f707200f027c0d20aa0c9732a23cea3a322e2b4081a80dd2fdb1b58de04a7a",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "race-v3-p3-lab/characters/dog4.contract.json"
+   },
+   "expectedSha256": "86f707200f027c0d20aa0c9732a23cea3a322e2b4081a80dd2fdb1b58de04a7a",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/contract"
+  },
+  {
+   "dest": "contract/dog4.layout.json",
+   "role": "contract",
+   "bytes": 190,
+   "sha256": "7ee678bd9bcbd642e3c4c9bc15da263947c2bc68288f099662fc9dcd3236b56d",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "dog4-v3-lab/layout.json"
+   }
+  },
+  {
+   "dest": "integration/ASSET_REGISTRY.md",
+   "role": "integration",
+   "bytes": 5145,
+   "sha256": "4c2baf9ca2f017ce5f83d28cf72224d1142461a7fc32319abd0f293e83759f50",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/ASSET_REGISTRY.md"
+   }
+  },
+  {
+   "dest": "integration/README.md",
+   "role": "integration",
+   "bytes": 10402,
+   "sha256": "f97065c6fee228cd77c675ace9d21e56b5738dc2f1494cfc001f82e5cf569264",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/README.md"
+   }
+  },
+  {
+   "dest": "integration/STATES_AND_TRANSITIONS.md",
+   "role": "integration",
+   "bytes": 4521,
+   "sha256": "83baf0fe8978fb48d6673d846648accf834c3eb0e6bfdd2c9e2824b650254e5b",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/STATES_AND_TRANSITIONS.md"
+   }
+  },
+  {
+   "dest": "integration/results/check_package.json",
+   "role": "integration",
+   "bytes": 6284,
+   "sha256": "0969ad7ea46098f01ca4e97b5107018864513d92e65285cdd1f753acbffa1bac",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/results/check_package.json"
+   }
+  },
+  {
+   "dest": "integration/results/race_v3_tests_rerun.json",
+   "role": "integration",
+   "bytes": 2221,
+   "sha256": "fa3aea48b01a7b506367e9e22d28610fdc6101ea16ed7c0a11dbe997797c4a27",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/results/race_v3_tests_rerun.json"
+   }
+  },
+  {
+   "dest": "integration/results/selection_logic_check.json",
+   "role": "integration",
+   "bytes": 217,
+   "sha256": "4ea3bb4e2e7767f639ed68381f13296db14c8f7321f7628a67e497896d851591",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/results/selection_logic_check.json"
+   }
+  },
+  {
+   "dest": "integration/runtime/dog4_selection.mjs",
+   "role": "integration",
+   "bytes": 1847,
+   "sha256": "d65b9fb2ca2fad2b7a0d715abe3ce50570264f68c775cb459cf812276dc8b9e7",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/runtime/dog4_selection.mjs"
+   }
+  },
+  {
+   "dest": "integration/tools/check_package.py",
+   "role": "integration",
+   "bytes": 5296,
+   "sha256": "6f99c88bda176c501eec90dea4a365a60636d23eba68da612aa87e42e0659df3",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/tools/check_package.py"
+   }
+  },
+  {
+   "dest": "integration/tools/check_selection_logic.mjs",
+   "role": "integration",
+   "bytes": 1808,
+   "sha256": "fb1add67758c96f35cfec62ab43a506caa9bdd42223c08b436904d475f3c624e",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/tools/check_selection_logic.mjs"
+   }
+  },
+  {
+   "dest": "integration/tools/demo_race_states.py",
+   "role": "integration",
+   "bytes": 4238,
+   "sha256": "83eac6ae7dfca09d580931b709600280686d5a2b90fee477dfeeef68eb436c53",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/tools/demo_race_states.py"
+   }
+  },
+  {
+   "dest": "integration/tools/demo_selection.py",
+   "role": "integration",
+   "bytes": 3341,
+   "sha256": "082adb5a199ef96d8c3f4a29d063979a261dd965168ca162dcfa75f592b7f45f",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/tools/demo_selection.py"
+   }
+  },
+  {
+   "dest": "integration/tools/make_manifest.py",
+   "role": "integration",
+   "bytes": 15790,
+   "sha256": "b17679583baed88dea7f2ae4db94d5f3b38685aca5d47abe32709f89173ca673",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/integration_v1/tools/make_manifest.py"
+   }
+  },
+  {
+   "dest": "sources/DOG4_IDLE_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1711045,
+   "sha256": "a60c29df16b3bb881cb886310f324bb1a94ce4567012f50e7e85d1667143150e",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/idle_g1/DOG4_IDLE_G1_kling_original.mp4"
+   },
+   "expectedSha256": "a60c29df16b3bb881cb886310f324bb1a94ce4567012f50e7e85d1667143150e",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/IDLE/source"
+  },
+  {
+   "dest": "sources/DOG4_SELECTED_G2v4_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1411910,
+   "sha256": "6c6773b1cbe209ce71c442b57644ac0160076e03342d2748ecb4519e81e67634",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/selected_g2v4/DOG4_SELECTED_G2v4_kling_original.mp4"
+   },
+   "expectedSha256": "6c6773b1cbe209ce71c442b57644ac0160076e03342d2748ecb4519e81e67634",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/SELECTED/source"
+  },
+  {
+   "dest": "stills/G0_FRONT_STAND_alpha_1276.png",
+   "role": "still",
+   "bytes": 359701,
+   "sha256": "cf4bd3cf3817cfb7eb419bbe4be045a0ef64de7331d313b11b603c85d6c68f22",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/front_stand_g0/G0_FRONT_STAND_alpha_1276.png"
+   },
+   "expectedSha256": "cf4bd3cf3817cfb7eb419bbe4be045a0ef64de7331d313b11b603c85d6c68f22",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/FRONT_STAND/asset"
+  },
+  {
+   "dest": "stills/G0_FRONT_STAND_studio_1276.png",
+   "role": "still",
+   "bytes": 924790,
+   "sha256": "e5b256e162aed40045f62192406e145a51271c68bc8115459ac00e0774b9b51f",
+   "source": {
+    "ref": "origin/claude/dog4-pups-integration-20261102",
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "path": "bulldog4-pups/front_stand_g0/G0_FRONT_STAND_studio_1276.png"
+   },
+   "expectedSha256": "e5b256e162aed40045f62192406e145a51271c68bc8115459ac00e0774b9b51f",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/FRONT_STAND/studio"
+  }
+ ],
+ "unresolved": []
+}

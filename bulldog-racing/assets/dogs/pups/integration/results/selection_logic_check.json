@@ -1,0 +1,14 @@
+{
+ "gatesEqualLab": true,
+ "picks": 240,
+ "mismatches": [],
+ "maxWait": {
+  "frames": 87,
+  "at": 94,
+  "s": 3.625
+ },
+ "meanWaitS": 0.789,
+ "doublePickIgnored": true,
+ "pickDuringSelectedIgnored": true,
+ "ok": true
+}

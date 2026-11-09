@@ -1,0 +1,39 @@
+{
+  "cellWidth": 178,
+  "cellHeight": 100,
+  "columns": 24,
+  "clips": {
+    "BASE": {
+      "file": "assets/base.png",
+      "frames": 1
+    },
+    "START": {
+      "file": "assets/start.png",
+      "frames": 40
+    },
+    "RUN": {
+      "file": "assets/run.png",
+      "frames": 23
+    },
+    "STOP": {
+      "file": "assets/stop.png",
+      "frames": 37
+    },
+    "SNIFF_PEE": {
+      "file": "assets/sniff_pee.png",
+      "frames": 229
+    },
+    "RETURN": {
+      "file": "assets/return.png",
+      "frames": 109
+    },
+    "BUTTERFLY": {
+      "file": "assets/butterfly.png",
+      "frames": 121
+    },
+    "ROLL": {
+      "file": "assets/roll.png",
+      "frames": 145
+    }
+  }
+}
