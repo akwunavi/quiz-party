@@ -106,6 +106,11 @@ export function buildTrack(): TrackArt {
   x.globalCompositeOperation = 'source-over'
   // трещины: ломаные тонкие линии
   x.lineWidth = 0.7; for (let i = 0; i < WW / 38; i++) { let px = r() * WW, py = Y(BERM_Y + 40 + r() * (ARENA.H - BERM_Y - 60)); x.strokeStyle = `rgba(235,230,255,${0.10 + r() * 0.2})`; x.beginPath(); x.moveTo(px, py); const n = 3 + (r() * 6 | 0); for (let k = 0; k < n; k++) { px += (r() - 0.35) * 60; py += (r() - 0.5) * 18; x.lineTo(px, py) } x.stroke() }
+  // лёгкая «шлифовка» дорожек: чередующиеся едва заметные полосы по центру дорожек, длинные пологие дуги от коньков, мягкие светлые пятна — лёд не пустой, но не ковёр
+  for (let i = 0; i < 5; i++) { const ly = ARENA.LANE_Y[i], top = i ? (ARENA.LANE_Y[i - 1] + ly) / 2 + 4 : BERM_Y + 24, bot = i < 4 ? (ly + ARENA.LANE_Y[i + 1]) / 2 - 2 : ARENA.H
+    x.fillStyle = lin(x, 0, Y(top), 0, Y(bot), [[0, 'rgba(255,255,255,0)'], [0.55, i % 2 ? 'rgba(255,255,255,.075)' : 'rgba(150,130,255,.085)'], [1, 'rgba(255,255,255,0)']]); x.fillRect(0, Y(top), WW, bot - top)
+    for (let k = 0; k < WW / 520; k++) { const px = r() * WW, len = 260 + r() * 520, py = Y(ly - 12 - r() * 34), bend = (r() - 0.5) * 26; x.strokeStyle = `rgba(255,255,255,${0.09 + r() * 0.1})`; x.lineWidth = 0.8 + r() * 0.9; x.beginPath(); x.moveTo(px, py); x.quadraticCurveTo(px + len / 2, py + bend, px + len, py + bend * 0.2); x.stroke() }
+    for (let k = 0; k < WW / 700; k++) { const px = r() * WW, py = Y(ly - 22), rw = 90 + r() * 170; const g = x.createRadialGradient(px, py, 0, px, py, rw); g.addColorStop(0, r() < 0.5 ? 'rgba(255,190,220,.11)' : 'rgba(190,175,255,.11)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.save(); x.translate(px, py); x.scale(1, 0.16); x.translate(-px, -py); x.fillStyle = g; x.fillRect(px - rw, py - rw, rw * 2, rw * 2); x.restore() } }
   // снежные гребни между дорожками: тень, тело гребня (неровное), блик
   const B = [0, 1, 2, 3].map(i => (ARENA.LANE_Y[i] + ARENA.LANE_Y[i + 1]) / 2 + 2)
   for (const by of B) {

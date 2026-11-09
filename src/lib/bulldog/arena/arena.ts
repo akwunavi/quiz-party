@@ -58,6 +58,7 @@ export class ArenaRenderer {
     for (const s of this.slots) this.drawSlot(s, X, T)                       // все авторские слои — ЗА ограждением, от дальнего к ближнему (параллакс по возрастанию)
     c.drawImage(A.fence, -X, BERM_Y + 2 - FENCE_H + sw(0.9))
     c.drawImage(A.track.canvas, -X, A.track.y0)
+    this.drawSlotReflection(X)
     this.drawIceSparkle(T, X)
     this.drawDogs(t, X)
     this.drawLanternBloom(T, X)
@@ -80,9 +81,20 @@ export class ArenaRenderer {
   }
   private drawLakeGlints(T: number, X: number) { const c = this.ctx, r = rng(3); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 70; i++) { const wx = r() * 3600, y = HZ + 6 + r() * (BERM_Y - HZ - 40), a = 0.25 * Math.abs(Math.sin(T * (0.8 + r()) + r() * 6)), x = ((wx - X * 0.2) % (ARENA.W + 200) + ARENA.W + 200) % (ARENA.W + 200) - 100; c.fillStyle = `rgba(255,220,230,${a})`; c.fillRect(x, y, 10 + r() * 24, 1) } c.restore() }
   private drawIceSparkle(T: number, X: number) { const c = this.ctx, r = rng(8); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 90; i++) { const wx = r() * 3000, y = BERM_Y + 30 + r() * (ARENA.H - BERM_Y - 60), ph = r() * 9, a = Math.pow(Math.max(0, Math.sin(T * (1.2 + r() * 2) + ph)), 12), x = ((wx - X) % 3000 + 3000) % 3000 - 500; if (x < -20 || x > ARENA.W + 20) continue; c.fillStyle = `rgba(255,255,255,${a * 0.9})`; c.fillRect(x - 3, y, 7, 1); c.fillRect(x, y - 3, 1, 7) } c.restore() }
+  /** Отражение трибуны и деревни в льду у дальнего борта: половинное разрешение, быстрое затухание — тёплые пятна оживляют верх льда, не споря с собаками. */
+  private reflC = cv(960, 90)
+  private drawSlotReflection(X: number) {
+    if (!this.slots.length) return
+    const r = this.reflC.getContext('2d')!, c = this.ctx; r.setTransform(1, 0, 0, 1, 0, 0); r.clearRect(0, 0, 960, 90); r.globalCompositeOperation = 'source-over'
+    r.setTransform(0.5, 0, 0, -0.5, 0, 0.5 * BERM_Y)
+    for (const s of this.slots) { const sp = s.spec, mw = s.img.width / sp.modules
+      for (const p of slotPlacements(sp, X)) r.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH * p.scale, sp.tileW * p.scale, sp.tileH * p.scale) }
+    r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'destination-in'; const g = r.createLinearGradient(0, 0, 0, 90); g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)'); r.fillStyle = g; r.fillRect(0, 0, 960, 90)
+    c.save(); c.globalAlpha = 0.2; c.drawImage(this.reflC, 0, 0, 960, 90, 0, BERM_Y + 8, ARENA.W, 180); c.restore()
+  }
   private drawSlot(s: LoadedSlot, X: number, T: number) {
     const c = this.ctx, sp = s.spec, mw = s.img.width / sp.modules
-    for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH, sp.tileW, sp.tileH)
+    for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH * p.scale, sp.tileW * p.scale, sp.tileH * p.scale)
     void T
   }
   private noseOf(id: string, d: DogData, v: { sheet: string | null; index: number | null }, bm: ImageBitmap) {

@@ -54,11 +54,11 @@ describe('слоты авторской графики', () => {
   })
   it('маршрут: трибуна → открытый участок → деревня → открытый участок → трибуна, без наложений и без старой трибуны', () => {
     const st = SLOTS.find(x => x.id === 'stands_crowd')!, vi = SLOTS.find(x => x.id === 'village_mid')!
-    const items = [...st.route!.map(r => ({ id: 'st', x: r.x, w: st.tileW })), ...vi.route!.map(r => ({ id: 'vi', x: r.x, w: vi.tileW }))].sort((a, b) => a.x - b.x)
+    const items = [...st.route!.map(r => ({ id: 'st', x: r.x, w: st.tileW * (r.scale ?? 1) })), ...vi.route!.map(r => ({ id: 'vi', x: r.x, w: vi.tileW }))].sort((a, b) => a.x - b.x)
     expect(items.map(i => i.id)).toEqual(['st', 'vi', 'st'])
     expect(st.parallax).toBe(vi.parallax)                                    // идут по одной «линии» маршрута — взаимный сдвиг не плывёт
     // объекты (у трибуны ≈ 82% модуля, у деревни весь кадр) не налезают друг на друга; между ними — открытый участок с горами ≥ 300 px
-    const ends = [items[0].x + 1303, items[1].x + vi.tileW, items[2].x + 294]; const starts = [items[1].x, items[2].x + 294]
+    const ends = [items[0].x + 1303 * 0.9, items[1].x + vi.tileW, items[2].x + 294 * 0.74]; const starts = [items[1].x, items[2].x + 294 * 0.74]
     for (let k = 0; k < 2; k++) expect(starts[k] - ends[k]).toBeGreaterThanOrEqual(300)
     expect(SLOTS.some(x => x.id === 'stands')).toBe(true)                    // старая двухъярусная в маршрут не входит (её нет в файлах public/arena)
     expect(slotPlacements(vi, 0).length + slotPlacements(vi, 2687).length).toBeGreaterThan(0)
@@ -69,7 +69,7 @@ describe('слоты авторской графики', () => {
     expect(moduleOf(5, 1)).toBe(0)
   })
   it('нижние кромки слоёв не заходят на трассу, у всех есть описание для художника', () => {
-    for (const s of SLOTS) { expect(s.bottomY).toBeLessThan(ARENA.LANE_Y[0] - 15);           // низ слоя (его нижние ~30 px прячет борт) не доходит до первой дорожки
+    for (const s of SLOTS) { expect(s.bottomY).toBeLessThanOrEqual(BERM_Y + 40);           // низ слоя (его нижние ~30 px прячет борт) не доходит до первой дорожки
        expect(s.note.length).toBeGreaterThan(20); expect(s.file).toMatch(/\.webp$/) }
   })
 })
