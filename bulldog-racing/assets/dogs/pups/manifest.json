@@ -1,0 +1,256 @@
+{
+ "schema": "bulldog-library-dog/v1",
+ "dog": "pups",
+ "name": "Пупс",
+ "number": 4,
+ "technicalId": "bulldog4 / dog4",
+ "fps": 24,
+ "alphaFormat": "VP9 WebM alpha_mode=1, 1276x720 (PNG-стойки — RGBA 1276x720 или 2720x1536)",
+ "states": {
+  "FRONT_STAND": {
+   "status": "accepted",
+   "statusSource": "MANIFEST (G0)",
+   "files": [
+    "stills/G0_FRONT_STAND_alpha_1276.png"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "stills/G0_FRONT_STAND_alpha_1276.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "IDLE": {
+   "status": "accepted",
+   "statusSource": "MANIFEST (G1)",
+   "files": [
+    "alpha/DOG4_IDLE_v1_alpha_loop240.webm"
+   ],
+   "contractClip": null,
+   "note": "выход: integration/runtime/dog4_selection.mjs (до 3,62 с)",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG4_IDLE_v1_alpha_loop240.webm": {
+     "frames": 240,
+     "seconds": 10.0
+    }
+   }
+  },
+  "SELECTED": {
+   "status": "accepted",
+   "statusSource": "MANIFEST (v4)",
+   "files": [
+    "alpha/DOG4_SELECTED_v4_alpha_s0-s120.webm"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG4_SELECTED_v4_alpha_s0-s120.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "RETURN_TO_IDLE": {
+   "status": "not_needed",
+   "statusSource": "MANIFEST: SELECTED кончается в G0",
+   "files": [],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {}
+  },
+  "RACE_STAND": {
+   "status": "accepted",
+   "statusSource": "MANIFEST",
+   "files": [
+    "alpha/race_RACE_STAND__DOG4_BASE_STAND.png"
+   ],
+   "contractClip": "BASE",
+   "note": "мастер без alpha (RGB)",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_RACE_STAND__DOG4_BASE_STAND.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "START": {
+   "status": "accepted",
+   "statusSource": "MANIFEST (тайминг рабочий)",
+   "files": [
+    "alpha/race_START__dog4-start-alpha.webm"
+   ],
+   "contractClip": "START",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_START__dog4-start-alpha.webm": {
+     "frames": 40,
+     "seconds": 1.667
+    }
+   }
+  },
+  "RUN": {
+   "status": "accepted",
+   "statusSource": "MANIFEST (цикл #11–22 рабочий)",
+   "files": [
+    "alpha/race_RUN__dog4-run-alpha.webm"
+   ],
+   "contractClip": "RUN",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_RUN__dog4-run-alpha.webm": {
+     "frames": 81,
+     "seconds": 3.375
+    }
+   }
+  },
+  "STOP": {
+   "status": "accepted",
+   "statusSource": "MANIFEST",
+   "files": [
+    "alpha/race_STOP__dog4_stop_alpha.webm"
+   ],
+   "contractClip": "STOP",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_STOP__dog4_stop_alpha.webm": {
+     "frames": 37,
+     "seconds": 1.542
+    }
+   }
+  },
+  "FINISH": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST (рабочий)",
+   "files": [],
+   "contractClip": "FINISH_DECELERATE",
+   "note": "= STOP, затем BASE",
+   "framesPlay": null,
+   "media": {}
+  },
+  "SNIFF_PEE+RETURN": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST (движение принято, тайминг рабочий)",
+   "files": [
+    "alpha/race_SNIFF_PEE__dog4_sniff_pee_optimized_alpha.webm",
+    "alpha/race_RETURN__dog4_return_A_alpha.webm"
+   ],
+   "contractClip": "SNIFF_PEE+RETURN",
+   "note": "два клипа 229 + 109",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_SNIFF_PEE__dog4_sniff_pee_optimized_alpha.webm": {
+     "frames": 230,
+     "seconds": 9.583
+    },
+    "alpha/race_RETURN__dog4_return_A_alpha.webm": {
+     "frames": 109,
+     "seconds": 4.542
+    }
+   }
+  },
+  "ROLL": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST (хореография принята, стыки рабочие)",
+   "files": [
+    "alpha/race_ROLL__dog4_roll_alpha.webm"
+   ],
+   "contractClip": "ROLL",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_ROLL__dog4_roll_alpha.webm": {
+     "frames": 145,
+     "seconds": 6.042
+    }
+   }
+  },
+  "BUTTERFLY": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST (рабочий; бабочка вырезана маской)",
+   "files": [
+    "alpha/race_BUTTERFLY__dog4_butterfly_alpha.webm"
+   ],
+   "contractClip": "BUTTERFLY",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/race_BUTTERFLY__dog4_butterfly_alpha.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  }
+ },
+ "race": {
+  "contract": "contract/pups.contract.json",
+  "atlas": "atlas/atlas.json",
+  "atlasKind": "clip-indexed",
+  "cell": [
+   178,
+   100
+  ],
+  "columns": 24,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  },
+  "scale": 1.0,
+  "display": "display.json"
+ },
+ "selectionLogic": "integration/runtime/dog4_selection.mjs",
+ "provenance": {
+  "lock": "SOURCES.lock.json",
+  "refs": {
+   "origin/claude/dog4-pups-integration-20261102": {
+    "commit": "03ebd8b68bdd43453535e60a57704afba485cdb1",
+    "files": 30
+   },
+   "3147f9a907884acc688c614adfe74a81844059c9": {
+    "commit": "3147f9a907884acc688c614adfe74a81844059c9",
+    "files": 1
+   },
+   "aa92582d57a55b428faf2210076ed1acc4e5584b": {
+    "commit": "aa92582d57a55b428faf2210076ed1acc4e5584b",
+    "files": 1
+   },
+   "e8a7588b2ff54545b9c8df62499a209160bef067": {
+    "commit": "e8a7588b2ff54545b9c8df62499a209160bef067",
+    "files": 1
+   },
+   "b2f77160da79eddf86183e1a6decf46fcae8d0ad": {
+    "commit": "b2f77160da79eddf86183e1a6decf46fcae8d0ad",
+    "files": 1
+   },
+   "bfa8f12f44cd55e38d25dcf94067211df7fe507d": {
+    "commit": "bfa8f12f44cd55e38d25dcf94067211df7fe507d",
+    "files": 1
+   },
+   "e1aa45f870e9ff09933eacd55da2414be3e1cb9c": {
+    "commit": "e1aa45f870e9ff09933eacd55da2414be3e1cb9c",
+    "files": 1
+   },
+   "4a41f98a560f3fe122695c5ada633cb03e2bfde6": {
+    "commit": "4a41f98a560f3fe122695c5ada633cb03e2bfde6",
+    "files": 1
+   },
+   "53526d2142ee1c920b7113f3c5feab11b6009727": {
+    "commit": "53526d2142ee1c920b7113f3c5feab11b6009727",
+    "files": 1
+   }
+  },
+  "unresolved": 0,
+  "filesInLock": 38
+ }
+}

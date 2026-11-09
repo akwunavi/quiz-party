@@ -1,0 +1,245 @@
+{
+ "schema": "bulldog-library-dog/v1",
+ "dog": "frenk",
+ "name": "Фрэнк",
+ "number": 1,
+ "technicalId": "bulldog1-frenk",
+ "fps": 24,
+ "alphaFormat": "VP9 WebM alpha_mode=1, 1276x720 (PNG-стойки — RGBA 1276x720 или 2720x1536)",
+ "states": {
+  "FRONT_STAND": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "stills/DOG1_FRONT_STAND_alpha_frame0.png"
+   ],
+   "contractClip": null,
+   "note": "вне контракта V3",
+   "framesPlay": null,
+   "media": {
+    "stills/DOG1_FRONT_STAND_alpha_frame0.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "IDLE": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set (v1, 2026-10-15)",
+   "files": [
+    "alpha/DOG1_IDLE_v1_alpha_loop220.webm"
+   ],
+   "contractClip": null,
+   "note": "петля 220 кадров",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_IDLE_v1_alpha_loop220.webm": {
+     "frames": 220,
+     "seconds": 9.167
+    }
+   }
+  },
+  "SELECTED": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/DOG1_SELECTED_v1_alpha_f20-f121.webm",
+    "alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm"
+   ],
+   "contractClip": null,
+   "note": "вход из любого кадра IDLE: runtime/selection.mjs (entry A, ожидание до 106 кадров)",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_SELECTED_v1_alpha_f20-f121.webm": {
+     "frames": 102,
+     "seconds": 4.25
+    },
+    "alpha/DOG1_SELECTED_v1_alpha_f1-f24_entry.webm": {
+     "frames": 24,
+     "seconds": 1.0
+    }
+   }
+  },
+  "RETURN_TO_IDLE": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm": {
+     "frames": 120,
+     "seconds": 5.0
+    }
+   }
+  },
+  "RACE_STAND": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set (v3)",
+   "files": [
+    "alpha/DOG1_RACE_STAND_v3_alpha_1276.webm",
+    "stills/DOG1_RACE_STAND_v3_2720x1536.png"
+   ],
+   "contractClip": "RACE_STAND",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_RACE_STAND_v3_alpha_1276.webm": {
+     "frames": 1,
+     "seconds": 0.042
+    },
+    "stills/DOG1_RACE_STAND_v3_2720x1536.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "START": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/DOG1_RACE_START_v1_alpha.webm",
+    "alpha/DOG1_RACE_START_gen3_alpha.webm"
+   ],
+   "contractClip": "START",
+   "note": "lead 3",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_RACE_START_v1_alpha.webm": {
+     "frames": 73,
+     "seconds": 3.042
+    },
+    "alpha/DOG1_RACE_START_gen3_alpha.webm": {
+     "frames": 73,
+     "seconds": 3.042
+    }
+   }
+  },
+  "RUN": {
+   "status": "accepted",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/dog1-run-alpha.webm"
+   ],
+   "contractClip": "START",
+   "note": "цикл run87..run98 (12 кадров)",
+   "framesPlay": null,
+   "media": {
+    "alpha/dog1-run-alpha.webm": {
+     "frames": 81,
+     "seconds": 3.375
+    }
+   }
+  },
+  "STOP": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set (STOP V4)",
+   "files": [
+    "alpha/DOG1_STOP_v4_alpha_k38-k73.webm"
+   ],
+   "contractClip": "STOP",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_STOP_v4_alpha_k38-k73.webm": {
+     "frames": 36,
+     "seconds": 1.5
+    }
+   }
+  },
+  "FINISH": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set",
+   "files": [],
+   "contractClip": "FINISH_DECELERATE",
+   "note": "= STOP V4 (решение 2026-10-15)",
+   "framesPlay": null,
+   "media": {}
+  },
+  "SNIFF_PEE+RETURN": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set (V3.2 EVENT)",
+   "files": [
+    "alpha/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm"
+   ],
+   "contractClip": "SNIFF_PEE",
+   "note": "RETURN слит в клип",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_SNIFF_PEE_V3_2_EVENT_alpha_v3_ribbonfix.webm": {
+     "frames": 200,
+     "seconds": 8.333
+    }
+   }
+  },
+  "ROLL": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/DOG1_ROLL_v1_alpha.webm"
+   ],
+   "contractClip": "ROLL",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_ROLL_v1_alpha.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "BUTTERFLY": {
+   "status": "accepted_working",
+   "statusSource": "MANIFEST approved_set",
+   "files": [
+    "alpha/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm"
+   ],
+   "contractClip": "BUTTERFLY",
+   "note": "бабочку рисует игра; траектория — только предложение",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG1_BUTTERFLY_v1_alpha_game_f1-f93.webm": {
+     "frames": 93,
+     "seconds": 3.875
+    }
+   }
+  }
+ },
+ "race": {
+  "contract": "contract/frenk.contract.json",
+  "atlas": "atlas/atlas.json",
+  "atlasKind": "labelled",
+  "cell": [
+   207,
+   116
+  ],
+  "columns": 24,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  },
+  "scale": 1.0,
+  "display": "display.json"
+ },
+ "selectionLogic": "runtime/selection.mjs (anytime, entry A)",
+ "provenance": {
+  "lock": "SOURCES.lock.json",
+  "refs": {
+   "origin/claude/dog5-luna-batch-20261108": {
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "files": 50
+   },
+   "8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c": {
+    "commit": "8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c",
+    "files": 1
+   }
+  },
+  "unresolved": 0,
+  "filesInLock": 51
+ }
+}

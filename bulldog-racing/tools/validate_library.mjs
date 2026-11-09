@@ -113,7 +113,7 @@ for(const dog of DOGS){
       withPhaseModule:{cellBeforeStop:Object.keys(stopEntry).map(Number),sourceFrame:adSrc}};
     if(!rawSrc.every(x=>x===68))P('partial','Рокки: контракт P3 сам даёт перед STOP исходный #'+rawSrc.join(',#')+' вместо принятого #68; поправка кадра — только через runtime/phase.mjs (адаптер её применяет)');
     {const bad=Object.entries(stopEntry).filter(([cell])=>rockySource(+cell)!==68).reduce((a,[,n])=>a+n,0);rep.t4.rockyAcceptedPhase.stopsNotAt68={count:bad,of:stops,share:+(bad/stops).toFixed(3),reason:'перед этим STOP RUN-отрезок короче 155 кадров: phase.mjs его не обрабатывает ("six advances need separate review"), остаётся натуральный P3 (#62)'};
-    if(bad)P('error','Рокки: у '+bad+' из '+stops+' остановок ('+(100*bad/stops).toFixed(0)+'%) RUN короче 155 кадров, принятая фазировка phase.mjs к ним не применима: перед STOP исходный #62 вместо #68 (IoU швa 0.58)');}
+    if(bad)P('error','Рокки: у '+bad+' из '+stops+' остановок ('+(100*bad/stops).toFixed(0)+'%) RUN короче 155 кадров, принятая фазировка phase.mjs к ним не применима: перед STOP исходный #62 вместо #68 (IoU шва 0.58)');}
   }
   rep.seams=[...seams.entries()].map(([k,e])=>{const [pair,win]=k.split('|');const [a,b]=pair.split('>');return {from:a,to:b,windows:win,count:e.n,shiftPxFrom:e.sa,shiftPxTo:e.sb};});
 }

@@ -1,0 +1,60 @@
+{
+ "dog": "rocky",
+ "name": "Рокки №3",
+ "schema": "bulldog-display/v1",
+ "layout": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "startX": 406,
+  "finishX": 1484,
+  "finishControlOffset": 92,
+  "laneTop": 260,
+  "laneStep": 159,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  }
+ },
+ "atlasCell": [
+  178,
+  100
+ ],
+ "stretchedToSprite": true,
+ "scale": 1.0,
+ "scaleNote": "1.0",
+ "pawLine": {
+  "laneRowInSprite": 110,
+  "raceStandBottomRow": 108,
+  "raceStandOffsetPx": 2,
+  "runBottomRowMin": 102,
+  "runBottomRowMax": 115,
+  "runBelowLanePx": 5
+ },
+ "sizeGamePx": {
+  "raceStand": {
+   "w": 113,
+   "h": 107,
+   "area": 6260
+  },
+  "runLoopMean": {
+   "w": 120.25,
+   "h": 97.58,
+   "area": 6321.5
+  }
+ },
+ "runLengthVsOthersMean": 1.118,
+ "runAreaVsOthersMean": 1.242,
+ "spriteShiftRule": "нет сдвигов; поправка КАДРА RUN перед STOP (runtime/phase.mjs, шесть пропусков #65), P3 её не выражает; сдвиг входа STOP запечён в атлас",
+ "highResSource": {
+  "alphaFrame": [
+   1276,
+   720
+  ],
+  "gameToSourceFactor": 6.164,
+  "note": "для атласа крупнее перестроить из alpha в library (каталог alpha/); для Пупса и Рокки исходные ячейки 178×100 растянуты ×1.163 — перестройка из alpha даст чётче"
+ }
+}

@@ -1,0 +1,60 @@
+{
+ "dog": "frenk",
+ "name": "Фрэнк №1",
+ "schema": "bulldog-display/v1",
+ "layout": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "startX": 406,
+  "finishX": 1484,
+  "finishControlOffset": 92,
+  "laneTop": 260,
+  "laneStep": 159,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  }
+ },
+ "atlasCell": [
+  207,
+  116
+ ],
+ "stretchedToSprite": false,
+ "scale": 1.0,
+ "scaleNote": "1.0",
+ "pawLine": {
+  "laneRowInSprite": 110,
+  "raceStandBottomRow": 109,
+  "raceStandOffsetPx": 1,
+  "runBottomRowMin": 94,
+  "runBottomRowMax": 110,
+  "runBelowLanePx": 0
+ },
+ "sizeGamePx": {
+  "raceStand": {
+   "w": 99,
+   "h": 101,
+   "area": 5019
+  },
+  "runLoopMean": {
+   "w": 108.42,
+   "h": 87.83,
+   "area": 5123.33
+  }
+ },
+ "runLengthVsOthersMean": 0.981,
+ "runAreaVsOthersMean": 0.951,
+ "spriteShiftRule": "массивы START по категории скорости + массивы STOP по категории + стационарный сдвиг от последнего STOP (contract/frenk_*_shift_arrays.json, единицы — px исходного кадра 1276)",
+ "highResSource": {
+  "alphaFrame": [
+   1276,
+   720
+  ],
+  "gameToSourceFactor": 6.164,
+  "note": "для атласа крупнее перестроить из alpha в library (каталог alpha/); для Пупса и Рокки исходные ячейки 178×100 растянуты ×1.163 — перестройка из alpha даст чётче"
+ }
+}

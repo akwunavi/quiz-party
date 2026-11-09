@@ -1,0 +1,60 @@
+{
+ "dog": "luna",
+ "name": "Луна №5",
+ "schema": "bulldog-display/v1",
+ "layout": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "startX": 406,
+  "finishX": 1484,
+  "finishControlOffset": 92,
+  "laneTop": 260,
+  "laneStep": 159,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  }
+ },
+ "atlasCell": [
+  207,
+  116
+ ],
+ "stretchedToSprite": false,
+ "scale": 1.0,
+ "scaleNote": "Луна остаётся 1.0; возможное ×0.93 проверить позднее в общей гонке",
+ "pawLine": {
+  "laneRowInSprite": 110,
+  "raceStandBottomRow": 110,
+  "raceStandOffsetPx": 0,
+  "runBottomRowMin": 93,
+  "runBottomRowMax": 110,
+  "runBelowLanePx": 0
+ },
+ "sizeGamePx": {
+  "raceStand": {
+   "w": 112,
+   "h": 107,
+   "area": 5507
+  },
+  "runLoopMean": {
+   "w": 127.58,
+   "h": 92.0,
+   "area": 5701.33
+  }
+ },
+ "runLengthVsOthersMean": 1.206,
+ "runAreaVsOthersMean": 1.087,
+ "spriteShiftRule": "contract/stop_shift.json: сдвиг на каждый кадр STOP (37 + хвост 22), вход 0, выход ≈ −1 px; остальное 0",
+ "highResSource": {
+  "alphaFrame": [
+   1276,
+   720
+  ],
+  "gameToSourceFactor": 6.164,
+  "note": "для атласа крупнее перестроить из alpha в library (каталог alpha/); для Пупса и Рокки исходные ячейки 178×100 растянуты ×1.163 — перестройка из alpha даст чётче"
+ }
+}

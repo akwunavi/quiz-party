@@ -1,0 +1,229 @@
+{
+ "schema": "bulldog-library-dog/v1",
+ "dog": "zefir",
+ "name": "Зефир",
+ "number": 2,
+ "technicalId": "bulldog2",
+ "fps": 24,
+ "alphaFormat": "VP9 WebM alpha_mode=1, 1276x720 (PNG-стойки — RGBA 1276x720 или 2720x1536)",
+ "states": {
+  "FRONT_STAND": {
+   "status": "accepted",
+   "statusSource": "STATUS.md: FRONT_STAND = RUN #0 = IDLE f1 = SELECTED f1",
+   "files": [],
+   "contractClip": null,
+   "note": "отдельного файла нет: кадр f1 из IDLE-alpha (в цепочке используется f4); PNG не создавался",
+   "framesPlay": null,
+   "media": {}
+  },
+  "IDLE": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/DOG2_IDLE_MAIN_L1_alpha_loop131.webm",
+    "alpha/DOG2_IDLE_alpha_f1-f121.webm"
+   ],
+   "contractClip": null,
+   "note": "MAIN_L1 петля 131 кадр; f1-f121 — путь выхода",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_IDLE_MAIN_L1_alpha_loop131.webm": {
+     "frames": 131,
+     "seconds": 5.458
+    },
+    "alpha/DOG2_IDLE_alpha_f1-f121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "SELECTED": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/DOG2_SELECTED_alpha_f1-f121.webm"
+   ],
+   "contractClip": null,
+   "note": "играется s4–s121 (118 кадров)",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_SELECTED_alpha_f1-f121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "RETURN_TO_IDLE": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/DOG2_RETURN_TO_IDLE_v1_alpha_m109.webm"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_RETURN_TO_IDLE_v1_alpha_m109.webm": {
+     "frames": 109,
+     "seconds": 4.542
+    }
+   }
+  },
+  "RACE_STAND": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/DOG2_RUN_alpha_src28-100.webm"
+   ],
+   "contractClip": "RACE_STAND",
+   "note": "кадр RUN #30 со сдвигом стойки",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_RUN_alpha_src28-100.webm": {
+     "frames": 73,
+     "seconds": 3.042
+    }
+   }
+  },
+  "START": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (START B)",
+   "files": [
+    "alpha/DOG2_RUN_alpha_src28-100.webm"
+   ],
+   "contractClip": "START",
+   "note": "lead 0; кадры #30–#71 → #96",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_RUN_alpha_src28-100.webm": {
+     "frames": 73,
+     "seconds": 3.042
+    }
+   }
+  },
+  "RUN": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/DOG2_RUN_alpha_src28-100.webm"
+   ],
+   "contractClip": "START",
+   "note": "цикл #88–#99",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_RUN_alpha_src28-100.webm": {
+     "frames": 73,
+     "seconds": 3.042
+    }
+   }
+  },
+  "STOP": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (STOP B, stop_montage_v2/APPROVED.md)",
+   "files": [
+    "alpha/DOG2_STOP_v2_alpha_k27-k40.webm",
+    "alpha/DOG2_STOP_v1_alpha_k66-k73.webm"
+   ],
+   "contractClip": "STOP",
+   "note": "монтаж 37 кадров: RUN #89-#96 + v2 k27-k40 + v1 k66-k73 + стойка",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_STOP_v2_alpha_k27-k40.webm": {
+     "frames": 14,
+     "seconds": 0.583
+    },
+    "alpha/DOG2_STOP_v1_alpha_k66-k73.webm": {
+     "frames": 8,
+     "seconds": 0.333
+    }
+   }
+  },
+  "FINISH": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [],
+   "contractClip": "FINISH_DECELERATE",
+   "note": "= STOP B",
+   "framesPlay": null,
+   "media": {}
+  },
+  "SNIFF_PEE+RETURN": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (V1S_SHORT_HOLD)",
+   "files": [
+    "alpha/DOG2_SNIFF_PEE_v1_alpha_s1-s193.webm"
+   ],
+   "contractClip": "SNIFF_PEE",
+   "note": "один клип 199 кадров на оба окна",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_SNIFF_PEE_v1_alpha_s1-s193.webm": {
+     "frames": 193,
+     "seconds": 8.042
+    }
+   }
+  },
+  "ROLL": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (ROLL v3)",
+   "files": [
+    "alpha/DOG2_ROLL_v3_alpha_r1-r121.webm"
+   ],
+   "contractClip": "ROLL",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_ROLL_v3_alpha_r1-r121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "BUTTERFLY": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (BUTTERFLY v2)",
+   "files": [
+    "alpha/DOG2_BUTTERFLY_v2_alpha_b1-b121.webm"
+   ],
+   "contractClip": "BUTTERFLY",
+   "note": "бабочку рисует игра",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG2_BUTTERFLY_v2_alpha_b1-b121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  }
+ },
+ "race": {
+  "contract": "contract/zefir.contract.json",
+  "atlas": "atlas/atlas.json",
+  "atlasKind": "labelled",
+  "cell": [
+   207,
+   116
+  ],
+  "columns": 24,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  },
+  "scale": 1.0,
+  "display": "display.json"
+ },
+ "selectionLogic": "runtime/selection.mjs (0,46–2,42 с)",
+ "provenance": {
+  "lock": "SOURCES.lock.json",
+  "refs": {
+   "origin/claude/dog5-luna-batch-20261108": {
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "files": 45
+   }
+  },
+  "unresolved": 0,
+  "filesInLock": 45
+ }
+}

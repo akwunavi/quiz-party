@@ -1,0 +1,240 @@
+{
+ "schema": "bulldog-library-dog/v1",
+ "dog": "rocky",
+ "name": "Рокки",
+ "number": 3,
+ "technicalId": "bulldog3",
+ "fps": 24,
+ "alphaFormat": "VP9 WebM alpha_mode=1, 1276x720 (PNG-стойки — RGBA 1276x720 или 2720x1536)",
+ "states": {
+  "FRONT_STAND": {
+   "status": "accepted",
+   "statusSource": "STATUS.md 23.10.2026 (idle-alpha-lab/APPROVED.md)",
+   "files": [
+    "stills/DOG3_FRONT_STAND_ALPHA.png"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "stills/DOG3_FRONT_STAND_ALPHA.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "IDLE": {
+   "status": "accepted",
+   "statusSource": "STATUS.md 23.10.2026 (IDLE B, 240 кадров)",
+   "files": [
+    "alpha/DOG3_IDLE_B_ALPHA_240.webm"
+   ],
+   "contractClip": null,
+   "note": "выход из IDLE: лаборатория idle-exit-lab (макс. 3,79 с) — НЕ принята для production, модуля выбора в библиотеке нет",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG3_IDLE_B_ALPHA_240.webm": {
+     "frames": 240,
+     "seconds": 10.0
+    }
+   }
+  },
+  "SELECTED": {
+   "status": "accepted",
+   "statusSource": "STATUS.md 23.10.2026 (коммит f401530)",
+   "files": [
+    "alpha/DOG3_SELECTED_ALPHA_121.webm"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG3_SELECTED_ALPHA_121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  },
+  "RETURN_TO_IDLE": {
+   "status": "accepted_working",
+   "statusSource": "STATUS.md (вариант D, рабочий)",
+   "files": [
+    "alpha/DOG3_RETURN_D_ALPHA_97.webm"
+   ],
+   "contractClip": null,
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG3_RETURN_D_ALPHA_97.webm": {
+     "frames": 97,
+     "seconds": 4.042
+    }
+   }
+  },
+  "RACE_STAND": {
+   "status": "accepted_working",
+   "statusSource": "STATUS.md (рабочая боковая стойка)",
+   "files": [
+    "alpha/rocky-race-stand-alpha.png",
+    "stills/DOG3_RACE_STAND_GENERATED_01.png"
+   ],
+   "contractClip": "BASE",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/rocky-race-stand-alpha.png": {
+     "frames": 1,
+     "seconds": null
+    },
+    "stills/DOG3_RACE_STAND_GENERATED_01.png": {
+     "frames": 1,
+     "seconds": null
+    }
+   }
+  },
+  "START": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (игровая версия принята)",
+   "files": [
+    "alpha/rocky-race-start-alpha-24.webm"
+   ],
+   "contractClip": "START",
+   "note": "кадры Kling #18–#41, 40 ячеек",
+   "framesPlay": null,
+   "media": {
+    "alpha/rocky-race-start-alpha-24.webm": {
+     "frames": 24,
+     "seconds": 1.0
+    }
+   }
+  },
+  "RUN": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (петля #61–72; фазировка #68 принята)",
+   "files": [
+    "alpha/bulldog_03_run_alpha_v2.webm"
+   ],
+   "contractClip": "RUN",
+   "note": "ОГРАНИЧЕНИЕ: фазировка phase.mjs не работает на RUN короче 155 кадров, см. KNOWN_ISSUES",
+   "framesPlay": null,
+   "media": {
+    "alpha/bulldog_03_run_alpha_v2.webm": {
+     "frames": 85,
+     "seconds": 3.542
+    }
+   }
+  },
+  "STOP": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/rocky-stop-alpha-37.webm",
+    "sources/DOG3_STOP_KLING_V3_ORIGINAL.mp4"
+   ],
+   "contractClip": "STOP",
+   "note": "исходник восстановлен с ветки claude/nifty-johnson-assbj5",
+   "framesPlay": null,
+   "media": {
+    "alpha/rocky-stop-alpha-37.webm": {
+     "frames": 37,
+     "seconds": 1.542
+    }
+   }
+  },
+  "FINISH": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [],
+   "contractClip": "FINISH_DECELERATE",
+   "note": "= STOP",
+   "framesPlay": null,
+   "media": {}
+  },
+  "SNIFF_PEE+RETURN": {
+   "status": "provisional",
+   "statusSource": "STATUS.md (предварительно; финал в общей гонке)",
+   "files": [
+    "alpha/DOG3_SNIFF_PEE_ALPHA_240.webm"
+   ],
+   "contractClip": "SNIFF_PEE",
+   "note": "240 кадров на оба окна; ускорение ×1.0019",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG3_SNIFF_PEE_ALPHA_240.webm": {
+     "frames": 240,
+     "seconds": 10.0
+    }
+   }
+  },
+  "ROLL": {
+   "status": "accepted",
+   "statusSource": "STATUS.md (монтаж B)",
+   "files": [
+    "alpha/DOG3_ROLL_V2_B_ALPHA_145.webm"
+   ],
+   "contractClip": "ROLL",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/DOG3_ROLL_V2_B_ALPHA_145.webm": {
+     "frames": 145,
+     "seconds": 6.042
+    }
+   }
+  },
+  "BUTTERFLY": {
+   "status": "accepted",
+   "statusSource": "STATUS.md",
+   "files": [
+    "alpha/rocky-butterfly-alpha-121.webm"
+   ],
+   "contractClip": "BUTTERFLY",
+   "note": "",
+   "framesPlay": null,
+   "media": {
+    "alpha/rocky-butterfly-alpha-121.webm": {
+     "frames": 121,
+     "seconds": 5.042
+    }
+   }
+  }
+ },
+ "race": {
+  "contract": "contract/rocky.contract.json",
+  "atlas": "atlas/atlas.json",
+  "atlasKind": "clip-indexed",
+  "cell": [
+   178,
+   100
+  ],
+  "columns": 24,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  },
+  "scale": 1.0,
+  "display": "display.json"
+ },
+ "selectionLogic": null,
+ "provenance": {
+  "lock": "SOURCES.lock.json",
+  "refs": {
+   "origin/codex/dog3-idle-exit-lab-20261102": {
+    "commit": "9fd99d075ec92a1aae021fd6a13381e816def29b",
+    "files": 48
+   },
+   "bbd913d3c153f50685be70db3b61ec4ab691201d": {
+    "commit": "bbd913d3c153f50685be70db3b61ec4ab691201d",
+    "files": 1
+   },
+   "origin/claude/nifty-johnson-assbj5": {
+    "commit": "28dc74268d2c116dc4361bf3869a8592a034e458",
+    "files": 1
+   }
+  },
+  "unresolved": 0,
+  "filesInLock": 50
+ }
+}

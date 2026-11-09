@@ -1,0 +1,60 @@
+{
+ "dog": "pups",
+ "name": "Пупс №4",
+ "schema": "bulldog-display/v1",
+ "layout": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "startX": 406,
+  "finishX": 1484,
+  "finishControlOffset": 92,
+  "laneTop": 260,
+  "laneStep": 159,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  }
+ },
+ "atlasCell": [
+  178,
+  100
+ ],
+ "stretchedToSprite": true,
+ "scale": 1.0,
+ "scaleNote": "1.0",
+ "pawLine": {
+  "laneRowInSprite": 110,
+  "raceStandBottomRow": 110,
+  "raceStandOffsetPx": 0,
+  "runBottomRowMin": 101,
+  "runBottomRowMax": 113,
+  "runBelowLanePx": 3
+ },
+ "sizeGamePx": {
+  "raceStand": {
+   "w": 80,
+   "h": 107,
+   "area": 4612
+  },
+  "runLoopMean": {
+   "w": 85.33,
+   "h": 94.17,
+   "area": 4319.0
+  }
+ },
+ "runLengthVsOthersMean": 0.734,
+ "runAreaVsOthersMean": 0.773,
+ "spriteShiftRule": "нет",
+ "highResSource": {
+  "alphaFrame": [
+   1276,
+   720
+  ],
+  "gameToSourceFactor": 6.164,
+  "note": "для атласа крупнее перестроить из alpha в library (каталог alpha/); для Пупса и Рокки исходные ячейки 178×100 растянуты ×1.163 — перестройка из alpha даст чётче"
+ }
+}

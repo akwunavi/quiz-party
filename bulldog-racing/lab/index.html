@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Bulldog library lab</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{margin:0;background:#1d2224;color:#e8eceb;font:14px system-ui,sans-serif}
+ header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;background:#14181a}
+ button,select,input{font:inherit;padding:4px 10px;background:#2b3336;color:#e8eceb;border:1px solid #4a5559;border-radius:4px}
+ button.on{background:#4b6b5d} button:hover{background:#3a464a}
+ #wrap{padding:8px 12px} canvas{width:100%;max-width:1920px;height:auto;background:#d9d5c7;display:block}
+ #sel{display:none;grid-template-columns:repeat(5,1fr);gap:8px;max-width:1920px}
+ .card{background:#c9c4b3;color:#222;padding:6px;border-radius:4px;text-align:center}
+ .card video{width:100%;aspect-ratio:1276/720;display:block;background:#bdb7a3}
+ #info{max-width:1920px;font-size:13px;line-height:1.5} table{border-collapse:collapse;font-size:12px} td,th{border:1px solid #4a5559;padding:2px 6px}
+ .warn{color:#ffcf7a}
+</style></head><body>
+<header>
+ <b>Лаборатория библиотеки бульдогов</b>
+ <button id="mRace" class="on">Гонка (V3)</button><button id="mStand">Стойки и размеры</button><button id="mSel">Выбор (IDLE/SELECTED)</button>
+ <span id="raceCtl">
+  <select id="preset"></select> seed <input id="seed" size="7" value="12345"><button id="go">Новая гонка</button>
+  <button id="play">▶</button><button id="reset">⟲</button>
+  <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option><option>2</option></select>
+  <input id="scrub" type="range" min="0" max="1000" value="0" style="width:260px"><span id="clock">0:00.00</span>
+  <label><input type="checkbox" id="guides" checked> линии</label>
+  <label><input type="checkbox" id="luna93"> Луна ×0.93 (проверка)</label>
+  <label>дорожки <select id="rot"><option value="0">Ф З Р П Л</option><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option></select></label>
+ </span>
+</header>
+<div id="wrap">
+ <canvas id="cv" width="1920" height="1080"></canvas>
+ <div id="sel"></div>
+ <div id="info"></div>
+</div>
+<script type="module" src="./lab.mjs"></script>
+</body></html>

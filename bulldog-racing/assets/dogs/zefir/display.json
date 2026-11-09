@@ -1,0 +1,60 @@
+{
+ "dog": "zefir",
+ "name": "Зефир №2",
+ "schema": "bulldog-display/v1",
+ "layout": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "startX": 406,
+  "finishX": 1484,
+  "finishControlOffset": 92,
+  "laneTop": 260,
+  "laneStep": 159,
+  "sprite": {
+   "w": 207,
+   "h": 116,
+   "anchorX": 148,
+   "topOffset": 110
+  }
+ },
+ "atlasCell": [
+  207,
+  116
+ ],
+ "stretchedToSprite": false,
+ "scale": 1.0,
+ "scaleNote": "1.0",
+ "pawLine": {
+  "laneRowInSprite": 110,
+  "raceStandBottomRow": 109,
+  "raceStandOffsetPx": 1,
+  "runBottomRowMin": 104,
+  "runBottomRowMax": 110,
+  "runBelowLanePx": 0
+ },
+ "sizeGamePx": {
+  "raceStand": {
+   "w": 102,
+   "h": 100,
+   "area": 5111
+  },
+  "runLoopMean": {
+   "w": 109.0,
+   "h": 91.75,
+   "area": 5212.83
+  }
+ },
+ "runLengthVsOthersMean": 0.987,
+ "runAreaVsOthersMean": 0.971,
+ "spriteShiftRule": "стойка и действия: сдвиг стойки (cxRun − cx(run30)); START: гашение качания корпуса, сдвиг = −(cx − cxRun)·(1 − smoothstep(k/42)); STOP: сдвиги монтажа stopB_montage_list.json с плавным выходом на сдвиг стойки",
+ "highResSource": {
+  "alphaFrame": [
+   1276,
+   720
+  ],
+  "gameToSourceFactor": 6.164,
+  "note": "для атласа крупнее перестроить из alpha в library (каталог alpha/); для Пупса и Рокки исходные ячейки 178×100 растянуты ×1.163 — перестройка из alpha даст чётче"
+ }
+}
