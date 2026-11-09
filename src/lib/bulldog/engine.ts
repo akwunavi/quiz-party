@@ -30,7 +30,18 @@ export interface SheetAtlas { kind: 'labelled' | 'clip-indexed'; cellWidth: numb
   sheets?: Record<string, string>; clips?: Record<string, { sheet: string; count: number }>; frames?: Record<string, { sheet: string; index: number }> }
 export interface SelAtlas { cell: [number, number]; columns: number; scale: number; crop: number[]; clips: Record<string, { sheet: string; count: number }> }
 export interface DogData { id: DogId; visual: DogVisualFn; atlas: SheetAtlas; contract: { clips: Record<string, { sampler: string; labels?: string[]; count?: number }> }; sel: SelAtlas }
-const J = async <T>(u: string): Promise<T> => { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json() as Promise<T> }
+// Источник файлов (JSON и картинки). По умолчанию — сеть (fetch), в автономной демо-сборке (file://, где fetch и getImageData запрещены) подставляется
+// встроенный набор: setAssetSource(...). Движок, сцена и правила — те же.
+export interface AssetSource { json<T>(url: string): Promise<T>; blob(url: string): Promise<Blob>; prefetch: boolean }
+const netSource: AssetSource = {
+  prefetch: true,
+  async json<T>(u: string) { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json() as Promise<T> },
+  async blob(u: string) { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.blob() },
+}
+let source: AssetSource = netSource
+export function setAssetSource(s: AssetSource) { source = s; dogCache.clear(); selData = null }
+export const canPrefetch = () => source.prefetch
+const J = <T>(u: string): Promise<T> => source.json<T>(u)
 const dogCache = new Map<DogId, Promise<DogData>>()
 export function loadDogData(id: DogId): Promise<DogData> {
   let p = dogCache.get(id)
@@ -78,7 +89,7 @@ export class BitmapPool {
   get(url: string): Promise<ImageBitmap> {
     let p = this.m.get(url)
     if (!p) {
-      p = fetch(url).then(r => { if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r.blob() }).then(b => createImageBitmap(b))
+      p = source.blob(url).then(b => createImageBitmap(b))
       this.m.set(url, p); p.then(b => { if (this.m.get(url) === p) this.ready.set(url, b); else b.close() }, () => { if (this.m.get(url) === p) this.m.delete(url) })
     }
     return p

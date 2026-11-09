@@ -3,7 +3,7 @@
 // Не знает про React и сеть: снаружи вызывают setInput() и draw(nowMs).
 import { LAYOUT as L, DOG_IDS, T, type DogId } from './config'
 import { raceClock, type RacePhase } from './phases'
-import { raceFor, stateAt, loadDogData, loadSelectionData, createSelectionPlayer, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from './engine'
+import { raceFor, stateAt, canPrefetch, loadDogData, loadSelectionData, createSelectionPlayer, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from './engine'
 import { ButterflyManager } from './vendor/butterfly.mjs'
 import type { RaceV3, SelectionPlayer, SelectionFrame, Visual } from './v3types'
 
@@ -87,7 +87,7 @@ export class StageRenderer {
     let loading = false
     for (const u of want) { if (!this.pool.peek(u)) { loading = true; void this.pool.get(u).catch(() => {}) } }
     // прогрев сетевого кеша гонки (без декодирования), пока идёт выбор: к старту листы уже скачаны (SW кеширует их cache-first)
-    if (!this.prefetched && phase === 'select' && !loading && this.dogs.every(Boolean)) {
+    if (!this.prefetched && canPrefetch() && phase === 'select' && !loading && this.dogs.every(Boolean)) {
       this.prefetched = true
       void (async () => { for (const d of this.dogs) { if (!d) continue; for (const u of raceSheetUrls(d, [{ kind: 'BUTTERFLY' }, { kind: 'ROLL' }, { kind: 'SNIFF_PEE' }, { kind: 'RETURN' }] as never)) { try { await (await fetch(u)).blob() } catch { /* не критично */ } } } })()
     }

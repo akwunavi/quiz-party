@@ -9,6 +9,7 @@
     "test": "vitest run",
     "lint": "eslint .",
     "deploy:prep": "npm run build && rm -rf docs && cp -r dist docs",
+    "demo:bulldog": "node scripts/bulldog/build-demo.mjs",
     "lab": "vite --open /quiz-party/labs/newyear/",
     "lab:build": "node scripts/build-ny-lab.mjs",
     "lab:magic": "vite --open /quiz-party/labs/magic2/",
