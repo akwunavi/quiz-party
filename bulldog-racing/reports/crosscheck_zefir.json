@@ -1,0 +1,30 @@
+{
+ "races": 100,
+ "compared": 581496,
+ "frameMismatch": 0,
+ "shiftMismatch": 0,
+ "maxShiftDiffPx": 0,
+ "first": null,
+ "byWindow": {
+  "BASE": {
+   "n": 24000,
+   "bad": 0
+  },
+  "START": {
+   "n": 27504,
+   "bad": 0
+  },
+  "RUN": {
+   "n": 487590,
+   "bad": 0
+  },
+  "STOP": {
+   "n": 23902,
+   "bad": 0
+  },
+  "FINISH_DECELERATE": {
+   "n": 18500,
+   "bad": 0
+  }
+ }
+}

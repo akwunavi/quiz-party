@@ -1,0 +1,29 @@
+{
+ "schema": "character-visual-contract/v1-lab",
+ "character": "bulldog4",
+ "role": "REFERENCE (identity metadata): reproduces dog4-v3-lab/model.mjs frameFor() exactly; lead 0, no tail, no pad, no retime, no shift",
+ "fps": 24,
+ "assetStatus": {"BASE":"reference","START":"reference","RUN":"reference","STOP":"reference","BUTTERFLY":"reference","ROLL":"reference","SNIFF_PEE":"reference","RETURN":"reference"},
+ "clips": {
+  "BASE": {"sampler": "constant", "frame": 0},
+  "START": {"sampler": "bands", "bands": [[24,72],[16,24]], "count": 40},
+  "RUN": {"sampler": "prologueLoop", "prologue": 11, "loop": 12},
+  "STOP": {"sampler": "linear", "fps": 24, "count": 37, "eps": false},
+  "BUTTERFLY": {"sampler": "linear", "fps": 24, "count": 121, "eps": false},
+  "ROLL": {"sampler": "linear", "fps": 24, "count": 145, "eps": false},
+  "SNIFF_PEE": {"sampler": "bands", "bands": [[48,24],[82,48],[20,24],[55,32],[24,24]], "count": 229},
+  "RETURN": {"sampler": "bands", "bands": [[16,48],[68,40],[8,24],[17,48]], "count": 109}
+ },
+ "windows": {
+  "BASE": {"hold": "BASE"},
+  "START": {"clip": "START", "lead": 0},
+  "RUN": {"clip": "RUN"},
+  "STOP": {"clip": "STOP"},
+  "FINISH_DECELERATE": {"clip": "STOP"},
+  "BUTTERFLY": {"body": "BUTTERFLY"},
+  "ROLL": {"body": "ROLL"},
+  "SNIFF_PEE": {"body": "SNIFF_PEE"},
+  "RETURN": {"body": "RETURN"}
+ },
+ "naturalWindowCheck": {"note": "every Dog4 clip equals its canonical window; the validator checks natural durations against the parsed V3 constants"}
+}

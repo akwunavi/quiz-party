@@ -1,0 +1,1521 @@
+{
+ "generated": "2026-11-09",
+ "races": 200,
+ "dogs": {
+  "frenk": {
+   "files": {
+    "lockEntries": 51,
+    "missing": 0,
+    "badSha": 0,
+    "unresolved": 0
+   },
+   "contract": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "incomplete": [],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "afterStop": {
+       "window": 121,
+       "body": 93,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 96,
+       "slack": 25,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 121,
+       "sum": 96,
+       "slack": 25,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "afterStop": {
+       "window": 145,
+       "body": 104,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 107,
+       "slack": 38,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 145,
+       "sum": 107,
+       "slack": 38,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "afterStop": {
+       "window": 239.55,
+       "body": 200,
+       "stopTail": 0,
+       "lead": 3,
+       "sum": 203,
+       "slack": 36.55,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 239.55,
+       "sum": 203,
+       "slack": 36.55,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     }
+    },
+    "info": {
+     "RETURN": "merged into SNIFF_PEE",
+     "derivedLead": 3,
+     "runFrameBeforeFirstStopAtDeclaredLead": 96,
+     "runFramesBeforeFirstStop": 9
+    }
+   },
+   "atlas": {
+    "kind": "labelled",
+    "cell": [
+     207,
+     116
+    ],
+    "clips": {},
+    "frames": 487
+   },
+   "sweep": {
+    "racesTimesLanes": 1000,
+    "evaluations": 1385545,
+    "missing": 0,
+    "overflow": 0,
+    "badCell": 0,
+    "statusCount": {
+     "approved: RACE_STAND v3": 91502,
+     "accepted_working: RACE_START gen3 + V1 entry, join f35 -> RUN #88, lead 3 (user, browser lab 2026-10-15)": 1038462,
+     "accepted_working: STOP V4 k38-k73 + RACE_STAND (37 frames = canonical STOP) (user 2026-10-15)": 85359,
+     "accepted_working: V3.2 EVENT 200 frames, alpha v3 ribbonfix (user 2026-10-15)": 63800,
+     "accepted_working: game cut f1-f93 (3.875 s), no retime (user 2026-10-14)": 53382,
+     "accepted_working: ROLL v1 r10-r113 (104 frames, 4.33 s) (user 2026-10-15, commit 481a113)": 53040
+    },
+    "windowFrames": {
+     "BASE/hold": {
+      "min": 9,
+      "max": 36.00000000000017
+     },
+     "START/body": {
+      "min": 50,
+      "max": 1370
+     },
+     "STOP/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "SNIFF_PEE/body": {
+      "min": 199.99999999999997,
+      "max": 200.00000000000006
+     },
+     "SNIFF_PEE/pad": {
+      "min": 36.54999999999984,
+      "max": 36.55000000000001
+     },
+     "FINISH_DECELERATE/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "BUTTERFLY/body": {
+      "min": 92.99999999999997,
+      "max": 93.00000000000017
+     },
+     "BUTTERFLY/pad": {
+      "min": 24.999999999999773,
+      "max": 25.000000000000114
+     },
+     "ROLL/body": {
+      "min": 103.99999999999989,
+      "max": 104.00000000000006
+     },
+     "ROLL/pad": {
+      "min": 37.999999999999886,
+      "max": 38.00000000000023
+     }
+    }
+   },
+   "t4": {
+    "stopsAndFinishes": 2307,
+    "finishes": 1000,
+    "declaredPreviousRunFrame": 96,
+    "runFrameBeforeStop": {
+     "run96": 2307
+    },
+    "mismatches": 0,
+    "firstMismatch": null
+   },
+   "seams": [
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:v1f1",
+     "windows": "BASE>START",
+     "count": 904,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 20.2782131661442
+    },
+    {
+     "from": "START:run96",
+     "to": "STOP:v4k38",
+     "windows": "START>STOP",
+     "count": 1307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": -3.327249216300941
+    },
+    {
+     "from": "STOP:RACE_STAND",
+     "to": "SNIFF_PEE:sniffEv1",
+     "windows": "STOP>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "SNIFF_PEE:sniffEv200",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "SNIFF_PEE>SNIFF_PEE",
+     "count": 319,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:v1f1",
+     "windows": "SNIFF_PEE>START",
+     "count": 319,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -4.649388714733542
+    },
+    {
+     "from": "START:run96",
+     "to": "STOP:v4k38",
+     "windows": "START>FINISH_DECELERATE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": -3.327249216300941
+    },
+    {
+     "from": "STOP:RACE_STAND",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "FINISH_DECELERATE>BASE",
+     "count": 1000,
+     "shiftPxFrom": -23.976959247648907,
+     "shiftPxTo": -23.976959247648907
+    },
+    {
+     "from": "STOP:RACE_STAND",
+     "to": "BUTTERFLY:bf1",
+     "windows": "STOP>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "BUTTERFLY:bf93",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "BUTTERFLY>BUTTERFLY",
+     "count": 574,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:v1f1",
+     "windows": "BUTTERFLY>START",
+     "count": 574,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -4.649388714733542
+    },
+    {
+     "from": "STOP:RACE_STAND",
+     "to": "ROLL:roll10",
+     "windows": "STOP>ROLL",
+     "count": 472,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "ROLL:roll113",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "ROLL>ROLL",
+     "count": 510,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -24.927601880877745
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:v1f1",
+     "windows": "ROLL>START",
+     "count": 510,
+     "shiftPxFrom": -24.927601880877745,
+     "shiftPxTo": -4.649388714733542
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "SNIFF_PEE:sniffEv1",
+     "windows": "BASE>SNIFF_PEE",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "BUTTERFLY:bf1",
+     "windows": "BASE>BUTTERFLY",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "ROLL:roll10",
+     "windows": "BASE>ROLL",
+     "count": 38,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    }
+   ],
+   "problems": []
+  },
+  "zefir": {
+   "files": {
+    "lockEntries": 45,
+    "missing": 0,
+    "badSha": 0,
+    "unresolved": 0
+   },
+   "contract": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "incomplete": [],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "afterStop": {
+       "window": 121,
+       "body": 102,
+       "stopTail": 0,
+       "lead": 0,
+       "sum": 102,
+       "slack": 19,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 121,
+       "sum": 102,
+       "slack": 19,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "afterStop": {
+       "window": 145,
+       "body": 108,
+       "stopTail": 0,
+       "lead": 0,
+       "sum": 108,
+       "slack": 37,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 145,
+       "sum": 108,
+       "slack": 37,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "afterStop": {
+       "window": 239.55,
+       "body": 199,
+       "stopTail": 0,
+       "lead": 0,
+       "sum": 199,
+       "slack": 40.55,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 239.55,
+       "sum": 199,
+       "slack": 40.55,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     }
+    },
+    "info": {
+     "RETURN": "merged into SNIFF_PEE",
+     "derivedLead": 0,
+     "runFrameBeforeFirstStopAtDeclaredLead": 88,
+     "runFramesBeforeFirstStop": 5
+    }
+   },
+   "atlas": {
+    "kind": "labelled",
+    "cell": [
+     207,
+     116
+    ],
+    "clips": {},
+    "frames": 530
+   },
+   "sweep": {
+    "racesTimesLanes": 1000,
+    "evaluations": 1385545,
+    "missing": 0,
+    "overflow": 0,
+    "badCell": 0,
+    "statusCount": {
+     "accepted_working: RUN #30 (STATUS.md, утверждён)": 91536,
+     "accepted_working: START B #30-#71 -> #96 (lead 0, STATUS.md)": 1031541,
+     "accepted_working: STOP B 37 кадров (stop_montage_v2/APPROVED.md)": 85359,
+     "accepted_working: SNIFF_PEE v1 монтаж V1S_SHORT_HOLD, 199 кадров + стойка (одним клипом через SNIFF_PEE+RETURN)": 63481,
+     "accepted_working: BUTTERFLY v2 b8-b109 + стойка": 58548,
+     "accepted_working: ROLL v3 r10-r117 + стойка": 55080
+    },
+    "windowFrames": {
+     "BASE/hold": {
+      "min": 12,
+      "max": 36.00000000000017
+     },
+     "START/body": {
+      "min": 47,
+      "max": 1367
+     },
+     "STOP/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "SNIFF_PEE/body": {
+      "min": 198.99999999999994,
+      "max": 199.00000000000003
+     },
+     "SNIFF_PEE/pad": {
+      "min": 40.549999999999955,
+      "max": 40.550000000000125
+     },
+     "FINISH_DECELERATE/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "BUTTERFLY/body": {
+      "min": 101.99999999999997,
+      "max": 102.00000000000017
+     },
+     "BUTTERFLY/pad": {
+      "min": 18.999999999999773,
+      "max": 19.000000000000114
+     },
+     "ROLL/body": {
+      "min": 107.99999999999983,
+      "max": 108.00000000000017
+     },
+     "ROLL/pad": {
+      "min": 36.99999999999977,
+      "max": 37.000000000000114
+     }
+    }
+   },
+   "t4": {
+    "stopsAndFinishes": 2307,
+    "finishes": 1000,
+    "declaredPreviousRunFrame": 88,
+    "runFrameBeforeStop": {
+     "run88": 2307
+    },
+    "mismatches": 0,
+    "firstMismatch": null
+   },
+   "seams": [
+    {
+     "from": "RACE_STAND:run30",
+     "to": "START:run30",
+     "windows": "BASE>START",
+     "count": 904,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "START:run88",
+     "to": "STOP:run89",
+     "windows": "START>STOP",
+     "count": 1307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:run30",
+     "to": "SNIFF_PEE:sniff6",
+     "windows": "STOP>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "SNIFF_PEE:sniff176",
+     "to": "RACE_STAND:run30",
+     "windows": "SNIFF_PEE>SNIFF_PEE",
+     "count": 319,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "START:run30",
+     "windows": "SNIFF_PEE>START",
+     "count": 319,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "START:run88",
+     "to": "STOP:run89",
+     "windows": "START>FINISH_DECELERATE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:run30",
+     "to": "RACE_STAND:run30",
+     "windows": "FINISH_DECELERATE>BASE",
+     "count": 1000,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "STOP:run30",
+     "to": "BUTTERFLY:bf8",
+     "windows": "STOP>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "BUTTERFLY:bf109",
+     "to": "RACE_STAND:run30",
+     "windows": "BUTTERFLY>BUTTERFLY",
+     "count": 574,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "START:run30",
+     "windows": "BUTTERFLY>START",
+     "count": 574,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "STOP:run30",
+     "to": "ROLL:roll10",
+     "windows": "STOP>ROLL",
+     "count": 472,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "ROLL:roll117",
+     "to": "RACE_STAND:run30",
+     "windows": "ROLL>ROLL",
+     "count": 510,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "START:run30",
+     "windows": "ROLL>START",
+     "count": 510,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "SNIFF_PEE:sniff6",
+     "windows": "BASE>SNIFF_PEE",
+     "count": 29,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "BUTTERFLY:bf8",
+     "windows": "BASE>BUTTERFLY",
+     "count": 29,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    },
+    {
+     "from": "RACE_STAND:run30",
+     "to": "ROLL:roll10",
+     "windows": "BASE>ROLL",
+     "count": 38,
+     "shiftPxFrom": 8.205083333333363,
+     "shiftPxTo": 8.205083333333363
+    }
+   ],
+   "problems": []
+  },
+  "rocky": {
+   "files": {
+    "lockEntries": 50,
+    "missing": 0,
+    "badSha": 0,
+    "unresolved": 0
+   },
+   "contract": {
+    "ok": true,
+    "errors": [],
+    "warnings": [
+     "SNIFF_PEE/SNIFF_PEE: provisional: SNIFF_PEE+RETURN 240 (предварительно принят, финал — в общей гонке)"
+    ],
+    "incomplete": [
+     {
+      "window": "SNIFF_PEE",
+      "clip": "SNIFF_PEE",
+      "status": "provisional: SNIFF_PEE+RETURN 240 (предварительно принят, финал — в общей гонке)"
+     }
+    ],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "START": {
+      "naturalSeconds": 1,
+      "canonicalSeconds": 1,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "mode": "exact",
+      "naturalSeconds": 5.041667,
+      "canonicalSeconds": 5.041667,
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "mode": "exact",
+      "naturalSeconds": 6.041667,
+      "canonicalSeconds": 6.041667,
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "afterStop": {
+       "window": 239.55,
+       "body": 239.54,
+       "stopTail": 0,
+       "lead": 0,
+       "sum": 239.54,
+       "slack": 0.01,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 239.55,
+       "sum": 239.54,
+       "slack": 0.01,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     }
+    },
+    "info": {
+     "RETURN": "merged into SNIFF_PEE"
+    }
+   },
+   "atlas": {
+    "kind": "clip-indexed",
+    "cell": [
+     178,
+     100
+    ],
+    "clips": {
+     "BASE": 1,
+     "START": 40,
+     "RUN": 23,
+     "STOP": 37,
+     "BUTTERFLY": 121,
+     "ROLL": 145,
+     "SNIFF_PEE": 240
+    },
+    "frames": null
+   },
+   "sweep": {
+    "racesTimesLanes": 1000,
+    "evaluations": 1385545,
+    "missing": 0,
+    "overflow": 0,
+    "badCell": 0,
+    "statusCount": {
+     "accepted_working: RACE_STAND рабочая боковая (STATUS.md)": 48681,
+     "accepted_working: RACE_START #18-#41 (пользователь принял игровую версию)": 55368,
+     "accepted_working: RUN loop #61-#72, фазировка #68 принята ТОЛЬКО через phase.mjs": 976173,
+     "accepted_working: STOP 37 кадров (принят)": 85359,
+     "provisional: SNIFF_PEE+RETURN 240 (предварительно принят, финал — в общей гонке)": 76560,
+     "accepted_working: BUTTERFLY v1 121 (полностью принят)": 69454,
+     "accepted_working: ROLL v2 монтаж B 145 (окончательно принят)": 73950
+    },
+    "windowFrames": {
+     "BASE/hold": {
+      "min": 12,
+      "max": 36.00000000000017
+     },
+     "START/body": {
+      "min": 24,
+      "max": 24.000000000000085
+     },
+     "RUN/body": {
+      "min": 23.000000000000004,
+      "max": 1343
+     },
+     "STOP/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "SNIFF_PEE/body": {
+      "min": 239.54486475696172,
+      "max": 239.54486475696189
+     },
+     "SNIFF_PEE/pad": {
+      "min": 0.0051352430380120495,
+      "max": 0.00513524303835311
+     },
+     "FINISH_DECELERATE/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "BUTTERFLY/body": {
+      "min": 120.99999999999994,
+      "max": 121.00000000000011
+     },
+     "ROLL/body": {
+      "min": 144.99999999999994,
+      "max": 145.0000000000001
+     }
+    }
+   },
+   "t4": {
+    "stopsAndFinishes": 2307,
+    "finishes": 1000,
+    "declaredPreviousRunFrame": null,
+    "runFrameBeforeStop": {
+     "16": 1920,
+     "22": 387
+    },
+    "mismatches": 0,
+    "firstMismatch": null,
+    "rockyAcceptedPhase": {
+     "requiredSourceFrame": 68,
+     "p3ContractAlone": {
+      "cellBeforeStop": [
+       22
+      ],
+      "sourceFrame": [
+       62
+      ]
+     },
+     "withPhaseModule": {
+      "cellBeforeStop": [
+       16,
+       22
+      ],
+      "sourceFrame": [
+       68,
+       62
+      ]
+     },
+     "stopsNotAt68": {
+      "count": 387,
+      "of": 2307,
+      "share": 0.168,
+      "reason": "перед этим STOP RUN-отрезок короче 155 кадров: phase.mjs его не обрабатывает (\"six advances need separate review\"), остаётся натуральный P3 (#62)"
+     }
+    }
+   },
+   "seams": [
+    {
+     "from": "BASE:0",
+     "to": "START:0",
+     "windows": "BASE>START",
+     "count": 904,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "START:39",
+     "to": "RUN:0",
+     "windows": "START>RUN",
+     "count": 2307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:16",
+     "to": "STOP:0",
+     "windows": "RUN>STOP",
+     "count": 1149,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "SNIFF_PEE:0",
+     "windows": "STOP>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "SNIFF_PEE:239",
+     "to": "START:1",
+     "windows": "SNIFF_PEE>START",
+     "count": 319,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:16",
+     "to": "STOP:0",
+     "windows": "RUN>FINISH_DECELERATE",
+     "count": 771,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "BASE:0",
+     "windows": "FINISH_DECELERATE>BASE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "BUTTERFLY:0",
+     "windows": "STOP>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BUTTERFLY:120",
+     "to": "START:1",
+     "windows": "BUTTERFLY>START",
+     "count": 55,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:22",
+     "to": "STOP:0",
+     "windows": "RUN>FINISH_DECELERATE",
+     "count": 229,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "ROLL:0",
+     "windows": "STOP>ROLL",
+     "count": 472,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "ROLL:144",
+     "to": "START:0",
+     "windows": "ROLL>START",
+     "count": 463,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BUTTERFLY:120",
+     "to": "START:0",
+     "windows": "BUTTERFLY>START",
+     "count": 519,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:22",
+     "to": "STOP:0",
+     "windows": "RUN>STOP",
+     "count": 158,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "ROLL:144",
+     "to": "START:1",
+     "windows": "ROLL>START",
+     "count": 47,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "SNIFF_PEE:0",
+     "windows": "BASE>SNIFF_PEE",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "BUTTERFLY:0",
+     "windows": "BASE>BUTTERFLY",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "ROLL:0",
+     "windows": "BASE>ROLL",
+     "count": 38,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    }
+   ],
+   "problems": [
+    {
+     "sev": "warn",
+     "msg": "валидатор P3: SNIFF_PEE/SNIFF_PEE: provisional: SNIFF_PEE+RETURN 240 (предварительно принят, финал — в общей гонке)"
+    },
+    {
+     "sev": "partial",
+     "msg": "Рокки: контракт P3 сам даёт перед STOP исходный #62 вместо принятого #68; поправка кадра — только через runtime/phase.mjs (адаптер её применяет)"
+    },
+    {
+     "sev": "error",
+     "msg": "Рокки: у 387 из 2307 остановок (17%) RUN короче 155 кадров, принятая фазировка phase.mjs к ним не применима: перед STOP исходный #62 вместо #68 (IoU швa 0.58)"
+    }
+   ]
+  },
+  "pups": {
+   "files": {
+    "lockEntries": 38,
+    "missing": 0,
+    "badSha": 0,
+    "unresolved": 0
+   },
+   "contract": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "incomplete": [],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "START": {
+      "naturalSeconds": 1,
+      "canonicalSeconds": 1,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "mode": "exact",
+      "naturalSeconds": 5.041667,
+      "canonicalSeconds": 5.041667,
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "mode": "exact",
+      "naturalSeconds": 6.041667,
+      "canonicalSeconds": 6.041667,
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "mode": "exact",
+      "naturalSeconds": 9.98125,
+      "canonicalSeconds": 9.98125,
+      "verdict": "FITS"
+     }
+    },
+    "info": {}
+   },
+   "atlas": {
+    "kind": "clip-indexed",
+    "cell": [
+     178,
+     100
+    ],
+    "clips": {
+     "BASE": 1,
+     "START": 40,
+     "RUN": 23,
+     "STOP": 37,
+     "SNIFF_PEE": 229,
+     "RETURN": 109,
+     "BUTTERFLY": 121,
+     "ROLL": 145
+    },
+    "frames": null
+   },
+   "sweep": {
+    "racesTimesLanes": 1000,
+    "evaluations": 1385545,
+    "missing": 0,
+    "overflow": 0,
+    "badCell": 0,
+    "statusCount": {
+     "reference": 1385545
+    },
+    "windowFrames": {
+     "BASE/hold": {
+      "min": 12,
+      "max": 36.00000000000017
+     },
+     "START/body": {
+      "min": 24,
+      "max": 24.000000000000085
+     },
+     "RUN/body": {
+      "min": 23.000000000000004,
+      "max": 1343
+     },
+     "STOP/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "SNIFF_PEE/body": {
+      "min": 174.24999999999994,
+      "max": 174.25000000000003
+     },
+     "RETURN/body": {
+      "min": 65.29999999999995,
+      "max": 65.30000000000013
+     },
+     "FINISH_DECELERATE/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "BUTTERFLY/body": {
+      "min": 120.99999999999994,
+      "max": 121.00000000000011
+     },
+     "ROLL/body": {
+      "min": 144.99999999999994,
+      "max": 145.0000000000001
+     }
+    }
+   },
+   "t4": {
+    "stopsAndFinishes": 2307,
+    "finishes": 1000,
+    "declaredPreviousRunFrame": null,
+    "runFrameBeforeStop": {
+     "22": 2307
+    },
+    "mismatches": 0,
+    "firstMismatch": null
+   },
+   "seams": [
+    {
+     "from": "BASE:0",
+     "to": "START:0",
+     "windows": "BASE>START",
+     "count": 904,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "START:39",
+     "to": "RUN:0",
+     "windows": "START>RUN",
+     "count": 2307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:22",
+     "to": "STOP:0",
+     "windows": "RUN>STOP",
+     "count": 1307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "SNIFF_PEE:0",
+     "windows": "STOP>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "SNIFF_PEE:228",
+     "to": "RETURN:1",
+     "windows": "SNIFF_PEE>RETURN",
+     "count": 319,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RETURN:107",
+     "to": "START:1",
+     "windows": "RETURN>START",
+     "count": 319,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RUN:22",
+     "to": "STOP:0",
+     "windows": "RUN>FINISH_DECELERATE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "BASE:0",
+     "windows": "FINISH_DECELERATE>BASE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "BUTTERFLY:0",
+     "windows": "STOP>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BUTTERFLY:120",
+     "to": "START:1",
+     "windows": "BUTTERFLY>START",
+     "count": 55,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:36",
+     "to": "ROLL:0",
+     "windows": "STOP>ROLL",
+     "count": 472,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "ROLL:144",
+     "to": "START:0",
+     "windows": "ROLL>START",
+     "count": 463,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BUTTERFLY:120",
+     "to": "START:0",
+     "windows": "BUTTERFLY>START",
+     "count": 519,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "ROLL:144",
+     "to": "START:1",
+     "windows": "ROLL>START",
+     "count": 47,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "SNIFF_PEE:0",
+     "windows": "BASE>SNIFF_PEE",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "BUTTERFLY:0",
+     "windows": "BASE>BUTTERFLY",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BASE:0",
+     "to": "ROLL:0",
+     "windows": "BASE>ROLL",
+     "count": 38,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    }
+   ],
+   "problems": []
+  },
+  "luna": {
+   "files": {
+    "lockEntries": 32,
+    "missing": 0,
+    "badSha": 0,
+    "unresolved": 0
+   },
+   "contract": {
+    "ok": true,
+    "errors": [],
+    "warnings": [],
+    "incomplete": [],
+    "fits": {
+     "STOP_moving": {
+      "naturalSeconds": 1.541667,
+      "canonicalSeconds": 1.541667,
+      "ok": true
+     },
+     "BUTTERFLY": {
+      "afterStop": {
+       "window": 121,
+       "body": 73,
+       "stopTail": 22,
+       "lead": 7,
+       "sum": 102,
+       "slack": 19,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 121,
+       "sum": 80,
+       "slack": 41,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "ROLL": {
+      "afterStop": {
+       "window": 145,
+       "body": 109,
+       "stopTail": 22,
+       "lead": 7,
+       "sum": 138,
+       "slack": 7,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 145,
+       "sum": 116,
+       "slack": 29,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "SNIFF_PEE": {
+      "afterStop": {
+       "window": 239.55,
+       "body": 193,
+       "stopTail": 22,
+       "lead": 7,
+       "sum": 222,
+       "slack": 17.55,
+       "verdict": "FITS"
+      },
+      "earlyFromBase": {
+       "window": 239.55,
+       "sum": 200,
+       "slack": 39.55,
+       "verdict": "FITS"
+      },
+      "verdict": "FITS"
+     },
+     "FINISH": {
+      "tailFrames": 22,
+      "baseFrames": 36,
+      "slack": 14,
+      "verdict": "FITS"
+     }
+    },
+    "info": {
+     "RETURN": "merged into SNIFF_PEE",
+     "derivedLead": 7,
+     "runFrameBeforeFirstStopAtDeclaredLead": 71,
+     "runFramesBeforeFirstStop": 12
+    }
+   },
+   "atlas": {
+    "kind": "labelled",
+    "cell": [
+     207,
+     116
+    ],
+    "clips": {},
+    "frames": 444
+   },
+   "sweep": {
+    "racesTimesLanes": 1000,
+    "evaluations": 1385545,
+    "missing": 0,
+    "overflow": 0,
+    "badCell": 0,
+    "statusCount": {
+     "accepted_working: RACE_STAND G1 (accepted 2026-11-09)": 42683,
+     "accepted_working (user 2026-11-09): RUN G1 #18-#71 (takeoff from RACE_STAND, spill into loop), lead 7": 1047690,
+     "accepted_working (user 2026-11-09): STOP G1 #0-#7,#18-#46 (stride #8-#17 removed), entry after RUN #71": 85359,
+     "accepted_working (user 2026-11-09): STOP G1 #47-#68 settle on the stand": 50754,
+     "accepted_working (user 2026-11-09): SNIFF_PEE+RETURN fixed build, 193 frames (orig #24-#93 + leg-lift insert 1-96 + orig #179-#205)": 61567,
+     "accepted_working (user 2026-11-09): BUTTERFLY G1 #18-#90": 41902,
+     "accepted_working (user 2026-11-09): ROLL G1 reverse build R69 (#6->#69->#24)": 55590
+    },
+    "windowFrames": {
+     "BASE/hold": {
+      "min": 5,
+      "max": 14.000000000000227
+     },
+     "START/body": {
+      "min": 54,
+      "max": 1374
+     },
+     "STOP/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "SNIFF_PEE/tail": {
+      "min": 21.999999999999943,
+      "max": 22.00000000000003
+     },
+     "SNIFF_PEE/body": {
+      "min": 192.99999999999994,
+      "max": 193.0000000000001
+     },
+     "SNIFF_PEE/pad": {
+      "min": 17.549999999999727,
+      "max": 39.55000000000001
+     },
+     "FINISH_DECELERATE/move": {
+      "min": 36.99999999999994,
+      "max": 37.000000000000114
+     },
+     "BASE/tail": {
+      "min": 21.999999999999943,
+      "max": 22.000000000000114
+     },
+     "BUTTERFLY/tail": {
+      "min": 21.999999999999943,
+      "max": 22.000000000000114
+     },
+     "BUTTERFLY/body": {
+      "min": 72.99999999999994,
+      "max": 73.00000000000011
+     },
+     "BUTTERFLY/pad": {
+      "min": 18.999999999999773,
+      "max": 41
+     },
+     "ROLL/tail": {
+      "min": 21.999999999999943,
+      "max": 22.000000000000114
+     },
+     "ROLL/body": {
+      "min": 108.99999999999994,
+      "max": 109.00000000000011
+     },
+     "ROLL/pad": {
+      "min": 6.999999999999773,
+      "max": 28.999999999999993
+     }
+    }
+   },
+   "t4": {
+    "stopsAndFinishes": 2307,
+    "finishes": 1000,
+    "declaredPreviousRunFrame": 71,
+    "runFrameBeforeStop": {
+     "run71": 2307
+    },
+    "mismatches": 0,
+    "firstMismatch": null
+   },
+   "seams": [
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:run18",
+     "windows": "BASE>START",
+     "count": 904,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "START:run71",
+     "to": "STOP:stop0",
+     "windows": "START>STOP",
+     "count": 1307,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:stop46",
+     "to": "STOP_TAIL:stop47",
+     "windows": "STOP>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": -13.31,
+     "shiftPxTo": -11.66
+    },
+    {
+     "from": "STOP_TAIL:stop68",
+     "to": "SNIFF_PEE:sniff1",
+     "windows": "SNIFF_PEE>SNIFF_PEE",
+     "count": 290,
+     "shiftPxFrom": -0.17,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "SNIFF_PEE:sniff193",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "SNIFF_PEE>SNIFF_PEE",
+     "count": 319,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:run18",
+     "windows": "SNIFF_PEE>START",
+     "count": 319,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "START:run71",
+     "to": "STOP:stop0",
+     "windows": "START>FINISH_DECELERATE",
+     "count": 1000,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:stop46",
+     "to": "STOP_TAIL:stop47",
+     "windows": "FINISH_DECELERATE>BASE",
+     "count": 1000,
+     "shiftPxFrom": -13.31,
+     "shiftPxTo": -11.66
+    },
+    {
+     "from": "STOP_TAIL:stop68",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "BASE>BASE",
+     "count": 1000,
+     "shiftPxFrom": -0.17,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:stop46",
+     "to": "STOP_TAIL:stop47",
+     "windows": "STOP>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": -13.31,
+     "shiftPxTo": -11.66
+    },
+    {
+     "from": "STOP_TAIL:stop68",
+     "to": "BUTTERFLY:bf18",
+     "windows": "BUTTERFLY>BUTTERFLY",
+     "count": 545,
+     "shiftPxFrom": -0.17,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "BUTTERFLY:bf90",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "BUTTERFLY>BUTTERFLY",
+     "count": 574,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:run18",
+     "windows": "BUTTERFLY>START",
+     "count": 574,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "STOP:stop46",
+     "to": "STOP_TAIL:stop47",
+     "windows": "STOP>ROLL",
+     "count": 472,
+     "shiftPxFrom": -13.31,
+     "shiftPxTo": -11.66
+    },
+    {
+     "from": "STOP_TAIL:stop68",
+     "to": "ROLL:roll6",
+     "windows": "ROLL>ROLL",
+     "count": 472,
+     "shiftPxFrom": -0.17,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "ROLL:roll24",
+     "to": "RACE_STAND:RACE_STAND",
+     "windows": "ROLL>ROLL",
+     "count": 510,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "START:run18",
+     "windows": "ROLL>START",
+     "count": 510,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "SNIFF_PEE:sniff1",
+     "windows": "BASE>SNIFF_PEE",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "BUTTERFLY:bf18",
+     "windows": "BASE>BUTTERFLY",
+     "count": 29,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    },
+    {
+     "from": "RACE_STAND:RACE_STAND",
+     "to": "ROLL:roll6",
+     "windows": "BASE>ROLL",
+     "count": 38,
+     "shiftPxFrom": 0,
+     "shiftPxTo": 0
+    }
+   ],
+   "problems": []
+  }
+ }
+}

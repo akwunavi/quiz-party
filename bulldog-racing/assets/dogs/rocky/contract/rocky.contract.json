@@ -1,0 +1,106 @@
+{
+ "schema": "character-visual-contract/v1",
+ "contractVersion": "rocky-1.0.0-partial",
+ "date": "2026-11-09",
+ "character": "bulldog3-rocky",
+ "fps": 24,
+ "role": "Рокки (dog3) для неизменённого валидатора Race V3/P3, стиль Пупса (клипы по индексу ячейки). ЧАСТИЧНО: принятая фазировка RUN->STOP (#68, runtime/phase.mjs) в P3 не выражается — см. KNOWN_ISSUES.",
+ "assetStatus": {
+  "BASE": "accepted_working: RACE_STAND рабочая боковая (STATUS.md)",
+  "START": "accepted_working: RACE_START #18-#41 (пользователь принял игровую версию)",
+  "RUN": "accepted_working: RUN loop #61-#72, фазировка #68 принята ТОЛЬКО через phase.mjs",
+  "STOP": "accepted_working: STOP 37 кадров (принят)",
+  "BUTTERFLY": "accepted_working: BUTTERFLY v1 121 (полностью принят)",
+  "ROLL": "accepted_working: ROLL v2 монтаж B 145 (окончательно принят)",
+  "SNIFF_PEE": "provisional: SNIFF_PEE+RETURN 240 (предварительно принят, финал — в общей гонке)",
+  "RETURN": "merged into SNIFF_PEE"
+ },
+ "clips": {
+  "BASE": {
+   "sampler": "constant",
+   "frame": 0
+  },
+  "START": {
+   "sampler": "bands",
+   "bands": [
+    [
+     24,
+     72
+    ],
+    [
+     16,
+     24
+    ]
+   ],
+   "count": 40
+  },
+  "RUN": {
+   "sampler": "prologueLoop",
+   "prologue": 11,
+   "loop": 12
+  },
+  "STOP": {
+   "sampler": "linear",
+   "fps": 24,
+   "count": 37,
+   "eps": false
+  },
+  "BUTTERFLY": {
+   "sampler": "linear",
+   "fps": 24,
+   "count": 121,
+   "eps": false
+  },
+  "ROLL": {
+   "sampler": "linear",
+   "fps": 24,
+   "count": 145,
+   "eps": false
+  },
+  "SNIFF_PEE": {
+   "sampler": "linear",
+   "fps": 24,
+   "count": 240,
+   "eps": false
+  }
+ },
+ "windows": {
+  "BASE": {
+   "hold": "BASE"
+  },
+  "START": {
+   "clip": "START",
+   "lead": 0
+  },
+  "RUN": {
+   "clip": "RUN"
+  },
+  "STOP": {
+   "clip": "STOP"
+  },
+  "FINISH_DECELERATE": {
+   "clip": "STOP"
+  },
+  "BUTTERFLY": {
+   "body": "BUTTERFLY"
+  },
+  "ROLL": {
+   "body": "ROLL"
+  },
+  "SNIFF_PEE": {
+   "body": "SNIFF_PEE",
+   "pad": "BASE",
+   "rate": 1.0019
+  },
+  "RETURN": {
+   "mergeInto": "SNIFF_PEE"
+  }
+ },
+ "limits": {
+  "retimeRateBounds": [
+   0.9,
+   1.12
+  ]
+ },
+ "rateNote": "SNIFF_PEE 240 кадров против окна SNIFF_PEE+RETURN 239.55 кадра: ускорение x1.0019 (в пределах 0.9-1.12), кадры и порядок не меняются."
+}

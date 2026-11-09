@@ -1,0 +1,48 @@
+{
+ "schema": "bulldog-atlas/v1",
+ "kind": "clip-indexed",
+ "dog": "pups",
+ "cellWidth": 178,
+ "cellHeight": 100,
+ "columns": 24,
+ "sprite": {
+  "w": 207,
+  "h": 116,
+  "stretch": "x1.1629 / x1.16 (решение сохранено)"
+ },
+ "clips": {
+  "BASE": {
+   "sheet": "atlas/base.png",
+   "count": 1
+  },
+  "START": {
+   "sheet": "atlas/start.png",
+   "count": 40
+  },
+  "RUN": {
+   "sheet": "atlas/run.png",
+   "count": 23
+  },
+  "STOP": {
+   "sheet": "atlas/stop.png",
+   "count": 37
+  },
+  "SNIFF_PEE": {
+   "sheet": "atlas/sniff_pee.png",
+   "count": 229
+  },
+  "RETURN": {
+   "sheet": "atlas/return.png",
+   "count": 109
+  },
+  "BUTTERFLY": {
+   "sheet": "atlas/butterfly.png",
+   "count": 121
+  },
+  "ROLL": {
+   "sheet": "atlas/roll.png",
+   "count": 145
+  }
+ },
+ "note": "SNIFF_PEE и RETURN — два клипа (229 + 109), как в dog4-v3-lab."
+}
