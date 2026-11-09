@@ -1,6 +1,6 @@
 // Арена: камера, раскладка дорожек и слоты авторской графики — без холста (чистая математика). Гонка — Race V3 того же движка (seed 328, D=42).
 import { describe, expect, it } from 'vitest'
-import { ARENA, buildCameraTrack, worldX } from '../camera'
+import { ARENA, DOG_ENVELOPE, LANE_RULES, buildCameraTrack, worldX } from '../camera'
 import { SLOTS, slotPlacements, moduleOf } from '../slots'
 import { BERM_Y } from '../art'
 import { raceFor, stateAt } from '../../engine'
@@ -40,8 +40,11 @@ describe('дорожки', () => {
     for (let i = 1; i < 5; i++) { expect(ARENA.LANE_Y[i] - ARENA.LANE_Y[i - 1]).toBeGreaterThanOrEqual(105); expect(ARENA.LANE_K[i]).toBeGreaterThan(ARENA.LANE_K[i - 1]) }
     expect(ARENA.LANE_Y[0]).toBeGreaterThan(BERM_Y); expect(ARENA.LANE_Y[4] + 8 * ARENA.LANE_K[4]).toBeLessThan(ARENA.H + 4)
   })
-  it('самый высокий силуэт (замер на сиде 328: 108 строк атласа) помещается в шаг дорожки — собаки не наступают друг на друга при любой позе', () => {
-    for (let i = 1; i < 5; i++) expect(108 * ARENA.LANE_K[i]).toBeLessThan(ARENA.LANE_Y[i] - ARENA.LANE_Y[i - 1])
+  it('вертикальная компоновка закрыта: зазор между соседями ≥ minGap при самых высоких позах за всю гонку, Фрэнк не доходит до ограждения, Луна с запасом снизу', () => {
+    const { up, down } = DOG_ENVELOPE, Y = ARENA.LANE_Y, K = ARENA.LANE_K
+    for (let i = 0; i < 4; i++) expect(Y[i + 1] - up[i + 1] * K[i + 1] - (Y[i] + down[i] * K[i])).toBeGreaterThanOrEqual(LANE_RULES.minGap)
+    expect(Y[0] - up[0] * K[0]).toBeGreaterThanOrEqual(BERM_Y - LANE_RULES.fenceEdge + LANE_RULES.topClear)
+    expect(Y[4] + down[4] * K[4]).toBeLessThanOrEqual(ARENA.H - LANE_RULES.bottomMargin)
   })
 })
 

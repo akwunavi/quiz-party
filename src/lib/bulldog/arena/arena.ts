@@ -117,6 +117,18 @@ export class ArenaRenderer {
       return null
     })
   }
+  /** Рамка силуэта каждой собаки в момент T (секунды гонки, не окна) относительно линии лап, в пикселях масштаба 1: up — вверх от лап, down — вниз. Для проверки вертикальной компоновки по ВСЕМ анимациям. */
+  silhouetteBox(T: number): ({ up: number; down: number } | null)[] {
+    return this.dogs.map((d, i) => {
+      if (!d) return null; const v = d.visual.at(this.race!.dogs[i].segments, T), bm = v.sheet ? this.pool.peek(selectSheetUrl(DOG_IDS[i], v.sheet)) : undefined; if (!bm || v.index == null) return null
+      const g = this.nose.getContext('2d', { willReadFrequently: true })!; g.clearRect(0, 0, SW, SH); const A = d.atlas
+      g.drawImage(bm, (v.index % A.columns) * A.cellWidth, Math.floor(v.index / A.columns) * A.cellHeight, A.cellWidth, A.cellHeight, 0, 0, SW, SH)
+      const px = g.getImageData(0, 0, SW, SH).data; let top = -1, bot = -1
+      for (let y = 0; y < SH && top < 0; y++) for (let x = 0; x < SW; x++) if (px[(y * SW + x) * 4 + 3] >= 128) { top = y; break }
+      for (let y = SH - 1; y >= 0 && bot < 0; y--) for (let x = 0; x < SW; x++) if (px[(y * SW + x) * 4 + 3] >= 128) { bot = y; break }
+      return top < 0 ? null : { up: L.spriteTopOffset - top, down: bot - L.spriteTopOffset }
+    })
+  }
   private drawDogs(t: number, X: number) {
     const c = this.ctx, race = this.race!, T = this.t0 + t
     for (let i = 0; i < 5; i++) {                                     // порядок i = дальняя дорожка → ближняя: ближние перекрывают дальние

@@ -7,9 +7,9 @@ export const PAL = {                         // «B+C»: спортивная я
   skyTop: '#161447', skyMid: '#4b3a8c', skyLow: '#c4669a', horizon: '#ffb778',
   iceFar: '#b9a6e6', iceNear: '#4c4aa6', snowLit: '#f7ecff', snowShade: '#8d86cf', warm: '#ffc27a', warmDeep: '#ff8f4a',
 }
-export const HZ = 468                        // линия горизонта (низ гор, начало озера)
+export const HZ = 379                        // линия горизонта (низ гор, начало озера)
 export const FENCE_H = 340                  // высота холста ограждения: фонарь с колпаком и свечением целиком внутри (раньше 150 px резало колпак и свечение по прямой линии)
-export const BERM_Y = 566                    // дальний снежный борт: верхняя кромка трассы
+export const BERM_Y = 477                    // дальний снежный борт: верхняя кромка трассы
 export const rng = (seed: number) => { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 } }
 export const cv = (w: number, h: number) => { const c = document.createElement('canvas'); c.width = Math.ceil(w); c.height = Math.ceil(h); return c }
 const lin = (c: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, stops: [number, string][]) => { const g = c.createLinearGradient(x0, y0, x1, y1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g }
