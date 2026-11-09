@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Bulldog Racing — лаборатория раунда</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{margin:0;background:#1d2224;color:#e8eceb;font:14px system-ui,sans-serif}
+ #app{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:10px;padding:8px;height:100vh;box-sizing:border-box}
+ canvas{width:100%;height:auto;background:#d9d5c7;display:block;align-self:start}
+ #side{overflow:auto;background:#14181a;border-radius:6px;padding:10px;font-size:13px}
+ h3{margin:10px 0 4px;font-size:13px;color:#9fd1b8;text-transform:uppercase;letter-spacing:.04em}
+ button,select,input{font:inherit;padding:3px 8px;background:#2b3336;color:#e8eceb;border:1px solid #4a5559;border-radius:4px}
+ button:hover:not(:disabled){background:#3a464a} button:disabled{opacity:.4} button.on{background:#4b6b5d;border-color:#7fb89c}
+ .trow{display:flex;gap:3px;align-items:center;margin:2px 0}.trow b{width:28px} .trow button{padding:2px 7px}
+ #teams{max-height:260px;overflow:auto} .big{font-size:15px;font-weight:bold;color:#ffd98a} .row{display:flex;gap:6px;align-items:center;margin:4px 0;flex-wrap:wrap}
+ #status{color:#aab;font-size:12px}
+</style></head><body>
+<div id="app">
+ <canvas id="cv" width="1920" height="1080"></canvas>
+ <div id="side">
+  <b>Лаборатория раунда «Скачки бульдогов»</b><div id="status">…</div>
+  <h3>Фаза</h3><div class="big" id="phase">—</div><div id="live"></div>
+  <h3>Ставки команд</h3><div id="counts"></div>
+  <div class="row">команд <input id="teamN" type="number" min="1" max="24" value="6" style="width:52px">
+   <select id="dist"><option value="random">случайно</option><option value="even">поровну</option><option value="all-one">все на №3</option><option value="skewed">перекос на №1</option><option value="none">никто</option></select>
+   <button id="apply">Раздать</button></div>
+  <div id="teams"></div>
+  <h3>Гонка</h3>
+  <div class="row">seed <input id="seed" size="10" placeholder="случайный при старте"> D <input id="D" type="number" min="20" max="300" value="42" style="width:56px"> с
+   скорость <select id="speed"><option>1</option><option>2</option><option>4</option><option>8</option></select></div>
+  <div class="row"><button id="go">Завершить выбор → К старту</button><button id="skip">Пропустить паузу</button><button id="restart">Перезапуск</button></div>
+  <p style="color:#889;font-size:12px">D — «время дистанции собаки с обычным темпом» (в Race V3 — 42 с). Длительность гонки получается из физики: темп собак × D + окна действий. Выбор собак исход не меняет: сид рождается при старте.</p>
+ </div>
+</div>
+<script type="module" src="./src/main.mjs"></script>
+</body></html>

@@ -1,0 +1,40 @@
+{
+ "schema": "bulldog-selection-atlas/v1",
+ "dog": "zefir",
+ "cell": [
+  227,
+  283
+ ],
+ "columns": 24,
+ "scale": 0.4,
+ "crop": [
+  356,
+  0,
+  923,
+  707
+ ],
+ "frame": [
+  1276,
+  720
+ ],
+ "clips": {
+  "idle": {
+   "sheet": "selection/idle.png",
+   "count": 106,
+   "sourceFirstFrame": 4,
+   "file": "alpha/DOG2_IDLE_alpha_f1-f121.webm"
+  },
+  "sel": {
+   "sheet": "selection/sel.png",
+   "count": 118,
+   "sourceFirstFrame": 4,
+   "file": "alpha/DOG2_SELECTED_alpha_f1-f121.webm"
+  },
+  "ret": {
+   "sheet": "selection/ret.png",
+   "count": 109,
+   "sourceFirstFrame": 1,
+   "file": "alpha/DOG2_RETURN_TO_IDLE_v1_alpha_m109.webm"
+  }
+ }
+}

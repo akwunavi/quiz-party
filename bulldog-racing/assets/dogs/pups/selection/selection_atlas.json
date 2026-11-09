@@ -1,0 +1,34 @@
+{
+ "schema": "bulldog-selection-atlas/v1",
+ "dog": "pups",
+ "cell": [
+  227,
+  283
+ ],
+ "columns": 24,
+ "scale": 0.4,
+ "crop": [
+  356,
+  0,
+  923,
+  707
+ ],
+ "frame": [
+  1276,
+  720
+ ],
+ "clips": {
+  "idle": {
+   "sheet": "selection/idle.png",
+   "count": 240,
+   "sourceFirstFrame": 0,
+   "file": "alpha/DOG4_IDLE_v1_alpha_loop240.webm"
+  },
+  "sel": {
+   "sheet": "selection/sel.png",
+   "count": 121,
+   "sourceFirstFrame": 0,
+   "file": "alpha/DOG4_SELECTED_v4_alpha_s0-s120.webm"
+  }
+ }
+}
