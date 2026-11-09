@@ -57,6 +57,7 @@ describe('слоты авторской графики', () => {
     expect(moduleOf(5, 1)).toBe(0)
   })
   it('нижние кромки слоёв не заходят на трассу, у всех есть описание для художника', () => {
-    for (const s of SLOTS) { expect(s.bottomY).toBeLessThanOrEqual(BERM_Y + 2); expect(s.note.length).toBeGreaterThan(20); expect(s.file).toMatch(/\.webp$/) }
+    for (const s of SLOTS) { expect(s.bottomY).toBeLessThan(ARENA.LANE_Y[0] - 15);           // низ слоя (его нижние ~30 px прячет борт) не доходит до первой дорожки
+       expect(s.note.length).toBeGreaterThan(20); expect(s.file).toMatch(/\.webp$/) }
   })
 })

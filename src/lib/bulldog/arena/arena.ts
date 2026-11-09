@@ -55,9 +55,8 @@ export class ArenaRenderer {
     c.drawImage(A.lake, px(0.2), HZ - 4)
     this.drawLakeGlints(T, X)
     // авторские слои деревни/леса/трибун — только если файлы есть
-    for (const s of this.slots) if (s.spec.parallax < 0.85) this.drawSlot(s, X, T)
+    for (const s of this.slots) this.drawSlot(s, X, T)                       // все авторские слои — ЗА ограждением, от дальнего к ближнему (параллакс по возрастанию)
     c.drawImage(A.fence, -X, BERM_Y + 2 - FENCE_H + sw(0.9))
-    for (const s of this.slots) if (s.spec.parallax >= 0.85) this.drawSlot(s, X, T)
     c.drawImage(A.track.canvas, -X, A.track.y0)
     this.drawIceSparkle(T, X)
     this.drawDogs(t, X)
