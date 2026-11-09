@@ -16,13 +16,23 @@ export interface SlotSpec {
   modules: number
   /** Что внутри и условия съёмки/отрисовки — попадает в ASSET_BRIEF. */
   note: string
+  /** Маршрут: явные места модулей (x — левый край модуля В КООРДИНАТАХ СЛОЯ, т.е. на экране x − camX·parallax). Есть — вместо периодической укладки. */
+  route?: { x: number; module: number }[]
+  /** Нижний срез исходника: строки ниже `from` плавно гаснут до `to` (собственный забор и сугробы ассета не дают «двойного забора»). Считается один раз при загрузке. */
+  fadeBottom?: { from: number; to: number }
+  /** Сколько строк исходника рисовать сверху (ниже — прозрачная пустота файла). Нет — вся высота. */
+  contentH?: number
 }
+/** Деревня: параллакс как у трибуны (идут по одной «линии» маршрута), ширина кадра на экране и посадка по низу. */
+export const VILLAGE_PARALLAX = 0.92, VILLAGE_W = 1152, VILLAGE_BOTTOM = BERM_Y - 18, VILLAGE_SRC_H = 723
 export const SLOTS: SlotSpec[] = [
   { id: 'forest_far', file: 'forest_far.webp', title: 'Дальний хвойный склон с огоньками посёлка', parallax: 0.30, bottomY: BERM_Y - 40, tileW: 3840, tileH: 300, mode: 'tile', modules: 1,
     note: 'бесшовно по горизонтали; плотные заснеженные ели + крыши и тёплые окна далёких шале в просветах; воздушная дымка (мягче и светлее переднего плана); фон прозрачный сверху (небо и горы за ним)' },
-  { id: 'village_mid', file: 'village_mid.webp', title: 'Зимняя деревня: шале, колокольня, дым из труб', parallax: 0.55, bottomY: BERM_Y - 10, tileW: 2752, tileH: 400, mode: 'sequence', modules: 3,
-    note: '3 модуля (вариант A) или 4 (вариант B); края каждого модуля свободны (120 px) — стык закрывают ели/фонари спрайтами; шале с тёплыми окнами, балконы, гирлянды, колокольня, ели между домами; без зрителей' },
+  { id: 'village_mid', file: 'village_mid.webp', title: 'Зимняя деревня (один цельный кадр 1920×819): шале, рынок, часовая башня, ели, дым', parallax: VILLAGE_PARALLAX, bottomY: VILLAGE_BOTTOM, tileW: VILLAGE_W, tileH: Math.round(VILLAGE_SRC_H * VILLAGE_W / 1920), mode: 'sequence', modules: 1,
+    route: [{ x: 2000, module: 0 }], fadeBottom: { from: 636, to: 690 }, contentH: VILLAGE_SRC_H,
+    note: 'готовый ассет 1920×819 RGBA, один экземпляр на маршруте; собственный забор и сугробы внизу кадра садятся ЗА ограждение арены (не двойной забор); дым статичный, горы по бокам остаются видны' },
   { id: 'stands_crowd', file: 'stands_crowd.webp', title: 'Трибуна с публикой (вариант A)', parallax: 0.92, bottomY: BERM_Y + 30, tileW: 1596, tileH: 365, mode: 'sequence', modules: 2,
+    route: [{ x: 250, module: 0 }, { x: 3306, module: 1 }],
     note: 'модуль 2282×522 исходных px (≈1596×365 при 1×; трибуна ≈1300 px + зазор ≈290 px, в котором видны горы): низкая фронтальная трибуна с публикой, снежная крыша, гирлянды, баннеры; файл = обычный и зеркальный модули; нижние ~30 px прячет борт, публика остаётся над перилами ограждения' },
   { id: 'stands', file: 'stands.webp', title: 'Трибуны/навесы (без зрителей)', parallax: 0.92, bottomY: BERM_Y + 2, tileW: 2400, tileH: 340, mode: 'sequence', modules: 3,
     note: '3 модуля стыкуются в любом порядке; многоуровневые деревянные трибуны B (тёмно-синие металлические элементы, световые панели), навесы с гирляндами C; ярусы пустые — зрители отдельным слоем' },
@@ -31,12 +41,21 @@ export const SLOTS: SlotSpec[] = [
   { id: 'spruce_set', file: 'spruce_set.webp', title: 'Крупные ели (спрайты)', parallax: 0.80, bottomY: BERM_Y + 2, tileW: 2400, tileH: 640, mode: 'sequence', modules: 6,
     note: '6–8 отдельных елей разной высоты на прозрачном фоне; ставятся кодом за ограждением; никогда не перед дорожками' },
 ]
-export interface LoadedSlot { spec: SlotSpec; img: HTMLImageElement }
+export interface LoadedSlot { spec: SlotSpec; img: HTMLImageElement | HTMLCanvasElement }
+/** Готовит слой: мягко гасит низ по `fadeBottom` (альфа-маска на копии; файл не меняется). */
+export function prepareSlotImage(spec: SlotSpec, img: HTMLImageElement): HTMLImageElement | HTMLCanvasElement {
+  const f = spec.fadeBottom; if (!f) return img
+  const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height; const c = cv.getContext('2d')!
+  c.drawImage(img, 0, 0); c.globalCompositeOperation = 'destination-in'
+  const g = c.createLinearGradient(0, 0, 0, cv.height), k = (y: number) => Math.min(1, Math.max(0, y / cv.height))
+  g.addColorStop(0, '#fff'); g.addColorStop(k(f.from), '#fff'); g.addColorStop(k(f.to), 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,0)')
+  c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height); return cv
+}
 /** Грузит доступные слои; отсутствующие возвращает списком (их просто нет в кадре). */
 export async function loadSlots(base: string, files?: string[]): Promise<{ loaded: LoadedSlot[]; missing: SlotSpec[] }> {
   const loaded: LoadedSlot[] = [], missing: SlotSpec[] = []
   await Promise.all(SLOTS.map(spec => new Promise<void>(res => {
-    if (files && !files.includes(spec.file)) { missing.push(spec); res(); return } const img = new Image(); img.onload = () => { loaded.push({ spec, img }); res() }; img.onerror = () => { missing.push(spec); res() }; img.src = `${base}${spec.file}` })))
+    if (files && !files.includes(spec.file)) { missing.push(spec); res(); return } const img = new Image(); img.onload = () => { loaded.push({ spec, img: prepareSlotImage(spec, img) }); res() }; img.onerror = () => { missing.push(spec); res() }; img.src = `${base}${spec.file}` })))
   loaded.sort((a, b) => a.spec.parallax - b.spec.parallax); return { loaded, missing }
 }
 /** Какой модуль файла стоит в плитке i: детерминированно, без одного и того же модуля подряд (при ≥ 2 модулях). */
@@ -47,7 +66,9 @@ export function moduleOf(i: number, modules: number): number {
 }
 /** Положение плиток слоя при камере camX: слева направо, покрывая кадр. Чистая функция — тестируется без холста. */
 export function slotPlacements(spec: SlotSpec, camX: number, viewW = ARENA.W): { x: number; i: number; module: number }[] {
-  const off = camX * spec.parallax, first = Math.floor(off / spec.tileW), out: { x: number; i: number; module: number }[] = []
+  const off = camX * spec.parallax
+  if (spec.route) return spec.route.filter(r => r.x - off < viewW && r.x + spec.tileW - off > 0).map((r, k) => ({ x: r.x - off, i: k, module: r.module }))
+  const first = Math.floor(off / spec.tileW), out: { x: number; i: number; module: number }[] = []
   for (let i = first; i * spec.tileW - off < viewW; i++) out.push({ x: i * spec.tileW - off, i, module: moduleOf(i, spec.modules) })
   return out
 }

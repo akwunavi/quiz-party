@@ -47,10 +47,22 @@ describe('дорожки', () => {
 
 describe('слоты авторской графики', () => {
   it('раскладка по параллаксу: при камере 0 слой начинается с 0; сдвиг = камера × параллакс; кадр закрыт целиком', () => {
-    const s = SLOTS.find(x => x.id === 'village_mid')!
+    const s = SLOTS.find(x => x.id === 'forest_far')!
     expect(slotPlacements(s, 0)[0].x).toBe(0)
     expect(slotPlacements(s, 1000)[0].x).toBeCloseTo(-1000 * s.parallax + Math.floor(1000 * s.parallax / s.tileW) * s.tileW, 6)
     for (const cx of [0, 777, 3210]) { const p = slotPlacements(s, cx); expect(p[0].x).toBeLessThanOrEqual(0); expect(p[p.length - 1].x + s.tileW).toBeGreaterThanOrEqual(ARENA.W) }
+  })
+  it('маршрут: трибуна → открытый участок → деревня → открытый участок → трибуна, без наложений и без старой трибуны', () => {
+    const st = SLOTS.find(x => x.id === 'stands_crowd')!, vi = SLOTS.find(x => x.id === 'village_mid')!
+    const items = [...st.route!.map(r => ({ id: 'st', x: r.x, w: st.tileW })), ...vi.route!.map(r => ({ id: 'vi', x: r.x, w: vi.tileW }))].sort((a, b) => a.x - b.x)
+    expect(items.map(i => i.id)).toEqual(['st', 'vi', 'st'])
+    expect(st.parallax).toBe(vi.parallax)                                    // идут по одной «линии» маршрута — взаимный сдвиг не плывёт
+    // объекты (у трибуны ≈ 82% модуля, у деревни весь кадр) не налезают друг на друга; между ними — открытый участок с горами ≥ 300 px
+    const ends = [items[0].x + 1303, items[1].x + vi.tileW, items[2].x + 294]; const starts = [items[1].x, items[2].x + 294]
+    for (let k = 0; k < 2; k++) expect(starts[k] - ends[k]).toBeGreaterThanOrEqual(300)
+    expect(SLOTS.some(x => x.id === 'stands')).toBe(true)                    // старая двухъярусная в маршрут не входит (её нет в файлах public/arena)
+    expect(slotPlacements(vi, 0).length + slotPlacements(vi, 2687).length).toBeGreaterThan(0)
+    expect(slotPlacements(vi, 0).length).toBeLessThanOrEqual(1)
   })
   it('модули идут без одинакового подряд и используют все варианты', () => {
     for (const m of [2, 3, 4, 6]) { const seq = Array.from({ length: 200 }, (_, i) => moduleOf(i, m)); for (let i = 1; i < seq.length; i++) expect(seq[i]).not.toBe(seq[i - 1]); expect(new Set(seq).size).toBe(m) }

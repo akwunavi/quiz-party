@@ -82,7 +82,7 @@ export class ArenaRenderer {
   private drawIceSparkle(T: number, X: number) { const c = this.ctx, r = rng(8); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 90; i++) { const wx = r() * 3000, y = BERM_Y + 30 + r() * (ARENA.H - BERM_Y - 60), ph = r() * 9, a = Math.pow(Math.max(0, Math.sin(T * (1.2 + r() * 2) + ph)), 12), x = ((wx - X) % 3000 + 3000) % 3000 - 500; if (x < -20 || x > ARENA.W + 20) continue; c.fillStyle = `rgba(255,255,255,${a * 0.9})`; c.fillRect(x - 3, y, 7, 1); c.fillRect(x, y - 3, 1, 7) } c.restore() }
   private drawSlot(s: LoadedSlot, X: number, T: number) {
     const c = this.ctx, sp = s.spec, mw = s.img.width / sp.modules
-    for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, s.img.height, p.x, sp.bottomY - sp.tileH, sp.tileW, sp.tileH)
+    for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH, sp.tileW, sp.tileH)
     void T
   }
   private noseOf(id: string, d: DogData, v: { sheet: string | null; index: number | null }, bm: ImageBitmap) {

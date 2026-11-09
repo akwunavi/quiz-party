@@ -6,7 +6,7 @@
 import sys, numpy as np
 from PIL import Image
 SPEC = {  # id: (минимальная высота 1x, ширина модуля 1x, число модулей или None, bottom-line обязательна)
-    'forest_far': (300, 3840, 1, False), 'village_mid': (400, 2752, None, True), 'stands': (320, 2400, None, True),
+    'forest_far': (300, 3840, 1, False), 'village_mid': (430, 1152, 1, True), 'stands': (320, 2400, None, True),
     'crowd': (230, 2400, None, True), 'stands_crowd': (360, 1596, None, True), 'spruce_set': (300, 0, None, False)}
 def main():
     path, lid = sys.argv[1], sys.argv[2]; im = Image.open(path).convert('RGBA'); a = np.asarray(im).astype(int); H, W = a.shape[:2]; rep = []; ok = True
