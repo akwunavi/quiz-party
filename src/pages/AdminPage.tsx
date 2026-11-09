@@ -39,7 +39,7 @@ import { exportAnswersCsv } from '../lib/exportAnswers'
 import { autocheck } from '../lib/autocheck'
 import { startRace } from '../lib/raceActions'
 import { courseSeconds, dogNames } from '../lib/bulldog/config'
-import { countsByDog, raceRef } from '../lib/bulldog/bets'
+import { countsByDog, raceOf, raceRef } from '../lib/bulldog/bets'
 // Пульты «Своей игры» и мелодии в телефоне работают на ТЕХ ЖЕ вызовах, что и
 // проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
@@ -1890,7 +1890,7 @@ function RaceControls({ gameState, round }: {
   const bets = answers.filter(a => a.question_ref === raceRef(gameState.round_number))
   const counts = countsByDog(bets)
   const names = dogNames(round.settings as RaceSettings)
-  const stage = gameState.melody?.race?.stage
+  const stage = raceOf(gameState.melody, gameState.round_number, gameState.game_id).stage
 
   if (stage === 'running') {
     return <div className="adm-dim">🐾 ЗАБЕГ ИДЁТ НА ПРОЕКТОРЕ</div>

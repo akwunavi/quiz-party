@@ -476,7 +476,7 @@ function HostInner({ gameState, pack }: {
 
   // ── «Скачки бульдогов» ──
   if (gameState.phase === 'question' && round.mechanic === 'race') {
-    return <RaceBoard pack={pack} round={round} gameState={gameState} />
+    return <RaceBoard key={`${gameState.game_id}-${gameState.round_number}`} pack={pack} round={round} gameState={gameState} />
   }
 
   // ── «Угадай мелодию» ──

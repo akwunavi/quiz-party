@@ -37,3 +37,14 @@ export function gradingRows<T extends { answer_text: string; stake?: number | st
 export function effectiveBet(stage: string | undefined, local: number | null, server: number | null): number | null {
   return stage === 'betting' || !stage ? (local ?? server) : server
 }
+
+export type RaceState = NonNullable<import('../../types/quiz').MelodyState['race']>
+export const raceKey = (gameId: string, roundNumber: number) => `${gameId}:${roundNumber}`
+/** Состояние гонки ЭТОГО раунда и ЭТОЙ игры. Мешок `melody` общий на всю комнату, поэтому «завершённая» гонка прошлого раунда/прошлой игры не должна
+ *  читаться как состояние нынешней (иначе ставки второго раунда-гонки никогда не откроются). Записи без `round`/`game` (до 10.45) считаются подходящими.
+ *  Слот `race` один на комнату; уже сыгранные гонки лежат в `raceDone` — возврат к такому раунду показывает итог, а не открывает ставки заново. */
+export function raceOf(melody: { race?: RaceState; raceDone?: Record<string, RaceState> } | null | undefined, roundNumber: number, gameId: string): RaceState {
+  const r = melody?.race
+  if (r && (r.round == null || r.round === roundNumber) && (r.game == null || r.game === gameId)) return r
+  return melody?.raceDone?.[raceKey(gameId, roundNumber)] ?? {}
+}

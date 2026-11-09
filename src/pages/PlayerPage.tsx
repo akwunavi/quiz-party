@@ -6,7 +6,7 @@ import { registerTeam, heartbeat } from '../lib/gameActions'
 import { rateQuestion, saveRoundComment } from '../lib/ratings'
 import { useBlitz } from '../lib/blitzApi'
 import { currentTeam, MAX_ATTEMPTS, SKIP_MARK, NEXT_DELAY_MS } from '../lib/blitzState'
-import { effectiveBet } from '../lib/bulldog/bets'
+import { effectiveBet, raceOf } from '../lib/bulldog/bets'
 import { enqueueAnswer, dropPending } from '../lib/answerQueue'
 import { jeopardyRef } from '../lib/jeopardyRef'
 import { ConnectionDot } from '../components/ConnectionDot'
@@ -135,7 +135,7 @@ function PlayerInner({ gameState, pack, team, setTeam }: {
     return <PlayerReview team={team} round={round} roundNumber={gameState.round_number}
       label={displayRoundNumber(pack, gameState.round_number)} gameState={gameState} />
   if (phase === 'question' && round?.mechanic === 'race')
-    return <RacePlayer team={team} gameState={gameState} round={round}
+    return <RacePlayer key={`${gameState.game_id}-${gameState.round_number}`} team={team} gameState={gameState} round={round}
       roundLabel={displayRoundNumber(pack, gameState.round_number)} />
   if (phase === 'question' && round?.mechanic === 'melody')
     return <MelodyPlayer team={team} gameState={gameState}
@@ -612,7 +612,7 @@ function RacePlayer({ team, gameState, round, roundLabel }: {
   team: Team; roundLabel: string; round: LoadedRound
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
-  const race = gameState.melody?.race ?? {}
+  const race = raceOf(gameState.melody, gameState.round_number, gameState.game_id)
   const names = dogNames(round.settings as RaceSettings)
   const ref = raceRef(gameState.round_number)
   // Ответы читаем всегда: пока выбор открыт — счётчики и своя ставка, дальше (бег, финиш) — только чтобы показать ставку, ЗАФИКСИРОВАННУЮ

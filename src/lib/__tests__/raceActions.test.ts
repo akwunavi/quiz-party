@@ -26,7 +26,7 @@ describe('raceActions', () => {
   it('открыть ставки → «betting», остальное melody не затирается', async () => {
     session = mk({ jp: { tile: 1 } } as never)
     expect(await openRaceBets(session)).toBe('written')
-    expect(race()).toEqual({ stage: 'betting' }); expect((session.melody as never as { jp: unknown }).jp).toEqual({ tile: 1 })
+    expect(race()).toEqual({ stage: 'betting', round: 2, game: 'g' }); expect((session.melody as never as { jp: unknown }).jp).toEqual({ tile: 1 })
   })
   it('перезагрузка/повтор проектора НЕ возвращает идущую гонку в «betting»', async () => {
     session = { ...mk({ race: { stage: 'running', seed: 7, D: 42, startedAt: 'x' } }), state_rev: 5 }; const stale = mk()   // экран держит устаревший снимок «гонки нет»
@@ -64,7 +64,43 @@ describe('raceActions', () => {
     expect(await finishRace(session, 5)).toBe('already'); expect(race()!.stage).toBe('running')
   })
   it('чистые условия идемпотентны', () => {
-    expect(openBetsFn({ race: { stage: 'betting' } })).toBeNull(); expect(startRaceFn(1, 't', 42)({ race: { stage: 'running' } })).toBeNull()
-    expect(finishRaceFn(1)({ race: { stage: 'done', seed: 1 } })).toBeNull()
+    const at = { round: 2, game: 'g' }
+    expect(openBetsFn(at)({ race: { stage: 'betting', round: 2, game: 'g' } })).toBeNull(); expect(startRaceFn(at, 1, 't', 42)({ race: { stage: 'running', round: 2, game: 'g' } })).toBeNull()
+    expect(finishRaceFn(at, 1)({ race: { stage: 'done', seed: 1, round: 2, game: 'g' } })).toBeNull()
+  })
+  // найдено сквозным тестом на настоящем backend (e2e/bulldog/net.cjs, S19): мешок melody общий на комнату
+  it('второй раунд-гонка: «завершённая» гонка ПРОШЛОГО раунда не мешает открыть ставки нового', async () => {
+    session = { ...mk({ race: { stage: 'done', seed: 9, D: 42, startedAt: 'x', round: 0, game: 'g' } }), round_number: 2, state_rev: 4 }
+    expect(await openRaceBets(session)).toBe('written')
+    expect(race()).toEqual({ stage: 'betting', round: 2, game: 'g' })
+  })
+  it('новая игра в той же комнате (другой game_id): старая гонка не читается как текущая', async () => {
+    session = { ...mk({ race: { stage: 'done', seed: 9, D: 42, startedAt: 'x', round: 2, game: 'OLD' } }), state_rev: 4 }
+    expect(await openRaceBets(session)).toBe('written'); expect(race()).toMatchObject({ stage: 'betting', game: 'g' })
+  })
+  it('возврат к уже сыгранному раунду после более позднего: показан итог (done), ставки НЕ открываются заново', async () => {
+    session = { ...mk({ race: { stage: 'running', seed: 5, D: 42, startedAt: 'a', round: 0, game: 'g' } }), round_number: 0, state_rev: 3 }
+    expect(await finishRace(session, 5)).toBe('written')                      // раунд 0 сыгран и записан в raceDone
+    session = { ...session, round_number: 2 }; expect(await openRaceBets(session)).toBe('written')   // раунд 2: слот race занят новой гонкой
+    const { raceOf } = await import('../bulldog/bets')
+    expect(raceOf(session.melody, 0, 'g')).toMatchObject({ stage: 'done', seed: 5 })    // назад в раунд 0 — итог прежней гонки
+    expect(raceOf(session.melody, 2, 'g').stage).toBe('betting')
+    session = { ...session, round_number: 0 }; expect(await openRaceBets(session)).toBe('already')
+  })
+  it('старт и «окончен» привязаны к раунду и игре: чужая запись не проходит', async () => {
+    session = { ...mk({ race: { stage: 'betting', round: 0, game: 'g' } }), state_rev: 1 }   // ставки ДРУГОГО раунда (текущий — 2)
+    await expect(startRace(session)).rejects.toThrow(/выбор ещё не открыт/)
+    session = { ...mk({ race: { stage: 'running', seed: 5, D: 42, round: 7, game: 'g' } }), state_rev: 1 }
+    expect(await finishRace(session, 5)).toBe('already'); expect(race()!.stage).toBe('running')
+  })
+})
+
+describe('raceOf', () => {
+  it('подходящее состояние отдаётся, чужое раунда/игры — пустое, без полей (старая запись) — подходит', async () => {
+    const { raceOf } = await import('../bulldog/bets')
+    expect(raceOf({ race: { stage: 'done', round: 1, game: 'g' } }, 1, 'g').stage).toBe('done')
+    expect(raceOf({ race: { stage: 'done', round: 1, game: 'g' } }, 2, 'g')).toEqual({})
+    expect(raceOf({ race: { stage: 'done', round: 1, game: 'g' } }, 1, 'h')).toEqual({})
+    expect(raceOf({ race: { stage: 'running' } }, 5, 'x').stage).toBe('running'); expect(raceOf(undefined, 0, 'g')).toEqual({})
   })
 })

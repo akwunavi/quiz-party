@@ -20,7 +20,7 @@ import type { PreviewCtx } from '../../lib/previewState'
 import { serverNow } from '../../lib/serverClock'
 import { courseSeconds, dogNames } from '../../lib/bulldog/config'
 import { raceClock, gradeAt } from '../../lib/bulldog/phases'
-import { countsByDog, gradingRows, raceRef, scoreRows } from '../../lib/bulldog/bets'
+import { countsByDog, gradingRows, raceOf, raceRef, scoreRows } from '../../lib/bulldog/bets'
 import { raceFor } from '../../lib/bulldog/engine'
 import type { RaceV3 } from '../../lib/bulldog/v3types'
 
@@ -33,7 +33,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats }: {
 }) {
   const s = round.settings as RaceSettings
   const names = dogNames(s)
-  const race = gameState.melody?.race ?? {}
+  const race = raceOf(gameState.melody, gameState.round_number, gameState.game_id)
   const D = race.D ?? courseSeconds(s)
   const liveTeams = useTeams(preview ? null : gameState.game_id)
   const liveAnswers = useAnswers(preview ? null : gameState.game_id, gameState.round_number)
