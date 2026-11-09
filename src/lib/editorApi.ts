@@ -95,7 +95,7 @@ export async function createRound(pack_id: string, _position: number, mechanic: 
     : mechanic === 'sprint'
       ? { pointsPerQuestion: 2, allCorrectBonus: 5, startDelaySec: 5, afterTimerSec: 5 }
     : mechanic === 'race'
-      ? { dogs: ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета'], betSec: 30, raceSec: 18 }
+      ? { dogs: ['Фрэнк', 'Зефир', 'Рокки', 'Пупс', 'Луна'], betSec: 30, courseSec: 42 }
     : mechanic === 'melody'
       ? { themes: [], spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10 }
     : mechanic === 'blitz'

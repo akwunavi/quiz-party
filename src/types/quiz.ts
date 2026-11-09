@@ -161,7 +161,8 @@ export interface MelodySettings {
 export interface RaceSettings {
   dogs?: string[]               // клички 5 бульдогов
   betSec?: number               // окно ставок (30)
-  raceSec?: number              // длительность забега (18)
+  raceSec?: number              // УСТАРЕЛО (старый упрощённый забег, 18 с) — не используется Race V3
+  courseSec?: number            // Race V3: время дистанции собаки с обычным темпом, с (42; 20–120). Забег целиком ≈ 1,3–1,8 × это
 }
 export interface RevealSettings {
   p1Sec?: number      // фаза 1 (2 картинки), дефолт 30
@@ -307,7 +308,9 @@ export interface MelodyState {
                                  // открытии трека — listen и snippet играют с неё же
   played?: string[]             // отыгранные треки
   chooser?: string              // (не используется: выбор всегда рулеткой)
-  race?: { seed?: number; stage?: 'betting' | 'running' | 'done'; startedAt?: string }
+  race?: { seed?: number; stage?: 'betting' | 'running' | 'done'; startedAt?: string
+    /** Race V3: courseSec на момент старта (пишется вместе с seed — экраны считают ОДНУ и ту же гонку, даже если настройку потом правили) */
+    D?: number }
   /** «Своя игра»: что сейчас с открытой плиткой. Живёт ЗДЕСЬ, а не в памяти
    *  вкладки проектора (как было до 8.86) — иначе пульт ведущего в телефоне
    *  не знает ни того, что плитка открыта, ни того, показан ли ответ, и

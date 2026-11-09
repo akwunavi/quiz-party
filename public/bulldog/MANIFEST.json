@@ -1,0 +1,295 @@
+{
+ "schema": "bulldog-product-assets/v1",
+ "libraryCommit": "4139093",
+ "source": "bulldog-racing/assets/dogs (ветка claude/bulldog-round-lab-20261109)",
+ "files": {
+  "frenk/race/frenk_bf.webp": {
+   "bytes": 1050546,
+   "sha256": "d7c5c041072a1d3f896481c69f527816c6add1c80bcd4fb07b321ceae7befc89"
+  },
+  "frenk/race/frenk_roll.webp": {
+   "bytes": 1100432,
+   "sha256": "41d6653cda9ca86c898035040d01f963e2118e6f5d3770ed895d2b79922cad30"
+  },
+  "frenk/race/frenk_run.webp": {
+   "bytes": 138744,
+   "sha256": "06d6639a2519cf767aa4fb62ade1ce1c64d3f2bbc7b237084c52c05b81da81cb"
+  },
+  "frenk/race/frenk_sniff.webp": {
+   "bytes": 2395546,
+   "sha256": "ff548489784e469e53c91de290312aaa60f7ecb4a25c1218893c945f2996cfd1"
+  },
+  "frenk/race/frenk_start.webp": {
+   "bytes": 500296,
+   "sha256": "2b8e1737ef9c48f68fea4b02ff198b45bb223515032c182352418f63847db080"
+  },
+  "frenk/race/frenk_stop.webp": {
+   "bytes": 433256,
+   "sha256": "7a466f305354b0a5158681db6633a62ec8aa5b1cae22661c6ec3c760dba5295a"
+  },
+  "frenk/race/atlas.json": {
+   "bytes": 31379,
+   "sha256": "7331f6b0b61cf20987b41a17db14bb1cc5661533a80d0944d2749e65ac29b03e"
+  },
+  "frenk/race/contract.json": {
+   "bytes": 15000,
+   "sha256": "0dab58887fa1c2c1b998baea1ebea6fd3f9799e69f8ac6b4b9dc52365764d670"
+  },
+  "frenk/race/extras.json": {
+   "bytes": 9807,
+   "sha256": "a8c0fee83461f20f9ac539dfba9f8d780bb87c9bfd5a33febfc50d3b58066b5a"
+  },
+  "frenk/select/idle.webp": {
+   "bytes": 1722426,
+   "sha256": "9a957d6a1a75e513808400a284f693f3f3ee00e33f513469206e97733e2f2aea"
+  },
+  "frenk/select/sel.webp": {
+   "bytes": 1475572,
+   "sha256": "9b315f80a8fdaefcbe1bfcf937e00eac355e4e47a66121ce2bc6afbc6460ce7c"
+  },
+  "frenk/select/ret.webp": {
+   "bytes": 1944576,
+   "sha256": "dcdfc1ff33a361986f72b812a2b74b05cb406257a2bd69ac73d426a0d28ffe0b"
+  },
+  "frenk/select/atlas.json": {
+   "bytes": 507,
+   "sha256": "298e93d4f04bacfe3139bcf3a00cb7e25c11fc19f544003a90e4597a60b77db3"
+  },
+  "frenk/still.webp": {
+   "bytes": 23298,
+   "sha256": "f5894643988e8119f00adcb972b30193741b039db0ebdf729875f872afec2d52"
+  },
+  "zefir/race/dog2_butterfly_v2.webp": {
+   "bytes": 1184056,
+   "sha256": "b5c0f661a976cba6d9ed472dcaed50b5416ccf88b11e28f2ef39155048f253f5"
+  },
+  "zefir/race/dog2_roll_v3.webp": {
+   "bytes": 1188908,
+   "sha256": "64334a4a3f7ee54d787ddc1372e06f809be11feb3ed5b1e68ac788719db86cb7"
+  },
+  "zefir/race/dog2_run28-100.webp": {
+   "bytes": 798796,
+   "sha256": "90880463389d19fa78708dd633027efe552caebc6af149a3c92b47241cfdd20a"
+  },
+  "zefir/race/dog2_sniff_pee_v1.webp": {
+   "bytes": 1941052,
+   "sha256": "a8f20968251551696293ee0ccea923bb6df661175e0406b2347d231b4d0f14f0"
+  },
+  "zefir/race/dog2_stopB.webp": {
+   "bytes": 241406,
+   "sha256": "da0982b1e6caf0d3a99347cad674e92756cb86ed8dc565daa9493f3fc70b331f"
+  },
+  "zefir/race/atlas.json": {
+   "bytes": 33340,
+   "sha256": "a02851c287e91bf29e47d97a429cf3996f6e310c143b2a2461d209685e59ddc0"
+  },
+  "zefir/race/contract.json": {
+   "bytes": 6861,
+   "sha256": "b26dd33be04e0a6f70a96d98f12826a3ae888a0702ae20f1cfd826ac4723f25b"
+  },
+  "zefir/race/extras.json": {
+   "bytes": 2385,
+   "sha256": "81b8f9fa9680dece478861987b66d5b94552af7b1ec37c13e41ac519f552c4c9"
+  },
+  "zefir/select/idle.webp": {
+   "bytes": 1448652,
+   "sha256": "cfa5095a3181a2b141c1956dc8c96376a8e90acbe28225bf282647fd22c209f3"
+  },
+  "zefir/select/sel.webp": {
+   "bytes": 1598274,
+   "sha256": "39b052c50e859b21c513e8f6adfd8489066106fd8098d13d83f8e784a7924e84"
+  },
+  "zefir/select/ret.webp": {
+   "bytes": 1495592,
+   "sha256": "5048b89266cc2d3a4a26673e6df276685ec804458fc9beda71a3388feacd5c67"
+  },
+  "zefir/select/atlas.json": {
+   "bytes": 496,
+   "sha256": "3604e1d722a08159d809d3c65a3d88249b87c613067e0db5f237a69ced807d5b"
+  },
+  "zefir/still.webp": {
+   "bytes": 20188,
+   "sha256": "05e9b979def9d2b5679a742c82afa1e869842057cfc2b1e92a4f0c06bcf2178e"
+  },
+  "rocky/race/base.webp": {
+   "bytes": 11182,
+   "sha256": "a270945d3b141e802116f5dfdad49de1ec38641eb88b13d431add79e7f55cd19"
+  },
+  "rocky/race/butterfly.webp": {
+   "bytes": 891082,
+   "sha256": "9af1bd47b16cd57fad6f9c5174b1b76daecbd694c17b64f35c373b8a8af81aa1"
+  },
+  "rocky/race/roll.webp": {
+   "bytes": 1113332,
+   "sha256": "aca3dd9b35d8cdae3f94d5289ae720c79725ac42f6b8067471bd8fe5294ba3ce"
+  },
+  "rocky/race/run.webp": {
+   "bytes": 218326,
+   "sha256": "acd95a2f54cbfbde90ea61ff348aa2ecd2b7d09b2223831589feeb82479a2f55"
+  },
+  "rocky/race/sniff_pee.webp": {
+   "bytes": 1681164,
+   "sha256": "90229b731e77c0dfc2521e9d2206bb4d2a33abb4a295bc189236826334bc9773"
+  },
+  "rocky/race/start.webp": {
+   "bytes": 298180,
+   "sha256": "dad759eee6a04ebeb9e45d2dc3be79259500d501c283b98964d7b861301e0842"
+  },
+  "rocky/race/stop.webp": {
+   "bytes": 365274,
+   "sha256": "a2c9f13330ea479586d346b7ea3ef8656c2fb0c446e66078a4c94f7b4f533c7f"
+  },
+  "rocky/race/atlas.json": {
+   "bytes": 833,
+   "sha256": "527537b63bd8fda0698182f7d7344f6fa3ec8d250c45abb0c454e4df76bc581f"
+  },
+  "rocky/race/contract.json": {
+   "bytes": 2660,
+   "sha256": "09820dec666808f9336a9487b315da1c1ec9420e922f9c505e41d4df8b328593"
+  },
+  "rocky/race/extras.json": {
+   "bytes": 2,
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  "rocky/select/idle.webp": {
+   "bytes": 1663376,
+   "sha256": "fff6d43d1d1b7df74b0279e0c2add33673ba2efca701adbfb4ef9cafb2fa3db9"
+  },
+  "rocky/select/sel.webp": {
+   "bytes": 1665548,
+   "sha256": "b1d65e1d0218df4b27b96e095e59af7b36f012ffe539e0eed6bd3d2ade6f5de4"
+  },
+  "rocky/select/ret.webp": {
+   "bytes": 1329234,
+   "sha256": "11ee224ba31d2f44b610e28da3a4ab0e3d2babfcc31d7a6cddfe56fe75076ee9"
+  },
+  "rocky/select/delay_map.json": {
+   "bytes": 46047,
+   "sha256": "f3e713790da186acdf875dc7f60984fe7127fdc6e8fec54c1acc1642e0a1f6cd"
+  },
+  "rocky/select/atlas.json": {
+   "bytes": 483,
+   "sha256": "9e97f84ef8bdc031059ab9d45899153634e90afdee97b78f6a4e25f9cfbdc206"
+  },
+  "rocky/still.webp": {
+   "bytes": 19892,
+   "sha256": "72c62dab30cbd867041fbe8d1a2be3e216f1beb1c672ec71e64a6c053c1855e2"
+  },
+  "pups/race/base.webp": {
+   "bytes": 9256,
+   "sha256": "b372f2a1fd11ad2d5cb885fcdc4543b951b8791a39ea313e7ed5b2d6022b3b25"
+  },
+  "pups/race/butterfly.webp": {
+   "bytes": 1015242,
+   "sha256": "6709b49fdaa7798b8d9cebc9311ef8084cb3ad16d416009a449fa188f87d258f"
+  },
+  "pups/race/return.webp": {
+   "bytes": 944956,
+   "sha256": "fb6e9447fa9378fb542010b3e9828ebbf51ecfb69a7b783c77dc79ded84d6f72"
+  },
+  "pups/race/roll.webp": {
+   "bytes": 1144716,
+   "sha256": "a82eb08f1723f464b58c7833718bfb2d3e29ff3df307cdde163813a50ebdc3dd"
+  },
+  "pups/race/run.webp": {
+   "bytes": 184742,
+   "sha256": "b37733d4670c0950df3a3ba7f8f1a7dc4c7f4fae516aa8cf5ae7ddb6b4ed7c61"
+  },
+  "pups/race/sniff_pee.webp": {
+   "bytes": 1833924,
+   "sha256": "6b5734dd1eff3e6adbe461fe09370cba3bceb0642d8184bb629e7f025f95efdc"
+  },
+  "pups/race/start.webp": {
+   "bytes": 328638,
+   "sha256": "eef41f2e9371864b625d2718131c1c9e3abc1e1841c9abf72459bed3a8d65de4"
+  },
+  "pups/race/stop.webp": {
+   "bytes": 299598,
+   "sha256": "41fa4a20cdd1e35226730b270795bcc853d0ea4cf6b83ff87aff196dbeef5fe2"
+  },
+  "pups/race/atlas.json": {
+   "bytes": 685,
+   "sha256": "a5c17c4e69c5fd38426746fdf711dd14f4c4f543ca2c64706b320006caf6559c"
+  },
+  "pups/race/contract.json": {
+   "bytes": 1343,
+   "sha256": "bf02feef4d4fafead1fc614b5c0298e26bb1585b5cb3a024add3ef1da535172a"
+  },
+  "pups/race/extras.json": {
+   "bytes": 2,
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  "pups/select/idle.webp": {
+   "bytes": 3194100,
+   "sha256": "794a5b7b33a1f01c7f6dab4305a5566145ad4f81150372b6dd746d7781b445b1"
+  },
+  "pups/select/sel.webp": {
+   "bytes": 1652748,
+   "sha256": "b6b0a52c7f53eeafe6e2208395c80dd6ddd653e591ccdbe7013d07e44b9c180f"
+  },
+  "pups/select/gates.json": {
+   "bytes": 457,
+   "sha256": "08f7f1ab49543ddf01839d97c91ce710cb62ce0a2eec2b93b4244061b2cd65da"
+  },
+  "pups/select/atlas.json": {
+   "bytes": 380,
+   "sha256": "9e8950fa553d5eb92d62898273e198f749867347934b3461214dade9a0e20632"
+  },
+  "pups/still.webp": {
+   "bytes": 21156,
+   "sha256": "2bf421912a2819324c8efe133729ba2f6887444153d66d5df27f8b41b1c1f6bc"
+  },
+  "luna/race/luna_bf.webp": {
+   "bytes": 748522,
+   "sha256": "74aa5e9667de8a3005aa845145f42f70300f80f5063dacd83f6c32836560b94a"
+  },
+  "luna/race/luna_roll.webp": {
+   "bytes": 592788,
+   "sha256": "53797a0b11cb761f4cb1eef2656849c394daa1f4f953503a549c10b601eff6ff"
+  },
+  "luna/race/luna_run.webp": {
+   "bytes": 622470,
+   "sha256": "8d598491ba18b2824e091634c166b76f34865688ae666cb1b06563ad0e67430a"
+  },
+  "luna/race/luna_sniff.webp": {
+   "bytes": 2068726,
+   "sha256": "63f718c0a6083cbe547d3e4129291a96e6b77f7739e3790f2b62b07f1471bc80"
+  },
+  "luna/race/luna_stop.webp": {
+   "bytes": 668578,
+   "sha256": "e8a0302ddfb0524243cc2b177636742cb59df870229fff41933a2edd32f75428"
+  },
+  "luna/race/atlas.json": {
+   "bytes": 28417,
+   "sha256": "cad9d9c537222e66211a846617568c88afdcba1fdd3cfd562a20cbd9d71c3524"
+  },
+  "luna/race/contract.json": {
+   "bytes": 6872,
+   "sha256": "ec6f8edce3b1d0ddc24c7a0a897cc97f704b58331f5fe662f9d543bb27011f0b"
+  },
+  "luna/race/extras.json": {
+   "bytes": 1373,
+   "sha256": "9a9bf7f759ae5a59fb8024213de98dfbb078bfc2b31112dad4d5293176965083"
+  },
+  "luna/select/idle.webp": {
+   "bytes": 793070,
+   "sha256": "982401c56badabd8897399d87351e8eaa4e41ffdc634b23312e1d0e184c95e34"
+  },
+  "luna/select/sel.webp": {
+   "bytes": 1897696,
+   "sha256": "cff932bfa2977f6ea5df399fbcdb87093715fe43f28126e62270f3117ecc7bab"
+  },
+  "luna/select/ret.webp": {
+   "bytes": 1937656,
+   "sha256": "f223a0a886549c3ab6e9056b72b278588dcdb0b748b2c69b027451735a21a236"
+  },
+  "luna/select/atlas.json": {
+   "bytes": 496,
+   "sha256": "7bb3d94dce0c656ec2302579b7deb87b177e4ae335754bb452eb8fe975758521"
+  },
+  "luna/still.webp": {
+   "bytes": 22638,
+   "sha256": "3d9ddfe0c54fc337459c19fbfa378ad1fb9d2b28ad8e1472edea261066fc9590"
+  }
+ }
+}

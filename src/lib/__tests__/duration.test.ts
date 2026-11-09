@@ -36,18 +36,18 @@ describe('estimateRoundMinutes — standard и родственные механ
 })
 
 describe('estimateRoundMinutes — race (ставка + забег, не число вопросов)', () => {
-  it('не зависит от round.questions, считает по betSec+raceSec', () => {
+  it('не зависит от round.questions, считает по betSec+courseSec', () => {
     const r = { mechanic: 'race' as const, questions: [], timer_seconds: 45,
-      settings: { betSec: 30, raceSec: 18 } }
+      settings: { betSec: 30, courseSec: 42 } }
     const m = estimateRoundMinutes(r)
     expect(m).toBeGreaterThan(0)
   })
 
   it('длиннее ставка/забег — длиннее раунд', () => {
     const short = estimateRoundMinutes({ mechanic: 'race' as const, questions: [],
-      timer_seconds: 45, settings: { betSec: 10, raceSec: 10 } })
+      timer_seconds: 45, settings: { betSec: 10, courseSec: 20 } })
     const long = estimateRoundMinutes({ mechanic: 'race' as const, questions: [],
-      timer_seconds: 45, settings: { betSec: 60, raceSec: 60 } })
+      timer_seconds: 45, settings: { betSec: 60, courseSec: 120 } })
     expect(long).toBeGreaterThan(short)
   })
 })

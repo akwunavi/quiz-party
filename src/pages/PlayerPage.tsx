@@ -12,7 +12,7 @@ import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
 import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
-import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme } from '../types/quiz'
+import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme, RaceSettings } from '../types/quiz'
 import { revealPointsFor } from '../lib/scoring'
 import { spendsEdit } from '../lib/edits'
 import {
@@ -21,6 +21,9 @@ import {
   persistAnagramLocal, anagramPlayerVerdict, type AnagramBoardState, type AnagramLocal,
 } from '../lib/anagram'
 import { useAnswers } from '../hooks/useAnswers'
+import { BulldogPicker } from '../components/BulldogPicker'
+import { dogNames } from '../lib/bulldog/config'
+import { countsByDog, raceRef } from '../lib/bulldog/bets'
 import { TEAM_PALETTE } from '../lib/teamColors'
 import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
@@ -609,43 +612,42 @@ function RacePlayer({ team, gameState, round, roundLabel }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
 }) {
   const race = gameState.melody?.race ?? {}
-  const s = round.settings as { dogs?: string[] }
-  const dogs = (s.dogs ?? []).length === 5 ? s.dogs! : ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета']
-  const [bet, setBet] = useState<number | null>(null)
-  useEffect(() => { if (!race.stage || race.stage === 'betting') setBet(b => b) }, [race.stage])
-
+  const names = dogNames(round.settings as RaceSettings)
+  const ref = raceRef(gameState.round_number)
+  // чужие и свои ответы читаем только пока выбор открыт (счётчики) и после финиша (свои очки) — не нагружаем сеть на бегу
+  const stage = race.stage
+  const answers = useAnswers(!stage || stage === 'betting' || stage === 'done' ? gameState.game_id : null, gameState.round_number)
+  const all = answers.filter(a => a.question_ref === ref)
+  const mine = all.find(a => a.team_id === team.id)
+  const [local, setLocal] = useState<number | null>(() => { const n = Number(localStorage.getItem(`qp-race-${gameState.game_id}-${ref}-${team.id}`)); return n >= 1 && n <= 5 ? n : null })
+  const bet = local ?? (mine ? Number(mine.answer_text) || null : null)
+  const counts = countsByDog(all)
+  const pick = (n: number) => {
+    setLocal(n); localStorage.setItem(`qp-race-${gameState.game_id}-${ref}-${team.id}`, String(n))
+    void enqueueAnswer({
+      team_id: team.id, game_id: gameState.game_id, question_ref: ref,
+      round_number: gameState.round_number, answer_text: String(n),
+    })
+  }
   return (
     <div className="pl-root">
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
-        {!race.stage && <div className="pl-wait" style={{ padding: 30 }}>ЖДЁМ ОТКРЫТИЯ СТАВОК</div>}
-        {race.stage === 'betting' && (
-          <div className="pl-card"><div className="pl-qlabel">НА КОГО СТАВИМ?</div>
+        {!stage && <div className="pl-wait" style={{ padding: 30 }}>ЖДЁМ ОТКРЫТИЯ ВЫБОРА</div>}
+        {stage === 'betting' && (
+          <div className="pl-card"><div className="pl-qlabel">ВЫБЕРИТЕ СВОЕГО БУЛЬДОГА</div>
             <div className="pl-card-body">
               <div className="mel-points-hint">1 место — 5 баллов · 2 — 4 · … · 5 — 1</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {dogs.map((name, i) => (
-                  <button key={i} className={`pl-send${bet === i + 1 ? '' : ' ghosted'}`}
-                    style={bet === i + 1 ? {} : { opacity: .65 }}
-                    onClick={() => {
-                      setBet(i + 1)
-                      void enqueueAnswer({
-                        team_id: team.id, game_id: gameState.game_id,
-                        question_ref: `q-race-${gameState.round_number}`,
-                        round_number: gameState.round_number, answer_text: String(i + 1),
-                      })
-                    }}>№{i + 1} · {name}</button>
-                ))}
-              </div>
-              {bet && <div className="pl-sent">Ставка: №{bet} {dogs[bet - 1]} · можно изменить</div>}
+              <BulldogPicker names={names} counts={counts} selected={bet} locked={false} onPick={pick} />
             </div>
           </div>
         )}
-        {race.stage === 'running' && <div className="pl-wait" style={{ padding: 30 }}>
-          БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁</div>}
-        {race.stage === 'done' && <div className="pl-wait" style={{ padding: 30 }}>
-          ЗАБЕГ ОКОНЧЕН — БАЛЛЫ НАЧИСЛЕНЫ</div>}
+        {stage === 'running' && <div className="pl-wait" style={{ padding: 30 }}>
+          БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁{bet && <div style={{ marginTop: 10, fontSize: '.7em' }}>Ваш бульдог: №{bet} {names[bet - 1]}</div>}</div>}
+        {stage === 'done' && <div className="pl-wait" style={{ padding: 30 }}>
+          ЗАБЕГ ОКОНЧЕН — БАЛЛЫ НАЧИСЛЕНЫ
+          {mine && Number(mine.stake) > 0 && <div style={{ marginTop: 10, fontSize: '.7em' }}>Ваш бульдог №{mine.answer_text} {names[Number(mine.answer_text) - 1]}: +{mine.stake}</div>}</div>}
       </div>
     </div>
   )

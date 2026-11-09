@@ -1,0 +1,56 @@
+{
+ "labCommit": "4139093",
+ "note": "sha256 оригинала считается по тексту ДО замены путей импортов",
+ "files": {
+  "model.mjs": {
+   "source": "dog4-v3-lab/model.mjs",
+   "originalSha256": "ab22a87ea4974c4c62f72315eb0c27878ccebf3cc0fc1a96355a58d198d8cd20",
+   "vendoredSha256": "c27b89c717b6f275e22b44d4a609a83fa4171cb72d581fa072c423e97c3948e6"
+  },
+  "scenario.mjs": {
+   "source": "dog4-v3-lab/scenario.mjs",
+   "originalSha256": "732dfc527c9ab575b04db96c6a8da852fe5ccda80fa31fc90b5d23fd51e5ac85",
+   "vendoredSha256": "17f7fbb78af81e2d940427e71d1f8cdef28e15ff8d0649d5733d5c023bf32e43"
+  },
+  "p3visual.mjs": {
+   "source": "race-v3-p3-lab/src/visual.mjs",
+   "originalSha256": "a3fbdddbcf9548517472876238620065c0aa2a3bc214cd0091c70a93bac549ba",
+   "vendoredSha256": "7aa4af747ba59ac10800c815794b80768bbbee56b14779765c54eba68d66fae4"
+  },
+  "dogVisual.mjs": {
+   "source": "bulldog-racing/runtime/dog_visual.mjs",
+   "originalSha256": "4909c563daaec1af1521117c4b598a9e977f9640ddd10ef557717df6b75a45d1",
+   "vendoredSha256": "48e9e01b8f0409c4a9b0fa3c52df8e6abbabb731235c55835ab8bd3be667236f"
+  },
+  "rockyPhase.mjs": {
+   "source": "bulldog-racing/assets/dogs/rocky/runtime/phase.mjs",
+   "originalSha256": "4361fe44864c9b11215a7514e26781a37e6710523252e19c6118d0ae5cb8f770",
+   "vendoredSha256": "443dea7a6099b99730901b8360db770a6b92a607ccb98094009c76b01d9e239b"
+  },
+  "rockyPhaseV2.mjs": {
+   "source": "bulldog-racing/assets/dogs/rocky/runtime/phase_v2.mjs",
+   "originalSha256": "8fc135c1bd4c700b5bb2fca89bb08b61d6d115ef37a34b993dd6fed57099aa63",
+   "vendoredSha256": "b007ba10aeb542c07cb0e2bed0a1bc3b43b1844eb8bbadadedcb6f1253b4f1d2"
+  },
+  "frenkSelection.mjs": {
+   "source": "bulldog-racing/assets/dogs/frenk/runtime/selection.mjs",
+   "originalSha256": "42bee57c61cbc810424fd742e95cea666c47fd5b29776c8ed00fe51d294f0922",
+   "vendoredSha256": "2d2f56bb985486d4306fc00aba6cbf000aa7dc6290cd30a68cd7cfd7dc29fd78"
+  },
+  "zefirSelection.mjs": {
+   "source": "bulldog-racing/assets/dogs/zefir/runtime/selection.mjs",
+   "originalSha256": "eea3fba9c96a217dbf8f5324b30db080667a8ca692a7095415741290f131d7dd",
+   "vendoredSha256": "d81921bd3cfb2777b3429bea8e39301d2882aa5c9c1754b6eacfd0a59cd41e88"
+  },
+  "selectionRules.mjs": {
+   "source": "bulldog-racing/round-lab/src/selection.mjs",
+   "originalSha256": "b24b957ad260ebeb01497f5e8167a8b1523e6568016f2e1e452956b79b7e826b",
+   "vendoredSha256": "0ec25c4e0052ce7d9f154c71ba981bd4a7af1827809fb8241c2e2adc2f9ac6ec"
+  },
+  "butterfly.mjs": {
+   "source": "bulldog-racing/round-lab/src/butterfly.mjs",
+   "originalSha256": "e252db7af15357a1768a92b604e759a816674687ac59bc592f0c22007608e74d",
+   "vendoredSha256": "ccd5449eaeaea74925b58c1b3799fefe42e75dc5393fb14a870d003c3ff8d41f"
+  }
+ }
+}

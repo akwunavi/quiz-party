@@ -17,6 +17,7 @@ import { returnUnplayedBlitz, takeBlitzFromBank, blitzBankCount, blitzPlayedCoun
 import { AiRoundReview } from './AiReview'
 import { estimateRoundMinutes } from '../../lib/duration'
 import { useHint, Hint } from '../../components/Hint'
+import { dogNames, DEFAULT_COURSE_SEC, COURSE_SEC_MIN, COURSE_SEC_MAX } from '../../lib/bulldog/config'
 
 // ═══ Экран раунда: настройки механики + вопросы ═══
 
@@ -821,14 +822,13 @@ function MelodyEditor({ pack, round, locked, onChanged }: {
 function RaceEditor({ pack, round, locked, onChanged }: {
   pack: LoadedPack; round: LoadedRound; locked: boolean; onChanged: () => void
 }) {
-  const s = round.settings as { dogs?: string[]; raceSec?: number }
-  const dogs = (s.dogs ?? []).length === 5 ? s.dogs!
-    : ['Френк', 'Батон', 'Пельмень', 'Турбо', 'Ракета']
+  const s = round.settings as { dogs?: string[]; courseSec?: number }
+  const dogs = dogNames(s)
   const set = (patch: Record<string, unknown>) =>
     void updateRound(round.id, { settings: { ...round.settings, ...patch } as never }).then(onChanged)
   return (
     <div className="ed-card"><h4>«Скачки бульдогов»</h4>
-      <div className="ed-hint">Финал-лотерея: команды ставят на бульдога 1–5, забег решает
+      <div className="ed-hint">Финал-лотерея: команды выбирают бульдога 1–5 (Фрэнк, Зефир, Рокки, Пупс, Луна), забег решает
         случайный сид, который создаётся в момент нажатия «Старт!» — победителя не знает
         никто, включая ведущего. Баллы: 1 место — 5, 2 — 4, 3 — 3, 4 — 2, 5 — 1.</div>
       <div className="ed-grid2">
@@ -845,14 +845,15 @@ function RaceEditor({ pack, round, locked, onChanged }: {
             onChange={paths => set({ race_music: paths[0] ?? '' })} />
           <div className="ed-hint">Играет, пока бегут. Пусто — возьмётся общая фоновая музыка пакета</div>
         </div>
-        <div className="ed-field"><label>Длительность забега, сек</label>
+        <div className="ed-field"><label>Время дистанции, сек (20–120)</label>
           <NumField
-              value={s.raceSec ?? 18}
-              min={8}
-              max={60}
+              value={s.courseSec ?? DEFAULT_COURSE_SEC}
+              min={COURSE_SEC_MIN}
+              max={COURSE_SEC_MAX}
               disabled={locked}
-              onCommit={v => set({ raceSec: v || 18 })}
+              onCommit={v => set({ courseSec: v || DEFAULT_COURSE_SEC })}
               />
+          <div className="ed-hint">За это время дистанцию пробежит бульдог с обычным темпом; весь забег с остановками ≈ 1,3–1,8 раза дольше (по умолчанию 42 → ≈ 1–1,5 минуты)</div>
         </div>
       </div>
     </div>

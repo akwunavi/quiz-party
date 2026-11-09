@@ -38,6 +38,8 @@ import { rankTeams } from '../lib/ranking'
 import { exportAnswersCsv } from '../lib/exportAnswers'
 import { autocheck } from '../lib/autocheck'
 import { startRace } from '../lib/raceActions'
+import { courseSeconds, dogNames } from '../lib/bulldog/config'
+import { countsByDog, raceRef } from '../lib/bulldog/bets'
 // Пульты «Своей игры» и мелодии в телефоне работают на ТЕХ ЖЕ вызовах, что и
 // проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
@@ -60,7 +62,7 @@ import {
   parseLocalExport, summarizeLocalImport, summaryText, importLocalGame,
 } from '../lib/importLocalGame'
 import type {
-  Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, RevealSettings, Team,
+  Answer, JeopardyTheme, MelodySettings, MelodyState, Pack, RevealSettings, Team, RaceSettings,
 } from '../types/quiz'
 import { saveReveal, clearReveal } from '../lib/revealActions'
 import { revealNext, revealAllAnswered } from '../lib/reveal'
@@ -525,7 +527,7 @@ export function RoundView({ pack, round, gameState, teams, answers, offline }: {
         )}
 
         {round.mechanic === 'race' && phase === 'question' && (
-          <RaceControls gameState={gameState} />
+          <RaceControls gameState={gameState} round={round} />
         )}
 
         {isAnagram && phase === 'question' && (
@@ -1879,12 +1881,15 @@ function AnagramControls({ pack, round, gameState, teams, answers }: {
   )
 }
 
-function RaceControls({ gameState }: {
+function RaceControls({ gameState, round }: {
   gameState: NonNullable<ReturnType<typeof useGameState>['gameState']>
+  round: LoadedPack['rounds'][number]
 }) {
   const teams = useTeams(gameState.game_id)
   const answers = useAnswers(gameState.game_id, gameState.round_number)
-  const bets = answers.filter(a => a.question_ref === `q-race-${gameState.round_number}`)
+  const bets = answers.filter(a => a.question_ref === raceRef(gameState.round_number))
+  const counts = countsByDog(bets)
+  const names = dogNames(round.settings as RaceSettings)
   const stage = gameState.melody?.race?.stage
 
   if (stage === 'running') {
@@ -1898,9 +1903,10 @@ function RaceControls({ gameState }: {
       <div className="adm-dim" style={{
         color: bets.length === teams.length && teams.length > 0 ? '#22c55e' : undefined,
       }}>СДЕЛАЛИ ВЫБОР: {bets.length} / {teams.length}</div>
+      <div className="adm-dim">{counts.map((c, i) => `№${i + 1} ${names[i]}: ${c}`).join(' · ')}</div>
       <button className="adm-btn primary" disabled={bets.length === 0}
-        onClick={() => void runAction('начало забега', () => startRace(gameState))}>
-        🏁 НАЧАТЬ СКАЧКИ (СТАВКИ ЗАКРЫВАЮТСЯ)
+        onClick={() => void runAction('начало забега', () => startRace(gameState, courseSeconds(round.settings as RaceSettings)))}>
+        🏁 ЗАКРЫТЬ ВЫБОР И НАЧАТЬ СКАЧКИ
       </button>
     </div>
   )

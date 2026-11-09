@@ -181,9 +181,10 @@ function previewMelody(round: LoadedRound, qid: string | undefined, stage?: stri
     return { jp: { tile: null } }
   }
   if (round.mechanic === 'race') {
-    if (stage === 'running') return { race: { stage: 'running', seed: 12345, startedAt: serverIso() } }
+    // Race V3: часы идут от startedAt. «Бежит» — середина гонки (20 с после старта), «финиш» — давно после неё (пьедестал)
+    if (stage === 'running') return { race: { stage: 'running', seed: 12345, startedAt: new Date(serverNow() - 20_000).toISOString(), D: 42 } }
     if (stage === 'done')
-      return { race: { stage: 'done', seed: 12345, startedAt: new Date(serverNow() - 60_000).toISOString() } }
+      return { race: { stage: 'done', seed: 12345, startedAt: new Date(serverNow() - 400_000).toISOString(), D: 42 } }
     return { race: { stage: 'betting' } }
   }
   if (round.mechanic === 'melody' && stage && stage !== 'board') {

@@ -29,8 +29,9 @@ export function estimateRoundMinutes(round: DurationRound, teamCount?: number): 
   const mechanic = round.mechanic ?? 'standard'
 
   if (mechanic === 'race') {
-    const s = (round.settings ?? {}) as { betSec?: number; raceSec?: number }
-    const seconds = intro + (s.betSec ?? 30) + (s.raceSec ?? 18)
+    // Race V3: выбор + переход/отсчёт (≈6 с) + забег (≈1,5 × время дистанции) + финиш/пьедестал (≈12 с)
+    const s = (round.settings ?? {}) as { betSec?: number; courseSec?: number }
+    const seconds = intro + (s.betSec ?? 30) + 6 + Math.round(1.5 * (s.courseSec ?? 42)) + 12
     return Math.max(1, Math.round(seconds / 60))
   }
 
