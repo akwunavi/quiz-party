@@ -7,29 +7,13 @@ import '../../src/styles/global.css'
 import './demo.css'
 import { RaceBoard } from '../../src/pages/rounds/RaceRound'
 import { serverNow } from '../../src/lib/serverClock'
-import { setAssetSource } from '../../src/lib/bulldog/engine'
+import { installEmbeddedAssets } from './embedded'
 import { DOG_IDS, DOG_NAMES, COURSE_SEC_MIN, COURSE_SEC_MAX, DEFAULT_COURSE_SEC } from '../../src/lib/bulldog/config'
 import type { StageStats } from '../../src/lib/bulldog/stage'
 import type { LoadedPack, LoadedRound } from '../../src/lib/packLoader'
 import type { GameState, Team, Answer } from '../../src/types/quiz'
 
-// ── встроенный набор файлов (data/*.js кладут их в window.__BD), вместо fetch, который file:// запрещает
-const BD = ((window as unknown as { __BD?: Record<string, unknown> }).__BD ??= {})
-const key = (u: string) => u.replace(/^.*?bulldog\//, '').replace(/\?.*$/, '')
-const blobs = new Map<string, Blob>()
-setAssetSource({
-  prefetch: false,
-  async json<T>(u: string) { const v = BD[key(u)]; if (v === undefined) throw new Error('нет в демо-наборе: ' + u); return v as T },
-  async blob(u: string) {
-    const k = key(u); let b = blobs.get(k)
-    if (!b) {
-      const s = BD[k]; if (typeof s !== 'string') throw new Error('нет в демо-наборе: ' + u)
-      const bin = atob(s), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i)
-      b = new Blob([a], { type: 'image/webp' }); blobs.set(k, b)
-    }
-    return b
-  },
-})
+installEmbeddedAssets()
 
 const round = { id: 'r1', position: 1, mechanic: 'race', title_lines: ['СКАЧКИ БУЛЬДОГОВ'], timer_seconds: 0, settings: { courseSec: DEFAULT_COURSE_SEC }, questions: [] } as unknown as LoadedRound
 const pack = { id: 'p1', settings: {}, rounds: [round], theme: 'classic' } as unknown as LoadedPack

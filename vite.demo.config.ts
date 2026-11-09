@@ -2,6 +2,7 @@
 // двойным щелчком по index.html (file:// запрещает <script type=module> и fetch). Остальное приложение этим конфигом не собирается.
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+const ARENA = process.env.DEMO_ENTRY === 'arena'
 export default defineConfig({
   plugins: [react()],
   base: './',
@@ -14,8 +15,8 @@ export default defineConfig({
     'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify('demo'),
   },
   build: {
-    outDir: 'dist-demo/app', emptyOutDir: true, cssCodeSplit: false, target: 'es2020', assetsInlineLimit: 0,
-    lib: { entry: 'demo/bulldog/main.tsx', formats: ['iife'], name: 'BulldogDemo', fileName: () => 'demo.js' },
+    outDir: ARENA ? 'dist-demo/app-arena' : 'dist-demo/app', emptyOutDir: true, cssCodeSplit: false, target: 'es2020', assetsInlineLimit: 0,
+    lib: { entry: ARENA ? 'demo/bulldog/arena.ts' : 'demo/bulldog/main.tsx', formats: ['iife'], name: ARENA ? 'BulldogArena' : 'BulldogDemo', fileName: () => ARENA ? 'arena.js' : 'demo.js' },
     rollupOptions: { output: { inlineDynamicImports: true, assetFileNames: a => a.name?.endsWith('.css') ? 'demo.css' : 'assets/[name][extname]' } },
   },
 })

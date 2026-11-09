@@ -2,7 +2,7 @@
 export interface Segment { kind: string; t0: number; t1: number; p0: number; p1: number; eventIndex: number; base?: number }
 export interface RaceDog { index: number; base: number; segments: Segment[]; crossing: number; end: number; eventsActual: { kind: string; actual: number; actionEnd: number }[] }
 export interface RaceV3 { requestedSeed: number; effectiveSeed: number; places: number[]; dogs: RaceDog[]; end: number }
-export interface DogState { progress: number; finished?: boolean; complete?: boolean; segment?: string }
+export interface DogState { progress: number; speed?: number; finished?: boolean; complete?: boolean; segment?: string }
 export interface Visual { clip: string; frame: string | number | null; role: string; window: string; localIdx: number | null; status: string; overflow: boolean
   sheet: string | null; index: number | null; shiftPx: number; frameOverridden?: boolean }
 export interface DogVisualFn { at(segments: Segment[], t: number): Visual; contract: unknown; atlas: unknown }
