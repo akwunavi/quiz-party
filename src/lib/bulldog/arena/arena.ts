@@ -69,14 +69,15 @@ export class ArenaRenderer {
   }
 
   private drawStars(T: number) { const c = this.ctx; c.save(); for (const s of STARS) { const a = 0.35 + 0.65 * Math.abs(Math.sin(T * 0.9 + s.ph)); c.fillStyle = `rgba(255,245,255,${a * 0.8})`; c.fillRect(s.x - 360 * 0 % 1, s.y, s.s, s.s) } c.restore() }
-  private aur = cv(960, 260)
+  private aur = cv(960, 260); private aurB = cv(960, 260)
   private drawAurora(T: number, X: number) {
     // полотнища рисуются в половинном разрешении, один раз размываются и растягиваются: мягкие ленты без «штрихкода»
     const a = this.aur.getContext('2d')!; a.clearRect(0, 0, 960, 260); a.save(); a.globalCompositeOperation = 'lighter'
     const curtains: [number, number, number, string][] = [[34, 0.5, 0.9, '110,255,210'], [60, 0.8, 1.9, '170,130,255'], [86, 0.7, 3.1, '255,130,210']]
     curtains.forEach(([base, sp, ph, col], k) => { for (let x = -20; x < 980; x += 5) { const u = (x * 2 + X * 0.03) / 300, y = base + Math.sin(u * 1.1 + T * 0.16 * sp + ph) * 26 + Math.sin(u * 2.9 - T * 0.1 + k) * 8, h = 46 + 62 * (0.5 + 0.5 * Math.sin(u * 1.7 + T * 0.35 * sp + k * 2)); const g = a.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, `rgba(${col},0)`); g.addColorStop(0.22, `rgba(${col},.20)`); g.addColorStop(1, `rgba(${col},0)`); a.fillStyle = g; a.fillRect(x, y, 7, h) } })
     a.restore()
-    const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'; c.filter = 'blur(6px)'; c.globalAlpha = 0.85; c.drawImage(this.aur, 0, 20, 1920, 520); c.restore()
+    const b = this.aurB.getContext('2d')!; b.clearRect(0, 0, 960, 260); b.filter = 'blur(3px)'; b.drawImage(this.aur, 0, 0); b.filter = 'none'      // размытие на маленьком холсте: на полном кадре оно стоило ~39 мс из 66
+    const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.85; c.drawImage(this.aurB, 0, 20, 1920, 520); c.restore()
   }
   private drawLakeGlints(T: number, X: number) { const c = this.ctx, r = rng(3); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 70; i++) { const wx = r() * 3600, y = HZ + 6 + r() * (BERM_Y - HZ - 40), a = 0.25 * Math.abs(Math.sin(T * (0.8 + r()) + r() * 6)), x = ((wx - X * 0.2) % (ARENA.W + 200) + ARENA.W + 200) % (ARENA.W + 200) - 100; c.fillStyle = `rgba(255,220,230,${a})`; c.fillRect(x, y, 10 + r() * 24, 1) } c.restore() }
   private drawIceSparkle(T: number, X: number) { const c = this.ctx, r = rng(8); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 90; i++) { const wx = r() * 3000, y = BERM_Y + 30 + r() * (ARENA.H - BERM_Y - 60), ph = r() * 9, a = Math.pow(Math.max(0, Math.sin(T * (1.2 + r() * 2) + ph)), 12), x = ((wx - X) % 3000 + 3000) % 3000 - 500; if (x < -20 || x > ARENA.W + 20) continue; c.fillStyle = `rgba(255,255,255,${a * 0.9})`; c.fillRect(x - 3, y, 7, 1); c.fillRect(x, y - 3, 1, 7) } c.restore() }
