@@ -1,14 +1,14 @@
 {
  "schema": "character-visual-contract/v1",
- "contractVersion": "rocky-1.0.0-partial",
+ "contractVersion": "rocky-1.1.0",
  "date": "2026-11-09",
  "character": "bulldog3-rocky",
  "fps": 24,
- "role": "Рокки (dog3) для неизменённого валидатора Race V3/P3, стиль Пупса (клипы по индексу ячейки). ЧАСТИЧНО: принятая фазировка RUN->STOP (#68, runtime/phase.mjs) в P3 не выражается — см. KNOWN_ISSUES.",
+ "role": "Рокки (dog3) для неизменённого валидатора Race V3/P3, стиль Пупса (клипы по индексу ячейки). Кадр RUN перед STOP (#68) задаёт не P3, а runtime/phase_v2.mjs (frameRule ниже): без него P3 даёт #62.",
  "assetStatus": {
   "BASE": "accepted_working: RACE_STAND рабочая боковая (STATUS.md)",
   "START": "accepted_working: RACE_START #18-#41 (пользователь принял игровую версию)",
-  "RUN": "accepted_working: RUN loop #61-#72, фазировка #68 принята ТОЛЬКО через phase.mjs",
+  "RUN": "accepted_working: RUN loop #61-#72; фазировка #68: phase.mjs (>=155 кадров, принят) + phase_v2.mjs (короткие, новое, ждёт глазной приёмки)",
   "STOP": "accepted_working: STOP 37 кадров (принят)",
   "BUTTERFLY": "accepted_working: BUTTERFLY v1 121 (полностью принят)",
   "ROLL": "accepted_working: ROLL v2 монтаж B 145 (окончательно принят)",
@@ -101,6 +101,13 @@
    0.9,
    1.12
   ]
+ },
+ "frameRule": {
+  "module": "runtime/phase_v2.mjs",
+  "required": true,
+  "window": "RUN",
+  "stopEntrySourceFrame": 68,
+  "what": "порядок показа ячеек цикла RUN: 6 однокадровых пропусков, чтобы последним кадром перед STOP/FINISH был исходный #68; RUN >= 155 кадров — принятый phase.mjs без изменений, короче — phase_v2 (схемы T1/T2/T3)"
  },
  "rateNote": "SNIFF_PEE 240 кадров против окна SNIFF_PEE+RETURN 239.55 кадра: ускорение x1.0019 (в пределах 0.9-1.12), кадры и порядок не меняются."
 }

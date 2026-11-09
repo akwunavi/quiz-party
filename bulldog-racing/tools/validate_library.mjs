@@ -19,7 +19,7 @@ const {visualAt,buildTimeline,categoryOf}=await import(path.join(REPO,'race-v3-p
 const {createVisual}=await import(path.join(REPO,'bulldog-racing/runtime/dog_visual.mjs'));
 const {races}=await import(path.join(REPO,'race-v3-p3-lab/tests/lib.mjs'));
 const N=+(process.argv[2]||200), OUT=process.argv[3]||path.join(REPO,'bulldog-racing/reports/validation_raw.json');
-const phaseMod=await import(path.join(REPO,'bulldog-racing/assets/dogs/rocky/runtime/phase.mjs'));
+const phaseMod=await import(path.join(REPO,'bulldog-racing/assets/dogs/rocky/runtime/phase_v2.mjs'));
 const DOGS=['frenk','zefir','rocky','pups','luna'];
 const LIB=d=>path.join(REPO,'bulldog-racing/assets/dogs',d);
 const sha=f=>createHash('sha256').update(readFileSync(f)).digest('hex');
@@ -111,9 +111,9 @@ for(const dog of DOGS){
     const rawSrc=Object.keys(stopEntryRaw).map(Number).map(rockySource),adSrc=Object.keys(stopEntry).map(Number).map(rockySource);
     rep.t4.rockyAcceptedPhase={requiredSourceFrame:68,p3ContractAlone:{cellBeforeStop:Object.keys(stopEntryRaw).map(Number),sourceFrame:rawSrc},
       withPhaseModule:{cellBeforeStop:Object.keys(stopEntry).map(Number),sourceFrame:adSrc}};
-    if(!rawSrc.every(x=>x===68))P('partial','Рокки: контракт P3 сам даёт перед STOP исходный #'+rawSrc.join(',#')+' вместо принятого #68; поправка кадра — только через runtime/phase.mjs (адаптер её применяет)');
-    {const bad=Object.entries(stopEntry).filter(([cell])=>rockySource(+cell)!==68).reduce((a,[,n])=>a+n,0);rep.t4.rockyAcceptedPhase.stopsNotAt68={count:bad,of:stops,share:+(bad/stops).toFixed(3),reason:'перед этим STOP RUN-отрезок короче 155 кадров: phase.mjs его не обрабатывает ("six advances need separate review"), остаётся натуральный P3 (#62)'};
-    if(bad)P('error','Рокки: у '+bad+' из '+stops+' остановок ('+(100*bad/stops).toFixed(0)+'%) RUN короче 155 кадров, принятая фазировка phase.mjs к ним не применима: перед STOP исходный #62 вместо #68 (IoU шва 0.58)');}
+    if(!rawSrc.every(x=>x===68))P('note','Рокки: контракт P3 сам по себе даёт перед STOP исходный #'+rawSrc.join(',#')+' (принято #68); кадр RUN корректирует runtime/phase_v2.mjs — контракт без него неполон');
+    {const bad=Object.entries(stopEntry).filter(([cell])=>rockySource(+cell)!==68).reduce((a,[,n])=>a+n,0);rep.t4.rockyAcceptedPhase.stopsNotAt68={count:bad,of:stops,share:+(bad/stops).toFixed(3),reason:'phase_v2.mjs не дал #68 (ожидается 0)'};
+    if(bad)P('error','Рокки: у '+bad+' из '+stops+' остановок ('+(100*bad/stops).toFixed(0)+'%) фазировка phase_v2.mjs не дала #68');}
   }
   rep.seams=[...seams.entries()].map(([k,e])=>{const [pair,win]=k.split('|');const [a,b]=pair.split('>');return {from:a,to:b,windows:win,count:e.n,shiftPxFrom:e.sa,shiftPxTo:e.sb};});
 }

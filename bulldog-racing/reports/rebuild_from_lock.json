@@ -1,0 +1,27 @@
+{
+ "repo": "/home/user/wt-codex",
+ "totalEntries": 216,
+ "problems": 0,
+ "dogs": {
+  "frenk": {
+   "entries": 51,
+   "problems": []
+  },
+  "luna": {
+   "entries": 32,
+   "problems": []
+  },
+  "pups": {
+   "entries": 38,
+   "problems": []
+  },
+  "rocky": {
+   "entries": 50,
+   "problems": []
+  },
+  "zefir": {
+   "entries": 45,
+   "problems": []
+  }
+ }
+}

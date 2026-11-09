@@ -65,7 +65,7 @@ SPEC = {
    "RETURN_TO_IDLE": S(ACCW, "STATUS.md (вариант D, рабочий)", ["alpha/DOG3_RETURN_D_ALPHA_97.webm"]),
    "RACE_STAND": S(ACCW, "STATUS.md (рабочая боковая стойка)", ["alpha/rocky-race-stand-alpha.png", "stills/DOG3_RACE_STAND_GENERATED_01.png"], "BASE"),
    "START": S(ACC, "STATUS.md (игровая версия принята)", ["alpha/rocky-race-start-alpha-24.webm"], "START", "кадры Kling #18–#41, 40 ячеек"),
-   "RUN": S(ACC, "STATUS.md (петля #61–72; фазировка #68 принята)", ["alpha/bulldog_03_run_alpha_v2.webm"], "RUN", "ОГРАНИЧЕНИЕ: фазировка phase.mjs не работает на RUN короче 155 кадров, см. KNOWN_ISSUES"),
+   "RUN": S(ACC, "STATUS.md (петля #61–72; фазировка #68 принята)", ["alpha/bulldog_03_run_alpha_v2.webm"], "RUN", "кадр перед STOP (#68): runtime/phase_v2.mjs (до 155 кадров — новая схема, ждёт глазной приёмки; от 155 — принятый phase.mjs)"),
    "STOP": S(ACC, "STATUS.md", ["alpha/rocky-stop-alpha-37.webm", "sources/DOG3_STOP_KLING_V3_ORIGINAL.mp4"], "STOP", "исходник восстановлен с ветки claude/nifty-johnson-assbj5"),
    "FINISH": S(ACC, "STATUS.md", [], "FINISH_DECELERATE", "= STOP"),
    "SNIFF_PEE+RETURN": S(PROV, "STATUS.md (предварительно; финал в общей гонке)", ["alpha/DOG3_SNIFF_PEE_ALPHA_240.webm"], "SNIFF_PEE", "240 кадров на оба окна; ускорение ×1.0019"),

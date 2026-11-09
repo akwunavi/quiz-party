@@ -23,7 +23,7 @@ for (const [id, name] of DOGS) {
   if (id === 'frenk') extras.startArrays = await J(base + 'contract/frenk_start_shift_arrays.json'), extras.stopMeta = await J(base + 'contract/frenk_stop_v4_shift_arrays.json');
   if (id === 'zefir') extras.stopList = await J(base + 'atlas/stopB_montage_list.json');
   if (id === 'luna') extras.stopShift = await J(base + 'contract/stop_shift.json');
-  if (id === 'rocky') extras.phase = await import(base + 'runtime/phase.mjs');
+  if (id === 'rocky') extras.phase = await import(base + 'runtime/phase_v2.mjs');
   const rels = atlas.kind === 'labelled' ? Object.values(atlas.sheets) : Object.values(atlas.clips).map(c => c.sheet);
   const sheets = {};
   for (const r of new Set(rels)) sheets[r] = await IMG(base + r);
@@ -117,6 +117,43 @@ function drawStand(elapsed) {
   });
   ctx.fillStyle = '#444'; ctx.font = '16px system-ui'; ctx.fillText('красная — линия лап (строка спрайта 110), синяя рамка — силуэт (alpha ≥ 128)', 28, 1050);
 }
+// ---------------------------------------------------------------- режим: Рокки, фаза RUN до/после (короткие пробеги)
+const rockyP2 = D.rocky.V.rockyPhase;
+function rockySeq(n, after) {
+  const d = D.rocky, A = d.atlas, seg = {t0: 0, t1: n / 24}, out = [];
+  const srcOf = c => c < 11 ? 52 + c : 61 + ((c - 11 + 2) % 12);
+  for (let k = 0; k < 24; k++) { const tt = k / 24, c = tt < 1 / 3 - 1e-9 ? Math.floor(tt * 72 + 1e-9) : 24 + Math.floor((tt - 1 / 3) * 24 + 1e-9); out.push({sheet: A.clips.START.sheet, index: Math.min(39, c), tag: 'START'}); }
+  for (let i = 0; i < n; i++) {
+    let c = i < 11 ? i : 11 + ((i - 11) % 12);
+    if (after) { const v = rockyP2.visualRunFrame(seg, i / 24 + 1e-6); if (v != null) c = v; }
+    out.push({sheet: A.clips.RUN.sheet, index: c, tag: 'RUN', src: srcOf(c)});
+  }
+  for (let k = 0; k < 37; k++) out.push({sheet: A.clips.STOP.sheet, index: k, tag: 'STOP'});
+  for (let k = 0; k < 24; k++) out.push({sheet: A.clips.BASE.sheet, index: 0, tag: 'STAND'});
+  return out;
+}
+const rockyRows = [23, 47, 71].map(n => ({n, before: rockySeq(n, false), after: rockySeq(n, true)}));
+let rockySlow = 2;
+function drawRocky(now) {
+  ctx.fillStyle = '#d9d5c7'; ctx.fillRect(0, 0, 1920, 1080);
+  ctx.fillStyle = '#333'; ctx.font = 'bold 30px system-ui'; ctx.fillText('Рокки: фаза RUN перед STOP — до и после (короткие пробеги, игровая ячейка ×1.6)', 28, 46);
+  ctx.font = '22px system-ui'; ctx.fillText('ДО: натуральный цикл P3 (перед STOP #62)', 330, 90); ctx.fillText('ПОСЛЕ: phase_v2 (перед STOP #68)', 1180, 90);
+  const k = 1.6, d = D.rocky;
+  rockyRows.forEach((row, r) => {
+    const laneY = 330 + r * 330, total = row.before.length, f = Math.floor(now / 1000 * 24 / rockySlow) % (total + 18);
+    ctx.strokeStyle = 'rgba(200,40,40,.7)'; ctx.beginPath(); ctx.moveTo(0, laneY); ctx.lineTo(1920, laneY); ctx.stroke();
+    ctx.fillStyle = '#222'; ctx.font = 'bold 24px system-ui'; ctx.fillText(`RUN ${row.n} кадров (${(row.n / 24).toFixed(2)} с)`, 20, laneY - 120);
+    [[row.before, 360], [row.after, 1210]].forEach(([seq, x0], side) => {
+      const fr = seq[Math.min(f, total - 1)], prev = seq[Math.max(0, Math.min(f, total - 1) - 1)];
+      drawCell(d, fr.sheet, fr.index, x0, laneY - layout.spriteTopOffset * k, k);
+      ctx.fillStyle = '#222'; ctx.font = '20px system-ui';
+      const skip = fr.tag === 'RUN' && prev.tag === 'RUN' && ((fr.index - prev.index + 12) % 12 === 2 || (fr.index === 11 && false));
+      ctx.fillText(fr.tag + (fr.src ? ' #' + fr.src : '') + (skip ? '   ⏭ пропуск кадра' : ''), x0, laneY + 36);
+      // кадр перед STOP подсветить
+      if (fr.tag === 'STOP' && fr.index === 0) { ctx.fillStyle = side ? '#2a7a3a' : '#b02a2a'; ctx.font = 'bold 22px system-ui'; ctx.fillText(side ? 'вход в STOP из #68' : 'вход в STOP из #62', x0 + 210, laneY + 36); }
+    });
+  });
+}
 // ---------------------------------------------------------------- режим: выбор (видео alpha)
 const SEL = {
   frenk: {idle: 'alpha/DOG1_IDLE_v1_alpha_loop220.webm', sel: 'alpha/DOG1_SELECTED_v1_alpha_f20-f121.webm', ret: 'alpha/DOG1_RETURN_TO_IDLE_v1_alpha_r2-r121.webm'},
@@ -162,15 +199,16 @@ buildSel();
 const frame = now => {
   if (mode === 'race') { if (playing) { t = Math.min(race.end, refT + (now - ref) / 1000 * Number($('speed').value)); if (t >= race.end) playing = false; $('play').textContent = playing ? 'Ⅱ' : '▶'; } drawRace(t); }
   if (mode === 'stand') drawStand(performance.now() / 1000);
+  if (mode === 'rocky') drawRocky(performance.now());
   requestAnimationFrame(frame);
 };
 function setMode(m) {
   mode = m; cv.style.display = m === 'sel' ? 'none' : 'block'; $('sel').style.display = m === 'sel' ? 'grid' : 'none'; $('raceCtl').style.display = m === 'race' ? '' : 'none';
-  for (const [b, mm] of [['mRace', 'race'], ['mStand', 'stand'], ['mSel', 'sel']]) $(b).classList.toggle('on', m === mm);
+  for (const [b, mm] of [['mRace', 'race'], ['mStand', 'stand'], ['mSel', 'sel'], ['mRocky', 'rocky']]) $(b).classList.toggle('on', m === mm);
   if (m === 'sel') for (const id in players) players[id].toIdle();
   info();
 }
-$('mRace').onclick = () => setMode('race'); $('mStand').onclick = () => setMode('stand'); $('mSel').onclick = () => setMode('sel');
+$('mRace').onclick = () => setMode('race'); $('mStand').onclick = () => setMode('stand'); $('mSel').onclick = () => setMode('sel'); $('mRocky').onclick = () => setMode('rocky');
 $('preset').onchange = () => { preset = $('preset').value; race = RACES[preset]; t = 0; playing = false; };
 $('go').onclick = () => { race = resolveRace(Number($('seed').value)); preset = 'RANDOM'; t = 0; playing = false; };
 $('play').onclick = () => { if (t >= race.end) t = 0; playing = !playing; ref = performance.now(); refT = t; };

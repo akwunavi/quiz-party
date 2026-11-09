@@ -23,7 +23,7 @@ export function createVisual(dogId, { contract, atlas, extras = {} }, { visualAt
     const c = atlas.clips[clip]; return c && Number.isInteger(frame) && frame >= 0 && frame < c.count ? { sheet: c.sheet, index: frame } : null;
   };
   return {
-    dogId, contract, atlas,
+    dogId, contract, atlas, rockyPhase: extras.phase,
     at(segments, t) {
       const v = visualAt(contract, segments, t);
       if (v.role === 'missing') return { ...v, sheet: null, index: null, shiftPx: 0 };

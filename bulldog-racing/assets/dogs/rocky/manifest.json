@@ -115,7 +115,7 @@
     "alpha/bulldog_03_run_alpha_v2.webm"
    ],
    "contractClip": "RUN",
-   "note": "ОГРАНИЧЕНИЕ: фазировка phase.mjs не работает на RUN короче 155 кадров, см. KNOWN_ISSUES",
+   "note": "кадр перед STOP (#68): runtime/phase_v2.mjs (до 155 кадров — новая схема, ждёт глазной приёмки; от 155 — принятый phase.mjs)",
    "framesPlay": null,
    "media": {
     "alpha/bulldog_03_run_alpha_v2.webm": {

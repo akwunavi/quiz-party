@@ -21,6 +21,7 @@ STATES.md  DISPLAY_CONTRACT.md  KNOWN_ISSUES.md
 * Пересобрать каталог из веток: `python3 bulldog-racing/tools/build_library.py` (нужен `git fetch`; ветки перечислены в `SOURCES.lock.json`).
 * Контракты Зефира/Рокки и индексы атласов: `python3 bulldog-racing/tools/make_contracts.py`; атлас Луны: `python3 bulldog-racing/tools/build_luna_atlas.py`.
 * Проверка: `node bulldog-racing/tools/validate_library.mjs 200 && python3 bulldog-racing/tools/measure.py && python3 bulldog-racing/tools/make_report.py`.
-* Лаборатория: `python3 -m http.server 8000`, затем `http://localhost:8000/bulldog-racing/lab/`.
+* Тесты фазы Рокки: `node --test bulldog-racing/tests/rocky_phase.test.mjs`; сравнение до/после: `python3 bulldog-racing/tools/rocky_phase_eval.py`; воспроизводимость из lock: `python3 bulldog-racing/tools/rebuild_from_lock.py`.
+* Лаборатория (режим «Рокки: фаза RUN до/после»): `python3 -m http.server 8000`, затем `http://localhost:8000/bulldog-racing/lab/`.
 
 Зависимости: `race-v3-p3-lab/` и `dog4-v3-lab/` (неизменённые, из этой же ветки), Node 22, Python 3 + Pillow + numpy, ffmpeg с libvpx-vp9 (только для пересборки Луны/манифестов).
