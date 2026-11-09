@@ -1,0 +1,198 @@
+{
+ "schema": "bulldog5-luna/character-manifest/0-draft",
+ "id": "dog5",
+ "name": "Луна",
+ "number": 5,
+ "notDog4": "Собака №5 «Луна»; не путать с №4 «Пупс» (dog4).",
+ "version": "luna-0.5-draft",
+ "date": "2026-11-08",
+ "fps": 24,
+ "statusLegend": {
+  "ACCEPTED": "принято пользователем",
+  "WORKING": "рабочее, принято для дальнейшей работы, не финальное",
+  "CANDIDATE": "собрано и проверено технически, ждёт визуальной приёмки",
+  "PROBLEM": "есть дефект, не утверждается",
+  "ACCEPTED_WORKING": "принято пользователем в текущем виде (не переделывать без конкретной проблемы)"
+ },
+ "selection": {
+  "frame": {
+   "width": 1276,
+   "height": 720
+  },
+  "cardRule": "верх изображения = верх карточки (уши SELECTED s71–s78 уходят за край), как у Пупса",
+  "states": {
+   "FRONT_STAND": {
+    "status": "WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage2/front_stand/DOG5_FRONT_STAND_alpha_f0_1276.png",
+     "sha256": "f764b1a5e39ac8c9b700ccd086787b0fc95a347082a5bcb950572a24f52c0c2d",
+     "bytes": 523299
+    }
+   },
+   "IDLE": {
+    "status": "WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage2/alpha/DOG5_IDLE_alpha_f0-f120.webm",
+     "sha256": "279687ef1bdbdaebe82f896325b28e9a699a3c9a28c161c4591251c6094a59a5",
+     "bytes": 1693731
+    },
+    "order": "variant A: f0→f48→f1 (96 frames); B (f0→f120→f1) kept as alternative",
+    "gates": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "maxWaitForwardS": 3.71
+   },
+   "SELECTED": {
+    "status": "WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage2/alpha/DOG5_SELECTED_alpha_s0-s120.webm",
+     "sha256": "dbbc0ea802129bca6398bf6b5ac4d3d250a7a0ce33a3cb969c76e1d6b4f84594",
+     "bytes": 1643397
+    },
+    "frames": 121
+   },
+   "RETURN_TO_IDLE": {
+    "status": "ACCEPTED_WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage6_batch/alpha/DOG5_RETURN_TO_IDLE_G1_alpha_graded.webm",
+     "sha256": "3e28b97fea72beda5f861b2a40e977a01b45e82271e411319fb6b573cec149bd",
+     "bytes": 1530283
+    },
+    "source": {
+     "path": "bulldog5-luna/stage6_batch/sources/DOG5_RETURN_TO_IDLE_G1_kling_original.mp4",
+     "sha256": "51c126cc46b26e056f4b75d9cfb4b6820ba9e71dd2ae3435eb3a62b8cdccda07",
+     "bytes": 1624563
+    },
+    "frames": 121,
+    "then": "IDLE A from f1"
+   }
+  }
+ },
+ "race": {
+  "sprite": "207×116, anchor x−148 / laneY−110 (as Race V3); scale 100% (decision 2026-11-08)",
+  "contractDraft": {
+   "path": "bulldog5-luna/stage6_batch/contract/luna.contract.draft.json",
+   "sha256": "1bc31d5999f2017b7fe5ca35028dcd3fc78e754dbf45b7e43f4026311c6f47eb",
+   "bytes": 9811
+  },
+  "states": {
+   "RACE_STAND": {
+    "status": "WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage4_race_stand/DOG5_RACE_STAND_G1_1276.png",
+     "sha256": "4050545f3a922a7ea71302256a8b58307db2f28c3bcaee038a31fe1ac88555f6",
+     "bytes": 313158
+    },
+    "gameFrame": "RUN G1 f0 alpha"
+   },
+   "START": {
+    "status": "ACCEPTED_WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage5_run/alpha/DOG5_RUN_G1_alpha_f0-f120.webm",
+     "sha256": "501f8bc60ef08c80d6dacba5509c8a00bbae1f9bf46515aec1a053287b136ef0",
+     "bytes": 2417796
+    },
+    "frames": "#18–#59 then loop, lead 7, spillFromStart"
+   },
+   "RUN": {
+    "status": "ACCEPTED",
+    "asset": {
+     "path": "bulldog5-luna/stage5_run/alpha/DOG5_RUN_G1_alpha_f0-f120.webm",
+     "sha256": "501f8bc60ef08c80d6dacba5509c8a00bbae1f9bf46515aec1a053287b136ef0",
+     "bytes": 2417796
+    },
+    "loop": [
+     60,
+     71
+    ],
+    "stopEntryPreviousRunFrame": 71
+   },
+   "STOP": {
+    "status": "ACCEPTED_WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage6_batch/alpha/DOG5_STOP_G1_alpha.webm",
+     "sha256": "7b5fe67f7c36b9fdb839d7d9e5715b1e253aeff9ad33d25aab269638bbbea753",
+     "bytes": 1417848
+    },
+    "moving": "#0–#7,#18–#46 (37)",
+    "tail": "#47–#68 (22)",
+    "shift": {
+     "path": "bulldog5-luna/stage6_batch/stop_shift.json",
+     "sha256": "ff60d09c6e9ac3b91168956024d892914d4b4682603aa7ec2ffa1ebbc91e04ff",
+     "bytes": 2164
+    }
+   },
+   "FINISH": {
+    "status": "ACCEPTED_WORKING",
+    "note": "= STOP + tail, then BASE"
+   },
+   "SNIFF_PEE+RETURN": {
+    "status": "CANDIDATE",
+    "source": {
+     "path": "bulldog5-luna/stage6_batch/sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4",
+     "sha256": "2349013ce11c29bb442ef3ff0a4c0d39396515af53a8e53b199ccbd64c37fbfb",
+     "bytes": 2103748
+    },
+    "insertAttempt1": {
+     "result": "FAILED: leg goes backward again (#32-#92)",
+     "file": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G1_kling_original.mp4",
+     "report": "bulldog5-luna/stage7_fix/sniff/INSERT_G1_RESULT.md"
+    },
+    "asset": {
+     "path": "bulldog5-luna/stage7_fix/sniff/alpha/DOG5_SNIFF_PEE_RETURN_FIXED_alpha_193f.webm",
+     "sha256": "f26cb0c06a2e5c74446cbb2d125798f39777f5828ef0b8f48ad7dd0298775a8a",
+     "bytes": 2269414
+    },
+    "frames": 193,
+    "order": "orig #24-#93, insert 1-96, orig #179-#205",
+    "insert": {
+     "path": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G2K_kling_original.mp4",
+     "sha256": "e9fc5c57b3320edc137dc34a9f38e03e45b762e2728711d4edc040dfca0b53a8",
+     "bytes": 1010870
+    },
+    "poseKeyframe": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_POSE_G1_1276.png",
+    "report": "bulldog5-luna/stage7_fix/sniff/FIXED_BUILD_REPORT.md",
+    "note": "leg bent, silhouette back-up like Zefir/Pups; head dip in the insert (see report)"
+   },
+   "ROLL": {
+    "status": "ACCEPTED",
+    "asset": {
+     "path": "bulldog5-luna/stage7_fix/roll/DOG5_ROLL_R69_alpha_109f.webm",
+     "sha256": "58ad3a01bfe8bc7da6e2fea3a8db09fd953a47883bc61ffa46bb69dc24475fbb",
+     "bytes": 1558479
+    },
+    "source": {
+     "path": "bulldog5-luna/stage6_batch/sources/DOG5_ROLL_G1_kling_original.mp4",
+     "sha256": "f81b54a886555ffd49571e55ea6d047ba88d3e56123a1f5a6abafd7de9886bc6",
+     "bytes": 1949656
+    },
+    "order": "#6→#69 forward, #68→#24 backward (109); source #91–#108 (pelvis deformation) unused"
+   },
+   "BUTTERFLY": {
+    "status": "ACCEPTED_WORKING",
+    "asset": {
+     "path": "bulldog5-luna/stage6_batch/alpha/DOG5_BUTTERFLY_G1_alpha.webm",
+     "sha256": "31bf6e7eb35b08b7d395a9c898cd218dd3696d316045599e76deb9d458984d25",
+     "bytes": 885335
+    },
+    "gameCut": "#18–#90 (73)",
+    "note": "reaction only; the butterfly is drawn by the engine"
+   }
+  }
+ },
+ "kling": {
+  "spentCredits": {
+   "RACE_STAND": 20,
+   "RUN": 30,
+   "batch_2026-11-08": 174,
+   "sniff_insert_G1": 24,
+   "sniff_pose_G1": 20,
+   "sniff_pose_G2": 20,
+   "sniff_insert_keyframe_v4": 40
+  },
+  "balanceAfter": 1888
+ }
+}

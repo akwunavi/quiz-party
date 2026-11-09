@@ -1,0 +1,67 @@
+{
+ "gateRule": "IDLE frame differs from FRONT_STAND f0 by <= 1.2/255 (frame 319x180, on gray)",
+ "gates": [
+  0,
+  1,
+  2,
+  3
+ ],
+ "variants": {
+  "A": {
+   "order": "f0→f48→f1",
+   "frames": 96,
+   "seconds": 4.0,
+   "forwardOnly": {
+    "maxFrames": 89,
+    "maxS": 3.71,
+    "meanS": 1.74
+   },
+   "reverseToStand": {
+    "maxFrames": 45,
+    "maxS": 1.88
+   },
+   "turnSteps": [
+    [
+     0,
+     0.12
+    ],
+    [
+     48,
+     0.1
+    ]
+   ]
+  },
+  "B": {
+   "order": "f0→f120→f1",
+   "frames": 240,
+   "seconds": 10.0,
+   "forwardOnly": {
+    "maxFrames": 233,
+    "maxS": 9.71,
+    "meanS": 4.73
+   },
+   "reverseToStand": {
+    "maxFrames": 117,
+    "maxS": 4.88
+   },
+   "turnSteps": [
+    [
+     0,
+     0.12
+    ],
+    [
+     48,
+     0.1
+    ],
+    [
+     120,
+     0.23
+    ],
+    [
+     48,
+     0.11
+    ]
+   ]
+  }
+ }
+}

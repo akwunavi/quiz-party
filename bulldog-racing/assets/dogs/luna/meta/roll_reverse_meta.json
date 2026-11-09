@@ -1,0 +1,14 @@
+{
+ "R69": {
+  "bodyFrames": 109,
+  "order": "#6→#69→#24, затем стойка",
+  "fitsWindowWithLead7": true,
+  "fitsWithStopTail22": true
+ },
+ "R81": {
+  "bodyFrames": 133,
+  "order": "#6→#81→#24, затем стойка",
+  "fitsWindowWithLead7": true,
+  "fitsWithStopTail22": false
+ }
+}

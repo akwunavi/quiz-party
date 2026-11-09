@@ -1,0 +1,397 @@
+{
+ "dog": "luna",
+ "files": [
+  {
+   "dest": "alpha/DOG5_BUTTERFLY_G1_alpha.webm",
+   "role": "alpha",
+   "bytes": 885335,
+   "sha256": "31bf6e7eb35b08b7d395a9c898cd218dd3696d316045599e76deb9d458984d25",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/alpha/DOG5_BUTTERFLY_G1_alpha.webm"
+   }
+  },
+  {
+   "dest": "alpha/DOG5_IDLE_alpha_f0-f120.webm",
+   "role": "alpha",
+   "bytes": 1693731,
+   "sha256": "279687ef1bdbdaebe82f896325b28e9a699a3c9a28c161c4591251c6094a59a5",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage2/alpha/DOG5_IDLE_alpha_f0-f120.webm"
+   },
+   "expectedSha256": "279687ef1bdbdaebe82f896325b28e9a699a3c9a28c161c4591251c6094a59a5",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/IDLE/asset"
+  },
+  {
+   "dest": "alpha/DOG5_RETURN_TO_IDLE_G1_alpha_graded.webm",
+   "role": "alpha",
+   "bytes": 1530283,
+   "sha256": "3e28b97fea72beda5f861b2a40e977a01b45e82271e411319fb6b573cec149bd",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/alpha/DOG5_RETURN_TO_IDLE_G1_alpha_graded.webm"
+   },
+   "expectedSha256": "3e28b97fea72beda5f861b2a40e977a01b45e82271e411319fb6b573cec149bd",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/RETURN_TO_IDLE/asset"
+  },
+  {
+   "dest": "alpha/DOG5_ROLL_R69_alpha_109f.webm",
+   "role": "alpha",
+   "bytes": 1558479,
+   "sha256": "58ad3a01bfe8bc7da6e2fea3a8db09fd953a47883bc61ffa46bb69dc24475fbb",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage7_fix/roll/DOG5_ROLL_R69_alpha_109f.webm"
+   },
+   "expectedSha256": "58ad3a01bfe8bc7da6e2fea3a8db09fd953a47883bc61ffa46bb69dc24475fbb",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/ROLL/asset"
+  },
+  {
+   "dest": "alpha/DOG5_RUN_G1_alpha_f0-f120.webm",
+   "role": "alpha",
+   "bytes": 2417796,
+   "sha256": "501f8bc60ef08c80d6dacba5509c8a00bbae1f9bf46515aec1a053287b136ef0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage5_run/alpha/DOG5_RUN_G1_alpha_f0-f120.webm"
+   },
+   "expectedSha256": "501f8bc60ef08c80d6dacba5509c8a00bbae1f9bf46515aec1a053287b136ef0",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/START/asset"
+  },
+  {
+   "dest": "alpha/DOG5_SELECTED_alpha_s0-s120.webm",
+   "role": "alpha",
+   "bytes": 1643397,
+   "sha256": "dbbc0ea802129bca6398bf6b5ac4d3d250a7a0ce33a3cb969c76e1d6b4f84594",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage2/alpha/DOG5_SELECTED_alpha_s0-s120.webm"
+   },
+   "expectedSha256": "dbbc0ea802129bca6398bf6b5ac4d3d250a7a0ce33a3cb969c76e1d6b4f84594",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/SELECTED/asset"
+  },
+  {
+   "dest": "alpha/DOG5_SNIFF_PEE_RETURN_FIXED_alpha_193f.webm",
+   "role": "alpha",
+   "bytes": 2269414,
+   "sha256": "f26cb0c06a2e5c74446cbb2d125798f39777f5828ef0b8f48ad7dd0298775a8a",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage7_fix/sniff/alpha/DOG5_SNIFF_PEE_RETURN_FIXED_alpha_193f.webm"
+   },
+   "expectedSha256": "f26cb0c06a2e5c74446cbb2d125798f39777f5828ef0b8f48ad7dd0298775a8a",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/SNIFF_PEE+RETURN/asset"
+  },
+  {
+   "dest": "alpha/DOG5_STOP_G1_alpha.webm",
+   "role": "alpha",
+   "bytes": 1417848,
+   "sha256": "7b5fe67f7c36b9fdb839d7d9e5715b1e253aeff9ad33d25aab269638bbbea753",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/alpha/DOG5_STOP_G1_alpha.webm"
+   }
+  },
+  {
+   "dest": "docs/DECISIONS.md",
+   "role": "other",
+   "bytes": 5013,
+   "sha256": "4a9a104a7131c4ce22710db9a0ec8de5e3b7e162de71ccac5d2f774572961739",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/DECISIONS.md"
+   }
+  },
+  {
+   "dest": "docs/STATUS.md",
+   "role": "other",
+   "bytes": 2240,
+   "sha256": "dc8823a0fe85f49af28f7927f4597429cf4d63aef7061ebcfa7426354164d4ef",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/STATUS.md"
+   }
+  },
+  {
+   "dest": "meta/MANIFEST.source.json",
+   "role": "meta",
+   "bytes": 6897,
+   "sha256": "e5bfb5c7c3b0a877cbd81253a165532875897ea151dee015468f41175d992d39",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/MANIFEST.json"
+   }
+  },
+  {
+   "dest": "meta/RETURN_TO_IDLE_grade_offsets.json",
+   "role": "meta",
+   "bytes": 7404,
+   "sha256": "efb50b00545f4572197c80ca1bd4db806031cad1dcddac01ca5ea8aad2b75ae0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/alpha/RETURN_TO_IDLE_grade_offsets.json"
+   }
+  },
+  {
+   "dest": "meta/idle_variants.json",
+   "role": "meta",
+   "bytes": 845,
+   "sha256": "45208feada314cc06b5cd618854c0622c984ed1499cb9caf584c0e3270003368",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage2/idle/idle_variants.json"
+   }
+  },
+  {
+   "dest": "meta/loops.json",
+   "role": "meta",
+   "bytes": 1454,
+   "sha256": "b83474aeede8546abc44b67d8e8e2c2d9ab2d2be03d5cd4a50b8cd325e2a829e",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage3_run/loops/loops.json"
+   }
+  },
+  {
+   "dest": "meta/luna.contract.draft.json",
+   "role": "meta",
+   "bytes": 9811,
+   "sha256": "1bc31d5999f2017b7fe5ca35028dcd3fc78e754dbf45b7e43f4026311c6f47eb",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/contract/luna.contract.draft.json"
+   }
+  },
+  {
+   "dest": "meta/roll_reverse_meta.json",
+   "role": "meta",
+   "bytes": 301,
+   "sha256": "dd3e740a418901cbc80af916c451a5a790917bf4c3ae33aeccdc8b86bdd3d024",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage7_fix/roll/roll_reverse_meta.json"
+   }
+  },
+  {
+   "dest": "meta/sniff_fixed_assembly.json",
+   "role": "meta",
+   "bytes": 5604,
+   "sha256": "fc0f22e1f1105641151fed2c9198737bb8d364d489aca21f17f7843e10fb0fa0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage7_fix/sniff/alpha/sniff_fixed_assembly.json"
+   }
+  },
+  {
+   "dest": "meta/stop_shift.json",
+   "role": "meta",
+   "bytes": 2164,
+   "sha256": "ff60d09c6e9ac3b91168956024d892914d4b4682603aa7ec2ffa1ebbc91e04ff",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/stop_shift.json"
+   },
+   "expectedSha256": "ff60d09c6e9ac3b91168956024d892914d4b4682603aa7ec2ffa1ebbc91e04ff",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/STOP/shift"
+  },
+  {
+   "dest": "other/DOG5_RACE_STAND_G1_kling_original.jpg",
+   "role": "other",
+   "bytes": 102539,
+   "sha256": "1148b9cc6e8f9e388d03527d7abb091a81f1c9c60de2417edfbb4d23cb2ae683",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage4_race_stand/DOG5_RACE_STAND_G1_kling_original.jpg"
+   }
+  },
+  {
+   "dest": "runtime/check_contract.mjs",
+   "role": "runtime",
+   "bytes": 1851,
+   "sha256": "36b9556951624f19042e0696c1012cc1a4f25ff7969dbde6dbd8806eefe53484",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/contract/check_contract.mjs"
+   }
+  },
+  {
+   "dest": "sources/DOG5_BUTTERFLY_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 918210,
+   "sha256": "4d0d1dd467c05de9527b13b85f6cf388f19ca565a68fd9ffdf5fc476d7268a04",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/sources/DOG5_BUTTERFLY_G1_kling_original.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG5_IDLE_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 2018018,
+   "sha256": "284ee4857b4d940ac3181b78b93e13690127ee81df2a722204ea513a72b3f2dd",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/sources/DOG5_IDLE_kling_original.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG5_RETURN_TO_IDLE_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1624563,
+   "sha256": "51c126cc46b26e056f4b75d9cfb4b6820ba9e71dd2ae3435eb3a62b8cdccda07",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/sources/DOG5_RETURN_TO_IDLE_G1_kling_original.mp4"
+   },
+   "expectedSha256": "51c126cc46b26e056f4b75d9cfb4b6820ba9e71dd2ae3435eb3a62b8cdccda07",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/RETURN_TO_IDLE/source"
+  },
+  {
+   "dest": "sources/DOG5_ROLL_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1949656,
+   "sha256": "f81b54a886555ffd49571e55ea6d047ba88d3e56123a1f5a6abafd7de9886bc6",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/sources/DOG5_ROLL_G1_kling_original.mp4"
+   },
+   "expectedSha256": "f81b54a886555ffd49571e55ea6d047ba88d3e56123a1f5a6abafd7de9886bc6",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/ROLL/source"
+  },
+  {
+   "dest": "sources/DOG5_RUN_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 3200301,
+   "sha256": "135dbad1b9a99bd7ee03a80606afe56c7ee43aa5ce4b92f0518400c12de87e2a",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage5_run/DOG5_RUN_G1_kling_original.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG5_SELECTED_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 2104238,
+   "sha256": "3f2c13d273164c73eb085e5da7a68561bdc408cfe3f44ce078ea336fc97e18d0",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/sources/DOG5_SELECTED_kling_original.mp4"
+   }
+  },
+  {
+   "dest": "sources/DOG5_SNIFF_LEGLIFT_INSERT_G2K_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1010870,
+   "sha256": "e9fc5c57b3320edc137dc34a9f38e03e45b762e2728711d4edc040dfca0b53a8",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage7_fix/sniff/DOG5_SNIFF_LEGLIFT_INSERT_G2K_kling_original.mp4"
+   },
+   "expectedSha256": "e9fc5c57b3320edc137dc34a9f38e03e45b762e2728711d4edc040dfca0b53a8",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/SNIFF_PEE+RETURN/insert"
+  },
+  {
+   "dest": "sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 2103748,
+   "sha256": "2349013ce11c29bb442ef3ff0a4c0d39396515af53a8e53b199ccbd64c37fbfb",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/sources/DOG5_SNIFF_PEE_RETURN_G1_kling_original.mp4"
+   },
+   "expectedSha256": "2349013ce11c29bb442ef3ff0a4c0d39396515af53a8e53b199ccbd64c37fbfb",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/SNIFF_PEE+RETURN/source"
+  },
+  {
+   "dest": "sources/DOG5_STOP_G1_kling_original.mp4",
+   "role": "kling_source",
+   "bytes": 1537980,
+   "sha256": "55aab895c90eede496ce8aa01014a970fb946569b935a3013088696a57519e35",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage6_batch/sources/DOG5_STOP_G1_kling_original.mp4"
+   }
+  },
+  {
+   "dest": "stills/DOG5_FRONT_STAND_alpha_f0_1276.png",
+   "role": "still",
+   "bytes": 523299,
+   "sha256": "f764b1a5e39ac8c9b700ccd086787b0fc95a347082a5bcb950572a24f52c0c2d",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage2/front_stand/DOG5_FRONT_STAND_alpha_f0_1276.png"
+   },
+   "expectedSha256": "f764b1a5e39ac8c9b700ccd086787b0fc95a347082a5bcb950572a24f52c0c2d",
+   "shaMatchesApproved": true,
+   "note": "manifest/selection/states/FRONT_STAND/asset"
+  },
+  {
+   "dest": "stills/DOG5_RACE_STAND_G1_1276.png",
+   "role": "still",
+   "bytes": 313158,
+   "sha256": "4050545f3a922a7ea71302256a8b58307db2f28c3bcaee038a31fe1ac88555f6",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage4_race_stand/DOG5_RACE_STAND_G1_1276.png"
+   },
+   "expectedSha256": "4050545f3a922a7ea71302256a8b58307db2f28c3bcaee038a31fe1ac88555f6",
+   "shaMatchesApproved": true,
+   "note": "manifest/race/states/RACE_STAND/asset"
+  },
+  {
+   "dest": "stills/DOG5_RACE_STAND_G1_alpha_1276.png",
+   "role": "still",
+   "bytes": 564434,
+   "sha256": "b30de41a5153632d78f7d67010922f6aac37fc21bbc5697f5887739796ec1457",
+   "source": {
+    "ref": "origin/claude/dog5-luna-batch-20261108",
+    "commit": "bc445bdbc248b8852ff841467f914dd2ff8d665b",
+    "path": "bulldog5-luna/stage4_race_stand/DOG5_RACE_STAND_G1_alpha_1276.png"
+   }
+  }
+ ],
+ "unresolved": []
+}
