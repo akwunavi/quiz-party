@@ -43,7 +43,7 @@ import { countsByDog, raceOf, raceRef } from '../lib/bulldog/bets'
 // Пульты «Своей игры» и мелодии в телефоне работают на ТЕХ ЖЕ вызовах, что и
 // проектор: чистые переходы в lib/melody.ts + lib/jeopardyRef.ts, запись — в
 // *Actions.ts. Своих копий этих переходов в админке нет и быть не должно.
-import { saveMelody, melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
+import { melodyClick, gradeMelody, passMelody } from '../lib/melodyActions'
 import { navFrom, quietStale } from '../lib/navGuard'
 import { afterBlitzFinished, blitzShownIds } from '../lib/blitzPool'
 import { casEnabled } from '../lib/sessionBag'
@@ -52,8 +52,8 @@ import {
   melodyRevealMiss, melodyToBoard, guardMelody, melodyBidSec, melodyEmergencyClose,
   melodyAcceptAnswer, melodyPick,
 } from '../lib/melody'
-import { jeopardyTile, jpOpenTile, jpLocate, jpShowAnswer, jpReplay } from '../lib/jeopardyRef'
-import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../lib/jeopardyActions'
+import { jeopardyTile, jpOpenTile, jpLocate } from '../lib/jeopardyRef'
+import { jeopardyOpened, openJeopardyTile, closeJeopardyTile, showJeopardyAnswer, replayJeopardyTile } from '../lib/jeopardyActions'
 import { room } from '../lib/transport'
 import { listPacks } from '../lib/packLoader'
 import { usePackOffline } from '../hooks/usePackOffline'
@@ -1996,9 +1996,9 @@ function JeopardyControls({ round, gameState, onBack, onFinish }: {
         )}
         <div className="adm-row-btns">
           <button className="adm-btn"
-            onClick={() => void runAction('переслушать плитку', () => saveMelody(jpReplay(gameState.melody ?? {})))}>↻ ПЕРЕСЛУШАТЬ</button>
+            onClick={() => void runAction('переслушать плитку', () => replayJeopardyTile(gameState))}>↻ ПЕРЕСЛУШАТЬ</button>
           <button className="adm-btn" disabled={answerShown}
-            onClick={() => void runAction('показ ответа плитки', () => saveMelody(jpShowAnswer(gameState.melody ?? {})))}>ПОКАЗАТЬ ОТВЕТ</button>
+            onClick={() => void runAction('показ ответа плитки', () => showJeopardyAnswer(gameState))}>ПОКАЗАТЬ ОТВЕТ</button>
         </div>
         <button className="adm-btn primary"
           onClick={() => void runAction('закрыть плитку', () => closeJeopardyTile(gameState, at.key, opened))}>ЗАКРЫТЬ ПЛИТКУ</button>

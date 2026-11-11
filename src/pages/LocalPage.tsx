@@ -13,14 +13,15 @@ import { VERSION } from '../version'
 import { copyText } from '../lib/clipboard'
 import { createPollLoop } from '../lib/pollLoop'
 import { readPack, listCachedPackIds } from '../lib/packCache'
+import { getLocalPin, localPinHeaders, setLocalPin } from '../lib/transport/localPin'
 
-type Health = { ok: true; version: string; rev: number; armed: boolean; gameId: string }
+type Health = { ok: true; version: string; rev: number; armed: boolean; gameId: string; pinOk?: boolean }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 2500)
   try {
-    const res = await fetch(path, { ...init, signal: controller.signal })
+    const res = await fetch(path, { ...init, headers: { ...localPinHeaders(), ...(init?.headers as Record<string, string> | undefined) }, signal: controller.signal })
     const text = await res.text()
     const body = text ? JSON.parse(text) : undefined
     if (!res.ok) throw new Error(body?.error ?? `сервер ответил ${res.status}`)
@@ -51,6 +52,7 @@ export function LocalPage() {
   const [packIds, setPackIds] = useState<string[]>([])
   const [selectedPack, setSelectedPack] = useState('')
   const [packUploadMsg, setPackUploadMsg] = useState('')
+  const [pinInput, setPinInput] = useState(getLocalPin)
 
   useEffect(() => {
     const loop = createPollLoop<Health | null>(
@@ -128,6 +130,10 @@ export function LocalPage() {
               {health.armed ? 'ЛОКАЛЬНЫЙ РЕЖИМ ВКЛЮЧЁН — идёт запись' : 'ХОЛОДНЫЙ СТАРТ — запись выключена'}
             </div>
             <div className="adm-dim">версия сервера {health.version} · rev {health.rev} · игра {health.gameId.slice(0, 8)}</div>
+            <div className="adm-dim" style={{ marginTop: 8 }}>
+              PIN ведущего (напечатан в окне сервера на ноутбуке): <input value={pinInput} inputMode="numeric" style={{ width: 110 }} onChange={e => { setPinInput(e.target.value); setLocalPin(e.target.value) }} />
+              {' '}{health.pinOk ? '✓ принят' : '— не введён или неверный: переключать режим и вести игру с этого устройства нельзя'}
+            </div>
             <button className="local-toggle" disabled={busy} onClick={() => void toggleArmed()}>
               {busy ? 'Переключаю…' : health.armed ? 'ВЫКЛЮЧИТЬ ЛОКАЛЬНЫЙ РЕЖИМ' : 'ВКЛЮЧИТЬ ЛОКАЛЬНЫЙ РЕЖИМ'}
             </button>

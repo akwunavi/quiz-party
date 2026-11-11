@@ -60,11 +60,13 @@ export function prepareSlotImage(spec: SlotSpec, img: HTMLImageElement): HTMLIma
   g.addColorStop(0, '#fff'); g.addColorStop(k(f.from), '#fff'); g.addColorStop(k(f.to), 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,0)')
   c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height); return cv
 }
+/** Сколько ждать один файл слоя: «повисшая» картинка не должна навсегда держать подготовку гонки (аудит В5) — по таймауту слой считается отсутствующим. */
+export const SLOT_TIMEOUT_MS = 8000
 /** Грузит доступные слои; отсутствующие возвращает списком (их просто нет в кадре). */
 export async function loadSlots(base: string, files?: string[]): Promise<{ loaded: LoadedSlot[]; missing: SlotSpec[] }> {
   const loaded: LoadedSlot[] = [], missing: SlotSpec[] = []
   await Promise.all(SLOTS.map(spec => new Promise<void>(res => {
-    if (files && !files.includes(spec.file)) { missing.push(spec); res(); return } const img = new Image(); img.onload = () => { loaded.push({ spec, img: prepareSlotImage(spec, img) }); res() }; img.onerror = () => { missing.push(spec); res() }; img.src = `${base}${spec.file}` })))
+    if (files && !files.includes(spec.file)) { missing.push(spec); res(); return } const img = new Image(); let done = false; const fin = (ok: boolean) => { if (done) return; done = true; clearTimeout(to); if (ok) loaded.push({ spec, img: prepareSlotImage(spec, img) }); else missing.push(spec); res() }; const to = setTimeout(() => fin(false), SLOT_TIMEOUT_MS); img.onload = () => fin(true); img.onerror = () => fin(false); img.src = `${base}${spec.file}` })))
   loaded.sort((a, b) => a.spec.parallax - b.spec.parallax); return { loaded, missing }
 }
 /** Какой модуль файла стоит в плитке i: детерминированно, без одного и того же модуля подряд (при ≥ 2 модулях). */

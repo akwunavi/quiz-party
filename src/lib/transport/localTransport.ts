@@ -19,6 +19,7 @@
 //    ответил 204 (rev не изменился), отдаём то, что уже знаем — экономим
 //    трафик на LAN, хотя выигрыш здесь и так небольшой.
 import type { Answer, GameState, Team } from '../../types/quiz'
+import { localPinHeaders } from './localPin'
 import type { BlitzState } from '../blitzState'
 import type {
   AnswerPatch, AnswerUpsert, CasResult, DeleteAnswersBy, RoomTransport, SessionPatch, TeamPatch,
@@ -38,7 +39,7 @@ async function withTimeout(path: string, init?: RequestInit): Promise<Response> 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
   try {
-    return await fetch(path, { ...init, signal: controller.signal })
+    return await fetch(path, { ...init, headers: { ...localPinHeaders(), ...(init?.headers as Record<string, string> | undefined) }, signal: controller.signal })
   } finally {
     clearTimeout(timer)
   }

@@ -60,7 +60,7 @@ export function PlayerPage() {
   })
 
   useEffect(() => {
-    if (gameState?.pack_id) void loadPack(gameState.pack_id).then(setPack).catch(() => {})
+    if (gameState?.pack_id) void loadPack(gameState.pack_id, false, false, true).then(setPack).catch(() => {})
     else setPack(null)
   }, [gameState?.pack_id])
 

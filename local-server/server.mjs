@@ -36,6 +36,45 @@ const isRaceRef = ref => typeof ref === 'string' && ref.startsWith('q-race-')
 const raceBetsOpen = (st, round) => st.session?.melody?.race?.stage === 'betting' && String(st.session.round_number) === String(round)
 
 
+// ═══ Безопасность локального сервера (10.64, аудит К3/В4/В1) ═══
+// 1) decodeURIComponent на кривом адресе (`/quiz-party/%`) бросает URIError — раньше это роняло весь процесс. Теперь — безопасное чтение, ответ 400.
+// 2) PIN ведущего: «опасные» запросы (включить/выключить запись, сменить фазу игры, удалить команду, править/начислять ответы, блиц, загрузить/скачать пакет с ответами, выгрузка)
+//    требуют заголовок X-QP-PIN. Игроки с телефонов PIN не знают: они регистрируются, пишут свои ответы и читают состояние — этого достаточно.
+// 3) Служебные строки очков (q-paper-/q-adjust-/q-blitz) и «выписанные» ставки игроку без PIN не принимаются (зеркало миграции 0018).
+// 4) Пакет для игроков — без ответов (то же, что в облаке делает функция player_pack_questions).
+export function safeDecode(s) { try { return decodeURIComponent(s) } catch { return null } }
+const SERVICE_REF = /^(q-paper-|q-adjust-|q-blitz)/
+export const MAX_PLAYER_STAKE = 100
+/** Убирает из вопроса пакета всё, что выдаёт ответ (кроме слова кроссворда и фразы «Скрэмбла», без которых телефон не построит поле). */
+export function sanitizeQuestion(q) {
+  if (!q || typeof q !== 'object') return q
+  const a = q.answer && typeof q.answer === 'object' ? { ...q.answer } : q.answer
+  if (a && typeof a === 'object') { delete a.correct; delete a.display; delete a.correct_choice; delete a.correct_order; delete a.correct_pairs }
+  const media = q.media && typeof q.media === 'object' ? { ...q.media } : q.media
+  if (media && typeof media === 'object') delete media.answer
+  return { ...q, answer: a, media, answer_note: null }
+}
+export function sanitizePack(pack) {
+  if (!pack || typeof pack !== 'object') return pack
+  return { ...pack, rounds: (pack.rounds ?? []).map(r => ({ ...r, questions: (r.questions ?? []).map(sanitizeQuestion) })) }
+}
+function pinOk(req, pin) {
+  const got = String(req.headers['x-qp-pin'] ?? ''); if (!pin || !got) return false
+  const a = Buffer.from(got), b = Buffer.from(String(pin)); return a.length === b.length && crypto.timingSafeEqual(a, b)
+}
+/** Какие запросы только для ведущего (нужен PIN). */
+function hostOnly(method, seg) {
+  const s0 = seg[0]
+  if (s0 === 'arm' || s0 === 'disarm') return true
+  if (s0 === 'session' && method === 'PATCH') return true
+  if (s0 === 'teams' && method === 'DELETE') return true
+  if (s0 === 'answers' && (method === 'PATCH' || method === 'DELETE')) return true
+  if (s0 === 'blitz' && method === 'PUT') return true
+  if (s0 === 'pack' && method === 'POST') return true
+  if (s0 === 'export') return true
+  return false
+}
+
 export const PORT = Number(process.env.QP_LOCAL_PORT) || 7331
 // База путей приложения — ДОЛЖНА совпадать с `base` в vite.config.ts.
 // Сейчас там '/quiz-party/'. Если поменяется там — поменять и здесь.
@@ -198,10 +237,11 @@ function serveApp(req, res, pathname, appDir) {
   if (pathname === '/') { res.writeHead(302, { Location: APP_BASE }); res.end(); return true }
   if (!pathname.startsWith(APP_BASE)) return false
 
-  let rel = decodeURIComponent(pathname.slice(APP_BASE.length))
+  let rel = safeDecode(pathname.slice(APP_BASE.length))
+  if (rel === null || rel.includes('\0')) { sendError(res, 400, 'плохой адрес'); return true }
   if (rel === '') rel = 'index.html'
-  const filePath = path.join(appDir, rel)
-  if (!filePath.startsWith(path.resolve(appDir))) { sendError(res, 400, 'плохой путь'); return true }
+  const root = path.resolve(appDir), filePath = path.resolve(root, rel)
+  if (filePath !== root && !filePath.startsWith(root + path.sep)) { sendError(res, 400, 'плохой путь'); return true }
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
@@ -239,8 +279,8 @@ function sendHtmlNotFound(res, appDir) {
 
 function serveMedia(req, res, relPath, mediaDir) {
   if (req.method !== 'GET' && req.method !== 'HEAD') { sendError(res, 405, 'метод не поддержан'); return }
-  const filePath = path.join(mediaDir, relPath)
-  if (!filePath.startsWith(path.resolve(mediaDir))) { sendError(res, 400, 'плохой путь'); return }
+  const root = path.resolve(mediaDir), filePath = path.resolve(root, relPath)
+  if (relPath.includes('\0') || !filePath.startsWith(root + path.sep)) { sendError(res, 400, 'плохой путь'); return }
   fs.stat(filePath, (err, stat) => {
     if (err || !stat.isFile()) { sendError(res, 404, 'файла нет на сервере'); return }
     const range = req.headers.range
@@ -283,7 +323,7 @@ function serveMedia(req, res, relPath, mediaDir) {
 
 // ═══ API ═══
 
-function createApiHandler(store) {
+function createApiHandler(store, pin) {
   const WRITE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE'])
 
   return async function handleApi(req, res, url) {
@@ -291,6 +331,9 @@ function createApiHandler(store) {
     const seg = url.pathname.replace(/^\/api\//, '').split('/').filter(Boolean)
     const method = req.method
 
+    // PIN ведущего для «опасных» запросов (ответ 403 — клиент покажет, что нужно ввести PIN на странице /local)
+    const isHost = pinOk(req, pin)
+    if (hostOnly(method, seg) && !isHost) { sendError(res, 403, 'нужен PIN ведущего (он напечатан в окне сервера; введите его на странице /local)'); return }
     // arm/disarm сами переключают замок — их эти проверки не касаются.
     const isArmToggle = seg[0] === 'arm' || seg[0] === 'disarm'
     if (WRITE_METHODS.has(method) && !st.armed && !isArmToggle) {
@@ -307,7 +350,7 @@ function createApiHandler(store) {
 
       // ── health ──
       if (seg[0] === 'health' && method === 'GET') {
-        sendJson(res, 200, { ok: true, version: VERSION, rev: st.rev, armed: st.armed, gameId: st.gameId })
+        sendJson(res, 200, { ok: true, version: VERSION, rev: st.rev, armed: st.armed, gameId: st.gameId, pinOk: isHost })
         return
       }
 
@@ -430,6 +473,12 @@ function createApiHandler(store) {
               // ПОСЛЕДНЕЙ СМЕНЫ ТЕКСТА. Значение из тела клиента выкидываем
               // всегда (иначе Object.assign затёр бы его клиентским).
               const { accepted_at: _ignored, ...clean } = row
+              if (!isHost) {
+                if (SERVICE_REF.test(String(row.question_ref ?? ''))) continue                    // служебные очки пишет только ведущий (зеркало 0018)
+                if (clean.stake != null && !(Number(clean.stake) >= 0 && Number(clean.stake) <= MAX_PLAYER_STAKE)) delete clean.stake
+                if (isRaceRef(row.question_ref)) { delete clean.stake; delete clean.is_correct }  // очки гонки — только проектор (зеркало 0017)
+                delete clean.is_correct                                                          // верность ответа отмечает только ведущий (зеркало 0012)
+              }
               const existing = st.answers.find(a => a.team_id === row.team_id && a.question_ref === row.question_ref)
               // ставки «Скачек бульдогов» (зеркало миграции 0017): выбор меняется только пока race.stage = 'betting' в ЭТОМ раунде.
               // Здесь нет ролей (локальная сеть бара доверенная), поэтому закрывается именно текст ставки: после старта новая
@@ -501,7 +550,7 @@ function createApiHandler(store) {
         if (method === 'GET') {
           const pack = st.packs[id]
           if (!pack) { sendError(res, 404, 'пакет не загружен на этот сервер'); return }
-          sendJson(res, 200, pack)
+          sendJson(res, 200, isHost ? pack : sanitizePack(pack))                              // игроку — без ответов
           return
         }
         if (method === 'POST') {
@@ -534,28 +583,35 @@ function createApiHandler(store) {
 
 // ═══ Сервер целиком ═══
 
-export function createServer({ dataDir, appDir }) {
+export function createServer({ dataDir, appDir, pin }) {
   const store = createStore(dataDir)
-  const apiHandler = createApiHandler(store)
+  const hostPin = pin ?? process.env.QP_LOCAL_PIN ?? String(crypto.randomInt(100000, 1000000))
+  const apiHandler = createApiHandler(store, hostPin)
 
   const server = http.createServer((req, res) => {
-    const url = new URL(req.url, 'http://localhost')
+   try {
+    let url
+    try { url = new URL(req.url, 'http://localhost') } catch { sendError(res, 400, 'плохой адрес'); return }
     // /api/media/* — отдельная раздача файлов с диска (Range), НЕ через
     // JSON-обработчик apiHandler; проверяем ДО общего префикса /api/.
     const mediaRel = matchMedia(url.pathname)
     if (mediaRel !== null) {
-      serveMedia(req, res, decodeURIComponent(mediaRel), store.mediaDir)
+      const dec = safeDecode(mediaRel); if (dec === null) { sendError(res, 400, 'плохой адрес'); return }
+      serveMedia(req, res, dec, store.mediaDir)
       return
     }
     if (url.pathname.startsWith('/api/')) {
-      void apiHandler(req, res, url)
+      apiHandler(req, res, url).catch(err => { try { sendError(res, 500, err instanceof Error ? err.message : String(err)) } catch { /* ответ уже ушёл */ } })
       return
     }
     if (serveApp(req, res, url.pathname, appDir)) return
     sendHtmlNotFound(res, appDir)
+   } catch (err) {                                                       // что бы ни случилось с одним запросом — сервер живёт дальше
+     try { sendError(res, 500, err instanceof Error ? err.message : String(err)) } catch { /* ответ уже ушёл */ }
+   }
   })
 
-  return { server, store }
+  return { server, store, pin: hostPin }
 }
 
 function matchMedia(pathname) {
@@ -566,7 +622,7 @@ function matchMedia(pathname) {
 
 // ═══ Точка входа (запуск скриптом start-quiz-local.cmd) ═══
 
-function printAddresses(port) {
+function printAddresses(port, pin) {
   const nets = os.networkInterfaces()
   const addrs = []
   for (const list of Object.values(nets)) {
@@ -579,6 +635,9 @@ function printAddresses(port) {
   console.log('  QUIZ PARTY — ЛОКАЛЬНЫЙ СЕРВЕР ЗАПУЩЕН')
   console.log('========================================')
   console.log(`  Версия: ${VERSION}`)
+  console.log('')
+  console.log(`  PIN ВЕДУЩЕГО: ${pin}   (введи его один раз на странице /local на устройстве ведущего;`)
+  console.log('  игрокам НЕ говори — без него нельзя менять фазу игры, начислять очки и скачивать ответы)')
   console.log('')
   console.log('  Адреса для подключения (с этого же вай-фая/хот-спота):')
   if (addrs.length === 0) {
@@ -598,10 +657,19 @@ function printAddresses(port) {
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 if (isMain) {
   const here = path.dirname(fileURLToPath(import.meta.url))
-  const { server } = createServer({
-    dataDir: path.join(here, 'data'),
+  // PIN переживает перезапуск сервера (иначе ведущему пришлось бы вводить новый посреди игры): лежит в data/pin.txt; удалить файл = выдать новый
+  const dataDir = path.join(here, 'data'); fs.mkdirSync(dataDir, { recursive: true })
+  let pinValue = process.env.QP_LOCAL_PIN
+  try { pinValue = pinValue || fs.readFileSync(path.join(dataDir, 'pin.txt'), 'utf8').trim() } catch { /* файла нет — выдадим */ }
+  if (!pinValue) { pinValue = String(crypto.randomInt(100000, 1000000)); try { fs.writeFileSync(path.join(dataDir, 'pin.txt'), pinValue) } catch { /* не критично */ } }
+  const { server, pin } = createServer({
+    dataDir,
     appDir: path.join(here, 'app'),
+    pin: pinValue,
   })
+  // последний рубеж: неожиданная ошибка пишется в журнал, процесс не умирает посреди игры
+  process.on('uncaughtException', err => { console.error('[ошибка, сервер продолжает работу]', err) })
+  process.on('unhandledRejection', err => { console.error('[необработанный отказ, сервер продолжает работу]', err) })
   server.on('error', err => {
     if (err.code === 'EADDRINUSE') {
       console.error(`Порт ${PORT} уже занят — закрой другую копию сервера или поменяй QP_LOCAL_PORT.`)
@@ -609,5 +677,5 @@ if (isMain) {
     }
     throw err
   })
-  server.listen(PORT, () => printAddresses(PORT))
+  server.listen(PORT, () => printAddresses(PORT, pin))
 }

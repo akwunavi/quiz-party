@@ -61,9 +61,14 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   // если ответов реально 0), считаем данные загруженными.
   const initialAnswersRef = useRef(answers)
   const answersLoadedRef = useRef(false)
+  // «ответы загружены» и «вкладка видна» — СОСТОЯНИЕ (а не только ref/чтение document.hidden): эффект начисления зависит от них, поэтому после перезагрузки
+  // проектора после финиша или возврата скрытой вкладки он перезапускается сам (раньше менялся только ref — эффект больше не запускался, очки терялись, HANDOFF §3em).
+  const [answersLoaded, setAnswersLoaded] = useState(false)
+  const [visible, setVisible] = useState(() => !document.hidden)
   useEffect(() => {
-    if (answers !== initialAnswersRef.current) answersLoadedRef.current = true
+    if (answers !== initialAnswersRef.current) { answersLoadedRef.current = true; setAnswersLoaded(true) }
   }, [answers])
+  useEffect(() => { const f = () => setVisible(!document.hidden); document.addEventListener('visibilitychange', f); return () => document.removeEventListener('visibilitychange', f) }, [])
 
   // гонка из (seed, D): детерминированна, поэтому не хранится в БД
   const raceObj: RaceV3 | null = useMemo(() => {
@@ -120,7 +125,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   // финиш: начисляем баллы (5/4/3/2/1 по месту выбранной собаки) — один раз, ПАЧКОЙ одним upsert (CLAUDE.md), с повторами при сбое сети
   // и теми же защитами, что описаны выше (answersLoadedRef, cancelled). Начисление — по моменту финиша гонки, не по показу пьедестала.
   useEffect(() => {
-    if (preview || !running || !allFinished || graded.current || document.hidden
+    if (preview || !running || !allFinished || graded.current || !visible
       || !answersLoadedRef.current || !raceObj) return
     graded.current = true
     // Опоздавшая запись из СТАРОГО цикла ретраев не должна затирать состояние
@@ -163,7 +168,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
     })()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, running, allFinished, retryTick])
+  }, [preview, running, allFinished, retryTick, answersLoaded, visible])
 
   // ставки открываются сразу с появлением экрана — лишний клик убран
   useEffect(() => {
