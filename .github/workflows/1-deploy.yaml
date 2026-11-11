@@ -60,6 +60,12 @@ jobs:
             || { echo "::error::В сборке нет версии $VER — собран не тот код"; exit 1; }
           echo "📦 Версия v$VER" >> $GITHUB_STEP_SUMMARY
 
+      - name: Версия Service Worker совпадает с версией приложения
+        run: |
+          APP=$(grep -o "VERSION = '[0-9.]*'" src/version.ts | grep -o "[0-9.]*")
+          SW=$(grep -o "^const VERSION = '[0-9.]*'" public/sw.js | grep -o "[0-9.]*")
+          [ "$APP" = "$SW" ] || { echo "::error::src/version.ts=$APP, public/sw.js=$SW — разъехались, после деплоя устройства останутся на старом коде"; exit 1; }
+
       - name: Публикация в docs/
         run: |
           rm -rf docs && cp -r dist docs && touch docs/.nojekyll

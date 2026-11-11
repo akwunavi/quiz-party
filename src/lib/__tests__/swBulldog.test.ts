@@ -26,3 +26,10 @@ describe('Service Worker × библиотека собак', () => {
     expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(150 * 1024)
   })
 })
+
+describe('Service Worker × версия приложения', () => {
+  it('VERSION в public/sw.js == VERSION в src/version.ts (иначе после деплоя устройства остаются на старом коде)', () => {
+    const app = readFileSync(path.join(ROOT, 'src/version.ts'), 'utf8').match(/VERSION = '([0-9.]+)'/)?.[1]
+    expect(sw.match(/^const VERSION = '([0-9.]+)'/m)?.[1]).toBe(app)
+  })
+})

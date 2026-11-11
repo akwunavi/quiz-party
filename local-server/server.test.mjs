@@ -7,7 +7,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { createServer } from './server.mjs'
+import { createServer, safeDecode, sanitizePack, MAX_PLAYER_STAKE } from './server.mjs'
+
+const TEST_PIN = '424242'
 
 let server
 let baseUrl
@@ -18,7 +20,7 @@ beforeEach(async () => {
   dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qp-local-data-'))
   appDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qp-local-app-'))
   fs.writeFileSync(path.join(appDir, 'index.html'), '<html><head><title>t</title></head><body>app</body></html>')
-  const created = createServer({ dataDir, appDir })
+  const created = createServer({ dataDir, appDir, pin: TEST_PIN })
   server = created.server
   await new Promise(resolve => server.listen(0, resolve))
   const { port } = server.address()
@@ -31,8 +33,9 @@ afterEach(async () => {
   fs.rmSync(appDir, { recursive: true, force: true })
 })
 
+/** По умолчанию запрос идёт «от ведущего» (с PIN); `guest()` — как телефон игрока без PIN. */
 async function api(pathAndQuery, init) {
-  const res = await fetch(`${baseUrl}/api/${pathAndQuery}`, init)
+  const res = await fetch(`${baseUrl}/api/${pathAndQuery}`, { ...init, headers: { 'x-qp-pin': TEST_PIN, ...(init?.headers ?? {}) } })
   const text = await res.text()
   const body = text ? JSON.parse(text) : undefined
   return { status: res.status, body, headers: res.headers }
@@ -268,7 +271,7 @@ describe('локальный сервер: старый state.json без state_
     }
     fs.writeFileSync(path.join(dataDir, 'state.json'), JSON.stringify(oldState))
 
-    const created = createServer({ dataDir, appDir })
+    const created = createServer({ dataDir, appDir, pin: TEST_PIN })
     server = created.server
     await new Promise(resolve => server.listen(0, resolve))
     baseUrl = `http://127.0.0.1:${server.address().port}`
@@ -362,5 +365,72 @@ describe('локальный сервер: статика приложения',
     const row = (await rows())[0]
     await api(`answers/${row.id}`, { method: 'PATCH', body: JSON.stringify({ question_ref: 'q-x', team_id: 't9', round_number: 7, stake: 4 }) })
     expect((await rows())[0]).toMatchObject({ question_ref: 'q-race-2', team_id: 't1', round_number: 2, stake: 4 })   // очки (stake) ведущий пишет, личность — нет
+  })
+})
+
+
+// ═══ 10.64: безопасность (аудит К3/В4/В1) ═══
+describe('локальный сервер: устойчивость и PIN ведущего', () => {
+  const guest = async (p, init) => { const res = await fetch(`${baseUrl}/api/${p}`, init); const t = await res.text(); return { status: res.status, body: t ? JSON.parse(t) : undefined } }
+  it('кривой адрес (%, %00, обход каталога) — 400/404, а не падение процесса; сервер потом отвечает', async () => {
+    for (const p of ['/quiz-party/%', '/quiz-party/%E0%A4%A', '/api/media/%', '/quiz-party/..%2fapp-secret%2fx.txt', '/quiz-party/%00', '/api/media/..%2f..%2fstate.json']) {
+      const r = await fetch(baseUrl + p); expect([400, 404]).toContain(r.status); await r.text()
+    }
+    expect((await api('health')).status).toBe(200)
+  })
+  it('соседняя папка с тем же началом имени не отдаётся (проверка пути с разделителем)', async () => {
+    const sibling = appDir + '-secret'; fs.mkdirSync(sibling); fs.writeFileSync(path.join(sibling, 'x.txt'), 'секрет')
+    try { const r = await fetch(`${baseUrl}/quiz-party/..%2f${encodeURIComponent(path.basename(sibling))}%2fx.txt`); expect(await r.text()).not.toContain('секрет') } finally { fs.rmSync(sibling, { recursive: true, force: true }) }
+  })
+  it('без PIN нельзя: включить/выключить запись, сменить фазу, удалить команду, править ответ, писать блиц, грузить пакет, выгружать игру', async () => {
+    await api('arm', { method: 'POST' })
+    for (const [p, m] of [['disarm', 'POST'], ['arm', 'POST'], ['session', 'PATCH'], ['teams/x', 'DELETE'], ['answers/x', 'PATCH'], ['blitz?round=0', 'PUT'], ['pack/p1', 'POST'], ['export', 'GET']]) {
+      const r = await guest(p, { method: m, body: m === 'GET' ? undefined : '{}' }); expect(r.status, `${m} ${p}`).toBe(403)
+    }
+    expect((await api('health')).body.armed).toBe(true)                 // запись по-прежнему включена
+  })
+  it('с неверным PIN — тоже 403; с верным — работает', async () => {
+    const bad = await fetch(`${baseUrl}/api/disarm`, { method: 'POST', headers: { 'x-qp-pin': '000000' } }); expect(bad.status).toBe(403); await bad.text()
+    expect((await api('arm', { method: 'POST' })).status).toBe(200)
+  })
+  it('игрок без PIN по-прежнему может: читать состояние, зарегистрировать команду, писать свой ответ', async () => {
+    await api('arm', { method: 'POST' })
+    expect((await guest('session')).status).toBe(200)
+    expect((await guest('teams', { method: 'POST', body: JSON.stringify({ name: 'Синие', color: '#123', game_id: 'g' }) })).status).toBe(200)
+    expect((await guest('answers', { method: 'POST', body: JSON.stringify([{ team_id: 't1', game_id: 'g', question_ref: 'q-abc', round_number: 0, answer_text: '42' }]) })).status).toBe(200)
+    expect((await api('answers')).body.find(a => a.team_id === 't1').answer_text).toBe('42')
+  })
+  it('игрок без PIN не пишет служебные очки (q-paper/q-adjust/q-blitz), не ставит себе is_correct и безумный stake', async () => {
+    await api('arm', { method: 'POST' })
+    const rows = [
+      { team_id: 't1', game_id: 'g', question_ref: 'q-adjust-0', round_number: 0, answer_text: '', stake: 999 },
+      { team_id: 't2', game_id: 'g', question_ref: 'q-paper-1', round_number: 1, answer_text: '', stake: 0 },
+      { team_id: 't3', game_id: 'g', question_ref: 'q-blitz', round_number: 2, answer_text: '', stake: 50 },
+      { team_id: 't4', game_id: 'g', question_ref: 'q-x', round_number: 3, answer_text: 'a', stake: 1000, is_correct: true },
+    ]
+    await guest('answers', { method: 'POST', body: JSON.stringify(rows) })
+    const all = (await api('answers')).body
+    expect(all.map(a => a.question_ref)).toEqual(['q-x'])
+    expect(all[0].stake).toBe(null); expect(all[0].is_correct).toBe(null); expect(MAX_PLAYER_STAKE).toBe(100)
+    // ведущий (с PIN) те же служебные строки пишет
+    await api('answers', { method: 'POST', body: JSON.stringify([rows[0]]) }); expect((await api('answers')).body.some(a => a.question_ref === 'q-adjust-0' && a.stake === 999)).toBe(true)
+  })
+  it('пакет: ведущему целиком, игроку — без ответов (кроме слова кроссворда и фразы «Скрэмбла»)', async () => {
+    await api('arm', { method: 'POST' })
+    const pack = { id: 'p1', rounds: [{ id: 'r1', questions: [
+      { id: 'q1', answer: { mode: 'free_text', correct: 'ОТВЕТ', display: 'ОТВЕТ' }, media: { question: ['a.png'], answer: ['b.png'] }, answer_note: 'секрет' },
+      { id: 'q2', answer: { mode: 'choice', choices: [{ key: 'А', text: 'x' }], correct_choice: 'А', display: 'x' } },
+      { id: 'q3', answer: { mode: 'crossword_word', word: 'СЛОВО' } }] }] }
+    await api('pack/p1', { method: 'POST', body: JSON.stringify(pack) })
+    const host = (await api('pack/p1')).body, g = (await guest('pack/p1')).body
+    expect(host.rounds[0].questions[0].answer.correct).toBe('ОТВЕТ')
+    const q = g.rounds[0].questions
+    expect(q[0].answer.correct).toBeUndefined(); expect(q[0].answer.display).toBeUndefined(); expect(q[0].media.answer).toBeUndefined(); expect(q[0].answer_note).toBe(null); expect(q[0].media.question).toEqual(['a.png'])
+    expect(q[1].answer.correct_choice).toBeUndefined(); expect(q[1].answer.choices).toHaveLength(1); expect(q[2].answer.word).toBe('СЛОВО')
+    expect(JSON.stringify(g)).not.toContain('ОТВЕТ"')
+  })
+  it('утилиты: safeDecode не бросает, sanitizePack не трогает исходник', () => {
+    expect(safeDecode('%')).toBe(null); expect(safeDecode('%D0%B0')).toBe('а')
+    const p = { rounds: [{ questions: [{ answer: { correct: 'x' } }] }] }; sanitizePack(p); expect(p.rounds[0].questions[0].answer.correct).toBe('x')
   })
 })

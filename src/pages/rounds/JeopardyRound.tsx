@@ -7,9 +7,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { TileCard } from '../../components/TileCard'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { setPhase } from '../../lib/gameActions'
-import { jeopardyTile, jpShowAnswer, jpReplay, jpOpenTile, jpLocate, jpNextReplay } from '../../lib/jeopardyRef'
-import { jeopardyOpened, openJeopardyTile, closeJeopardyTile } from '../../lib/jeopardyActions'
-import { saveMelody } from '../../lib/melodyActions'
+import { jeopardyTile, jpOpenTile, jpLocate, jpNextReplay } from '../../lib/jeopardyRef'
+import { jeopardyOpened, openJeopardyTile, closeJeopardyTile, showJeopardyAnswer, replayJeopardyTile } from '../../lib/jeopardyActions'
 import { mediaUrl } from '../../lib/media'
 import { useScrambleReveal } from '../../hooks/useScrambleReveal'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -121,8 +120,8 @@ function useJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   const replayNonce = !preview && tileLocal !== undefined && predictedReplay.current != null
     ? predictedReplay.current
     : (gameState.melody?.jp?.replay ?? 0)
-  const onShowAnswer = () => { if (!preview) void saveMelody(jpShowAnswer(gameState.melody ?? {})) }
-  const onReplay = () => { if (!preview) void saveMelody(jpReplay(gameState.melody ?? {})) }
+  const onShowAnswer = () => { if (!preview) void showJeopardyAnswer(gameState) }
+  const onReplay = () => { if (!preview) void replayJeopardyTile(gameState) }
   const onClose = (tileKey: string) => { if (preview) return; setTileLocal(null); void closeTile(tileKey) }
   return { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose }
 }

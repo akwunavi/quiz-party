@@ -3,7 +3,7 @@
 import { ARENA, buildCameraTrack, worldX } from './camera'
 import { HZ, BERM_Y, FENCE_H, STARS, buildSky, buildMountains, buildFarShore, buildLake, buildTrack, buildFence, rng, cv, type TrackArt } from './art'
 import { butterflyArtPose, butterflyHeading, bfFrame, BF_CELL_W, BF_CELL_H, BF_DRAW_W, BF_ANCHOR } from './butterfly'
-import { SLOTS, loadSlots, slotPlacements, type LoadedSlot, type SlotSpec } from './slots'
+import { SLOT_TIMEOUT_MS, SLOTS, loadSlots, slotPlacements, type LoadedSlot, type SlotSpec } from './slots'
 import { LAYOUT as L, DOG_IDS } from '../config'
 import { raceFor, stateAt, loadDogData, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from '../engine'
 import { ButterflyManager } from '../vendor/butterfly.mjs'
@@ -43,7 +43,7 @@ export class ArenaRenderer {
     const lake = buildLake(sky, mtnFar, mtnNear, shore, 0.2), track = buildTrack(), fence = buildFence(track.lanternsX)
     this.art = { sky, mtnFar, mtnNear, shore, lake, track, fence, ray: cv(2, 2) }
     if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase, this.opt.slotFiles); this.slots = r.loaded; this.missing = r.missing }
-    if (this.opt.slotBase && (!this.opt.slotFiles || this.opt.slotFiles.includes('butterfly.webp'))) this.bfSheet = await new Promise<HTMLImageElement | null>(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `${this.opt.slotBase}butterfly.webp` })
+    if (this.opt.slotBase && (!this.opt.slotFiles || this.opt.slotFiles.includes('butterfly.webp'))) this.bfSheet = await new Promise<HTMLImageElement | null>(res => { const im = new Image(); const to = setTimeout(() => res(null), SLOT_TIMEOUT_MS); im.onload = () => { clearTimeout(to); res(im) }; im.onerror = () => { clearTimeout(to); res(null) }; im.src = `${this.opt.slotBase}butterfly.webp` })
     this.assetsDone = true; this.buildMs = performance.now() - s
   }
   private assetsDone = false
@@ -51,7 +51,16 @@ export class ArenaRenderer {
   setRace(race: { seed: number; D: number }, t0: number, dur: number) { this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur); this.bf.reset() }
   /** Готова к кадру только когда загружены И нарисованные слои, И авторские файлы (трибуна, деревня, ели, бабочка): раньше слои всплывали посреди перехода. */
   get ready() { return !!this.art && !!this.cam && this.assetsDone }
-  destroy() { if (!this.opt.shared) this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }
+  /** Освобождает ВСЁ тяжёлое: холсты слоёв (трасса 8720 px, ограждение, небо, горы, озеро), вспомогательные холсты, кадры слотов. Размер 0 отдаёт видеопамять сразу, а не при сборке мусора (аудит В6). */
+  destroy() {
+    if (!this.opt.shared) this.pool.release()
+    const zero = (c?: HTMLCanvasElement | null) => { if (c) { c.width = 0; c.height = 0 } }
+    if (this.art) { zero(this.art.sky); zero(this.art.mtnFar); zero(this.art.mtnNear); zero(this.art.shore); zero(this.art.lake); zero(this.art.track.canvas); zero(this.art.fence); zero(this.art.ray) }
+    zero(this.tmp); zero(this.nose); zero(this.aur); zero(this.aurB)
+    for (const sl of this.slots) if (sl.img instanceof HTMLCanvasElement) zero(sl.img)
+    this.slots = []; this.bfSheet = null; this.noseCache.clear(); this.assetsDone = false
+    this.canvas.width = 0; this.canvas.height = 0
+  }
   get duration() { return this.cam?.dur ?? 0 }
   camX(t: number) { return this.cam!.at(t).x }
 

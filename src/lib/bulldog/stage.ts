@@ -71,7 +71,8 @@ export class StageRenderer {
   }
   /** Уход с экрана: закрыть все ImageBitmap и ОТДАТЬ видеопамять canvas (размер 0) — иначе буфер 1920×1080 и временный холст живут до сборщика мусора. */
   destroy() {
-    this.dead = true; this.arena?.destroy(); this.arena = null; this.arenaCv = null; this.pool.release(); this.noseCache.clear()
+    this.dead = true; this.arena?.destroy(); this.arena = null; this.arenaCv = null; this.pool.release(); this.noseCache.clear(); this.pawCache.clear()
+    for (const c of [this.endSnap, this.podiumBg, this.pawCv]) if (c) { c.width = 0; c.height = 0 }; this.endSnap = null; this.podiumBg = null; this.pawCv = null; this.pawCtx = null
     this.canvas.width = 0; this.canvas.height = 0; this.tmp.width = 0; this.tmp.height = 0
   }
   private async boot() {

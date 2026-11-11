@@ -25,8 +25,11 @@ import type { LoadedPack } from './roundMeta'
 const memCache = new Map<string, LoadedPack>()
 const LS_KEY = (id: string) => `qp-pack-${id}`
 
-export async function loadPack(packId: string, force = false, includeHidden = false): Promise<LoadedPack> {
-  const cacheKey = includeHidden ? `${packId}:h` : packId
+/** `forPlayer` — телефон игрока: вопросы приходят урезанными (без правильных ответов, миграция 0018);
+ *  до миграции функции в базе нет — тогда берём прямым чтением, как раньше. */
+export async function loadPack(packId: string, force = false, includeHidden = false, forPlayer = false): Promise<LoadedPack> {
+  const cacheKey = includeHidden ? `${packId}:h` : forPlayer ? `${packId}:p` : packId
+  const storeId = forPlayer && !includeHidden ? `${packId}:p` : packId
   if (!force && memCache.has(cacheKey)) return memCache.get(cacheKey)!
 
   try {
@@ -38,18 +41,28 @@ export async function loadPack(packId: string, force = false, includeHidden = fa
     if (e2) throw e2
 
     const roundIds = (rounds ?? []).map(r => r.id)
-    let qQuery = supabase.from('pack_questions').select('*')
-      .in('round_id', roundIds).order('position')
-    if (!includeHidden) qQuery = qQuery.eq('hidden', false)
-    const { data: questions, error: e3 } = roundIds.length
-      ? await qQuery : { data: [], error: null }
-    if (e3) throw e3
+    let questions: unknown[] | null = null
+    if (forPlayer && !includeHidden && roundIds.length) {
+      const { data: rpcData, error: rpcErr } = await supabase.rpc('player_pack_questions', { p_pack_id: packId })
+      if (!rpcErr && Array.isArray(rpcData)) questions = rpcData
+    }
+    if (questions === null) {
+      let qQuery = supabase.from('pack_questions').select('*')
+        .in('round_id', roundIds).order('position')
+      if (!includeHidden) qQuery = qQuery.eq('hidden', false)
+      const { data, error: e3 } = roundIds.length
+        ? await qQuery : { data: [], error: null }
+      if (e3) throw e3
+      questions = data
+      // после миграции 0018 телефону прямое чтение возвращает пусто БЕЗ ошибки — пустой пакет не кешируем, берём офлайн-копию
+      if (forPlayer && !includeHidden && roundIds.length && (data ?? []).length === 0) throw new Error('player pack: вопросы недоступны')
+    }
 
     const loaded: LoadedPack = {
       ...(pack as Pack),
       rounds: (rounds ?? []).map(r => ({
         ...(r as RoundBase),
-        questions: (questions ?? []).filter(q => q.round_id === r.id) as Question[],
+        questions: ((questions ?? []) as Question[]).filter(q => q.round_id === r.id),
       })),
     }
     memCache.set(cacheKey, loaded)
@@ -57,13 +70,13 @@ export async function loadPack(packId: string, force = false, includeHidden = fa
     // от localStorage (см. шапку файла). includeHidden-снимок (превью
     // редактора со скрытыми вопросами) в офлайн-кеш не кладём: офлайн нужен
     // ведущему в игре, а там includeHidden всегда false.
-    if (!includeHidden) { try { await savePack(packId, loaded) } catch { /* IndexedDB недоступен */ } }
+    if (!includeHidden) { try { await savePack(storeId, loaded) } catch { /* IndexedDB недоступен */ } }
     return loaded
   } catch (err) {
     // сеть мигнула — пробуем IndexedDB, потом legacy localStorage
     if (!includeHidden) {
       try {
-        const cached = await readPack<LoadedPack>(packId)
+        const cached = await readPack<LoadedPack>(storeId)
         if (cached) { memCache.set(cacheKey, cached); return cached }
       } catch { /* IndexedDB недоступен — пробуем localStorage ниже */ }
     }

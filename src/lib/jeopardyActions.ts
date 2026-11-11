@@ -8,7 +8,8 @@
 import { getRoomId } from './room'
 import { room } from './transport'
 import { gotoQuestion, startTimer } from './gameActions'
-import { jeopardyRef, jpOpen, jpClose } from './jeopardyRef'
+import { jeopardyRef, jpOpen, jpClose, jpOpenTile, jpShowAnswer, jpReplay } from './jeopardyRef'
+import { updateMelodyBag } from './sessionBag'
 import type { GameState } from '../types/quiz'
 
 /** Отметки «плитка отыграна» из состояния комнаты. Отдельное поле сессии:
@@ -29,7 +30,18 @@ export async function openJeopardyTile(gameState: GameState, flat: number) {
     gameId: gameState.game_id, roundNumber: gameState.round_number,
     questionRef: jeopardyRef(gameState.round_number, flat),
   })
-  await room.patchSession(getRoomId(), { melody: jpOpen(gameState.melody ?? {}, flat) })
+  // защищённая запись (CAS): накладывается на СВЕЖИЙ мешок, а не на снимок экрана — устаревший снимок не затрёт race/melody/rv (аудит В7).
+  // Идемпотентно: плитка уже открыта и ответ не показан (двойной клик) — ничего не пишем.
+  await updateMelodyBag(null, cur => (jpOpenTile(cur) === flat && cur.jp?.answer === false ? null : jpOpen(cur, flat)))
+}
+
+/** «Показать ответ» плитки — на свежем мешке; повтор ничего не меняет. */
+export async function showJeopardyAnswer(gameState: GameState) {
+  await updateMelodyBag(gameState, cur => (cur.jp?.answer === true ? null : jpShowAnswer(cur)))
+}
+/** «Переслушать» — каждый нажим на свежем мешке прибавляет счётчик повторов. */
+export async function replayJeopardyTile(gameState: GameState) {
+  await updateMelodyBag(gameState, cur => jpReplay(cur))
 }
 
 /** Закрыть плитку: пометить отыгранной и вернуть доску.
@@ -48,9 +60,7 @@ export async function closeJeopardyTile(gameState: GameState, tileKey: string,
   }
   // Плитка закрыта — у команд должна пропасть форма ответа. Она видна, пока
   // идёт таймер, поэтому его надо снять, иначе форма висит вечно.
-  await room.patchSession(getRoomId(), {
-    timer_started_at: null, reveal: false,
-    melody: jpClose(gameState.melody ?? {}),
-  })
+  await room.patchSession(getRoomId(), { timer_started_at: null, reveal: false })
+  await updateMelodyBag(null, cur => (jpOpenTile(cur) == null ? null : jpClose(cur)))   // доска возвращается на свежем мешке; уже закрыта — не пишем
   return errorText
 }
