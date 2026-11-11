@@ -1,0 +1,62 @@
+# Удалённые ветки собак (10.64)
+
+Оставлены: claude/bulldog-library-integration-20261109 claude/bulldog-round-lab-20261109 claude/bulldog-quiz-integration-20261109. Любую ветку можно вернуть: `git push origin <sha>:refs/heads/<имя>`.
+
+| ветка | последний коммит |
+|---|---|
+| claude-frenk-to-codex | 443ed0056c4ef194026f0b32005b9b653fee967e |
+| claude/dog4-pups-audit-20261023 | 50cf0b04c48f552fa9eee1913cb8506d8ec3a85d |
+| claude/dog4-pups-integration-20261102 | 03ebd8b68bdd43453535e60a57704afba485cdb1 |
+| claude/dog4-pups-selection-20261023 | 1f0f0c59a54986d3469c101bb5cd6042db7984a8 |
+| claude/dog5-luna-batch-20261108 | bc445bdbc248b8852ff841467f914dd2ff8d665b |
+| claude/dog5-luna-stage1-20261102 | 005573869f611433a7d89e72b3b1192d70dee16c |
+| claude/frenk-audit-20261022 | e7f77e1831fe8846bbd9d9c47b7d8a19a1b0d1d3 |
+| codex/bulldog4-lab-delivery-20261008 | e84d830ddfb373be7eb03e3134830c3b49d3ba84 |
+| codex/bulldog4-stand-architecture-20261009 | feed641bb5eaec2f6b09a495a3bd95436efbf4b7 |
+| codex/bulldog4-technical-audit-20261009 | 4a41f98a560f3fe122695c5ada633cb03e2bfde6 |
+| codex/bulldog4-transition-rework-20261009 | f458b8a6f6652fc5016dea374c2c10fd06f966d4 |
+| codex/dog3-idle-alpha-lab-20261023 | 8e1ccc5da74dfcdd617a39caba92f8ab9932e21b |
+| codex/dog3-idle-b-approval-20261023 | e77de6ddcfeec4c347e6e276b7c1bf685af08a69 |
+| codex/dog3-idle-exit-lab-20261102 | 9fd99d075ec92a1aae021fd6a13381e816def29b |
+| codex/dog3-idle-front-stand-review-20261022 | 8ba18e7dc904f1c874b7494045bcb7cf5e18dabd |
+| codex/dog3-idle-source-reassessment-20261022 | 0078f98fe292f3c8f2a240b0d840eb83688f8b0c |
+| codex/dog3-library-approval-audit-20261022 | 0e9a955025b3dfb9132ad88bd9e5669232ab74fb |
+| codex/dog3-library-research-20261013 | 421fbbcc10548f4cb5bda4410ec495a4080a405d |
+| codex/dog3-return-approved-20261102 | fd73f98374ffe5744fed976ba278c5fbc40ebcd4 |
+| codex/dog3-return-montage-review-20261023 | e72f6c15635cd9337def37c1be673652b6636724 |
+| codex/dog3-return-montage-v2-20261023 | 95f3f2c2f31a892913bd11686f49cd97b7bb04d2 |
+| codex/dog3-roll-prep-20261022 | 5a583730c104cdf5717b283fc53fc1c2c5d80233 |
+| codex/dog3-roll-rhythm-review-20261022 | d33b670e775eee684a9ece5d34a85bc23bf9a068 |
+| codex/dog3-roll-v3-lab-20261022 | f7f9970bd5d2947f236db9e5e1bba89b5fac17bb |
+| codex/dog3-selected-alpha-return-prep-20261023 | f4015309a90aeb82dc2efc15d244816f172c97f6 |
+| codex/dog3-selected-review-20261023 | 632df128b8cc2029d5592a74805031c42e29f9c2 |
+| codex/dog3-stop-review-20261016 | 99c64a97a6af554b50129b97dd6e3eeee9e86135 |
+| codex/dog4-butterfly-20261013 | 3147f9a907884acc688c614adfe74a81844059c9 |
+| codex/dog4-final-timing-20261012 | e1aa45f870e9ff09933eacd55da2414be3e1cb9c |
+| codex/dog4-finish-test-20261012 | f1a5e35f5b94787fa120e9a77c1e0fdf737ae837 |
+| codex/dog4-parallel-10-20261012 | e208adb402f66dfaf9e573f10adbb5c045eecedc |
+| codex/dog4-race-v3-5lane-20261012 | 23dd257b34290b0962f0e4753f0eec777e131766 |
+| codex/dog4-return-frames-20261012 | 853b4628d310926ae2ced02cde795a6845eadb34 |
+| codex/dog4-return-montage-20261012 | e8a7588b2ff54545b9c8df62499a209160bef067 |
+| codex/dog4-return-retime-20261012 | bcbe5279312c5c320a01e937b834047873f73631 |
+| codex/dog4-roll-alpha-20261013 | b2f77160da79eddf86183e1a6decf46fcae8d0ad |
+| codex/dog4-roll-prep-20261013 | 7fc0d0e3ef4b172dacb5aa98ab36f3c082de538f |
+| codex/dog4-run-loop-audit-20261012 | 7e35b8ec23a29556a8adb22580f1ca2219156a19 |
+| codex/dog4-run-reference-20261012 | aa92582d57a55b428faf2210076ed1acc4e5584b |
+| codex/dog4-stop-asset-20261012 | 53526d2142ee1c920b7113f3c5feab11b6009727 |
+| codex/dog4-stop-frames-20261012 | 1cbe14f8bb7ca72b4a0c136993ec01a9478dfd57 |
+| codex/dog4-transition-check-20261012 | 8f86362480ae4bf484618107c2588e2eee6b5b90 |
+| codex/race-motion-diagnostics-20261102 | a1e96642aef26d95b1bfaaeb435e6a5927828d33 |
+| codex/winter-arena-lab-20261102 | 245f7054f330c84388170b57127d2a4c4522e8f4 |
+| codex/winter-art-assets-audit-20261108 | 2428d622ebef6521a124e0eeb1c0e6ce32ae8500 |
+| codex/winter-cup-blender-assets-20261108 | 9d6a7f722a752a4ad8d339f23de39d24c877342c |
+| codex/winter-cup-rendered-segment-20261108 | 2cb05db097024e81d429af62f7de7cadc9d6caf0 |
+| codex/winter-race-first-segment-20261102 | 4153aa84a2b9a7dfbdda6258d47c6f6059c24265 |
+| codex/winter-race-lane-art-review-20261102 | 242821349d2e957686945f7680290b95de7fb7e6 |
+| codex/winter-race-scene-concepts-20261108 | 74de0b57d0de9d78c593c12bea08c2d21629c84d |
+| codex/winter-route-concepts-20261102 | d4954fb0768ef042e12fa590336080e060248aae |
+| docs/bulldog-race-quality-gates-20261014 | 8e156a92f6229f69ad08d3f90ba920673da0c195 |
+| preview/bulldog-03-05-alpha-v2-20261008 | bbd913d3c153f50685be70db3b61ec4ab691201d |
+| preview/bulldog-04-alpha-20261008 | bfa8f12f44cd55e38d25dcf94067211df7fe507d |
+| preview/bulldog-real-dogs-20261007 | 1c652ce822455469101f5f4740653db3f12e8868 |
+| preview/bulldogs-1235-alpha-20261008 | 8e30e5152fdd54e85a0dcebf44dc15b2a0a6f43c |
