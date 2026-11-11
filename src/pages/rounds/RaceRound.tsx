@@ -110,7 +110,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
     if (!preparing || !projector || prepStatus !== 'ready' || race.seed == null || begun.current === race.seed) return
     begun.current = race.seed
     void beginRace(gameState, race.seed).catch(() => { begun.current = null; setTimeout(() => setPrepTick(x => x + 1), 1500) })
-  }, [preparing, projector, prepStatus, race.seed])                                        // eslint-disable-line react-hooks/exhaustive-deps
+  }, [preparing, projector, prepStatus, race.seed, prepTick])                              // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {                                                                        // музыка стартует в момент raceT=0; опоздавшая (перезагрузка, поздняя загрузка) — не играет
     const m = musicRef.current; if (!running || !m || musicStatus !== 'ready' || startedMs == null || race.noMusic) return
     m.playAt(startedMs + (T.transition + T.countdown) * 1000)

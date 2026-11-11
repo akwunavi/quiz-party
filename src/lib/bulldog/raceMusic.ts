@@ -10,7 +10,9 @@ export function musicStartPlan(targetMs: number, nowMs: number, tolerance = LATE
   if (-delay <= tolerance) return { mode: 'start', delaySec: 0, offsetSec: -delay / 1000 }
   return { mode: 'skip' }
 }
-export interface MusicDeps { AudioContext?: new () => AudioContext; fetchBuffer: () => Promise<ArrayBuffer>; now: () => number }
+/** Повторные попытки загрузки трека: паузы между попытками (мс); всего попыток = длина + 1. */
+export const RETRY_DELAYS_MS = [1500, 4000, 8000]
+export interface MusicDeps { AudioContext?: new () => AudioContext; fetchBuffer: () => Promise<ArrayBuffer>; now: () => number; sleep?: (ms: number) => Promise<void>; retryDelays?: number[] }
 export interface RaceMusic {
   status(): MusicStatus; reason(): string
   /** Жест пользователя / повторная попытка: разрешить звук. */
@@ -31,9 +33,16 @@ export function createRaceMusic(hasTrack: boolean, deps: MusicDeps): RaceMusic {
     else {
       ctx = new Ctor(); ctx.onstatechange = () => refresh()
       void (async () => {
-        try { const raw = await deps.fetchBuffer(); if (dead) return; buf = await ctx!.decodeAudioData(raw.slice(0)); if (dead) return
-          if (ctx!.state !== 'running') { try { await ctx!.resume() } catch { /* нужен жест */ } } refresh()
-        } catch (e) { if (!dead) set('error', 'не удалось загрузить музыку: ' + (e instanceof Error ? e.message : String(e))) }
+        const delays = deps.retryDelays ?? RETRY_DELAYS_MS, sleep = deps.sleep ?? ((ms: number) => new Promise<void>(r => setTimeout(r, ms)))
+        let last = ''
+        for (let attempt = 0; attempt <= delays.length; attempt++) {                       // что-то пошло не так (сеть, обрыв, битый файл) — качаем заново, а не сдаёмся после первой попытки
+          if (dead) return
+          if (attempt > 0) { set('loading', `повторная попытка загрузки музыки (${attempt}/${delays.length})`); await sleep(delays[attempt - 1]); if (dead) return }
+          try { const raw = await deps.fetchBuffer(); if (dead) return; buf = await ctx!.decodeAudioData(raw.slice(0)); if (dead) return
+            void ctx!.resume().then(refresh, () => {}); refresh(); return          // resume() без жеста в Chrome не отклоняется, а висит — не ждём его: статус (ready/blocked) берём сразу по состоянию контекста
+          } catch (e) { last = e instanceof Error ? e.message : String(e) }
+        }
+        if (!dead) set('error', 'не удалось загрузить музыку: ' + last)
       })()
     }
   }

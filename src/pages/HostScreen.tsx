@@ -3,6 +3,7 @@ import { LobbyMusic } from '../components/LobbyMusic'
 import { InfoSlideView } from '../components/InfoSlideView'
 import { BlitzBoard, BlitzDice } from './rounds/BlitzRound'
 import { useBlitz } from '../lib/blitzApi'
+import { prefetchArena } from '../lib/bulldog/arena/prefetch'
 import {
   toResults, initBlitz, showQuestion, answerCorrect, answerWrong, skip,
   pauseForCheck, resumeAfterCheck, finishNoQuestions, pickNext, currentTeam,
@@ -208,6 +209,8 @@ function HostInner({ gameState, pack }: {
   // Предзагрузка следующего вопроса. Хук стоит ЗДЕСЬ, до всех ранних
   // return: вызов внутри условия однажды уже дал падение React #310.
   usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
+  const raceNear = pack?.rounds?.[gameState?.round_number ?? 0]?.mechanic === 'race' || pack?.rounds?.[(gameState?.round_number ?? 0) + 1]?.mechanic === 'race'
+  useEffect(() => { if (raceNear) prefetchArena(import.meta.env.BASE_URL) }, [raceNear])                // арена «Скачек» — заранее, пока идут правила/раунд перед гонкой
 
   // blob-URL текущего+следующего раунда из офлайн-кеша (шаг 5 плана,
   // Part A) — если пакет скачан заранее из админки, mediaUrl() внутри

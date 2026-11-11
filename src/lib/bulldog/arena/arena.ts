@@ -44,11 +44,13 @@ export class ArenaRenderer {
     this.art = { sky, mtnFar, mtnNear, shore, lake, track, fence, ray: cv(2, 2) }
     if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase, this.opt.slotFiles); this.slots = r.loaded; this.missing = r.missing }
     if (this.opt.slotBase && (!this.opt.slotFiles || this.opt.slotFiles.includes('butterfly.webp'))) this.bfSheet = await new Promise<HTMLImageElement | null>(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `${this.opt.slotBase}butterfly.webp` })
-    this.buildMs = performance.now() - s
+    this.assetsDone = true; this.buildMs = performance.now() - s
   }
+  private assetsDone = false
   /** Привязка к гонке Race V3 и камера на окно [t0, t0+dur]. Дёшево — можно звать при смене гонки. */
   setRace(race: { seed: number; D: number }, t0: number, dur: number) { this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur); this.bf.reset() }
-  get ready() { return !!this.art && !!this.cam }
+  /** Готова к кадру только когда загружены И нарисованные слои, И авторские файлы (трибуна, деревня, ели, бабочка): раньше слои всплывали посреди перехода. */
+  get ready() { return !!this.art && !!this.cam && this.assetsDone }
   destroy() { if (!this.opt.shared) this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }
   get duration() { return this.cam?.dur ?? 0 }
   camX(t: number) { return this.cam!.at(t).x }
