@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import type { AnswerUpsert } from '../../lib/transport'
-import { openRaceBets, startRace, finishRace } from '../../lib/raceActions'
+import { openRaceBets, startRace, finishRace, beginRace, reportPrep } from '../../lib/raceActions'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { BulldogStage } from '../../components/BulldogStage'
 import type { StageInput, StageStats } from '../../lib/bulldog/stage'
@@ -15,22 +15,26 @@ import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, RaceSettings } from '../../types/quiz'
-import { createAudio } from '../../lib/audioSource'
+import { createRaceMusic, type RaceMusic, type MusicStatus } from '../../lib/bulldog/raceMusic'
 import type { PreviewCtx } from '../../lib/previewState'
 import { serverNow } from '../../lib/serverClock'
-import { courseSeconds, dogNames } from '../../lib/bulldog/config'
+import { courseSeconds, dogNames, T } from '../../lib/bulldog/config'
 import { raceClock, gradeAt } from '../../lib/bulldog/phases'
 import { countsByDog, gradingRows, raceOf, raceRef, scoreRows } from '../../lib/bulldog/bets'
 import { raceFor } from '../../lib/bulldog/engine'
 import type { RaceV3 } from '../../lib/bulldog/v3types'
 
+const PREP_TEXT: Record<'loading' | 'audio_blocked' | 'error' | 'ready', (m?: string) => { title: string; sub?: string }> = {
+  loading: m => ({ title: 'ГОТОВИМ ГОНКУ…', sub: m }), ready: () => ({ title: 'ВСЁ ГОТОВО', sub: 'запускаем' }),
+  audio_blocked: () => ({ title: 'ЗВУК ЗАБЛОКИРОВАН', sub: 'Включите звук или начните без музыки' }), error: m => ({ title: 'НЕ УДАЛОСЬ ПОДГОТОВИТЬ', sub: m }),
+}
 export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
   /** Предпросмотр в редакторе: музыка/начисление баллов/автооткрытие ставок выключены; часы остаются (сцена живая). */
   preview?: PreviewCtx
   /** Диагностика сцены (фаза, память, время кадра) — только для стенда e2e/bulldog */
   onStats?: (s: StageStats) => void
-  /** Зимняя арена на гонке (демо/пробный показ). Нет — прежняя трасса: по умолчанию в игре арена выключена. */
+  /** Зимняя арена на гонке. Нет — на проекторе включена по умолчанию (слои из /arena/), в предпросмотре редактора выключена. */
   arena?: StageInput['arena']
 }) {
   const s = round.settings as RaceSettings
@@ -68,6 +72,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   }, [race.seed, D])
   const raceErr = race.seed != null && raceObj == null
   const running = race.stage === 'running' && !!raceObj
+  const preparing = race.stage === 'preparing' && !!raceObj
   const done = race.stage === 'done'
   const startedMs = race.startedAt ? Date.parse(race.startedAt) : (done ? serverNow() - 1e7 : null)
 
@@ -78,21 +83,39 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   const clock = raceObj && startedMs != null ? raceClock(elapsed, raceObj.end) : null
   const allFinished = !!raceObj && startedMs != null && elapsed >= gradeAt(raceObj.end)
 
-  // музыка забега: своя (настройка раунда) или общая фоновая пакета.
-  // Жест уже был (клик «Старт!»), поэтому обычный Audio играет без плясок.
+  // ── подготовка проектора и музыка (этап `preparing`, без таймеров «через N секунд»): гонка стартует, только когда готовы ресурсы И музыка, либо ведущий решил сам
+  const musicSrc = (round.settings as { race_music?: string }).race_music ?? pack.settings?.bg_music
+  const projector = !preview && !document.hidden
+  const [stageStats, setStageStats] = useState<StageStats | null>(null)
+  const [prepTick, setPrepTick] = useState(0)
+  const [musicStatus, setMusicStatus] = useState<MusicStatus>('none'); const [musicWhy, setMusicWhy] = useState('')
+  const musicRef = useRef<RaceMusic | null>(null)
+  const wantMusic = projector && !!musicSrc && !race.noMusic && (preparing || running) && race.seed != null
   useEffect(() => {
-    const src = (round.settings as { race_music?: string }).race_music
-      ?? pack.settings?.bg_music
-    if (preview || race.stage !== 'running' || !src || document.hidden) return
-    let cancelled = false
-    const a = createAudio(); a.src = mediaUrl(src)
-    a.loop = true; a.volume = .55
-    // play() асинхронный — та же гонка, что и с озвучкой вопроса.
-    a.play().then(() => {
-      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-    }).catch(() => {})
-    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-  }, [preview, race.stage])
+    if (!wantMusic || !musicSrc) { musicRef.current = null; setMusicStatus('none'); return }
+    const m = createRaceMusic(true, { now: serverNow, fetchBuffer: async () => { const r = await fetch(mediaUrl(musicSrc)); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.arrayBuffer() } })
+    musicRef.current = m; const sync = () => { setMusicStatus(m.status()); setMusicWhy(m.reason()) }; sync(); const off = m.onChange(sync)
+    const gesture = () => { void m.resume() }; document.addEventListener('pointerdown', gesture, { once: true })       // жест на проекторе сам снимает блокировку звука
+    return () => { off(); document.removeEventListener('pointerdown', gesture); m.destroy(); if (musicRef.current === m) musicRef.current = null }
+  }, [wantMusic, musicSrc, race.seed, prepTick])
+  const musicOk = !wantMusic || musicStatus === 'ready'
+  const prepStatus: 'loading' | 'audio_blocked' | 'error' | 'ready' = wantMusic && musicStatus === 'error' ? 'error' : wantMusic && musicStatus === 'blocked' ? 'audio_blocked' : (stageStats?.raceReady && musicOk) ? 'ready' : 'loading'
+  const prepMsg = prepStatus === 'error' ? musicWhy : prepStatus === 'audio_blocked' ? 'звук заблокирован браузером' : prepStatus === 'loading' ? (stageStats?.raceReady ? 'загружается музыка' : 'загружаются собаки и трасса') : undefined
+  useEffect(() => {                                                                        // статус для пульта (не критично)
+    if (!preparing || !projector || race.seed == null) return
+    void reportPrep(gameState, race.seed, prepStatus, prepMsg).catch(() => {})
+  }, [preparing, projector, race.seed, prepStatus, prepMsg])
+  const begun = useRef<number | null>(null)
+  useEffect(() => {                                                                        // всё готово → ОДИН серверный startedAt (CAS); повтор/второй экран ничего не перепишут
+    if (!preparing || !projector || prepStatus !== 'ready' || race.seed == null || begun.current === race.seed) return
+    begun.current = race.seed
+    void beginRace(gameState, race.seed).catch(() => { begun.current = null; setTimeout(() => setPrepTick(x => x + 1), 1500) })
+  }, [preparing, projector, prepStatus, race.seed])                                        // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {                                                                        // музыка стартует в момент raceT=0; опоздавшая (перезагрузка, поздняя загрузка) — не играет
+    const m = musicRef.current; if (!running || !m || musicStatus !== 'ready' || startedMs == null || race.noMusic) return
+    m.playAt(startedMs + (T.transition + T.countdown) * 1000)
+    return () => m.stop()
+  }, [running, musicStatus, startedMs, race.noMusic])                                    
 
   // финиш: начисляем баллы (5/4/3/2/1 по месту выбранной собаки) — один раз, ПАЧКОЙ одним upsert (CLAUDE.md), с повторами при сбое сети
   // и теми же защитами, что описаны выше (answersLoadedRef, cancelled). Начисление — по моменту финиша гонки, не по показу пьедестала.
@@ -158,10 +181,17 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   return (
     <div className="host-screen grid-bg race-screen">
       <div className="host-topbar"><span className="qnum">{round.title_lines.join(' ') || 'СКАЧКИ БУЛЬДОГОВ'}</span></div>
-      <BulldogStage onStats={onStats} input={{
-        race: race.seed != null && startedMs != null && (running || done) ? { seed: race.seed, D, startedMs } : null,
-        counts, names, scores, arena,
+      <BulldogStage onStats={st => { setStageStats(st); onStats?.(st) }} input={{
+        race: race.seed != null && raceObj && (preparing || (startedMs != null && (running || done))) ? { seed: race.seed, D, startedMs: preparing ? null : startedMs } : null,
+        counts, names, scores, arena: arena ?? (preview ? undefined : { slotBase: `${import.meta.env.BASE_URL}arena/` }),
+        prep: preparing ? PREP_TEXT[prepStatus](prepMsg) : null,
       }} />
+      {!preview && preparing && race.seed != null && (prepStatus === 'audio_blocked' || prepStatus === 'error') && (
+        <div className="host-actions">
+          {prepStatus === 'audio_blocked' && <button onClick={() => void musicRef.current?.resume()}>🔊 Включить звук</button>}
+          {prepStatus === 'error' && <button onClick={() => setPrepTick(x => x + 1)}>↻ Повторить подготовку</button>}
+          <button onClick={() => void beginRace(gameState, race.seed as number, { noMusic: true })}>▶ Играть без музыки</button>
+        </div>)}
       {raceErr && <div className="mono-tag" style={{ color: 'var(--danger)' }}>Не удалось построить забег для этого сида — нажмите «Назад» и запустите заново</div>}
       {betting && (
         <div className="race-betbar">

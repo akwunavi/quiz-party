@@ -209,8 +209,8 @@ export class ArenaRenderer {
     c.restore()
   }
   private drawHud(T: number) {
-    const c = this.ctx; c.save(); c.font = 'bold 24px system-ui, sans-serif'; c.textBaseline = 'middle'
-    for (let i = 0; i < 5; i++) { const y = ARENA.LANE_Y[i] - 34 * ARENA.LANE_K[i]; c.fillStyle = 'rgba(255,120,40,.92)'; c.beginPath(); c.roundRect(28, y - 20, 40, 40, 10); c.fill(); c.fillStyle = '#fff'; c.textAlign = 'center'; c.fillText(String(i + 1), 48, y + 1); c.textAlign = 'left'; c.fillStyle = 'rgba(255,255,255,.92)'; c.font = 'bold 20px system-ui, sans-serif'; c.fillText(this.names[i], 78, y + 1); c.font = 'bold 24px system-ui, sans-serif' }
+    const c = this.ctx; c.save()
+    // подписи и номера дорожек у левого края убраны (решение 10.58): игроки знают свою собаку, колонка под подписи не резервируется
     // мини-карта: положение собак на дистанции
     const x0 = 560, x1 = 1360, y = 44; c.fillStyle = 'rgba(15,10,60,.55)'; c.beginPath(); c.roundRect(x0 - 16, y - 18, x1 - x0 + 32, 36, 18); c.fill(); c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(x0, y - 1, x1 - x0, 2)
     this.race!.dogs.forEach((dog, i) => { const p = stateAt(dog, T).progress; c.fillStyle = ['#ffb26b', '#fff', '#7a6fb0', '#8fb0ff', '#e9e3ff'][i]; c.strokeStyle = '#1a1250'; c.lineWidth = 2; c.beginPath(); c.arc(x0 + p * (x1 - x0), y, 8, 0, 7); c.fill(); c.stroke() })

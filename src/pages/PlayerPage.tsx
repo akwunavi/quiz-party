@@ -653,6 +653,8 @@ function RacePlayer({ team, gameState, round, roundLabel }: {
             </div>
           </div>
         )}
+        {stage === 'preparing' && <div className="pl-wait" style={{ padding: 30 }}>
+          ГОТОВИМ ГОНКУ — ВЫБОР ЗАКРЫТ 🏁<div style={{ marginTop: 10, fontSize: '.7em' }}>{bet ? <>Ваш бульдог: №{bet} {names[bet - 1]}</> : 'Смотрите на экран'}</div></div>}
         {stage === 'running' && <div className="pl-wait" style={{ padding: 30 }}>
           БЕГУТ! СМОТРИТЕ НА ЭКРАН 🏁<div style={{ marginTop: 10, fontSize: '.7em' }}>{bet ? <>Ваш бульдог: №{bet} {names[bet - 1]}</> : all.length > 0 ? 'Ваш выбор не успел дойти до старта' : null}</div></div>}
         {stage === 'done' && <div className="pl-wait" style={{ padding: 30 }}>

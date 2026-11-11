@@ -15,6 +15,16 @@ describe('фазы раунда: чистая функция от времени
     expect(raceClock(T.transition + T.countdown + 12.5, END).raceT).toBeCloseTo(12.5, 6)
     expect(raceClock(gradeAt(END) + 1, END).raceT).toBe(END)
   })
+  it('согласованная схема: переход 4 с → отсчёт 5…1 по секунде → raceT=0 ровно на 9-й секунде; в переходе и отсчёте гоночное время не тратится', () => {
+    expect(T.transition).toBe(4); expect(T.countdown).toBe(5)
+    const digits = [4.0, 4.99, 5.0, 5.99, 6.0, 6.99, 7.0, 7.99, 8.0, 8.99].map(e => raceClock(e, END).countdown); expect(digits).toEqual([5, 5, 4, 4, 3, 3, 2, 2, 1, 1])
+    for (const e of [0, 1.5, 3.99, 4, 6.5, 8.99]) expect(raceClock(e, END).raceT).toBe(0)
+    expect(raceClock(9, END)).toMatchObject({ phase: 'race', raceT: 0 }); expect(raceClock(9.5, END).raceT).toBeCloseTo(0.5, 9)
+    expect(gradeAt(END)).toBe(9 + END)                                       // начисление считается от startedAt с учётом перехода и отсчёта
+  })
+  it('перезагрузка проектора в разгар отсчёта: те же часы дают ту же цифру и тот же raceT (состояние не хранится на экране)', () => {
+    const at = (reload: number) => raceClock(reload, END); expect(at(6.2)).toEqual(raceClock(6.2, END)); expect(at(6.2).countdown).toBe(3)
+  })
   it('перезагрузка страницы через час: сразу пьедестал, все три места открыты', () => {
     const c = raceClock(3600, END); expect(c.phase).toBe('podium'); expect(c.podiumShown).toBe(3)
   })

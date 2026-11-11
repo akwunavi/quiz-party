@@ -335,6 +335,9 @@ describe('локальный сервер: статика приложения',
     await setRace({ stage: 'betting' })
     await post({ team_id: 't1', answer_text: '1' }); await post({ team_id: 't1', answer_text: '3' })
     expect((await text('t1')).answer_text).toBe('3')
+    await setRace({ stage: 'preparing', seed: 1 })                               // «Старт» уже нажат, гонка ещё не идёт — ставки закрыты сразу
+    await post({ team_id: 't1', answer_text: '5' }); await post({ team_id: 't2', answer_text: '2' })
+    expect((await text('t1')).answer_text).toBe('3'); expect(await text('t2')).toBeUndefined()
     await setRace({ stage: 'running', seed: 1 })
     await post({ team_id: 't1', answer_text: '5' }); await post({ team_id: 't2', answer_text: '2' })
     expect((await text('t1')).answer_text).toBe('3')

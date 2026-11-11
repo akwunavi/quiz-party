@@ -37,7 +37,7 @@ import { computeTotals, computeRoundScores } from '../lib/totals'
 import { rankTeams } from '../lib/ranking'
 import { exportAnswersCsv } from '../lib/exportAnswers'
 import { autocheck } from '../lib/autocheck'
-import { startRace } from '../lib/raceActions'
+import { beginRace, startRace } from '../lib/raceActions'
 import { courseSeconds, dogNames } from '../lib/bulldog/config'
 import { countsByDog, raceOf, raceRef } from '../lib/bulldog/bets'
 // Пульты «Своей игры» и мелодии в телефоне работают на ТЕХ ЖЕ вызовах, что и
@@ -1890,8 +1890,25 @@ function RaceControls({ gameState, round }: {
   const bets = answers.filter(a => a.question_ref === raceRef(gameState.round_number))
   const counts = countsByDog(bets)
   const names = dogNames(round.settings as RaceSettings)
-  const stage = raceOf(gameState.melody, gameState.round_number, gameState.game_id).stage
+  const race = raceOf(gameState.melody, gameState.round_number, gameState.game_id), stage = race.stage
 
+  if (stage === 'preparing') {
+    const st = race.prep?.status
+    return (
+      <div className="adm-blitz">
+        <div className="adm-dim">⏳ ПОДГОТОВКА ГОНКИ НА ПРОЕКТОРЕ — выбор закрыт, гонка ещё не началась</div>
+        <div className="adm-dim" style={{ color: st === 'error' || st === 'audio_blocked' ? '#f59e0b' : undefined }}>
+          {!st && 'Проектор ещё не отозвался (экран забега открыт?)'}
+          {st === 'loading' && `Проектор загружает: ${race.prep?.msg ?? 'ресурсы'}`}
+          {st === 'ready' && 'Проектор готов — запускаем'}
+          {st === 'audio_blocked' && 'Звук заблокирован браузером проектора: нажмите «Включить звук» на проекторе или начните без музыки'}
+          {st === 'error' && `Не удалось подготовить: ${race.prep?.msg ?? 'ошибка'} — повторите на проекторе или начните без музыки`}
+        </div>
+        {(st === 'audio_blocked' || st === 'error') && <button className="adm-btn" onClick={() => void runAction('старт без музыки', () => beginRace(gameState, race.seed as number, { noMusic: true }))}>▶ НАЧАТЬ БЕЗ МУЗЫКИ</button>}
+        <button className="adm-btn" onClick={() => { if (window.confirm('Начать без проверки проектора? Если он не готов, гонка может начаться с «загрузкой».')) void runAction('старт без проверки проектора', () => beginRace(gameState, race.seed as number, { noMusic: st === 'audio_blocked' || st === 'error' })) }}>▶ НАЧАТЬ БЕЗ ПРОВЕРКИ ПРОЕКТОРА</button>
+      </div>
+    )
+  }
   if (stage === 'running') {
     return <div className="adm-dim">🐾 ЗАБЕГ ИДЁТ НА ПРОЕКТОРЕ</div>
   }

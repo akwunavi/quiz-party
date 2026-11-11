@@ -16,7 +16,7 @@ const room = {
 }
 vi.mock('../transport', () => ({ room }))
 vi.mock('../room', () => ({ getRoomId: () => 'room-1' }))
-const { startRace, openRaceBets, finishRace, startRaceFn, openBetsFn, finishRaceFn } = await import('../raceActions')
+const { startRace, openRaceBets, finishRace, startRaceFn, openBetsFn, finishRaceFn, beginRace, reportPrep, beginRaceFn, reportPrepFn } = await import('../raceActions')
 const mk = (melody: MelodyState = {}): GameState => ({ id: 1, game_id: 'g', pack_id: 'p', phase: 'question', round_number: 2, question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [], updated_at: '', melody, state_rev: 0 }) as GameState
 const race = () => session.melody?.race
 
@@ -33,13 +33,44 @@ describe('raceActions', () => {
     expect(await openRaceBets(stale)).toBe('already')
     expect(race()).toMatchObject({ stage: 'running', seed: 7 })
   })
-  it('старт: running + сид uint32 + startedAt + D; D по умолчанию 42', async () => {
+  it('старт: этап preparing (ставки закрыты, гонка НЕ идёт) + сид uint32 + D + preparingAt, startedAt нет; D по умолчанию 42', async () => {
     session = mk({ race: { stage: 'betting' } })
     await startRace(session, 60)
-    expect(race()).toMatchObject({ stage: 'running', D: 60 }); expect(Number.isInteger(race()!.seed)).toBe(true)
+    expect(race()).toMatchObject({ stage: 'preparing', D: 60 }); expect(Number.isInteger(race()!.seed)).toBe(true)
     expect(race()!.seed!).toBeGreaterThanOrEqual(0); expect(race()!.seed!).toBeLessThanOrEqual(0xffffffff)
-    expect(Number.isFinite(Date.parse(race()!.startedAt!))).toBe(true)
+    expect(Number.isFinite(Date.parse(race()!.preparingAt!))).toBe(true); expect(race()!.startedAt).toBeUndefined()
     session = mk({ race: { stage: 'betting' } }); await startRace(session); expect(race()!.D).toBe(42)
+  })
+  it('проектор готов → beginRace: running + ОДИН startedAt в будущем (запас START_LEAD), сид и D не меняются; повтор/второй экран — без записи', async () => {
+    session = mk({ race: { stage: 'betting' } }); await startRace(session, 50); const { seed, D } = race()!
+    const before = Date.now(); expect(await beginRace(session, seed!)).toBe('written')
+    expect(race()).toMatchObject({ stage: 'running', seed, D }); const t = Date.parse(race()!.startedAt!); expect(t).toBeGreaterThanOrEqual(before + 1900)
+    const first = { ...race() }; const calls = room.casSession.mock.calls.length
+    expect(await beginRace(session, seed!)).toBe('already'); expect(await beginRace(session, seed!, { noMusic: true })).toBe('already')
+    expect(race()).toEqual(first); expect(room.casSession.mock.calls.length).toBe(calls)
+  })
+  it('beginRace не работает без preparing и с чужим сидом', async () => {
+    session = mk({ race: { stage: 'betting' } }); expect(await beginRace(session, 1)).toBe('already'); expect(race()).toEqual({ stage: 'betting' })
+    session = mk({ race: { stage: 'betting' } }); await startRace(session); expect(await beginRace(session, (race()!.seed! + 1) >>> 0)).toBe('already'); expect(race()!.stage).toBe('preparing')
+  })
+  it('решение «без музыки» пишется вместе со стартом и видно всем экранам', async () => {
+    session = mk({ race: { stage: 'betting' } }); await startRace(session); await beginRace(session, race()!.seed!, { noMusic: true }); expect(race()!.noMusic).toBe(true)
+  })
+  it('пульт и проектор жмут одновременно — startedAt один', async () => {
+    session = mk({ race: { stage: 'betting' } }); await startRace(session); const seed = race()!.seed!, snap = structuredClone(session)
+    const [a, b] = await Promise.all([beginRace(snap, seed), beginRace(snap, seed, { noMusic: true })]); expect([a, b].sort()).toEqual(['already', 'written'])
+  })
+  it('статус подготовки: пишется только в preparing, одинаковый статус — без записи; после старта статус исчезает', async () => {
+    session = mk({ race: { stage: 'betting' } }); await startRace(session); const seed = race()!.seed!
+    await reportPrep(session, seed, 'loading'); expect(race()!.prep?.status).toBe('loading')
+    const c = room.casSession.mock.calls.length; await reportPrep(session, seed, 'loading'); expect(room.casSession.mock.calls.length).toBe(c)
+    await reportPrep(session, seed, 'audio_blocked', 'звук заблокирован'); expect(race()!.prep).toMatchObject({ status: 'audio_blocked', msg: 'звук заблокирован' })
+    await beginRace(session, seed); expect(race()!.prep).toBeUndefined()
+    const c2 = room.casSession.mock.calls.length; await reportPrep(session, seed, 'ready'); expect(room.casSession.mock.calls.length).toBe(c2)
+  })
+  it('ставки закрыты уже в preparing: открыть ставки заново нельзя (перезагрузка проектора не откатывает)', async () => {
+    session = mk({ race: { stage: 'betting' } }); await startRace(session); const stale = mk()
+    expect(await openRaceBets(stale)).toBe('already'); expect(race()!.stage).toBe('preparing')
   })
   it('два «Старта» подряд (двойной клик / проектор + пульт): гонка стартует ОДИН раз, сид и startedAt не меняются', async () => {
     session = mk({ race: { stage: 'betting' } }); const snap = structuredClone(session)
@@ -65,7 +96,8 @@ describe('raceActions', () => {
   })
   it('чистые условия идемпотентны', () => {
     const at = { round: 2, game: 'g' }
-    expect(openBetsFn(at)({ race: { stage: 'betting', round: 2, game: 'g' } })).toBeNull(); expect(startRaceFn(at, 1, 't', 42)({ race: { stage: 'running', round: 2, game: 'g' } })).toBeNull()
+    expect(openBetsFn(at)({ race: { stage: 'betting', round: 2, game: 'g' } })).toBeNull(); expect(startRaceFn(at, 1, 't', 42)({ race: { stage: 'running', round: 2, game: 'g' } })).toBeNull(); expect(startRaceFn(at, 1, 't', 42)({ race: { stage: 'preparing', round: 2, game: 'g' } })).toBeNull()
+    expect(beginRaceFn(at, 1, 't')({ race: { stage: 'running', seed: 1, startedAt: 'x', round: 2, game: 'g' } })).toBeNull(); expect(reportPrepFn(at, 1, { status: 'ready', at: 't' })({ race: { stage: 'running', seed: 1, round: 2, game: 'g' } })).toBeNull()
     expect(finishRaceFn(at, 1)({ race: { stage: 'done', seed: 1, round: 2, game: 'g' } })).toBeNull()
   })
   // найдено сквозным тестом на настоящем backend (e2e/bulldog/net.cjs, S19): мешок melody общий на комнату

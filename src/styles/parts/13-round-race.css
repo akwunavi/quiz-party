@@ -27,3 +27,10 @@
 @media (prefers-reduced-motion: reduce) { .bd-arrow, .bd-dots span { transition: none; } }
 /* сетка-фон дрейфует анимацией: на экране гонки она под canvas, а перерисовка 1920×1080 каждый кадр отнимала ~85% кадра на программном рендере (замер 10.41) */
 .grid-bg.race-screen { animation: none; }
+
+/* Скин экранов раунда (выбор, переход, отсчёт, итоги, пьедестал): canvas читает ЭТИ переменные у активной темы (lib/bulldog/stageSkin.ts), остальное — общие токены темы.
+   --race-frame: bevel | arch | round | leaf — форма карточек и панелей; --race-decor: none | winter — снежные шапки, гирлянда, дерево+снег на пьедестале. Нет переменной — bevel / none. */
+.theme-classic { --race-frame: bevel; --race-decor: none; }
+.theme-potter { --race-frame: arch; --race-decor: none; }
+.theme-new_year, .theme-ny_book, .theme-ny_home { --race-frame: round; --race-decor: winter; }
+.theme-enchanted_forest { --race-frame: leaf; --race-decor: none; }

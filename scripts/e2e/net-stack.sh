@@ -20,6 +20,7 @@ up)
   (nohup node $R/scripts/e2e/gateway.cjs > /tmp/gateway.log 2>&1 &); sleep 1
   ANON=$(node $R/scripts/e2e/keys.cjs $S anon); echo "ANON=$ANON" > /tmp/e2e.env; echo "SRV=$(node $R/scripts/e2e/keys.cjs $S service_role)" >> /tmp/e2e.env
   curl -s -X POST http://127.0.0.1:54321/auth/v1/signup -H "apikey: $ANON" -H 'content-type: application/json' -d '{"email":"host@e2e.test","password":"e2e-host-pass-1"}' >/dev/null
+  psql -h 127.0.0.1 -U postgres -d postgres -q -c "update auth.users set role='authenticated' where role is null or role=''"   # без роли PostgREST отвечает 400 «role \"\" does not exist» (10.58: поймано при перезапуске стека)
   psql -h 127.0.0.1 -U postgres -d postgres -q -f $R/scripts/e2e/seed.sql
   (cd $R && VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_ANON_KEY=$ANON npx vite build --outDir /tmp/e2edist --emptyOutDir >/dev/null 2>&1)
   (nohup node $R/scripts/e2e/static.cjs /tmp/e2edist 5301 > /tmp/static.log 2>&1 &)

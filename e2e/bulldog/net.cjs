@@ -33,10 +33,11 @@ async function login() {
   const r = await fetch(`${API}/auth/v1/token?grant_type=password`, { method: 'POST', headers: { apikey: ANON, 'content-type': 'application/json' }, body: JSON.stringify({ email: 'host@e2e.test', password: 'e2e-host-pass-1' }) })
   const s = await r.json(); if (!s.access_token) throw new Error('вход не удался: ' + JSON.stringify(s).slice(0, 200)); return s
 }
-async function mk(browser, name, { phone = false, session = null, video = true } = {}) {
+async function mk(browser, name, { phone = false, session = null, video = true, init = null } = {}) {
   const ctx = await browser.newContext({ viewport: phone ? { width: 390, height: 780 } : { width: 1600, height: 900 }, deviceScaleFactor: 1,
     ...(video ? { recordVideo: { dir: `${OUT}/video`, size: phone ? { width: 390, height: 780 } : { width: 1280, height: 720 } } } : {}) })
   if (session) await ctx.addInitScript(s => localStorage.setItem('sb-127-auth-token', JSON.stringify(s)), session)
+  if (init) await ctx.addInitScript(init)
   const page = await ctx.newPage(); watch(page, name)
   bdReq[name] = []; page.on('request', q => { if (q.url().includes('/bulldog/')) bdReq[name].push(q.url().replace(/^.*\/bulldog\//, '').replace(/\?.*$/, '')) })
   const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error') errs.push(m.text()) })
@@ -58,7 +59,7 @@ async function expectedRace(seed, Dv) {
   const { resolveRace } = await import('/home/user/quiz-party/src/lib/bulldog/vendor/scenario.mjs')
   for (let a = 0; ; a++) { try { return resolveRace((seed + a * 65) % 0x100000000, { courseSeconds: Dv }) } catch (e) { if (a >= 6) throw e } }
 }
-const T = { transition: 3.2, countdown: 3, finishHold: 3.5, podiumTransition: 2.6 }
+const T = { transition: 4, countdown: 5, finishHold: 3.5, podiumTransition: 2.6 }
 
 async function pick(c, k) {
   await c.page.click(`.bd-dots span:nth-child(${k})`)
@@ -120,13 +121,17 @@ async function register(c, name) {
     await shot(host, '03_projector_before_start')
     const startAdmin = admin.page.locator('button', { hasText: 'НАЧАТЬ СКАЧКИ' }), startHost = host.page.locator('.host-actions button', { hasText: 'Старт' })
     await Promise.all([startAdmin.click(), startAdmin.dblclick().catch(() => {}), startHost.click().catch(() => {})])
-    await until(() => sess()[3] === 'running', 15000); const run = sess()
+    // этап preparing: «Старт» закрывает ставки и фиксирует seed/D, но гонка ещё НЕ идёт (startedAt пуст) — проектор готовит ресурсы
+    await until(() => ['preparing', 'running'].includes(sess()[3]), 15000); const prep = sess(); const tPrep = Date.now()
+    rec('S8.0', 'После «Старт» (пульт ×3 клика + проектор): этап preparing, seed и D записаны, startedAt ещё нет (гоночное время не идёт)', 'server', prep[3] === 'preparing' && prep[4] !== '-' && prep[6] !== '-' && prep[5] === '-', prep.join('|'))
+    for (const r of held) await r.continue().catch(() => {}); await sleep(1500)
+    await until(() => sess()[3] === 'running', 90000); const run = sess()
     await sleep(3000); const run2 = sess()
-    rec('S8', 'Старт тремя путями сразу (пульт ×3 клика + проектор): одна запись — rev +1, seed/startedAt/D не менялись', 'server', +run[2] === rev0 + 1 && run[4] === run2[4] && run[5] === run2[5] && run[2] === run2[2], `rev ${rev0}→${run[2]}→${run2[2]}, seed=${run[4]}, D=${run[6]}`)
+    rec('S8', 'Старт тремя путями сразу: ровно один переход в running — после готовности проектора; seed/startedAt/D не менялись, rev стабилен', 'server', run[4] === prep[4] && run[6] === prep[6] && run[4] === run2[4] && run[5] === run2[5] && run[2] === run2[2], `rev ${rev0}→${prep[2]}→${run[2]}→${run2[2]}, seed=${run[4]}, startedAt=${run[5]}`)
+    rec('S8.1', 'startedAt — один серверный момент ПОСЛЕ готовности проектора (позже «Старта», с запасом), а не момент нажатия', 'server', Date.parse(run[5]) > tPrep - 1000, `подготовка ≈ ${((Date.parse(run[5]) - tPrep) / 1000).toFixed(1)} с после наблюдения preparing`)
     const seed = +run[4], startedAt = Date.parse(run[5]), Dgame = +run[6]
     rec('S9.0', 'D записан вместе с seed и равен настройке (42 по умолчанию или заданной)', 'server', Dgame === 42 || Dgame === D, `D=${Dgame}`)
-    // задержанный запрос теперь доходит до сервера ПОСЛЕ старта
-    for (const r of held) await r.continue().catch(() => {}); await sleep(1500)
+    // задержанный запрос доходит до сервера ПОСЛЕ «Старта» (этап preparing уже закрыл ставки — до готовности проектора)
     rec('S4.1', 'Запрос ВОЛКОВ, дошедший ПОСЛЕ старта, отклонён сервером: ставки нет', 'server', bets()['ВОЛКИ'] === undefined, JSON.stringify(bets()))
     const lateNet = netlog.filter(n => n.who === 'телефон-4' && n.method === 'POST' && /answers/.test(n.path)).pop()
     rec('S4.2', 'Ответ сети на задержанный запрос: PostgREST вернул успех (триггер молча пропустил запись, очередь не зацикливается)', 'server', lateNet && lateNet.status < 300, lateNet ? `${lateNet.method} ${lateNet.path} → ${lateNet.status}` : '')
@@ -151,6 +156,10 @@ async function register(c, name) {
     const ph4 = await P[3].page.textContent('.pl-root'); rec('S10.3', 'Телефон ВОЛКОВ (запрос не дошёл вовремя): «выбор не успел дойти до старта», ставки нет', 'browser', /не успел дойти/.test(ph4), ph4.replace(/\s+/g, ' ').slice(0, 90))
     await shot(P[1], '04_phone2_running_after_reload'); await shot(P[3], '04_phone4_missed'); await shot(admin, '04_admin_running'); await shot(host, '04_projector_transition')
 
+    // ═══ S8.2: перезагрузка проектора ВО ВРЕМЯ ОТСЧЁТА: состояние в БД то же, гонка стартует по тем же часам (raceT=0 на startedAt+9)
+    { const t0 = Date.parse(run[5]); await sleep(Math.max(0, t0 + (T.transition + 2.5) * 1000 - Date.now())); const mid0 = sess()
+      await host.page.reload(); await host.page.waitForSelector('.bulldog-canvas', { timeout: 15000 }); await sleep(1500)
+      rec('S8.2', 'Перезагрузка проектора в разгар отсчёта: seed/startedAt/stage/rev в БД те же (повторного старта нет)', 'server', sess().join() === mid0.join(), sess().join('|')) }
     // ═══ S13: синхронизация состояний
     const raceObj = await expectedRace(seed, Dgame), gradeMs = startedAt + (T.transition + T.countdown + raceObj.end) * 1000
     const adminRun = await admin.page.textContent('body'); rec('S13.1', 'Пульт показывает «ЗАБЕГ ИДЁТ НА ПРОЕКТОРЕ»', 'browser', /ЗАБЕГ ИДЁТ/.test(adminRun))
@@ -226,7 +235,7 @@ async function register(c, name) {
     // ═══ S21: частично выполненная запись и повторный запуск: второй полный забег; у проектора обрываются записи сессии ровно в момент финиша
     await pick(P[0], 2); await pick(P[1], 2); await pick(P[2], 4); await until(() => Object.keys(bets(2)).length === 3, 10000)
     const b2 = bets(2); rec('S21.0', 'Ставки раунда 3: ТИГРЫ→2, СОВЫ→2, ЛИСЫ→4; ВОЛКИ без ставки', 'server', b2['ТИГРЫ'] === '2/-/-' && b2['СОВЫ'] === '2/-/-' && b2['ЛИСЫ'] === '4/-/-' && !b2['ВОЛКИ'], JSON.stringify(b2))
-    await admin.page.locator('button', { hasText: 'НАЧАТЬ СКАЧКИ' }).click(); await until(() => sess()[3] === 'running', 15000)
+    await admin.page.locator('button', { hasText: 'НАЧАТЬ СКАЧКИ' }).click(); await until(() => sess()[3] === 'running', 90000)
     const r2 = sess(); const seed2 = +r2[4], started2 = Date.parse(r2[5]), D2 = +r2[6]; const race2 = await expectedRace(seed2, D2)
     rec('S21.1', 'Второй старт: новый seed, прежний D', 'server', seed2 !== seed && D2 === Dgame, `seed ${seed}→${seed2}`)
     const grade2 = started2 + (T.transition + T.countdown + race2.end) * 1000
@@ -285,6 +294,36 @@ async function register(c, name) {
       orders[n === 6 ? 'before' : 'after']++
     }
     rec('S24', `Параллельно «ставка»×6 и «Старт» (25 повторов, настоящие запросы к PostgREST): ни одна ставка, начатая после старта, не записана; после старта ничего не меняется; принято ${accepted}, отклонено ${rejected}`, 'server', viol === 0 && accepted + rejected === 150, `нарушений: ${viol}; исходы: все 6 до старта в ${orders.before} повторах, часть/все после в ${orders.after}`)
+
+    // ═══ S25: музыка и звук. Проектор в браузере БЕЗ разрешения на автозапуск звука: гонка НЕ стартует сама (ни через 20 с, ни позже), пульт получает понятный статус; дальше два пути — «Включить звук» жестом или «Без музыки» решением ведущего
+    { const MUSIC = 'http://127.0.0.1:5301/quiz-party/main.mp3'
+      sql(`update packs set settings = settings || '{"bg_music":"${MUSIC}"}'::jsonb where id='00000000-0000-0000-0000-0000000000a1'`)
+      await host.ctx.close().catch(() => {})                                   // прежний проектор (со звуком) закрыт: иначе он сам подготовит и запустит гонку в той же комнате
+      const reset = () => { sql(`update game_sessions set phase='question', round_number=0, question_index=0, melody='{"race":{"stage":"betting","round":0,"game":"${GAME}"}}' where id='${ROOM}'; delete from answers where game_id='${GAME}'; insert into answers(team_id, game_id, question_ref, round_number, answer_text) select id, game_id, 'q-race-0', 0, '2' from teams where name='ТИГРЫ' and game_id='${GAME}'`) }
+      // headless Chromium не применяет политику автозапуска звука (проверено: AudioContext сразу 'running'), поэтому политика ЭМУЛИРУЕТСЯ: пока на странице не было жеста (pointerdown), state='suspended', resume() ничего не даёт
+      const policy = () => { const d = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, 'state'), r = AudioContext.prototype.resume; window.__gesture = false
+        addEventListener('pointerdown', () => { window.__gesture = true }, true)
+        Object.defineProperty(BaseAudioContext.prototype, 'state', { get() { return window.__gesture ? d.get.call(this) : 'suspended' } })
+        AudioContext.prototype.resume = function () { return window.__gesture ? r.call(this) : Promise.resolve() } }
+      const b2 = browser; const ses = await login()
+      const h2 = await mk(b2, 'проектор-2', { session: ses, video: false, init: policy }), a2 = await mk(b2, 'пульт-2', { phone: true, session: ses, video: false })
+      reset(); await h2.page.goto(`${APP}#/?room=${ROOM}`); await a2.page.goto(`${APP}#/admin?room=${ROOM}`); await h2.page.waitForSelector('.race-betbar', { timeout: 20000 }); await sleep(2500)
+      await a2.page.locator('button', { hasText: 'НАЧАТЬ СКАЧКИ' }).click()
+      const blocked = await until(() => sql(`select coalesce(melody->'race'->'prep'->>'status','-') from game_sessions where id='${ROOM}'`) === 'audio_blocked', 90000, 1000)
+      rec('S25.1', 'Звук заблокирован браузером проектора → на пульт записан статус audio_blocked', 'server', !!blocked, sql(`select melody->'race' from game_sessions where id='${ROOM}'`).slice(0, 200))
+      await sleep(25000)
+      const still = sess(); rec('S25.2', 'Гонка НЕ запускается сама: через 25 с ожидания этап всё ещё preparing, startedAt нет', 'server', still[3] === 'preparing' && still[5] === '-', still.join('|'))
+      const adminTxt = await a2.page.textContent('body'); rec('S25.3', 'Пульт показывает понятный статус и кнопки: «Звук заблокирован…», «НАЧАТЬ БЕЗ МУЗЫКИ»', 'browser', /Звук заблокирован/.test(adminTxt) && /НАЧАТЬ БЕЗ МУЗЫКИ/.test(adminTxt))
+      const hostTxt = await h2.page.textContent('body'); rec('S25.4', 'Проектор показывает «Включить звук» и «Играть без музыки»', 'browser', /Включить звук/.test(hostTxt) && /Играть без музыки/.test(hostTxt))
+      await shot(h2, '25_projector_audio_blocked'); await shot(a2, '25_admin_audio_blocked')
+      await a2.page.locator('button', { hasText: 'НАЧАТЬ БЕЗ МУЗЫКИ' }).click(); await until(() => sess()[3] === 'running', 20000)
+      rec('S25.5', 'Решение ведущего «без музыки»: stage=running, noMusic=true, один startedAt', 'server', sess()[3] === 'running' && sess()[5] !== '-' && sql(`select melody->'race'->>'noMusic' from game_sessions where id='${ROOM}'`) === 'true', sess().join('|'))
+      // второй путь: жест на проекторе разрешает звук → подготовка завершается сама
+      reset(); await sleep(3000); await a2.page.reload(); await a2.page.locator('button', { hasText: 'НАЧАТЬ СКАЧКИ' }).click()
+      await until(() => sql(`select coalesce(melody->'race'->'prep'->>'status','-') from game_sessions where id='${ROOM}'`) === 'audio_blocked', 90000, 1000)
+      await h2.page.locator('.host-actions button', { hasText: 'Включить звук' }).click(); const ok2 = await until(() => sess()[3] === 'running', 30000, 500)
+      rec('S25.6', 'Жест «Включить звук» на проекторе: подготовка завершается, stage=running БЕЗ noMusic', 'server', !!ok2 && sql(`select coalesce(melody->'race'->>'noMusic','-') from game_sessions where id='${ROOM}'`) === '-', sess().join('|'))
+      await h2.ctx.close(); await a2.ctx.close() }
   } catch (e) {
     rec('ERR', 'сценарий прерван исключением', 'browser', false, String(e.stack || e).slice(0, 400)); try { await shot(host, '99_error_projector'); await shot(admin, '99_error_admin') } catch {}
   }

@@ -9,7 +9,7 @@ import { serverNow } from '../../src/lib/serverClock'
 import type { LoadedPack, LoadedRound } from '../../src/lib/packLoader'
 import type { GameState, Team, Answer } from '../../src/types/quiz'
 
-interface Cfg { stage?: 'betting' | 'running' | 'done'; startOffsetSec: number; courseSec: number; seed: number; teams: { dog: number | null }[]; theme: string; show?: boolean }
+interface Cfg { stage?: 'betting' | 'preparing' | 'running' | 'done'; startOffsetSec: number; courseSec: number; seed: number; teams: { dog: number | null; name?: string }[]; theme: string; show?: boolean }
 const round = { id: 'r1', position: 1, mechanic: 'race', title_lines: ['СКАЧКИ БУЛЬДОГОВ'], timer_seconds: 0, settings: { courseSec: 42 }, questions: [] } as unknown as LoadedRound
 const pack = { id: 'p1', settings: {}, rounds: [round], theme: 'classic' } as unknown as LoadedPack
 const started0 = serverNow()
@@ -18,7 +18,7 @@ function App() {
   const [cfg, set] = useState<Cfg>({ stage: undefined, startOffsetSec: 0, courseSec: 42, seed: 777, teams: [{ dog: 1 }, { dog: 3 }, { dog: 3 }, { dog: 5 }], theme: 'classic' })
   setCfg = c => set(p => ({ ...p, ...c }))
   const started = started0
-  const teams = cfg.teams.map((t, i) => ({ id: `t${i + 1}`, name: `КОМАНДА ${i + 1}`, color: '#888' })) as unknown as Team[]
+  const teams = cfg.teams.map((t, i) => ({ id: `t${i + 1}`, name: cfg.teams[i].name ?? `КОМАНДА ${i + 1}`, color: '#888' })) as unknown as Team[]
   const answers = cfg.teams.filter(t => t.dog).map((t, i) => ({ team_id: `t${cfg.teams.indexOf(t) + 1}`, question_ref: 'q-race-0', round_number: 0, answer_text: String(t.dog), id: `a${i}` })) as unknown as Answer[]
   const gs = { id: 1, game_id: 'g', pack_id: 'p1', phase: 'question', round_number: 0, question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [], updated_at: '',
     melody: { race: cfg.stage ? { stage: cfg.stage, seed: cfg.seed, D: cfg.courseSec, startedAt: new Date(started - cfg.startOffsetSec * 1000).toISOString() } : { stage: 'betting' } } } as unknown as GameState

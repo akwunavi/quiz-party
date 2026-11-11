@@ -10,7 +10,9 @@ export const LAYOUT = { width: 1920, height: 1080, startX: 406, finishX: 1484, f
 export const DEFAULT_COURSE_SEC = 42
 export const COURSE_SEC_MIN = 20, COURSE_SEC_MAX = 120
 /** Тайминги сцен ПОСЛЕ нажатия «Старт» (все экраны считают их от одного startedAt, поэтому не расходятся). */
-export const T = { transition: 3.2, countdown: 3, finishHold: 3.5, podiumTransition: 2.6, podiumStep: 1.3 } as const
+export const T = { transition: 4, countdown: 5, finishHold: 3.5, podiumTransition: 2.6, podiumStep: 1.3 } as const
+/** Запас между «проектор готов» и startedAt, мс: чтобы все экраны успели получить запись (опрос) до начала перехода. Время гонки (raceT=0) наступает через transition+countdown ПОСЛЕ startedAt. */
+export const START_LEAD_MS = 2000
 export const BULLDOG_BASE = `${import.meta.env.BASE_URL}bulldog/`
 declare const __BULLDOG_V__: string | undefined
 /** Версия библиотеки собак (sha MANIFEST.json, подставляется сборкой). Дописывается к адресу файла: `…/idle.webp?v=<версия>`. */
