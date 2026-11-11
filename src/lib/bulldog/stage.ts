@@ -166,6 +166,31 @@ export class StageRenderer {
     if (!this.endSnap && this.raceObj && this.arenaReady() && this.dogs.every(Boolean)) { const a = this.arena!; a.names = this.input.names; a.draw(this.raceObj.end); this.endSnap = document.createElement('canvas'); this.endSnap.width = L.width; this.endSnap.height = L.height; this.endSnap.getContext('2d')!.drawImage(this.arenaCv!, 0, 0) }
     if (this.endSnap) c.drawImage(this.endSnap, 0, 0); else this.drawTrack(this.raceObj!.end, 'race')
   }
+  /** Замер ТЕКУЩЕГО кадра IDLE: нижняя строка непрозрачных пикселей (подошвы лап) и центр/ширина лап по нижним строкам. У каждой собаки и каждого кадра они свои (257–275 из 283), общий сдвиг оставлял зазор или топил лапы. */
+  private pawCache = new Map<string, { bottom: number; cx: number; span: number }>()
+  private pawMetrics(i: number, fr: SelectionFrame): { bottom: number; cx: number; span: number } | null {
+    const key = `${i}:${fr.clip}:${fr.index}`, hit = this.pawCache.get(key); if (hit) return hit
+    const s = this.selBitmap(i, fr); if (!s) return null
+    const [cw, ch] = s.d.sel.cell, cols = s.d.sel.columns
+    if (!this.pawCv) { this.pawCv = document.createElement('canvas'); this.pawCtx = this.pawCv.getContext('2d', { willReadFrequently: true })! }
+    this.pawCv.width = cw; this.pawCv.height = ch; const g = this.pawCtx!; g.clearRect(0, 0, cw, ch)
+    g.drawImage(s.bm, (fr.index % cols) * cw, Math.floor(fr.index / cols) * ch, cw, ch, 0, 0, cw, ch)
+    const px = g.getImageData(0, 0, cw, ch).data; let bottom = -1
+    for (let y = ch - 1; y >= 0 && bottom < 0; y--) for (let x = 0; x < cw; x++) if (px[(y * cw + x) * 4 + 3] >= 128) { bottom = y; break }
+    if (bottom < 0) return null
+    let x0 = cw, x1 = -1; for (let y = Math.max(0, bottom - 10); y <= bottom; y++) for (let x = 0; x < cw; x++) if (px[(y * cw + x) * 4 + 3] >= 128) { if (x < x0) x0 = x; if (x > x1) x1 = x }
+    const m = { bottom, cx: (x0 + x1) / 2, span: Math.max(20, x1 - x0) }; this.pawCache.set(key, m); return m
+  }
+  private pawCv: HTMLCanvasElement | null = null; private pawCtx: CanvasRenderingContext2D | null = null
+  /** Собака на тумбе: подошвы ТЕКУЩЕГО кадра ложатся ровно на линию поверхности surfY, лапы центрируются по cx; под ними контактная тень по ширине лап. */
+  private podiumDog(i: number, cx: number, surfY: number, k: number) {
+    const fr = this.podiumFrames[i], d = this.dogs[i]; if (!fr || !d) return; const m = this.pawMetrics(i, fr) ?? { bottom: PODIUM_PAW_ROW, cx: d.sel.cell[0] / 2, span: 100 }
+    const c = this.ctx, w = m.span * k
+    c.save(); c.translate(cx, surfY + 1); c.scale(1, .16)                                                // мягкая тень-пятно под всей собакой
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, w * .95); g.addColorStop(0, 'rgba(18,10,44,.62)'); g.addColorStop(.6, 'rgba(18,10,44,.3)'); g.addColorStop(1, 'rgba(18,10,44,0)'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, w * .95, 0, 7); c.fill(); c.restore()
+    this.drawSel(i, fr, cx - m.cx * k, surfY - m.bottom * k, k)
+    c.save(); c.globalAlpha = .5; c.fillStyle = 'rgba(18,10,44,.7)'; c.beginPath(); c.ellipse(cx, surfY + .5, w * .42, 2.6, 0, 0, 7); c.fill(); c.restore()   // «вес» у самых подошв (тонкая линия контакта поверх нижнего края лап)
+  }
   private resultsIO(): SK.ResultsIO {
     const race = this.raceObj!, sc = this.input.scores, names = this.input.names
     return { rows: race.places.map((d, p) => ({ dog: d, name: names[d] ?? '', time: race.dogs[d].crossing, teams: sc.filter(x => x.dog === d + 1).map(x => x.team), points: 5 - p })), noBet: sc.filter(x => !x.dog).map(x => x.team), dog: (i, cx, pawY, k) => this.dogAt(this.podiumFrames[i], i, cx, pawY, k) }
@@ -176,7 +201,7 @@ export class StageRenderer {
       this.drawEnd(); const b = document.createElement('canvas'); b.width = L.width; b.height = L.height; const bc = b.getContext('2d')!; bc.filter = 'blur(5px)'; bc.drawImage(this.endSnap ?? this.canvas, -30, -30, L.width + 60, L.height + 60); this.podiumBg = b
     }
     SK.drawPodium(this.ctx, this.skin, { places: race.places, names: this.input.names, shown: rc.podiumShown, bgBlur: this.podiumBg,
-      teamsByDog: [0, 1, 2, 3, 4].map(d => sc.filter(x => x.dog === d + 1).map(x => x.team)), scores: sc.map(x => ({ team: x.team, dog: x.dog, points: x.points })), dog: (i, cx, pawY, k) => this.dogAt(this.podiumFrames[i], i, cx, pawY, k) })
+      teamsByDog: [0, 1, 2, 3, 4].map(d => sc.filter(x => x.dog === d + 1).map(x => x.team)), scores: sc.map(x => ({ team: x.team, dog: x.dog, points: x.points })), dog: (i, cx, surfY, k) => this.podiumDog(i, cx, surfY, k) })
   }
   /** Арена включена, привязана к ЭТОЙ гонке и готова к кадру. */
   private arenaReady(): boolean {

@@ -150,7 +150,7 @@ export function drawResults(c: C, sk: Skin, io: ResultsIO, u = 1) {
 // ── пьедестал A «Основательный»: материалы и декор по теме (зима — дерево+снег+гирлянда; bevel — сталь+неон; arch/leaf — камень с отделкой цветами темы)
 export interface PodiumIO { places: number[]; names: string[]; teamsByDog: string[][]; scores: { team: string; dog: number | null; points: number }[]; shown: number; dog: (i: number, cx: number, pawY: number, k: number) => void; bgBlur?: CanvasImageSource | null }
 const STEPS = [{ place: 1, x: 500, h: 190, need: 2 }, { place: 0, x: 880, h: 280, need: 3 }, { place: 2, x: 1260, h: 120, need: 1 }]
-const PBASE = 860, PW = 340, PD = 34
+const PBASE = 860, PW = 340, PD = 46                                   // PD — глубина верхней площадки (в проекции): собака стоит на её середине
 function snowCap(c: C, x: number, y: number, w: number, light: boolean) {
   c.save(); c.fillStyle = light ? '#fff' : '#f5f1ff'; c.shadowColor = 'rgba(40,30,110,.35)'; c.shadowBlur = 10; c.shadowOffsetY = 4
   c.beginPath(); c.moveTo(x - 12, y + 14); for (let k = 0; k <= 24; k++) c.lineTo(x - 12 + (w + 24) * k / 24, y - 10 - Math.sin(k * 1.3 + w) * 5 - (k % 3) * 3); c.lineTo(x + w + 12, y + 20); c.lineTo(x + w - 20, y + 30 + Math.sin(w) * 4); c.lineTo(x + 40, y + 28); c.lineTo(x - 12, y + 22); c.closePath(); c.fill(); c.restore()
@@ -188,9 +188,8 @@ export function drawPodium(c: C, sk: Skin, io: PodiumIO) {
   const fl = c.createLinearGradient(0, PBASE - 30, 0, H); fl.addColorStop(0, rgba(sk.decor === 'winter' ? '#d9ccff' : sk.panel, sk.decor === 'winter' ? .9 : .6)); fl.addColorStop(1, rgba(sk.bg, 1)); c.fillStyle = fl; c.fillRect(0, PBASE - 24, W, H - PBASE + 24)
   STEPS.forEach(s => {
     const top = PBASE - s.h, shown = io.shown >= s.need; podiumBlock(c, sk, s.place, s.x, s.h); if (!shown) return
-    const d = io.places[s.place], pawY = top - PD / 2 + 2
-    c.save(); const sg = c.createRadialGradient(s.x + 8, pawY, 0, s.x + 8, pawY, 150); sg.addColorStop(0, 'rgba(20,10,50,.5)'); sg.addColorStop(1, 'rgba(20,10,50,0)'); c.translate(s.x + 8, pawY); c.scale(1, .12); c.translate(-(s.x + 8), -pawY); c.fillStyle = sg; c.beginPath(); c.arc(s.x + 8, pawY, 150, 0, 7); c.fill(); c.restore()
-    io.dog(d, s.x, pawY, 1.5)
+    const d = io.places[s.place], surf = top - PD * 0.46                                                       // линия поверхности (подошвы) — на верхней площадке, чуть ближе к краю, чем к центру
+    io.dog(d, s.x, surf, 1.5)
     const px = s.x - 170, py = PBASE + 30; frame(c, sk, px, py, 340, 120, false, true); text(c, fit(c, io.names[d] ?? '', 300, 40, sk.disp, 'bold'), s.x, py + 50, 40, sk.fg, { align: 'center', font: sk.disp, weight: 'bold' })
     text(c, io.teamsByDog[d]?.length ? fitList(c, io.teamsByDog[d], 300, 24, sk.disp) : 'без ставок', s.x, py + 90, 24, sk.muted, { align: 'center', font: sk.disp })
   })
