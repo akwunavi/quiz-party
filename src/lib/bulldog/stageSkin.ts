@@ -151,20 +151,20 @@ export function drawResults(c: C, sk: Skin, io: ResultsIO, u = 1) {
 export interface PodiumIO { places: number[]; names: string[]; teamsByDog: string[][]; scores: { team: string; dog: number | null; points: number }[]; shown: number; dog: (i: number, cx: number, pawY: number, k: number) => void; bgBlur?: CanvasImageSource | null }
 const STEPS = [{ place: 1, x: 500, h: 190, need: 2 }, { place: 0, x: 880, h: 280, need: 3 }, { place: 2, x: 1260, h: 120, need: 1 }]
 const PBASE = 860, PW = 340, PD = 46                                   // PD — глубина верхней площадки (в проекции): собака стоит на её середине
-function snowCap(c: C, x: number, y: number, w: number, light: boolean) {
-  c.save(); c.fillStyle = light ? '#fff' : '#f5f1ff'; c.shadowColor = 'rgba(40,30,110,.35)'; c.shadowBlur = 10; c.shadowOffsetY = 4
-  c.beginPath(); c.moveTo(x - 12, y + 14); for (let k = 0; k <= 24; k++) c.lineTo(x - 12 + (w + 24) * k / 24, y - 10 - Math.sin(k * 1.3 + w) * 5 - (k % 3) * 3); c.lineTo(x + w + 12, y + 20); c.lineTo(x + w - 20, y + 30 + Math.sin(w) * 4); c.lineTo(x + 40, y + 28); c.lineTo(x - 12, y + 22); c.closePath(); c.fill(); c.restore()
-  c.fillStyle = 'rgba(190,200,255,.85)'; for (let k = 0; k < 9; k++) { const px = x + 14 + (w - 28) * (k + .3) / 9, ih = 12 + rnd(k + w) * 20; c.beginPath(); c.moveTo(px - 5, y + 24); c.lineTo(px + 5, y + 24); c.lineTo(px, y + 24 + ih); c.closePath(); c.fill() }
-}
 function podiumBlock(c: C, sk: Skin, p: number, x: number, h: number) {
   const top = PBASE - h, l = x - PW / 2, [m1, m2] = medalColors(p, sk)
-  if (sk.decor === 'winter') {
-    const g = c.createLinearGradient(0, top, 0, PBASE); g.addColorStop(0, '#9a6a45'); g.addColorStop(1, '#4a2f22'); c.fillStyle = g; c.fillRect(l, top, PW, h)
-    for (let k = 0; k < PW / 42; k++) { c.fillStyle = `rgba(0,0,0,${.12 + rnd(k + p) * .12})`; c.fillRect(l + k * 42, top, 3, h); c.fillStyle = 'rgba(255,220,170,.08)'; c.fillRect(l + k * 42 + 4, top, 6, h) }
-    for (let k = 0; k < 60; k++) { c.strokeStyle = `rgba(40,20,10,${.1 + rnd(k) * .1})`; c.lineWidth = 1; const gx = l + rnd(k + p) * PW; c.beginPath(); c.moveTo(gx, top + rnd(k + 2) * h); c.lineTo(gx + (rnd(k + 5) - .5) * 10, top + rnd(k + 2) * h + 30 + rnd(k + 7) * 40); c.stroke() }
-    for (const by of [top + 26, PBASE - 30]) { c.fillStyle = '#2b2f3a'; c.fillRect(l - 2, by, PW + 4, 14); c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(l - 2, by, PW + 4, 3); for (let k = 0; k < 8; k++) { c.fillStyle = '#8b94a4'; c.beginPath(); c.arc(l + 20 + k * (PW - 40) / 7, by + 8, 2.5, 0, 7); c.fill() } }
-    c.fillStyle = '#c28a5a'; c.beginPath(); c.moveTo(l + 16, top - PD); c.lineTo(l + PW - 16, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()
-    snowCap(c, l + 10, top - PD + 6, PW - 20, sk.light); garland(c, sk, top + 62, l + 6, l + PW - 6)
+  if (sk.decor === 'winter') {                                                           // зима: тёплая сосновая тумба из досок со светлой рамкой-панелью, плоская снежная площадка сверху, гирлянда по верхней кромке, сугроб у подножия (без обручей и «бочки»)
+    const g = c.createLinearGradient(0, top, 0, PBASE); g.addColorStop(0, '#c99a67'); g.addColorStop(1, '#8a5a3a'); c.fillStyle = g; c.fillRect(l, top, PW, h)
+    for (let y = top + 22; y < PBASE; y += 22) { c.fillStyle = 'rgba(60,32,16,.28)'; c.fillRect(l, y, PW, 2); c.fillStyle = 'rgba(255,230,190,.12)'; c.fillRect(l, y + 2, PW, 2) }          // горизонтальные доски
+    for (let k = 0; k < 70; k++) { c.strokeStyle = `rgba(70,38,18,${.07 + rnd(k) * .08})`; c.lineWidth = 1; const gy = top + rnd(k + p) * h, gx = l + rnd(k + 3) * PW; c.beginPath(); c.moveTo(gx, gy); c.lineTo(gx + 28 + rnd(k + 5) * 50, gy + (rnd(k + 7) - .5) * 3); c.stroke() }
+    c.strokeStyle = 'rgba(255,236,200,.55)'; c.lineWidth = 4; c.strokeRect(l + 14, top + 22, PW - 28, h - 40); c.strokeStyle = 'rgba(70,38,18,.45)'; c.lineWidth = 2; c.strokeRect(l + 19, top + 27, PW - 38, h - 50)   // рамка-панель
+    c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(l, top, 6, h); c.fillRect(l + PW - 6, top, 6, h)
+    c.fillStyle = '#e6b985'; c.beginPath(); c.moveTo(l + 14, top - PD); c.lineTo(l + PW - 14, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()   // деревянная полка под снегом
+    const sg = c.createLinearGradient(0, top - PD, 0, top + 6); sg.addColorStop(0, '#ffffff'); sg.addColorStop(1, '#d9d4f4')                                                    // плоская снежная поверхность
+    c.fillStyle = sg; c.beginPath(); c.moveTo(l + 20, top - PD + 3); c.lineTo(l + PW - 20, top - PD + 3); c.lineTo(l + PW + 4, top - 2); c.quadraticCurveTo(l + PW / 2, top + 9, l - 4, top - 2); c.closePath(); c.fill()
+    c.fillStyle = 'rgba(190,200,255,.8)'; for (let k = 0; k < 8; k++) { const px = l + 14 + (PW - 28) * (k + .4) / 8, ih = 8 + rnd(k + p * 3) * 14; c.beginPath(); c.moveTo(px - 4, top + 2); c.lineTo(px + 4, top + 2); c.lineTo(px, top + 2 + ih); c.closePath(); c.fill() }
+    garland(c, sk, top + 30, l + 10, l + PW - 10)
+    const dr = c.createRadialGradient(x, PBASE, 10, x, PBASE, PW * .62); dr.addColorStop(0, 'rgba(255,255,255,.95)'); dr.addColorStop(1, 'rgba(235,230,255,0)'); c.save(); c.translate(x, PBASE); c.scale(1, .16); c.translate(-x, -PBASE); c.fillStyle = dr; c.beginPath(); c.arc(x, PBASE, PW * .62, 0, 7); c.fill(); c.restore()
   } else if (sk.frame === 'bevel') {
     const g = c.createLinearGradient(0, top, 0, PBASE); g.addColorStop(0, mixc(sk.panel, '#ffffff', .12)); g.addColorStop(1, mixc(sk.panel, '#000000', .45)); c.fillStyle = g; c.beginPath(); c.moveTo(l, top); c.lineTo(l + PW, top); c.lineTo(l + PW, PBASE - 16); c.lineTo(l + PW - 16, PBASE); c.lineTo(l + 16, PBASE); c.lineTo(l, PBASE - 16); c.closePath(); c.fill()
     c.strokeStyle = rgba(sk.accent2, .12); c.lineWidth = 1; for (let k = 0; k < PW; k += 24) { c.beginPath(); c.moveTo(l + k, top); c.lineTo(l + k - 40, PBASE); c.stroke() }

@@ -167,29 +167,36 @@ export class StageRenderer {
     if (this.endSnap) c.drawImage(this.endSnap, 0, 0); else this.drawTrack(this.raceObj!.end, 'race')
   }
   /** Замер ТЕКУЩЕГО кадра IDLE: нижняя строка непрозрачных пикселей (подошвы лап) и центр/ширина лап по нижним строкам. У каждой собаки и каждого кадра они свои (257–275 из 283), общий сдвиг оставлял зазор или топил лапы. */
-  private pawCache = new Map<string, { bottom: number; cx: number; span: number }>()
-  private pawMetrics(i: number, fr: SelectionFrame): { bottom: number; cx: number; span: number } | null {
+  private pawCache = new Map<string, { bottom: number; cx: number; span: number; paws: { x0: number; x1: number; bottom: number }[] }>()
+  private pawMetrics(i: number, fr: SelectionFrame) {
     const key = `${i}:${fr.clip}:${fr.index}`, hit = this.pawCache.get(key); if (hit) return hit
     const s = this.selBitmap(i, fr); if (!s) return null
     const [cw, ch] = s.d.sel.cell, cols = s.d.sel.columns
     if (!this.pawCv) { this.pawCv = document.createElement('canvas'); this.pawCtx = this.pawCv.getContext('2d', { willReadFrequently: true })! }
     this.pawCv.width = cw; this.pawCv.height = ch; const g = this.pawCtx!; g.clearRect(0, 0, cw, ch)
     g.drawImage(s.bm, (fr.index % cols) * cw, Math.floor(fr.index / cols) * ch, cw, ch, 0, 0, cw, ch)
-    const px = g.getImageData(0, 0, cw, ch).data; let bottom = -1
-    for (let y = ch - 1; y >= 0 && bottom < 0; y--) for (let x = 0; x < cw; x++) if (px[(y * cw + x) * 4 + 3] >= 128) { bottom = y; break }
+    const px = g.getImageData(0, 0, cw, ch).data
+    const colBottom = new Int16Array(cw).fill(-1); let bottom = -1
+    for (let x = 0; x < cw; x++) for (let y = ch - 1; y >= 0; y--) if (px[(y * cw + x) * 4 + 3] >= 128) { colBottom[x] = y; if (y > bottom) bottom = y; break }
     if (bottom < 0) return null
-    let x0 = cw, x1 = -1; for (let y = Math.max(0, bottom - 10); y <= bottom; y++) for (let x = 0; x < cw; x++) if (px[(y * cw + x) * 4 + 3] >= 128) { if (x < x0) x0 = x; if (x > x1) x1 = x }
-    const m = { bottom, cx: (x0 + x1) / 2, span: Math.max(20, x1 - x0) }; this.pawCache.set(key, m); return m
+    // каждая лапа — отдельная группа соседних колонок, чьи нижние точки лежат у самой земли (не выше 36 строк от самой нижней): у неё свой контакт с поверхностью
+    const paws: { x0: number; x1: number; bottom: number }[] = []; let cur: { x0: number; x1: number; bottom: number } | null = null, gap = 0
+    for (let x = 0; x < cw; x++) { const near = colBottom[x] >= bottom - 36
+      if (near) { if (!cur) cur = { x0: x, x1: x, bottom: colBottom[x] }; else { cur.x1 = x; cur.bottom = Math.max(cur.bottom, colBottom[x]) } gap = 0 }
+      else if (cur && ++gap > 5) { paws.push(cur); cur = null } }
+    if (cur) paws.push(cur)
+    const wide = paws.filter(p => p.x1 - p.x0 >= 8), x0 = Math.min(...wide.map(p => p.x0), cw), x1 = Math.max(...wide.map(p => p.x1), 0)
+    const m = { bottom, cx: wide.length ? (x0 + x1) / 2 : cw / 2, span: Math.max(20, x1 - x0), paws: wide }; this.pawCache.set(key, m); return m
   }
   private pawCv: HTMLCanvasElement | null = null; private pawCtx: CanvasRenderingContext2D | null = null
-  /** Собака на тумбе: подошвы ТЕКУЩЕГО кадра ложатся ровно на линию поверхности surfY, лапы центрируются по cx; под ними контактная тень по ширине лап. */
+  /** Собака на тумбе: самая нижняя подошва ТЕКУЩЕГО кадра ложится на линию поверхности surfY; у КАЖДОЙ лапы (дальние выше, ближние ниже — перспектива спрайта) своя контактная тень прямо под подошвой, плюс мягкая общая тень тела. */
   private podiumDog(i: number, cx: number, surfY: number, k: number) {
-    const fr = this.podiumFrames[i], d = this.dogs[i]; if (!fr || !d) return; const m = this.pawMetrics(i, fr) ?? { bottom: PODIUM_PAW_ROW, cx: d.sel.cell[0] / 2, span: 100 }
-    const c = this.ctx, w = m.span * k
-    c.save(); c.translate(cx, surfY + 1); c.scale(1, .16)                                                // мягкая тень-пятно под всей собакой
-    const g = c.createRadialGradient(0, 0, 0, 0, 0, w * .95); g.addColorStop(0, 'rgba(18,10,44,.62)'); g.addColorStop(.6, 'rgba(18,10,44,.3)'); g.addColorStop(1, 'rgba(18,10,44,0)'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, w * .95, 0, 7); c.fill(); c.restore()
-    this.drawSel(i, fr, cx - m.cx * k, surfY - m.bottom * k, k)
-    c.save(); c.globalAlpha = .5; c.fillStyle = 'rgba(18,10,44,.7)'; c.beginPath(); c.ellipse(cx, surfY + .5, w * .42, 2.6, 0, 0, 7); c.fill(); c.restore()   // «вес» у самых подошв (тонкая линия контакта поверх нижнего края лап)
+    const fr = this.podiumFrames[i], d = this.dogs[i]; if (!fr || !d) return; const m = this.pawMetrics(i, fr) ?? { bottom: PODIUM_PAW_ROW, cx: d.sel.cell[0] / 2, span: 100, paws: [] }
+    const c = this.ctx, w = m.span * k, ox = cx - m.cx * k, oy = surfY - m.bottom * k
+    const blob = (x: number, y: number, rx: number, ry: number, a: number) => { c.save(); c.translate(x, y); c.scale(1, ry / rx); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(14,8,36,${a})`); g.addColorStop(.55, `rgba(14,8,36,${a * .55})`); g.addColorStop(1, 'rgba(14,8,36,0)'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 7); c.fill(); c.restore() }
+    blob(cx, surfY - 6, w * .8, w * .8 * .2, .45)                                                                 // общая тень тела на площадке
+    for (const p of m.paws) { const px = ox + (p.x0 + p.x1) / 2 * k, py = oy + p.bottom * k, pw = (p.x1 - p.x0 + 14) * k; blob(px, py + 1, pw * .8, pw * .8 * .26, .62); blob(px, py, pw * .5, pw * .5 * .22, .8) }   // контакт под каждой лапой
+    this.drawSel(i, fr, ox, oy, k)
   }
   private resultsIO(): SK.ResultsIO {
     const race = this.raceObj!, sc = this.input.scores, names = this.input.names
