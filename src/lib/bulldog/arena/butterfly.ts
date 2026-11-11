@@ -22,6 +22,7 @@ export function butterflyArtPose(u: number, nose: { x: number; y: number }, tSec
 export function butterflyHeading(at: (t: number) => { x: number; y: number }, tSec: number): number {
   const a = at(tSec - 0.04), b = at(tSec + 0.04); return Math.atan2(b.y - a.y, b.x - a.x)
 }
-/** Лист кадров: BF_FRAMES кадров взмаха в одну строку, кадр BF_CELL×BF_CELL; крылья машут на BF_FPS независимо от полёта. */
-export const BF_FRAMES = 8, BF_CELL = 128, BF_FPS = 18, BF_DRAW_PX = 40
-export const bfFrame = (tSec: number, dog: number) => Math.floor(tSec * BF_FPS + dog * 3) % BF_FRAMES
+/** Лист кадров `public/arena/butterfly.webp` (scripts/arena/prep_butterfly.py): кадры одной строкой, ячейка BF_CELL_W×BF_CELL_H, число кадров = ширина листа / BF_CELL_W; крылья машут на BF_FPS независимо от полёта.
+ *  Бабочка смотрит вправо; точка привязки (тело) — BF_ANCHOR в долях ячейки: вокруг неё идут поворот по курсу и зеркало при полёте влево. Ширина на экране — BF_DRAW_W px (морда бульдога ≈ 60 px). */
+export const BF_CELL_W = 192, BF_CELL_H = 134, BF_FPS = 11, BF_DRAW_W = 64, BF_ANCHOR = { x: 0.8, y: 0.62 }
+export const bfFrame = (tSec: number, dog: number, frames: number) => Math.floor(tSec * BF_FPS + dog * 3) % Math.max(1, frames)

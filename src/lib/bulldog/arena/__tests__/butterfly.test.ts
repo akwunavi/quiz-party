@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { butterflyArtPose, butterflyHeading, bfFrame, BF_FRAMES } from '../butterfly'
+import { butterflyArtPose, butterflyHeading, bfFrame } from '../butterfly'
 
 describe('бабочка арены', () => {
   const nose = { x: 800, y: 500 }
@@ -24,6 +24,6 @@ describe('бабочка арены', () => {
   })
   it('курс считается по полёту, взмахи крыльев — отдельный счётчик кадров листа', () => {
     expect(Number.isFinite(butterflyHeading(t => butterflyArtPose(0.1, nose, t, 0), 3))).toBe(true)
-    const f = new Set(Array.from({ length: 60 }, (_, i) => bfFrame(i / 60, 0))); expect(f.size).toBe(BF_FRAMES)
+    const f = new Set(Array.from({ length: 60 }, (_, i) => bfFrame(i / 60, 0, 9))); expect(f.size).toBe(9); expect(bfFrame(5, 1, 9)).toBe(bfFrame(5, 1, 9)); expect(bfFrame(5, 1, 0)).toBe(0)
   })
 })

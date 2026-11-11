@@ -2,7 +2,7 @@
 // Дорожки, скорость и тайминги — из Race V3 без изменений; здесь только «картинка» (прогресс → мировые пиксели, см. camera.ts).
 import { ARENA, buildCameraTrack, worldX } from './camera'
 import { HZ, BERM_Y, FENCE_H, STARS, buildSky, buildMountains, buildFarShore, buildLake, buildTrack, buildFence, rng, cv, type TrackArt } from './art'
-import { butterflyArtPose, butterflyHeading, bfFrame, BF_CELL, BF_DRAW_PX } from './butterfly'
+import { butterflyArtPose, butterflyHeading, bfFrame, BF_CELL_W, BF_CELL_H, BF_DRAW_W, BF_ANCHOR } from './butterfly'
 import { SLOTS, loadSlots, slotPlacements, type LoadedSlot, type SlotSpec } from './slots'
 import { LAYOUT as L, DOG_IDS } from '../config'
 import { raceFor, stateAt, loadDogData, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from '../engine'
@@ -139,7 +139,7 @@ export class ArenaRenderer {
         c.drawImage(this.tmp, 0, 0, w + 4, h + 4, ox, oy, w + 4, h + 4)
         const cl = d.contract.clips.BUTTERFLY, n = cl?.sampler === 'table' ? cl.labels!.length : (cl?.count ?? 1)
         const b = this.bf.update(i, v, n, T, () => { const nz = this.noseOf(DOG_IDS[i], d, v, bm); return { x: ox + nz.x * k, y: oy + nz.y * k } })
-        if (b) { if (this.bfSheet) this.drawButterflySprite(i, b.u, T, () => { const nz = this.noseOf(DOG_IDS[i], d, v, bm); return { x: ox + nz.x * k, y: oy + nz.y * k } }); else this.drawButterfly(b) }
+        if (b && this.bfSheet) this.drawButterflySprite(i, b.u, T, () => { const nz = this.noseOf(DOG_IDS[i], d, v, bm); return { x: ox + nz.x * k, y: oy + nz.y * k } })
       }
     }
   }
@@ -171,13 +171,8 @@ export class ArenaRenderer {
     const c = this.ctx, n = nose(), pose = butterflyArtPose(u, n, T, i); if (pose.alpha <= 0.01) return
     const hd = butterflyHeading(t => butterflyArtPose(u, n, t, i), T), flip = Math.cos(hd) < 0
     c.save(); c.globalAlpha = pose.alpha; c.translate(pose.x, pose.y); c.rotate(Math.max(-0.6, Math.min(0.6, flip ? Math.atan2(-Math.sin(hd), -Math.cos(hd)) : hd))); if (flip) c.scale(-1, 1)
-    c.drawImage(this.bfSheet!, bfFrame(T, i) * BF_CELL, 0, BF_CELL, BF_CELL, -BF_DRAW_PX / 2, -BF_DRAW_PX / 2, BF_DRAW_PX, BF_DRAW_PX); c.restore()
-  }
-  private drawButterfly(b: { x: number; y: number; alpha: number; wing: number }) {
-    const c = this.ctx; c.save(); c.globalAlpha = b.alpha; c.translate(b.x, b.y)
-    const w = 6 + 9 * (0.35 + 0.65 * b.wing); c.fillStyle = '#ff9a2e'; c.strokeStyle = '#7a3b00'; c.lineWidth = 1.5
-    for (const s of [-1, 1]) { c.beginPath(); c.ellipse(s * w * .55, -3, w * .55, 7, s * .35, 0, 7); c.fill(); c.stroke(); c.beginPath(); c.ellipse(s * w * .4, 5, w * .38, 5, -s * .3, 0, 7); c.fill(); c.stroke() }
-    c.fillStyle = '#3a2000'; c.fillRect(-1.2, -8, 2.4, 17); c.restore()
+    const sh = this.bfSheet!, dw = BF_DRAW_W, dh = BF_DRAW_W * BF_CELL_H / BF_CELL_W, fr = Math.floor(sh.width / BF_CELL_W)
+    c.drawImage(sh, bfFrame(T, i, fr) * BF_CELL_W, 0, BF_CELL_W, BF_CELL_H, -dw * BF_ANCHOR.x, -dh * BF_ANCHOR.y, dw, dh); c.restore()
   }
   private drawLanternBloom(T: number, X: number) {
     const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'

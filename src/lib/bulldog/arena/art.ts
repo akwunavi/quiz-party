@@ -104,21 +104,24 @@ export function buildTrack(): TrackArt {
   // лёгкая «шлифовка» дорожек: чередующиеся едва заметные полосы по центру дорожек
   for (let i = 0; i < 5; i++) { const ly = ARENA.LANE_Y[i], top = i ? (ARENA.LANE_Y[i - 1] + ly) / 2 + 4 : BERM_Y + 24, bot = i < 4 ? (ly + ARENA.LANE_Y[i + 1]) / 2 - 2 : ARENA.H
     x.fillStyle = lin(x, 0, Y(top), 0, Y(bot), [[0, 'rgba(255,255,255,0)'], [0.55, i % 2 ? 'rgba(255,250,255,.05)' : 'rgba(110,100,210,.06)'], [1, 'rgba(255,255,255,0)']]); x.fillRect(0, Y(top), WW, bot - top) }
-  // разделители дорожек: ЦЕПОЧКА маленьких тёплых огоньков, утопленных в снег (4 линии между 5 дорожками), с мягким пятном света на снегу
+  // разделители дорожек: тонкая гирлянда на снегу — едва заметный провод с лёгким провисом, редкие РАЗНЫЕ огоньки (неровный шаг 60–200 px, разный размер и оттенок, иногда пара рядом), мягкое тёплое свечение,
+  // местами снежные наметы, прикрывающие провод и низ лампочек (утоплена в снег). Без тёмных оснований. Запечено в мировые координаты — при движении камеры линия непрерывна, ничего не «бежит».
   const B = [0, 1, 2, 3].map(i => (ARENA.LANE_Y[i] + ARENA.LANE_Y[i + 1]) / 2 + 2)
-  for (const by of B) {
-    x.fillStyle = lin(x, 0, Y(by) - 7, 0, Y(by) + 7, [[0, 'rgba(255,170,90,0)'], [0.5, 'rgba(255,170,90,.09)'], [1, 'rgba(255,170,90,0)']]); x.fillRect(0, Y(by) - 7, WW, 14)      // непрерывная тёплая полоса света
+  B.forEach((by, li) => {
+    const g = rng(5151 + li * 97), wy = (px: number) => Y(by) + 1.2 * Math.sin(px * 0.0043 + li * 1.9) + 1.4 * Math.sin(px / 215 * Math.PI * 2 + li) * 0.5     // провод лежит чуть волной, не по линейке
+    x.strokeStyle = 'rgba(64,52,120,.32)'; x.lineWidth = 0.9; x.lineCap = 'round'; x.beginPath(); x.moveTo(0, wy(0)); for (let px = 8; px <= WW; px += 8) x.lineTo(px, wy(px)); x.stroke()
+    x.strokeStyle = 'rgba(255,236,255,.35)'; x.lineWidth = 0.6; x.beginPath(); x.moveTo(0, wy(0) - 0.9); for (let px = 8; px <= WW; px += 8) x.lineTo(px, wy(px) - 0.9); x.stroke()   // блик на проводе
+    const bulbs: { px: number; r: number; w: number }[] = []
+    for (let px = 40 + g() * 80; px < WW; ) { const r0 = 2.3 + g() * 1.5; bulbs.push({ px, r: r0, w: g() }); px += g() < 0.16 ? 26 + g() * 16 : 70 + g() * 130 }
     x.globalCompositeOperation = 'lighter'
-    for (let px = 20; px < WW; px += 56) { const g = x.createRadialGradient(px, Y(by), 0, px, Y(by), 34); g.addColorStop(0, 'rgba(255,176,92,.42)'); g.addColorStop(0.5, 'rgba(255,150,70,.15)'); g.addColorStop(1, 'rgba(255,170,90,0)'); x.save(); x.translate(px, Y(by)); x.scale(1, 0.32); x.translate(-px, -Y(by)); x.fillStyle = g; x.fillRect(px - 34, Y(by) - 34, 68, 68); x.restore() }
+    for (const bl of bulbs) { const by2 = wy(bl.px) - 1, rr = 20 + bl.r * 6, gg = x.createRadialGradient(bl.px, by2, 0, bl.px, by2, rr); const warm = bl.w < 0.7 ? '255,178,96' : '255,205,140'; gg.addColorStop(0, `rgba(${warm},.40)`); gg.addColorStop(0.45, `rgba(${warm},.14)`); gg.addColorStop(1, `rgba(${warm},0)`)
+      x.save(); x.translate(bl.px, by2); x.scale(1, 0.34); x.translate(-bl.px, -by2); x.fillStyle = gg; x.fillRect(bl.px - rr, by2 - rr, rr * 2, rr * 2); x.restore() }
     x.globalCompositeOperation = 'source-over'
-    for (let px = 20; px < WW; px += 56) {
-      x.fillStyle = 'rgba(40,30,80,.38)'; x.beginPath(); x.ellipse(px + 1, Y(by) + 2.2, 7.5, 2.6, 0, 0, 7); x.fill()                                   // тень-лунка в снегу
-      x.fillStyle = '#4a3a58'; x.beginPath(); x.ellipse(px, Y(by) + 0.6, 5.4, 2.2, 0, 0, 7); x.fill()                                                 // тёмное основание светильника
-      const bg = x.createRadialGradient(px - 0.8, Y(by) - 2.4, 0.3, px, Y(by) - 1.2, 3.6); bg.addColorStop(0, '#fff6d6'); bg.addColorStop(0.55, '#ffc868'); bg.addColorStop(1, '#e98a30'); x.fillStyle = bg
-      x.beginPath(); x.ellipse(px, Y(by) - 0.8, 3.3, 2.9, 0, Math.PI, 0); x.fill()                                                                  // лампочка-купол
-      x.fillStyle = 'rgba(244,236,255,.95)'; x.beginPath(); x.ellipse(px, Y(by) + 0.9, 6.3, 1.9, 0, 0, Math.PI); x.fill()                              // снежная кромка перед светильником: «утоплен»
-    }
-  }
+    for (const bl of bulbs) { const by2 = wy(bl.px) - 1, cg = x.createRadialGradient(bl.px - 0.4, by2 - 0.6, 0.1, bl.px, by2, bl.r + 0.6); cg.addColorStop(0, '#fff6dc'); cg.addColorStop(0.5, bl.w < 0.7 ? '#ffc766' : '#ffdca0'); cg.addColorStop(1, 'rgba(235,140,60,.85)'); x.fillStyle = cg
+      x.beginPath(); x.arc(bl.px, by2 - 0.2, bl.r, Math.PI, 0); x.fill()
+      x.fillStyle = 'rgba(226,216,250,.92)'; x.beginPath(); x.ellipse(bl.px, by2 + 0.9, bl.r * 1.7, 1.25, 0, 0, Math.PI); x.fill() }                      // снежная кромка спереди: лампочка «утоплена»
+    for (let px = g() * 200; px < WW; px += 160 + g() * 330) { const rx = 12 + g() * 22; x.fillStyle = `rgba(236,228,255,${0.5 + g() * 0.3})`; x.beginPath(); x.ellipse(px, wy(px) + 0.6, rx, 1.5 + g() * 1.2, 0, Math.PI, 0); x.fill() }   // наметы поверх провода
+  })
   // дальний борт (снежный вал) с мягкой верхней кромкой и тенью на льду; ближний край — низкий вал без громоздкости
   const berm = (yy: number, hh: number, top: boolean) => {
     const pts: number[] = []; for (let px = 0; px <= WW; px += 8) pts.push(Y(yy) - (hh + Math.sin(px * 0.013) * hh * 0.25 + Math.sin(px * 0.047 + 2) * hh * 0.12 + Math.sin(px * 0.19) * 1.2 + r() * 1.6))
