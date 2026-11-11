@@ -2,6 +2,7 @@
 // Дорожки, скорость и тайминги — из Race V3 без изменений; здесь только «картинка» (прогресс → мировые пиксели, см. camera.ts).
 import { ARENA, buildCameraTrack, worldX } from './camera'
 import { HZ, BERM_Y, FENCE_H, STARS, buildSky, buildMountains, buildFarShore, buildLake, buildTrack, buildFence, rng, cv, type TrackArt } from './art'
+import { butterflyArtPose, butterflyHeading, bfFrame, BF_CELL, BF_DRAW_PX } from './butterfly'
 import { SLOTS, loadSlots, slotPlacements, type LoadedSlot, type SlotSpec } from './slots'
 import { LAYOUT as L, DOG_IDS } from '../config'
 import { raceFor, stateAt, loadDogData, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from '../engine'
@@ -18,9 +19,10 @@ export class ArenaRenderer {
   private cam: ReturnType<typeof buildCameraTrack> | null = null
   private t0 = 0
   private bf = new ButterflyManager()
-  private tmp = cv(SW * 2, SH * 2); private refl = cv(SW * 2, SH * 2); private nose = cv(SW, SH)
+  private tmp = cv(SW * 2, SH * 2); private nose = cv(SW, SH)
   private noseCache = new Map<string, { x: number; y: number }>()
   private art!: { sky: HTMLCanvasElement; mtnFar: HTMLCanvasElement; mtnNear: HTMLCanvasElement; shore: HTMLCanvasElement; lake: HTMLCanvasElement; track: TrackArt; fence: HTMLCanvasElement; ray: HTMLCanvasElement }
+  private bfSheet: HTMLImageElement | null = null
   slots: LoadedSlot[] = []; missing: SlotSpec[] = SLOTS.slice()
   guide = false; names: string[] = ['Фрэнк', 'Зефир', 'Рокки', 'Пупс', 'Луна']
   buildMs = 0
@@ -37,6 +39,7 @@ export class ArenaRenderer {
     this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur)
     await Promise.all(DOG_IDS.map(async (id, i) => { const d = await loadDogData(id); this.dogs[i] = d; await Promise.all(raceSheetUrls(d, this.race!.dogs[i].segments).map(u => this.pool.get(u))) }))
     if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase, this.opt.slotFiles); this.slots = r.loaded; this.missing = r.missing }
+    if (this.opt.slotBase && (!this.opt.slotFiles || this.opt.slotFiles.includes('butterfly.webp'))) this.bfSheet = await new Promise<HTMLImageElement | null>(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `${this.opt.slotBase}butterfly.webp` })
     this.buildMs = performance.now() - s
   }
   destroy() { this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }
@@ -58,8 +61,6 @@ export class ArenaRenderer {
     for (const s of this.slots) this.drawSlot(s, X, T)                       // все авторские слои — ЗА ограждением, от дальнего к ближнему (параллакс по возрастанию)
     c.drawImage(A.fence, -X, BERM_Y + 2 - FENCE_H + sw(0.9))
     c.drawImage(A.track.canvas, -X, A.track.y0)
-    this.drawSlotReflection(X)
-    this.drawIceSparkle(T, X)
     this.drawDogs(t, X)
     this.drawLanternBloom(T, X)
     this.drawSnow(T, X)
@@ -80,18 +81,6 @@ export class ArenaRenderer {
     const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.85; c.drawImage(this.aurB, 0, 20, 1920, 520); c.restore()
   }
   private drawLakeGlints(T: number, X: number) { const c = this.ctx, r = rng(3); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 70; i++) { const wx = r() * 3600, y = HZ + 6 + r() * (BERM_Y - HZ - 40), a = 0.25 * Math.abs(Math.sin(T * (0.8 + r()) + r() * 6)), x = ((wx - X * 0.2) % (ARENA.W + 200) + ARENA.W + 200) % (ARENA.W + 200) - 100; c.fillStyle = `rgba(255,220,230,${a})`; c.fillRect(x, y, 10 + r() * 24, 1) } c.restore() }
-  private drawIceSparkle(T: number, X: number) { const c = this.ctx, r = rng(8); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 90; i++) { const wx = r() * 3000, y = BERM_Y + 30 + r() * (ARENA.H - BERM_Y - 60), ph = r() * 9, a = Math.pow(Math.max(0, Math.sin(T * (1.2 + r() * 2) + ph)), 12), x = ((wx - X) % 3000 + 3000) % 3000 - 500; if (x < -20 || x > ARENA.W + 20) continue; c.fillStyle = `rgba(255,255,255,${a * 0.9})`; c.fillRect(x - 3, y, 7, 1); c.fillRect(x, y - 3, 1, 7) } c.restore() }
-  /** Отражение трибуны и деревни в льду у дальнего борта: половинное разрешение, быстрое затухание — тёплые пятна оживляют верх льда, не споря с собаками. */
-  private reflC = cv(960, 90)
-  private drawSlotReflection(X: number) {
-    if (!this.slots.length) return
-    const r = this.reflC.getContext('2d')!, c = this.ctx; r.setTransform(1, 0, 0, 1, 0, 0); r.clearRect(0, 0, 960, 90); r.globalCompositeOperation = 'source-over'
-    r.setTransform(0.5, 0, 0, -0.5, 0, 0.5 * BERM_Y)
-    for (const s of this.slots) { const sp = s.spec, mw = s.img.width / sp.modules
-      for (const p of slotPlacements(sp, X)) r.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH * p.scale, sp.tileW * p.scale, sp.tileH * p.scale) }
-    r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'destination-in'; const g = r.createLinearGradient(0, 0, 0, 90); g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)'); r.fillStyle = g; r.fillRect(0, 0, 960, 90)
-    c.save(); c.globalAlpha = 0.2; c.drawImage(this.reflC, 0, 0, 960, 90, 0, BERM_Y + 8, ARENA.W, 180); c.restore()
-  }
   private drawSlot(s: LoadedSlot, X: number, T: number) {
     const c = this.ctx, sp = s.spec, mw = s.img.width / sp.modules
     for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH * p.scale, sp.tileW * p.scale, sp.tileH * p.scale)
@@ -135,8 +124,9 @@ export class ArenaRenderer {
       const d = this.dogs[i], dog = race.dogs[i]; if (!d) continue
       const k = ARENA.LANE_K[i], ly = ARENA.LANE_Y[i], st = stateAt(dog, T), wx = worldX(st.progress), sx = wx - X, v = d.visual.at(dog.segments, T)
       const bm = v.sheet ? this.pool.peek(selectSheetUrl(DOG_IDS[i], v.sheet)) : undefined
-      // тень-пятно на льду
-      c.save(); c.translate(sx - 52 * k, ly + 3); c.scale(1, 0.1); const sg = c.createRadialGradient(0, 0, 0, 0, 0, 74 * k); sg.addColorStop(0, 'rgba(24,18,86,.62)'); sg.addColorStop(1, 'rgba(24,18,86,0)'); c.fillStyle = sg; c.beginPath(); c.arc(0, 0, 74 * k, 0, 7); c.fill(); c.restore()
+      // контактная тень на снегу: широкое мягкое пятно под корпусом + плотное ядро под лапами; свет слева-сзади чуть смещает её вправо
+      c.save(); c.translate(sx - 40 * k, ly + 2 * k); c.scale(1, 0.15); const sg = c.createRadialGradient(0, 0, 0, 0, 0, 104 * k); sg.addColorStop(0, 'rgba(40,36,120,.55)'); sg.addColorStop(0.55, 'rgba(48,44,132,.28)'); sg.addColorStop(1, 'rgba(48,44,132,0)'); c.fillStyle = sg; c.beginPath(); c.arc(0, 0, 104 * k, 0, 7); c.fill(); c.restore()
+      this.drawPawprints(i, dog, T, X, k, ly)
       this.drawPuffs(i, dog, T, X, k, ly)
       if (bm && v.index != null) {
         const w = SW * k, h = SH * k, ox = sx - L.spriteAnchorX * k + v.shiftPx * k, oy = ly - L.spriteTopOffset * k
@@ -146,16 +136,23 @@ export class ArenaRenderer {
         g.globalCompositeOperation = 'source-atop'
         g.fillStyle = (() => { const q = g.createLinearGradient(0, 0, 0, h); q.addColorStop(0, 'rgba(120,110,230,.20)'); q.addColorStop(0.6, 'rgba(70,60,160,.10)'); q.addColorStop(1, 'rgba(255,170,110,.10)'); return q })(); g.fillRect(0, 0, w + 4, h + 4)
         g.fillStyle = (() => { const q = g.createLinearGradient(0, 0, w, 0); q.addColorStop(0, 'rgba(255,170,110,.22)'); q.addColorStop(0.4, 'rgba(255,170,110,0)'); return q })(); g.fillRect(0, 0, w + 4, h + 4)
-        // отражение во льду: перевёрнутый силуэт, размытый и затухающий
-        const rg = this.refl.getContext('2d')!; rg.clearRect(0, 0, w + 4, h + 4); rg.save(); rg.filter = 'blur(1.4px)'; rg.translate(0, h * 0.62); rg.scale(1, -1); rg.drawImage(this.tmp, 0, 0, w, h, 0, -h * 0.38, w, h); rg.restore()
-        rg.globalCompositeOperation = 'destination-in'; const fade = rg.createLinearGradient(0, 0, 0, h * 0.62); fade.addColorStop(0, 'rgba(0,0,0,.42)'); fade.addColorStop(1, 'rgba(0,0,0,0)'); rg.fillStyle = fade; rg.fillRect(0, 0, w + 4, h * 0.62); rg.globalCompositeOperation = 'source-over'
-        c.drawImage(this.refl, 0, 0, w + 4, h * 0.62, ox, oy + L.spriteTopOffset * k - 2, w + 4, h * 0.62)
         c.drawImage(this.tmp, 0, 0, w + 4, h + 4, ox, oy, w + 4, h + 4)
         const cl = d.contract.clips.BUTTERFLY, n = cl?.sampler === 'table' ? cl.labels!.length : (cl?.count ?? 1)
         const b = this.bf.update(i, v, n, T, () => { const nz = this.noseOf(DOG_IDS[i], d, v, bm); return { x: ox + nz.x * k, y: oy + nz.y * k } })
-        if (b) this.drawButterfly(b)
+        if (b) { if (this.bfSheet) this.drawButterflySprite(i, b.u, T, () => { const nz = this.noseOf(DOG_IDS[i], d, v, bm); return { x: ox + nz.x * k, y: oy + nz.y * k } }); else this.drawButterfly(b) }
       }
     }
+  }
+  /** Следы лап на утрамбованном снегу: остаются на месте (мировые координаты), темнеют на тёплой сетке времени 0,11 с и гаснут за ~1,6 с. Детерминированы временем гонки. */
+  private drawPawprints(i: number, dog: RaceV3['dogs'][number], T: number, X: number, k: number, ly: number) {
+    const c = this.ctx, step = 0.11, base = Math.floor(T / step) * step; c.save()
+    for (let j = 0; j < 15; j++) {
+      const te = base - j * step, age = T - te; if (te < 0 || age > 1.6) continue
+      const st = stateAt(dog, te), spd = st.speed ?? 0; if (spd < 0.012) continue
+      const x = worldX(st.progress) - X - 36 * k, a = (1 - age / 1.6) * 0.3 * Math.min(1, spd * 22), f = (j + i) % 2 ? 1 : -1
+      c.fillStyle = `rgba(52,48,130,${a})`; c.beginPath(); c.ellipse(x, ly - 0.5 * k + f * 1.6 * k, 5.2 * k, 1.9 * k, 0, 0, 7); c.fill(); c.beginPath(); c.ellipse(x - 30 * k, ly - 0.5 * k - f * 1.6 * k, 4.6 * k, 1.7 * k, 0, 0, 7); c.fill()
+    }
+    c.restore()
   }
   private drawPuffs(i: number, dog: RaceV3['dogs'][number], T: number, X: number, k: number, ly: number) {
     const c = this.ctx, step = 0.05, base = Math.floor(T / step) * step; c.save()
@@ -168,6 +165,13 @@ export class ArenaRenderer {
       if (rr > 0.7) { c.globalAlpha = (1 - u) * 0.8; c.fillStyle = '#ffffff'; c.fillRect(x + s, y - s * 1.2, 1.6, 1.6) }
     }
     c.restore()
+  }
+  /** Художественная бабочка из листа `butterfly.webp`: путь привязан к носу собаки (нос берётся с кадра), курс — по ходу полёта, взмахи — свои. Размер не зависит от масштаба дорожки. */
+  private drawButterflySprite(i: number, u: number, T: number, nose: () => { x: number; y: number }) {
+    const c = this.ctx, n = nose(), pose = butterflyArtPose(u, n, T, i); if (pose.alpha <= 0.01) return
+    const hd = butterflyHeading(t => butterflyArtPose(u, n, t, i), T), flip = Math.cos(hd) < 0
+    c.save(); c.globalAlpha = pose.alpha; c.translate(pose.x, pose.y); c.rotate(Math.max(-0.6, Math.min(0.6, flip ? Math.atan2(-Math.sin(hd), -Math.cos(hd)) : hd))); if (flip) c.scale(-1, 1)
+    c.drawImage(this.bfSheet!, bfFrame(T, i) * BF_CELL, 0, BF_CELL, BF_CELL, -BF_DRAW_PX / 2, -BF_DRAW_PX / 2, BF_DRAW_PX, BF_DRAW_PX); c.restore()
   }
   private drawButterfly(b: { x: number; y: number; alpha: number; wing: number }) {
     const c = this.ctx; c.save(); c.globalAlpha = b.alpha; c.translate(b.x, b.y)
