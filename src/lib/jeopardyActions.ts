@@ -32,7 +32,7 @@ export async function openJeopardyTile(gameState: GameState, flat: number) {
   })
   // защищённая запись (CAS): накладывается на СВЕЖИЙ мешок, а не на снимок экрана — устаревший снимок не затрёт race/melody/rv (аудит В7).
   // Идемпотентно: плитка уже открыта и ответ не показан (двойной клик) — ничего не пишем.
-  await updateMelodyBag(gameState, cur => (jpOpenTile(cur) === flat && cur.jp?.answer === false ? null : jpOpen(cur, flat)))
+  await updateMelodyBag(null, cur => (jpOpenTile(cur) === flat && cur.jp?.answer === false ? null : jpOpen(cur, flat)))
 }
 
 /** «Показать ответ» плитки — на свежем мешке; повтор ничего не меняет. */
@@ -61,6 +61,6 @@ export async function closeJeopardyTile(gameState: GameState, tileKey: string,
   // Плитка закрыта — у команд должна пропасть форма ответа. Она видна, пока
   // идёт таймер, поэтому его надо снять, иначе форма висит вечно.
   await room.patchSession(getRoomId(), { timer_started_at: null, reveal: false })
-  await updateMelodyBag(gameState, cur => (jpOpenTile(cur) == null ? null : jpClose(cur)))   // доска возвращается на свежем мешке; уже закрыта — не пишем
+  await updateMelodyBag(null, cur => (jpOpenTile(cur) == null ? null : jpClose(cur)))   // доска возвращается на свежем мешке; уже закрыта — не пишем
   return errorText
 }

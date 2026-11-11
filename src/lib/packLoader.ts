@@ -54,6 +54,8 @@ export async function loadPack(packId: string, force = false, includeHidden = fa
         ? await qQuery : { data: [], error: null }
       if (e3) throw e3
       questions = data
+      // после миграции 0018 телефону прямое чтение возвращает пусто БЕЗ ошибки — пустой пакет не кешируем, берём офлайн-копию
+      if (forPlayer && !includeHidden && roundIds.length && (data ?? []).length === 0) throw new Error('player pack: вопросы недоступны')
     }
 
     const loaded: LoadedPack = {

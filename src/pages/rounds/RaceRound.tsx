@@ -133,6 +133,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
     // между попытками (jsonb `melody` заменяется целиком при записи — HANDOFF
     // §3bv/CLAUDE.md). cancelled выставляется в cleanup эффекта.
     let cancelled = false
+    let finished = false
     const seed = race.seed as number
     const places = raceObj.places
     const ref = raceRef(gameState.round_number)
@@ -151,6 +152,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
           if (rows.length > 0) await room.upsertAnswers(rows)
           if (cancelled) return
           await finishRace(gameState, seed)
+          finished = true
           return
         } catch {
           if (attempt === 2) {
@@ -166,7 +168,9 @@ export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
         }
       }
     })()
-    return () => { cancelled = true }
+    // оборванный (вкладка спрятана/смена зависимостей) и не доведённый цикл обязан дать начать заново, иначе очки не запишутся никогда;
+    // повтор безопасен: upsert и finishRace идемпотентны
+    return () => { cancelled = true; if (!finished) graded.current = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, running, allFinished, retryTick, answersLoaded, visible])
 
