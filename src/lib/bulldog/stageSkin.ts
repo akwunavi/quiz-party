@@ -150,7 +150,7 @@ export function drawResults(c: C, sk: Skin, io: ResultsIO, u = 1) {
 // ── пьедестал A «Основательный»: материалы и декор по теме (зима — дерево+снег+гирлянда; bevel — сталь+неон; arch/leaf — камень с отделкой цветами темы)
 export interface PodiumIO { places: number[]; names: string[]; teamsByDog: string[][]; scores: { team: string; dog: number | null; points: number }[]; shown: number; dog: (i: number, cx: number, pawY: number, k: number) => void; bgBlur?: CanvasImageSource | null }
 const STEPS = [{ place: 1, x: 500, h: 190, need: 2 }, { place: 0, x: 880, h: 280, need: 3 }, { place: 2, x: 1260, h: 120, need: 1 }]
-const PBASE = 860, PW = 340, PD = 46                                   // PD — глубина верхней площадки (в проекции): собака стоит на её середине
+const PBASE = 860, PW = 340, PD = 84                                   // PD — глубина верхней площадки (в проекции): собака стоит на её середине
 function podiumBlock(c: C, sk: Skin, p: number, x: number, h: number) {
   const top = PBASE - h, l = x - PW / 2, [m1, m2] = medalColors(p, sk)
   if (sk.decor === 'winter') {                                                           // зима: тёплая сосновая тумба из досок со светлой рамкой-панелью, плоская снежная площадка сверху, гирлянда по верхней кромке, сугроб у подножия (без обручей и «бочки»)
@@ -159,21 +159,21 @@ function podiumBlock(c: C, sk: Skin, p: number, x: number, h: number) {
     for (let k = 0; k < 70; k++) { c.strokeStyle = `rgba(70,38,18,${.07 + rnd(k) * .08})`; c.lineWidth = 1; const gy = top + rnd(k + p) * h, gx = l + rnd(k + 3) * PW; c.beginPath(); c.moveTo(gx, gy); c.lineTo(gx + 28 + rnd(k + 5) * 50, gy + (rnd(k + 7) - .5) * 3); c.stroke() }
     c.strokeStyle = 'rgba(255,236,200,.55)'; c.lineWidth = 4; c.strokeRect(l + 14, top + 22, PW - 28, h - 40); c.strokeStyle = 'rgba(70,38,18,.45)'; c.lineWidth = 2; c.strokeRect(l + 19, top + 27, PW - 38, h - 50)   // рамка-панель
     c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(l, top, 6, h); c.fillRect(l + PW - 6, top, 6, h)
-    c.fillStyle = '#e6b985'; c.beginPath(); c.moveTo(l + 14, top - PD); c.lineTo(l + PW - 14, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()   // деревянная полка под снегом
+    c.fillStyle = '#e6b985'; c.beginPath(); c.moveTo(l + 30, top - PD); c.lineTo(l + PW - 30, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()   // деревянная полка под снегом
     const sg = c.createLinearGradient(0, top - PD, 0, top + 6); sg.addColorStop(0, '#ffffff'); sg.addColorStop(1, '#d9d4f4')                                                    // плоская снежная поверхность
-    c.fillStyle = sg; c.beginPath(); c.moveTo(l + 20, top - PD + 3); c.lineTo(l + PW - 20, top - PD + 3); c.lineTo(l + PW + 4, top - 2); c.quadraticCurveTo(l + PW / 2, top + 9, l - 4, top - 2); c.closePath(); c.fill()
+    c.fillStyle = sg; c.beginPath(); c.moveTo(l + 34, top - PD + 3); c.lineTo(l + PW - 34, top - PD + 3); c.lineTo(l + PW + 4, top - 2); c.quadraticCurveTo(l + PW / 2, top + 9, l - 4, top - 2); c.closePath(); c.fill()
     c.fillStyle = 'rgba(190,200,255,.8)'; for (let k = 0; k < 8; k++) { const px = l + 14 + (PW - 28) * (k + .4) / 8, ih = 8 + rnd(k + p * 3) * 14; c.beginPath(); c.moveTo(px - 4, top + 2); c.lineTo(px + 4, top + 2); c.lineTo(px, top + 2 + ih); c.closePath(); c.fill() }
     garland(c, sk, top + 30, l + 10, l + PW - 10)
     const dr = c.createRadialGradient(x, PBASE, 10, x, PBASE, PW * .62); dr.addColorStop(0, 'rgba(255,255,255,.95)'); dr.addColorStop(1, 'rgba(235,230,255,0)'); c.save(); c.translate(x, PBASE); c.scale(1, .16); c.translate(-x, -PBASE); c.fillStyle = dr; c.beginPath(); c.arc(x, PBASE, PW * .62, 0, 7); c.fill(); c.restore()
   } else if (sk.frame === 'bevel') {
     const g = c.createLinearGradient(0, top, 0, PBASE); g.addColorStop(0, mixc(sk.panel, '#ffffff', .12)); g.addColorStop(1, mixc(sk.panel, '#000000', .45)); c.fillStyle = g; c.beginPath(); c.moveTo(l, top); c.lineTo(l + PW, top); c.lineTo(l + PW, PBASE - 16); c.lineTo(l + PW - 16, PBASE); c.lineTo(l + 16, PBASE); c.lineTo(l, PBASE - 16); c.closePath(); c.fill()
     c.strokeStyle = rgba(sk.accent2, .12); c.lineWidth = 1; for (let k = 0; k < PW; k += 24) { c.beginPath(); c.moveTo(l + k, top); c.lineTo(l + k - 40, PBASE); c.stroke() }
-    c.fillStyle = mixc(sk.panel, '#ffffff', .22); c.beginPath(); c.moveTo(l + 18, top - PD); c.lineTo(l + PW - 18, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()
+    c.fillStyle = mixc(sk.panel, '#ffffff', .22); c.beginPath(); c.moveTo(l + 32, top - PD); c.lineTo(l + PW - 32, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()
     c.save(); c.shadowColor = sk.accent; c.shadowBlur = 24; c.strokeStyle = sk.accent; c.lineWidth = 4; c.beginPath(); c.moveTo(l, top); c.lineTo(l + PW, top); c.stroke(); c.strokeStyle = sk.accent2; c.lineWidth = 3; c.beginPath(); c.moveTo(l + 16, PBASE - 6); c.lineTo(l + PW - 16, PBASE - 6); c.stroke(); c.restore()
   } else {
     const g = c.createLinearGradient(0, top, 0, PBASE); g.addColorStop(0, mixc(sk.panel, '#ffffff', .22)); g.addColorStop(1, mixc(sk.panel, '#000000', .35)); c.fillStyle = g; c.fillRect(l, top, PW, h)
     c.save(); c.beginPath(); c.rect(l, top, PW, h); c.clip(); for (let r = 0; r < h / 46; r++) for (let k = 0; k < 5; k++) { c.strokeStyle = 'rgba(0,0,0,.28)'; c.strokeRect(l + k * 85 + (r % 2) * 42 - 42, top + r * 46, 85, 46) } c.restore()
-    c.fillStyle = mixc(sk.panel, '#ffffff', .32); c.beginPath(); c.moveTo(l + 16, top - PD); c.lineTo(l + PW - 16, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()
+    c.fillStyle = mixc(sk.panel, '#ffffff', .32); c.beginPath(); c.moveTo(l + 30, top - PD); c.lineTo(l + PW - 30, top - PD); c.lineTo(l + PW, top); c.lineTo(l, top); c.closePath(); c.fill()
     c.strokeStyle = sk.accent; c.lineWidth = 5; c.beginPath(); c.moveTo(l, top); c.lineTo(l + PW, top); c.stroke(); c.lineWidth = 2; c.strokeRect(l + 10, top + 14, PW - 20, h - 24)
   }
   const gm = c.createRadialGradient(x - 8, top + h / 2 - 12, 4, x, top + h / 2, 56); gm.addColorStop(0, m1); gm.addColorStop(1, m2); c.fillStyle = gm; c.beginPath(); c.arc(x, top + h / 2 + 6, 52, 0, 7); c.fill(); c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = 3; c.stroke()
@@ -188,7 +188,7 @@ export function drawPodium(c: C, sk: Skin, io: PodiumIO) {
   const fl = c.createLinearGradient(0, PBASE - 30, 0, H); fl.addColorStop(0, rgba(sk.decor === 'winter' ? '#d9ccff' : sk.panel, sk.decor === 'winter' ? .9 : .6)); fl.addColorStop(1, rgba(sk.bg, 1)); c.fillStyle = fl; c.fillRect(0, PBASE - 24, W, H - PBASE + 24)
   STEPS.forEach(s => {
     const top = PBASE - s.h, shown = io.shown >= s.need; podiumBlock(c, sk, s.place, s.x, s.h); if (!shown) return
-    const d = io.places[s.place], surf = top - PD * 0.46                                                       // линия поверхности (подошвы) — на верхней площадке, чуть ближе к краю, чем к центру
+    const d = io.places[s.place], surf = top - 14                                                       // линия поверхности (подошвы) — на верхней площадке, чуть ближе к краю, чем к центру
     io.dog(d, s.x, surf, 1.5)
     const px = s.x - 170, py = PBASE + 30; frame(c, sk, px, py, 340, 120, false, true); text(c, fit(c, io.names[d] ?? '', 300, 40, sk.disp, 'bold'), s.x, py + 50, 40, sk.fg, { align: 'center', font: sk.disp, weight: 'bold' })
     text(c, io.teamsByDog[d]?.length ? fitList(c, io.teamsByDog[d], 300, 24, sk.disp) : 'без ставок', s.x, py + 90, 24, sk.muted, { align: 'center', font: sk.disp })
