@@ -14,6 +14,8 @@ import type { LoadedPack, LoadedRound } from '../../src/lib/packLoader'
 import type { GameState, Team, Answer } from '../../src/types/quiz'
 
 installEmbeddedAssets()
+const ARENA_FILES = (window as unknown as { __ARENA_SLOTS?: string[] }).__ARENA_SLOTS
+const ARENA = { slotBase: './arena/', slotFiles: ARENA_FILES ?? [] }
 
 const round = { id: 'r1', position: 1, mechanic: 'race', title_lines: ['СКАЧКИ БУЛЬДОГОВ'], timer_seconds: 0, settings: { courseSec: DEFAULT_COURSE_SEC }, questions: [] } as unknown as LoadedRound
 const pack = { id: 'p1', settings: {}, rounds: [round], theme: 'classic' } as unknown as LoadedPack
@@ -43,7 +45,7 @@ function App() {
   return (
     <div className="demo-root theme-classic">
       <div className="demo-screen"><div className="demo-frame" key={cfg.run}>
-        <RaceBoard pack={pack} round={round} gameState={view.gs} preview={{ teams: view.teams, answers: view.answers }} onStats={s => { setStats(s); if (cfg.diag) tick(n => n + 1) }} />
+        <RaceBoard pack={pack} round={round} gameState={view.gs} preview={{ teams: view.teams, answers: view.answers }} arena={ARENA} onStats={s => { setStats(s); if (cfg.diag) tick(n => n + 1) }} />
       </div></div>
       <div className="demo-panel" aria-label="Панель демонстрации">
         <div className="dp-row">

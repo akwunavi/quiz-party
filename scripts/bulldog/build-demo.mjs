@@ -33,6 +33,7 @@ writeFileSync(join(out, 'index.html'), `<!doctype html>
 <title>Скачки бульдогов — демо</title><link rel="stylesheet" href="demo.css"></head>
 <body><div id="root"><p style="color:#ccc;font:16px sans-serif;padding:24px">Загрузка собак…</p></div>
 ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}
+<script src="arena/slots.js"></script>
 <script src="demo.js"></script></body></html>
 `)
 writeFileSync(join(out, 'arena.js'), readFileSync(join(R, 'dist-demo/app-arena/arena.js')))

@@ -22,7 +22,7 @@ function App() {
   const answers = cfg.teams.filter(t => t.dog).map((t, i) => ({ team_id: `t${cfg.teams.indexOf(t) + 1}`, question_ref: 'q-race-0', round_number: 0, answer_text: String(t.dog), id: `a${i}` })) as unknown as Answer[]
   const gs = { id: 1, game_id: 'g', pack_id: 'p1', phase: 'question', round_number: 0, question_index: 0, timer_started_at: null, reveal: false, completed_rounds: [], updated_at: '',
     melody: { race: cfg.stage ? { stage: cfg.stage, seed: cfg.seed, D: cfg.courseSec, startedAt: new Date(started - cfg.startOffsetSec * 1000).toISOString() } : { stage: 'betting' } } } as unknown as GameState
-  return <div className={`theme-${cfg.theme}`} style={{ width: '100vw', height: '100vh' }}>{cfg.show !== false && <RaceBoard pack={pack} round={round} gameState={gs} preview={{ teams, answers }} onStats={s => { (window as unknown as { __stats: unknown }).__stats = s }} />}</div>
+  return <div className={`theme-${cfg.theme}`} style={{ width: '100vw', height: '100vh' }}>{cfg.show !== false && <RaceBoard pack={pack} round={round} gameState={gs} preview={{ teams, answers }} arena={new URLSearchParams(location.search).has('arena') ? { slotBase: `${import.meta.env.BASE_URL}arena/` } : undefined} onStats={s => { (window as unknown as { __stats: unknown }).__stats = s }} />}</div>
 }
-;(window as unknown as { harness: unknown }).harness = { set: (c: Partial<Cfg>) => setCfg(c), now: () => serverNow(), startNow: (extra: Partial<Cfg> = {}) => setCfg({ stage: 'running', startOffsetSec: (started0 - serverNow()) / 1000, ...extra }) }
+;(window as unknown as { harness: unknown }).harness = { age: () => (serverNow() - started0) / 1000, set: (c: Partial<Cfg>) => setCfg(c), now: () => serverNow(), startNow: (extra: Partial<Cfg> = {}) => setCfg({ stage: 'running', startOffsetSec: (started0 - serverNow()) / 1000, ...extra }) }
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)

@@ -26,7 +26,7 @@ export const worldX = (progress: number) => ARENA.START_X + progress * ARENA.TRA
 export function camTarget(race: RaceV3, t: number): number {
   const xs = race.dogs.map(d => worldX(stateAt(d, t).progress)), lead = Math.max(...xs)
   const tail = Math.max(Math.min(...xs), lead - 1500), mid = (lead + tail) / 2
-  return lead * 0.35 + mid * 0.65 - ARENA.W * 0.56
+  return Math.max(0, lead * 0.35 + mid * 0.65 - ARENA.W * 0.56)     // у старта камера не уходит левее края трассы (за x<0 мира нет — иначе виден край); окно 8–30 с (камера ≥ 476) не затронуто
 }
 
 /** Траектория камеры за окно [t0, t0+dur]: шаг 1/120 с, пружина ω=1.7 (≈1,3 с на отработку), в начале камера уже на цели (без «рывка со старта»). */

@@ -6,16 +6,20 @@ import { raceClock, type RacePhase } from './phases'
 import { raceFor, stateAt, canPrefetch, loadDogData, loadSelectionData, createSelectionPlayer, raceSheetUrls, selectSheetUrl, BitmapPool, type DogData } from './engine'
 import { ButterflyManager } from './vendor/butterfly.mjs'
 import type { RaceV3, SelectionPlayer, SelectionFrame, Visual } from './v3types'
+import { ArenaRenderer, type ArenaOptions } from './arena/arena'
 
 export interface StageInput {
   race: { seed: number; D: number; startedMs: number } | null      // null — идёт выбор; startedMs — startedAt (мс, серверное время)
   frozenElapsed?: number                                             // предпросмотр редактора: фиксированное время с «Старт» вместо часов
   counts: number[]; names: string[]
   scores: { team: string; dog: number | null; place: number | null; points: number }[]
+  /** Зимняя арена вместо плоской трассы на фазах переход/отсчёт/гонка/финиш. Нет поля — прежняя сцена (по умолчанию в игре). Слои арены — из slotBase. */
+  arena?: Pick<ArenaOptions, 'slotBase' | 'slotFiles'>
 }
 export interface StageStats { phase: RacePhase | 'select'; decodedMB: number; bitmaps: number; loading: boolean; drawMs: number }
 const ease = (u: number) => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u) }
 const SW = L.spriteWidth, SH = L.spriteHeight
+const PODIUM_PAW_ROW = 273
 
 export class StageRenderer {
   private ctx: CanvasRenderingContext2D
@@ -35,6 +39,7 @@ export class StageRenderer {
   private noseCache = new Map<string, { x: number; y: number }>(); private tmp: HTMLCanvasElement; private tctx: CanvasRenderingContext2D
   private pal = { fg: '#f2f5fa', muted: '#9aa7bd', panel: '#101728', accent: '#ea580c', accent2: '#22d3ee', ok: '#57f5c0', font: 'sans-serif', at: 0 }
   private dead = false; private prefetched = false
+  private arena: ArenaRenderer | null = null; private arenaCv: HTMLCanvasElement | null = null; private arenaKey = ''
   stats: StageStats = { phase: 'select', decodedMB: 0, bitmaps: 0, loading: true, drawMs: 0 }
   private drawAcc = 0; private drawN = 0
   constructor(private canvas: HTMLCanvasElement, private now: () => number = Date.now) {
@@ -47,16 +52,17 @@ export class StageRenderer {
     const c = i.counts
     if (this.prevCounts) c.forEach((n, k) => { if (n > 0 && this.prevCounts![k] === 0 && !this.input.race && !i.race) this.wantPick.add(k) })   // собака реагирует на ПЕРВЫЙ выбор
     this.prevCounts = c.slice(); this.input = i
+    if (i.arena && !this.arena) { this.arenaCv = document.createElement('canvas'); this.arena = new ArenaRenderer(this.arenaCv, { ...i.arena, shared: { pool: this.pool, dogs: this.dogs } }); void this.arena.prepare().catch(() => { this.arena = null }) }   // тяжёлое (небо, трасса) — пока идёт выбор
     const key = i.race ? `${i.race.seed}:${i.race.D}` : ''
     if (key !== this.raceKey) {
       this.raceKey = key; this.raceObj = key ? raceFor(i.race!.seed, i.race!.D) : null
-      this.bf.reset(); this.podiumPicked = false; this.podiumPlayers = [null, null, null, null, null]
+      this.bf.reset(); this.arenaKey = ''; this.podiumPicked = false; this.podiumPlayers = [null, null, null, null, null]
       if (!key) { this.players = [null, null, null, null, null]; this.frames = [null, null, null, null, null]; this.wantPick.clear() }       // новый раунд: выбор начинается заново
     }
   }
   /** Уход с экрана: закрыть все ImageBitmap и ОТДАТЬ видеопамять canvas (размер 0) — иначе буфер 1920×1080 и временный холст живут до сборщика мусора. */
   destroy() {
-    this.dead = true; this.pool.release(); this.noseCache.clear()
+    this.dead = true; this.arena?.destroy(); this.arena = null; this.arenaCv = null; this.pool.release(); this.noseCache.clear()
     this.canvas.width = 0; this.canvas.height = 0; this.tmp.width = 0; this.tmp.height = 0
   }
   private async boot() {
@@ -118,14 +124,21 @@ export class StageRenderer {
     else if (phase === 'transition') {
       const u = rc!.phaseT / T.transition, a = ease(u / 0.4)
       if (u < 0.4) this.drawSelect(1 - a, a * 500)
-      else { this.drawTrack(0, 'stand', (i) => ease((u - 0.55 - 0.07 * i) / 0.2)); this.text('К СТАРТОВОЙ ЛИНИИ', 960, 60, 30, this.rgba(this.pal.fg, ease((u - 0.4) / 0.2)), 'center', 'bold') }
+      else { if (!this.drawArena(0, ease((u - 0.4) / 0.35))) this.drawTrack(0, 'stand', (i) => ease((u - 0.55 - 0.07 * i) / 0.2)); this.text('К СТАРТОВОЙ ЛИНИИ', 960, 60, 30, this.rgba(this.pal.fg, ease((u - 0.4) / 0.2)), 'center', 'bold') }
     }
-    else if (phase === 'countdown') { this.drawTrack(0, 'stand'); this.text(rc!.countdown > 0 ? String(rc!.countdown) : 'СТАРТ!', 960, 560, 220, this.rgba(this.pal.fg, .85), 'center', 'bold') }
-    else if (phase === 'race') this.drawTrack(rc!.raceT, 'race')
-    else if (phase === 'finish') { this.drawTrack(this.raceObj!.end, 'race'); this.drawFinishOverlay() }
-    else if (phase === 'podiumTransition') { this.drawTrack(this.raceObj!.end, 'race'); this.drawFinishOverlay(); this.drawPodium(rc!, ease(rc!.phaseT / T.podiumTransition)) }
+    else if (phase === 'countdown') { if (!this.drawArena(0)) this.drawTrack(0, 'stand'); this.text(rc!.countdown > 0 ? String(rc!.countdown) : 'СТАРТ!', 960, 560, 220, this.rgba(this.pal.fg, .85), 'center', 'bold') }
+    else if (phase === 'race') { if (!this.drawArena(rc!.raceT)) this.drawTrack(rc!.raceT, 'race') }
+    else if (phase === 'finish') { if (!this.drawArena(this.raceObj!.end)) this.drawTrack(this.raceObj!.end, 'race'); this.drawFinishOverlay() }
+    else if (phase === 'podiumTransition') { if (!this.drawArena(this.raceObj!.end)) this.drawTrack(this.raceObj!.end, 'race'); this.drawFinishOverlay(); this.drawPodium(rc!, ease(rc!.phaseT / T.podiumTransition)) }
     else this.drawPodium(rc!, 1)
     if (this.stats.loading && (phase === 'select' || phase === 'transition' || phase === 'countdown')) this.text('Загрузка бульдогов…', 960, 1040, 26, this.rgba(this.pal.muted, .9), 'center')
+  }
+  /** Кадр зимней арены (если включена и готова) на основное полотно; false — рисуем прежнюю трассу. t — секунды гонки (0 — старт). */
+  private drawArena(t: number, alpha = 1): boolean {
+    const a = this.arena, race = this.input.race; if (!a || !this.raceObj || !race || !this.dogs.every(Boolean)) return false
+    if (this.arenaKey !== this.raceKey) { a.setRace({ seed: race.seed, D: race.D }, 0, this.raceObj.end); this.arenaKey = this.raceKey }
+    if (!a.ready) return false
+    a.names = this.input.names; a.draw(t); const c = this.ctx; c.save(); c.globalAlpha = alpha; c.drawImage(this.arenaCv!, 0, 0); c.restore(); return true
   }
   private tickSelection(phase: RacePhase | 'select') {
     if (!this.selData) return
@@ -259,15 +272,22 @@ export class StageRenderer {
     const c = this.ctx, P = this.pal, race = this.raceObj!, pl = race.places; c.save(); c.globalAlpha = alpha
     c.fillStyle = this.rgba(P.panel, 1); c.fillRect(0, 0, L.width, L.height)
     this.text('ФИНИШ · ПЬЕДЕСТАЛ', 960, 76, 46, P.fg, 'center', 'bold')
-    const steps = [{ place: 2, x: 560, h: 170, dog: pl[1] }, { place: 1, x: 960, h: 250, dog: pl[0] }, { place: 3, x: 1360, h: 110, dog: pl[2] }], base = 880, k = 1.5, bw = 330, pawY = 690 * (this.dogs[0]?.sel.scale ?? 0.4)
+    const steps = [{ place: 2, x: 560, h: 170, dog: pl[1] }, { place: 1, x: 960, h: 250, dog: pl[0] }, { place: 3, x: 1360, h: 110, dog: pl[2] }], base = 880, k = 1.5, bw = 330, TOP = 30
+    const pawRow = PODIUM_PAW_ROW                                                                  // нижняя строка лап в ячейке IDLE (замер по листам 5 собак: 266–275, медиана 273)
+    // тёплое пятно-«пол» под пьедесталом, чтобы блоки не висели на сплошной заливке
+    { const g = c.createRadialGradient(960, base + 6, 20, 960, base + 6, 980); g.addColorStop(0, 'rgba(255,200,150,.10)'); g.addColorStop(1, 'rgba(255,200,150,0)'); c.save(); c.translate(960, base + 6); c.scale(1, 0.12); c.translate(-960, -(base + 6)); c.fillStyle = g; c.fillRect(0, base - 980, L.width, 1960); c.restore() }
     steps.forEach(s => {
-      const shown = rc.podiumShown >= (s.place === 3 ? 1 : s.place === 2 ? 2 : 3)
-      c.fillStyle = s.place === 1 ? '#d9b44a' : s.place === 2 ? '#bfc4c9' : '#c08a5a'; c.fillRect(s.x - bw / 2, base - s.h, bw, s.h); c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(s.x - bw / 2, base - s.h, bw, 8)
-      this.text(String(s.place), s.x, base - s.h / 2 + 30, 90, '#fff', 'center', 'bold')
+      const shown = rc.podiumShown >= (s.place === 3 ? 1 : s.place === 2 ? 2 : 3), col = s.place === 1 ? [217, 180, 74] : s.place === 2 ? [191, 196, 201] : [192, 138, 90], top = base - s.h
+      const fg = c.createLinearGradient(0, top, 0, base); fg.addColorStop(0, `rgb(${col.map(v => Math.round(v * .94)).join(',')})`); fg.addColorStop(1, `rgb(${col.map(v => Math.round(v * .72)).join(',')})`)
+      c.fillStyle = fg; c.fillRect(s.x - bw / 2, top, bw, s.h)                                       // фасад
+      c.fillStyle = `rgb(${col.map(v => Math.min(255, Math.round(v * 1.08))).join(',')})`; c.beginPath(); c.moveTo(s.x - bw / 2 + 14, top - TOP); c.lineTo(s.x + bw / 2 - 14, top - TOP); c.lineTo(s.x + bw / 2, top); c.lineTo(s.x - bw / 2, top); c.closePath(); c.fill()   // верхняя площадка (видна глубина — собака стоит НА ней)
+      c.fillStyle = 'rgba(255,255,255,.22)'; c.fillRect(s.x - bw / 2, top, bw, 3); c.fillStyle = 'rgba(0,0,0,.16)'; c.fillRect(s.x - bw / 2, base - 8, bw, 8)
+      this.text(String(s.place), s.x, top + s.h / 2 + 34, 90, '#fff', 'center', 'bold')
       if (!shown) return
-      const cell = this.dogs[s.dog]?.sel.cell ?? [227, 283], dw = cell[0] * k
-      c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(s.x, base - s.h + 4, 130, 13, 0, 0, 7); c.fill()
-      this.drawSel(s.dog, this.podiumFrames[s.dog], s.x - dw / 2, base - s.h - pawY * k + 4, k)
+      const cell = this.dogs[s.dog]?.sel.cell ?? [227, 283], dw = cell[0] * k, pawY = top - TOP / 2 + 2                  // лапы — посередине площадки, чуть глубже её переднего края
+      const sg = c.createRadialGradient(s.x + 8, pawY + 1, 0, s.x + 8, pawY + 1, 150); sg.addColorStop(0, 'rgba(30,20,60,.50)'); sg.addColorStop(0.55, 'rgba(30,20,60,.24)'); sg.addColorStop(1, 'rgba(30,20,60,0)')
+      c.save(); c.translate(s.x + 8, pawY + 1); c.scale(1, 0.12); c.translate(-(s.x + 8), -(pawY + 1)); c.fillStyle = sg; c.beginPath(); c.arc(s.x + 8, pawY + 1, 150, 0, 7); c.fill(); c.restore()   // мягкая контактная тень на площадке
+      this.drawSel(s.dog, this.podiumFrames[s.dog], s.x - dw / 2, pawY - pawRow * k, k)
       c.fillStyle = this.rgba(P.panel, .95); this.rr(s.x - 150, base + 14, 300, 76, 14); c.fill(); c.strokeStyle = P.accent; c.lineWidth = 2; c.stroke()
       this.text(`${s.place} место · №${s.dog + 1}`, s.x, base + 46, 28, P.fg, 'center', 'bold'); this.text(this.input.names[s.dog] ?? '', s.x, base + 78, 28, P.muted, 'center')
     })

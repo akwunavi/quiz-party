@@ -10,11 +10,12 @@ import { ButterflyManager } from '../vendor/butterfly.mjs'
 import type { RaceV3 } from '../v3types'
 
 const SW = L.spriteWidth, SH = L.spriteHeight
-export interface ArenaOptions { slotBase?: string; slotFiles?: string[]; names?: string[]; guide?: boolean }
+/** shared — внешний пул листов и собаки (сцена раунда уже держит их): арена не грузит и не закрывает свои. */
+export interface ArenaOptions { slotBase?: string; slotFiles?: string[]; names?: string[]; guide?: boolean; shared?: { pool: BitmapPool; dogs: (DogData | null)[] } }
 export class ArenaRenderer {
   private ctx: CanvasRenderingContext2D
-  private pool = new BitmapPool()
-  private dogs: (DogData | null)[] = [null, null, null, null, null]
+  private pool: BitmapPool
+  private dogs: (DogData | null)[]
   private race: RaceV3 | null = null
   private cam: ReturnType<typeof buildCameraTrack> | null = null
   private t0 = 0
@@ -27,22 +28,28 @@ export class ArenaRenderer {
   guide = false; names: string[] = ['Фрэнк', 'Зефир', 'Рокки', 'Пупс', 'Луна']
   buildMs = 0
   constructor(private canvas: HTMLCanvasElement, private opt: ArenaOptions = {}) {
+    this.pool = opt.shared?.pool ?? new BitmapPool(); this.dogs = opt.shared?.dogs ?? [null, null, null, null, null]
     canvas.width = ARENA.W; canvas.height = ARENA.H; this.ctx = canvas.getContext('2d')!; this.guide = !!opt.guide; if (opt.names) this.names = opt.names
   }
   /** Тяжёлая часть: рисует слои, грузит собак и листы гонки для окна, подключает доступные авторские слои. */
   async init(race: { seed: number; D: number }, t0: number, dur: number) {
+    await this.prepare(); this.setRace(race, t0, dur)
+    if (!this.opt.shared) await Promise.all(DOG_IDS.map(async (id, i) => { const d = await loadDogData(id); this.dogs[i] = d; await Promise.all(raceSheetUrls(d, this.race!.dogs[i].segments).map(u => this.pool.get(u))) }))
+  }
+  /** Часть, не зависящая от гонки: небо, горы, озеро, трасса, ограждение, авторские слои, лист бабочки. */
+  async prepare() {
     const s = performance.now()
     const sky = buildSky(), mtnFar = buildMountains(0.06, 41, 205, 'far'), mtnNear = buildMountains(0.10, 77, 150, 'near'), shore = buildFarShore(0.16)
     const lake = buildLake(sky, mtnFar, mtnNear, shore, 0.2), track = buildTrack(), fence = buildFence(track.lanternsX)
-    const ray = cv(2, 2)
-    this.art = { sky, mtnFar, mtnNear, shore, lake, track, fence, ray }
-    this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur)
-    await Promise.all(DOG_IDS.map(async (id, i) => { const d = await loadDogData(id); this.dogs[i] = d; await Promise.all(raceSheetUrls(d, this.race!.dogs[i].segments).map(u => this.pool.get(u))) }))
+    this.art = { sky, mtnFar, mtnNear, shore, lake, track, fence, ray: cv(2, 2) }
     if (this.opt.slotBase) { const r = await loadSlots(this.opt.slotBase, this.opt.slotFiles); this.slots = r.loaded; this.missing = r.missing }
     if (this.opt.slotBase && (!this.opt.slotFiles || this.opt.slotFiles.includes('butterfly.webp'))) this.bfSheet = await new Promise<HTMLImageElement | null>(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `${this.opt.slotBase}butterfly.webp` })
     this.buildMs = performance.now() - s
   }
-  destroy() { this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }
+  /** Привязка к гонке Race V3 и камера на окно [t0, t0+dur]. Дёшево — можно звать при смене гонки. */
+  setRace(race: { seed: number; D: number }, t0: number, dur: number) { this.race = raceFor(race.seed, race.D); this.t0 = t0; this.cam = buildCameraTrack(this.race, t0, dur); this.bf.reset() }
+  get ready() { return !!this.art && !!this.cam }
+  destroy() { if (!this.opt.shared) this.pool.release(); this.canvas.width = 0; this.canvas.height = 0 }
   get duration() { return this.cam?.dur ?? 0 }
   camX(t: number) { return this.cam!.at(t).x }
 
@@ -61,6 +68,7 @@ export class ArenaRenderer {
     for (const s of this.slots) this.drawSlot(s, X, T)                       // все авторские слои — ЗА ограждением, от дальнего к ближнему (параллакс по возрастанию)
     c.drawImage(A.fence, -X, BERM_Y + 2 - FENCE_H + sw(0.9))
     c.drawImage(A.track.canvas, -X, A.track.y0)
+    this.drawStartFinish(X)
     this.drawDogs(t, X)
     this.drawLanternBloom(T, X)
     this.drawSnow(T, X)
@@ -81,6 +89,12 @@ export class ArenaRenderer {
     const c = this.ctx; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.85; c.drawImage(this.aurB, 0, 20, 1920, 520); c.restore()
   }
   private drawLakeGlints(T: number, X: number) { const c = this.ctx, r = rng(3); c.save(); c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 70; i++) { const wx = r() * 3600, y = HZ + 6 + r() * (BERM_Y - HZ - 40), a = 0.25 * Math.abs(Math.sin(T * (0.8 + r()) + r() * 6)), x = ((wx - X * 0.2) % (ARENA.W + 200) + ARENA.W + 200) % (ARENA.W + 200) - 100; c.fillStyle = `rgba(255,220,230,${a})`; c.fillRect(x, y, 10 + r() * 24, 1) } c.restore() }
+  /** Стартовая линия (тонкая светлая) и финишная (шашечки поперёк всех дорожек) на снегу: рисуются до собак, в мировых координатах. Нос собаки пересекает линию при progress = 1. */
+  private drawStartFinish(X: number) {
+    const c = this.ctx, y0 = BERM_Y + 24, y1 = ARENA.H - 2, sx = worldX(0) + 6 - X, fx = worldX(1) + 6 - X
+    if (sx > -20 && sx < ARENA.W + 20) { c.fillStyle = 'rgba(255,250,255,.42)'; c.fillRect(sx - 2, y0, 4, y1 - y0); c.fillStyle = 'rgba(60,50,130,.18)'; c.fillRect(sx + 2, y0, 2, y1 - y0) }
+    if (fx > -40 && fx < ARENA.W + 40) { for (let r = 0, y = y0; y < y1; r++, y += 18) for (let k = 0; k < 2; k++) { c.fillStyle = (r + k) % 2 ? 'rgba(40,30,90,.72)' : 'rgba(255,250,255,.86)'; c.fillRect(fx - 9 + k * 9, y, 9, Math.min(18, y1 - y)) } }
+  }
   private drawSlot(s: LoadedSlot, X: number, T: number) {
     const c = this.ctx, sp = s.spec, mw = s.img.width / sp.modules
     for (const p of slotPlacements(sp, X)) c.drawImage(s.img, p.module * mw, 0, mw, sp.contentH ?? s.img.height, p.x, sp.bottomY - sp.tileH * p.scale, sp.tileW * p.scale, sp.tileH * p.scale)

@@ -9,7 +9,7 @@ import type { AnswerUpsert } from '../../lib/transport'
 import { openRaceBets, startRace, finishRace } from '../../lib/raceActions'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
 import { BulldogStage } from '../../components/BulldogStage'
-import type { StageStats } from '../../lib/bulldog/stage'
+import type { StageInput, StageStats } from '../../lib/bulldog/stage'
 import { mediaUrl } from '../../lib/media'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
@@ -24,12 +24,14 @@ import { countsByDog, gradingRows, raceOf, raceRef, scoreRows } from '../../lib/
 import { raceFor } from '../../lib/bulldog/engine'
 import type { RaceV3 } from '../../lib/bulldog/v3types'
 
-export function RaceBoard({ pack, round, gameState, preview, onStats }: {
+export function RaceBoard({ pack, round, gameState, preview, onStats, arena }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
   /** Предпросмотр в редакторе: музыка/начисление баллов/автооткрытие ставок выключены; часы остаются (сцена живая). */
   preview?: PreviewCtx
   /** Диагностика сцены (фаза, память, время кадра) — только для стенда e2e/bulldog */
   onStats?: (s: StageStats) => void
+  /** Зимняя арена на гонке (демо/пробный показ). Нет — прежняя трасса: по умолчанию в игре арена выключена. */
+  arena?: StageInput['arena']
 }) {
   const s = round.settings as RaceSettings
   const names = dogNames(s)
@@ -158,7 +160,7 @@ export function RaceBoard({ pack, round, gameState, preview, onStats }: {
       <div className="host-topbar"><span className="qnum">{round.title_lines.join(' ') || 'СКАЧКИ БУЛЬДОГОВ'}</span></div>
       <BulldogStage onStats={onStats} input={{
         race: race.seed != null && startedMs != null && (running || done) ? { seed: race.seed, D, startedMs } : null,
-        counts, names, scores,
+        counts, names, scores, arena,
       }} />
       {raceErr && <div className="mono-tag" style={{ color: 'var(--danger)' }}>Не удалось построить забег для этого сида — нажмите «Назад» и запустите заново</div>}
       {betting && (

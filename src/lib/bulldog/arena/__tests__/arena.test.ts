@@ -1,6 +1,6 @@
 // Арена: камера, раскладка дорожек и слоты авторской графики — без холста (чистая математика). Гонка — Race V3 того же движка (seed 328, D=42).
 import { describe, expect, it } from 'vitest'
-import { ARENA, DOG_ENVELOPE, LANE_RULES, buildCameraTrack, worldX } from '../camera'
+import { ARENA, DOG_ENVELOPE, LANE_RULES, buildCameraTrack, camTarget, worldX } from '../camera'
 import { SLOTS, slotPlacements, moduleOf } from '../slots'
 import { BERM_Y } from '../art'
 import { raceFor, stateAt } from '../../engine'
@@ -32,6 +32,14 @@ describe('камера сопровождения', () => {
   it('собаки не «приклеены» к кадру: положение лидера на экране меняется по ходу', () => {
     const xs = [0, 5, 10, 15, 20].map(t => Math.max(...race.dogs.map(d => worldX(stateAt(d, T0 + t).progress))) - cam.at(t).x)
     expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(40)
+  })
+})
+
+describe('камера на полной гонке', () => {
+  it('у старта камера не уходит левее края трассы (x ≥ 0), на всём забеге остаётся в пределах холста трассы', () => {
+    const race = raceFor(328, 42), cam = buildCameraTrack(race, 0, race.end)
+    for (let t = 0; t <= race.end; t += 0.25) { const x = cam.at(t).x; expect(x).toBeGreaterThanOrEqual(-0.5); expect(x + ARENA.W).toBeLessThanOrEqual(ARENA.START_X + ARENA.TRACK_LEN + 1700) }
+    expect(camTarget(race, 0)).toBe(0)
   })
 })
 
