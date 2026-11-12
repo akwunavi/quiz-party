@@ -599,3 +599,14 @@
 .theme-ny_book .bk-fin-v3 .fin-row.fin-first td:nth-child(2) .sb-name { font-size: 1.18em; color: var(--bk-red); }
 .theme-ny_book .bk-fin-v3 .neon-title span:last-child { text-transform: none; }
 .theme-ny_book .bk-fin-v3 .neon-title { border-bottom: calc(2 * var(--u)) solid var(--bk-gold); padding-bottom: calc(6 * var(--u)); }
+
+/* ── заставка раунда / правила / кроссворд: заголовок книжным display-шрифтом, длинное название не режется ── */
+.theme-ny_book .round-intro .neon-title, .theme-ny_book .round-intro h1 { font-family: var(--bk-display) !important; font-weight: 700 !important; color: var(--bk-ink-2) !important;
+  text-shadow: 0 calc(3 * var(--u)) 0 rgba(201, 161, 74, .45); letter-spacing: .01em; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.theme-ny_book .round-intro .neon-title { font-size: calc(84 * var(--u)) !important; line-height: 1.02; }
+.theme-ny_book .round-intro .neon-title span { color: var(--bk-ink-2) !important; }
+.theme-ny_book .round-badge, .theme-ny_book .rb-num { font-family: var(--bk-serif); font-weight: 700; background: linear-gradient(180deg, var(--bk-red-2), var(--bk-red)); box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(242, 213, 140, .6), 0 calc(4 * var(--u)) 0 var(--bk-red-3); }
+.theme-ny_book .rule-item { border-left: calc(8 * var(--u)) solid var(--bk-gold); }
+.theme-ny_book .rule-item .idx { color: var(--bk-red); }
+.theme-ny_book .rules-frame .rule-item, .theme-ny_book .rules-frame .rule-item * { font-family: var(--bk-serif); }
+.theme-ny_book .round-intro .meta-line { font-family: var(--bk-serif); font-style: normal; font-weight: 700; letter-spacing: .14em; border-color: var(--bk-line); color: var(--bk-muted); }
