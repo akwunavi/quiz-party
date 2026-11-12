@@ -4,7 +4,8 @@
 // поверх игры (выше затемнения), как и раньше.
 import type { CSSProperties, ReactNode } from 'react'
 import type { NyTeam } from '../types'
-import { lobbyLayout } from './geometry'
+import { lobbyLayout, lobbyRowH } from './geometry'
+import { bookTeamVariant } from './copy'
 
 /** Команды на правой странице: 1–4 карточки, 5–8 список, 9+ колонки, «+N» только при нехватке места. */
 export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean }) {
@@ -22,7 +23,8 @@ export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean 
   }
   const shown = l.hidden ? teams.slice(0, teams.length - l.hidden) : teams
   return (
-    <div className={`bk-teams is-${l.mode}`} style={{ '--cols': l.cols, '--per': l.perCol, '--fs': l.fontU } as CSSProperties}>
+    <div className={`bk-teams is-${l.mode} bk-t${bookTeamVariant()}`}
+      style={{ '--cols': l.cols, '--per': l.perCol, '--fs': l.fontU, '--rh': lobbyRowH(l) } as CSSProperties}>
       <div className="bk-teams-head"><span>КОМАНДЫ ЗА СТОЛОМ</span><b>{teams.length}</b></div>
       <ol className="bk-teams-grid">
         {shown.map((t, i) => {

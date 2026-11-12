@@ -44,6 +44,13 @@ describe('Книга: раскладка лобби по числу команд
     const l = lobbyLayout(60)
     expect(60 - l.hidden + 1).toBe(l.cols * l.perCol)
   })
+  it('высота строки: не меньше читаемой и не больше области; 10 и 16 команд — 62 px', () => {
+    expect(lobbyRowH(lobbyLayout(0))).toBe(0)
+    expect(lobbyRowH(lobbyLayout(4))).toBe(118)
+    expect(lobbyRowH(lobbyLayout(8))).toBe(66)
+    expect(lobbyRowH(lobbyLayout(16))).toBe(62)
+    for (let n = 1; n <= 60; n++) expect(lobbyRowH(lobbyLayout(n))).toBeGreaterThanOrEqual(56)
+  })
   it('кегль не растёт с числом команд; любая раскладка влезает в область команд', () => {
     let prev = Infinity
     for (let n = 1; n <= 60; n++) {

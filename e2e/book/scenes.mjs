@@ -44,11 +44,13 @@ export function makeApi(origin, pin) {
     call,
     reset: () => call(`/stand/reset?game=${GAME}`, 'POST'),
     session: patch => call('/api/session', 'PATCH', patch),
-    async teams(n) {
+    // names — свои имена (сцены «имена команд»); override (review-стенд) подменяет число команд там, где оно применимо
+    async teams(n, names) {
+      if (api.teamsOverride != null && !names) n = api.teamsOverride
       const out = []
       for (let i = 0; i < n; i++) {
         out.push(await call('/api/teams', 'POST', {
-          name: TEAM_NAMES[i % TEAM_NAMES.length] + (i >= TEAM_NAMES.length ? ` ${Math.floor(i / TEAM_NAMES.length) + 1}` : ''),
+          name: names ? names[i] : TEAM_NAMES[i % TEAM_NAMES.length] + (i >= TEAM_NAMES.length ? ` ${Math.floor(i / TEAM_NAMES.length) + 1}` : ''),
           color: PALETTE[i % PALETTE.length], icon: null, game_id: GAME,
           // «живая» команда (isAlive: last_seen за 10 с) — ставим далёкое будущее, снимок не зависит от часов
           last_seen_at: '2099-01-01T00:00:00.000Z', created_at: iso(Date.UTC(2026, 10, 12, 18, 0, i)),
@@ -105,6 +107,10 @@ function finaleRows(teams) {
   return rows
 }
 
+/** Трудные имена для плиток команд: одно слово, до 28 знаков, цифры, эмодзи, короткое. */
+export const NAMES_HARD = ['Ёлка', 'Самая длинная команда вечера', 'Сто двадцать пять снеговиков ⛄', 'Команда №7', 'Ёлочки 🎄🎄',
+  'Дед Мороз и Снегурочка и Ко', 'Му', 'Тридцать первое декабря'].map(n => n.slice(0, 31))
+
 export const SCENES = [
   // 1. лобби
   lobbyScene('01-lobby-0', 'лобби, 0 команд', 0),
@@ -115,6 +121,8 @@ export const SCENES = [
   lobbyScene('01-lobby-24', 'лобби, 24 команды', 24),
   lobbyScene('01-lobby-8-groups', 'лобби, 8 команд + окно составов', 8, { groups: true }),
   lobbyScene('01-lobby-paper-8', 'лобби, бумага, 8 команд', 8, { paper: true }),
+  { id: '01-lobby-names', title: 'лобби, трудные имена (одно слово, 28 знаков, цифры, эмодзи)', ready: '.lobby-screen', settle: 3500,
+    async setup(api) { await api.reset(); await api.teams(NAMES_HARD.length, NAMES_HARD); await api.session({ pack_id: PACK_ONLINE, phase: 'lobby', round_number: 0, question_index: 0 }) } },
   // 2. правила
   {
     id: '02-rules', title: 'заставка раунда с правилами (round_intro, R1)', ready: '.round-intro', settle: 4000,
@@ -253,6 +261,17 @@ export const SCENES = [
       await api.session({ pack_id: PACK_ONLINE, phase: 'finale', round_number: 7, question_index: 2, timer_started_at: null, reveal: true })
     },
   },
+  // прототип этапа 2: три варианта плиток команд в лобби (?bkteam=1|2|3) при 4/8/10/16 командах и с трудными именами
+  ...[1, 2, 3].flatMap(v => [[4, 4], [8, 8], [10, 10], [16, 16], ['names', 0]].map(([k, n]) => ({
+    id: `17-team-t${v}-${k}`, title: `плитки команд, вариант T${v}: ${k === 'names' ? 'трудные имена' : k + ' команд'}`, ready: '.lobby-screen', settle: 3000, query: `bkteam=${v}`,
+    async setup(api) {
+      await api.reset()
+      if (k === 'names') await api.teams(NAMES_HARD.length, NAMES_HARD); else await api.teams(n)
+      await api.session({ pack_id: PACK_ONLINE, phase: 'lobby', round_number: 0, question_index: 0 })
+    },
+  }))),
+  // лист шрифтов: статическая страница стенда (review/fonts.html) на тех же локальных шрифтах и токенах --bk-*
+  { id: '18-fonts', title: 'лист шрифтов: иерархия типографики «Книги»', ready: '.fs-ready', settle: 800, path: '/review/fonts.html', async setup() {} },
 ]
 
 export { qref, qrefP }

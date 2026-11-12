@@ -51,6 +51,8 @@ async function main() {
     const errors = [], media = []
     page.on('pageerror', e => errors.push(String(e.message || e)))
     page.on('console', m => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)) })
+    const ext = new Set()
+    page.on('request', r => { try { const u = new URL(r.url()); if (!/^(127\.0\.0\.1|localhost)$/.test(u.hostname) && u.protocol.startsWith('http')) ext.add(u.hostname) } catch { /* data: */ } })
     page.on('response', r => { if (/\/api\/media\//.test(r.url())) media.push(`${r.status()} ${decodeURIComponent(r.url().replace(/.*\/api\/media\//, ''))}`) })
     await scene.setup(api)
     // факт РЕАЛЬНОГО воспроизведения звука (событие playing у любого <audio>, в т.ч. не в DOM)
@@ -63,7 +65,7 @@ async function main() {
     })
     await page.clock.install()
     // scene.query — параметры адреса сцены (прототипные флаги, напр. bkfin=2 — вариант финала)
-    await page.goto(scene.query ? url + '&' + scene.query : url)
+    await page.goto(scene.path ? ORIGIN + scene.path : scene.query ? url + '&' + scene.query : url)
     let ok = true, why = ''
     try {
       await page.waitForSelector(scene.ready, { timeout: 15000 })
@@ -90,6 +92,9 @@ async function main() {
     if (save) await page.screenshot({ path: path.join(PNG_DIR, name + '.png') })
     const m = await measure(page, { scene: scene.id, reduced })
     m.playing = await page.evaluate(() => window.__qpPlaying ?? [])
+    // шрифты: какие начертания реально загружены (локально) + внешние хосты (должно быть пусто — никаких чужих CDN)
+    m.fontFaces = await page.evaluate(() => [...document.fonts].filter(f => f.status === 'loaded').map(f => `${f.family.replace(/"/g, '')} ${f.weight}`).sort())
+    m.externalHosts = [...ext]
     await ctx.close()
     const rec = { name, title: scene.title, ok, why, errors: [...new Set(errors)].slice(0, 8), media: [...new Set(media)].filter(s => !s.startsWith('20')), ...m }
     results.push(rec)

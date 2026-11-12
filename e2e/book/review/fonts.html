@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Лист шрифтов — «Книга»</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Лист шрифтов (ПРОТОТИП этапа 2): иерархия типографики темы ny_book на ТЕХ ЖЕ локальных шрифтах и токенах --bk-*, что и в игре.
+     CSS приложения подхватывается из собранного index.html стенда (никаких чужих CDN). Только стенд, в боевую сборку не входит. -->
+<style>
+  html,body{margin:0;background:#120d0b}
+  .fs{width:1920px;height:1080px;box-sizing:border-box;padding:48px 72px;display:grid;grid-template-columns:1fr 1fr;gap:28px 64px;align-content:start;
+    background:radial-gradient(ellipse 90% 80% at 50% 45%,var(--bk-paper) 30%,var(--bk-paper-2) 75%,var(--bk-paper-3));color:var(--bk-ink);font-family:var(--bk-serif)}
+  .fs h2{grid-column:1/-1;margin:0;font:700 34px/1 var(--bk-display);letter-spacing:.26em;text-transform:uppercase;color:var(--bk-red);border-bottom:2px solid var(--bk-line);padding-bottom:8px}
+  .row{display:flex;flex-direction:column;gap:4px}
+  .meta{font:400 15px/1.3 var(--bk-serif);color:var(--bk-muted);letter-spacing:.02em}
+  .t-title{font:700 92px/1 var(--bk-display);color:var(--bk-ink-2)}
+  .t-sub{font:700 30px/1.2 var(--bk-display);letter-spacing:.26em;text-transform:uppercase;color:var(--bk-red)}
+  .t-name{font:600 44px/1.08 var(--bk-name);color:var(--bk-ink-2)}
+  .t-text{font:400 28px/1.35 var(--bk-serif)} .t-text b{font-weight:700}
+  .t-num{font:700 56px/1 var(--bk-num);font-variant-numeric:lining-nums;color:var(--bk-red)}
+  .cmp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 24px;grid-column:1/-1}
+  .cmp div{font-size:36px;line-height:1.1;color:var(--bk-ink-2);white-space:nowrap;overflow:hidden}
+  .cmp small{display:block;font:400 14px/1.2 var(--bk-serif);color:var(--bk-muted)}
+  #status{grid-column:1/-1;font:400 14px/1.4 monospace;color:var(--bk-muted)}
+</style></head>
+<body>
+<div class="theme-ny_book fs" id="fs">
+  <h2>Лист шрифтов · иерархия «Книги»</h2>
+  <div class="row"><div class="t-title">Глава последняя.<br>Наши победители</div><div class="meta">ЗАГОЛОВОК · Cormorant Garamond 700 · 92 px · интерлиньяж 1.0 · только заголовки (лента лобби, глава, итоги)</div></div>
+  <div class="row"><div class="t-sub">Команды за столом</div><div class="meta">ПОДЗАГОЛОВОК / ШАПКИ · Cormorant Garamond 700, капс, разрядка .26em · 30 px</div>
+    <div class="t-name" style="margin-top:14px">Мандарины и шампанское</div><div class="meta">НАЗВАНИЕ КОМАНДЫ · EB Garamond 600 · 44 px (лобби 28–50 px по числу команд) · кернинг включён</div></div>
+  <div class="row"><div class="t-text">Вопрос, ответ и повтор набраны <b>одним шрифтом</b>: «Какая страна считается родиной ёлочных игрушек из стекла?» — Ёё, Йй, Щщ, Ъъ.</div><div class="meta">ТЕКСТ · PT Serif 400/700 · 28 px · интерлиньяж 1.35 · вопрос/ответ/повтор — всегда PT Serif 700</div></div>
+  <div class="row"><div class="t-num">0123456789 · 42.5 · 7/10 · №3</div><div class="meta">ЦИФРЫ · PT Serif 700, lining-nums (цифры в строку, не «старого стиля») · счёт, номера, таймер</div></div>
+  <h2>Кандидаты для названий команд (одно имя, 36 px)</h2>
+  <div class="cmp">
+    <div style="font-family:var(--bk-serif);font-weight:700">Дед Мороз и компания 123<small>PT Serif 700 (прежний)</small></div>
+    <div style="font-family:var(--bk-name);font-weight:600">Дед Мороз и компания 123<small>EB Garamond 600 — ВЫБРАН</small></div>
+    <div style="font-family:'Lora';font-weight:600">Дед Мороз и компания 123<small>Lora 600</small></div>
+    <div style="font-family:var(--bk-display);font-weight:700">Дед Мороз и компания 123<small>Cormorant Garamond 700 (display)</small></div>
+  </div>
+  <div id="status">загрузка шрифтов…</div>
+</div>
+<script>
+(async () => {
+  try {
+    const idx = await (await fetch('/quiz-party/')).text()
+    for (const m of idx.matchAll(/href="([^"]+\.css)"/g)) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = m[1]; document.head.appendChild(l); await new Promise(r => { l.onload = l.onerror = r }) }
+  } catch (e) { /* без CSS приложения лист пустой — стенд должен быть собран */ }
+  const faces = ['700 92px "Cormorant Garamond"', '600 44px "EB Garamond"', '400 28px "PT Serif"', '700 28px "PT Serif"', '600 36px Lora']
+  const sample = 'Ёё Щщ Ъъ Мандарины 0123'
+  await Promise.all(faces.map(f => document.fonts.load(f, sample)))
+  await document.fonts.ready
+  const loaded = [...document.fonts].filter(f => f.status === 'loaded').map(f => f.family.replace(/"/g, '') + ' ' + f.weight)
+  document.getElementById('status').textContent = 'Загружено локально (без внешних CDN): ' + [...new Set(loaded)].join(' · ')
+  document.getElementById('fs').classList.add('fs-ready')
+  const d = document.createElement('div'); d.className = 'fs-ready'; d.hidden = true; document.body.appendChild(d)
+})()
+</script></body></html>

@@ -46,9 +46,10 @@ export function lobbyLayout(n: number): LobbyLayout {
   return { mode: 'cols3', cols: 3, perCol: MAX_PER_COL, fontU: 24, hidden: k - (cap - 1) }
 }
 
-/** Высота строки команды (px сцены) — чтобы проверить, что раскладка влезает в TEAMS_BOX. */
+/** Высота строки команды (px сцены): базовая для режима, но не больше, чем позволяет область команд (шапка ~70 px, зазор 10 px) —
+ *  поэтому любая раскладка влезает в TEAMS_BOX без прокрутки. CSS получает её как --rh. */
 export function lobbyRowH(l: LobbyLayout): number {
-  if (l.mode === 'cards') return 118
-  if (l.mode === 'list') return 62
-  return l.mode === 'cols2' ? 62 : 56
+  if (l.perCol <= 0) return 0
+  const base = l.mode === 'cards' ? 118 : l.mode === 'list' ? 66 : l.mode === 'cols2' ? 62 : 56
+  return Math.min(base, Math.floor((TEAMS_BOX.h - 70) / l.perCol) - 10)
 }

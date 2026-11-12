@@ -118,7 +118,17 @@ function resetGame(store, gameId) {
   })
 }
 
-export async function startStand({ noBuild = false } = {}) {
+// страницы review-стенда (e2e/book/review/*) — статикой на том же порту (в боевую сборку не входят)
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.webp': 'image/webp' }
+function serveReview(pathname, res) {
+  const rel = decodeURIComponent(pathname.replace(/^\/review\//, '')) || 'index.html'
+  const file = path.resolve(HERE, 'review', rel)
+  if (!file.startsWith(path.join(HERE, 'review') + path.sep) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end('нет такого файла'); return }
+  res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' })
+  fs.createReadStream(file).pipe(res)
+}
+
+export async function startStand({ noBuild = false, extra = null } = {}) {
   // порт занят другим прогоном — НЕ трогаем его данные (rmSync ниже стёр бы чужой стенд посреди снимков)
   const busy = await fetch(`${ORIGIN}/api/server-now`, { signal: AbortSignal.timeout(800) }).then(() => true, () => false)
   if (busy) throw new Error(`стенд уже запущен на ${ORIGIN} — дождитесь конца прогона`)
@@ -131,6 +141,8 @@ export async function startStand({ noBuild = false } = {}) {
   const server = http.createServer((req, res) => {
     let url
     try { url = new URL(req.url, ORIGIN) } catch { res.writeHead(400); res.end(); return }
+    if (url.pathname.startsWith('/review/') && req.method === 'GET') return serveReview(url.pathname, res)
+    if (extra && url.pathname.startsWith('/review-api/')) return void extra(req, res, url)
     if (url.pathname.startsWith('/sb/rest/v1/')) return fakeRest(store, req, res, url)
     if (url.pathname.startsWith('/sb/')) { res.writeHead(401, { 'Content-Type': 'application/json' }); res.end('{"message":"stand: облака нет"}'); return }
     if (url.pathname === '/stand/reset' && req.method === 'POST') {

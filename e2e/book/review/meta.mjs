@@ -1,0 +1,36 @@
+// Метаданные сцен для просмотра: группы, где применим переключатель числа команд, кнопки «шаг» (без запуска стенда).
+// `node e2e/book/review/meta.mjs --json` печатает список — его читает сборщик статического просмотра.
+import { SCENES } from '../scenes.mjs'
+
+export const group = id => {
+  if (/^01/.test(id)) return 'Лобби'
+  if (/^0[23]/.test(id)) return 'Правила'
+  if (/^0[4-8]/.test(id)) return 'Вопросы'
+  if (/^09/.test(id)) return 'Ожидание'
+  if (/^1[012]-|^10-/.test(id) && !/^10b/.test(id)) return 'Раскрытие'
+  if (/^1[34]/.test(id)) return 'Мелодия'
+  if (/^1[56]/.test(id)) return 'Финал'
+  if (/^17/.test(id)) return 'Плитки команд'
+  if (/^18/.test(id)) return 'Типографика'
+  return 'Прочее'
+}
+export const teamsApplicable = id => /^(01-lobby-(?!names)|09-answer-time$|10-recall-A|11-|12-|15-finale)/.test(id)
+export /** Кнопки «шаг / повторить переход» — только записи в состояние игры (как это сделал бы пульт), без самого пульта. */
+function stepsFor(id) {
+  const g = group(id)
+  const st = []
+  if (g === 'Вопросы') st.push({ id: 'next', label: 'Следующий вопрос → (листание страницы)' }, { id: 'prev', label: '← Предыдущий вопрос' }, { id: 'timer', label: 'Перезапустить таймер' })
+  if (g === 'Правила') st.push({ id: 'to-q', label: 'Начать раунд → (заставка → вопрос, листание)' }, { id: 'to-intro', label: '← К заставке раунда' })
+  if (/^11-|^12-/.test(id)) st.push({ id: 'rereveal', label: 'Повторить раскрытие ответа (скрыть → показать)' }, { id: 'hide', label: 'Скрыть ответ' }, { id: 'show', label: 'Показать ответ' })
+  if (/^10-recall-A/.test(id)) st.push({ id: 'show', label: 'Раскрыть ответ (разворот карточки)' }, { id: 'hide', label: 'Вернуть вопрос (до раскрытия)' })
+  if (/^13/.test(id)) st.push({ id: 'spin', label: 'Запустить рулетку' })
+  if (/^14/.test(id)) st.push({ id: 'play', label: 'Играть отрывок (пластинка; один раз кликните по экрану)' }, { id: 'stop', label: 'Закрыть трек (пластинка стоит)' })
+  if (g === 'Лобби' || /^17/.test(id)) st.push({ id: 'addteam', label: '+ Добавить команду' })
+  if (g === 'Финал' || g === 'Раскрытие' || g === 'Ожидание') st.push({ id: 'reset', label: 'Начать сцену заново' })
+  return st
+}
+
+
+export const sceneList = () => SCENES.map(s => ({ id: s.id, title: s.title, group: group(s.id), teams: teamsApplicable(s.id), steps: stepsFor(s.id), path: s.path ?? null }))
+
+if (process.argv.includes('--json')) console.log(JSON.stringify(sceneList()))

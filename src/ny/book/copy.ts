@@ -13,3 +13,14 @@ export function bookFinaleVariant(): BookFinaleVariant {
     return m ? (Number(m[1]) as BookFinaleVariant) : 1
   } catch { return 1 }
 }
+
+export type BookTeamVariant = 1 | 2 | 3
+
+/** ПРОТОТИП (только для согласования): вариант плитки команды в лобби из адреса проектора `?bkteam=1|2|3`
+ *  (1 — лента-закладка, 2 — карточка с бумажным язычком, 3 — подарочная бирка). После выбора флаг убирается. */
+export function bookTeamVariant(): BookTeamVariant {
+  try {
+    const m = typeof location !== 'undefined' ? /[?&]bkteam=([123])/.exec(location.href) : null
+    return m ? (Number(m[1]) as BookTeamVariant) : 1
+  } catch { return 1 }
+}
