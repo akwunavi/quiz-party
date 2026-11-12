@@ -32,7 +32,9 @@ function staticVariantId(id, kind, v) {
 }
 const isNav = s => !/-v[23]$/.test(s.id) && !/^17-team-t[23]-/.test(s.id)
 const cur = () => S.scenes.find(s => s.id === S.id)
-const navList = () => S.scenes.filter(isNav)
+const GROUPS = ['Лобби', 'Правила', 'Вопросы', 'Ожидание', 'Раскрытие', 'Мелодия', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', 'Прочее']
+const gi = g => { const i = GROUPS.indexOf(g); return i < 0 ? GROUPS.length : i }
+const navList = () => S.scenes.filter(isNav).map((s, i) => [s, i]).sort((a, b) => gi(a[0].group) - gi(b[0].group) || a[1] - b[1]).map(x => x[0])
 
 function url() {
   const p = new URLSearchParams()

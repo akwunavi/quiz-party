@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Статический просмотр прототипов «Книги»: ОДИН self-contained HTML из кадров shots/proto (без сервера, без сети, без CDN).
-Навигация/разрешения/варианты — тот же review.js (режим window.REVIEW_STATIC). Кадры ужимаются (ширина ≤ 1400, WebP q52) и вшиваются
+Навигация/разрешения/варианты — тот же review.js (режим window.REVIEW_STATIC). Кадры ужимаются (ширина ≤ 1200, WebP q46) и вшиваются
 base64. Результат: docs-dev/book-redesign/review/book-review.html. usage: python3 -I e2e/book/review/build-static.py"""
 import base64, io, json, os, re, subprocess, sys
 from PIL import Image
@@ -19,8 +19,8 @@ def add(dirpath, prefix):
         if not m: continue
         sid, res = m.groups(); have.add(sid)
         im = Image.open(os.path.join(dirpath, f)).convert('RGB')
-        im = im.resize((1400, round(im.height * 1400 / im.width)), Image.LANCZOS)
-        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=52, method=6)
+        im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
+        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=46, method=6)
         frames.setdefault(prefix + sid, {})[res] = 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
 add(SHOTS, '')
 ADAPT = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'adaptive')
