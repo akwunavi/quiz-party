@@ -1,0 +1,167 @@
+// ═══ Демо-пакет «Книги» для стенда e2e/book — тяжёлые сценарии вёрстки ═══
+//
+// Пакет собирается по типам src/types/quiz.ts (Pack + RoundBase + Question,
+// форма LoadedPack: pack + rounds[].questions[]). 8 раундов, тема ny_book.
+// Медиа — пути `book/<файл>` относительно media-папки локального сервера
+// (`/api/media/book/...`), файлы генерирует e2e/book/media/gen.py.
+//
+// Ничего реального здесь нет: ни живых пакетов, ни ответов. ID детерминированы,
+// чтобы сценарии (scenes.mjs) могли ссылаться на конкретный вопрос.
+//
+// usage (отдельно, для просмотра JSON): node e2e/book/make-pack.mjs [paper]
+
+export const PACK_ONLINE = 'stand-book'
+export const PACK_PAPER = 'stand-book-paper'
+
+const T0 = '2026-11-12T00:00:00.000Z'
+const m = f => `book/${f}`
+
+/** ~400 знаков пояснения (answer_note) */
+export const NOTE_400 = 'Пояснение к ответу длиной около четырёхсот знаков. Ёлку в домах стали ставить массово только в девятнадцатом '
+  + 'веке, а до этого зелёные ветви вешали под потолком вверх ногами. Стеклянные шары придумали стеклодувы, когда '
+  + 'не уродились яблоки, а мишуру поначалу делали из настоящего серебра, и она быстро темнела от свечей. '
+  + 'Ведущий читает это вслух, пока команды проверяют бланки и спорят о засчитанных баллах.'
+
+const LONG_Q = 'Этот вопрос нарочно очень длинный, чтобы проверить подгонку кегля в рамке без картинок: в старинной '
+  + 'рождественской книге рассказывается, что в одном северном городке каждый год в канун праздника жители выносили '
+  + 'на площадь самую высокую ель, украшали её бумажными звёздами и стеклянными шарами, а в полночь зажигали свечи. '
+  + 'Какой материал, по легенде, заменил свечи после большого пожара, случившегося в этом городке?'
+
+const LONG_Q2 = 'Длинный вопрос с четырьмя картинками разных пропорций: посмотрите внимательно на все четыре снимка, '
+  + 'среди них есть вертикальный, горизонтальный, квадратный и прозрачный PNG. Что их объединяет, если не считать '
+  + 'того, что все они сделаны для проверки вёрстки?'
+
+const LONG_Q3 = 'Длинный вопрос, у которого на разборе есть собственная картинка ответа (media.answer): в какой стране '
+  + 'принято на Рождество прятать в доме метлу, чтобы её не украли ведьмы, вылетающие в эту ночь, и почему эта '
+  + 'традиция дожила до наших дней почти без изменений, несмотря на весь технический прогресс?'
+
+function free(correct, display) { return { mode: 'free_text', correct, display: display ?? correct.split(' / ')[0] } }
+
+function q(roundId, pos, text, extra = {}) {
+  return {
+    id: `${roundId}-q${pos}`, round_id: roundId, position: pos, question_text: text,
+    media: { question: [], ...(extra.media ?? {}) }, answer: extra.answer ?? free('ответ'),
+    answer_note: extra.note ?? null, service: {}, is_final_question: false, status: 'ready', hidden: false,
+  }
+}
+
+function round(packId, pos, mechanic, title, rules, questions, settings = {}, extra = {}) {
+  const id = `${packId}-r${pos}`
+  return {
+    id, pack_id: packId, position: pos, mechanic, title_lines: Array.isArray(title) ? title : [title], rules,
+    rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: false,
+    answers_reveal: extra.reveal ?? 'after_round', meta_line_override: null, status: 'ready',
+    questions: questions(id),
+  }
+}
+
+/** Кроссворд 7×10: СНЕГОВИК / САНИ / ВАЛЕНКИ / ИГЛА / КАТОК — пересечения сверены вручную. */
+export const CROSSWORD_GRID = {
+  rows: 7, cols: 10,
+  words: [
+    { word: 'СНЕГОВИК', clue: 'Его лепят во дворе из трёх комов', number: 1, dir: 'across', row: 0, col: 0 },
+    { word: 'САНИ', clue: 'На них катаются с горки', number: 1, dir: 'down', row: 0, col: 0 },
+    { word: 'ВАЛЕНКИ', clue: 'Тёплая войлочная обувь', number: 2, dir: 'down', row: 0, col: 5 },
+    { word: 'ИГЛА', clue: 'Колючая часть ёлки', number: 3, dir: 'across', row: 3, col: 0 },
+    { word: 'КАТОК', clue: 'Лёд для коньков', number: 4, dir: 'across', row: 5, col: 5 },
+  ],
+}
+
+function melodyThemes(names, perTheme, ext) {
+  return names.map((name, t) => ({
+    name,
+    tracks: Array.from({ length: perTheme }, (_, k) => ({ audio: m(`mel-${t}-${k}.${ext}`), correct: `${name}: трек ${k + 1} — исполнитель «Длинное название группы»` })),
+  }))
+}
+
+/** Собрать пакет. `paper` — бумажный режим (play_mode: 'paper'). `audioExt` — mp3|wav (что сгенерировал gen.py). */
+export function buildPack({ paper = false, audioExt = 'mp3' } = {}) {
+  const id = paper ? PACK_PAPER : PACK_ONLINE
+  const rounds = [
+    // R1 — все раскладки обычного вопроса
+    round(id, 0, 'standard', 'Разминка у новогоднего камина', [
+      'Отвечайте с телефона капитана: одна команда — один ответ на вопрос',
+      'За верный ответ — 1 балл, за неверный штрафа нет, но и снисхождения тоже',
+      'Ответ можно поправить два раза, пока идёт время вопроса',
+      'Опечатки ведущий прощает, если смысл ответа очевиден залу',
+    ], rid => [
+      q(rid, 0, LONG_Q, { answer: free('электрические гирлянды / гирлянды', 'Электрические гирлянды'), note: NOTE_400 }),
+      q(rid, 1, 'Что изображено на этой вертикальной картинке 3:4?', { media: { question: [m('p3x4.jpg')] } }),
+      q(rid, 2, 'Две картинки: широкая 16:9 и квадрат 1:1. Что общего?', { media: { question: [m('p16x9.jpg'), m('p1x1.jpg')] } }),
+      q(rid, 3, 'Три картинки: 3:4, 16:9 и прозрачный PNG. Какая лишняя?', { media: { question: [m('p3x4.jpg'), m('p16x9.jpg'), m('alpha1x1.png')] } }),
+      q(rid, 4, 'Четыре картинки разных пропорций — найдите звезду', { media: { question: [m('p1x1.jpg'), m('p9x16.jpg'), m('p21x9.jpg'), m('alpha3x2.png')] } }),
+      q(rid, 5, LONG_Q2, { media: { question: [m('p3x4.jpg'), m('p16x9.jpg'), m('p1x1.jpg'), m('alpha1x1.png')] } }),
+      q(rid, 6, 'Какая из четырёх картинок — настоящая рождественская открытка?', {
+        media: { question: [m('opt-0.jpg'), m('opt-1.jpg'), m('opt-2.jpg'), m('opt-3.jpg')] },
+        answer: { mode: 'choice', choices: [
+          { key: 'А', text: 'Открытка с оленем' }, { key: 'Б', text: 'Открытка со снеговиком в шляпе' },
+          { key: 'В', text: 'Широкая панорама' }, { key: 'Г', text: 'Почтовая марка' },
+        ], correct_choice: 'Б', display: 'Б — открытка со снеговиком' },
+      }),
+      q(rid, 7, 'Сколько оленей в упряжке Санта-Клауса по классическому стихотворению 1823 года?', {
+        answer: { mode: 'choice', choices: [
+          { key: 'А', text: 'Шесть оленей' }, { key: 'Б', text: 'Восемь оленей, без Рудольфа' },
+          { key: 'В', text: 'Девять оленей вместе с Рудольфом' }, { key: 'Г', text: 'Двенадцать' },
+        ], correct_choice: 'Б', display: 'Восемь' },
+      }),
+      q(rid, 8, LONG_Q3, { media: { question: [], answer: [m('ans16x9.jpg')] }, answer: free('Норвегия'), note: NOTE_400 }),
+      q(rid, 9, 'Три картинки и варианты текстом: где снят этот кадр?', {
+        media: { question: [m('p4x3.jpg'), m('p9x16.jpg'), m('alpha3x2.png')] },
+        answer: { mode: 'choice', choices: [
+          { key: 'А', text: 'Лапландия' }, { key: 'Б', text: 'Великий Устюг' }, { key: 'В', text: 'Рованиеми' }, { key: 'Г', text: 'Студия' },
+        ], correct_choice: 'Г', display: 'Студия' },
+      }),
+    ]),
+    // R2 — сопоставление, порядок
+    round(id, 1, 'stakes_free', 'Сопоставь и расставь по порядку', [
+      'Ставка 0 или 2: верно со ставкой — плюс три, неверно — минус два',
+      'Без ставки — обычный балл за верный ответ',
+    ], rid => [
+      q(rid, 0, 'Сопоставьте страну и новогоднего персонажа', {
+        answer: { mode: 'match', left: ['Россия', 'Финляндия', 'Италия', 'Нидерланды'], right: ['А', 'Б', 'В', 'Г'],
+          right_labels: ['Йоулупукки', 'Синтерклаас', 'Дед Мороз', 'Бефана'], correct_pairs: ['1В', '2А', '3Г', '4Б'],
+          display: ['1 — Дед Мороз', '2 — Йоулупукки', '3 — Бефана', '4 — Синтерклаас'] },
+      }),
+      q(rid, 1, 'Расставьте праздники по порядку в календаре', {
+        answer: { mode: 'order', choices: [
+          { key: 'А', text: 'Старый Новый год' }, { key: 'Б', text: 'Католическое Рождество' },
+          { key: 'В', text: 'Новый год' }, { key: 'Г', text: 'Православное Рождество' },
+        ], correct_order: 'БВГА', display: ['Католическое Рождество', 'Новый год', 'Православное Рождество', 'Старый Новый год'] },
+      }),
+      q(rid, 2, 'Короткий вопрос со ставкой', { answer: free('мандарин') }),
+    ], { stakesValues: [0, 2] }),
+    // R3 — ребус
+    round(id, 2, 'rebus', 'Ребусы из старой открытки', ['Две картинки — одно слово', 'Правило 3+3: три попытки, три подсказки'], rid => [
+      q(rid, 0, '', { media: { question: [m('rebus-a.jpg'), m('rebus-b.jpg')] }, answer: free('снежинка') }),
+      q(rid, 1, '', { media: { question: [m('rebus-b.jpg'), m('rebus-a.jpg')] }, answer: free('хлопушка') }),
+    ]),
+    // R4 — кроссворд с сеткой
+    round(id, 3, 'crossword', 'Зимний кроссворд', ['Каждый вопрос — одно слово сетки', 'Буквы на пересечениях помогают соседям'], rid =>
+      CROSSWORD_GRID.words.map((w, i) => q(rid, i, w.clue, { answer: { mode: 'crossword_word', word: w.word } })),
+    { grid: CROSSWORD_GRID }),
+    // R5 — мелодия 3 темы × 4 трека
+    round(id, 4, 'melody', 'Песни под ёлку', ['Ставка — за сколько секунд угадаете', '2–5 сек — 2 балла, 6–10 сек — 1 балл'], () => [],
+      { themes: melodyThemes(['Советские новогодние', 'Зарубежные хиты', 'Мультфильмы'], 4, audioExt), spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10, trackSec: 14 }),
+    // R6 — мелодия 4 темы × 6 треков, название 30 знаков
+    round(id, 5, 'melody', 'Большой новогодний хит-парад!', ['Темы и треки выбирает рулетка'], () => [],
+      { themes: melodyThemes(['Песни из кинофильмов о любви', 'Ретро', 'Рок-н-ролл под снегом', 'Детские'], 6, audioExt), spinSec: 5, bidSec: 10, answerSec: 30, passAnswerSec: 10, trackSec: 14 }),
+    // R7, R8 — обычные (для таблицы итогов из 8 раундов)
+    round(id, 6, 'standard', 'Вопросы от Деда Мороза', ['Обычные вопросы, балл за ответ'], rid => [
+      q(rid, 0, 'Из чего делали первые ёлочные игрушки?', { answer: free('стекло / из стекла') }),
+      q(rid, 1, 'Как зовут внучку Деда Мороза?', { answer: free('Снегурочка') }),
+    ]),
+    round(id, 7, 'thematic_x2', 'Финальный вопрос вечера', ['Угадайте тему — и баллы удвоятся'], rid => [
+      q(rid, 0, 'Последний вопрос пакета: что загадывают под бой курантов?', { answer: free('желание') }),
+    ]),
+  ]
+  return {
+    id, name: paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme: 'ny_book',
+    created_by: null, created_at: T0, updated_at: T0, last_game_id: null,
+    settings: { play_mode: paper ? 'paper' : 'phones', timer_seconds: 60, max_edits: 2 },
+    rounds,
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log(JSON.stringify(buildPack({ paper: process.argv[2] === 'paper' }), null, 1))
+}
