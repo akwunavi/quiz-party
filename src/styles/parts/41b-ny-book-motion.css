@@ -34,3 +34,11 @@
   .theme-ny_book .bk-vinyl.is-spin .bk-vinyl-disc { animation: none !important; }
   .theme-ny_book .bk-vinyl-arm { transition: none !important; }
 }
+
+/* ── прежние анимации экранов «Книги», которые не гасились при reduced-motion (STAND §4): те же селекторы + !important ── */
+@media (prefers-reduced-motion: reduce) {
+  .theme-ny_book .neon-title { animation: none !important; }
+  .theme-ny_book .p-ros-num { animation: none !important; }
+  .theme-ny_book .choice-plate { animation: none !important; }
+  .theme-ny_book :is(.jp-modal, .mel-modal) { animation: none !important; }
+}

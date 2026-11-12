@@ -5391,7 +5391,7 @@
    }
   },
   "anim": {
-   ".neon-title": "p-unfurl 1.1s",
+   ".neon-title": "none",
    ".bk-team": "bk-team-in 0.001s",
    ".bk-lamp": "bk-twinkle 0.001s",
    ".bk-spark": "bk-spark 0.001s"
@@ -6514,7 +6514,7 @@
    }
   },
   "anim": {
-   ".neon-title": "p-unfurl 1.1s",
+   ".neon-title": "none",
    ".bk-team": "bk-team-in 0.001s",
    ".bk-lamp": "bk-twinkle 0.001s",
    ".bk-spark": "bk-spark 0.001s"
@@ -8417,7 +8417,7 @@
   },
   "anim": {
    ".rule-item": "none",
-   ".neon-title": "glitchRGB 16s",
+   ".neon-title": "none",
    ".bk-lamp": "bk-twinkle 0.001s",
    ".bk-spark": "bk-spark 0.001s"
   },
@@ -16096,7 +16096,7 @@
   "anim": {
    ".q-text": "none",
    ".p-ros": "none",
-   ".p-ros-num": "p-flip 0.4s",
+   ".p-ros-num": "none",
    ".bk-lamp": "bk-twinkle 0.001s",
    ".bk-spark": "bk-spark 0.001s"
   },
@@ -22449,7 +22449,7 @@
   "anim": {
    ".neon-title": "none",
    ".p-ros": "none",
-   ".p-ros-num": "p-flip 0.4s",
+   ".p-ros-num": "none",
    ".bk-lamp": "bk-twinkle 0.001s",
    ".bk-spark": "bk-spark 0.001s"
   },
