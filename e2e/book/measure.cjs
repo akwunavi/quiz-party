@@ -18,20 +18,25 @@ const KEYS = [
   '.p-teams', '.host-actions', '.round-badge', '.ri-main', '.rules-frame', '.rule-item', '.neon-title', '.meta-line', '.cw-layout',
   '.answer-time-teams', '.at-team', '.answer-pulse', '.recap-screen', '.recap-body', '.groups-modal', '.pack-badge', '.link-badge',
   '.mono-tag', '.lobby-screen', '.mel-theme', '.mel-tile', '.answers-main', '.p-flag-team',
+  '.bk-team', '.bk-invite', '.answer-gallery', '.fin-rname', '.fin-medal', '.fin-award', '.bk-turn',
 ]
 // Блоки, которые НЕ должны пересекаться между собой (если не вложены друг в друга)
 const BLOCKS = [
   '.host-topbar', '.q-frame', '.q-text', '.q-media-grid', '.img-answers', '.choices-grid', '.answer-block', '.answer-media',
   '.answer-reveal', '.team-answers', '.answered-chip', '.q-recall', '.round-badge', '.ri-main', '.rules-frame', '.fin-table-wrap',
   '.p-qr', '.p-teams', '.pack-badge', '.link-badge', '.answer-time-teams', '.answer-pulse', '.mel-board', '.groups-modal',
-  '.neon-title', '.meta-line', '.recap-body',
+  '.neon-title', '.meta-line', '.recap-body', '.bk-teams', '.bk-qr', '.bk-invite', '.answer-gallery',
 ]
 const FRAMES = ['.q-frame', '.q-text', '.answer-block', '.answers-main', '.team-answers', '.fin-table-wrap', '.rules-frame', '.host-screen',
   '.answer-time-teams', '.mel-board', '.mel-modal', '.recap-body', '.groups-modal', '.p-teams', '.ri-main', '.answer-reveal', '.cw-layout']
-const ANIM = ['.q-text', '.answer-block', '.choice-plate', '.rule-item', '.neon-title', '.p-ros', '.p-ros-num', '.mel-tile', '.fin-row', '.p-flag-team', '.p-qr', '.answered-chip', '.mel-modal']
+const ANIM = ['.q-text', '.answer-block', '.choice-plate', '.rule-item', '.neon-title', '.p-ros', '.p-ros-num', '.mel-tile', '.fin-row', '.p-flag-team', '.p-qr', '.answered-chip', '.mel-modal',
+  '.bk-team', '.bk-lamp', '.bk-spark', '.bk-vinyl-disc', '.answer-block.bk-live', '.bk-turn-leaf']
+// кегли (px) ключевого текста — для сравнения «до/после» (PROTOTYPES.md)
+const TEXT = ['.q-text', '.q-recall', '.answer-main', '.answer-note', '.choice-plate', '.ia-text', '.team-answer .text', '.team-answer .name',
+  '.at-team', '.qnum', '.rule-item', '.mel-theme', '.mel-tile .qt-front', '.fin-table td', '.fin-table th', '.p-flag-name', '.bk-team', '.lg-name', '.mel-big']
 
 async function measure(page, ctx = {}) {
-  return page.evaluate(({ KEYS, BLOCKS, FRAMES, ANIM, ctx }) => {
+  return page.evaluate(({ KEYS, BLOCKS, FRAMES, ANIM, TEXT, ctx }) => {
     const W = innerWidth, H = innerHeight
     const r2 = r => ({ x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) })
     const vis = el => {
@@ -59,11 +64,11 @@ async function measure(page, ctx = {}) {
     }
     // книга: обложка и страницы сцены (bg-слой)
     const bgRect = sel => { const el = document.querySelector(`.ny-layer-bg ${sel}`); return el ? el.getBoundingClientRect() : null }
-    const cover = bgRect('.p-cover'), pl = bgRect('.p-page-l'), pr = bgRect('.p-page-r')
+    const cover = bgRect('.p-cover') ?? bgRect('.bk-cover'), pl = bgRect('.p-page-l') ?? bgRect('.bk-page-l'), pr = bgRect('.p-page-r') ?? bgRect('.bk-page-r')
     const clip = r => r && ({ left: Math.max(0, Math.round(-r.left)), top: Math.max(0, Math.round(-r.top)), right: Math.max(0, Math.round(r.right - W)), bottom: Math.max(0, Math.round(r.bottom - H)) })
     const pages = pl && pr ? { left: Math.min(pl.left, pr.left), top: Math.min(pl.top, pr.top), right: Math.max(pl.right, pr.right), bottom: Math.max(pl.bottom, pr.bottom) } : null
     const visPages = pages ? { left: Math.max(0, pages.left), top: Math.max(0, pages.top), right: Math.min(W, pages.right), bottom: Math.min(H, pages.bottom) } : null
-    const stage = document.querySelector('.ny-layer-bg .nyl-stage')
+    const stage = document.querySelector('.ny-layer-bg .ny-stage-cover:last-child .nyl-stage') ?? document.querySelector('.ny-layer-bg .nyl-stage')
     const themeEl = document.querySelector('.theme-ny_book')
     const book = {
       viewport: { w: W, h: H },
@@ -107,12 +112,31 @@ async function measure(page, ctx = {}) {
     }
     const qt = fonts['.q-text'], qr = fonts['.q-recall']
     const fontMatch = qt && qr ? { family: qt.family === qr.family, weight: qt.weight === qr.weight, style: qt.style === qr.style } : null
+    // кегли текста (px, min/max) и полезная площадь: контент-бокс экрана ∩ видимые страницы
+    const text = {}
+    for (const sel of TEXT) {
+      const els = [...document.querySelectorAll(sel)].filter(vis)
+      if (!els.length) continue
+      const sz = els.map(e => parseFloat(getComputedStyle(e).fontSize))
+      text[sel] = { n: els.length, min: Math.round(Math.min(...sz) * 10) / 10, max: Math.round(Math.max(...sz) * 10) / 10 }
+    }
+    const hs = document.querySelector('.host-screen')
+    let area = null
+    if (hs) {
+      const r = hs.getBoundingClientRect(), cs = getComputedStyle(hs)
+      const cb = { l: r.left + parseFloat(cs.paddingLeft), t: r.top + parseFloat(cs.paddingTop), r: r.right - parseFloat(cs.paddingRight), b: r.bottom - parseFloat(cs.paddingBottom) }
+      const vp = visPages ? { l: visPages.left, t: visPages.top, r: visPages.right, b: visPages.bottom } : { l: 0, t: 0, r: W, b: H }
+      const iw = Math.max(0, Math.min(cb.r, vp.r) - Math.max(cb.l, vp.l)), ih = Math.max(0, Math.min(cb.b, vp.b) - Math.max(cb.t, vp.t))
+      area = { content: { w: Math.round(cb.r - cb.l), h: Math.round(cb.b - cb.t) }, onPages: Math.round(iw * ih), share: Math.round((iw * ih) / (W * H) * 1000) / 10,
+        offPages: Math.round((cb.r - cb.l) * (cb.b - cb.t) - iw * ih) }
+    }
     // анимации
     const anim = {}
     for (const sel of ANIM) { const el = document.querySelector(sel); if (el) { const cs = getComputedStyle(el); anim[sel] = cs.animationName === 'none' ? 'none' : `${cs.animationName} ${cs.animationDuration}` } }
     return { scene: ctx.scene, viewport: `${W}x${H}`, reduced: !!ctx.reduced, phaseClasses: document.querySelector('.host-screen')?.className ?? null,
-      density: themeEl?.getAttribute('data-ny-density') ?? null, nodes, overlaps, outside, overflow, fonts, fontMatch, book, anim }
-  }, { KEYS, BLOCKS, FRAMES, ANIM, ctx })
+      density: themeEl?.getAttribute('data-ny-density') ?? null, nodes, overlaps, outside, overflow, fonts, fontMatch, book, anim, text, area,
+      vinylSpin: document.querySelector('.bk-vinyl') ? document.querySelector('.bk-vinyl').classList.contains('is-spin') : null }
+  }, { KEYS, BLOCKS, FRAMES, ANIM, TEXT, ctx })
 }
 
 module.exports = { measure, KEYS, BLOCKS }

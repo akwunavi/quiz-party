@@ -10,6 +10,10 @@
 // usage:
 //   QP_BOOK_SCRATCH=/путь/scratch node e2e/book/shoot.cjs [--no-build] [--set baseline]
 //       [--only 01-lobby,15-finale] [--vp 1920x1080,1899x905,1366x768] [--no-reduced | --only-reduced]
+//       [--mask] [--exact] [--out <каталог>]
+//   --mask  — регресс других тем: гасит анимации и прячет canvas (снег, ели), чтобы сравнение «до/после» не ловило случайный кадр;
+//   --exact — точные id сцен в --only; --out — куда писать WebP/measure.json (вне репозитория).
+// Окружение: QP_BOOK_THEME (тема пакетов), QP_BOOK_APP (готовая сборка, напр. предка).
 // Браузер: chromium из PLAYWRIGHT_BROWSERS_PATH (в облачной сессии /opt/pw-browsers).
 'use strict'
 const { chromium } = require('playwright')
@@ -24,7 +28,9 @@ const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] :
 const SET = opt('--set', 'baseline')
 const VPS = opt('--vp', '1920x1080,1899x905,1366x768').split(',').map(s => s.split('x').map(Number))
 const ONLY = (opt('--only', '') || '').split(',').filter(Boolean)
-const OUT = path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', SET)
+const MASK = argv.includes('--mask')
+const EXACT = argv.includes('--exact')
+const OUT = opt('--out', '') ? path.resolve(opt('--out', '')) : path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', SET)
 const MAX_WEBP = 300 * 1024
 
 async function main() {
@@ -36,7 +42,7 @@ async function main() {
   const api = makeApi(ORIGIN, PIN)
   const url = `${ORIGIN}/quiz-party/#/?room=stand`
   const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] })
-  const scenes = SCENES.filter(s => !ONLY.length || ONLY.some(p => s.id.startsWith(p)))
+  const scenes = SCENES.filter(s => !ONLY.length || ONLY.some(p => EXACT ? s.id === p : s.id.startsWith(p)))
   const results = []
 
   async function shootOne(scene, [w, h], { reduced = false, save = true } = {}) {
@@ -56,7 +62,8 @@ async function main() {
       }
     })
     await page.clock.install()
-    await page.goto(url)
+    // scene.query — параметры адреса сцены (прототипные флаги, напр. bkfin=2 — вариант финала)
+    await page.goto(scene.query ? url + '&' + scene.query : url)
     let ok = true, why = ''
     try {
       await page.waitForSelector(scene.ready, { timeout: 15000 })
@@ -74,6 +81,10 @@ async function main() {
         if (Number.isFinite(it) && a.playState !== 'finished') { try { a.finish() } catch { /* бесконечная задержка */ } }
       }))
       await page.waitForTimeout(250)
+      if (MASK) {
+        await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important} canvas,video{visibility:hidden!important}' })
+        await page.waitForTimeout(150)
+      }
     } catch (e) { ok = false; why = `нет «${scene.ready}»: ${String(e.message).split('\n')[0]}` }
     const name = `${scene.id}-${w}x${h}${reduced ? '-reduced' : ''}`
     if (save) await page.screenshot({ path: path.join(PNG_DIR, name + '.png') })

@@ -5,7 +5,9 @@
 import { useEffect, useState } from 'react'
 import { Stage } from './engine/stage'
 import { Atmosphere } from './engine/Atmosphere'
-import { BookFx, BookWorld } from './book/BookScene'
+import { BookPages, BookPagesFx, BookTable } from './book/BookStage'
+import { bookDecor } from './book/geometry'
+import type { TurnSnap } from './book/motion'
 import { HomeBackdrop, HomeFx } from './home/HomeScene'
 import { nyDensity, type NyThemeKey } from './density'
 import { NY_SLOT_BG, NY_SLOT_FX } from './NySlot'
@@ -27,12 +29,20 @@ function useReducedMotion() {
 export function NyBackdrop({ theme, phase, plain }: { theme: NyThemeKey; phase?: string; plain?: boolean }) {
   const reduced = useReducedMotion()
   const density = nyDensity(theme, phase, plain)
+  // «Книга» — прототип этапа 2 (PLAN §1.1): стол — cover (весь экран), книга с декором — contain (всегда целиком,
+  // тот же масштаб, что --u вёрстки). Число детей ThemeLayer не меняется.
+  if (theme === 'ny_book') return (
+    <div className="ny-layer ny-layer-bg" data-ny-density={density}>
+      <Stage fit="cover" paused={false} reduced={reduced}><BookTable /></Stage>
+      <Stage fit="contain" paused={false} reduced={reduced}>
+        <BookPages decor={bookDecor(phase)}><div id={NY_SLOT_BG} className="ny-slot" /></BookPages>
+      </Stage>
+    </div>
+  )
   return (
     <div className="ny-layer ny-layer-bg" data-ny-density={density}>
       <Stage fit="cover" paused={false} reduced={reduced}>
-        {theme === 'ny_book'
-          ? <BookWorld density={density} scene={phase ?? 'lobby'}><div id={NY_SLOT_BG} className="ny-slot" /></BookWorld>
-          : <HomeBackdrop density={density}><div id={NY_SLOT_BG} className="ny-slot" /></HomeBackdrop>}
+        <HomeBackdrop density={density}><div id={NY_SLOT_BG} className="ny-slot" /></HomeBackdrop>
         <Atmosphere theme={theme} />
       </Stage>
     </div>
@@ -41,15 +51,15 @@ export function NyBackdrop({ theme, phase, plain }: { theme: NyThemeKey; phase?:
 
 /** Слой поверх игры: у Тёплого дома — «эфир» (развёртка, виньетка, блик стекла), у обоих —
  *  слот для QR (выше затемнения окна составов). */
-export function NyFx({ theme, phase, plain }: { theme: NyThemeKey; phase?: string; plain?: boolean }) {
+export function NyFx({ theme, phase, plain, turn }: { theme: NyThemeKey; phase?: string; plain?: boolean; turn?: TurnSnap | null }) {
   const reduced = useReducedMotion()
   const density = nyDensity(theme, phase, plain)
   return (
     <div className="ny-layer ny-layer-fx">
-      <Stage fit="cover" paused={false} reduced={reduced}>
+      <Stage fit={theme === 'ny_home' ? 'cover' : 'contain'} paused={false} reduced={reduced}>
         {theme === 'ny_home'
           ? <HomeFx density={density}><div id={NY_SLOT_FX} className="ny-slot" /></HomeFx>
-          : <BookFx><div id={NY_SLOT_FX} className="ny-slot" /></BookFx>}
+          : <BookPagesFx turn={turn}><div id={NY_SLOT_FX} className="ny-slot" /></BookPagesFx>}
       </Stage>
     </div>
   )

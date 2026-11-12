@@ -63,7 +63,9 @@
 /* Новогодние темы 9.90 («Книга» / «Тёплый дом»): движок сцены, потом сцены, потом экраны */
 @import './parts/40-ny-engine.css';
 @import './parts/40-ny-book-world.css';
+@import './parts/40a-ny-book-core.css';
 @import './parts/42-ny-home-world.css';
 @import './parts/41-ny-book.css';
+@import './parts/41b-ny-book-motion.css';
 @import './parts/43-ny-home.css';
 @import './parts/44-forest-shell.css';

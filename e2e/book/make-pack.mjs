@@ -75,7 +75,7 @@ function melodyThemes(names, perTheme, ext) {
 }
 
 /** Собрать пакет. `paper` — бумажный режим (play_mode: 'paper'). `audioExt` — mp3|wav (что сгенерировал gen.py). */
-export function buildPack({ paper = false, audioExt = 'mp3' } = {}) {
+export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book' } = {}) {
   const id = paper ? PACK_PAPER : PACK_ONLINE
   const rounds = [
     // R1 — все раскладки обычного вопроса
@@ -155,7 +155,7 @@ export function buildPack({ paper = false, audioExt = 'mp3' } = {}) {
     ]),
   ]
   return {
-    id, name: paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme: 'ny_book',
+    id, name: paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,
     created_by: null, created_at: T0, updated_at: T0, last_game_id: null,
     settings: { play_mode: paper ? 'paper' : 'phones', timer_seconds: 60, max_edits: 2 },
     rounds,

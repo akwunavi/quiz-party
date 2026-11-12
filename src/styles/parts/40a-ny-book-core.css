@@ -1,0 +1,153 @@
+/* ═══ «Книга» (ny_book) — BOOK CORE: токены, сцена разворота, общие рецепты (ПРОТОТИП этапа 2) ═══
+   docs-dev/book-redesign/PLAN.md §1.3, PROTOTYPES.md. Порядок в global.css: после 40-ny-book-world, ДО 41-ny-book (экраны).
+
+   Геометрия (PLAN §1.1): книга и декор — Stage fit="contain" (масштаб = --u), стол — cover. На не-16:9 у книги поля:
+   --bk-ox/--bk-oy — сдвиг книжной сцены от края окна. ВСЕ отступы игровой вёрстки «Книги» = сдвиг + N·--u, иначе
+   вёрстка уезжает с разворота (на 1899×905 — на 145 px по бокам).
+
+   Слои (z): .ny-layer-bg [стол (cover) → книга: переплёт, срез страниц, страницы, сгиб, закладка, свет → декор задний →
+   искры → .bk-content (команды лобби) → декор передний → гирлянды → снег] ‖ .host-screen ‖ .ny-layer-fx [QR, перелистывание]
+   ‖ порталы .mel-overlay/.jp-overlay (несут класс темы сами). */
+.theme-ny_book {
+  /* палитра */
+  --bk-paper: #f8eedb; --bk-paper-2: #efe0c1; --bk-paper-3: #e4d1a9;
+  --bk-ink: #2a1f17; --bk-ink-2: #1f2a44; --bk-muted: #6b4e33;
+  --bk-red: #8f1d2c; --bk-red-2: #b3263a; --bk-red-3: #5e101b;
+  --bk-gold: #c9a14a; --bk-gold-2: #f2d58c; --bk-gold-3: #8a6a24;
+  --bk-silver: #c3cad2; --bk-silver-2: #7f8a96; --bk-bronze: #c58046; --bk-bronze-2: #7d4a22;
+  --bk-pine: #24442f; --bk-ok: #2f6b3f;
+  --bk-shade: #d9c59c; --bk-shadow: rgba(60, 35, 12, .28); --bk-line: rgba(138, 106, 36, .55);
+  --bk-night: #120d0b;
+  /* шрифты: --bk-serif — ЕДИНСТВЕННЫЙ шрифт вопросов, ответов, повторов, букв вариантов и имён команд;
+     --bk-display — только заголовки (лента лобби, название раунда, итоги) */
+  --bk-serif: 'PT Serif', Georgia, 'Times New Roman', serif;
+  --bk-display: 'Cormorant Garamond', 'PT Serif', Georgia, serif;
+  /* геометрия: сдвиг книжной сцены (contain) и безопасная область вёрстки */
+  --bk-ox: max(0px, calc((100vw - 1920 * var(--u)) / 2));
+  --bk-oy: max(0px, calc((100vh - 1080 * var(--u)) / 2));
+  --bk-safe-t: calc(var(--bk-oy) + 134 * var(--u));
+  --bk-safe-x: calc(var(--bk-ox) + 250 * var(--u));
+  --bk-safe-b: calc(var(--bk-oy) + 136 * var(--u));
+  --bk-gap: calc(24 * var(--u)); --bk-radius: calc(6 * var(--u));
+  /* движение */
+  --bk-turn-ms: 900ms; --bk-reveal-ms: 800ms;
+}
+
+/* ═══ СЦЕНА: стол (cover) ═══ */
+.bk-table { position: absolute; inset: 0; background: var(--bk-night); }
+.bk-table-wood { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 46%, rgba(255, 196, 120, .16), rgba(0, 0, 0, 0) 70%),
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, .025) 0 3px, rgba(0, 0, 0, 0) 3px 11px),
+    repeating-linear-gradient(88deg, rgba(0, 0, 0, .18) 0 2px, rgba(0, 0, 0, 0) 2px 37px),
+    linear-gradient(180deg, #3a2318, #2a1810 55%, #1a0f0a); }
+.bk-table-lamp { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 60% 70% at 30% 10%, rgba(255, 214, 150, .14), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .55)); }
+.bk-table-bokeh span { position: absolute; border-radius: 50%; margin: -50% 0 0 -50%;
+  background: radial-gradient(circle, rgba(255, 210, 130, .55), rgba(255, 190, 100, 0) 70%); filter: blur(2px); opacity: .6; }
+
+/* ═══ СЦЕНА: книга (contain) ═══ */
+.bk-scene { position: absolute; inset: 0; font-family: var(--bk-serif); color: var(--bk-ink); }
+.bk-book { position: absolute; }
+/* бордовый кожаный переплёт: тиснёная строчка, текстура кожи, золотые уголки */
+.bk-cover { position: absolute; inset: -22px -26px -32px; border-radius: 14px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 80% 70% at 40% 35%, #a52a3a, var(--bk-red) 55%, var(--bk-red-3));
+  box-shadow: 0 46px 90px rgba(0, 0, 0, .62), 0 12px 24px rgba(0, 0, 0, .45), inset 0 0 0 3px rgba(255, 210, 170, .1), inset 0 0 40px rgba(0, 0, 0, .45); }
+.bk-cover::after { content: ''; position: absolute; inset: 9px; border-radius: 9px; border: 2px dashed rgba(242, 213, 140, .32); pointer-events: none; }
+.bk-corner { position: absolute; width: 74px; height: 74px; z-index: 3;
+  background: linear-gradient(135deg, var(--bk-gold-2), var(--bk-gold) 45%, var(--bk-gold-3));
+  clip-path: polygon(0 0, 100% 0, 100% 22%, 30% 30%, 22% 100%, 0 100%); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
+.bk-corner.is-tl { left: -2px; top: -2px; }
+.bk-corner.is-tr { right: -2px; top: -2px; transform: scaleX(-1); }
+.bk-corner.is-bl { left: -2px; bottom: -2px; transform: scaleY(-1); }
+.bk-corner.is-br { right: -2px; bottom: -2px; transform: scale(-1, -1); }
+/* видимая толщина страниц: срез стопки снизу и по внешним краям */
+.bk-edges { position: absolute; left: 6px; right: 6px; top: 8px; bottom: -16px; border-radius: 3px 3px 10px 10px;
+  background: repeating-linear-gradient(180deg, #f3e6c8 0 2px, #d8c49c 2px 3px);
+  box-shadow: -8px 0 0 -2px #e6d5b0, 8px 0 0 -2px #e6d5b0, 0 6px 12px rgba(0, 0, 0, .35); }
+/* пергамент: тёплая бумага с пятнами, темнее к сгибу и к внешнему краю */
+.bk-page { position: absolute; top: 0; bottom: 0; width: 50%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .4 0 0 0 0 .2 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 90% 80% at 50% 45%, var(--bk-paper) 30%, var(--bk-paper-2) 75%, var(--bk-paper-3)); }
+.bk-page-l { left: 0; border-radius: 6px 0 0 6px; } .bk-page-r { right: 0; border-radius: 0 6px 6px 0; }
+.bk-page-l::after, .bk-page-r::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+.bk-page-l::after { background: linear-gradient(90deg, rgba(110, 76, 30, .18), rgba(110, 76, 30, 0) 5%, rgba(110, 76, 30, 0) 86%, rgba(90, 60, 22, .22) 97%, rgba(70, 44, 14, .34)); }
+.bk-page-r::after { background: linear-gradient(270deg, rgba(110, 76, 30, .18), rgba(110, 76, 30, 0) 5%, rgba(110, 76, 30, 0) 86%, rgba(90, 60, 22, .22) 97%, rgba(70, 44, 14, .34)); }
+/* центральный сгиб: глубокая тень + блик по обе стороны */
+.bk-gutter { position: absolute; top: 0; bottom: 0; left: 50%; width: 120px; margin-left: -60px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, rgba(80, 52, 18, 0), rgba(80, 52, 18, .1) 30%, rgba(255, 248, 230, .25) 40%, rgba(60, 36, 10, .42) 49.5%, rgba(40, 22, 6, .55) 50%, rgba(60, 36, 10, .42) 50.5%, rgba(255, 248, 230, .25) 60%, rgba(80, 52, 18, .1) 70%, rgba(80, 52, 18, 0)); }
+.bk-mark { position: absolute; left: 50%; bottom: -54px; width: 34px; height: 70px; margin-left: 30px; z-index: 0;
+  background: linear-gradient(90deg, var(--bk-red-3), var(--bk-red-2) 50%, var(--bk-red-3)); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }
+.bk-light { position: absolute; inset: 0; pointer-events: none; z-index: 2; mix-blend-mode: soft-light;
+  background: radial-gradient(ellipse 60% 55% at 28% 18%, rgba(255, 246, 220, .38), rgba(255, 246, 220, 0) 70%),
+    radial-gradient(ellipse 110% 90% at 50% 55%, rgba(0, 0, 0, 0) 62%, rgba(70, 40, 10, .16)); }
+
+/* декор: смонтирован всегда, плотность — opacity по data-decor (без перемонтажа) */
+.bk-decor-back, .bk-decor-front, .bk-sparks { position: absolute; inset: 0; pointer-events: none; }
+.bk-decor-back { z-index: 4; } .bk-sparks { z-index: 5; } .bk-content { position: absolute; z-index: 20; } .bk-decor-front { z-index: 24; }
+.bk-deco, .bk-garland, .bk-spark { position: absolute; opacity: 0; transition: opacity .7s ease; }
+.bk-deco img, .bk-garland img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 10px 10px rgba(40, 20, 6, .35)); }
+.bk-garland { z-index: 26; }
+.bk-scene[data-decor="sparse"] [data-on~="sparse"],
+.bk-scene[data-decor="medium"] [data-on~="medium"],
+.bk-scene[data-decor="dense"] [data-on~="dense"] { opacity: 1; }
+/* лампочки гирлянды и елей: тёплое свечение поверх растра, у каждой своя фаза */
+.bk-lamp { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 250, 225, .95) 0 12%, rgba(255, 214, 130, .7) 28%, rgba(255, 190, 90, 0) 70%);
+  animation: bk-twinkle calc(1.8s + var(--i) * .07s) ease-in-out calc(var(--i) * -.53s) infinite alternate; }
+.bk-lamp.is-small { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+@keyframes bk-twinkle { 0% { opacity: .35; transform: scale(.8); } 60% { opacity: 1; transform: scale(1.08); } 100% { opacity: .7; transform: scale(.95); } }
+.bk-spark { width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  background: radial-gradient(circle, #fffbe8 0 10%, rgba(255, 240, 190, 0) 45%),
+    linear-gradient(0deg, rgba(255, 244, 200, 0) 44%, #fff6d6 50%, rgba(255, 244, 200, 0) 56%),
+    linear-gradient(90deg, rgba(255, 244, 200, 0) 44%, #fff6d6 50%, rgba(255, 244, 200, 0) 56%); }
+.bk-scene[data-decor] .bk-spark[data-on] { animation: bk-spark 3.6s ease-in-out calc(var(--i) * -.9s) infinite; }
+@keyframes bk-spark { 0%, 70%, 100% { transform: scale(.2) rotate(0); filter: brightness(.6); } 82% { transform: scale(1) rotate(45deg); filter: brightness(1.2); } }
+.bk-snow { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+
+/* ═══ ЛОББИ: команды и приглашение на развороте (координаты книги, px сцены) ═══ */
+.theme-ny_book .bk-content .ny-slot { position: absolute; inset: 0; }
+.bk-teams { position: absolute; left: 960px; top: 262px; width: 640px; height: 680px; display: flex; flex-direction: column; gap: 12px; }
+.bk-teams-head { display: flex; align-items: baseline; justify-content: center; gap: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--bk-line);
+  font: 700 22px/1.2 var(--bk-serif); letter-spacing: .28em; color: var(--bk-red); }
+.bk-teams-head b { font: 700 40px/1 var(--bk-display); letter-spacing: 0; color: var(--bk-ink-2); }
+.bk-teams-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; gap: 10px 22px;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-template-rows: repeat(var(--per), auto); align-content: start; }
+.bk-team { position: relative; display: flex; align-items: center; gap: 14px; min-width: 0; padding: 10px 16px 10px 12px;
+  background: linear-gradient(180deg, #fffaf0, var(--bk-paper)); border-left: 10px solid var(--tc, var(--bk-gold));
+  box-shadow: 0 3px 0 var(--bk-shade), 0 8px 12px var(--bk-shadow); border-radius: 2px;
+  font: 700 calc(var(--fs) * 1px)/1.12 var(--bk-serif); color: var(--bk-ink); animation: bk-team-in .6s cubic-bezier(.2, .9, .3, 1.1) both; }
+.bk-team-num { flex: none; min-width: 1.55em; height: 1.55em; display: grid; place-items: center; border-radius: 50%;
+  font: 700 .62em/1 var(--bk-serif); color: var(--bk-paper); background: var(--bk-red); box-shadow: inset 0 0 0 2px rgba(242, 213, 140, .5); }
+.bk-team-name { min-width: 0; overflow-wrap: anywhere; text-wrap: balance; }
+.bk-team-name i { font-style: normal; margin-right: .3em; }
+.bk-team.is-mid { font-size: calc(var(--fs) * .88px); } .bk-team.is-long { font-size: calc(var(--fs) * .78px); }
+.bk-team.is-away { opacity: .45; }
+.bk-team.is-more { justify-content: center; border-left-color: var(--bk-gold); font-style: italic; color: var(--bk-muted); }
+.bk-teams.is-cards .bk-team { min-height: 104px; padding: 14px 24px 14px 18px; border-left-width: 14px; }
+.bk-teams.is-cards .bk-teams-grid { gap: 16px; }
+.bk-teams.is-cols3 .bk-team { padding: 7px 10px 7px 8px; gap: 8px; border-left-width: 7px; }
+@keyframes bk-team-in { from { opacity: 0; transform: translateY(-10px) rotate(-1deg); } to { opacity: 1; transform: none; } }
+.bk-teams.is-invite { align-items: center; text-align: center; justify-content: flex-start; gap: 24px; }
+.bk-teams.is-invite .bk-teams-head { align-self: stretch; }
+.bk-invite-big { margin: 120px 0 0; font: 700 64px/1.1 var(--bk-display); color: var(--bk-ink-2); }
+.bk-invite-sub { margin: 0; max-width: 560px; font: 400 30px/1.35 var(--bk-serif); color: var(--bk-muted); }
+.bk-invite { position: absolute; left: 360px; top: 752px; width: 460px; text-align: center; }
+.bk-invite-title { margin: 0; font: 700 40px/1.1 var(--bk-display); color: var(--bk-red); }
+.bk-invite-text { margin: 6px 0 0; font: 400 25px/1.3 var(--bk-serif); color: var(--bk-ink); }
+.bk-invite.is-paper { top: 360px; left: 250px; width: 580px; }
+.bk-invite.is-paper .bk-invite-title { font-size: 72px; }
+.bk-invite.is-paper .bk-invite-text { font-size: 34px; margin-top: 20px; }
+/* QR: наклонена только пергаментная подложка с золотой рамкой, код прямой с тихой зоной */
+.bk-qr { position: absolute; left: 400px; top: 300px; width: 380px; height: 430px; z-index: 6; }
+.bk-qr-card { position: absolute; inset: 0; transform: rotate(-2.5deg); border-radius: 6px;
+  background: radial-gradient(ellipse at 40% 30%, #fffaf0, var(--bk-paper-2)); box-shadow: 0 0 0 3px var(--bk-gold), 0 0 0 9px var(--bk-paper), 0 0 0 11px var(--bk-line), 0 18px 28px rgba(40, 20, 6, .45); }
+.bk-qr-tile { position: absolute; left: 40px; top: 40px; width: 300px; height: 300px; line-height: 0; background: #fff; box-shadow: 0 0 0 10px #fff; }
+.bk-qr-tile svg { display: block; }
+.bk-qr::after { content: 'СКАНИРУЙТЕ'; position: absolute; left: 0; right: 0; bottom: 30px; text-align: center; font: 700 22px/1 var(--bk-serif); letter-spacing: .32em; color: var(--bk-red); }
+.bk-qr.is-lit { z-index: 91; }
+.bk-qr.is-lit .bk-qr-card { box-shadow: 0 0 0 3px var(--bk-gold), 0 0 0 9px var(--bk-paper), 0 0 0 14px rgba(242, 213, 140, .9), 0 0 60px rgba(255, 214, 140, .55); }

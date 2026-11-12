@@ -45,7 +45,10 @@ export const ORIGIN = `http://127.0.0.1:${PORT}`
 
 function arg(name, def) { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : def }
 export const SCRATCH = path.resolve(arg('--scratch', process.env.QP_BOOK_SCRATCH || path.join(os.tmpdir(), 'qp-book-stand')))
-const APP_DIR = path.join(SCRATCH, 'book-app')
+// QP_BOOK_APP — готовая сборка из другого места (регресс «до/после»: сборка предка лежит отдельно)
+const APP_DIR = process.env.QP_BOOK_APP ? path.resolve(process.env.QP_BOOK_APP) : path.join(SCRATCH, 'book-app')
+// QP_BOOK_THEME — те же пакеты (те же id) в другой теме: регресс classic/potter/new_year/ny_home/enchanted_forest
+export const THEME = process.env.QP_BOOK_THEME || 'ny_book'
 const DATA_DIR = path.join(SCRATCH, 'book-data')
 
 // ffmpeg из /opt/pw-browsers урезан под запись видео Playwright (нет lavfi/mp3) —
@@ -116,6 +119,9 @@ function resetGame(store, gameId) {
 }
 
 export async function startStand({ noBuild = false } = {}) {
+  // порт занят другим прогоном — НЕ трогаем его данные (rmSync ниже стёр бы чужой стенд посреди снимков)
+  const busy = await fetch(`${ORIGIN}/api/server-now`, { signal: AbortSignal.timeout(800) }).then(() => true, () => false)
+  if (busy) throw new Error(`стенд уже запущен на ${ORIGIN} — дождитесь конца прогона`)
   fs.mkdirSync(SCRATCH, { recursive: true })
   if (fs.existsSync(DATA_DIR)) fs.rmSync(DATA_DIR, { recursive: true, force: true })
   const manifest = genMedia()
@@ -142,7 +148,7 @@ export async function startStand({ noBuild = false } = {}) {
   }
   await call('/api/arm', { method: 'POST' })
   for (const paper of [false, true]) {
-    const pack = buildPack({ paper, audioExt: manifest.audioExt })
+    const pack = buildPack({ paper, audioExt: manifest.audioExt, theme: THEME })
     await call(`/api/pack/${pack.id}`, { method: 'POST', body: JSON.stringify(pack) })
   }
   console.log(`[stand] ${ORIGIN}/quiz-party/#/?room=stand  · PIN ${PIN} · пакеты ${PACK_ONLINE}, ${PACK_PAPER} · данные ${DATA_DIR}`)

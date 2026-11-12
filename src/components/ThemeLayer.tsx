@@ -6,12 +6,15 @@ import { NewYearScene } from './NewYearScene'
 import { NyBackdrop, NyFx } from '../ny/NyScene'
 import { isNyTheme, nyDensity } from '../ny/density'
 import { nyNavEnabled } from '../ny/config'
+import type { TurnSnap } from '../ny/book/motion'
 import { isForestTheme } from '../forest/config'
 // Лес грузится отдельным куском и только на проекторе в этой теме: телефоны и пульт его не тянут
 const ForestFrame = lazy(() => import('../forest/shell').then(m => ({ default: m.ForestFrame })))
 
-export function ThemeLayer({ theme, isProjector, phase, plain, paper, children }: {
+export function ThemeLayer({ theme, isProjector, phase, plain, paper, turn, children }: {
   theme: ThemeKey; isProjector?: boolean
+  /** «Книга» (прототип этапа 2): снимок для перелистывания страницы при смене вопроса */
+  turn?: TurnSnap | null
   /** Игра на бумаге (бар): ведущий управляет с проектора, поэтому кнопки на нём остаются видны (пока — только в этом режиме). */
   paper?: boolean
   /** Новогодние темы: вопрос без картинок и вариантов — самый «пустой» экран. */
@@ -42,7 +45,7 @@ export function ThemeLayer({ theme, isProjector, phase, plain, paper, children }
       </>}
       {theme === 'potter' && isProjector && <MagicScene phase={phase} />}
       {children}
-      {ny && isProjector && <NyFx theme={theme} phase={phase} plain={plain} />}
+      {ny && isProjector && <NyFx theme={theme} phase={phase} plain={plain} turn={turn} />}
     </div>
   )
 }

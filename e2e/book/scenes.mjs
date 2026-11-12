@@ -235,6 +235,24 @@ export const SCENES = [
       await api.session({ pack_id: PACK_ONLINE, phase: 'finale', round_number: 7, question_index: 99, timer_started_at: null, reveal: false })
     },
   })),
+  // прототип этапа 2: ещё два варианта оформления финала (флаг адреса ?bkfin=2|3 — только для согласования)
+  ...[8, 16].flatMap(n => [2, 3].map(v => ({
+    id: `15-finale-${n}-v${v}`, title: `финал, вариант ${v}: ${n} команд`, ready: '.fin-table', settle: 1500, runFor: 20000, query: `bkfin=${v}`,
+    async setup(api) {
+      await api.reset(); const ts = await api.teams(n)
+      await api.answers(finaleRows(ts))
+      await api.session({ pack_id: PACK_ONLINE, phase: 'finale', round_number: 7, question_index: 99, timer_started_at: null, reveal: false })
+    },
+  }))),
+  // награждение «бар»: шаг «1 место» (ничья на 1-м — обе команды, одна медаль)
+  {
+    id: '16-award-1', title: 'награждение «бар»: 1 место, ничья (медаль без emoji)', ready: '.fin-award', settle: 1500,
+    async setup(api) {
+      await api.reset(); const ts = await api.teams(8)
+      await api.answers(finaleRows(ts))
+      await api.session({ pack_id: PACK_ONLINE, phase: 'finale', round_number: 7, question_index: 2, timer_started_at: null, reveal: true })
+    },
+  },
 ]
 
 export { qref, qrefP }
