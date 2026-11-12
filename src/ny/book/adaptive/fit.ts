@@ -43,5 +43,24 @@ export const TEXT_ROLES = {
 } as const
 export type TextRole = keyof typeof TEXT_ROLES
 
-export const roleRange = (role: TextRole, unit: number): FitRange =>
-  ({ min: TEXT_ROLES[role].min * unit, max: TEXT_ROLES[role].max * unit })
+/** Целевой (потолочный) кегль по иерархии и ДЛИНЕ текста, px мокапа: короткий вопрос не раздувается до предела рамки.
+ *  Лесенка непрерывная по длине (линейная интерполяция между опорами), поэтому соседние длины не дают скачков. Измерение (fitFontSize)
+ *  по-прежнему может ТОЛЬКО уменьшить кегль, если текст не влезает в область, — но «наибольший влезающий» больше не критерий. */
+const TARGETS: Record<TextRole, [number, number][]> = {
+  //            знаков → кегль
+  plain: [[0, 84], [30, 84], [70, 72], [130, 62], [220, 52], [340, 44]],
+  split: [[0, 66], [40, 62], [90, 54], [170, 46], [300, 38]],
+  above: [[0, 54], [40, 52], [100, 46], [180, 40], [300, 34]],
+}
+export function targetSize(role: TextRole, len: number): number {
+  const t = TARGETS[role], n = Math.max(0, len)
+  if (n <= t[0][0]) return t[0][1]
+  for (let i = 1; i < t.length; i++) if (n <= t[i][0]) { const [x0, y0] = t[i - 1], [x1, y1] = t[i]; return y0 + (y1 - y0) * (n - x0) / (x1 - x0) }
+  return t[t.length - 1][1]
+}
+
+/** Диапазон для fitFontSize: min — предел читаемости, max — целевой кегль по длине (если длина не задана — прежний предел роли). */
+export const roleRange = (role: TextRole, unit: number, len?: number): FitRange => {
+  const r = TEXT_ROLES[role], max = len == null ? r.max : Math.min(r.max, Math.max(r.min, targetSize(role, len)))
+  return { min: r.min * unit, max: max * unit }
+}

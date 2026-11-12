@@ -177,7 +177,7 @@ function ClassicQuestionScreen({
   const bkGrid = isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
   const bkCls = bkPlain ? ' bk-ad bk-ad-plain' : bkSplit ? ' bk-ad bk-ad-split' : bkGrid ? ' bk-ad bk-ad-grid' : ''
   const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
-  const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight })) : undefined
+  const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight }), q.question_text.trim().length) : undefined
 
   return (
     <div ref={rootRef} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${

@@ -66,3 +66,17 @@ describe('AdaptiveMedia: chooseLayout (кандидаты + оценка)', () =
     expect(one.name).toBe('single'); expect(one.placed[0].photo.h).toBeCloseTo(H, 3)
   })
 })
+
+import { roleRange, targetSize } from '../book/adaptive/fit'
+describe('AdaptiveText: целевой кегль по иерархии и длине', () => {
+  it('короткий вопрос не раздувается до 120u; кегль монотонно убывает с длиной; границы стабильны', () => {
+    expect(targetSize('plain', 12)).toBeLessThan(100)
+    let prev = Infinity
+    for (let n = 0; n <= 500; n += 10) { const v = targetSize('plain', n); expect(v).toBeLessThanOrEqual(prev + 1e-9); prev = v }
+    expect(targetSize('plain', 1000)).toBe(targetSize('plain', 340))
+  })
+  it('иерархия: на одной длине plain ≥ split ≥ above; диапазон масштабируется и не выше предела роли', () => {
+    for (const n of [20, 80, 160, 280]) { expect(targetSize('plain', n)).toBeGreaterThanOrEqual(targetSize('split', n)); expect(targetSize('split', n)).toBeGreaterThanOrEqual(targetSize('above', n)) }
+    const r = roleRange('plain', 2, 20); expect(r.max).toBe(targetSize('plain', 20) * 2); expect(r.min).toBe(56)
+  })
+})
