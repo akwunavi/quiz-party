@@ -1,4 +1,5 @@
 import type { ThemeKey } from '../types/quiz'
+import { FinMedal } from './FinMedal'
 
 // ═══ МЕДАЛЬ НА ЭКРАНЕ НАГРАЖДЕНИЯ ═══
 //
@@ -16,6 +17,8 @@ export function AwardMedal({ theme, place }: { theme: ThemeKey; place: number })
   if (theme === 'classic') return <CyberMedal place={place} />
   if (theme === 'potter') return <MerlinMedal place={place} />
   if (theme === 'new_year') return <BaubleMedal place={place} />
+  // «Книга» (прототип этапа 2, F3): медаль-розетка золото/серебро/бронза вместо emoji
+  if (theme === 'ny_book') return <FinMedal place={(place >= 1 && place <= 3 ? place : 3) as 1 | 2 | 3} />
   return <span className="award-emoji">{EMOJI[place - 1] ?? EMOJI[2]}</span>
 }
 

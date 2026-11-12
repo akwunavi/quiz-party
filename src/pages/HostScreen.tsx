@@ -42,6 +42,7 @@ import { boardRowsFrom, mmss, playedCols, podiumSlots, rulesViewFrom, type Board
 import { useImageSizes } from '../forest/stage1/gameHooks'
 import { NyLobby } from '../ny/NyLobby'
 import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
+import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -2612,6 +2613,11 @@ function Finale({ pack, gameId, gameState }: {
     </>
   )
 
+  // «Книга» (прототип этапа 2): заголовок «Глава последняя. Наши победители», названия раундов в шапке, три варианта
+  // оформления (?bkfin=1|2|3 — только для согласования). Ранжирование не меняется.
+  const book = pack.theme === 'ny_book'
+  const finCls = book ? ` bk-fin bk-fin-v${bookFinaleVariant()}` : ''
+  const finTitle = book ? [...BOOK_FINALE_TITLE] : ['РЕЗУЛЬТАТЫ']
   const fullTable = (
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
@@ -2620,7 +2626,8 @@ function Finale({ pack, gameId, gameState }: {
         {/* ДВЕ пустые колонки: место и название команды. Была одна —
             заголовки раундов съезжали влево на целый столбец. */}
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
-          <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
+          <th key={r.id}>Р{displayRoundNumber(pack, i)}{book &&
+            <small className="fin-rname">{r.title_lines.join(' ').replace(/\s+/g, ' ').trim()}</small>}</th>)}<th>{book ? 'Итого' : 'Σ'}</th></tr></thead>
         <tbody>
           {/* Строки — ВСЕ и ВСЕГДА (та же причина, что у табло): подгон
               кегля меряет постоянную разметку, не растущую по одной
@@ -2657,10 +2664,10 @@ function Finale({ pack, gameId, gameState }: {
     const places = [...new Set(rows.map(r => r.place))]
       .filter(p => p <= 3).sort((a, b) => b - a)
     if (step >= places.length) return (
-      <div className="host-screen grid-bg fin-screen">
+      <div className={`host-screen grid-bg fin-screen${finCls}`}>
         {fireworks}
         <div className="mono-tag">ИТОГИ ИГРЫ</div>
-        <Title ref={finTitleRef} theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+        <Title ref={finTitleRef} theme={pack.theme} lines={finTitle} />
         {fullTable}
         <div className="host-actions">
           <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
@@ -2736,10 +2743,10 @@ function Finale({ pack, gameId, gameState }: {
   }
 
   return (
-    <div className="host-screen grid-bg fin-screen">
+    <div className={`host-screen grid-bg fin-screen${finCls}`}>
       {fireworks}
       <div className="mono-tag">ИТОГИ ИГРЫ</div>
-      <Title theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+      <Title ref={book ? finTitleRef : undefined} theme={pack.theme} lines={finTitle} />
       {fullTable}
       <div className="host-actions">
         <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>

@@ -14863,5 +14863,3857 @@
   "playing": [
    "mel-1-2.mp3"
   ]
+ },
+ {
+  "name": "15-finale-16-1899x905",
+  "title": "финальная таблица: 16 команд, 8 раундов, дробные, ничья на 1 и 3",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v1",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 254,
+      "w": 1140,
+      "h": 557,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 242,
+      "w": 1190,
+      "h": 583,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 597,
+      "y": 122,
+      "w": 705,
+      "h": 99,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 832,
+      "y": 273,
+      "w": 62,
+      "h": 19,
+      "visible": true
+     },
+     {
+      "x": 908,
+      "y": 273,
+      "w": 62,
+      "h": 19,
+      "visible": true
+     },
+     {
+      "x": 985,
+      "y": 273,
+      "w": 62,
+      "h": 19,
+      "visible": true
+     },
+     {
+      "x": 1061,
+      "y": 273,
+      "w": 62,
+      "h": 19,
+      "visible": true
+     },
+     {
+      "x": 1138,
+      "y": 282,
+      "w": 62,
+      "h": 9,
+      "visible": true
+     },
+     {
+      "x": 1214,
+      "y": 273,
+      "w": 62,
+      "h": 19,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 399,
+      "y": 299,
+      "w": 27,
+      "h": 34,
+      "visible": true
+     },
+     {
+      "x": 399,
+      "y": 331,
+      "w": 27,
+      "h": 34,
+      "visible": true
+     },
+     {
+      "x": 412,
+      "y": 367,
+      "w": 21,
+      "h": 26,
+      "visible": true
+     },
+     {
+      "x": 405,
+      "y": 399,
+      "w": 21,
+      "h": 26,
+      "visible": true
+     },
+     {
+      "x": 405,
+      "y": 431,
+      "w": 21,
+      "h": 26,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "17.3026px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 17.3,
+    "max": 19.9
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 13.8,
+    "max": 13.8
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-16-1920x1080",
+  "title": "финальная таблица: 16 команд, 8 раундов, дробные, ничья на 1 и 3",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v1",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 300,
+      "w": 1360,
+      "h": 667,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 286,
+      "w": 1420,
+      "h": 698,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 539,
+      "y": 146,
+      "w": 842,
+      "h": 118,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 819,
+      "y": 323,
+      "w": 74,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 323,
+      "w": 74,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1003,
+      "y": 323,
+      "w": 74,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1095,
+      "y": 323,
+      "w": 74,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1187,
+      "y": 334,
+      "w": 74,
+      "h": 11,
+      "visible": true
+     },
+     {
+      "x": 1279,
+      "y": 323,
+      "w": 74,
+      "h": 23,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 301,
+      "y": 355,
+      "w": 32,
+      "h": 40,
+      "visible": true
+     },
+     {
+      "x": 301,
+      "y": 393,
+      "w": 32,
+      "h": 40,
+      "visible": true
+     },
+     {
+      "x": 317,
+      "y": 436,
+      "w": 25,
+      "h": 31,
+      "visible": true
+     },
+     {
+      "x": 308,
+      "y": 474,
+      "w": 25,
+      "h": 31,
+      "visible": true
+     },
+     {
+      "x": 308,
+      "y": 512,
+      "w": 25,
+      "h": 31,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.6484px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 20.6,
+    "max": 23.7
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 16.5,
+    "max": 16.5
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-16-v2-1899x905",
+  "title": "финал, вариант 2: 16 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16-v2",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v2",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 262,
+      "w": 1140,
+      "h": 548,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 250,
+      "w": 1190,
+      "h": 574,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 471,
+      "y": 122,
+      "w": 956,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 832,
+      "y": 282,
+      "w": 64,
+      "h": 20,
+      "visible": true
+     },
+     {
+      "x": 909,
+      "y": 282,
+      "w": 64,
+      "h": 20,
+      "visible": true
+     },
+     {
+      "x": 985,
+      "y": 282,
+      "w": 64,
+      "h": 20,
+      "visible": true
+     },
+     {
+      "x": 1062,
+      "y": 282,
+      "w": 64,
+      "h": 20,
+      "visible": true
+     },
+     {
+      "x": 1138,
+      "y": 292,
+      "w": 64,
+      "h": 10,
+      "visible": true
+     },
+     {
+      "x": 1214,
+      "y": 282,
+      "w": 64,
+      "h": 20,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 396,
+      "y": 306,
+      "w": 31,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 396,
+      "y": 339,
+      "w": 31,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 411,
+      "y": 377,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     },
+     {
+      "x": 404,
+      "y": 408,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     },
+     {
+      "x": 404,
+      "y": 440,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "17.99px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 18,
+    "max": 20.7
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 14.4,
+    "max": 14.4
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-16-v2-1920x1080",
+  "title": "финал, вариант 2: 16 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16-v2",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v2",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 310,
+      "w": 1360,
+      "h": 653,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 296,
+      "w": 1420,
+      "h": 688,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 389,
+      "y": 146,
+      "w": 1142,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 819,
+      "y": 334,
+      "w": 76,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 334,
+      "w": 76,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1003,
+      "y": 334,
+      "w": 76,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1095,
+      "y": 334,
+      "w": 76,
+      "h": 23,
+      "visible": true
+     },
+     {
+      "x": 1187,
+      "y": 346,
+      "w": 76,
+      "h": 12,
+      "visible": true
+     },
+     {
+      "x": 1278,
+      "y": 334,
+      "w": 76,
+      "h": 23,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 299,
+      "y": 362,
+      "w": 37,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 299,
+      "y": 400,
+      "w": 37,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 316,
+      "y": 443,
+      "w": 28,
+      "h": 35,
+      "visible": true
+     },
+     {
+      "x": 307,
+      "y": 481,
+      "w": 28,
+      "h": 35,
+      "visible": true
+     },
+     {
+      "x": 307,
+      "y": 518,
+      "w": 28,
+      "h": 35,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "21.3867px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 21.4,
+    "max": 24.6
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 17.1,
+    "max": 17.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-16-v3-1899x905",
+  "title": "финал, вариант 3: 16 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16-v3",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v3",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 260,
+      "w": 1140,
+      "h": 550,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 248,
+      "w": 1190,
+      "h": 577,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 597,
+      "y": 122,
+      "w": 705,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 833,
+      "y": 279,
+      "w": 60,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 909,
+      "y": 279,
+      "w": 60,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 986,
+      "y": 279,
+      "w": 60,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 1062,
+      "y": 279,
+      "w": 60,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 1139,
+      "y": 288,
+      "w": 60,
+      "h": 9,
+      "visible": true
+     },
+     {
+      "x": 1215,
+      "y": 279,
+      "w": 60,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 400,
+      "y": 305,
+      "w": 27,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 400,
+      "y": 337,
+      "w": 27,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 414,
+      "y": 373,
+      "w": 20,
+      "h": 25,
+      "visible": true
+     },
+     {
+      "x": 406,
+      "y": 404,
+      "w": 20,
+      "h": 25,
+      "visible": true
+     },
+     {
+      "x": 406,
+      "y": 436,
+      "w": 20,
+      "h": 25,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "16.8902px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 16.9,
+    "max": 19.4
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 13.5,
+    "max": 13.5
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-16-v3-1920x1080",
+  "title": "финал, вариант 3: 16 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-16-v3",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v3",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 308,
+      "w": 1360,
+      "h": 658,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 294,
+      "w": 1420,
+      "h": 690,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 539,
+      "y": 146,
+      "w": 842,
+      "h": 126,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 820,
+      "y": 331,
+      "w": 72,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 912,
+      "y": 331,
+      "w": 72,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 1004,
+      "y": 331,
+      "w": 72,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 1096,
+      "y": 331,
+      "w": 72,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 1188,
+      "y": 342,
+      "w": 72,
+      "h": 11,
+      "visible": true
+     },
+     {
+      "x": 1279,
+      "y": 331,
+      "w": 72,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 303,
+      "y": 362,
+      "w": 32,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 303,
+      "y": 402,
+      "w": 32,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 319,
+      "y": 445,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 483,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 520,
+      "w": 24,
+      "h": 30,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.0742px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 176,
+    "min": 20.1,
+    "max": 23.1
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 16.1,
+    "max": 16.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-1899x905",
+  "title": "финальная таблица: 8 команд, 8 раундов, дробные, ничья на 1 и 3",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v1",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 254,
+      "w": 1140,
+      "h": 480,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 242,
+      "w": 1190,
+      "h": 583,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 597,
+      "y": 122,
+      "w": 705,
+      "h": 99,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 767,
+      "y": 280,
+      "w": 78,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 852,
+      "y": 280,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 930,
+      "y": 280,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1009,
+      "y": 280,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1088,
+      "y": 280,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1167,
+      "y": 280,
+      "w": 76,
+      "h": 27,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 399,
+      "y": 327,
+      "w": 40,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 399,
+      "y": 382,
+      "w": 40,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 419,
+      "y": 430,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     },
+     {
+      "x": 408,
+      "y": 486,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     },
+     {
+      "x": 408,
+      "y": 541,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.1389px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 25.1,
+    "max": 28.9
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-1920x1080",
+  "title": "финальная таблица: 8 команд, 8 раундов, дробные, ничья на 1 и 3",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v1",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 300,
+      "w": 1360,
+      "h": 575,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 286,
+      "w": 1420,
+      "h": 698,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 539,
+      "y": 146,
+      "w": 842,
+      "h": 118,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 757,
+      "y": 332,
+      "w": 94,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 859,
+      "y": 332,
+      "w": 84,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 951,
+      "y": 332,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1043,
+      "y": 332,
+      "w": 84,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 332,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1226,
+      "y": 332,
+      "w": 92,
+      "h": 33,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 299,
+      "y": 388,
+      "w": 47,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 299,
+      "y": 455,
+      "w": 47,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 323,
+      "y": 511,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 578,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 645,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "30px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 30,
+    "max": 34.5
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-v2-1899x905",
+  "title": "финал, вариант 2: 8 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8-v2",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v2",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 262,
+      "w": 1140,
+      "h": 466,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 250,
+      "w": 1190,
+      "h": 574,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 471,
+      "y": 122,
+      "w": 956,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 769,
+      "y": 289,
+      "w": 78,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 853,
+      "y": 289,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 932,
+      "y": 289,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1010,
+      "y": 289,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1089,
+      "y": 289,
+      "w": 72,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1167,
+      "y": 289,
+      "w": 75,
+      "h": 27,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 399,
+      "y": 331,
+      "w": 44,
+      "h": 54,
+      "visible": true
+     },
+     {
+      "x": 399,
+      "y": 385,
+      "w": 44,
+      "h": 54,
+      "visible": true
+     },
+     {
+      "x": 420,
+      "y": 432,
+      "w": 33,
+      "h": 41,
+      "visible": true
+     },
+     {
+      "x": 409,
+      "y": 486,
+      "w": 33,
+      "h": 41,
+      "visible": true
+     },
+     {
+      "x": 409,
+      "y": 540,
+      "w": 33,
+      "h": 41,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.1389px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 25.1,
+    "max": 28.9
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-v2-1920x1080",
+  "title": "финал, вариант 2: 8 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8-v2",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v2",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 310,
+      "w": 1360,
+      "h": 562,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 296,
+      "w": 1420,
+      "h": 688,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 389,
+      "y": 146,
+      "w": 1142,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 759,
+      "y": 342,
+      "w": 94,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 861,
+      "y": 342,
+      "w": 84,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 953,
+      "y": 342,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1044,
+      "y": 342,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1136,
+      "y": 342,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1227,
+      "y": 342,
+      "w": 92,
+      "h": 33,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 299,
+      "y": 393,
+      "w": 52,
+      "h": 65,
+      "visible": true
+     },
+     {
+      "x": 299,
+      "y": 458,
+      "w": 52,
+      "h": 65,
+      "visible": true
+     },
+     {
+      "x": 324,
+      "y": 515,
+      "w": 40,
+      "h": 50,
+      "visible": true
+     },
+     {
+      "x": 311,
+      "y": 580,
+      "w": 40,
+      "h": 50,
+      "visible": true
+     },
+     {
+      "x": 311,
+      "y": 645,
+      "w": 40,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "30px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 30,
+    "max": 34.5
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-v3-1899x905",
+  "title": "финал, вариант 3: 8 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8-v3",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v3",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 260,
+      "w": 1140,
+      "h": 488,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 248,
+      "w": 1190,
+      "h": 577,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 597,
+      "y": 122,
+      "w": 705,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 804,
+      "y": 99,
+      "w": 290,
+      "h": 18,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 774,
+      "y": 286,
+      "w": 77,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 857,
+      "y": 286,
+      "w": 71,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 935,
+      "y": 286,
+      "w": 71,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1013,
+      "y": 286,
+      "w": 71,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1091,
+      "y": 286,
+      "w": 71,
+      "h": 27,
+      "visible": true
+     },
+     {
+      "x": 1169,
+      "y": 286,
+      "w": 75,
+      "h": 27,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 399,
+      "y": 337,
+      "w": 40,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 399,
+      "y": 396,
+      "w": 40,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 419,
+      "y": 445,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     },
+     {
+      "x": 408,
+      "y": 500,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     },
+     {
+      "x": 408,
+      "y": 556,
+      "w": 30,
+      "h": 38,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "67.037px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.1389px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 25.1,
+    "max": 28.9
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 726
+   },
+   "onPages": 863488,
+   "share": 50.2,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "15-finale-8-v3-1920x1080",
+  "title": "финал, вариант 3: 8 команд",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "15-finale-8-v3",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen bk-fin bk-fin-v3",
+  "density": "medium",
+  "nodes": {
+   ".fin-table": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 308,
+      "w": 1360,
+      "h": 587,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-table-wrap": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 294,
+      "w": 1420,
+      "h": 690,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 539,
+      "y": 146,
+      "w": 842,
+      "h": 126,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 787,
+      "y": 118,
+      "w": 346,
+      "h": 22,
+      "visible": true
+     },
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".fin-rname": {
+    "count": 8,
+    "items": [
+     {
+      "x": 764,
+      "y": 340,
+      "w": 94,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 866,
+      "y": 340,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 957,
+      "y": 340,
+      "w": 82,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1047,
+      "y": 340,
+      "w": 83,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1138,
+      "y": 340,
+      "w": 82,
+      "h": 33,
+      "visible": true
+     },
+     {
+      "x": 1228,
+      "y": 340,
+      "w": 91,
+      "h": 33,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 5,
+    "items": [
+     {
+      "x": 299,
+      "y": 400,
+      "w": 47,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 299,
+      "y": 473,
+      "w": 47,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 323,
+      "y": 531,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 598,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     },
+     {
+      "x": 310,
+      "y": 664,
+      "w": 36,
+      "h": 45,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   },
+   ".fin-table td": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "30px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "glitchRGB 16s",
+   ".fin-row": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".fin-table td": {
+    "n": 88,
+    "min": 30,
+    "max": 34.5
+   },
+   ".fin-table th": {
+    "n": 11,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 866
+   },
+   "onPages": 1229720,
+   "share": 59.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "16-award-1-1899x905",
+  "title": "награждение «бар»: 1 место, ничья (медаль без emoji)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "16-award-1",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen",
+  "density": "medium",
+  "nodes": {
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 851,
+      "y": 289,
+      "w": 197,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 832,
+      "y": 362,
+      "w": 182,
+      "h": 226,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-award": {
+    "count": 1,
+    "items": [
+     {
+      "x": 570,
+      "y": 316,
+      "w": 758,
+      "h": 418,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {},
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 603
+   },
+   "onPages": 717911,
+   "share": 41.8,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "16-award-1-1920x1080",
+  "title": "награждение «бар»: 1 место, ничья (медаль без emoji)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "16-award-1",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg fin-screen",
+  "density": "medium",
+  "nodes": {
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 843,
+      "y": 345,
+      "w": 235,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-medal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 825,
+      "y": 432,
+      "w": 218,
+      "h": 270,
+      "visible": true
+     }
+    ]
+   },
+   ".fin-award": {
+    "count": 1,
+    "items": [
+     {
+      "x": 508,
+      "y": 377,
+      "w": 905,
+      "h": 498,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {},
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 720
+   },
+   "onPages": 1022400,
+   "share": 49.3,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
  }
 ]

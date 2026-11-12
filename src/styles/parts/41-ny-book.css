@@ -538,3 +538,64 @@
 .theme-ny_book .bk-vinyl-arm::before { content: ''; position: absolute; left: 50%; top: calc(-10 * var(--u)); width: calc(34 * var(--u)); height: calc(34 * var(--u)); margin-left: calc(-17 * var(--u));
   border-radius: 50%; background: radial-gradient(circle, #e4e9ee, #6d757e); }
 .theme-ny_book .bk-vinyl.is-spin .bk-vinyl-arm { transform: rotate(34deg); }
+
+/* ── итоги: «Глава последняя. Наши победители» — три варианта оформления (.bk-fin-v1|2|3, ?bkfin= — только прототип) ── */
+.theme-ny_book .fin-screen.bk-fin { justify-content: flex-start; padding-top: calc(var(--bk-oy) + 118 * var(--u)); padding-bottom: calc(var(--bk-oy) + 96 * var(--u)); gap: calc(6 * var(--u)); }
+.theme-ny_book .fin-screen.bk-fin > .mono-tag { flex: none; background: none; box-shadow: none; padding: 0; font: 700 calc(22 * var(--u)) / 1 var(--bk-serif); letter-spacing: .42em; color: var(--bk-red); }
+.theme-ny_book .fin-screen.bk-fin > .mono-tag::before, .theme-ny_book .fin-screen.bk-fin > .mono-tag::after { content: '✦'; margin: 0 .8em; color: var(--bk-gold); letter-spacing: 0; }
+.theme-ny_book .fin-screen.bk-fin .neon-title { flex: none; margin: 0; font-family: var(--bk-display); font-weight: 700; font-size: calc(80 * var(--u)) !important; line-height: .98; color: var(--bk-ink-2) !important; letter-spacing: .01em; }
+.theme-ny_book .fin-screen.bk-fin .neon-title span:first-child { display: block; font-size: .5em; font-weight: 600; letter-spacing: .12em; color: var(--bk-muted) !important; }
+.theme-ny_book .fin-screen.bk-fin .neon-title span:last-child { color: var(--bk-ink-2) !important; text-transform: uppercase; }
+.theme-ny_book .fin-screen.bk-fin .fin-breakdown { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; width: 100%; }
+.theme-ny_book .fin-screen.bk-fin .fin-breakdown > .mono-tag { display: none; }
+.theme-ny_book .fin-screen.bk-fin .fin-table-wrap { flex: 1 1 0; min-height: 0; overflow: hidden; width: min(100%, calc(1460 * var(--u))); margin-inline: auto; padding: calc(14 * var(--u)) calc(30 * var(--u)) calc(18 * var(--u)); max-height: none; }
+.theme-ny_book .fin-screen.bk-fin .fin-table { width: 100%; font-size: calc(30 * var(--u)); border-collapse: separate; border-spacing: 0 calc(4 * var(--u)); }
+.theme-ny_book .fin-screen.bk-fin .fin-table th { vertical-align: bottom; padding: 0 calc(4 * var(--u)) calc(6 * var(--u)); font: 700 .8em / 1 var(--bk-serif); letter-spacing: .04em; color: var(--bk-ink-2); text-align: center; }
+.theme-ny_book .fin-screen.bk-fin .fin-table th:last-child { color: var(--bk-red); }
+.theme-ny_book .fin-screen.bk-fin .fin-table :is(th, td):nth-child(2) { text-align: left; }
+.theme-ny_book .fin-rname { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 7.2em; margin: .3em auto 0; font: 400 .62em / 1.1 var(--bk-serif); letter-spacing: 0; text-transform: none; color: var(--bk-muted); }
+.theme-ny_book .fin-screen.bk-fin .fin-table td { padding-block: calc(3 * var(--u)); color: var(--bk-ink); line-height: 1.12; text-align: center; border-bottom: 2px solid var(--bk-shade); vertical-align: middle; }
+/* высота строки = кегль, а не медаль/кольцо итога: иначе 16 команд ужимались подгоном до 12 px (замер прототипа) */
+.theme-ny_book .fin-screen.bk-fin .fin-table td:last-child { font-size: 1.15em; line-height: 1.05; }
+.theme-ny_book .fin-screen.bk-fin .fin-table td:first-child { width: auto; padding-right: calc(10 * var(--u)); font-weight: 700; color: var(--bk-muted); text-align: right; white-space: nowrap; border-bottom-color: transparent; }
+.theme-ny_book .fin-screen.bk-fin .fin-table td:nth-child(2) { color: var(--bk-ink) !important; border-left: calc(12 * var(--u)) solid var(--tc, var(--bk-ink)); padding-left: calc(20 * var(--u)); font-weight: 700; }
+.theme-ny_book .fin-screen.bk-fin .fin-table td:nth-child(2) .sb-name { font-size: 1.05em; }
+/* медали 1/2/3 — SVG (FinMedal), первое место заметнее второго; ничья — общее место и одинаковая медаль */
+.theme-ny_book .fin-screen.bk-fin .fin-medal { height: 1.5em; margin: -.3em .25em -.3em 0; vertical-align: middle; }
+.theme-ny_book .fin-screen.bk-fin .fin-medal.m1 { height: 1.95em; margin-block: -.5em; }
+.theme-ny_book .fin-screen.bk-fin .fin-table td:last-child b { display: inline-block; min-width: 2.6em; padding: 0 .3em; line-height: 1.1; color: var(--bk-red); }
+.theme-ny_book .fin-award .fin-award-medal svg { height: calc(220 * var(--u)); width: auto; filter: drop-shadow(0 calc(8 * var(--u)) calc(10 * var(--u)) rgba(40, 20, 6, .4)); }
+.theme-ny_book .fin-award.p1 .fin-award-medal svg { height: calc(270 * var(--u)); }
+.theme-ny_book .fin-award .fin-award-name[style*="color"] { font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink-2) !important; }
+.theme-ny_book .fin-award .fin-award-place { font-size: calc(34 * var(--u)); }
+
+/* V1 «Плашка»: пергаментный лист в двойной золотой рамке, 1-е место — бордовая плашка, итог в золотом кольце */
+.theme-ny_book .bk-fin-v1 .fin-table-wrap { box-shadow: 0 0 0 calc(3 * var(--u)) var(--bk-gold), 0 0 0 calc(9 * var(--u)) var(--bk-paper), 0 0 0 calc(11 * var(--u)) var(--bk-line), 0 calc(16 * var(--u)) calc(30 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .bk-fin-v1 .fin-row.fin-first td:not(:first-child) { background: linear-gradient(180deg, var(--bk-red-2), var(--bk-red)); color: var(--bk-paper) !important; border-bottom-color: var(--bk-red-3); }
+.theme-ny_book .bk-fin-v1 .fin-row.fin-first td:nth-child(2), .theme-ny_book .bk-fin-v1 .fin-row.fin-first .sb-name { color: var(--bk-paper) !important; }
+.theme-ny_book .bk-fin-v1 .fin-row.fin-first td:last-child b { color: var(--bk-ink-2); background: radial-gradient(circle, var(--bk-gold-2), var(--bk-gold)); border-radius: 999px; box-shadow: 0 0 0 calc(3 * var(--u)) var(--bk-paper), 0 0 0 calc(5 * var(--u)) var(--bk-gold-3); }
+.theme-ny_book .bk-fin-v1 .fin-row.top3:not(.fin-first) td:not(:first-child) { background: rgba(201, 161, 74, .14); }
+
+/* V2 «Венок»: заголовок в хвойных полувенках, строки — отдельные пергаментные карточки без общей рамки */
+.theme-ny_book .bk-fin-v2 .neon-title { position: relative; padding: calc(10 * var(--u)) calc(150 * var(--u)) 0; }
+.theme-ny_book .bk-fin-v2 .neon-title::before, .theme-ny_book .bk-fin-v2 .neon-title::after { content: ''; position: absolute; bottom: 0; width: calc(110 * var(--u)); height: calc(120 * var(--u));
+  background: radial-gradient(ellipse at 100% 50%, rgba(0, 0, 0, 0) 52%, var(--bk-pine) 53% 63%, rgba(0, 0, 0, 0) 64%),
+    radial-gradient(circle at 70% 20%, var(--bk-red-2) 0 6%, rgba(0, 0, 0, 0) 7%), radial-gradient(circle at 78% 82%, var(--bk-red-2) 0 6%, rgba(0, 0, 0, 0) 7%); }
+.theme-ny_book .bk-fin-v2 .neon-title::before { left: calc(20 * var(--u)); }
+.theme-ny_book .bk-fin-v2 .neon-title::after { right: calc(20 * var(--u)); transform: scaleX(-1); }
+.theme-ny_book .bk-fin-v2 .fin-table-wrap { background: none; box-shadow: none; padding: 0 calc(10 * var(--u)); }
+.theme-ny_book .bk-fin-v2 .fin-table { border-spacing: 0 calc(7 * var(--u)); }
+.theme-ny_book .bk-fin-v2 .fin-table td:not(:first-child) { background: linear-gradient(180deg, #fffaf0, var(--bk-paper)); border-bottom: 0; box-shadow: 0 calc(3 * var(--u)) 0 var(--bk-shade); }
+.theme-ny_book .bk-fin-v2 .fin-table td:last-child { border-radius: 0 calc(8 * var(--u)) calc(8 * var(--u)) 0; }
+.theme-ny_book .bk-fin-v2 .fin-row.fin-first td:not(:first-child) { background: linear-gradient(180deg, #fff6da, var(--bk-gold-2)); box-shadow: 0 calc(3 * var(--u)) 0 var(--bk-gold), 0 0 calc(18 * var(--u)) rgba(242, 213, 140, .8); }
+.theme-ny_book .fin-screen.bk-fin-v2 .fin-medal { height: 1.65em; } .theme-ny_book .fin-screen.bk-fin-v2 .fin-medal.m1 { height: 2.15em; }
+
+/* V3 «Грамота»: бордово-золотая рамка-грамота, разлинованные строки «книги учёта», 1-е место — красное имя и двойная золотая черта */
+.theme-ny_book .bk-fin-v3 .fin-table-wrap { position: relative; padding: calc(18 * var(--u)) calc(40 * var(--u)); background: var(--bk-paper);
+  box-shadow: inset 0 0 0 calc(6 * var(--u)) var(--bk-red), inset 0 0 0 calc(9 * var(--u)) var(--bk-gold), inset 0 0 0 calc(12 * var(--u)) var(--bk-paper), inset 0 0 0 calc(13 * var(--u)) var(--bk-line), 0 calc(14 * var(--u)) calc(26 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .bk-fin-v3 .fin-table td { border-bottom: calc(1.5 * var(--u)) dotted rgba(107, 78, 51, .45); background: none !important; }
+.theme-ny_book .bk-fin-v3 .fin-table td:nth-child(2) { border-left: calc(8 * var(--u)) solid var(--tc, var(--bk-ink)); }
+.theme-ny_book .bk-fin-v3 .fin-row.fin-first td { border-bottom: calc(3 * var(--u)) double var(--bk-gold); }
+.theme-ny_book .bk-fin-v3 .fin-row.fin-first td:nth-child(2) .sb-name { font-size: 1.18em; color: var(--bk-red); }
+.theme-ny_book .bk-fin-v3 .neon-title span:last-child { text-transform: none; }
+.theme-ny_book .bk-fin-v3 .neon-title { border-bottom: calc(2 * var(--u)) solid var(--bk-gold); padding-bottom: calc(6 * var(--u)); }
