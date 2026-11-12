@@ -8333,5 +8333,5039 @@
   },
   "vinylSpin": null,
   "playing": []
+ },
+ {
+  "name": "09-answer-time-1899x905",
+  "title": "ожидание ответов (online, 8 команд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09-answer-time",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 870,
+      "y": 485,
+      "w": 159,
+      "h": 159,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 431,
+      "y": 207,
+      "w": 1038,
+      "h": 173,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 409,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 677,
+      "w": 1190,
+      "h": 169,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 383,
+      "y": 677,
+      "w": 186,
+      "h": 47,
+      "visible": true
+     },
+     {
+      "x": 583,
+      "y": 677,
+      "w": 376,
+      "h": 47,
+      "visible": true
+     },
+     {
+      "x": 973,
+      "y": 677,
+      "w": 249,
+      "h": 47,
+      "visible": true
+     },
+     {
+      "x": 1236,
+      "y": 677,
+      "w": 280,
+      "h": 47,
+      "visible": true
+     },
+     {
+      "x": 524,
+      "y": 738,
+      "w": 336,
+      "h": 47,
+      "visible": true
+     },
+     {
+      "x": 874,
+      "y": 738,
+      "w": 267,
+      "h": 47,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 409,
+      "y": 203,
+      "w": 1082,
+      "h": 181,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 159,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 960,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "170px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 632
+   },
+   "onPages": 751812,
+   "share": 43.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "09-answer-time-1920x1080",
+  "title": "ожидание ответов (online, 8 команд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09-answer-time",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 865,
+      "y": 535,
+      "w": 190,
+      "h": 190,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 441,
+      "y": 246,
+      "w": 1038,
+      "h": 173,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 453,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 765,
+      "w": 1420,
+      "h": 184,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 305,
+      "y": 765,
+      "w": 214,
+      "h": 52,
+      "visible": true
+     },
+     {
+      "x": 533,
+      "y": 765,
+      "w": 440,
+      "h": 52,
+      "visible": true
+     },
+     {
+      "x": 987,
+      "y": 765,
+      "w": 288,
+      "h": 52,
+      "visible": true
+     },
+     {
+      "x": 1289,
+      "y": 765,
+      "w": 326,
+      "h": 52,
+      "visible": true
+     },
+     {
+      "x": 468,
+      "y": 831,
+      "w": 392,
+      "h": 52,
+      "visible": true
+     },
+     {
+      "x": 874,
+      "y": 831,
+      "w": 310,
+      "h": 52,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 419,
+      "y": 242,
+      "w": 1082,
+      "h": 181,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 190,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1085,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "170px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 754
+   },
+   "onPages": 1070680,
+   "share": 51.6,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "10-recall-A-1899x905",
+  "title": "разбор до раскрытия (A): вопрос + «Ответили N из M»",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "10-recall-A",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 335,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 144,
+      "w": 1190,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 273,
+      "w": 1190,
+      "h": 518,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 365,
+      "y": 273,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 273,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 365,
+      "y": 536,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 536,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     }
+    ]
+   },
+   ".answered-chip": {
+    "count": 1,
+    "items": [
+     {
+      "x": 354,
+      "y": 792,
+      "w": 239,
+      "h": 57,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 113,
+    "clientH": 109,
+    "scrollW": 1190,
+    "clientW": 1190,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "48.6019px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".answered-chip": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 48.6,
+    "max": 48.6
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 647
+   },
+   "onPages": 769760,
+   "share": 44.8,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "10-recall-A-1920x1080",
+  "title": "разбор до раскрытия (A): вопрос + «Ответили N из M»",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "10-recall-A",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 396,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 172,
+      "w": 1420,
+      "h": 130,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 326,
+      "w": 1420,
+      "h": 618,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 262,
+      "y": 326,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 975,
+      "y": 326,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 262,
+      "y": 640,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 975,
+      "y": 640,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     }
+    ]
+   },
+   ".answered-chip": {
+    "count": 1,
+    "items": [
+     {
+      "x": 249,
+      "y": 944,
+      "w": 287,
+      "h": 69,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 135,
+    "clientH": 130,
+    "scrollW": 1420,
+    "clientW": 1420,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "58px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".answered-chip": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 58,
+    "max": 58
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 772
+   },
+   "onPages": 1096240,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "10b-recap-1899x905",
+  "title": "повтор вопросов раунда (recap, 1-й слайд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "10b-recap",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg recap-screen",
+  "density": "medium",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1418,
+      "y": 39,
+      "w": 126,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 430,
+      "y": -55,
+      "w": 1039,
+      "h": 803,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".recap-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1899,
+      "h": 905,
+      "visible": true
+     }
+    ]
+   },
+   ".recap-body": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 175,
+      "w": 1190,
+      "h": 344,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 44,
+      "w": 297,
+      "h": 39,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".host-topbar[0]",
+    "b": ".q-text[0]",
+    "w": 1039,
+    "h": 49
+   }
+  ],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".q-text[0]",
+    "of": "viewport",
+    "by": {
+     "top": 55
+    }
+   },
+   {
+    "node": ".q-text[0]",
+    "of": "pages",
+    "by": {
+     "top": 97
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 805,
+    "clientH": 803,
+    "scrollW": 1039,
+    "clientW": 1039,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1015,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   },
+   {
+    "node": ".recap-body[0]",
+    "scrollH": 576,
+    "clientH": 344,
+    "scrollW": 1190,
+    "clientW": 1190,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "48.6019px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 48.6,
+    "max": 48.6
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 649
+   },
+   "onPages": 771754,
+   "share": 44.9,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "10b-recap-1920x1080",
+  "title": "повтор вопросов раунда (recap, 1-й слайд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "10b-recap",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg recap-screen",
+  "density": "medium",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1519,
+      "y": 46,
+      "w": 151,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 340,
+      "y": -31,
+      "w": 1240,
+      "h": 890,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".recap-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "visible": true
+     }
+    ]
+   },
+   ".recap-body": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 209,
+      "w": 1420,
+      "h": 410,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 355,
+      "h": 46,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".host-topbar[0]",
+    "b": ".q-text[0]",
+    "w": 1240,
+    "h": 58
+   }
+  ],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".q-text[0]",
+    "of": "viewport",
+    "by": {
+     "top": 31
+    }
+   },
+   {
+    "node": ".q-text[0]",
+    "of": "pages",
+    "by": {
+     "top": 81
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 893,
+    "clientH": 890,
+    "scrollW": 1240,
+    "clientW": 1240,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1211,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   },
+   {
+    "node": ".recap-body[0]",
+    "scrollH": 653,
+    "clientH": 410,
+    "scrollW": 1420,
+    "clientW": 1420,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "58px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 58,
+    "max": 58
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 774
+   },
+   "onPages": 1099080,
+   "share": 53,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11-revealed-plain-1899x905",
+  "title": "раскрытый ответ без картинок: 8 ответов команд + пояснение 400 знаков",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11-revealed-plain",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1279,
+      "y": 39,
+      "w": 266,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 392,
+      "w": 750,
+      "h": 413,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 428,
+      "y": 482,
+      "w": 602,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1135,
+      "y": 174,
+      "w": 394,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1135,
+      "y": 208,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 272,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 337,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 401,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 466,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 530,
+      "w": 394,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 205,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 355,
+      "y": 46,
+      "w": 300,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 180,
+      "w": 394,
+      "h": 20,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.9491px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "46.9259px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "21.787px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 46.9,
+    "max": 46.9
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 14.2,
+    "max": 14.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 645
+   },
+   "onPages": 767766,
+   "share": 44.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11-revealed-plain-1920x1080",
+  "title": "раскрытый ответ без картинок: 8 ответов команд + пояснение 400 знаков",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11-revealed-plain",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1356,
+      "y": 46,
+      "w": 314,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 467,
+      "w": 898,
+      "h": 493,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 339,
+      "y": 575,
+      "w": 719,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1184,
+      "y": 207,
+      "w": 470,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1184,
+      "y": 248,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 321,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 393,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 465,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 537,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 610,
+      "w": 470,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 244,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 358,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 215,
+      "w": 470,
+      "h": 24,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "56px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "26px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 56,
+    "max": 56
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 17,
+    "max": 17
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 770
+   },
+   "onPages": 1093400,
+   "share": 52.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11b-revealed-choices-1899x905",
+  "title": "раскрытый ответ: варианты текстом (StagedChoices)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11b-revealed-choices",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1279,
+      "y": 39,
+      "w": 266,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 402,
+      "w": 700,
+      "h": 287,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 380,
+      "y": 402,
+      "w": 338,
+      "h": 147,
+      "visible": true
+     },
+     {
+      "x": 742,
+      "y": 402,
+      "w": 338,
+      "h": 147,
+      "visible": true
+     },
+     {
+      "x": 380,
+      "y": 572,
+      "w": 338,
+      "h": 117,
+      "visible": true
+     },
+     {
+      "x": 742,
+      "y": 572,
+      "w": 338,
+      "h": 117,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 248,
+      "w": 750,
+      "h": 556,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1135,
+      "y": 174,
+      "w": 394,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1135,
+      "y": 208,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 272,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 337,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 401,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 466,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 530,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 61,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 355,
+      "y": 46,
+      "w": 300,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 180,
+      "w": 394,
+      "h": 20,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.1389px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.9769px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "21.787px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".choice-plate": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 26,
+    "max": 26
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 14.2,
+    "max": 14.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 645
+   },
+   "onPages": 767766,
+   "share": 44.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11b-revealed-choices-1920x1080",
+  "title": "раскрытый ответ: варианты текстом (StagedChoices)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11b-revealed-choices",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1356,
+      "y": 46,
+      "w": 314,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 500,
+      "w": 838,
+      "h": 303,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 280,
+      "y": 500,
+      "w": 407,
+      "h": 139,
+      "visible": true
+     },
+     {
+      "x": 711,
+      "y": 500,
+      "w": 407,
+      "h": 139,
+      "visible": true
+     },
+     {
+      "x": 280,
+      "y": 663,
+      "w": 407,
+      "h": 139,
+      "visible": true
+     },
+     {
+      "x": 711,
+      "y": 663,
+      "w": 407,
+      "h": 139,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 296,
+      "w": 898,
+      "h": 664,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1184,
+      "y": 207,
+      "w": 470,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1184,
+      "y": 248,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 321,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 393,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 465,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 537,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 610,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 73,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 358,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 215,
+      "w": 470,
+      "h": 24,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "30px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "31px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "26px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".choice-plate": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 31,
+    "max": 31
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 17,
+    "max": 17
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 770
+   },
+   "onPages": 1093400,
+   "share": 52.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11p-revealed-paper-1899x905",
+  "title": "бумага: раскрытый ответ без картинок (без колонки команд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11p-revealed-paper",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg paper-answers",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1279,
+      "y": 39,
+      "w": 266,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 315,
+      "w": 1174,
+      "h": 490,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 640,
+      "y": 471,
+      "w": 602,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 1174,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 46,
+      "w": 300,
+      "h": 39,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 1174,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.9491px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "46.9259px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 46.9,
+    "max": 46.9
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 645
+   },
+   "onPages": 767766,
+   "share": 44.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "11p-revealed-paper-1920x1080",
+  "title": "бумага: раскрытый ответ без картинок (без колонки команд)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "11p-revealed-paper",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg paper-answers",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1356,
+      "y": 46,
+      "w": 314,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 376,
+      "w": 1404,
+      "h": 584,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 592,
+      "y": 562,
+      "w": 719,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 1404,
+      "h": 153,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 358,
+      "h": 46,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 1404,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "56px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 56,
+    "max": 56
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 770
+   },
+   "onPages": 1093400,
+   "share": 52.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "12-revealed-answer-media-1899x905",
+  "title": "раскрытый ответ с картинкой ответа (длинный вопрос)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "12-revealed-answer-media",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1279,
+      "y": 39,
+      "w": 266,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 460,
+      "w": 700,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 460,
+      "w": 700,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 340,
+      "w": 750,
+      "h": 464,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 617,
+      "y": 399,
+      "w": 225,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-media": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 460,
+      "w": 700,
+      "h": 107,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1135,
+      "y": 174,
+      "w": 394,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 6,
+    "items": [
+     {
+      "x": 1135,
+      "y": 208,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 272,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 337,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 401,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 466,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 530,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 153,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 355,
+      "y": 46,
+      "w": 300,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 180,
+      "w": 394,
+      "h": 20,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.9491px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "46.9259px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "21.787px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 46.9,
+    "max": 46.9
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 20.9,
+    "max": 20.9
+   },
+   ".team-answer .text": {
+    "n": 6,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 6,
+    "min": 14.2,
+    "max": 14.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 645
+   },
+   "onPages": 767766,
+   "share": 44.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "12-revealed-answer-media-1920x1080",
+  "title": "раскрытый ответ с картинкой ответа (длинный вопрос)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "12-revealed-answer-media",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1356,
+      "y": 46,
+      "w": 314,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 549,
+      "w": 838,
+      "h": 127,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 549,
+      "w": 838,
+      "h": 127,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 406,
+      "w": 898,
+      "h": 554,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 565,
+      "y": 476,
+      "w": 269,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-media": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 549,
+      "w": 838,
+      "h": 127,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1184,
+      "y": 207,
+      "w": 470,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 6,
+    "items": [
+     {
+      "x": 1184,
+      "y": 248,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 321,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 393,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 465,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 537,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 610,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 183,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 358,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 215,
+      "w": 470,
+      "h": 24,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "56px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "26px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 56,
+    "max": 56
+   },
+   ".answer-note": {
+    "n": 1,
+    "min": 25,
+    "max": 25
+   },
+   ".team-answer .text": {
+    "n": 6,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 6,
+    "min": 17,
+    "max": 17
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 770
+   },
+   "onPages": 1093400,
+   "share": 52.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "12b-revealed-4img-1899x905",
+  "title": "раскрытый ответ: картинки вопроса (4) вместо своей",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "12b-revealed-4img",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1279,
+      "y": 39,
+      "w": 266,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 367,
+      "w": 700,
+      "h": 417,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 390,
+      "y": 367,
+      "w": 327,
+      "h": 204,
+      "visible": true
+     },
+     {
+      "x": 742,
+      "y": 367,
+      "w": 327,
+      "h": 204,
+      "visible": true
+     },
+     {
+      "x": 390,
+      "y": 580,
+      "w": 327,
+      "h": 204,
+      "visible": true
+     },
+     {
+      "x": 742,
+      "y": 580,
+      "w": 327,
+      "h": 204,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 248,
+      "w": 750,
+      "h": 556,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 664,
+      "y": 307,
+      "w": 130,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-media": {
+    "count": 1,
+    "items": [
+     {
+      "x": 380,
+      "y": 367,
+      "w": 700,
+      "h": 417,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1135,
+      "y": 174,
+      "w": 394,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1135,
+      "y": 208,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 272,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 337,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 401,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 466,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 530,
+      "w": 394,
+      "h": 57,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 61,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 355,
+      "y": 46,
+      "w": 300,
+      "h": 39,
+      "visible": true
+     },
+     {
+      "x": 1135,
+      "y": 180,
+      "w": 394,
+      "h": 20,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 174,
+      "w": 750,
+      "h": 631,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.1389px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "46.9259px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "21.787px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 46.9,
+    "max": 46.9
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 14.2,
+    "max": 14.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 645
+   },
+   "onPages": 767766,
+   "share": 44.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
+ },
+ {
+  "name": "12b-revealed-4img-1920x1080",
+  "title": "раскрытый ответ: картинки вопроса (4) вместо своей",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "12b-revealed-4img",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1356,
+      "y": 46,
+      "w": 314,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 439,
+      "w": 838,
+      "h": 497,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 292,
+      "y": 439,
+      "w": 392,
+      "h": 243,
+      "visible": true
+     },
+     {
+      "x": 714,
+      "y": 439,
+      "w": 392,
+      "h": 243,
+      "visible": true
+     },
+     {
+      "x": 292,
+      "y": 693,
+      "w": 392,
+      "h": 243,
+      "visible": true
+     },
+     {
+      "x": 714,
+      "y": 693,
+      "w": 392,
+      "h": 243,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-block": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 296,
+      "w": 898,
+      "h": 664,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 366,
+      "w": 156,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-media": {
+    "count": 1,
+    "items": [
+     {
+      "x": 280,
+      "y": 439,
+      "w": 838,
+      "h": 497,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1184,
+      "y": 207,
+      "w": 470,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   },
+   ".team-answer": {
+    "count": 8,
+    "items": [
+     {
+      "x": 1184,
+      "y": 248,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 321,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 393,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 465,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 537,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 610,
+      "w": 470,
+      "h": 63,
+      "visible": true
+     }
+    ]
+   },
+   ".q-recall": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 73,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 2,
+    "items": [
+     {
+      "x": 250,
+      "y": 52,
+      "w": 358,
+      "h": 46,
+      "visible": true
+     },
+     {
+      "x": 1184,
+      "y": 215,
+      "w": 470,
+      "h": 24,
+      "visible": true
+     }
+    ]
+   },
+   ".answers-main": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 207,
+      "w": 898,
+      "h": 753,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".q-recall": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "30px",
+    "loaded": true
+   },
+   ".answer-main": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "56px",
+    "loaded": true
+   },
+   ".team-answer": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "400",
+    "style": "normal",
+    "size": "26px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".answer-block": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-recall": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   },
+   ".answer-main": {
+    "n": 1,
+    "min": 56,
+    "max": 56
+   },
+   ".team-answer .text": {
+    "n": 8,
+    "min": 22,
+    "max": 22
+   },
+   ".team-answer .name": {
+    "n": 8,
+    "min": 17,
+    "max": 17
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 770
+   },
+   "onPages": 1093400,
+   "share": 52.7,
+   "offPages": 0
+  },
+  "vinylSpin": null,
+  "playing": []
  }
 ]

@@ -41,6 +41,7 @@ import { introKindOf } from '../forest/stage5/views'
 import { boardRowsFrom, mmss, playedCols, podiumSlots, rulesViewFrom, type BoardView } from '../forest/stage5/views'
 import { useImageSizes } from '../forest/stage1/gameHooks'
 import { NyLobby } from '../ny/NyLobby'
+import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -1738,6 +1739,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const total = round.questions.length
   const step = gameState.question_index
+  // «Книга» (прототип этапа 2): анимация раскрытия — только если этот экран видел вопрос нераскрытым, а потом раскрытым
+  // (ny/book/motion.ts). Перезагрузка на раскрытом ответе и опрос раз в 2 с её не запускают. Хук — до ранних return
+  // (React #310). Класс bk-live правил в других темах не имеет.
+  const revealLiveRef = useRef(REVEAL_LIVE_INIT)
+  revealLiveRef.current = revealLiveStep(revealLiveRef.current, `${gameState.game_id}:${gameState.round_number}:${step}`, revealed)
+  const revealLive = revealLiveRef.current.live
+  const isBook = pack.theme === 'ny_book'
 
   // подстраховка из старого: авто-раскрытие через 3 сек
   // document.hidden здесь убран (FLOW-03): эффект срабатывает ОДИН раз на вопрос, и если в этот момент вкладка была
@@ -1896,9 +1904,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && q.answer.mode !== 'match' && q.question_text.trim() && (
             <p className={`q-recall${lenClass(q.question_text)}`}>{q.question_text}</p>
           )}
+          {/* «Книга»: у ответа своя картинка — картинки вопроса остаются компактной галереей (только ny_book) */}
+          {revealed && isBook && answerImgs.length > 0 && questionImgs.length > 0 && round.mechanic !== 'rebus' && (
+            <div className="answer-gallery is-recall">
+              {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+            </div>
+          )}
 
           {revealed && (
-            <div className="answer-block reveal-in">
+            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}`}>
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
@@ -1946,7 +1960,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${
                       revealImgs.length > 1 ? ' eq-row' : ''}${
-                      revealImgs.length > 4 ? ' wrap2' : ''}`}>
+                      revealImgs.length > 4 ? ' wrap2' : ''}${
+                      // is-own — своя картинка ответа (media.answer), is-recall — картинки вопроса вместо неё
+                      answerImgs.length ? ' is-own' : ' is-recall'}`}>
                     {revealImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
                 )}

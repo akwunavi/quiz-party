@@ -442,3 +442,51 @@
 .theme-ny_book .host-screen.has-media:not(.has-choices) > .q-media-grid { max-height: none; }
 /* вопрос с картинками: шапка не наезжает на текст (замер baseline: пересечение 24–36 px) */
 .theme-ny_book .host-screen.has-media { padding-top: calc(var(--bk-oy) + 172 * var(--u)); }
+
+/* ── A: «Ответили N из M» — бумажный штамп в углу страницы (вне .grid-bg, fixed) ── */
+.theme-ny_book .answered-chip { left: calc(var(--bk-ox) + 250 * var(--u)); bottom: calc(var(--bk-oy) + 72 * var(--u)); border-radius: 2px; padding: calc(10 * var(--u)) calc(22 * var(--u));
+  font: 700 calc(26 * var(--u)) / 1.1 var(--bk-serif); letter-spacing: .06em; color: var(--bk-red); background: var(--bk-paper);
+  border: calc(3 * var(--u)) double var(--bk-red); box-shadow: 0 calc(4 * var(--u)) calc(10 * var(--u)) var(--bk-shadow); transform: rotate(-2deg); text-shadow: none; }
+.theme-ny_book .answered-chip b { color: var(--bk-ink); }
+
+/* ── B/C: разбор. Повтор вопроса — тот же шрифт, что вопрос (F4), целиком; карточка ответа; ответы команд вмещают 8+ ── */
+.theme-ny_book .answers-layout.revealed { min-height: 0; flex: 1 1 0; align-items: stretch; grid-template-rows: minmax(0, 1fr); padding-bottom: 0; }
+.theme-ny_book .host-screen:not(.paper-answers) > .answers-layout.revealed { grid-template-columns: minmax(0, 1fr) calc(470 * var(--u)); }
+.theme-ny_book .answers-main.revealed { display: flex; flex-direction: column; gap: calc(16 * var(--u)); min-height: 0; overflow: visible; }
+.theme-ny_book .answers-main > .q-recall { flex: none; margin: 0; font-size: calc(30 * var(--u)); line-height: 1.22; color: var(--bk-muted); text-align: center;
+  display: block; -webkit-line-clamp: unset; line-clamp: none; overflow: visible; max-height: none; text-overflow: clip; }
+.theme-ny_book .answers-main > .q-recall.len-l, .theme-ny_book .answers-main > .q-recall.len-xl { font-size: calc(25 * var(--u)); }
+.theme-ny_book .answer-gallery.is-recall { flex: none; display: flex; justify-content: center; gap: calc(18 * var(--u)); height: calc(120 * var(--u)); }
+.theme-ny_book .answer-gallery.is-recall .q-img { flex: 0 1 auto !important; height: 100%; margin: 0; padding: calc(6 * var(--u)); display: flex; }
+.theme-ny_book .answer-gallery.is-recall .q-img img { height: 100%; width: auto; max-width: 100%; background: #fffdf6;
+  box-shadow: 0 0 0 calc(5 * var(--u)) #fffdf6, 0 0 0 calc(6 * var(--u)) var(--bk-line), 0 calc(5 * var(--u)) calc(10 * var(--u)) rgba(60, 35, 12, .28); }
+.theme-ny_book .answer-gallery.is-recall .q-img[data-alpha] img { background: none; box-shadow: none; }
+.theme-ny_book .answers-main > .answer-block { position: relative; flex: 1 1 auto; min-height: 0; overflow: visible; display: flex; flex-direction: column; gap: calc(10 * var(--u));
+  border-top: calc(8 * var(--u)) solid var(--bk-gold); padding: calc(20 * var(--u)) calc(30 * var(--u)) calc(24 * var(--u)); }
+.theme-ny_book .answer-block > .answer-media { flex: 1 1 0; min-height: calc(140 * var(--u)); max-height: none; width: 100%; }
+.theme-ny_book .answer-block .answer-note { flex: none; max-height: none; overflow: visible; display: block; -webkit-line-clamp: none; font-family: var(--bk-serif); font-style: normal;
+  color: var(--bk-muted); text-align: left; line-height: 1.3; border-top: calc(2 * var(--u)) solid var(--bk-shade); padding-top: calc(10 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .answer-note, .theme-ny_book .host-screen .answer-block .answer-note:is(.n-m, .n-l, .n-xl) { font-size: calc(25 * var(--u)); }
+.theme-ny_book .answers-layout.revealed > .team-answers { display: flex; flex-direction: column; gap: calc(9 * var(--u)); min-height: 0; overflow: hidden; }
+.theme-ny_book .team-answers > .mono-tag { flex: none; background: none; box-shadow: none; padding: 0 0 calc(4 * var(--u)); font-size: calc(20 * var(--u)); }
+.theme-ny_book .host-screen .team-answer { flex: 0 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'n m' 't m'; align-items: center;
+  gap: 0 calc(10 * var(--u)); padding: calc(7 * var(--u)) calc(14 * var(--u)) calc(8 * var(--u)) calc(14 * var(--u)); border-left-width: calc(9 * var(--u)) !important; font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .team-answer .name { grid-area: n; font-size: calc(17 * var(--u)); letter-spacing: .04em; color: var(--bk-muted) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.theme-ny_book .host-screen .team-answer .text { grid-area: t; font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink); text-align: left; line-height: 1.15; overflow-wrap: anywhere; }
+.theme-ny_book .host-screen .team-answer .mark { grid-area: m; font-size: 1.1em; }
+.theme-ny_book .team-answers:has(> :nth-child(10)) .team-answer { grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr) auto; grid-template-areas: 'n t m'; font-size: calc(21 * var(--u)); padding-block: calc(5 * var(--u)); }
+.theme-ny_book .team-answers:has(> :nth-child(10)) .team-answer .text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.theme-ny_book .host-screen .answers-main .answer-block .answer-main { font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink-2); font-size: calc(56 * var(--u)); text-align: center; }
+/* B: раскрытие — анимация ТОЛЬКО при живой смене reveal (.bk-live, 41b); базовое появление прежних тем здесь снято */
+.theme-ny_book .answer-block.reveal-in { animation: none; }
+.theme-ny_book .answer-block.reveal-in .answer-main { animation: none; }
+/* повтор вопросов (recap): длинный текст не лезет под шапку — кегль ступенью по длине, ниже гирлянды */
+.theme-ny_book[data-ny-density] .recap-screen { padding-top: calc(var(--bk-oy) + 170 * var(--u)); }
+.theme-ny_book .recap-screen .recap-body .q-text { font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink); font-size: calc(56 * var(--u)); line-height: 1.18; }
+.theme-ny_book .recap-screen .recap-body .q-text.len-l { font-size: calc(44 * var(--u)); }
+.theme-ny_book .recap-screen .recap-body .q-text.len-xl { font-size: calc(36 * var(--u)); }
+/* «Отвечайте!»: без неоновой рамки-пульса; подписи — книжным набором */
+.theme-ny_book .host-screen .answer-pulse { border-color: transparent; box-shadow: none; background: none; }
+.theme-ny_book .host-screen .meta-line { font-family: var(--bk-serif); font-style: normal; font-weight: 700; }
+.theme-ny_book .host-screen .answer-time-teams > .at-team { font-family: var(--bk-serif); font-weight: 700; font-size: calc(24 * var(--u)); border-radius: 2px; }
+.theme-ny_book .host-screen .answer-pulse .neon-title, .theme-ny_book .host-screen:has(.answer-pulse) .neon-title { font-family: var(--bk-display) !important; font-weight: 700; color: var(--bk-ink-2) !important; animation: none; }
