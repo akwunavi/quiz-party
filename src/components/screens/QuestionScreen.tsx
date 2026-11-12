@@ -19,6 +19,8 @@ import { Icicles } from '../Icicles'
 import { WindText } from '../QuestionText'
 import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
 import { BookSingle } from '../../ny/book/adaptive/BookSingle'
+import { estFont, estLines } from '../../ny/book/adaptive/singleLayout'
+import { TEXT_ROLES, targetSize } from '../../ny/book/adaptive/fit'
 import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
 import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
 import { bookUnit } from '../../ny/book/adaptive/safeArea'
@@ -180,8 +182,13 @@ function ClassicQuestionScreen({
   const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
   const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight }), q.question_text.trim().length) : undefined
 
+  // «Книга», сетка картинок: полоса заголовка подстраивается под длину вопроса (оценка строк в единицах мокапа), а не фиксирована
+  const bkLen = q.question_text.trim().length
+  const bkBandF = estFont(bkLen, 1240, 250, targetSize('above', bkLen), TEXT_ROLES.above.min)
+  const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, 1240) * 1.16 * bkBandF + 28)))
+
   return (
-    <div ref={rootRef} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
+    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
       imgs.length && !q.media.hidden ? ' has-media' : ''}${
       (choices && !lettered) || (q.answer.mode === 'match'
         && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>

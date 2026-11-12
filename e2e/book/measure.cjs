@@ -148,6 +148,8 @@ async function measure(page, ctx = {}) {
       qnum: document.querySelector('.host-topbar .qnum') ? rc(document.querySelector('.host-topbar .qnum')) : null,
       emptyBelowPct: Math.round(Math.max(0, safeBottom - contentBottom) / (safeBottom - safeTop) * 1000) / 10,
       caps: [...document.querySelectorAll('.bk-cap-key, .img-answer .ia-key')].map(e => Math.round((e.getBoundingClientRect().top + e.getBoundingClientRect().height / 2) * 10) / 10),
+      layout: (() => { const m = document.querySelector('.bk-media'), c = document.querySelector('[data-bk-comp]'); return { media: m?.dataset.bkLayout ?? null, mediaScore: m?.dataset.bkScore ?? null, comp: c?.dataset.bkComp ?? null, compScore: c?.dataset.bkScore ?? null } })(),
+      caption: [...document.querySelectorAll('.bk-cap-text')].map(e => ({ fontPx: Math.round(parseFloat(getComputedStyle(e).fontSize) * 10) / 10, overflow: e.closest('.bk-cap').scrollHeight > e.closest('.bk-cap').clientHeight + 1 })),
       diag: typeof window.__bkDiagnose === 'function' ? window.__bkDiagnose() : null, diagAttr: document.querySelector('.host-screen')?.dataset.bkDiag ?? null }
     // анимации
     const anim = {}

@@ -12,7 +12,12 @@ export const group = id => {
   if (/^1[56]/.test(id)) return 'Финал'
   if (/^17/.test(id)) return 'Плитки команд'
   if (/^18/.test(id)) return 'Типографика'
-  if (/^20/.test(id)) return 'Адаптивность: до/после'
+  if (/^21-cmp-4v/.test(id)) return '4 вертикальных'
+  if (/^21-cmp-4h$/.test(id)) return '4 горизонтальных'
+  if (/^21-cmp-4sq/.test(id)) return '4 квадратных'
+  if (/^21-cmp-4mix/.test(id)) return '4 смешанных'
+  if (/^21-fold/.test(id)) return 'Текст через сгиб'
+  if (/^2[01]-/.test(id)) return 'Адаптивность: до/после'
   return 'Прочее'
 }
 export const teamsApplicable = id => /^(01-lobby-(?!names)|09-answer-time$|10-recall-A|11-|12-|15-finale)/.test(id)

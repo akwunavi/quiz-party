@@ -7,7 +7,8 @@
 // пропорции каждой картинки — точные. Картинки никогда не заходят на сгиб (spansFold) и за пределы контейнера.
 import { containBox, type Box } from './mediaPlan'
 
-export type ArrKind = 'one' | 'row' | 'col' | 'rowEq' | 'colEq'
+/** rowH — выключной ряд с ОБЩЕЙ высотой для всех панелей rowH кандидата (ряды на обеих страницах одной высоты) */
+export type ArrKind = 'one' | 'row' | 'rowH' | 'col' | 'rowEq' | 'colEq'
 export interface PaneSpec { side: 'L' | 'R' | 'ALL'; items: number[]; arr: ArrKind }
 export interface Candidate { name: string; panes: PaneSpec[] }
 
@@ -76,6 +77,7 @@ export function layoutCandidates(n: number, spansFold: boolean): Candidate[] {
     { name: 'row4', panes: [P('L', [0, 1], 'row'), P('R', [2, 3], 'row')] },
     { name: 'grid2x2', panes: [P('L', [0, 2], 'col'), P('R', [1, 3], 'col')] },
     { name: 'grid2x2eq', panes: [P('L', [0, 2], 'colEq'), P('R', [1, 3], 'colEq')] },
+    { name: 'row4h', panes: [P('L', [0, 1], 'rowH'), P('R', [2, 3], 'rowH')] },
     { name: 'row4eq', panes: [P('L', [0, 1], 'rowEq'), P('R', [2, 3], 'rowEq')] },
     { name: 'pages-stack', panes: [P('L', [0, 1], 'col'), P('R', [2, 3], 'col')] },
     { name: 'hero-L', panes: [P('L', [0], 'one'), P('R', [1, 2, 3], 'col')] },
@@ -92,7 +94,7 @@ const paneBox = (side: PaneSpec['side'], o: LayoutInput): PaneBox => {
 }
 
 /** Разместить панель: вернуть Placed2 для её items (индексы в общем массиве). */
-function placePane(spec: PaneSpec, o: LayoutInput, out: Placed2[]) {
+function placePane(spec: PaneSpec, o: LayoutInput, out: Placed2[], hCommon?: number) {
   const pb = paneBox(spec.side, o), cap = o.captionH, g = o.gap
   const rs = spec.items.map(i => (o.ratios[i] > 0 && Number.isFinite(o.ratios[i]) ? o.ratios[i] : 1))
   const m = spec.items.length
@@ -102,9 +104,10 @@ function placePane(spec: PaneSpec, o: LayoutInput, out: Placed2[]) {
   if (spec.arr === 'one') {
     const b = containBox(rs[0], pb.w, Math.max(0, pb.h - cap)), y = pb.y + (pb.h - (b.h + cap)) / 2
     put(spec.items[0], { x: pb.x, y, w: pb.w, h: b.h + cap }, { x: pb.x + (pb.w - b.w) / 2, y, w: b.w, h: b.h })
-  } else if (spec.arr === 'row') {            // выключной ряд: общая высота, ширины по пропорции
+  } else if (spec.arr === 'row' || spec.arr === 'rowH') {   // выключной ряд: общая высота, ширины по пропорции
     const sum = rs.reduce((a, b) => a + b, 0)
-    const h = Math.max(0, Math.min((pb.w - g * (m - 1)) / sum, pb.h - cap))
+    const own = Math.max(0, Math.min((pb.w - g * (m - 1)) / sum, pb.h - cap))
+    const h = spec.arr === 'rowH' && hCommon != null ? Math.min(own, hCommon) : own
     const total = h * sum + g * (m - 1), y = pb.y + (pb.h - (h + cap)) / 2
     let x = pb.x + (pb.w - total) / 2
     rs.forEach((r, k) => { const w = h * r; put(spec.items[k], { x, y, w, h: h + cap }, { x, y, w, h }); x += w + g })
@@ -114,7 +117,7 @@ function placePane(spec: PaneSpec, o: LayoutInput, out: Placed2[]) {
     const total = w * inv + cap * m + g * (m - 1)
     let y = pb.y + (pb.h - total) / 2
     rs.forEach((r, k) => { const h = w / r, x = pb.x + (pb.w - w) / 2
-      put(spec.items[k], { x, y, w, h: h + cap }, { x, y, w, h }); y += h + cap + g })
+      put(spec.items[k], { x: pb.x, y, w: pb.w, h: h + cap }, { x, y, w, h }); y += h + cap + g })   // подпись шире картинки — на ширину панели (рядом никого нет)
   } else if (spec.arr === 'rowEq') {          // равные ячейки в ряд: картинка вписана в свою ячейку, прижата к линии подписи
     const cw = (pb.w - g * (m - 1)) / m, zh = Math.max(0, pb.h - cap)
     rs.forEach((r, k) => { const b = containBox(r, cw, zh), x = pb.x + k * (cw + g)
@@ -134,9 +137,14 @@ const overlap = (a: Box, b: Box) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) -
 /** Разместить и оценить ОДНОГО кандидата. */
 export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
   const n = o.ratios.length, placed: Placed2[] = new Array(n)
-  c.panes.forEach(p => placePane(p, o, placed))
+  // общая высота рядов rowH: наименьшая из собственных высот панелей
+  const rowHs = c.panes.filter(p => p.arr === 'rowH').map(p => {
+    const rs = p.items.map(i => (o.ratios[i] > 0 && Number.isFinite(o.ratios[i]) ? o.ratios[i] : 1)), pb = paneBox(p.side, o)
+    return Math.max(0, Math.min((pb.w - o.gap * (p.items.length - 1)) / rs.reduce((a, b) => a + b, 0), pb.h - o.captionH))
+  })
+  c.panes.forEach(p => placePane(p, o, placed, rowHs.length ? Math.min(...rowHs) : undefined))
   // единая линия подписей: у панелей-«рядов» (one/row/rowEq) картинки встают на общую линию — нижний край самой высокой
-  const rowLike = c.panes.filter(p => p.arr === 'one' || p.arr === 'row' || p.arr === 'rowEq')
+  const rowLike = c.panes.filter(p => p.arr === 'one' || p.arr === 'row' || p.arr === 'rowH' || p.arr === 'rowEq')
   if (rowLike.length > 1) {
     const ids = rowLike.flatMap(p => p.items), base = Math.max(...ids.map(i => placed[i].photo.y + placed[i].photo.h))
     ids.forEach(i => { const d = base - (placed[i].photo.y + placed[i].photo.h); if (d > 0) {
@@ -157,7 +165,9 @@ export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
   const fill = areas.reduce((a, b) => a + b, 0) / area0
   const balance = amax > 0 ? amin / amax : 0
   const smallShare = amin / (area0 / n)
-  const cellUse = placed.reduce((s, p) => s + area(p.photo) / Math.max(1, area(p.cell) - (p.caption ? area(p.caption) : 0)), 0) / n
+  // пустые подложки: только у «равных ячеек» (rowEq/colEq) картинка может быть заметно меньше своей ячейки; у выключных рядов/колонок ячейка = картинка
+  const eqItems = new Set(c.panes.filter(p => p.arr === 'rowEq' || p.arr === 'colEq').flatMap(p => p.items))
+  const cellUse = placed.reduce((s, p, i) => s + (eqItems.has(i) ? area(p.photo) / Math.max(1, area(p.cell) - (p.caption ? area(p.caption) : 0)) : 1), 0) / n
   // подписи: хватает ли ширины на 2 строки
   let captionOk = 1
   if (o.captionH > 0 && o.captionLens) {
@@ -165,7 +175,7 @@ export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
     let ok = 0
     placed.forEach((p, i) => {
       const len = o.captionLens![i] ?? 0, w = Math.max(1, p.cell.w - mw - 12 * u)
-      ok += len === 0 || Math.ceil(len * 0.52 * font / w) <= 2 ? 1 : 0
+      ok += len === 0 || Math.ceil(len * 0.58 * font / w + 0.15) <= 2 ? 1 : 0
     })
     captionOk = ok / n
   }
@@ -176,7 +186,7 @@ export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
   const metrics: Metrics = { fill, balance, smallShare, cellUse, captionOk, minSide, align }
   const fillS = clamp01(fill / 0.5), balS = clamp01(balance / 0.4), smallS = clamp01(smallShare / 0.6),
     useS = clamp01((cellUse - 0.45) / 0.35), sizeS = clamp01(minSide / (130 * u))
-  const score = why ? -1 : 100 * (0.32 * fillS + 0.20 * balS + 0.13 * smallS + 0.11 * useS + 0.09 * captionOk + 0.07 * sizeS + 0.08 * align)
+  const score = why ? -1 : 100 * (0.32 * fillS + 0.20 * balS + 0.13 * smallS + 0.11 * useS + 0.09 * captionOk + 0.07 * sizeS + 0.08 * align) - 25 * (1 - captionOk)
   return { name: c.name, score, placed, metrics, valid: !why, why }
 }
 

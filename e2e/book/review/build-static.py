@@ -12,20 +12,21 @@ HERE = os.path.dirname(__file__)
 
 meta = json.loads(subprocess.run(['node', os.path.join(HERE, 'meta.mjs'), '--json'], capture_output=True, text=True, check=True, cwd=ROOT).stdout)
 frames, have = {}, set()
-def add(dirpath, prefix):
+def add(dirpath, prefix, width=1200, q=46):
     if not os.path.isdir(dirpath): return
     for f in sorted(os.listdir(dirpath)):
         m = re.match(r'^(.+)-(1920|1899|1366|1280)x\d+\.webp$', f)
         if not m: continue
         sid, res = m.groups(); have.add(sid)
         im = Image.open(os.path.join(dirpath, f)).convert('RGB')
-        im = im.resize((1200, round(im.height * 1200 / im.width)), Image.LANCZOS)
-        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=46, method=6)
+        im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=q, method=6)
         frames.setdefault(prefix + sid, {})[res] = 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
 add(SHOTS, '')
-ADAPT = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'adaptive')
-add(os.path.join(ADAPT, 'before'), 'b:'); add(os.path.join(ADAPT, 'after'), 'a:')
-have |= {i[2:] for i in frames if i[:2] in ('b:', 'a:')}
+# доработка адаптивности: b: — исходный baseline (до A–C), c: — этапы A–C (cbf101b), a: — после доработки (кадры мельче: их много)
+ADAPT2 = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'adaptive2')
+for d, pre in (('before', 'b:'), ('cbf', 'c:'), ('after', 'a:')): add(os.path.join(ADAPT2, d), pre, 1000, 40)
+have |= {i[2:] for i in frames if i[:2] in ('b:', 'c:', 'a:')}
 scenes = [{**{k: s[k] for k in ('id', 'title', 'group')}, 'teams': False, 'steps': [], 'path': None} for s in meta if s['id'] in have or any(k in frames for k in ('a:' + s['id'],))]
 css = open(os.path.join(HERE, 'review.css'), encoding='utf-8').read()
 js = open(os.path.join(HERE, 'review.js'), encoding='utf-8').read()

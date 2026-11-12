@@ -71,7 +71,8 @@ export function crossesFold(a: Rect, v: Viewport, tol = 1): boolean {
 
 /** Зоны декора сцены (px сцены): гирлянда с бантом, веточки в нижних углах, уголки переплёта. Контент обязан их не пересекать. */
 export const DECOR_ZONES: { id: string; r: Rect }[] = [
-  { id: 'garland', r: { x: 450, y: 0, w: 1020, h: 175 } },
+  { id: 'garland-bow', r: { x: 700, y: 0, w: 520, h: 140 } },
+  { id: 'garland-l', r: { x: 450, y: 0, w: 250, h: 92 } }, { id: 'garland-r', r: { x: 1220, y: 0, w: 250, h: 92 } },
   { id: 'sprig-bl', r: { x: 70, y: 955, w: 190, h: 105 } },
   { id: 'sprig-br', r: { x: 1660, y: 965, w: 190, h: 95 } },
   { id: 'corner-tl', r: { x: 30, y: 20, w: 90, h: 90 } }, { id: 'corner-tr', r: { x: 1800, y: 20, w: 90, h: 90 } },

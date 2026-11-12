@@ -675,9 +675,9 @@
 .theme-ny_book .host-screen.bk-ad:not(.bk-ad-split) .q-text::after { content: none; }
 .theme-ny_book .host-screen.bk-ad-plain .q-text { isolation: isolate; }
 .theme-ny_book .host-screen.bk-ad-plain .q-text::before, .theme-ny_book .host-screen.bk-ad-grid .q-text::before {
-  content: ''; position: absolute; z-index: -1; top: -6%; bottom: -6%; left: 50%; width: calc(240 * var(--u)); transform: translateX(-50%); pointer-events: none;
+  content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: calc(240 * var(--u)); transform: translateX(-50%); pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(250, 243, 224, .62) 0, rgba(250, 243, 224, .38) 45%, transparent 72%); }
 
 /* четыре картинки: заголовок над сеткой — фиксированная полоса, сетка 2×2 получает остальное; колонки разведены на сгиб */
-.theme-ny_book .host-screen.bk-ad-grid > div:has(> .q-text) { flex: 0 0 calc(150 * var(--u)); min-height: 0; width: 100%; max-width: 100%; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
+.theme-ny_book .host-screen.bk-ad-grid > div:has(> .q-text) { flex: 0 0 calc(var(--bk-band, 150) * var(--u)); min-height: 0; width: 100%; max-width: 100%; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
 .theme-ny_book .host-screen.bk-ad-grid > .bk-media { flex: 1 1 0; }

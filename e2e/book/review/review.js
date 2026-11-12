@@ -16,10 +16,10 @@ const baseId = id => id.replace(/-v[23]$/, '').replace(/^17-team-t[123]-/, '17-t
 const KINDS = {
   fin: { key: 'fin', vs: ['1', '2', '3'], lab: ['V1', 'V2', 'V3'], title: 'Финал' },
   team: { key: 'team', vs: ['1', '2', '3'], lab: ['T1', 'T2', 'T3'], title: 'Плитки команд' },
-  ba: { key: 'ba', vs: ['b', 'a'], lab: ['До', 'После'], title: 'Адаптивность' },
+  ba: { key: 'ba', vs: ['b', 'c', 'a'], lab: ['До (исходный)', 'Этапы A–C', 'После'], title: 'Адаптивность' },
 }
 function kindOf(id) {
-  if (ST && /^20-ad-/.test(id)) return 'ba'
+  if (ST && /^2[01]-/.test(id)) return 'ba'
   if (/^15-finale-/.test(id)) return 'fin'
   if (/^17-team-/.test(id) || (!ST && /^01-lobby-/.test(id))) return 'team'
   return null
@@ -32,7 +32,7 @@ function staticVariantId(id, kind, v) {
 }
 const isNav = s => !/-v[23]$/.test(s.id) && !/^17-team-t[23]-/.test(s.id)
 const cur = () => S.scenes.find(s => s.id === S.id)
-const GROUPS = ['Лобби', 'Правила', 'Вопросы', 'Ожидание', 'Раскрытие', 'Мелодия', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', 'Прочее']
+const GROUPS = ['Лобби', 'Правила', 'Вопросы', 'Ожидание', 'Раскрытие', 'Мелодия', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', '4 вертикальных', '4 горизонтальных', '4 квадратных', '4 смешанных', 'Текст через сгиб', 'Прочее']
 const gi = g => { const i = GROUPS.indexOf(g); return i < 0 ? GROUPS.length : i }
 const navList = () => S.scenes.filter(isNav).map((s, i) => [s, i]).sort((a, b) => gi(a[0].group) - gi(b[0].group) || a[1] - b[1]).map(x => x[0])
 
@@ -73,7 +73,7 @@ function bar() {
     const K = KINDS[kind]
     const avail = v => ST ? !!ST.frames[staticVariantId(s.id, kind, v)] : true
     b.append(grp(K.title, ...K.vs.map((v, i) => el('button', { textContent: K.lab[i], disabled: !avail(v), className: !S.split && S[K.key] === v ? 'on' : '', onclick: () => { S[K.key] = v; S.split = false; render() } })),
-      el('button', { textContent: kind === 'ba' ? 'Рядом: до | после' : 'Рядом ×3', className: S.split ? 'on' : '', onclick: () => { S.split = !S.split; render() } })))
+      el('button', { textContent: kind === 'ba' ? 'Рядом: до | A–C | после' : 'Рядом ×3', className: S.split ? 'on' : '', onclick: () => { S.split = !S.split; render() } })))
   }
   if (!ST && s.steps.length) b.append(grp('Шаги', ...s.steps.map(st => el('button', { textContent: st.label, onclick: () => step(st.id) }))))
   b.append(grp('', ...(!ST ? [el('button', { textContent: '↻ Повторить / начать заново', onclick: () => load(true) })] : []),
@@ -132,7 +132,7 @@ function onKey(e) {
   if (e.key === 'ArrowRight' && i < l.length - 1) go(l[i + 1].id)
   else if (e.key === 'ArrowLeft' && i > 0) go(l[i - 1].id)
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') fullscreen()
-  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind && kind !== 'ba') { S[KINDS[kind].key] = e.key; S.split = false; render() } else if (kind === 'ba') { S.ba = e.key === '1' ? 'b' : 'a'; S.split = false; render() } }
+  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind && kind !== 'ba') { S[KINDS[kind].key] = e.key; S.split = false; render() } else if (kind === 'ba') { S.ba = e.key === '1' ? 'b' : e.key === '2' ? 'c' : 'a'; S.split = false; render() } }
   else if (e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') { if (kindOf(S.id)) { S.split = !S.split; render() } }
 }
 document.addEventListener('keydown', onKey)
