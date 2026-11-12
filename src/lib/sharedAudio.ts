@@ -30,7 +30,9 @@ export type SharedPlayOpts = { startAt?: number; loop?: boolean; volume?: number
    *  подрезается по РЕАЛЬНОЙ длине файла до запуска (audioSource.seekSafely) */
   keepTail?: number }
 
-type Ev = 'playing' | 'ended' | 'loadedmetadata'
+// pause/waiting — прототип «Книги» (этап 2): пластинка крутится только пока звук реально идёт (lib/playbackActive.ts).
+// Только расширение подписки — логика вытеснения не менялась.
+type Ev = 'playing' | 'ended' | 'loadedmetadata' | 'pause' | 'waiting'
 
 type Sub = { ev: Ev; cb: () => void; attached: boolean; handler?: () => void }
 

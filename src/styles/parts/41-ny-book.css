@@ -490,3 +490,51 @@
 .theme-ny_book .host-screen .meta-line { font-family: var(--bk-serif); font-style: normal; font-weight: 700; }
 .theme-ny_book .host-screen .answer-time-teams > .at-team { font-family: var(--bk-serif); font-weight: 700; font-size: calc(24 * var(--u)); border-radius: 2px; }
 .theme-ny_book .host-screen .answer-pulse .neon-title, .theme-ny_book .host-screen:has(.answer-pulse) .neon-title { font-family: var(--bk-display) !important; font-weight: 700; color: var(--bk-ink-2) !important; animation: none; }
+
+/* ── мелодия: доска — музыкальные книжки-категории (по одной на тему, число — из данных) с объёмными плитками ── */
+.theme-ny_book .mel-screen { padding-top: calc(var(--bk-oy) + 150 * var(--u)); }
+.theme-ny_book .mel-screen .mel-board { gap: calc(16 * var(--u)) calc(56 * var(--u)); align-items: stretch; padding: calc(18 * var(--u)) calc(24 * var(--u)) calc(26 * var(--u)); max-height: none; }
+.theme-ny_book .bk-melbook { position: relative; margin: calc(-18 * var(--u)) calc(-22 * var(--u)) calc(-26 * var(--u)); border-radius: calc(4 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u)) calc(4 * var(--u));
+  background: linear-gradient(90deg, rgba(0, 0, 0, .32), rgba(0, 0, 0, 0) 7%, rgba(255, 255, 255, .06) 8%, rgba(0, 0, 0, 0) 12%),
+    radial-gradient(ellipse at 40% 25%, rgba(255, 255, 255, .14), rgba(0, 0, 0, 0) 60%), hsl(calc(var(--c, 0) * 118deg + 352deg) 46% 27%);
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) rgba(242, 213, 140, .55), inset 0 0 0 calc(7 * var(--u)) rgba(0, 0, 0, .18),
+    calc(6 * var(--u)) calc(6 * var(--u)) 0 var(--bk-paper-3), calc(9 * var(--u)) calc(9 * var(--u)) 0 var(--bk-shade), 0 calc(18 * var(--u)) calc(26 * var(--u)) rgba(40, 20, 6, .4); }
+.theme-ny_book .mel-screen .mel-board > .mel-theme { position: relative; z-index: 1; align-self: stretch; display: grid; place-items: center; margin: 0 calc(6 * var(--u)) calc(6 * var(--u));
+  padding: calc(10 * var(--u)) calc(14 * var(--u)); border-radius: 2px; background: linear-gradient(180deg, #fffaf0, var(--bk-paper)); color: var(--bk-ink-2);
+  box-shadow: 0 0 0 calc(2 * var(--u)) var(--bk-gold), 0 calc(4 * var(--u)) calc(8 * var(--u)) rgba(0, 0, 0, .3); font: 700 calc(30 * var(--u)) / 1.1 var(--bk-display); text-wrap: balance; }
+.theme-ny_book .mel-screen .mel-board .mel-tile, .theme-ny_book .mel-screen .mel-board .mel-tile :is(.qt-flip, .qt-face) { clip-path: none; }
+.theme-ny_book .mel-screen .mel-board .mel-tile { z-index: 1; filter: none; margin: calc(2 * var(--u)) calc(30 * var(--u)); }
+.theme-ny_book .mel-screen .mel-board .mel-tile .qt-front { border-radius: calc(6 * var(--u)); color: var(--bk-red); font: 700 calc(54 * var(--u)) / 1 var(--bk-serif);
+  background: linear-gradient(180deg, #fffcf4, var(--bk-paper) 60%, var(--bk-paper-2));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--bk-line), 0 calc(5 * var(--u)) 0 var(--bk-shade), 0 calc(7 * var(--u)) 0 var(--bk-paper-3), 0 calc(12 * var(--u)) calc(14 * var(--u)) rgba(30, 14, 4, .45); }
+/* сыгранная плитка — «перевёрнута»: тиснёная нота на тёмном пергаменте; «горячая» рулетки — приподнята с золотым контуром */
+.theme-ny_book .mel-screen .mel-board .mel-tile.done { opacity: 1; }
+.theme-ny_book .mel-screen .mel-board .mel-tile.done .qt-front { background: linear-gradient(180deg, var(--bk-paper-3), #cdb88c); color: rgba(90, 60, 22, .45);
+  box-shadow: inset 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .35), 0 calc(2 * var(--u)) 0 rgba(0, 0, 0, .2); }
+.theme-ny_book .mel-screen .mel-board .mel-tile.done .qt-front::after { content: '♪'; font: 700 calc(40 * var(--u)) / 1 var(--bk-serif); }
+.theme-ny_book .mel-screen .mel-board .mel-tile.spin .qt-front { transform: translateY(calc(-6 * var(--u))); color: var(--bk-ink-2);
+  background: linear-gradient(180deg, #fff6da, var(--bk-gold-2)); box-shadow: 0 0 0 calc(3 * var(--u)) var(--bk-gold), 0 0 calc(26 * var(--u)) rgba(242, 213, 140, .9), 0 calc(14 * var(--u)) calc(18 * var(--u)) rgba(30, 14, 4, .45); }
+/* окно трека: проигрыватель над текстом стадии; имя команды и счёт — книжным набором, чернилами */
+.theme-ny_book.mel-overlay .mel-modal { display: flex; flex-direction: column; align-items: center; gap: calc(14 * var(--u)); }
+.theme-ny_book.mel-overlay .mel-modal .mel-big { font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink-2) !important; text-shadow: none; }
+.theme-ny_book.mel-overlay .mel-modal :is(.mel-count, .mel-modal-theme) { font-family: var(--bk-display); font-weight: 700; }
+.theme-ny_book .bk-vinyl { position: relative; flex: none; width: calc(360 * var(--u)); height: calc(250 * var(--u)); }
+.theme-ny_book .bk-vinyl-plinth { position: absolute; inset: 0; border-radius: calc(12 * var(--u));
+  background: repeating-linear-gradient(88deg, rgba(255, 255, 255, .05) 0 3px, rgba(0, 0, 0, 0) 3px 9px), linear-gradient(180deg, #6b3d22, #3f2213);
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) rgba(242, 213, 140, .5), 0 calc(10 * var(--u)) calc(18 * var(--u)) rgba(30, 14, 4, .45); }
+.theme-ny_book .bk-vinyl-disc { position: absolute; left: calc(26 * var(--u)); top: calc(14 * var(--u)); width: calc(222 * var(--u)); height: calc(222 * var(--u)); border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 30%, rgba(255, 255, 255, .07) 31%, rgba(0, 0, 0, 0) 33%),
+    repeating-radial-gradient(circle, #141414 0 calc(2 * var(--u)), #232323 calc(2 * var(--u)) calc(3.4 * var(--u))),
+    conic-gradient(from 30deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 12%, rgba(255, 255, 255, .1) 50%, rgba(255, 255, 255, 0) 62%);
+  background-blend-mode: normal, normal, screen; box-shadow: 0 calc(4 * var(--u)) calc(10 * var(--u)) rgba(0, 0, 0, .6); }
+.theme-ny_book .bk-vinyl-label { position: absolute; left: 50%; top: 50%; width: 38%; height: 38%; margin: -19% 0 0 -19%; border-radius: 50%;
+  background: radial-gradient(circle, var(--bk-paper) 0 9%, var(--bk-red-2) 10%, var(--bk-red) 100%); box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--bk-gold);
+  display: grid; place-items: center; color: var(--bk-gold-2); overflow: hidden; }
+.theme-ny_book .bk-vinyl-label b { font: 700 calc(28 * var(--u)) / 1 var(--bk-serif); transform: translateY(calc(-18 * var(--u))); }
+.theme-ny_book .bk-vinyl-label i { display: none; }
+.theme-ny_book .bk-vinyl-arm { position: absolute; right: calc(34 * var(--u)); top: calc(26 * var(--u)); width: calc(14 * var(--u)); height: calc(170 * var(--u)); border-radius: calc(7 * var(--u));
+  background: linear-gradient(90deg, #9aa3ad, #e4e9ee 50%, #8a939c); transform-origin: 50% calc(8 * var(--u)); transform: rotate(24deg); transition: transform .6s ease;
+  box-shadow: calc(-3 * var(--u)) calc(4 * var(--u)) calc(5 * var(--u)) rgba(0, 0, 0, .35); }
+.theme-ny_book .bk-vinyl-arm::before { content: ''; position: absolute; left: 50%; top: calc(-10 * var(--u)); width: calc(34 * var(--u)); height: calc(34 * var(--u)); margin-left: calc(-17 * var(--u));
+  border-radius: 50%; background: radial-gradient(circle, #e4e9ee, #6d757e); }
+.theme-ny_book .bk-vinyl.is-spin .bk-vinyl-arm { transform: rotate(34deg); }
