@@ -80,3 +80,35 @@ describe('AdaptiveText: целевой кегль по иерархии и дл�
     const r = roleRange('plain', 2, 20); expect(r.max).toBe(targetSize('plain', 20) * 2); expect(r.min).toBe(56)
   })
 })
+
+import { chooseSingle, estLines, hashSeed } from '../book/adaptive/singleLayout'
+describe('Одна картинка: chooseSingle (композиция по оценке)', () => {
+  const base = (ratio: number, textLen: number, extra = {}) => ({ ratio, textLen, width: 1420, height: 764, midGap: 120, gap: 28, unit: 1, ...extra })
+  it('широкая картинка + короткий вопрос → «центральная» (крупнее картинка), вертикальная → картинка на странице', () => {
+    expect(chooseSingle(base(16 / 9, 40)).name).toBe('top-center')
+    expect(chooseSingle(base(9 / 16, 12)).name).toMatch(/\|/)
+  })
+  it('левая страница не пустая: ни одна композиция не оставляет картинку мельче порога, кегль считается по длине', () => {
+    for (const r of [9 / 16, 3 / 4, 1, 4 / 3, 16 / 9, 21 / 9]) for (const n of [8, 40, 120, 260]) {
+      const c = chooseSingle(base(r, n))
+      expect(c.metrics.imgShare).toBeGreaterThan(0.12)
+      expect(c.fontEst).toBeGreaterThan(0)
+      expect(c.image.w / c.image.h).toBeCloseTo(r, 5)
+    }
+  })
+  it('картинка вне сгиба в боковых композициях; на сгибе — только в «центральной», и это помечено crossesFold', () => {
+    for (const r of [9 / 16, 1, 16 / 9]) {
+      const c = chooseSingle(base(r, 60))
+      const onFold = c.image.x < 710 + 60 && c.image.x + c.image.w > 710 - 60
+      expect(c.crossesFold).toBe(onFold)
+      if (c.name !== 'top-center') expect(onFold).toBe(false)
+    }
+  })
+  it('зеркало при равных очках зависит от seed, а не фиксировано; детерминизм; гистерезис', () => {
+    const a = chooseSingle(base(9 / 16, 12, { seed: 0 })), b = chooseSingle(base(9 / 16, 12, { seed: 1 }))
+    expect(new Set([a.name, b.name]).size).toBe(2)
+    expect(chooseSingle(base(9 / 16, 12, { seed: 1 })).name).toBe(b.name)
+    expect(chooseSingle(base(9 / 16, 12, { seed: 0, prev: 'image|text' })).name).toBe('image|text')
+    expect(hashSeed('a')).toBe(hashSeed('a')); expect(estLines(100, 20, 500)).toBe(Math.ceil(100 * 0.52 * 20 / 500))
+  })
+})

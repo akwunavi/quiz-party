@@ -651,11 +651,32 @@
 .theme-ny_book .bk-cap-key { flex: none; width: 1.5em; height: 1.5em; display: grid; place-items: center; border-radius: 50%; font: 700 calc(30 * var(--u)) / 1 var(--bk-serif); color: var(--bk-paper); background: var(--bk-red); box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(242, 213, 140, .55); }
 .theme-ny_book .bk-cap-text { min-width: 0; font: 700 calc(28 * var(--u)) / 1.1 var(--bk-serif); color: var(--bk-ink); }
 
-/* текст + одна картинка: колонки = страницы разворота, сгиб между ними; текст по центру левой страницы, картинка — правой */
-.theme-ny_book .host-screen.bk-ad-split .q-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: calc(120 * var(--u)); flex: 1 1 0; min-height: 0; width: 100%; max-height: none; align-items: stretch; }
-.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child { background: none; box-shadow: none; padding: 0; border: 0; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
-.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::before, .theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::after { content: ''; position: absolute; left: 12%; right: 12%; height: calc(2 * var(--u)); background: linear-gradient(90deg, transparent, var(--bk-gold), transparent); }
-.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::before { top: 0; } .theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::after { bottom: 0; }
+/* вопрос + ОДНА картинка (BookSingle, singleLayout.ts): композиция выбирается оценкой.
+   .bk-c-ti — текст на левой странице | картинка на правой; .bk-c-it — зеркально; .bk-c-top — «центральная»: вопрос полосой сверху
+   (идёт через сгиб), картинка крупно под ним по центру разворота. Золотые линии — на самом тексте (держатся вплотную к блоку). */
+.theme-ny_book .host-screen.bk-ad-split .q-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: calc(120 * var(--u)); flex: 1 1 0; min-height: 0; width: 100%; max-height: none; align-items: stretch; transition: opacity .15s; }
+.theme-ny_book .host-screen.bk-ad-split .bk-single-text { background: none; box-shadow: none; padding: 0; border: 0; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-it .bk-single-text { order: 2; }
+.theme-ny_book .host-screen.bk-ad-split .bk-single-text .q-text::before, .theme-ny_book .host-screen.bk-ad-split .bk-single-text .q-text::after {
+  content: ''; display: block; width: 76%; height: calc(2 * var(--u)); margin: calc(28 * var(--u)) auto; background: linear-gradient(90deg, transparent, var(--bk-gold), transparent); }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-top { display: flex; flex-direction: column; align-items: stretch; row-gap: calc(28 * var(--u)); }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-top .bk-single-text { flex: 0 0 auto; width: 100%; }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-top .bk-single-text .q-text { max-width: calc(1240 * var(--u)); }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-top .bk-single-text .q-text::before, .theme-ny_book .host-screen.bk-ad-split .bk-c-top .bk-single-text .q-text::after { display: none; }
+.theme-ny_book .host-screen.bk-ad-split .bk-c-top .bk-media { flex: 1 1 0; width: 100%; }
+
+/* Картинка на сгибе («центральная» композиция): поверх неё — мягкая тень сгиба (multiply), объём книги сохраняется; рамка и пропорции целы */
+.theme-ny_book .bk-photo[data-fold]::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: calc(150 * var(--u)); transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(70, 40, 14, .30) 42%, rgba(70, 40, 14, .38) 50%, rgba(70, 40, 14, .30) 58%, transparent); mix-blend-mode: multiply; }
+
+/* Текст через сгиб: слой ТЕКСТА лежит над тенью сгиба (сцена под экраном), а под самим текстом тень слегка смягчается — полоса светлой бумаги,
+   растушёванная по краям (mask), объём сгиба по краям блока остаётся. Слова не разрываются (overflow-wrap: normal). */
+.theme-ny_book .host-screen.bk-ad .q-text { position: relative; z-index: 2; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.theme-ny_book .host-screen.bk-ad:not(.bk-ad-split) .q-text::after { content: none; }
+.theme-ny_book .host-screen.bk-ad-plain .q-text { isolation: isolate; }
+.theme-ny_book .host-screen.bk-ad-plain .q-text::before, .theme-ny_book .host-screen.bk-ad-grid .q-text::before {
+  content: ''; position: absolute; z-index: -1; top: -6%; bottom: -6%; left: 50%; width: calc(240 * var(--u)); transform: translateX(-50%); pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(250, 243, 224, .62) 0, rgba(250, 243, 224, .38) 45%, transparent 72%); }
 
 /* четыре картинки: заголовок над сеткой — фиксированная полоса, сетка 2×2 получает остальное; колонки разведены на сгиб */
 .theme-ny_book .host-screen.bk-ad-grid > div:has(> .q-text) { flex: 0 0 calc(150 * var(--u)); min-height: 0; width: 100%; max-width: 100%; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }

@@ -9,12 +9,14 @@ import { chooseLayout } from './mediaLayout'
 
 export interface MediaItem { src: string; marker?: string; caption?: string }
 
-export function AdaptiveMedia({ items, spansFold = false, lettered = false }: {
+export function AdaptiveMedia({ items, spansFold = false, lettered = false, crossFold = false }: {
   items: MediaItem[]
   /** контейнер лежит на обеих страницах → колонки разводятся на ширину сгиба */
   spansFold?: boolean
   /** есть маркеры/подписи → под каждой картинкой зона подписи одной высоты */
   lettered?: boolean
+  /** единственная картинка по центру разворота: ей разрешено лежать на сгибе, поверх рисуется мягкая тень сгиба (data-fold) */
+  crossFold?: boolean
 }) {
   const box = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -49,6 +51,7 @@ export function AdaptiveMedia({ items, spansFold = false, lettered = false }: {
       {plan.map((p, i) => (
         <figure key={i} className="bk-cell" style={{ left: p.cell.x, top: p.cell.y, width: p.cell.w, height: p.cell.h } as CSSProperties}>
           <div className="bk-photo" data-alpha={alpha[i] ? '' : undefined}
+            data-fold={crossFold && Math.abs(p.photo.x + p.photo.w / 2 - size.w / 2) < p.photo.w / 2 ? '' : undefined}
             style={{ left: p.photo.x - p.cell.x, top: p.photo.y - p.cell.y, width: p.photo.w, height: p.photo.h }}>
             <img src={items[i].src} alt="" data-bk-photo draggable={false} onLoad={e => {
               const im = e.currentTarget

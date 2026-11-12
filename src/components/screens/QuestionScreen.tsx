@@ -18,6 +18,7 @@ import { FitAnswer } from '../FitAnswer'
 import { Icicles } from '../Icicles'
 import { WindText } from '../QuestionText'
 import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
+import { BookSingle } from '../../ny/book/adaptive/BookSingle'
 import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
 import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
 import { bookUnit } from '../../ny/book/adaptive/safeArea'
@@ -192,7 +193,10 @@ function ClassicQuestionScreen({
         {timerSlot}
       </div>
 
-      {split ? (
+      {bkSplit ? (
+        /* «Книга»: вопрос + одна картинка — композицию выбирает оценка (singleLayout.ts) */
+        <BookSingle text={q.question_text} src={mediaUrl(imgs[0])} seed={q.id} />
+      ) : split ? (
         /* Картинка лежит РЯДОМ с рамкой вопроса, а не внутри неё.
            Пока она была вложена в рамку, экран выглядел так: рамка держит
            свою высоту, картинка тянется на 68vh и вылезает за её нижний
@@ -206,9 +210,7 @@ function ClassicQuestionScreen({
             {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
             <WindText key={q.id} text={q.question_text} range={bkRange} role={bkRole ?? undefined} />
           </div>
-          {bkSplit
-            ? <AdaptiveMedia key={q.id} items={[{ src: mediaUrl(imgs[0]) }]} />
-            : imgs.length === 1
+          {imgs.length === 1
             ? <div className="q-media-grid n1" style={mediaScaleVar(q)}>
                 {imgs.map((m, i) => (
                   <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />

@@ -103,6 +103,12 @@ images = [
 for i, lbl in enumerate(['А', 'Б', 'В', 'Г']):
     images.append(opaque(f'opt-{i}.jpg', [1000, 900, 1600, 1000][i], [1000, 1200, 900, 750][i], f'ВАРИАНТ {lbl}', i))
 
+# наборы для сценариев адаптивной раскладки (4 горизонтальных / вертикальных / квадратных)
+for i, lbl in enumerate('ABCD'):
+    images.append(opaque(f'ha-{i}.jpg', 800, 450, f'16:9 {lbl}', i))
+    images.append(opaque(f'va-{i}.jpg', 450, 800, f'9:16 {lbl}', i + 1))
+    images.append(opaque(f'sa-{i}.jpg', 600, 600, f'1:1 {lbl}', i + 2))
+
 audio = []
 if FFMPEG:
     # 4 + 6 треков на тему, 4 темы максимум; тоны разной высоты, 14 с

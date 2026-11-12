@@ -15,7 +15,7 @@ export function collectDiag(root: ParentNode): DiagInput {
       rect: rectOf(el), overflow: el.dataset.bkFit === 'overflow' }
   })
   const media = [...root.querySelectorAll<HTMLImageElement>('img[data-bk-photo]')].map((im, i) => ({
-    id: `photo#${i}`, rect: rectOf(im), natural: { w: im.naturalWidth, h: im.naturalHeight } }))
+    id: `photo#${i}`, rect: rectOf(im), natural: { w: im.naturalWidth, h: im.naturalHeight }, foldOk: !!im.closest('[data-fold]') }))
   const containers = [...root.querySelectorAll<HTMLElement>('[data-bk-container]')].map((el, i) => ({
     id: `${el.dataset.bkContainer}#${i}`, scrollW: el.scrollWidth, clientW: el.clientWidth, scrollH: el.scrollHeight, clientH: el.clientHeight }))
   const q = root.querySelector('.host-topbar .qnum'), slot = root.querySelector('[data-bk-slot="timer"]'), art = slot?.querySelector('.p-ros')

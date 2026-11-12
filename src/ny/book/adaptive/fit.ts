@@ -35,11 +35,11 @@ export function fitFontSize(range: FitRange, fits: (px: number) => boolean): Fit
 /** Роли текста и допустимые кегли в «пикселях мокапа» (умножаются на bookUnit). Минимум — предел читаемости с дальних столов. */
 export const TEXT_ROLES = {
   /** вопрос без картинок: большая область */
-  plain: { min: 28, max: 120 },
+  plain: { min: 28, max: 96 },
   /** вопрос рядом с картинкой (колонка страницы) */
-  split: { min: 28, max: 68 },
+  split: { min: 28, max: 90 },
   /** вопрос над рядом картинок/вариантов */
-  above: { min: 26, max: 58 },
+  above: { min: 26, max: 60 },
 } as const
 export type TextRole = keyof typeof TEXT_ROLES
 
@@ -49,7 +49,7 @@ export type TextRole = keyof typeof TEXT_ROLES
 const TARGETS: Record<TextRole, [number, number][]> = {
   //            знаков → кегль
   plain: [[0, 84], [30, 84], [70, 72], [130, 62], [220, 52], [340, 44]],
-  split: [[0, 66], [40, 62], [90, 54], [170, 46], [300, 38]],
+  split: [[0, 88], [14, 84], [40, 72], [90, 58], [170, 46], [300, 38]],
   above: [[0, 54], [40, 52], [100, 46], [180, 40], [300, 34]],
 }
 export function targetSize(role: TextRole, len: number): number {

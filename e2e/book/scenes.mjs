@@ -287,6 +287,17 @@ export const SCENES = [
     async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 9, timer_started_at: iso(now() - 8000), reveal: false }) } },
   { id: '20-ad-match', title: 'адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]', ready: '.host-screen .qnum', settle: 2500, mandatory: true,
     async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 1, question_index: 0, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  // ДОРАБОТКА адаптивности (ТЗ ведущего): сценарии композиций — раунд 9 пакета (индекс 8), вопросы по номеру
+  ...[
+    ['21-cmp-1h', 'одно горизонтальное, короткий вопрос', 0], ['21-cmp-1sq', 'одно квадратное, короткий вопрос', 1],
+    ['21-cmp-1v', 'одно вертикальное 9:16, короткий вопрос', 12], ['21-cmp-1h-long', 'одно горизонтальное, длинный вопрос', 13],
+    ['21-cmp-4mix', '4 разных пропорции (9:16, 1:1, 16:9, 4:3)', 2], ['21-cmp-4h', '4 горизонтальных', 3],
+    ['21-cmp-4v', '4 вертикальных', 4], ['21-cmp-4sq', '4 квадратных', 5],
+    ['21-cmp-4caps', '4 картинки с длинными подписями', 6], ['21-cmp-4-short', '4 картинки, короткий вопрос', 7],
+    ['21-cmp-4-long', '4 картинки, длинный вопрос', 8], ['21-cmp-3h', '3 горизонтальных', 14], ['21-cmp-3v', '3 вертикальных', 15],
+    ['21-fold-short', 'текст через сгиб: короткий', 9], ['21-fold-mid', 'текст через сгиб: средний', 10], ['21-fold-long', 'текст через сгиб: длинный', 11],
+  ].map(([id, title, qi]) => ({ id, title: 'композиция: ' + title, ready: '.host-screen .qnum', settle: 2500,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 8, question_index: qi, timer_started_at: iso(now() - 8000), reveal: false }) } })),
 ]
 
 export { qref, qrefP }

@@ -5,7 +5,9 @@ import type { Rect } from '../geometry'
 import { crossesFold, inside, overlapArea, type Viewport } from './safeArea'
 
 export interface DiagText { id: string; fontPx: number; minPx: number; rect: Rect; overflow: boolean }
-export interface DiagMedia { id: string; rect: Rect; natural: { w: number; h: number } }
+export interface DiagMedia { id: string; rect: Rect; natural: { w: number; h: number }
+  /** картинке разрешено лежать на сгибе («центральная» композиция одной картинки, поверх — тень сгиба) */
+  foldOk?: boolean }
 export interface DiagContainer { id: string; scrollW: number; clientW: number; scrollH: number; clientH: number }
 export interface DiagInput {
   viewport: Viewport
@@ -47,7 +49,7 @@ export function diagnoseLayout(d: DiagInput): DiagIssue[] {
   }
   for (const m of d.media) {
     if (!inside(m.rect, d.content, 2)) push('outside-safe', m.id, 'картинка вне безопасной области')
-    if (!d.mediaMayCrossFold && crossesFold(m.rect, d.viewport, 2)) push('fold', m.id, 'картинка заходит на сгиб')
+    if (!d.mediaMayCrossFold && !m.foldOk && crossesFold(m.rect, d.viewport, 2)) push('fold', m.id, 'картинка заходит на сгиб')
     if (m.natural.w > 0 && m.natural.h > 0 && m.rect.h > 0) {
       const want = m.natural.w / m.natural.h, got = m.rect.w / m.rect.h
       if (Math.abs(got - want) / want > TOL_RATIO) push('distortion', m.id, `пропорции ${got.toFixed(3)} вместо ${want.toFixed(3)}`)
