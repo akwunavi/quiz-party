@@ -25,7 +25,7 @@ def add(dirpath, prefix, width=1200, q=46):
 add(SHOTS, '')
 # доработка адаптивности: b: — исходный baseline (до A–C), c: — этапы A–C (cbf101b), a: — после доработки (кадры мельче: их много)
 ADAPT2 = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'adaptive2')
-for d, pre in (('before', 'b:'), ('cbf', 'c:'), ('after', 'a:')): add(os.path.join(ADAPT2, d), pre, 1000, 40)
+for d, pre in (('before', 'b:'), ('cbf', 'c:'), ('after', 'a:')): add(os.path.join(ADAPT2, d), pre, 880, 34)
 have |= {i[2:] for i in frames if i[:2] in ('b:', 'c:', 'a:')}
 scenes = [{**{k: s[k] for k in ('id', 'title', 'group')}, 'teams': False, 'steps': [], 'path': None} for s in meta if s['id'] in have or any(k in frames for k in ('a:' + s['id'],))]
 css = open(os.path.join(HERE, 'review.css'), encoding='utf-8').read()

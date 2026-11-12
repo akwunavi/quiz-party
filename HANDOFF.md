@@ -1310,7 +1310,7 @@ Share на самой странице.
 - **Чистая логика + тесты:** `ny/book/geometry.ts` (`lobbyLayout`, `bookDecor`), `ny/book/motion.ts` (`revealLiveStep`, `pageTurnKey`), `ny/book/assets.ts`, `lib/playbackActive.ts` (`bindPlayback`), `lib/imgAlpha.ts` (`data-alpha` у `FitImg`/`FitAnswer`).
 - **Временные ассеты:** `public/ny-book/_tmp/` (README «ВРЕМЕННЫЕ», `MANIFEST.json`), нарезка — `scripts/ny-book/cut-sheet.py` из `docs-dev/book-redesign/assets-src/sheet-*.png`. Новых генераций не было.
 - **Прототипный флаг:** `?bkfin=1|2|3` в адресе проектора — вариант оформления финала (`ny/book/copy.ts`). Только для согласования; после выбора убрать (этап 4, Б6).
-- Тесты: **966 пройденных + 7 todo (973) в 100 файлах** (97 passed + 3 skipped); адаптивная система +16 (`bookAdaptive`), перед ней 950+7/99; было 930+7/95: +20 (`bookGeometry`, `bookAssets`, `bookMotion`, `playbackActive`).
+- Тесты: **986 пройденных + 7 todo (993) в 101 файле** (98 passed + 3 skipped); доработка адаптивности +20 (`bookLayout`), перед ней 966+7/100; адаптивная система +16 (`bookAdaptive`), перед ней 950+7/99; было 930+7/95: +20 (`bookGeometry`, `bookAssets`, `bookMotion`, `playbackActive`).
 - `sharedAudio.ts`: тип событий расширен `pause | waiting` (только подписка, вытеснение не трогалось).
 - **Стенд (дополнения):** `QP_BOOK_THEME`/`QP_BOOK_APP` (регресс), `--mask`/`--exact`/`--out` у `shoot.cjs`, `probe.cjs` (выражение в странице), защита от второго запуска на занятом порту (иначе второй прогон стирал данные первого — так был потерян один прогон).
 
