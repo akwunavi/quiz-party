@@ -21,7 +21,7 @@ export interface DiagInput {
   /** служебные элементы шапки: плашка вопроса */
   qnum?: Rect | null
   /** таймер: слот и видимый рисунок (оба обязаны быть квадратами) */
-  timer?: { slot: Rect; art: Rect } | null
+  timer?: { slot: Rect; art: Rect; /** ожидаемое w/h рисунка: розетка 1; будущий ассет (почти квадрат с ветками и бантом) — своя фиксированная пропорция из data-art-ratio слота */ artRatio?: number } | null
   /** прочие критичные блоки (варианты ответов и т.п.), не пересекающие текст и картинки */
   critical?: { id: string; rect: Rect }[]
   /** разрешены ли картинки на сгибе (false — у однострочных сеток, где колонки лежат на разных страницах) */
@@ -59,7 +59,9 @@ export function diagnoseLayout(d: DiagInput): DiagIssue[] {
   if (d.timer) {
     const { slot, art } = d.timer
     if (Math.abs(slot.w - slot.h) > TOL_SQUARE) push('timer-shape', 'timer-slot', `слот ${slot.w.toFixed(1)}×${slot.h.toFixed(1)} не квадрат`)
-    if (Math.abs(art.w - art.h) > TOL_SQUARE) push('timer-shape', 'timer-art', `рисунок ${art.w.toFixed(1)}×${art.h.toFixed(1)} не квадрат`)
+    const want = d.timer.artRatio ?? 1
+    if (art.h > 0 && (want === 1 ? Math.abs(art.w - art.h) > TOL_SQUARE : Math.abs(art.w / art.h - want) / want > 0.01))
+      push('timer-shape', 'timer-art', `рисунок ${art.w.toFixed(1)}×${art.h.toFixed(1)}: пропорция ${(art.w / (art.h || 1)).toFixed(3)} вместо ${want}`)
     if (!inside(slot, d.book, 1)) push('outside-safe', 'timer-slot', 'таймер за пределами книги')
   }
   // пересечения критичных элементов: текст/картинки/плашка/таймер/варианты — попарно

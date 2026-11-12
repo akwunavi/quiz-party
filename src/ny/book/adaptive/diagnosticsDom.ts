@@ -21,7 +21,7 @@ export function collectDiag(root: ParentNode): DiagInput {
   const q = root.querySelector('.host-topbar .qnum'), slot = root.querySelector('[data-bk-slot="timer"]'), art = slot?.querySelector('.p-ros')
   const crit = [...root.querySelectorAll('.choices-grid')].map((el, i) => ({ id: `choices#${i}`, rect: rectOf(el) }))
   return { viewport, content: contentArea(viewport), book: bookRect(viewport), texts, media, containers,
-    qnum: q ? rectOf(q) : null, timer: slot && art ? { slot: rectOf(slot), art: rectOf(art) } : null, critical: crit, mediaMayCrossFold: false }
+    qnum: q ? rectOf(q) : null, timer: slot && art ? { slot: rectOf(slot), art: rectOf(art), artRatio: parseFloat((slot as HTMLElement).dataset.artRatio ?? '') || 1 } : null, critical: crit, mediaMayCrossFold: false }
 }
 
 declare global { interface Window { __bkDiagnose?: () => DiagIssue[] } }
