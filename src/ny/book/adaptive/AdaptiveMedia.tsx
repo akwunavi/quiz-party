@@ -5,7 +5,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { hasAlpha } from '../../../lib/imgAlpha'
 import { FOLD_GAP, bookUnit } from './safeArea'
-import { planMedia } from './mediaPlan'
+import { chooseLayout } from './mediaLayout'
 
 export interface MediaItem { src: string; marker?: string; caption?: string }
 
@@ -35,12 +35,17 @@ export function AdaptiveMedia({ items, spansFold = false, lettered = false }: {
   }, [])
   const u = bookUnit({ w: window.innerWidth, h: window.innerHeight })
   const ready = ratios.every(r => r != null) || late
-  const plan = planMedia({
+  const prev = useRef<string | null>(null)
+  const choice = chooseLayout({
     ratios: ratios.map(r => r ?? 1.5), width: size.w, height: size.h, gap: 20 * u,
-    colGap: spansFold ? FOLD_GAP * u : 20 * u, captionH: lettered ? 64 * u : 0,
+    midGap: spansFold ? FOLD_GAP * u : 20 * u, spansFold, captionH: lettered ? 64 * u : 0, unit: u,
+    captionLens: items.map(i => (i.caption ?? '').length), capFontPx: 28 * u, markerW: lettered ? 45 * u : 0, prev: prev.current,
   })
+  if (choice && size.w > 0 && ready) prev.current = choice.name
+  const plan = choice?.placed ?? []
   return (
-    <div ref={box} className="bk-media" data-bk-container="media" data-ready={ready ? '1' : '0'} style={{ opacity: ready ? 1 : 0 }}>
+    <div ref={box} className="bk-media" data-bk-container="media" data-ready={ready ? '1' : '0'}
+      data-bk-layout={choice?.name} data-bk-score={choice ? choice.score.toFixed(1) : undefined} style={{ opacity: ready ? 1 : 0 }}>
       {plan.map((p, i) => (
         <figure key={i} className="bk-cell" style={{ left: p.cell.x, top: p.cell.y, width: p.cell.w, height: p.cell.h } as CSSProperties}>
           <div className="bk-photo" data-alpha={alpha[i] ? '' : undefined}

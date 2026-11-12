@@ -174,7 +174,7 @@ function ClassicQuestionScreen({
   const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
   const bkPlain = isBook && hasText && !hasMediaCls && !hasChoicesCls
   const bkSplit = isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
-  const bkGrid = isBook && !split && hasMediaCls && imgs.length === 4
+  const bkGrid = isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
   const bkCls = bkPlain ? ' bk-ad bk-ad-plain' : bkSplit ? ' bk-ad bk-ad-split' : bkGrid ? ' bk-ad bk-ad-grid' : ''
   const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
   const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight })) : undefined
