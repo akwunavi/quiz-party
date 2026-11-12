@@ -26,6 +26,8 @@ export interface LayoutInput {
   captionH: number
   /** длины подписей (знаков) — для оценки читаемости; без них подписи считаются короткими (только маркеры) */
   captionLens?: number[]
+  /** сколько строк подписи вмещает зона (по умолчанию 2); при 3 зона выше */
+  capLines?: number
   /** кегль подписи, px — для оценки числа строк */
   capFontPx?: number
   /** ширина, на которую подпись «съедает» маркер (кружок буквы), px */
@@ -175,7 +177,7 @@ export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
     let ok = 0
     placed.forEach((p, i) => {
       const len = o.captionLens![i] ?? 0, w = Math.max(1, p.cell.w - mw - 12 * u)
-      ok += len === 0 || Math.ceil(len * 0.58 * font / w + 0.15) <= 2 ? 1 : 0
+      ok += len === 0 || Math.ceil(len * 0.62 * font / w + 0.3) <= (o.capLines ?? 2) ? 1 : 0
     })
     captionOk = ok / n
   }

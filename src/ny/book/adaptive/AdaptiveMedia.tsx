@@ -38,16 +38,23 @@ export function AdaptiveMedia({ items, spansFold = false, lettered = false, cros
   const u = bookUnit({ w: window.innerWidth, h: window.innerHeight })
   const ready = ratios.every(r => r != null) || late
   const prev = useRef<string | null>(null)
-  const choice = chooseLayout({
+  const lens = items.map(i => (i.caption ?? '').length)
+  const baseIn = {
     ratios: ratios.map(r => r ?? 1.5), width: size.w, height: size.h, gap: 20 * u,
-    midGap: spansFold ? FOLD_GAP * u : 20 * u, spansFold, captionH: lettered ? 76 * u : 0, unit: u,
-    captionLens: items.map(i => (i.caption ?? '').length), capFontPx: 26 * u, markerW: lettered ? 45 * u : 0, prev: prev.current,
-  })
+    midGap: spansFold ? FOLD_GAP * u : 20 * u, spansFold, unit: u,
+    captionLens: lens, capFontPx: 26 * u, markerW: lettered ? 45 * u : 0, prev: prev.current,
+  }
+  // подписи: зона на 2 строки; если ни одна раскладка не вмещает подписи в 2 строки — зона на 3 (выше), а не обрезка текста
+  let capLines = 2, choice = chooseLayout({ ...baseIn, captionH: lettered ? 76 * u : 0, capLines })
+  if (lettered && choice && choice.metrics.captionOk < 1) {
+    const c3 = chooseLayout({ ...baseIn, captionH: 104 * u, capLines: 3 })
+    if (c3 && c3.metrics.captionOk >= choice.metrics.captionOk) { choice = c3; capLines = 3 }
+  }
   if (choice && size.w > 0 && ready) prev.current = choice.name
   const plan = choice?.placed ?? []
   return (
     <div ref={box} className="bk-media" data-bk-container="media" data-ready={ready ? '1' : '0'}
-      data-bk-layout={choice?.name} data-bk-score={choice ? choice.score.toFixed(1) : undefined} style={{ opacity: ready ? 1 : 0 }}>
+      data-bk-caplines={lettered ? capLines : undefined} data-bk-layout={choice?.name} data-bk-score={choice ? choice.score.toFixed(1) : undefined} style={{ opacity: ready ? 1 : 0 }}>
       {plan.map((p, i) => (
         <figure key={i} className="bk-cell" style={{ left: p.cell.x, top: p.cell.y, width: p.cell.w, height: p.cell.h } as CSSProperties}>
           <div className="bk-photo" data-alpha={alpha[i] ? '' : undefined}

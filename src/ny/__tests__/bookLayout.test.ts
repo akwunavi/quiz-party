@@ -152,3 +152,12 @@ describe('BookLayoutDiagnostics: композиция (предупрежден�
     expect(codes(d)).toContain('timer-shape')
   })
 })
+
+describe('Подписи: зона на 3 строки, когда 2 не хватает', () => {
+  it('те же подписи в зоне на 3 строки оцениваются читаемыми, в зоне на 2 — нет', () => {
+    const o = { ...base([R.v, R.v, R.sq, R.h], { captionH: 76, captionLens: [30, 30, 30, 30], capFontPx: 26, markerW: 45 }) }
+    const two = chooseLayout({ ...o, capLines: 2 })!, three = chooseLayout({ ...o, captionH: 104, capLines: 3 })!
+    expect(three.metrics.captionOk).toBeGreaterThanOrEqual(two.metrics.captionOk)
+    expect(three.placed.every(p => (p.caption?.h ?? 0) === 104)).toBe(true)
+  })
+})
