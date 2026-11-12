@@ -12,6 +12,7 @@ export const group = id => {
   if (/^1[56]/.test(id)) return 'Финал'
   if (/^17/.test(id)) return 'Плитки команд'
   if (/^18/.test(id)) return 'Типографика'
+  if (/^20/.test(id)) return 'Адаптивность: до/после'
   return 'Прочее'
 }
 export const teamsApplicable = id => /^(01-lobby-(?!names)|09-answer-time$|10-recall-A|11-|12-|15-finale)/.test(id)

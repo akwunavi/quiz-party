@@ -17,6 +17,10 @@ import { FitImg } from '../FitImg'
 import { FitAnswer } from '../FitAnswer'
 import { Icicles } from '../Icicles'
 import { WindText } from '../QuestionText'
+import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
+import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
+import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
+import { bookUnit } from '../../ny/book/adaptive/safeArea'
 import { mediaUrl, mediaScaleVar } from '../../lib/media'
 import { choicesLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
@@ -161,9 +165,22 @@ function ClassicQuestionScreen({
     (q.answer.mode === 'match' && q.answer.left.length === imgs.length))
   const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
     ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
+  // «Книга» (ADAPTIVE.md, этап C): адаптивные раскладки для трёх случаев — текст без картинок, текст + одна картинка, четыре картинки.
+  // Остальные раскладки (варианты, 2–3 картинки, сопоставление) не трогаем. Хуки — до любых return (React #310).
+  const isBook = pack.theme === 'ny_book'
+  const rootRef = useRef<HTMLDivElement>(null)
+  useBookDiagnostics(rootRef, isBook)
+  const hasMediaCls = !!imgs.length && !q.media.hidden
+  const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
+  const bkPlain = isBook && hasText && !hasMediaCls && !hasChoicesCls
+  const bkSplit = isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
+  const bkGrid = isBook && !split && hasMediaCls && imgs.length === 4
+  const bkCls = bkPlain ? ' bk-ad bk-ad-plain' : bkSplit ? ' bk-ad bk-ad-split' : bkGrid ? ' bk-ad bk-ad-grid' : ''
+  const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
+  const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight })) : undefined
 
   return (
-    <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
+    <div ref={rootRef} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
       imgs.length && !q.media.hidden ? ' has-media' : ''}${
       (choices && !lettered) || (q.answer.mode === 'match'
         && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
@@ -187,9 +204,11 @@ function ClassicQuestionScreen({
             {isNY && <Icicles seed={q.id} low={timeLow} />}
             {isCyber && <span className="cf-scan" aria-hidden="true" />}
             {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-            <WindText key={q.id} text={q.question_text} />
+            <WindText key={q.id} text={q.question_text} range={bkRange} role={bkRole ?? undefined} />
           </div>
-          {imgs.length === 1
+          {bkSplit
+            ? <AdaptiveMedia key={q.id} items={[{ src: mediaUrl(imgs[0]) }]} />
+            : imgs.length === 1
             ? <div className="q-media-grid n1" style={mediaScaleVar(q)}>
                 {imgs.map((m, i) => (
                   <figure key={i} className="q-img"><img src={mediaUrl(m)} alt="" />
@@ -212,11 +231,17 @@ function ClassicQuestionScreen({
               {isNY && <Icicles seed={q.id} low={timeLow} />}
               {isCyber && <span className="cf-scan" aria-hidden="true" />}
               {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-              <WindText key={q.id} text={q.question_text} />
+              <WindText key={q.id} text={q.question_text} range={bkRange} role={bkRole ?? undefined} />
             </div>
           )}
           {!q.media.hidden && imgs.length > 0 && (
-            lettered
+            bkGrid
+              /* «Книга»: 4 картинки — единая сетка 2×2 по реальным пропорциям, подписи (буквы вариантов) на одном уровне */
+              ? <AdaptiveMedia key={q.id} spansFold lettered={lettered}
+                  items={imgs.map((m, i) => ({ src: mediaUrl(m),
+                    marker: lettered ? (q.answer.mode === 'match' ? String(i + 1) : (choices?.[i]?.key ?? '')) : undefined,
+                    caption: lettered && q.answer.mode === 'choice' ? choices?.[i]?.text : undefined }))} />
+            : lettered
               /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
               ? <div className={`img-answers n${Math.min(imgs.length, 6)}${
                     imgs.length > 1 ? ' eq-row' : ''}`}>

@@ -12,15 +12,21 @@ HERE = os.path.dirname(__file__)
 
 meta = json.loads(subprocess.run(['node', os.path.join(HERE, 'meta.mjs'), '--json'], capture_output=True, text=True, check=True, cwd=ROOT).stdout)
 frames, have = {}, set()
-for f in sorted(os.listdir(SHOTS)):
-    m = re.match(r'^(.+)-(1920|1899|1366)x\d+\.webp$', f)
-    if not m: continue
-    sid, res = m.groups(); have.add(sid)
-    im = Image.open(os.path.join(SHOTS, f)).convert('RGB')
-    im = im.resize((1400, round(im.height * 1400 / im.width)), Image.LANCZOS)
-    buf = io.BytesIO(); im.save(buf, 'WEBP', quality=52, method=6)
-    frames.setdefault(sid, {})[res] = 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
-scenes = [{**{k: s[k] for k in ('id', 'title', 'group')}, 'teams': False, 'steps': [], 'path': None} for s in meta if s['id'] in have]
+def add(dirpath, prefix):
+    if not os.path.isdir(dirpath): return
+    for f in sorted(os.listdir(dirpath)):
+        m = re.match(r'^(.+)-(1920|1899|1366|1280)x\d+\.webp$', f)
+        if not m: continue
+        sid, res = m.groups(); have.add(sid)
+        im = Image.open(os.path.join(dirpath, f)).convert('RGB')
+        im = im.resize((1400, round(im.height * 1400 / im.width)), Image.LANCZOS)
+        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=52, method=6)
+        frames.setdefault(prefix + sid, {})[res] = 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
+add(SHOTS, '')
+ADAPT = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'adaptive')
+add(os.path.join(ADAPT, 'before'), 'b:'); add(os.path.join(ADAPT, 'after'), 'a:')
+have |= {i[2:] for i in frames if i[:2] in ('b:', 'a:')}
+scenes = [{**{k: s[k] for k in ('id', 'title', 'group')}, 'teams': False, 'steps': [], 'path': None} for s in meta if s['id'] in have or any(k in frames for k in ('a:' + s['id'],))]
 css = open(os.path.join(HERE, 'review.css'), encoding='utf-8').read()
 js = open(os.path.join(HERE, 'review.js'), encoding='utf-8').read()
 data = json.dumps({'scenes': scenes, 'frames': frames}, ensure_ascii=False)

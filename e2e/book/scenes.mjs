@@ -272,6 +272,21 @@ export const SCENES = [
   }))),
   // лист шрифтов: статическая страница стенда (review/fonts.html) на тех же локальных шрифтах и токенах --bk-*
   { id: '18-fonts', title: 'лист шрифтов: иерархия типографики «Книги»', ready: '.fs-ready', settle: 800, path: '/review/fonts.html', async setup() {} },
+  // ЭТАП A–C адаптивной системы (ADAPTIVE.md): четыре контрольных сценария + три обязательных регрессионных (скриншоты ведущего)
+  { id: '20-ad-short', title: 'адаптив: короткий текст (без картинок)', ready: '.host-screen .qnum', settle: 2500, mandatory: false,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 6, question_index: 1, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-long', title: 'адаптив: длинный текст (без картинок)', ready: '.host-screen .qnum', settle: 2500,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 0, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-1img', title: 'адаптив: одно вертикальное изображение', ready: '.host-screen .qnum', settle: 2500,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 1, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-4img', title: 'адаптив: 4 изображения (1:1, 9:16, 21:9, PNG α) [скриншот ведущего №1]', ready: '.host-screen .qnum', settle: 2500, mandatory: true,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 4, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-4img-caps', title: 'адаптив: 4 картинки-варианта с подписями (A–Г) на одном уровне', ready: '.host-screen .qnum', settle: 2500,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 6, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-3img-choices', title: 'адаптив: 3 картинки + варианты — таймер не деформируется [скриншот ведущего №2]', ready: '.host-screen .qnum', settle: 2500, mandatory: true,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: 9, timer_started_at: iso(now() - 8000), reveal: false }) } },
+  { id: '20-ad-match', title: 'адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]', ready: '.host-screen .qnum', settle: 2500, mandatory: true,
+    async setup(api) { await api.reset(); await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 1, question_index: 0, timer_started_at: iso(now() - 8000), reveal: false }) } },
 ]
 
 export { qref, qrefP }

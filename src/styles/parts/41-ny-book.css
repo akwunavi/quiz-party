@@ -70,7 +70,7 @@
 .ny-qr-svg { display: block; width: 100%; height: 100%; }
 
 /* ── 02 ПРАВИЛА / информационный слайд ── */
-.theme-ny_book .host-topbar { top: calc(var(--bk-oy) + 46 * var(--u)); left: calc(var(--bk-ox) + 184 * var(--u)); right: calc(var(--bk-ox) + 184 * var(--u)); justify-content: space-between; align-items: center; }
+.theme-ny_book .host-topbar { top: calc(var(--bk-oy) + 60 * var(--u)); left: calc(var(--bk-ox) + 184 * var(--u)); right: calc(var(--bk-ox) + 184 * var(--u)); justify-content: space-between; align-items: center; }
 .theme-ny_book .info-screen .host-topbar, .theme-ny_book .bz-screen .host-topbar { justify-content: center; }
 .theme-ny_book .mono-tag { font: 700 calc(22 * var(--u)) / 1 var(--nb-serif); letter-spacing: .26em; color: var(--nb-red); text-shadow: none; }
 .theme-ny_book .info-screen .host-topbar .mono-tag { background: var(--nb-card); padding: calc(12 * var(--u)) calc(24 * var(--u)); box-shadow: 0 5px 0 var(--nb-shade); }
@@ -610,3 +610,53 @@
 .theme-ny_book .rule-item .idx { color: var(--bk-red); }
 .theme-ny_book .rules-frame .rule-item, .theme-ny_book .rules-frame .rule-item * { font-family: var(--bk-serif); }
 .theme-ny_book .round-intro .meta-line { font-family: var(--bk-serif); font-style: normal; font-weight: 700; letter-spacing: .14em; border-color: var(--bk-line); color: var(--bk-muted); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+   АДАПТИВНАЯ СИСТЕМА ЭКРАНОВ (этап C, ADAPTIVE.md): BookSafeArea / AdaptiveText / AdaptiveMedia / BookTimerSlot.
+   Включается классами .bk-ad-plain | .bk-ad-split | .bk-ad-grid на .host-screen (ставит QuestionScreen только для ny_book).
+   Кегль текста выставляет useFitText(range) инлайн (px) — правила font-size ниже лишь запасные до первого замера.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════ */
+/* BookSafeArea: контент между полями декора, ниже служебной полосы (плашка + таймер, до y=180u), выше среза страниц */
+.theme-ny_book .host-screen.bk-ad { padding: calc(var(--bk-oy) + 180 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 136 * var(--u)); gap: calc(20 * var(--u)); }
+
+/* плашка вопроса — компактная, лёгкая (раньше 58 px высотой и 30u кегля с тяжёлой тенью) */
+.theme-ny_book .host-topbar .qnum { font: 700 calc(23 * var(--u)) / 1 var(--bk-serif); letter-spacing: .1em; padding: calc(9 * var(--u)) calc(18 * var(--u));
+  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--bk-line), 0 calc(2 * var(--u)) 0 var(--bk-shade), 0 calc(5 * var(--u)) calc(8 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .host-topbar .qnum b { font-size: 1em; }
+
+/* BookTimerSlot: независимый слот, фиксированный КВАДРАТ; рисунок вписан на 100 %, число — динамический текст поверх (слот под будущий ассет) */
+.theme-ny_book .bk-timer-slot { --bk-timer-d: calc(120 * var(--u)); position: relative; flex: none; width: var(--bk-timer-d); height: var(--bk-timer-d); aspect-ratio: 1 / 1; contain: layout; }
+.theme-ny_book .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(260 * var(--u)); }
+.theme-ny_book .host-screen:has(.answer-pulse) .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(190 * var(--u)); margin-block: calc(10 * var(--u)); }
+.theme-ny_book .bk-timer-slot > .p-ros { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; --d: var(--bk-timer-d); }
+.theme-ny_book .host-screen:has(.answer-pulse) .bk-timer-slot > .p-ros.is-big { margin-block: 0; }
+
+/* AdaptiveText, «простой» вопрос: рамка заполняет безопасную область, текст — по центру обеими осями; прежний бумажный «островок» (для домика
+   и ёлок старой сцены) не нужен — картинка книги теперь чистая */
+.theme-ny_book .host-screen.bk-ad-plain:not(.has-media):not(.has-choices) > div:has(> .q-text) { flex: 1 1 0; min-height: 0; width: 100%; max-width: 100%; height: auto; margin: 0; padding: 0;
+  display: flex; align-items: center; justify-content: center; }
+.theme-ny_book .host-screen.bk-ad-plain:not(.has-media):not(.has-choices) > div:has(> .q-text)::before { display: none; }
+.theme-ny_book .host-screen.bk-ad .q-text { margin: 0 auto; max-width: calc(1240 * var(--u)); text-align: center; line-height: 1.16; text-wrap: balance; text-shadow: none; }
+.theme-ny_book .host-screen.bk-ad-split .q-text { max-width: 100%; }
+
+/* AdaptiveMedia: контейнер = свободное место; ячейки и рамки задаёт planMedia в px; подложка — рамка на самой картинке */
+.theme-ny_book .bk-media { position: relative; flex: 1 1 0; min-height: 0; min-width: 0; width: 100%; }
+.theme-ny_book .bk-cell { position: absolute; margin: 0; }
+.theme-ny_book .bk-photo { position: absolute; background: #fffdf6;
+  box-shadow: 0 0 0 calc(8 * var(--u)) #fffdf6, 0 0 0 calc(9.5 * var(--u)) var(--bk-line), 0 calc(10 * var(--u)) calc(18 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .28); }
+.theme-ny_book .bk-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; border: 0; border-radius: 0; }
+.theme-ny_book .bk-photo[data-alpha] { background: none; box-shadow: none; }
+.theme-ny_book .bk-photo[data-alpha] > img { filter: drop-shadow(0 calc(8 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .35)); }
+.theme-ny_book .bk-cap { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); padding-top: calc(10 * var(--u)); }
+.theme-ny_book .bk-cap-key { flex: none; width: 1.5em; height: 1.5em; display: grid; place-items: center; border-radius: 50%; font: 700 calc(30 * var(--u)) / 1 var(--bk-serif); color: var(--bk-paper); background: var(--bk-red); box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(242, 213, 140, .55); }
+.theme-ny_book .bk-cap-text { min-width: 0; font: 700 calc(28 * var(--u)) / 1.1 var(--bk-serif); color: var(--bk-ink); }
+
+/* текст + одна картинка: колонки = страницы разворота, сгиб между ними; текст по центру левой страницы, картинка — правой */
+.theme-ny_book .host-screen.bk-ad-split .q-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: calc(120 * var(--u)); flex: 1 1 0; min-height: 0; width: 100%; max-height: none; align-items: stretch; }
+.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child { background: none; box-shadow: none; padding: 0; border: 0; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::before, .theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::after { content: ''; position: absolute; left: 12%; right: 12%; height: calc(2 * var(--u)); background: linear-gradient(90deg, transparent, var(--bk-gold), transparent); }
+.theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::before { top: 0; } .theme-ny_book .host-screen.bk-ad-split .q-split > div:first-child::after { bottom: 0; }
+
+/* четыре картинки: заголовок над сеткой — фиксированная полоса, сетка 2×2 получает остальное; колонки разведены на сгиб */
+.theme-ny_book .host-screen.bk-ad-grid > div:has(> .q-text) { flex: 0 0 calc(150 * var(--u)); min-height: 0; width: 100%; max-width: 100%; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
+.theme-ny_book .host-screen.bk-ad-grid > .bk-media { flex: 1 1 0; }

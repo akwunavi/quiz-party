@@ -3,21 +3,29 @@
 // те же навигация/разрешения/варианты на картинках shots/proto, без сервера и без анимаций.
 'use strict'
 const ST = window.REVIEW_STATIC || null
-const RES = { '1920': [1920, 1080], '1899': [1899, 905], '1366': [1366, 768] }
+const RES = { '1920': [1920, 1080], '1899': [1899, 905], '1366': [1366, 768], '1280': [1280, 720] }
 const TEAM_COUNTS = [0, 4, 8, 10, 16, 24]
 const $ = s => document.querySelector(s)
 const el = (t, p = {}, ...k) => { const e = Object.assign(document.createElement(t), p); k.flat().forEach(c => e.append(c)); return e }
 const q = new URLSearchParams(location.search)
-const S = { scenes: [], id: q.get('scene'), res: RES[q.get('res')] ? q.get('res') : '1920', teams: q.get('teams'), fin: q.get('fin') || '1', team: q.get('team') || '1', split: q.get('split') === '1' }
+const S = { scenes: [], id: q.get('scene'), res: RES[q.get('res')] ? q.get('res') : '1920', teams: q.get('teams'), fin: q.get('fin') || '1', team: q.get('team') || '1', ba: q.get('ba') || 'a', split: q.get('split') === '1' }
 
 // варианты: fin — финал (?bkfin), team — плитки команд (?bkteam)
 const baseId = id => id.replace(/-v[23]$/, '').replace(/^17-team-t[123]-/, '17-team-t1-')
+// варианты по видам: ключ состояния, значения, подписи, заголовок группы кнопок
+const KINDS = {
+  fin: { key: 'fin', vs: ['1', '2', '3'], lab: ['V1', 'V2', 'V3'], title: 'Финал' },
+  team: { key: 'team', vs: ['1', '2', '3'], lab: ['T1', 'T2', 'T3'], title: 'Плитки команд' },
+  ba: { key: 'ba', vs: ['b', 'a'], lab: ['До', 'После'], title: 'Адаптивность' },
+}
 function kindOf(id) {
+  if (ST && /^20-ad-/.test(id)) return 'ba'
   if (/^15-finale-/.test(id)) return 'fin'
   if (/^17-team-/.test(id) || (!ST && /^01-lobby-/.test(id))) return 'team'
   return null
 }
 function staticVariantId(id, kind, v) {
+  if (kind === 'ba') return `${v}:${id}`
   if (kind === 'fin') { const b = id.replace(/-v[23]$/, ''); return v === '1' ? b : `${b}-v${v}` }
   if (kind === 'team' && /^17-team-/.test(id)) return id.replace(/^17-team-t[123]-/, `17-team-t${v}-`)
   return id
@@ -30,7 +38,7 @@ function url() {
   const p = new URLSearchParams()
   p.set('scene', S.id); p.set('res', S.res)
   if (S.teams != null && S.teams !== '') p.set('teams', S.teams)
-  if (S.fin !== '1') p.set('fin', S.fin); if (S.team !== '1') p.set('team', S.team); if (S.split) p.set('split', '1')
+  if (S.fin !== '1') p.set('fin', S.fin); if (S.team !== '1') p.set('team', S.team); if (S.ba !== 'a') p.set('ba', S.ba); if (S.split) p.set('split', '1')
   return location.pathname + '?' + p
 }
 const sync = () => history.replaceState(null, '', url())
@@ -60,11 +68,10 @@ function bar() {
   }
   const kind = kindOf(s.id)
   if (kind) {
-    const key = kind === 'fin' ? 'fin' : 'team'
-    const lab = kind === 'fin' ? ['V1', 'V2', 'V3'] : ['T1', 'T2', 'T3']
+    const K = KINDS[kind]
     const avail = v => ST ? !!ST.frames[staticVariantId(s.id, kind, v)] : true
-    b.append(grp(kind === 'fin' ? 'Финал' : 'Плитки команд', ...['1', '2', '3'].map((v, i) => el('button', { textContent: lab[i], disabled: !avail(v), className: !S.split && S[key] === v ? 'on' : '', onclick: () => { S[key] = v; S.split = false; render() } })),
-      el('button', { textContent: 'Рядом ×3', className: S.split ? 'on' : '', onclick: () => { S.split = !S.split; render() } })))
+    b.append(grp(K.title, ...K.vs.map((v, i) => el('button', { textContent: K.lab[i], disabled: !avail(v), className: !S.split && S[K.key] === v ? 'on' : '', onclick: () => { S[K.key] = v; S.split = false; render() } })),
+      el('button', { textContent: kind === 'ba' ? 'Рядом: до | после' : 'Рядом ×3', className: S.split ? 'on' : '', onclick: () => { S.split = !S.split; render() } })))
   }
   if (!ST && s.steps.length) b.append(grp('Шаги', ...s.steps.map(st => el('button', { textContent: st.label, onclick: () => step(st.id) }))))
   b.append(grp('', ...(!ST ? [el('button', { textContent: '↻ Повторить / начать заново', onclick: () => load(true) })] : []),
@@ -78,7 +85,7 @@ function stageRender() {
   const s = cur(); if (!s) return
   $('#title').textContent = s.title + (s.query ? '' : '')
   const [W, H] = RES[S.res]; const kind = kindOf(s.id)
-  const vs = S.split && kind ? ['1', '2', '3'] : [kind ? S[kind === 'fin' ? 'fin' : 'team'] : null]
+  const vs = S.split && kind ? KINDS[kind].vs : [kind ? S[KINDS[kind].key] : null]
   const n = vs.length, gap = 12, pad = 16
   const k = Math.min((st.clientWidth - pad - gap * (n - 1)) / (W * n), (st.clientHeight - pad - 26) / H)
   for (const v of vs) {
@@ -98,7 +105,7 @@ function stageRender() {
       f.src = u; f.addEventListener('load', () => { try { f.contentWindow.addEventListener('keydown', onKey) } catch { /* другой источник */ } })
       box.append(f)
     }
-    const fr = el('div', { className: 'frame' }, kind && n > 1 ? el('div', { className: 'cap', textContent: kind === 'fin' ? 'V' + v : 'T' + v }) : '', box)
+    const fr = el('div', { className: 'frame' }, kind && n > 1 ? el('div', { className: 'cap', textContent: KINDS[kind].lab[KINDS[kind].vs.indexOf(v)] }) : '', box)
     st.insertBefore(fr, $('#msg'))
   }
 }
@@ -123,7 +130,7 @@ function onKey(e) {
   if (e.key === 'ArrowRight' && i < l.length - 1) go(l[i + 1].id)
   else if (e.key === 'ArrowLeft' && i > 0) go(l[i - 1].id)
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') fullscreen()
-  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind) { S[kind === 'fin' ? 'fin' : 'team'] = e.key; S.split = false; render() } }
+  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind && kind !== 'ba') { S[KINDS[kind].key] = e.key; S.split = false; render() } else if (kind === 'ba') { S.ba = e.key === '1' ? 'b' : 'a'; S.split = false; render() } }
   else if (e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') { if (kindOf(S.id)) { S.split = !S.split; render() } }
 }
 document.addEventListener('keydown', onKey)

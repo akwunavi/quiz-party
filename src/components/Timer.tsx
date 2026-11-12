@@ -79,7 +79,11 @@ export function Timer({ startedAt, seconds, theme, chime = true, variant }: {
   if (nyTheme) {
     const t = { seconds, left, frac: startedAt ? frac : 1, low, zero: !!startedAt && left === 0, running: !!startedAt && left > 0 }
     const size = variant === 'ring' ? 'big' : 'top'
-    return theme === 'ny_book' ? <Rosette t={t} size={size} /> : <Dial t={t} size={size} />
+    // «Книга»: таймер — независимый слот фиксированного КВАДРАТА (BookTimerSlot, ADAPTIVE.md): геометрия не зависит от раскладки вопроса,
+    // рисунок (сейчас розетка, потом отдельный ассет) вписан в слот на 100 %, число — динамический текст поверх. Логика/длительность не тронуты.
+    return theme === 'ny_book'
+      ? <div className="bk-timer-slot" data-bk-slot="timer" data-size={size} data-art="rosette-v0"><Rosette t={t} size={size} /></div>
+      : <Dial t={t} size={size} />
   }
   if (theme === 'new_year') {
     const R = 44, C = 2 * Math.PI * R

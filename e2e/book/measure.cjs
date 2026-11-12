@@ -130,11 +130,30 @@ async function measure(page, ctx = {}) {
       area = { content: { w: Math.round(cb.r - cb.l), h: Math.round(cb.b - cb.t) }, onPages: Math.round(iw * ih), share: Math.round((iw * ih) / (W * H) * 1000) / 10,
         offPages: Math.round((cb.r - cb.l) * (cb.b - cb.t) - iw * ih) }
     }
+    // ── геометрия адаптивных экранов (одинаково для «до» и «после»): текст вопроса, картинки (пропорции), таймер, пустота снизу ──
+    const rc = e => { const r = e.getBoundingClientRect(); return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width * 10) / 10, h: Math.round(r.height * 10) / 10 } }
+    const uu = Math.min(W / 1920, H / 1080)
+    const qtEl = document.querySelector('.host-screen .q-text')
+    const imgEls = [...document.querySelectorAll('.host-screen :is(.q-img img, .bk-photo > img, .img-answer img)')].filter(vis)
+    const imgs = imgEls.map(im => { const r = im.getBoundingClientRect(), nw = im.naturalWidth, nh = im.naturalHeight
+      // «рамка картинки»: у «до» это объект внутри contain-ячейки, у «после» — сам img; искажение = |рендер/натив − 1| для рамки без contain
+      const contain = getComputedStyle(im).objectFit === 'contain'
+      return { rect: rc(im), natural: [nw, nh], ratioErr: nw && nh ? Math.round(Math.abs((r.width / r.height) / (nw / nh) - 1) * 1000) / 10 : null, contain, alpha: !!im.closest('[data-alpha]') } })
+    const ros = document.querySelector('.p-ros'), slot = document.querySelector('[data-bk-slot="timer"]')
+    const contentBottom = Math.max(0, ...[qtEl, ...imgEls].filter(Boolean).map(e => e.getBoundingClientRect().bottom))
+    const safeBottom = oyOf() + (1080 - 136) * uu, safeTop = oyOf() + 180 * uu
+    function oyOf() { return Math.max(0, (H - 1080 * uu) / 2) }
+    const geo = { u: Math.round(uu * 1000) / 1000, qtext: qtEl ? { fontPx: Math.round(parseFloat(getComputedStyle(qtEl).fontSize) * 10) / 10, rect: rc(qtEl), fit: qtEl.dataset.bkFit ?? null } : null,
+      imgs, timer: ros ? { art: rc(ros), slot: slot ? rc(slot) : null } : null,
+      qnum: document.querySelector('.host-topbar .qnum') ? rc(document.querySelector('.host-topbar .qnum')) : null,
+      emptyBelowPct: Math.round(Math.max(0, safeBottom - contentBottom) / (safeBottom - safeTop) * 1000) / 10,
+      caps: [...document.querySelectorAll('.bk-cap-key, .img-answer .ia-key')].map(e => Math.round((e.getBoundingClientRect().top + e.getBoundingClientRect().height / 2) * 10) / 10),
+      diag: typeof window.__bkDiagnose === 'function' ? window.__bkDiagnose() : null, diagAttr: document.querySelector('.host-screen')?.dataset.bkDiag ?? null }
     // анимации
     const anim = {}
     for (const sel of ANIM) { const el = document.querySelector(sel); if (el) { const cs = getComputedStyle(el); anim[sel] = cs.animationName === 'none' ? 'none' : `${cs.animationName} ${cs.animationDuration}` } }
     return { scene: ctx.scene, viewport: `${W}x${H}`, reduced: !!ctx.reduced, phaseClasses: document.querySelector('.host-screen')?.className ?? null,
-      density: themeEl?.getAttribute('data-ny-density') ?? null, nodes, overlaps, outside, overflow, fonts, fontMatch, book, anim, text, area,
+      density: themeEl?.getAttribute('data-ny-density') ?? null, nodes, overlaps, outside, overflow, fonts, fontMatch, book, anim, text, area, geo,
       vinylSpin: document.querySelector('.bk-vinyl') ? document.querySelector('.bk-vinyl').classList.contains('is-spin') : null }
   }, { KEYS, BLOCKS, FRAMES, ANIM, TEXT, ctx })
 }
