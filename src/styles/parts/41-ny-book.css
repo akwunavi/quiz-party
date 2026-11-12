@@ -620,7 +620,7 @@
 .theme-ny_book .host-screen.bk-ad { padding: calc(var(--bk-oy) + 180 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 136 * var(--u)); gap: calc(20 * var(--u)); }
 
 /* плашка вопроса — компактная, лёгкая (раньше 58 px высотой и 30u кегля с тяжёлой тенью) */
-.theme-ny_book .host-topbar .qnum { font: 700 calc(23 * var(--u)) / 1 var(--bk-serif); letter-spacing: .1em; padding: calc(9 * var(--u)) calc(18 * var(--u));
+.theme-ny_book .host-topbar .qnum { font: 700 max(calc(23 * var(--u)), 16.5px) / 1 var(--bk-serif); letter-spacing: .09em; padding: .42em .82em; /* пол кегля 16.5 px: на 1280×720 (23u = 15.3 px) плашка остаётся читаемой, отступы — в em, пропорции те же */
   box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--bk-line), 0 calc(2 * var(--u)) 0 var(--bk-shade), 0 calc(5 * var(--u)) calc(8 * var(--u)) var(--bk-shadow); }
 .theme-ny_book .host-topbar .qnum b { font-size: 1em; }
 
@@ -647,9 +647,9 @@
 .theme-ny_book .bk-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; border: 0; border-radius: 0; }
 .theme-ny_book .bk-photo[data-alpha] { background: none; box-shadow: none; }
 .theme-ny_book .bk-photo[data-alpha] > img { filter: drop-shadow(0 calc(8 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .35)); }
-.theme-ny_book .bk-cap { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); padding-top: calc(10 * var(--u)); }
+.theme-ny_book .bk-cap { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); padding-top: calc(8 * var(--u)); }
 .theme-ny_book .bk-cap-key { flex: none; width: 1.5em; height: 1.5em; display: grid; place-items: center; border-radius: 50%; font: 700 calc(30 * var(--u)) / 1 var(--bk-serif); color: var(--bk-paper); background: var(--bk-red); box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(242, 213, 140, .55); }
-.theme-ny_book .bk-cap-text { min-width: 0; font: 700 calc(28 * var(--u)) / 1.1 var(--bk-serif); color: var(--bk-ink); }
+.theme-ny_book .bk-cap-text { min-width: 0; font: 700 calc(26 * var(--u)) / 1.08 var(--bk-serif); color: var(--bk-ink); text-wrap: balance; }
 
 /* вопрос + ОДНА картинка (BookSingle, singleLayout.ts): композиция выбирается оценкой.
    .bk-c-ti — текст на левой странице | картинка на правой; .bk-c-it — зеркально; .bk-c-top — «центральная»: вопрос полосой сверху

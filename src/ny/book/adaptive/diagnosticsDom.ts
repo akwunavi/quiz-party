@@ -3,7 +3,7 @@
 import { useEffect, type RefObject } from 'react'
 import { diagnoseLayout, type DiagInput, type DiagIssue } from './diagnostics'
 import { TEXT_ROLES, type TextRole } from './fit'
-import { bookRect, bookUnit, contentArea } from './safeArea'
+import { bookRect, bookUnit, contentArea, decorZones } from './safeArea'
 
 const rectOf = (e: Element) => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height } }
 
@@ -19,9 +19,12 @@ export function collectDiag(root: ParentNode): DiagInput {
   const containers = [...root.querySelectorAll<HTMLElement>('[data-bk-container]')].map((el, i) => ({
     id: `${el.dataset.bkContainer}#${i}`, scrollW: el.scrollWidth, clientW: el.clientWidth, scrollH: el.scrollHeight, clientH: el.clientHeight }))
   const q = root.querySelector('.host-topbar .qnum'), slot = root.querySelector('[data-bk-slot="timer"]'), art = slot?.querySelector('.p-ros')
+  const captions = [...root.querySelectorAll<HTMLElement>('.bk-cap')].map((el, i) => ({ id: `caption#${i}`, fontPx: parseFloat(getComputedStyle(el.querySelector('.bk-cap-text') ?? el).fontSize), minPx: 18 * u,
+    overflow: el.scrollHeight > el.clientHeight + 1 }))
+  const mediaBoxes = [...root.querySelectorAll<HTMLElement>('.bk-media')].map((el, i) => ({ id: `media#${i}`, rect: rectOf(el) }))
   const crit = [...root.querySelectorAll('.choices-grid')].map((el, i) => ({ id: `choices#${i}`, rect: rectOf(el) }))
   return { viewport, content: contentArea(viewport), book: bookRect(viewport), texts, media, containers,
-    qnum: q ? rectOf(q) : null, timer: slot && art ? { slot: rectOf(slot), art: rectOf(art), artRatio: parseFloat((slot as HTMLElement).dataset.artRatio ?? '') || 1 } : null, critical: crit, mediaMayCrossFold: false }
+    qnum: q ? rectOf(q) : null, timer: slot && art ? { slot: rectOf(slot), art: rectOf(art), artRatio: parseFloat((slot as HTMLElement).dataset.artRatio ?? '') || 1 } : null, critical: crit, mediaMayCrossFold: false, captions, decor: decorZones(viewport), mediaBoxes, unit: u }
 }
 
 declare global { interface Window { __bkDiagnose?: () => DiagIssue[] } }
@@ -36,8 +39,10 @@ export function useBookDiagnostics(ref: RefObject<HTMLElement | null>, enabled: 
     let t = 0, last = ''
     const run = () => {
       const issues = diagnoseLayout(collectDiag(root))
-      root.dataset.bkDiag = issues.length ? String(issues.length) : 'ok'
+      const errs = issues.filter(i => i.severity === 'error')
+      root.dataset.bkDiag = errs.length ? String(errs.length) : 'ok'
       root.dataset.bkDiagCodes = [...new Set(issues.map(i => i.code))].join(' ')
+      root.dataset.bkDiagWarn = String(issues.filter(i => i.severity === 'warn').length)
       const sig = issues.map(i => `${i.code}:${i.id}`).join(',')
       if (loud && issues.length && sig !== last) console.warn('[book-diag]', issues)
       last = sig

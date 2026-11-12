@@ -112,3 +112,43 @@ describe('Одна картинка: chooseSingle (композиция по о�
     expect(hashSeed('a')).toBe(hashSeed('a')); expect(estLines(100, 20, 500)).toBe(Math.ceil(100 * 0.52 * 20 / 500))
   })
 })
+
+import { diagnoseLayout, isWarn, type DiagInput } from '../book/adaptive/diagnostics'
+import { bookRect, contentArea, decorZones } from '../book/adaptive/safeArea'
+describe('BookLayoutDiagnostics: композиция (предупреждения) и декор', () => {
+  const v = { w: 1920, h: 1080 }, content = contentArea(v), book = bookRect(v)
+  const R = (x: number, y: number, w: number, h: number) => ({ x, y, w, h })
+  const base = (): DiagInput => ({ viewport: v, content, book, texts: [], media: [], containers: [], mediaMayCrossFold: true, unit: 1, decor: decorZones(v), captions: [], mediaBoxes: [] })
+  const codes = (d: DiagInput) => diagnoseLayout(d).map(i => i.code)
+  it('мелкая картинка, дисбаланс площадей, неиспользуемая площадь, большая пустота — предупреждения (warn), не ошибки', () => {
+    const d = base()
+    d.media.push({ id: 'a', rect: R(300, 300, 60, 60), natural: { w: 1, h: 1 } }, { id: 'b', rect: R(500, 300, 600, 300), natural: { w: 2, h: 1 } })
+    d.mediaBoxes = [{ id: 'media#0', rect: R(250, 200, 1420, 740) }]
+    const is = diagnoseLayout(d)
+    for (const c of ['small-photo', 'imbalance', 'unused-area', 'empty-area']) expect(is.some(i => i.code === c), c).toBe(true)
+    expect(is.every(isWarn)).toBe(true)
+  })
+  it('хорошая раскладка не получает предупреждений: нет требования заполнять всё место', () => {
+    const d = base()
+    d.texts.push({ id: 't', fontPx: 50, minPx: 28, rect: R(400, 200, 1100, 100), overflow: false })
+    d.media.push({ id: 'a', rect: R(300, 330, 500, 280), natural: { w: 16, h: 9 } }, { id: 'b', rect: R(1000, 330, 500, 280), natural: { w: 16, h: 9 } })
+    d.mediaBoxes = [{ id: 'media#0', rect: R(250, 320, 1420, 600) }]
+    expect(codes(d).filter(c => ['small-photo', 'imbalance'].includes(c))).toEqual([])
+  })
+  it('декор и подписи — ошибки: контент на гирлянде; подпись обрезана или мельче минимума', () => {
+    const d = base()
+    d.texts.push({ id: 't', fontPx: 50, minPx: 28, rect: R(800, 60, 300, 80), overflow: false })
+    d.captions = [{ id: 'c0', fontPx: 12, minPx: 18, overflow: true }]
+    const is = diagnoseLayout(d)
+    expect(is.filter(i => i.code === 'decor').length).toBeGreaterThan(0)
+    expect(is.filter(i => i.code === 'caption').length).toBe(2)
+    expect(is.filter(i => i.code === 'decor' || i.code === 'caption').every(i => i.severity === 'error')).toBe(true)
+  })
+  it('таймер с фиксированной пропорцией ассета: ожидаемое w/h из data-art-ratio, слот остаётся квадратом', () => {
+    const d = base()
+    d.timer = { slot: R(1550, 60, 120, 120), art: R(1550, 60, 126, 120), artRatio: 1.05 }
+    expect(codes(d)).not.toContain('timer-shape')
+    d.timer = { slot: R(1550, 60, 120, 120), art: R(1550, 60, 140, 120), artRatio: 1.05 }
+    expect(codes(d)).toContain('timer-shape')
+  })
+})

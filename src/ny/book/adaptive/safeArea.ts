@@ -68,3 +68,12 @@ export function crossesFold(a: Rect, v: Viewport, tol = 1): boolean {
   const cx = ox + SCENE.w * u / 2, half = FOLD_GAP * u / 2
   return a.x < cx + half - tol && rectRight(a) > cx - half + tol
 }
+
+/** Зоны декора сцены (px сцены): гирлянда с бантом, веточки в нижних углах, уголки переплёта. Контент обязан их не пересекать. */
+export const DECOR_ZONES: { id: string; r: Rect }[] = [
+  { id: 'garland', r: { x: 450, y: 0, w: 1020, h: 175 } },
+  { id: 'sprig-bl', r: { x: 70, y: 955, w: 190, h: 105 } },
+  { id: 'sprig-br', r: { x: 1660, y: 965, w: 190, h: 95 } },
+  { id: 'corner-tl', r: { x: 30, y: 20, w: 90, h: 90 } }, { id: 'corner-tr', r: { x: 1800, y: 20, w: 90, h: 90 } },
+]
+export const decorZones = (v: Viewport) => DECOR_ZONES.map(z => ({ id: z.id, rect: sceneRect(v, z.r) }))
