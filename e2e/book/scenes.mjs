@@ -15,7 +15,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { PACK_ONLINE, PACK_PAPER } from './make-pack.mjs'
+import { PACK_ONLINE, PACK_PAPER, PACK_ALL } from './make-pack.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 // цвета команд — та же палитра, что выдаёт приложение (src/lib/teamColors.ts), читаем как текст
@@ -301,8 +301,9 @@ export const SCENES = [
   // ВСЕ остальные состояния для редизайна «Книги» (COVERAGE.md §4): сцены 3x-*, раунды 9–14 пакета
   ...(() => {
     const sc = (id, title, setup, o = {}) => ({ id, title, ready: o.ready ?? '.host-screen', settle: o.settle ?? 2500, ...o, async setup(api) { await api.reset(); await setup(api) } })
-    const Q = (round, qi, extra = {}) => ({ pack_id: PACK_ONLINE, phase: 'question', round_number: round, question_index: qi, timer_started_at: iso(now() - 8000), reveal: false, ...extra })
-    const qid = (round, qi) => `${PACK_ONLINE}-r${round}-q${qi}`
+    const PK = round => (round >= 9 ? PACK_ALL : PACK_ONLINE)
+    const Q = (round, qi, extra = {}) => ({ pack_id: PK(round), phase: 'question', round_number: round, question_index: qi, timer_started_at: iso(now() - 8000), reveal: false, ...extra })
+    const qid = (round, qi) => `${PK(round)}-r${round}-q${qi}`
     const bz = async (api, mut) => { const ts = await api.teams(5); const left = Object.fromEntries(ts.map((t, i) => [t.id, 60000 - i * 9000]))
       const st = { order: ts.map(t => t.id), turn: 1, left, correct: Object.fromEntries(ts.map((t, i) => [t.id, 3 - (i % 3)])), missed: Object.fromEntries(ts.map((t, i) => [t.id, i % 2])), used: [qid(11, 0)], current: { questionId: qid(11, 1), attempts: 1, shownAt: now() - 6000 }, finished: false }
       await api.call('/api/blitz?round=11', 'PUT', mut(st, ts)); await api.session(Q(11, 0, { timer_started_at: null })) }
@@ -318,15 +319,15 @@ export const SCENES = [
       sc('33-break', 'перерыв (break)', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'break', round_number: 3, question_index: 0, timer_started_at: iso(now() - 30000), reveal: false }) }),
       sc('34-counting', 'подсчёт результатов (counting)', async api => { const ts = await api.teams(8); await api.answers(finaleRows(ts)); await api.session({ pack_id: PACK_ONLINE, phase: 'counting', round_number: 7, question_index: 0, timer_started_at: null, reveal: false }) }, { runFor: 6000 }),
       sc('35-sprint', '«120 секунд»: все вопросы на слайде', async api => { await api.teams(6); await api.session(Q(9, 0)) }),
-      sc('36-rules-sprint', 'заставка и правила «120 секунд»', async api => { await api.teams(6); await api.session({ pack_id: PACK_ONLINE, phase: 'round_intro', round_number: 9, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen' }),
+      sc('36-rules-sprint', 'заставка и правила «120 секунд»', async api => { await api.teams(6); await api.session({ pack_id: PACK_ALL, phase: 'round_intro', round_number: 9, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen' }),
       sc('37-jp-board', 'Своя игра: доска тем × плитки', async api => { await api.teams(6); await api.session(Q(10, 0, { timer_started_at: null, melody: { jp: { tile: null } } })) }),
       sc('38-jp-tile', 'Своя игра: открыта плитка (слушаем)', async api => { await api.teams(6); await api.session(Q(10, 0, { timer_started_at: null, melody: { jp: { tile: 5 } } })) }),
       sc('39-jp-answer', 'Своя игра: показан ответ', async api => { await api.teams(6); await api.session(Q(10, 0, { timer_started_at: null, melody: { jp: { tile: 5, answer: true } } })) }),
       sc('40-blitz-dice', 'блиц: кубик очерёдности', async api => { await api.teams(5); await api.session(Q(11, 0, { timer_started_at: null })) }, { settle: 1500 }),
       sc('41-blitz-turn', 'блиц: ход команды, вопрос на экране', async api => { await bz(api, st => st) }),
       sc('42-blitz-verdict', 'блиц: вердикт «неверно» (окно проверки)', async api => { await bz(api, st => ({ ...st, current: { ...st.current, pausedAt: now() - 1000, verdict: 'no', lastAnswer: 'шесть' } })) }),
-      sc('43-race-betting', 'скачки: ставки команд', async api => { await api.teams(6); await api.session(Q(12, 0, { timer_started_at: null, melody: { race: { stage: 'betting', round: 12, game: GAME } } })) }, { settle: 3000 }),
-      sc('44-race-running', 'скачки: забег идёт', async api => { await api.teams(6); await api.session(Q(12, 0, { timer_started_at: null, melody: { race: { stage: 'running', seed: 7, D: 42, startedAt: iso(now() - 15000), round: 12, game: GAME } } })) }, { settle: 3500 }),
+      sc('43-race-betting', 'скачки: ставки команд', async api => { await api.teams(6); await api.session(Q(12, 0, { timer_started_at: null, melody: { race: { stage: 'betting', round: 12, game: GAME } } })) }, { settle: 3000, noPause: true }),
+      sc('44-race-running', 'скачки: забег идёт', async api => { await api.teams(6); await api.session(Q(12, 0, { timer_started_at: null, melody: { race: { stage: 'running', seed: 7, D: 42, startedAt: iso(now() - 15000), round: 12, game: GAME } } })) }, { settle: 2500, noPause: true }),
       sc('45-fp-1', '«3 попытки»: фаза 1 (2 картинки)', rv(1, 6000, 30)), sc('46-fp-2', '«3 попытки»: фаза 2 (3 картинки)', rv(2, 4000, 20)),
       sc('47-fp-3', '«3 попытки»: фаза 3 (4 картинки)', rv(3, 3000, 10)), sc('48-fp-review', '«3 попытки»: разбор', rv('review', 0, 0)),
       sc('49-anagram', 'Скрэмбл: доска плиток', async api => { await api.teams(6); await api.session(Q(14, 0, { timer_started_at: iso(now() - 12000) })) }),

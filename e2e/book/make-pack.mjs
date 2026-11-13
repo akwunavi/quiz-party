@@ -12,6 +12,8 @@
 
 export const PACK_ONLINE = 'stand-book'
 export const PACK_PAPER = 'stand-book-paper'
+/** Пакет со ВСЕМИ механиками в зачёте (раунды 9–14 нумеруются как обычные; в основном пакете они вне табло — иначе таблица на 15 колонок). */
+export const PACK_ALL = 'stand-book-all'
 
 const T0 = '2026-11-12T00:00:00.000Z'
 const m = f => `book/${f}`
@@ -49,7 +51,7 @@ function round(packId, pos, mechanic, title, rules, questions, settings = {}, ex
   const id = `${packId}-r${pos}`
   return {
     id, pack_id: packId, position: pos, mechanic, title_lines: Array.isArray(title) ? title : [title], rules,
-    rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: pos >= 8,
+    rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: pos >= 8 && !packId.endsWith('-all'),
     answers_reveal: extra.reveal ?? 'after_round', meta_line_override: null, status: 'ready',
     questions: questions(id),
   }
@@ -75,8 +77,8 @@ function melodyThemes(names, perTheme, ext) {
 }
 
 /** Собрать пакет. `paper` — бумажный режим (play_mode: 'paper'). `audioExt` — mp3|wav (что сгенерировал gen.py). */
-export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book' } = {}) {
-  const id = paper ? PACK_PAPER : PACK_ONLINE
+export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', all = false } = {}) {
+  const id = all ? PACK_ALL : paper ? PACK_PAPER : PACK_ONLINE
   const rounds = [
     // R1 — все раскладки обычного вопроса
     round(id, 0, 'standard', 'Разминка у новогоднего камина', [
@@ -196,7 +198,7 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book' }
       q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
   ]
   return {
-    id, name: paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,
+    id, name: all ? 'Стенд «Книга» · все механики' : paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,
     created_by: null, created_at: T0, updated_at: T0, last_game_id: null,
     settings: { play_mode: paper ? 'paper' : 'phones', timer_seconds: 60, max_edits: 2,
       info_slides: [{ id: 'sl-1', title: 'Добро пожаловать!', body: 'Играем командами: один телефон — одна команда\nОтвечайте честно и не подглядывайте\nПобеждает самая быстрая и знающая', images: [], show_rounds: true, show_stats: true, layout: 'full' }] },

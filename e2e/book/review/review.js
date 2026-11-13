@@ -8,7 +8,9 @@ const TEAM_COUNTS = [0, 4, 8, 10, 16, 24]
 const $ = s => document.querySelector(s)
 const el = (t, p = {}, ...k) => { const e = Object.assign(document.createElement(t), p); k.flat().forEach(c => e.append(c)); return e }
 const q = new URLSearchParams(location.search)
-const S = { scenes: [], id: q.get('scene'), res: RES[q.get('res')] ? q.get('res') : '1920', teams: q.get('teams'), fin: q.get('fin') || '1', team: q.get('team') || '1', ba: q.get('ba') || 'a', split: q.get('split') === '1' }
+const VARS = { font: { A: '08d-q-text-choices', B: '60-var-fontB' }, qn: { A: '07-q-3img', B: '61-var-qnB' }, rules: { 1: '63-rules-1', 2: '62-var-rules2' } }   // варианты на ОДНОМ и том же состоянии
+const varKindOf = id => Object.keys(VARS).find(k => Object.values(VARS[k]).includes(id)) || null
+const S = { font: 'A', qn: 'A', rules: '1', scenes: [], id: q.get('scene'), res: RES[q.get('res')] ? q.get('res') : '1920', teams: q.get('teams'), fin: q.get('fin') || '1', team: q.get('team') || '1', ba: q.get('ba') || 'a', split: q.get('split') === '1' }
 
 // варианты: fin — финал (?bkfin), team — плитки команд (?bkteam)
 const baseId = id => id.replace(/-v[23]$/, '').replace(/^17-team-t[123]-/, '17-team-t1-')
@@ -16,23 +18,28 @@ const baseId = id => id.replace(/-v[23]$/, '').replace(/^17-team-t[123]-/, '17-t
 const KINDS = {
   fin: { key: 'fin', vs: ['1', '2', '3'], lab: ['V1', 'V2', 'V3'], title: 'Финал' },
   team: { key: 'team', vs: ['1', '2', '3'], lab: ['T1', 'T2', 'T3'], title: 'Плитки команд' },
+  font: { key: 'font', vs: ['A', 'B'], lab: ['Типографика A', 'Типографика B'], title: 'Типографика' },
+  qn: { key: 'qn', vs: ['A', 'B'], lab: ['Плашка A (ярлык)', 'Плашка B (закладка)'], title: 'Плашка номера' },
+  rules: { key: 'rules', vs: ['1', '2'], lab: ['Правила 1', 'Правила 2'], title: 'Правила' },
   ba: { key: 'ba', vs: ['b', 'c', 'a'], lab: ['До (исходный)', 'Этапы A–C', 'После'], title: 'Адаптивность' },
 }
 function kindOf(id) {
+  if (ST && varKindOf(id)) return varKindOf(id)
   if (ST && /^2[01]-/.test(id)) return 'ba'
   if (/^15-finale-/.test(id)) return 'fin'
   if (/^17-team-/.test(id) || (!ST && /^01-lobby-/.test(id))) return 'team'
   return null
 }
 function staticVariantId(id, kind, v) {
+  if (VARS[kind]) return VARS[kind][v]
   if (kind === 'ba') return `${v}:${id}`
   if (kind === 'fin') { const b = id.replace(/-v[23]$/, ''); return v === '1' ? b : `${b}-v${v}` }
   if (kind === 'team' && /^17-team-/.test(id)) return id.replace(/^17-team-t[123]-/, `17-team-t${v}-`)
   return id
 }
-const isNav = s => !/-v[23]$/.test(s.id) && !/^17-team-t[23]-/.test(s.id)
+const isNav = s => !/-v[23]$/.test(s.id) && !/^17-team-t[23]-/.test(s.id) && !/^(60|61|62)-var/.test(s.id)
 const cur = () => S.scenes.find(s => s.id === S.id)
-const GROUPS = ['Лобби', 'Правила', 'Вопросы', 'Ожидание', 'Раскрытие', 'Мелодия', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', '4 вертикальных', '4 горизонтальных', '4 квадратных', '4 смешанных', 'Текст через сгиб', 'Прочее']
+const GROUPS = ['Лобби', 'Вступление, инфо, перерыв, табло', 'Правила раунда и варианты оформления', 'Вопросы', 'Ожидание', 'Раскрытие', '«120 секунд»', 'Своя игра', 'Блиц', 'Скачки бульдогов', '«3 попытки»', 'Скрэмбл', 'Расстановка и кроссворд', 'Мелодия', 'Мелодия: стадии (ставки → ответ)', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', '4 вертикальных', '4 горизонтальных', '4 квадратных', '4 смешанных', 'Текст через сгиб', 'Прочее']
 const gi = g => { const i = GROUPS.indexOf(g); return i < 0 ? GROUPS.length : i }
 const navList = () => S.scenes.filter(isNav).map((s, i) => [s, i]).sort((a, b) => gi(a[0].group) - gi(b[0].group) || a[1] - b[1]).map(x => x[0])
 
@@ -132,7 +139,7 @@ function onKey(e) {
   if (e.key === 'ArrowRight' && i < l.length - 1) go(l[i + 1].id)
   else if (e.key === 'ArrowLeft' && i > 0) go(l[i - 1].id)
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') fullscreen()
-  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind && kind !== 'ba') { S[KINDS[kind].key] = e.key; S.split = false; render() } else if (kind === 'ba') { S.ba = e.key === '1' ? 'b' : e.key === '2' ? 'c' : 'a'; S.split = false; render() } }
+  else if (/^[123]$/.test(e.key)) { const kind = kindOf(S.id); if (kind && kind !== 'ba') { const K = KINDS[kind]; S[K.key] = K.vs[Number(e.key) - 1] ?? S[K.key]; S.split = false; render() } else if (kind === 'ba') { S.ba = e.key === '1' ? 'b' : e.key === '2' ? 'c' : 'a'; S.split = false; render() } }
   else if (e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') { if (kindOf(S.id)) { S.split = !S.split; render() } }
 }
 document.addEventListener('keydown', onKey)

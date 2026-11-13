@@ -73,7 +73,7 @@ async function main() {
       await page.waitForFunction(() => [...document.images].every(i => i.complete), null, { timeout: 8000 }).catch(() => { why = 'картинки не догрузились за 8 с' })
       await page.waitForTimeout(scene.settle ?? 2000)
       const t = await page.evaluate(() => Date.now())
-      await page.clock.pauseAt(t + 20)
+      if (!scene.noPause) await page.clock.pauseAt(t + 20)   // noPause — тяжёлые сцены (скачки): pauseAt падает «Cannot fast-forward», кадр снимается живым
       // JS-таймеры сцены (каскад строк финала, StagedChoices, «checked» разбора) — промотать, а не ждать
       if (scene.runFor) { await page.clock.runFor(scene.runFor); await page.waitForTimeout(600) }
       // конечный кадр входных CSS-анимаций (слова вопроса по 0.12 с, каскады правил/строк):

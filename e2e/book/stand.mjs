@@ -35,7 +35,7 @@ import path from 'node:path'
 import http from 'node:http'
 import { fileURLToPath } from 'node:url'
 import { createServer } from '../../local-server/server.mjs'
-import { buildPack, PACK_ONLINE, PACK_PAPER } from './make-pack.mjs'
+import { buildPack, PACK_ONLINE, PACK_PAPER, PACK_ALL } from './make-pack.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(HERE, '..', '..')
@@ -159,11 +159,11 @@ export async function startStand({ noBuild = false, extra = null } = {}) {
     return r
   }
   await call('/api/arm', { method: 'POST' })
-  for (const paper of [false, true]) {
-    const pack = buildPack({ paper, audioExt: manifest.audioExt, theme: THEME })
+  for (const v of ['online', 'paper', 'all']) {
+    const pack = buildPack({ paper: v === 'paper', all: v === 'all', audioExt: manifest.audioExt, theme: THEME })
     await call(`/api/pack/${pack.id}`, { method: 'POST', body: JSON.stringify(pack) })
   }
-  console.log(`[stand] ${ORIGIN}/quiz-party/#/?room=stand  · PIN ${PIN} · пакеты ${PACK_ONLINE}, ${PACK_PAPER} · данные ${DATA_DIR}`)
+  console.log(`[stand] ${ORIGIN}/quiz-party/#/?room=stand  · PIN ${PIN} · пакеты ${PACK_ONLINE}, ${PACK_PAPER}, ${PACK_ALL} · данные ${DATA_DIR}`)
   return { server, store, manifest, close: () => new Promise(r => server.close(r)) }
 }
 
