@@ -1357,7 +1357,7 @@ function BlitzScreen({ pack, round, gameState }: {
     return (
       <div className="host-screen grid-bg bz-screen">
         <div className="host-topbar"><span className="mono-tag">БЛИЦ</span></div>
-        <BlitzDice teams={teams} rolling />
+        <BlitzDice teams={teams} rolling book={pack.theme === 'ny_book'} />
       </div>
     )
   }
@@ -1415,7 +1415,7 @@ function BlitzScreen({ pack, round, gameState }: {
         answerText={cur?.verdict === 'ok'
           || (cur?.verdict === 'no' && cur.attempts + 1 >= MAX_ATTEMPTS)
           ? displayAnswer(q as Question) : undefined}
-        dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} /> : undefined}
+        dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} book={pack.theme === 'ny_book'} /> : undefined}
       />
       {/* ── 5. Управление с проектора ──
           Те же действия, что в админке: ведущему не надо держать телефон,

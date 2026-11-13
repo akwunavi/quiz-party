@@ -15,6 +15,7 @@ import { usePlaybackActive } from '../../lib/playbackActive'
 import { BookMelodyCovers } from '../../ny/book/BookMelody'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
+import { BookTimer } from '../../ny/book/BookTimer'
 import { ScrollModal } from '../../ny/book/ScrollModal'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { TileCard } from '../../components/TileCard'
@@ -582,7 +583,9 @@ function ClassicMelodyBoard(props: BoardProps) {
                   тут таймер совсем, не пытаться сделать его точным. */}
               {!!deadline && m.stage !== 'listen' && (
                 // те же часы, что у большого таймера: --r = доля остатка
-                <div className="mel-count">
+                pack.theme === 'ny_book'
+                  ? <div className="mel-count bk-mel-timer"><BookTimer t={{ seconds: total, left, frac: total ? Math.max(0, Math.min(1, left / total)) : 0, low: left <= 5, zero: left <= 0, running: true }} /></div>
+                  : <div className="mel-count">
                   {pack.theme === 'potter'
                     ? <MagicCircleTimer left={left} seconds={total} low={left <= 5} />
                     : left}

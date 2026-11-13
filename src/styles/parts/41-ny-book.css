@@ -1183,3 +1183,15 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* пояснение занимает ровно столько, сколько нужно — остальное отдано картинкам ответа */
 .theme-ny_book .answers-main.revealed .answer-block.bk-shortnote > .bk-note-box { flex: 0 0 auto; min-height: 0; }
 .theme-ny_book .answers-main.revealed .answer-block.bk-shortnote > .answer-media { flex: 1 1 0; min-height: calc(180 * var(--u)); }
+/* повтор вопросов (recap): у текста нет подгонки useFitText, а общее правило .host-screen :is(.q-text…) бьёт ступени — замер: кегль 58 px при len-xl, текст 890 px в рамке 410 px и уходил под гирлянду. Ступени по длине — с !important, потому что подгонки здесь нет */
+.theme-ny_book .recap-screen .recap-body .q-text { font-size: calc(54 * var(--u)) !important; }
+.theme-ny_book .recap-screen .recap-body .q-text.len-l { font-size: calc(42 * var(--u)) !important; }
+.theme-ny_book .recap-screen .recap-body .q-text.len-xl { font-size: calc(40 * var(--u)) !important; }
+.theme-ny_book .recap-screen .recap-body { overflow: hidden; }
+/* блиц: кубик «кто начинает» — утверждённая карточка команды вместо текстовой плашки */
+.theme-ny_book .bz-dice-card { width: calc(620 * var(--u)); max-width: 80%; }
+.theme-ny_book .bz-dice-card.rolling { animation: bk-dice .22s steps(2) infinite; }
+@media (prefers-reduced-motion: reduce) { .theme-ny_book .bz-dice-card.rolling { animation: none !important; } }
+/* таймер в свитке (мелодия/«Своя игра»): то же кольцо и цифры, что на экранах вопросов */
+.theme-ny_book.mel-overlay .bk-mel-timer { --bk-timer-d: calc(96 * var(--u)); width: var(--bk-timer-d); height: var(--bk-timer-d); flex: none; }
+.theme-ny_book.mel-overlay .bk-mel-timer .bk-tm { --bk-timer-d: calc(96 * var(--u)); }

@@ -2,6 +2,7 @@
 // Вынесено из HostScreen.tsx (9.51, объединение предпросмотра с боевым
 // экраном) — импорт оттуда тянул бы весь проектор в чужой чанк, а
 // предпросмотру в редакторе нужен ровно этот компонент, не копия.
+import { BookTimer } from '../../ny/book/BookTimer'
 import { ScrollModal } from '../../ny/book/ScrollModal'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { TileCard } from '../../components/TileCard'
@@ -339,6 +340,7 @@ function useTileModal({ round, gameState, tile, tileIndex, replayNonce, origin, 
 function TileModal(props: TileProps) {
   const { theme, tile, onClose, packTheme, showAnswer, onShowAnswer, onReplay } = props
   const { modalRef, growVars, remaining, playing, teams, audioErr, localGrades, rows, grade } = useTileModal(props)
+  const totalRef = useRef(0); if (remaining > totalRef.current) totalRef.current = remaining
   return (
     <ScrollModal theme={packTheme} kind="jp" load={rows.length > 5 ? 'l' : 'm'} modalRef={modalRef} className={`hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
         <div className="jp-modal-head">
@@ -346,7 +348,9 @@ function TileModal(props: TileProps) {
             <div className="jp-modal-theme">{theme.name}</div>
             <div className="mono-tag">ПЛИТКА · {tile.value}</div>
           </div>
-          <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>
+          {packTheme === 'ny_book'
+            ? <div className="jp-count bk-mel-timer"><BookTimer t={{ seconds: Math.max(remaining, totalRef.current), left: remaining, frac: totalRef.current ? Math.max(0, Math.min(1, remaining / totalRef.current)) : 0, low: remaining <= 5, zero: remaining <= 0, running: playing }} /></div>
+            : <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>}
         </div>
 
         {showAnswer && (

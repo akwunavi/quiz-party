@@ -155,8 +155,8 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
 
 /** Кубик с названиями команд: крутится и останавливается на первой.
  *  Показывается один раз в начале раунда — дальше ходы идут по кругу. */
-export function BlitzDice({ teams, pickedId, rolling }: {
-  teams: Team[]; pickedId?: string; rolling: boolean
+export function BlitzDice({ teams, pickedId, rolling, book }: {
+  teams: Team[]; pickedId?: string; rolling: boolean; book?: boolean
 }) {
   const [face, setFace] = useState(0)
   useEffect(() => {
@@ -170,10 +170,12 @@ export function BlitzDice({ teams, pickedId, rolling }: {
     : teams.find(t => t.id === pickedId) ?? teams[0]
   return (
     <div className="bz-dice-wrap">
-      <div className={`bz-dice${rolling ? ' rolling' : ' done'}`}
-        style={{ ['--tc' as string]: shown?.color }}>
-        {shown?.name ?? '—'}
-      </div>
+      {book
+        ? <div className={`bz-dice-card${rolling ? ' rolling' : ' done'}`}><BookTeamCard name={shown?.name ?? '—'} ch={150} color={shown?.color} /></div>
+        : <div className={`bz-dice${rolling ? ' rolling' : ' done'}`}
+            style={{ ['--tc' as string]: shown?.color }}>
+            {shown?.name ?? '—'}
+          </div>}
       <div className="bz-dice-cap">{rolling ? 'кто начинает…' : 'начинает'}</div>
     </div>
   )
