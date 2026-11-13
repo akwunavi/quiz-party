@@ -978,8 +978,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .groups-overlay .groups-modal { margin-left: calc(560 * var(--u)); width: calc(1180 * var(--u)); max-width: calc(1180 * var(--u)); }
 .theme-ny_book .groups-modal .lg-team { border-top: 0 !important; background: linear-gradient(180deg, #fbf1da, #f1e2bd); border-radius: calc(4 * var(--u)); box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--bk-gold), 0 calc(3 * var(--u)) 0 var(--bk-shade); }
 .theme-ny_book .groups-modal .lg-team::before, .theme-ny_book .groups-modal .lg-team::after { display: none !important; }
-.theme-ny_book .groups-overlay { justify-content: flex-end !important; padding-right: calc(250 * var(--u)) !important; }
-.theme-ny_book .groups-overlay .groups-modal { margin: 0 !important; width: calc(880 * var(--u)) !important; max-width: calc(880 * var(--u)) !important; }
 /* финал, 14–16 команд: карточка в строке чуть выше и имя крупнее (на 1280×720 имена были ~9 px) */
 .theme-ny_book .fin-table.rows-14 .bk-tc-em, .theme-ny_book .fin-table.rows-16 .bk-tc-em { --tch: 2.15em; min-width: 14em; }
 .theme-ny_book .fin-table.rows-14 .bk-tc-em .bk-tc-name, .theme-ny_book .fin-table.rows-16 .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .5) !important; }
@@ -989,3 +987,10 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .fin-screen:has(.fin-table.rows-14, .fin-table.rows-16) :is(.fin-sub, .fin-kicker, .mono-tag, h2) { display: none; }
 .theme-ny_book .fin-table.rows-14 .bk-tc-em .bk-tc-name, .theme-ny_book .fin-table.rows-16 .bk-tc-em .bk-tc-name { font-size: 1.12em !important; }
 .theme-ny_book .fin-table.rows-14 .bk-tc-em.is-long .bk-tc-name, .theme-ny_book .fin-table.rows-16 .bk-tc-em.is-long .bk-tc-name { font-size: .9em !important; }
+
+/* РАНДОМАЙЗЕР (ТЗ): затемняется ВЕСЬ экран лобби, включая QR — он остаётся, но приглушён и не акцент; модалка — по центру доступной области */
+.theme-ny_book .groups-overlay { justify-content: center !important; align-items: center !important; background: rgba(24, 12, 6, .62) !important; backdrop-filter: blur(3px); }
+.theme-ny_book .groups-overlay .groups-modal { margin: 0 auto !important; width: min(calc(1240 * var(--u)), 92%) !important; max-width: none !important; }
+.theme-ny_book:has(.groups-overlay) .ny-layer-fx { z-index: 1 !important; }   /* QR уходит ПОД затемнение вместе со всем лобби: остаётся виден, но не акцент */
+.theme-ny_book .groups-overlay { display: grid !important; place-items: center !important; padding: 0 !important; }
+.theme-ny_book .groups-overlay .groups-modal { position: relative !important; left: 0 !important; top: 0 !important; transform: none !important; justify-self: center; }
