@@ -1923,7 +1923,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
           )}
 
           {revealed && (
-            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && revealImgs.length === 1 && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && q.answer.mode !== 'order' && (q.answer_note ?? '').length <= 160 ? ' bk-side' : ''}`}>
+            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}${isBook && revealImgs.length === 1 && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && q.answer.mode !== 'order' && (q.answer_note ?? '').length <= 160 ? ' bk-side' : ''}`}>
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}

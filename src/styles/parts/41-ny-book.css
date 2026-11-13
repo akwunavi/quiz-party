@@ -1180,3 +1180,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* reduced-motion: бесконечный pulse счётчика плитки «Своей игры» (08-projector.css) не гасился (найдено reduced-check.cjs на реальной эмуляции) */
 @media (prefers-reduced-motion: reduce) { .theme-ny_book .jp-count.on, .theme-ny_book.mel-overlay .jp-count.on { animation: none !important; } }
 @media (prefers-reduced-motion: reduce) { .theme-ny_book .answer-pulse, .theme-ny_book .host-screen .answer-pulse { animation: none !important; } }
+/* пояснение занимает ровно столько, сколько нужно — остальное отдано картинкам ответа */
+.theme-ny_book .answers-main.revealed .answer-block.bk-shortnote > .bk-note-box { flex: 0 0 auto; min-height: 0; }
+.theme-ny_book .answers-main.revealed .answer-block.bk-shortnote > .answer-media { flex: 1 1 0; min-height: calc(180 * var(--u)); }
