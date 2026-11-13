@@ -12,13 +12,13 @@ import { getRoomId } from '../../lib/room'
 import { createAudio, preloadAudio, preloadAudioAll } from '../../lib/audioSource'
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { usePlaybackActive } from '../../lib/playbackActive'
-import { Vinyl } from '../../ny/book/Vinyl'
+import { BookMelodyCovers } from '../../ny/book/BookMelody'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { createPortal } from 'react-dom'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { TileCard } from '../../components/TileCard'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { room } from '../../lib/transport'
 import { mediaUrl } from '../../lib/media'
 // Переходы стадий — общие с пультом ведущего в админке (8.86). Раньше жили
@@ -127,7 +127,8 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
   const [now, setNow] = useState(serverNow())
   useEffect(() => { const t = setInterval(() => setNow(serverNow()), 200); return () => clearInterval(t) }, [])
-  // «Книга» (прототип этапа 2): пластинка крутится только пока трек РЕАЛЬНО играет (события SharedPlayback)
+  // (проигрыватель/пластинка из модалки убраны по ТЗ 13.11; usePlaybackActive остаётся — на него подписаны play-эффекты)
+  // прежнее назначение: пластинка крутилась только пока трек РЕАЛЬНО играет (события SharedPlayback)
   const vinyl = usePlaybackActive()
 
   // Дедлайн записал ДРУГОЙ экран (пульт) по своим часам — сверяем с нашими (ADM-03, 10.27).
@@ -516,7 +517,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     if (!ans) return
     await gradeMelody(gameState, ans, correct, bidSec)
   }
-  return { vinylSpin: vinyl.active, s, themes, m, teams, answers, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
+  return { s, themes, m, teams, answers, played, deadline, left, total, ti, i, track, bids, loadState, manualPick, setManualPick,
     freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade }
 }
 
@@ -530,7 +531,7 @@ const EmptyMelody = () => (
 function ClassicMelodyBoard(props: BoardProps) {
   const { pack, gameState, preview } = props
   const { s, themes, m, teams, played, deadline, left, total, ti, i, track, bids, manualPick, setManualPick,
-    freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade, vinylSpin } = useMelodyBoard(props)
+    freeKeys, idle, click, pickManually, startSpin, currentId, currentTeam, bidSec, ans, grade } = useMelodyBoard(props)
   if (themes.length === 0) return <EmptyMelody />
 
   return (
@@ -591,7 +592,6 @@ function ClassicMelodyBoard(props: BoardProps) {
             </div>
 
             {/* «Книга» (прототип этапа 2): проигрыватель — пластинка крутится только пока трек реально играет */}
-            {pack.theme === 'ny_book' && <Vinyl spinning={vinylSpin} label={themes[ti]?.name} track={i + 1} />}
 
             {m.stage === 'listen' && <div className="mel-big">СЛУШАЕМ 1 СЕКУНДУ…</div>}
 
@@ -826,15 +826,13 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
       {theme === 'potter' && spinning && (
         <span ref={markerRef} className={`mg-wisp mel-marker${nearEnd ? ' flare' : ''}`} aria-hidden />
       )}
-      {/* «Книга» (прототип этапа 2): каждая тема — музыкальная книжка-подложка под своей колонкой (число тем и треков — из данных) */}
-      {theme === 'ny_book' && themes.map((_, ti) => (
-        <div key={`b${ti}`} className="bk-melbook" aria-hidden="true"
-          style={{ gridColumn: ti + 1, gridRow: `1 / span ${Math.max(...themes.map(t => t.tracks.length), 1) + 1}`, '--c': ti } as CSSProperties} />
+      {/* «Книга»: три объёмные обложки (утверждённый ассет) — вместо цветных колонок; плитки и названия внутри (BookMelodyCovers) */}
+      {theme === 'ny_book' && <BookMelodyCovers themes={themes} played={played} highlighted={highlighted ?? null} onPick={onPick}
+        setRef={(key, el) => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }} />}
+      {theme !== 'ny_book' && themes.map((t, ti) => (
+        <div key={`h${ti}`} className="mel-theme" style={undefined}>{t.name || `Тема ${ti + 1}`}</div>
       ))}
-      {themes.map((t, ti) => (
-        <div key={`h${ti}`} className="mel-theme" style={theme === 'ny_book' ? { gridColumn: ti + 1, gridRow: 1 } : undefined}>{t.name || `Тема ${ti + 1}`}</div>
-      ))}
-      {themes.map((t, ti) => t.tracks.map((_, i) => {
+      {theme !== 'ny_book' && themes.map((t, ti) => t.tracks.map((_, i) => {
         const key = `${ti}-${i}`
         const done = played.includes(key)
         const hot = highlighted === key
