@@ -1020,3 +1020,20 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 
 .theme-ny_book .mel-screen { padding-top: calc(var(--bk-oy) + 118 * var(--u)) !important; padding-bottom: calc(var(--bk-oy) + 110 * var(--u)) !important; }
 .theme-ny_book .mel-screen .mel-board:has(.bk-covs), .theme-ny_book .jp-screen .jp-board:has(.bk-covs) { margin-inline: calc(-120 * var(--u)); width: auto; }
+
+/* ═══ «120 СЕКУНД»: 8 вопросов в карточках на ОБЕИХ страницах разворота (4 + 4, равные высоты), нумерация — часть карточки, таймер в собственной безопасной зоне (верх-право, как на всех экранах) ═══ */
+.theme-ny_book .sprint-screen { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: calc(120 * var(--u)) !important; align-items: stretch !important;
+  padding: calc(var(--bk-oy) + 215 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 140 * var(--u)) !important; }
+.theme-ny_book .sprint-screen .sprint-col { display: grid !important; grid-auto-rows: 1fr; gap: calc(14 * var(--u)) !important; min-height: 0; }
+.theme-ny_book .sprint-screen > .sprint-center { position: absolute !important; top: calc(var(--bk-oy) + 56 * var(--u)); right: calc(var(--bk-ox) + 184 * var(--u)); left: auto; min-width: 0 !important; width: calc(150 * var(--u)); height: calc(150 * var(--u)); transform: none !important; }
+.theme-ny_book .sprint-screen .sprint-timer { transform: none !important; }
+.theme-ny_book .sprint-screen .sprint-card { grid-template-columns: calc(64 * var(--u)) minmax(0, 1fr) !important; padding: calc(10 * var(--u)) calc(22 * var(--u)) calc(10 * var(--u)) calc(14 * var(--u)) !important; height: 100%; align-items: center;
+  background: linear-gradient(180deg, #fbf1da, #ecdcb8) !important; box-shadow: inset 0 0 0 calc(2.5 * var(--u)) var(--bk-gold), inset 0 0 0 calc(7 * var(--u)) #f6e8c8, 0 calc(4 * var(--u)) 0 var(--bk-shade) !important; }
+.theme-ny_book .sprint-screen .sprint-num { width: calc(52 * var(--u)); height: calc(52 * var(--u)); font-size: calc(30 * var(--u)); }
+.theme-ny_book .sprint-screen .sprint-text { font-size: calc(33 * var(--u)) !important; line-height: 1.15; text-align: left; text-wrap: balance; }
+.theme-ny_book .sprint-screen .sprint-pre { position: absolute; left: 50%; top: calc(var(--bk-oy) + 70 * var(--u)); transform: translateX(-50%); }
+.theme-ny_book .sprint-screen { padding-left: 0 !important; padding-right: 0 !important; padding-top: calc(215 * var(--u) - 134 * var(--u)) !important; padding-bottom: 0 !important; }
+.theme-ny_book .sprint-screen .sprint-topbar { display: none; }
+.theme-ny_book .sprint-screen > .sprint-center { top: calc(var(--bk-oy) + 56 * var(--u)) !important; right: calc(var(--bk-ox) + 184 * var(--u)) !important; }
+.theme-ny_book .sprint-screen .bk-tm-num { font-size: calc(var(--bk-timer-d) * .3) !important; }
+.theme-ny_book .sprint-screen > .sprint-center { top: calc(-78 * var(--u)) !important; right: calc(-66 * var(--u)) !important; z-index: 6; }
