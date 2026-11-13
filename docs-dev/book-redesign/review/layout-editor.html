@@ -1,0 +1,39 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Редактор компоновки — прототип</title>
+<style>
+body{margin:0;font:15px system-ui;background:#2a1a12;color:#f3e6c8;padding:16px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+button{background:#7a1f2b;color:#fff;border:1px solid #c9a24a;border-radius:6px;padding:8px 12px;cursor:pointer}
+button.on{background:#c9a24a;color:#2a1a12}
+#stage{position:relative;width:min(960px,100%);aspect-ratio:16/9;background:#f4e9cf;border:6px solid #6b1522;border-radius:8px;overflow:hidden;color:#2a1a12}
+#work{position:absolute;left:13%;right:13%;top:19%;bottom:5%;outline:1px dashed #b8923a}
+#timer{position:absolute;right:13%;top:5%;width:7.8%;aspect-ratio:1;border-radius:50%;border:3px solid #b8923a;display:grid;place-items:center;background:#fff8}
+.box{position:absolute;border:2px solid #7a1f2b;background:#fff9;box-sizing:border-box;display:grid;place-items:center;font-weight:700;touch-action:none}
+.box.img{background:#c9a24a55}
+.h{position:absolute;right:0;bottom:0;width:16px;height:16px;background:#7a1f2b;cursor:nwse-resize}
+pre{background:#0004;padding:8px;border-radius:6px;overflow:auto}
+</style>
+<h3>Прототип редактора компоновки (не в боевой админке)</h3>
+<div class="bar"><button id="sq" class="on">Экран вопроса</button><button id="sa">Экран ответа</button>
+<button id="mauto" class="on">Авто</button><button id="mman">Вручную</button><button id="rst">Сбросить</button></div>
+<div id="stage"><div id="timer">30</div><div id="work"><div class="box" id="t">Текст</div><div class="box img" id="i">Картинка</div></div></div>
+<p>Значения хранятся в долях рабочей области (0..1), не в пикселях.</p><pre id="out"></pre>
+<script>
+const AUTO={question:{t:[0,0,.5,1],i:[.52,0,.48,1]},answer:{t:[0,0,1,.3],i:[.2,.32,.6,.68]}};
+let key='ld-proto',scr='question',st={};try{st=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+const $=s=>document.querySelector(s);
+function cur(){const o=st[scr];return o&&o.mode==='manual'?o:{mode:'auto',t:AUTO[scr].t,i:AUTO[scr].i}}
+function save(){try{localStorage.setItem(key,JSON.stringify(st))}catch(e){}}
+function draw(){const c=cur();for(const [id,r] of [['t',c.t],['i',c.i]]){const e=$('#'+id);e.style.left=r[0]*100+'%';e.style.top=r[1]*100+'%';e.style.width=r[2]*100+'%';e.style.height=r[3]*100+'%';e.style.pointerEvents=c.mode==='manual'?'auto':'none';let h=e.querySelector('.h');if(c.mode==='manual'&&!h){h=document.createElement('i');h.className='h';e.append(h)}if(c.mode!=='manual'&&h)h.remove()}
+$('#sq').classList.toggle('on',scr==='question');$('#sa').classList.toggle('on',scr==='answer');$('#mauto').classList.toggle('on',c.mode==='auto');$('#mman').classList.toggle('on',c.mode==='manual');
+$('#out').textContent=JSON.stringify({screen:scr,layout:st[scr]||null},null,1)}
+$('#sq').onclick=()=>{scr='question';draw()};$('#sa').onclick=()=>{scr='answer';draw()};
+$('#mauto').onclick=()=>{delete st[scr];save();draw()};
+$('#mman').onclick=()=>{const c=cur();st[scr]={mode:'manual',t:[...c.t],i:[...c.i]};save();draw()};
+$('#rst').onclick=$('#mauto').onclick;
+const cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+document.querySelectorAll('.box').forEach(e=>e.addEventListener('pointerdown',ev=>{const o=st[scr];if(!o||o.mode!=='manual')return;const w=$('#work').getBoundingClientRect(),k=e.id,r=o[k],resize=ev.target.classList.contains('h'),sx=ev.clientX,sy=ev.clientY,r0=[...r];e.setPointerCapture(ev.pointerId);
+const mv=m=>{const dx=(m.clientX-sx)/w.width,dy=(m.clientY-sy)/w.height;if(resize){r[2]=cl(r0[2]+dx,.1,1-r0[0]);r[3]=cl(r0[3]+dy,.1,1-r0[1])}else{r[0]=cl(r0[0]+dx,0,1-r[2]);r[1]=cl(r0[1]+dy,0,1-r[3])}draw()};
+const up=()=>{e.removeEventListener('pointermove',mv);e.removeEventListener('pointerup',up);save()};e.addEventListener('pointermove',mv);e.addEventListener('pointerup',up)}));
+draw();
+</script>
