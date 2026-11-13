@@ -24,6 +24,7 @@ export function BookMelodyCovers({ themes, played, highlighted, onPick, setRef }
         return (
           <div key={ti} className="bk-cov" style={{ backgroundImage: `url(${base}ny-book/cover-${COVERS[ti % 3]}.webp)` } as CSSProperties}>
             <div className="bk-cov-title" style={{ left: `${TITLE.x * 100}%`, top: `${TITLE.y * 100}%`, width: `${TITLE.w * 100}%`, height: `${TITLE.h * 100}%` }}><span>{t.name || `Тема ${ti + 1}`}</span></div>
+            {many && <div className="bk-cov-back" style={{ left: `${(PANEL.x[0] - .012) * 100}%`, top: `${(PANEL.y[0] - .012) * 100}%`, width: `${(PANEL.x[1] + PANEL.w - PANEL.x[0] + .024) * 100}%`, height: `${(PANEL.y[1] + PANEL.h - PANEL.y[0] + .024) * 100}%` }} />}
             {t.tracks.map((_, i) => {
               const key = `${ti}-${i}`, done = played.includes(key), hot = highlighted === key
               const c = i % 2, r = Math.floor(i / 2)
