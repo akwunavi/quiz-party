@@ -1044,9 +1044,9 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bz-block.on .bk-tc { filter: drop-shadow(0 0 calc(18 * var(--u)) rgba(255, 214, 110, .95)); transform: translateY(calc(-3 * var(--u))) scale(1.03); }
 .theme-ny_book .bz-row { gap: calc(22 * var(--u)) !important; }
 .theme-ny_book .bz-block .bz-timer { font-size: calc(50 * var(--u)); }
-.theme-ny_book .bk-tc-dot { width: calc(58 * var(--k)) !important; height: calc(58 * var(--k)) !important; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .95) 0 12%, transparent 13%), radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--dc, #c0392b) 100%, white 22%), var(--dc, #c0392b) 58%, color-mix(in srgb, var(--dc, #c0392b) 100%, black 38%)) !important;
-  box-shadow: 0 calc(3 * var(--k)) calc(5 * var(--k)) rgba(40, 20, 5, .45), 0 0 0 calc(4 * var(--k)) rgba(138, 106, 36, .85) !important; position: relative; }
-.theme-ny_book .bk-tc-dot::before { content: ''; position: absolute; left: 36%; top: calc(-9 * var(--k)); width: 28%; height: calc(9 * var(--k)); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--k)) calc(2 * var(--k)) 0 0; }
+.theme-ny_book .bz-card .bk-tc-dot { width: calc(215 * var(--k)) !important; height: calc(215 * var(--k)) !important; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .95) 0 12%, transparent 13%), radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--dc, #c0392b) 100%, white 22%), var(--dc, #c0392b) 58%, color-mix(in srgb, var(--dc, #c0392b) 100%, black 38%)) !important;
+  box-shadow: 0 calc(8 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .45), 0 0 0 calc(8 * var(--k)) rgba(138, 106, 36, .85) !important; position: relative; }
+.theme-ny_book .bz-card .bk-tc-dot::before { content: ''; position: absolute; left: 36%; top: calc(-22 * var(--k)); width: 28%; height: calc(22 * var(--k)); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--k)) calc(2 * var(--k)) 0 0; }
 .theme-ny_book .bz-block.on { background: none !important; box-shadow: none !important; }
 
 /* ═══ ПРАВИЛА — единый шаблон (COMPOSITION.md): левая страница — раунд и характеристики, правая — правила; заголовок не заходит за сгиб ═══ */
