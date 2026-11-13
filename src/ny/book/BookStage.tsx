@@ -144,22 +144,29 @@ export function BookPages({ decor, children }: { decor: Density; children?: Reac
   )
 }
 
-/** Перелистывание: лист только на СМЕНЕ вопроса (pageTurnKey), не на опросе и не на первом снимке; вкладка спала /
- *  прошло > 6 с с прошлого снимка — без листа (экран сразу в конечном кадре). */
+/** Перелистывание: лист только на СМЕНЕ вопроса (pageTurnKey), не на опросе и не на первом снимке. Без листа (экран сразу в конечном кадре) — если вкладка
+ *  пряталась/засыпала с прошлого снимка или стала видимой меньше 2 с назад. (Раньше «живость» считали по времени последней перерисовки — на тихом экране без
+ *  перерисовок через 6 с лист пропадал; теперь — только по настоящей видимости вкладки.) */
 function usePageTurn(snap: TurnSnap | null): number {
-  const prev = useRef<{ snap: TurnSnap | null; at: number }>({ snap: null, at: 0 })
+  const prev = useRef<{ snap: TurnSnap | null }>({ snap: null })
+  const vis = useRef({ hiddenSinceSnap: false, visibleAt: performance.now() })
   const [seq, setSeq] = useState(0)
   const k = snap ? `${snap.game_id}|${snap.phase}|${snap.round_number}|${snap.question_index}` : ''
   useEffect(() => {
+    const on = () => { if (document.hidden) vis.current.hiddenSinceSnap = true; else vis.current.visibleAt = performance.now() }
+    document.addEventListener('visibilitychange', on)
+    return () => document.removeEventListener('visibilitychange', on)
+  }, [])
+  useEffect(() => {
     if (!snap) return
     const now = performance.now()
-    const p = prev.current
-    const key = !document.hidden && now - p.at < 6000 ? pageTurnKey(p.snap, snap) : null
-    prev.current = { snap, at: now }
+    const v = vis.current
+    const key = !document.hidden && !v.hiddenSinceSnap && now - v.visibleAt > 2000 ? pageTurnKey(prev.current.snap, snap) : null
+    prev.current = { snap }
+    v.hiddenSinceSnap = false
     if (key) setSeq(n => n + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [k])
-  useEffect(() => { prev.current.at = performance.now() })   // опрос раз в 2 с — «живость» вкладки
   return seq
 }
 

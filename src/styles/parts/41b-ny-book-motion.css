@@ -42,3 +42,10 @@
   .theme-ny_book .choice-plate { animation: none !important; }
   .theme-ny_book :is(.jp-modal, .mel-modal) { animation: none !important; }
 }
+
+/* тень на листе в движении (физика: лист темнеет, когда стоит ребром к свету) */
+.bk-turn-leaf > i { overflow: hidden; }
+.bk-turn-leaf > i::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .5)); opacity: 0; animation: bk-turn-shade var(--bk-turn-ms) ease-in-out both; }
+.bk-turn-leaf > i + i::after { background: linear-gradient(270deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .5)); }
+@keyframes bk-turn-shade { 0% { opacity: 0; } 50% { opacity: .6; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bk-turn-leaf > i::after { animation: none !important; } }
