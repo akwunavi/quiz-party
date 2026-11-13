@@ -39,7 +39,7 @@ function staticVariantId(id, kind, v) {
 }
 const isNav = s => !/-v[23]$/.test(s.id) && !/^17-team-t[23]-/.test(s.id) && !/^(60|61|62)-var/.test(s.id)
 const cur = () => S.scenes.find(s => s.id === S.id)
-const GROUPS = ['Карточка команды', 'Лобби', 'Вступление, инфо, перерыв, табло', 'Правила раунда и варианты оформления', 'Вопросы', 'Ожидание', 'Раскрытие', '«120 секунд»', 'Своя игра', 'Блиц', 'Скачки бульдогов', '«3 попытки»', 'Скрэмбл', 'Расстановка и кроссворд', 'Мелодия', 'Мелодия: стадии (ставки → ответ)', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', '4 вертикальных', '4 горизонтальных', '4 квадратных', '4 смешанных', 'Текст через сгиб', 'Прочее']
+const GROUPS = ['Карточка команды', 'Лобби', 'Вступление, инфо, перерыв, табло', 'Правила раунда и варианты оформления', 'Вопросы', 'Ожидание', 'Раскрытие', '«120 секунд»', 'Своя игра', 'Блиц', 'Скачки бульдогов', '«3 попытки»', 'Скрэмбл', 'Расстановка и кроссворд', 'Мелодия', 'Мелодия: стадии (ставки → ответ)', 'Финал', 'Плитки команд', 'Типографика', 'Адаптивность: до/после', '4 вертикальных', '4 горизонтальных', '4 квадратных', '4 смешанных', 'Текст через сгиб', 'Прочее', 'Архив: Устарело / Не согласовано']
 const gi = g => { const i = GROUPS.indexOf(g); return i < 0 ? GROUPS.length : i }
 const navList = () => S.scenes.filter(isNav).map((s, i) => [s, i]).sort((a, b) => gi(a[0].group) - gi(b[0].group) || a[1] - b[1]).map(x => x[0])
 
@@ -63,7 +63,11 @@ function side() {
   nav.append(el('h1', { textContent: ST ? 'Book Design Review · кадры' : 'Book Design Review' }))
   let g = null
   for (const s of navList()) {
-    if (s.group !== g) { g = s.group; nav.append(el('h2', { textContent: g })) }
+    if (s.group !== g) {
+      if (g === null) nav.append(el('h1', { textContent: 'Актуальная версия', style: 'color:#f2d58c;font-size:15px;margin:10px 0 0' }))
+      if (s.group.startsWith('Архив') && !(g || '').startsWith('Архив')) nav.append(el('h1', { textContent: 'Архив (не актуально)', style: 'color:#b36a5a;font-size:15px;margin:18px 0 0;border-top:1px solid #5a4630;padding-top:10px' }))
+      g = s.group; nav.append(el('h2', { textContent: g }))
+    }
     nav.append(el('a', { textContent: s.title, className: s.id === S.id ? 'on' : '', onclick: () => go(s.id) }))
   }
 }

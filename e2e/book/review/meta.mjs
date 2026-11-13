@@ -3,6 +3,7 @@
 import { SCENES } from '../scenes.mjs'
 
 export const group = id => {
+  if (/^17-|^18-/.test(id)) return 'Архив: Устарело / Не согласовано'
   if (/^01/.test(id)) return 'Лобби'
   if (/^0[4-8]/.test(id)) return 'Вопросы'
   if (/^09/.test(id)) return 'Ожидание'
