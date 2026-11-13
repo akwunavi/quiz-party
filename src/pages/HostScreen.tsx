@@ -416,7 +416,7 @@ function HostInner({ gameState, pack }: {
               <Title theme={pack.theme} lines={round.title_lines} />
               <div className="meta-line" style={{ alignSelf: 'flex-start' }}>{metaLine(round)}</div>
               {pack.theme === 'ny_book'
-                ? (round.rules.length > 0 && <RulesFrame rules={round.rules} delay={i => 0.5 + i * 0.6} />)
+                ? (round.rules.length > 0 && <RulesFrame rules={round.rules} minScale={0.3} delay={i => 0.5 + i * 0.6} />)
                 : round.rules.map((r, i) => (
                 <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.5}s` }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
@@ -443,7 +443,7 @@ function HostInner({ gameState, pack }: {
           {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
               а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
-            <RulesFrame rules={round.rules}
+            <RulesFrame rules={round.rules} minScale={pack.theme === 'ny_book' ? 0.3 : 0.5}
               /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход сначала отыгрывает заставку раунда, и только
                  затем — с паузой около секунды — проступают правила. Другие темы не трогаем — их тайминг
                  согласован раньше и отдельно. */

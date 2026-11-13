@@ -5,8 +5,8 @@
 // до читаемого предела, и только затем работает прежнее ограничение по числу строк (`line-clamp`).
 import { useFitText } from '../hooks/useFitText'
 
-export function RulesFrame({ rules, delay }: { rules: string[]; delay: (i: number) => number }) {
-  const body = useFitText<HTMLDivElement>([rules.join('|')], { items: '.rule-item', minScale: 0.5 })
+export function RulesFrame({ rules, delay, minScale = 0.5 }: { rules: string[]; delay: (i: number) => number; minScale?: number }) {
+  const body = useFitText<HTMLDivElement>([rules.join('|')], { items: '.rule-item', minScale })
   return (
     <div className="rules-frame" data-count={rules.length}>
       <div className="rules-frame-label">ПРАВИЛА</div>
