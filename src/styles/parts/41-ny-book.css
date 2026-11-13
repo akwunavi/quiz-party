@@ -910,3 +910,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--bk-gold), inset 0 0 0 calc(7 * var(--u)) rgba(248, 238, 219, .0), inset 0 0 0 calc(8 * var(--u)) rgba(201, 161, 74, .55) !important; }
 :root[data-bk-rules="2"] .theme-ny_book .rules-frame .rule-item .idx { display: grid; place-items: center; width: calc(52 * var(--u)); height: calc(52 * var(--u)); border-radius: 50%; font-size: calc(30 * var(--u)) !important; color: var(--bk-paper) !important; background: radial-gradient(circle at 35% 30%, var(--bk-red-2), var(--bk-red-3)) !important; box-shadow: inset 0 0 0 calc(3 * var(--u)) rgba(242, 213, 140, .55) !important; text-shadow: none; }
 :root[data-bk-rules="2"] .theme-ny_book .rules-frame .rule-item { grid-template-columns: calc(62 * var(--u)) minmax(0, 1fr); }
+.theme-ny_book .bk-cov-title small { display: block; margin-top: .6cqw; font: italic 400 4.2cqw / 1.1 var(--bk-serif); color: var(--bk-muted); }
+.theme-ny_book .jp-screen .jp-board:has(.bk-covs) { display: flex !important; align-items: center; justify-content: center; padding: 0 !important; }
+.theme-ny_book .jp-screen { padding-top: calc(var(--bk-oy) + 150 * var(--u)); }
+.theme-ny_book .bk-cov-tile:has(span) span { max-width: 100%; }
+.theme-ny_book .jp-screen .bk-cov-tile span { font-size: 11cqw; }

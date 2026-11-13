@@ -126,6 +126,7 @@ function useJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   return { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose }
 }
 
+import { BookMelodyCovers } from '../../ny/book/BookMelody'
 function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   const { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose } = useJeopardyBoard({ pack, round, gameState, preview })
   if (themes.length === 0) return (
@@ -148,13 +149,25 @@ function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
         gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
       }}>
         {saveErr && <div className="jp-save-err">⚠ {saveErr}</div>}
-      {themes.map((t, ti) => (
+      {pack.theme !== 'ny_book' && themes.map((t, ti) => (
           <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
             {t.name || `Тема ${ti + 1}`}
             {t.hint && <span className="jp-theme-hint">{t.hint}</span>}
           </div>
         ))}
-        {themes.map((t, ti) => t.tiles.map((tile, i) => {
+        {pack.theme === 'ny_book' && <BookMelodyCovers themes={themes.map(t => ({ name: t.name, tracks: t.tiles }))} played={opened} highlighted={null}
+          labelOf={(ti, i) => themes[ti].tiles[i].value} hintOf={ti => themes[ti].hint}
+          onPick={preview ? undefined : key => {
+            const [ti, i] = key.split('-').map(Number)
+            const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+            openAt(flat, tileElRefs.current.get(flat)?.getBoundingClientRect())
+          }}
+          setRef={(key, el) => {
+            const [ti, i] = key.split('-').map(Number)
+            const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+            if (el) tileElRefs.current.set(flat, el); else tileElRefs.current.delete(flat)
+          }} />}
+        {pack.theme !== 'ny_book' && themes.map((t, ti) => t.tiles.map((tile, i) => {
           const done = opened.includes(`${ti}-${i}`)
           return (
             // data-c — номер темы для раскраски: у плиток мелодии цвет неона

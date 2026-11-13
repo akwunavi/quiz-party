@@ -8,8 +8,11 @@ const COVERS = ['red', 'green', 'blue'] as const
 const TITLE = { x: .2, y: .16, w: .74, h: .2 }
 const PANEL = { x: [.215, .584], w: .336, y: [.4, .637], h: .213 }
 
-export function BookMelodyCovers({ themes, played, highlighted, onPick, setRef }: {
+export function BookMelodyCovers({ themes, played, highlighted, onPick, setRef, labelOf, hintOf }: {
   themes: { name: string; tracks: unknown[] }[]
+  /** подпись плитки (по умолчанию — номер трека; у «Своей игры» — стоимость) */
+  labelOf?: (ti: number, i: number) => string | number
+  hintOf?: (ti: number) => string | undefined
   played: string[]
   highlighted: string | null
   onPick?: (key: string) => void
@@ -23,7 +26,7 @@ export function BookMelodyCovers({ themes, played, highlighted, onPick, setRef }
         const rows = Math.ceil(n / 2)
         return (
           <div key={ti} className="bk-cov" style={{ backgroundImage: `url(${base}ny-book/cover-${COVERS[ti % 3]}.webp)` } as CSSProperties}>
-            <div className="bk-cov-title" style={{ left: `${TITLE.x * 100}%`, top: `${TITLE.y * 100}%`, width: `${TITLE.w * 100}%`, height: `${TITLE.h * 100}%` }}><span>{t.name || `Тема ${ti + 1}`}</span></div>
+            <div className="bk-cov-title" style={{ left: `${TITLE.x * 100}%`, top: `${TITLE.y * 100}%`, width: `${TITLE.w * 100}%`, height: `${TITLE.h * 100}%` }}><span>{t.name || `Тема ${ti + 1}`}{hintOf?.(ti) && <small>{hintOf(ti)}</small>}</span></div>
             {many && <div className="bk-cov-back" style={{ left: `${(PANEL.x[0] - .012) * 100}%`, top: `${(PANEL.y[0] - .012) * 100}%`, width: `${(PANEL.x[1] + PANEL.w - PANEL.x[0] + .024) * 100}%`, height: `${(PANEL.y[1] + PANEL.h - PANEL.y[0] + .024) * 100}%` }} />}
             {t.tracks.map((_, i) => {
               const key = `${ti}-${i}`, done = played.includes(key), hot = highlighted === key
@@ -35,7 +38,7 @@ export function BookMelodyCovers({ themes, played, highlighted, onPick, setRef }
               return (
                 <button key={key} type="button" className={`bk-cov-tile${done ? ' is-used' : ''}${hot ? ' is-hot' : ''}${many ? ' is-many' : ''}`} style={st as CSSProperties}
                   disabled={!onPick || done} ref={el => setRef(key, el)} onClick={onPick ? () => onPick(key) : undefined} aria-label={`${t.name} · трек ${i + 1}`}>
-                  <span>{i + 1}</span>
+                  <span>{labelOf ? labelOf(ti, i) : i + 1}</span>
                 </button>
               )
             })}
