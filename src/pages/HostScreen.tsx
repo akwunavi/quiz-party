@@ -44,6 +44,7 @@ import { NyLobby } from '../ny/NyLobby'
 import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
 import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
 import { BookTeamCard } from '../ny/book/BookTeamCard'
+import { BookNote } from '../ny/book/BookNote'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -1976,12 +1977,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
               {/* подсказка выходит ВМЕСТЕ с автопроверкой — когда ответ
                   показан целиком, включая сопоставление и порядок */}
-              {checked && q.answer_note &&
-                <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
+              {checked && q.answer_note && (isBook
+                ? <BookNote text={q.answer_note} className={noteClass(q.answer_note).trim()} />
+                : <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>)}
             </div>
           )}
         </div>
-        {!paper && <div className="team-answers">
+        {!paper && <div className="team-answers" data-n={rows.length}>
           {/* Пока ответ не показан — видно только СКОЛЬКО команд ответило.
               Иначе зал читает чужие ответы и интрига пропадает. */}
           <div className="mono-tag">
@@ -2001,9 +2003,12 @@ function ShowAnswers({ pack, round, q, gameState }: {
             return (
               pack.theme === 'ny_book'
               ? <div key={a.id} className="team-answer bk-ta">
-                  <BookTeamCard name={team?.name ?? '—'} ch={56} color={team?.color} state={shown === true ? 'correct' : shown === false ? 'wrong' : 'normal'} />
+                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
                   <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
                     {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
+                  {/* статус — новогодний шар: верно (галочка), неверно (красный крестик), нет ответа/ещё не проверено (нейтральный) */}
+                  <span className={`bk-ball is-${!a.answer_text?.trim() ? 'none' : shown === true ? 'ok' : shown === false ? 'no' : 'wait'}`} aria-hidden="true">
+                    <i>{!a.answer_text?.trim() ? '' : shown === true ? '✓' : shown === false ? '✗' : ''}</i></span>
                 </div>
               : <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,

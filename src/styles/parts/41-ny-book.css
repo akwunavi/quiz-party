@@ -804,3 +804,44 @@
 .theme-ny_book .bk-tc-mark { position: absolute; right: calc(-34 * var(--k)); top: calc(70 * var(--k)); width: calc(150 * var(--k)); height: calc(150 * var(--k)); font-size: calc(104 * var(--k)); box-shadow: 0 0 0 calc(8 * var(--k)) #f6e8c8, 0 calc(6 * var(--k)) calc(10 * var(--k)) rgba(0, 0, 0, .35); z-index: 3; }
 .theme-ny_book .bk-tc-correct { filter: drop-shadow(0 0 calc(34 * var(--k)) rgba(47, 160, 80, 1)) drop-shadow(0 0 calc(10 * var(--k)) rgba(120, 230, 150, .9)); }
 .theme-ny_book .bk-tc-wrong { filter: drop-shadow(0 0 calc(34 * var(--k)) rgba(210, 40, 40, 1)) drop-shadow(0 0 calc(10 * var(--k)) rgba(255, 140, 130, .9)); }
+
+/* ═══ ЭКРАН ПРАВИЛЬНОГО ОТВЕТА (раскрытие, ny_book) — доработка по ТЗ п.6 ═══
+   Левая страница: вопрос (читаемый, прямой шрифт) → праздничная пергаментная подложка ответа с золотом → пояснение на своей подложке.
+   Правая: утверждённая карточка + ПОЛНЫЙ текст ответа + статус-шар. Высота распределяется flex-ом по доступной площади, ничего не вылезает. */
+.theme-ny_book .answers-layout.revealed { grid-template-columns: minmax(0, 1fr) calc(640 * var(--u)) !important; column-gap: calc(70 * var(--u)); align-items: stretch; }
+.theme-ny_book .answers-main.revealed { display: flex; flex-direction: column; gap: calc(14 * var(--u)); min-height: 0; min-width: 0; justify-content: flex-start; }
+.theme-ny_book .answers-main.revealed .q-recall { flex: 0 0 auto; margin: 0; max-width: none; text-align: center; font: 700 calc(34 * var(--u)) / 1.2 var(--bk-serif); font-style: normal; color: var(--bk-ink); opacity: 1; text-wrap: balance; }
+.theme-ny_book .answers-main.revealed .q-recall.len-m { font-size: calc(31 * var(--u)); } .theme-ny_book .answers-main.revealed .q-recall.len-l { font-size: calc(28 * var(--u)); } .theme-ny_book .answers-main.revealed .q-recall.len-xl { font-size: calc(24 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: calc(10 * var(--u)); padding: calc(26 * var(--u)) calc(34 * var(--u)) calc(22 * var(--u)); position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0, #fff4d4, #f3e0b3 70%, #ecd7a3); border: 0; border-radius: calc(12 * var(--u)); color: var(--bk-ink); animation: none;
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold), inset 0 0 0 calc(10 * var(--u)) #f6e8c8, inset 0 0 0 calc(12 * var(--u)) rgba(201, 161, 74, .75), 0 calc(10 * var(--u)) calc(22 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .answers-main.revealed .answer-block::before, .theme-ny_book .answers-main.revealed .answer-block::after { content: '❖'; position: absolute; top: calc(18 * var(--u)); font-size: calc(22 * var(--u)); color: var(--bk-gold-3); opacity: .8; }
+.theme-ny_book .answers-main.revealed .answer-block::before { left: calc(26 * var(--u)); } .theme-ny_book .answers-main.revealed .answer-block::after { right: calc(26 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-label { flex: none; font: 700 calc(22 * var(--u)) var(--bk-serif); letter-spacing: .3em; color: var(--bk-red); }
+.theme-ny_book .answers-main.revealed .answer-main { flex: none; font: 700 calc(54 * var(--u)) / 1.08 var(--bk-display); color: var(--bk-ink-2); text-align: center; text-wrap: balance; text-shadow: 0 calc(2 * var(--u)) 0 rgba(201, 161, 74, .45); }
+.theme-ny_book .answers-main.revealed .answer-media { flex: 1 1 0; min-height: calc(150 * var(--u)); width: 100%; }
+.theme-ny_book .answers-main.revealed .answer-note { flex: 0 1 auto; width: 100%; max-height: 46%; margin: 0; padding: calc(12 * var(--u)) calc(20 * var(--u)); font: italic 400 calc(25 * var(--u)) / 1.3 var(--bk-serif); color: var(--bk-muted); text-align: left;
+  background: rgba(255, 250, 235, .7); border: 0; border-left: calc(4 * var(--u)) solid var(--bk-gold); border-radius: calc(4 * var(--u)); overflow: hidden; }
+.theme-ny_book .answers-main.revealed .answer-note.n-l, .theme-ny_book .answers-main.revealed .answer-note.n-xl { font-size: calc(22 * var(--u)); }
+/* ответы команд: карточка | полный текст | шар статуса */
+.theme-ny_book .team-answers .team-answer.bk-ta { grid-template-columns: calc(280 * var(--u)) minmax(0, 1fr) calc(52 * var(--u)) !important; }
+.theme-ny_book .team-answers[data-n="9"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="10"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="11"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="12"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="13"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="14"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="15"] .team-answer.bk-ta, .theme-ny_book .team-answers[data-n="16"] .team-answer.bk-ta { grid-template-columns: calc(250 * var(--u)) minmax(0, 1fr) calc(40 * var(--u)) !important; }
+.theme-ny_book .team-answers .team-answer.bk-ta > .text { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: calc(26 * var(--u)) !important; line-height: 1.12; }
+.theme-ny_book .team-answers[data-n="9"] .bk-ta > .text, .theme-ny_book .team-answers[data-n="12"] .bk-ta > .text, .theme-ny_book .team-answers[data-n="16"] .bk-ta > .text { font-size: calc(21 * var(--u)) !important; }
+.theme-ny_book .team-answers > .mono-tag { margin-bottom: calc(6 * var(--u)); }
+.theme-ny_book .team-answers { gap: calc(6 * var(--u)); }
+/* шар-индикатор (новогодняя игрушка): верно — зелёный с галочкой, неверно — серебряный с красным крестиком, нет ответа — нейтральный контур */
+.theme-ny_book .bk-ball { position: relative; justify-self: center; width: 100%; max-width: calc(48 * var(--u)); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 calc(3 * var(--u)) calc(5 * var(--u)) rgba(40, 20, 5, .45), inset calc(-3 * var(--u)) calc(-4 * var(--u)) calc(7 * var(--u)) rgba(0, 0, 0, .28); }
+.theme-ny_book .bk-ball::before { content: ''; position: absolute; top: calc(-9 * var(--u)); left: 50%; width: 32%; height: calc(9 * var(--u)); transform: translateX(-50%); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--u)) calc(2 * var(--u)) 0 0; }
+.theme-ny_book .bk-ball::after { content: ''; position: absolute; left: 22%; top: 16%; width: 26%; height: 20%; border-radius: 50%; background: rgba(255, 255, 255, .6); transform: rotate(-30deg); }
+.theme-ny_book .bk-ball i { font: 700 calc(30 * var(--u)) / 1 var(--bk-serif); font-style: normal; position: relative; z-index: 2; text-shadow: 0 calc(1 * var(--u)) 0 rgba(0, 0, 0, .3); }
+.theme-ny_book .bk-ball.is-ok { background: radial-gradient(circle at 35% 30%, #7fe09a, #2f9a55 55%, #1c5f34); } .theme-ny_book .bk-ball.is-ok i { color: #fff; }
+.theme-ny_book .bk-ball.is-no { background: radial-gradient(circle at 35% 30%, #fff, #d4d9de 55%, #8b95a0); } .theme-ny_book .bk-ball.is-no i { color: #c62820; text-shadow: none; }
+.theme-ny_book .bk-ball.is-none, .theme-ny_book .bk-ball.is-wait { background: radial-gradient(circle at 35% 30%, #f4ead2, #d9c79c 60%, #b5a273); opacity: .55; }
+.theme-ny_book .answers-main.revealed .bk-note-box { flex: 1 1 0; min-height: calc(70 * var(--u)); width: 100%; display: flex; align-items: flex-start; padding: calc(8 * var(--u)) calc(16 * var(--u)); background: rgba(255, 250, 235, .72); border-left: calc(4 * var(--u)) solid var(--bk-gold); border-radius: calc(4 * var(--u)); overflow: hidden; }
+.theme-ny_book .answers-main.revealed .bk-note-box .answer-note.bk-note { max-height: none; width: 100%; padding: 0; background: none; border: 0; margin: 0; font-style: italic; line-height: 1.28; overflow: visible; }
+.theme-ny_book .answers-main.revealed .answer-media { flex: 0 1 auto; max-height: 34%; }
+.theme-ny_book .team-answers .team-answer.bk-ta > .text { white-space: normal !important; overflow-wrap: anywhere; min-width: 0; }
+.theme-ny_book .team-answers[data-n="13"], .theme-ny_book .team-answers[data-n="14"], .theme-ny_book .team-answers[data-n="15"], .theme-ny_book .team-answers[data-n="16"] { gap: calc(2 * var(--u)); }
+.theme-ny_book .team-answers[data-n="13"] .bk-ta > .text, .theme-ny_book .team-answers[data-n="14"] .bk-ta > .text, .theme-ny_book .team-answers[data-n="15"] .bk-ta > .text, .theme-ny_book .team-answers[data-n="16"] .bk-ta > .text { font-size: calc(19 * var(--u)) !important; line-height: 1.05; }
+.theme-ny_book .team-answers[data-n="16"] .bk-ball, .theme-ny_book .team-answers[data-n="15"] .bk-ball, .theme-ny_book .team-answers[data-n="14"] .bk-ball, .theme-ny_book .team-answers[data-n="13"] .bk-ball { max-width: calc(34 * var(--u)); }

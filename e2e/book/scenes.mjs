@@ -344,6 +344,13 @@ export const SCENES = [
       { ...sc('62-var-rules2', 'правила, вариант 2 (рамка-свиток), R1', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'round_intro', round_number: 0, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 }), query: 'bkrules=2' },
       sc('63-rules-1', 'правила, вариант 1 (по умолчанию), R1', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'round_intro', round_number: 0, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 }),
       { id: '66-tc-asset', title: 'карточка команды: утверждённый ассет и растяжение', ready: '.fs-ready', settle: 800, path: '/review/tc-asset.html', async setup() {} },
+      sc('64-reveal-16', 'раскрытие: 16 команд, длинные ответы, длинное пояснение', async api => { const ts = await api.teams(16)
+        const LONGA = ['Гирлянды', 'электрические гирлянды и ёлочные шары', 'Лампочки Эдисона на батарейках', 'не знаем', 'Фонарики из бумаги, которые вешали ещё наши бабушки на Новый год', 'свечи', 'Светодиоды', 'гирлянды', 'Электричество', 'нет идей']
+        await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(0, 0), round_number: 0, answer_text: i === 11 ? '' : LONGA[i % LONGA.length], is_correct: i === 11 ? null : i % 3 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 0, question_index: 0, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 }),
+      sc('65-reveal-short', 'раскрытие: короткий вопрос, 3 команды, картинка ответа', async api => { const ts = await api.teams(3)
+        await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(0, 8), round_number: 0, answer_text: ['Норвегия', 'Швеция', 'норвегия'][i], is_correct: [true, false, true][i] })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 0, question_index: 8, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 }),
       sc('57-mel-reveal', 'мелодия: ответ и кто забрал баллы (reveal)', mel('reveal', ts => ({ wonTeam: ts[1].id, wonPts: 2, turn: 1 }))),
     ]
   })(),
