@@ -5,7 +5,7 @@
 // РОВНО тот же компонент, не копия.
 import { useEffect, useRef, useState } from 'react'
 import { MagicCircleTimer } from './MagicCircleTimer'
-import { Rosette } from '../ny/book/BookScene'
+import { BookTimer, TIMER_RATIO } from '../ny/book/BookTimer'
 import { Dial } from '../ny/home/HomeScene'
 import { serverNow } from '../lib/serverClock'
 
@@ -82,7 +82,7 @@ export function Timer({ startedAt, seconds, theme, chime = true, variant }: {
     // «Книга»: таймер — независимый слот фиксированного КВАДРАТА (BookTimerSlot, ADAPTIVE.md): геометрия не зависит от раскладки вопроса,
     // рисунок (сейчас розетка, потом отдельный ассет) вписан в слот на 100 %, число — динамический текст поверх. Логика/длительность не тронуты.
     return theme === 'ny_book'
-      ? <div className="bk-timer-slot" data-bk-slot="timer" data-size={size} data-art="rosette-v0"><Rosette t={t} size={size} /></div>
+      ? <div className="bk-timer-slot" data-bk-slot="timer" data-size={size} data-art="timer-face-v1" data-art-ratio={TIMER_RATIO}><BookTimer t={t} /></div>
       : <Dial t={t} size={size} />
   }
   if (theme === 'new_year') {

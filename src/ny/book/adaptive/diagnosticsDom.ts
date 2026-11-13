@@ -18,7 +18,7 @@ export function collectDiag(root: ParentNode): DiagInput {
     id: `photo#${i}`, rect: rectOf(im), natural: { w: im.naturalWidth, h: im.naturalHeight }, foldOk: !!im.closest('[data-fold]') }))
   const containers = [...root.querySelectorAll<HTMLElement>('[data-bk-container]')].map((el, i) => ({
     id: `${el.dataset.bkContainer}#${i}`, scrollW: el.scrollWidth, clientW: el.clientWidth, scrollH: el.scrollHeight, clientH: el.clientHeight }))
-  const q = root.querySelector('.host-topbar .qnum'), slot = root.querySelector('[data-bk-slot="timer"]'), art = slot?.querySelector('.p-ros')
+  const q = root.querySelector('.host-topbar .qnum'), slot = root.querySelector('[data-bk-slot="timer"]'), art = slot?.querySelector('.bk-tm, .p-ros')
   const captions = [...root.querySelectorAll<HTMLElement>('.bk-cap')].map((el, i) => ({ id: `caption#${i}`, fontPx: parseFloat(getComputedStyle(el.querySelector('.bk-cap-text') ?? el).fontSize), minPx: 18 * u,
     overflow: el.scrollHeight > el.clientHeight + 1 }))
   const mediaBoxes = [...root.querySelectorAll<HTMLElement>('.bk-media')].map((el, i) => ({ id: `media#${i}`, rect: rectOf(el) }))

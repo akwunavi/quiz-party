@@ -950,6 +950,22 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* «Отвечайте»: карточки команд всегда внутри страницы — сетка 4 колонки, заголовок и таймер компактнее (самопроверка: 8 карточек на 1280×720 вылезали) */
 .theme-ny_book .host-screen:has(.answer-time-teams) { padding-top: calc(var(--bk-oy) + 150 * var(--u)); padding-bottom: calc(var(--bk-oy) + 150 * var(--u)); gap: calc(8 * var(--u)); justify-content: flex-start; }
 .theme-ny_book .host-screen:has(.answer-time-teams) :is(h1, .neon-title) { font-size: calc(120 * var(--u)) !important; line-height: 1; margin: 0; }
-.theme-ny_book .host-screen:has(.answer-time-teams) .p-ros.is-big, .theme-ny_book .host-screen:has(.answer-time-teams) .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(150 * var(--u)); --d: calc(150 * var(--u)); }
+.theme-ny_book .host-screen:has(.answer-time-teams) .p-ros.is-big, .theme-ny_book .host-screen:has(.answer-time-teams) .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(230 * var(--u)); --d: calc(230 * var(--u)); }
 .theme-ny_book .answer-time-teams { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(6 * var(--u)) calc(14 * var(--u)); width: calc(1300 * var(--u)); max-width: 100%; margin: 0 auto; }
 .theme-ny_book .answer-time-teams .bk-at { min-width: 0; }
+
+/* ═══ ЕДИНЫЙ ТАЙМЕР «Книги» (BookTimer.tsx): plash timer_face + кольцо timer_ring + дуга + цифры секунд. Слот — прежний квадрат; плашка вписана по высоте, пропорция 315:330 не искажается ═══ */
+.theme-ny_book .bk-timer-slot { display: grid; place-items: center; }
+.theme-ny_book .bk-tm { position: relative; height: 100%; aspect-ratio: 315 / 330; max-width: 100%; --d: calc(var(--bk-timer-d)); }
+.theme-ny_book .bk-tm > img { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
+.theme-ny_book .bk-tm .bk-tm-face { inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 calc(5 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
+.theme-ny_book .bk-tm .bk-tm-ring { left: 22%; top: 32.5%; width: 56%; height: 55%; transition: filter .4s; }
+.theme-ny_book .bk-tm .bk-tm-arc { position: absolute; left: 25.2%; top: 35.3%; width: 49.6%; height: 49.2%; border-radius: 50%;
+  background: conic-gradient(from 0deg, #b3263a calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%); mask: radial-gradient(circle, transparent 62%, #000 63%); }
+.theme-ny_book .bk-tm .bk-tm-num { position: absolute; left: 22%; top: 32.5%; width: 56%; height: 55%; display: grid; place-items: center; font: 700 calc(var(--bk-timer-d) * .34) / 1 var(--bk-serif); color: var(--bk-ink-2); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em; }
+.theme-ny_book .bk-tm.is-low .bk-tm-num { color: var(--bk-red-2); } .theme-ny_book .bk-tm.is-low .bk-tm-arc { background: conic-gradient(from 0deg, #d3322e calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); }
+.theme-ny_book .bk-tm.is-low .bk-tm-ring { filter: hue-rotate(-12deg) saturate(1.25); }
+.theme-ny_book .bk-tm.is-zero .bk-tm-num { color: #a3261f; } .theme-ny_book .bk-tm.is-zero .bk-tm-ring { filter: hue-rotate(-18deg) saturate(1.4) brightness(.92); }
+.theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: bk-tm-tick 1s ease-in-out infinite; } @keyframes bk-tm-tick { 50% { transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: none; } }
+.theme-ny_book .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(210 * var(--u)); }
