@@ -359,6 +359,9 @@ export const SCENES = [
       ...[[1, '69-ans-1img', 'ответ: картинка вопроса рядом с ответом, 8 команд', 8], [3, '69-ans-3img', 'ответ: 3 картинки вопроса, 16 команд', 16], [4, '69-ans-4img', 'ответ: 4 картинки вопроса, 3 команды', 3]].map(([qi, id, title, n]) => sc(id, title, async api => { const ts = await api.teams(n)
         await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(0, qi), round_number: 0, answer_text: ['Звезда', 'ёлка', 'шар', 'снеговик'][i % 4], is_correct: i % 3 !== 1 })))
         await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 0, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 8, 16].map(n => sc(`49-anagram-${n}`, `Скрэмбл: доска, ${n} команд`, async api => { const ts = await api.teams(n)
+        await api.answers(ts.slice(0, Math.min(n, 5)).map((t, i) => ({ team_id: t.id, question_ref: qid(14, 0), round_number: 14, answer_text: ['ёлка', 'шар', 'гирлянда'][i % 3], is_correct: i === 0 ? true : null })))
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 12000) })) }, { settle: 3000 })),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
       ...Array.from({ length: 15 }, (_, r) => sc(`7${String(r).padStart(2, '0')}-rules-r${r}`.replace(/^7(\d)(\d)/, (m, a, b) => `7${a}${b}`), `правила: раунд ${r}`, async api => { await api.teams(6); await api.session({ pack_id: PK(r), phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
     ]

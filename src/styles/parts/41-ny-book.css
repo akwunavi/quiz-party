@@ -1070,3 +1070,19 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .answer-block.bk-side > .bk-note-box { grid-column: 1 / -1; grid-row: 3; }
 /* подпись не лезет под угловые «❖» */
 .theme-ny_book .answers-main.revealed .answer-block:not(.bk-side) > .answer-label { padding: 0 calc(40 * var(--u)); }
+
+/* ═══ «СКРЭМБЛ»: панель команд — внутри рабочей области книги (x ≤ 1670), под слотом таймера; доска — левее неё. 6/8 команд — один столбец, 16 — два ═══ */
+.theme-ny_book .host-screen.an-screen.has-teams { padding-right: calc(var(--bk-ox) + 250 * var(--u) + 470 * var(--u)); }
+.theme-ny_book .host-screen.an-screen.has-teams:has(.an-teams.dense) { padding-right: calc(var(--bk-ox) + 250 * var(--u) + 600 * var(--u)); }
+.theme-ny_book .an-teams { right: calc(var(--bk-ox) + 250 * var(--u)); top: calc(var(--bk-oy) + 236 * var(--u)); width: calc(430 * var(--u)); max-height: calc(1080 * var(--u) - 236 * var(--u) - 140 * var(--u)); }
+.theme-ny_book .an-teams.dense { width: calc(560 * var(--u)); }
+.theme-ny_book .an-teams.dense ul { display: grid; grid-template-columns: 1fr 1fr; gap: calc(7 * var(--u)) calc(10 * var(--u)); }
+.theme-ny_book .an-teams.dense .an-team-name { font-size: calc(20 * var(--u)) !important; }
+.theme-ny_book .an-teams.dense .an-team-st { display: none; }
+.theme-ny_book .an-team-text { overflow-wrap: anywhere; font: 600 calc(22 * var(--u)) var(--bk-serif); }
+.theme-ny_book .an-screen.has-teams .an-tile { width: calc(74 * var(--u)); height: calc(92 * var(--u)); font-size: calc(56 * var(--u)) !important; }
+.theme-ny_book .an-screen.has-teams .an-cell:not(.fixed) { width: calc(68 * var(--u)); height: calc(86 * var(--u)); font-size: calc(52 * var(--u)) !important; }
+.theme-ny_book .an-screen.has-teams .an-tiles, .theme-ny_book .an-screen.has-teams .an-words { gap: calc(10 * var(--u)); }
+.theme-ny_book .an-screen.has-teams .an-board-wrap { max-width: 100%; }
+.theme-ny_book .an-teams.dense { width: calc(520 * var(--u)); }
+.theme-ny_book .host-screen.an-screen.has-teams:has(.an-teams.dense) { padding-right: calc(var(--bk-ox) + 250 * var(--u) + 560 * var(--u)); }
