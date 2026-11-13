@@ -947,3 +947,9 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .fin-screen .fin-table.rows-14, .theme-ny_book .fin-screen .fin-table.rows-16 { font-size: calc(21 * var(--u)); }
 .theme-ny_book .fin-screen .fin-table:not([class*="rows-"]) td { padding-top: .7em; padding-bottom: .7em; }
 .theme-ny_book .fin-screen .fin-table.rows-7 td { padding-top: .22em; padding-bottom: .22em; }
+/* «Отвечайте»: карточки команд всегда внутри страницы — сетка 4 колонки, заголовок и таймер компактнее (самопроверка: 8 карточек на 1280×720 вылезали) */
+.theme-ny_book .host-screen:has(.answer-time-teams) { padding-top: calc(var(--bk-oy) + 150 * var(--u)); padding-bottom: calc(var(--bk-oy) + 150 * var(--u)); gap: calc(8 * var(--u)); justify-content: flex-start; }
+.theme-ny_book .host-screen:has(.answer-time-teams) :is(h1, .neon-title) { font-size: calc(120 * var(--u)) !important; line-height: 1; margin: 0; }
+.theme-ny_book .host-screen:has(.answer-time-teams) .p-ros.is-big, .theme-ny_book .host-screen:has(.answer-time-teams) .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(150 * var(--u)); --d: calc(150 * var(--u)); }
+.theme-ny_book .answer-time-teams { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(6 * var(--u)) calc(14 * var(--u)); width: calc(1300 * var(--u)); max-width: 100%; margin: 0 auto; }
+.theme-ny_book .answer-time-teams .bk-at { min-width: 0; }

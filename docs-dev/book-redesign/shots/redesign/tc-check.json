@@ -165,7 +165,7 @@
    "vp": "1920x1080",
    "cards": 8,
    "net": 1,
-   "minFont": 17.5,
+   "minFont": 16,
    "bad": []
   },
   {
@@ -173,7 +173,7 @@
    "vp": "1899x905",
    "cards": 8,
    "net": 1,
-   "minFont": 14.5,
+   "minFont": 13.5,
    "bad": []
   },
   {
@@ -181,7 +181,7 @@
    "vp": "1366x768",
    "cards": 8,
    "net": 1,
-   "minFont": 12.5,
+   "minFont": 11.5,
    "bad": []
   },
   {
@@ -189,7 +189,7 @@
    "vp": "1280x720",
    "cards": 8,
    "net": 1,
-   "minFont": 11.5,
+   "minFont": 10.5,
    "bad": []
   },
   {
@@ -197,7 +197,7 @@
    "vp": "1920x1080",
    "cards": 8,
    "net": 1,
-   "minFont": 19.4,
+   "minFont": 18.1,
    "bad": []
   },
   {
@@ -205,7 +205,7 @@
    "vp": "1899x905",
    "cards": 8,
    "net": 1,
-   "minFont": 16,
+   "minFont": 15.1,
    "bad": []
   },
   {
@@ -213,7 +213,7 @@
    "vp": "1366x768",
    "cards": 8,
    "net": 1,
-   "minFont": 13.8,
+   "minFont": 12.9,
    "bad": []
   },
   {
@@ -221,7 +221,7 @@
    "vp": "1280x720",
    "cards": 8,
    "net": 1,
-   "minFont": 12.9,
+   "minFont": 11.9,
    "bad": []
   }
  ],
