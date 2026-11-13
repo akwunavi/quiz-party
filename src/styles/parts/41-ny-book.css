@@ -849,7 +849,7 @@
 /* ═══ «УГАДАЙ МЕЛОДИЮ» (ny_book): выбор трека — обложки (BookMelody.tsx), модалка — праздничная музыкальная страница ═══ */
 .theme-ny_book .mel-screen .mel-board:has(.bk-covs) { display: flex !important; align-items: center; justify-content: center; padding: 0 !important; gap: 0 !important; }
 .theme-ny_book .bk-covs { display: flex; gap: calc(34 * var(--u)); justify-content: center; align-items: center; width: 100%; height: 100%; min-height: 0; }
-.theme-ny_book .bk-cov { position: relative; flex: 0 1 auto; height: min(100%, calc((1420 - 34 * (var(--n) - 1)) / var(--n) * var(--u) * 1.32)); aspect-ratio: 640 / 848; max-width: calc((1420 - 34 * (var(--n) - 1)) / var(--n) * var(--u)); container-type: inline-size;
+.theme-ny_book .bk-cov { position: relative; flex: 0 1 auto; height: min(100%, calc((1640 - 28 * (var(--n) - 1)) / var(--n) * var(--u) * 1.32)); aspect-ratio: 640 / 848; max-width: calc((1640 - 28 * (var(--n) - 1)) / var(--n) * var(--u)); container-type: inline-size;
   background-size: 100% 100%; background-repeat: no-repeat; filter: drop-shadow(0 calc(16 * var(--u)) calc(18 * var(--u)) rgba(50, 25, 8, .45)); }
 .theme-ny_book .bk-cov-title { position: absolute; display: grid; place-items: center; text-align: center; padding: 0 3%; color: var(--bk-ink-2); }
 .theme-ny_book .bk-cov-title span { font: 700 8.4cqw / 1.05 var(--bk-display); text-wrap: balance; text-shadow: 0 .3cqw 0 rgba(201, 161, 74, .45); }
@@ -1017,3 +1017,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay .mel-modal .mel-bids { gap: calc(3 * var(--u)) !important; }
 .theme-ny_book.mel-overlay .mel-modal .mel-big { font-size: calc(31 * var(--u)) !important; line-height: 1.1; }
 .theme-ny_book.mel-overlay .mel-modal .mel-modal-theme { font-size: calc(26 * var(--u)) !important; }
+
+.theme-ny_book .mel-screen { padding-top: calc(var(--bk-oy) + 118 * var(--u)) !important; padding-bottom: calc(var(--bk-oy) + 110 * var(--u)) !important; }
+.theme-ny_book .mel-screen .mel-board:has(.bk-covs), .theme-ny_book .jp-screen .jp-board:has(.bk-covs) { margin-inline: calc(-120 * var(--u)); width: auto; }
