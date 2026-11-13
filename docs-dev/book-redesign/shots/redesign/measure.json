@@ -32166,9 +32166,9 @@
     "items": [
      {
       "x": 187,
-      "y": 205,
+      "y": 182,
       "w": 907,
-      "h": 439,
+      "h": 462,
       "visible": true
      }
     ]
@@ -32178,9 +32178,9 @@
     "items": [
      {
       "x": 167,
-      "y": 196,
+      "y": 173,
       "w": 947,
-      "h": 460,
+      "h": 483,
       "visible": true
      }
     ]
@@ -32201,10 +32201,10 @@
     "count": 1,
     "items": [
      {
-      "x": 359,
-      "y": 97,
-      "w": 561,
-      "h": 78,
+      "x": 451,
+      "y": 100,
+      "w": 379,
+      "h": 53,
       "visible": true
      }
     ]
@@ -32237,11 +32237,11 @@
     "count": 2,
     "items": [
      {
-      "x": 525,
-      "y": 79,
-      "w": 231,
-      "h": 15,
-      "visible": true
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
      },
      {
       "x": 0,
@@ -32256,44 +32256,44 @@
     "count": 8,
     "items": [
      {
-      "x": 515,
-      "y": 215,
-      "w": 32,
+      "x": 531,
+      "y": 193,
+      "w": 34,
       "h": 10,
       "visible": true
      },
      {
-      "x": 579,
-      "y": 215,
-      "w": 32,
+      "x": 594,
+      "y": 193,
+      "w": 34,
       "h": 10,
       "visible": true
      },
      {
-      "x": 643,
-      "y": 215,
-      "w": 32,
+      "x": 656,
+      "y": 193,
+      "w": 34,
       "h": 10,
       "visible": true
      },
      {
-      "x": 708,
-      "y": 215,
-      "w": 32,
+      "x": 718,
+      "y": 193,
+      "w": 34,
       "h": 10,
       "visible": true
      },
      {
-      "x": 771,
-      "y": 220,
-      "w": 32,
+      "x": 781,
+      "y": 198,
+      "w": 34,
       "h": 5,
       "visible": true
      },
      {
-      "x": 835,
-      "y": 215,
-      "w": 32,
+      "x": 843,
+      "y": 193,
+      "w": 34,
       "h": 10,
       "visible": true
      }
@@ -32303,38 +32303,38 @@
     "count": 5,
     "items": [
      {
-      "x": 228,
-      "y": 235,
-      "w": 14,
-      "h": 17,
+      "x": 222,
+      "y": 214,
+      "w": 15,
+      "h": 19,
       "visible": true
      },
      {
-      "x": 228,
-      "y": 260,
-      "w": 14,
-      "h": 17,
+      "x": 222,
+      "y": 241,
+      "w": 15,
+      "h": 19,
       "visible": true
      },
      {
-      "x": 235,
-      "y": 288,
-      "w": 11,
-      "h": 13,
+      "x": 230,
+      "y": 270,
+      "w": 12,
+      "h": 14,
       "visible": true
      },
      {
-      "x": 231,
-      "y": 314,
-      "w": 11,
-      "h": 13,
+      "x": 226,
+      "y": 297,
+      "w": 12,
+      "h": 14,
       "visible": true
      },
      {
-      "x": 231,
-      "y": 339,
-      "w": 11,
-      "h": 13,
+      "x": 226,
+      "y": 324,
+      "w": 12,
+      "h": 14,
       "visible": true
      }
     ]
@@ -32357,14 +32357,14 @@
     "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
     "weight": "700",
     "style": "normal",
-    "size": "53.3333px",
+    "size": "36px",
     "loaded": true
    },
    ".fin-table td": {
     "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
     "weight": "700",
     "style": "normal",
-    "size": "8.87031px",
+    "size": "9.55937px",
     "loaded": true
    }
   },
@@ -32423,22 +32423,22 @@
   "text": {
    ".fin-table td": {
     "n": 176,
-    "min": 8.9,
-    "max": 10.2
+    "min": 9.6,
+    "max": 11
    },
    ".fin-table th": {
     "n": 11,
-    "min": 7.1,
-    "max": 7.1
+    "min": 7.6,
+    "max": 7.6
    }
   },
   "area": {
    "content": {
     "w": 947,
-    "h": 577
+    "h": 556
    },
-   "onPages": 546542,
-   "share": 59.3,
+   "onPages": 526346,
+   "share": 57.1,
    "offPages": 0
   },
   "geo": {
@@ -33252,42 +33252,42 @@
     "count": 8,
     "items": [
      {
-      "x": 768,
+      "x": 796,
       "y": 316,
       "w": 48,
       "h": 15,
       "visible": true
      },
      {
-      "x": 866,
+      "x": 892,
       "y": 316,
       "w": 48,
       "h": 15,
       "visible": true
      },
      {
-      "x": 965,
+      "x": 987,
       "y": 316,
       "w": 48,
       "h": 15,
       "visible": true
      },
      {
-      "x": 1063,
+      "x": 1082,
       "y": 316,
       "w": 48,
       "h": 15,
       "visible": true
      },
      {
-      "x": 1162,
+      "x": 1177,
       "y": 324,
       "w": 48,
       "h": 7,
       "visible": true
      },
      {
-      "x": 1260,
+      "x": 1272,
       "y": 316,
       "w": 48,
       "h": 15,
@@ -33299,35 +33299,35 @@
     "count": 5,
     "items": [
      {
-      "x": 335,
+      "x": 332,
       "y": 347,
       "w": 21,
       "h": 26,
       "visible": true
      },
      {
-      "x": 335,
+      "x": 332,
       "y": 386,
       "w": 21,
       "h": 26,
       "visible": true
      },
      {
-      "x": 346,
+      "x": 343,
       "y": 428,
       "w": 16,
       "h": 20,
       "visible": true
      },
      {
-      "x": 340,
+      "x": 337,
       "y": 467,
       "w": 16,
       "h": 20,
       "visible": true
      },
      {
-      "x": 340,
+      "x": 337,
       "y": 506,
       "w": 16,
       "h": 20,
@@ -74683,6 +74683,1042 @@
   "vinylSpin": null,
   "playing": [],
   "fontFaces": [],
+  "externalHosts": []
+ },
+ {
+  "name": "67-rand-2-1280x720",
+  "title": "рандомайзер: результат, 2 команды (до публикации — обычное лобби 01-lobby-8)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "67-rand-2",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg lobby-screen",
+  "density": "sparse",
+  "nodes": {
+   ".bk-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 683,
+      "y": 208,
+      "w": 427,
+      "h": 453,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 369,
+      "y": 73,
+      "w": 541,
+      "h": 97,
+      "visible": true
+     }
+    ]
+   },
+   ".groups-modal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 340,
+      "y": 257,
+      "w": 767,
+      "h": 206,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 367,
+      "y": 290,
+      "w": 336,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   },
+   ".lobby-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "visible": true
+     }
+    ]
+   },
+   ".bk-invite": {
+    "count": 1,
+    "items": [
+     {
+      "x": 263,
+      "y": 535,
+      "w": 220,
+      "h": 98,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-teams[0]",
+    "w": 424,
+    "h": 206
+   },
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-qr[0]",
+    "w": 123,
+    "h": 206
+   }
+  ],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "69.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "p-unfurl 1.1s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".lg-name": {
+    "n": 2,
+    "min": 22.7,
+    "max": 22.7
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 556
+   },
+   "onPages": 526346,
+   "share": 57.1,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "67-rand-2-1920x1080",
+  "title": "рандомайзер: результат, 2 команды (до публикации — обычное лобби 01-lobby-8)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "67-rand-2",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg lobby-screen",
+  "density": "sparse",
+  "nodes": {
+   ".bk-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1024,
+      "y": 312,
+      "w": 640,
+      "h": 680,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 554,
+      "y": 110,
+      "w": 812,
+      "h": 146,
+      "visible": true
+     }
+    ]
+   },
+   ".groups-modal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 790,
+      "y": 406,
+      "w": 880,
+      "h": 269,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 830,
+      "y": 445,
+      "w": 505,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   },
+   ".lobby-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "visible": true
+     }
+    ]
+   },
+   ".bk-invite": {
+    "count": 1,
+    "items": [
+     {
+      "x": 394,
+      "y": 802,
+      "w": 330,
+      "h": 148,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-teams[0]",
+    "w": 640,
+    "h": 269
+   }
+  ],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "104px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "p-unfurl 1.1s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".lg-name": {
+    "n": 2,
+    "min": 34,
+    "max": 34
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 834
+   },
+   "onPages": 1184280,
+   "share": 57.1,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "68-rand-8-1280x720",
+  "title": "рандомайзер: результат, 8 команд, много игроков",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "68-rand-8",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg lobby-screen",
+  "density": "sparse",
+  "nodes": {
+   ".bk-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 683,
+      "y": 208,
+      "w": 427,
+      "h": 453,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 369,
+      "y": 73,
+      "w": 541,
+      "h": 97,
+      "visible": true
+     }
+    ]
+   },
+   ".groups-modal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 340,
+      "y": 188,
+      "w": 767,
+      "h": 343,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 367,
+      "y": 221,
+      "w": 336,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   },
+   ".lobby-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "visible": true
+     }
+    ]
+   },
+   ".bk-invite": {
+    "count": 1,
+    "items": [
+     {
+      "x": 263,
+      "y": 535,
+      "w": 220,
+      "h": 98,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-teams[0]",
+    "w": 424,
+    "h": 324
+   },
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-qr[0]",
+    "w": 123,
+    "h": 287
+   }
+  ],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "69.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "p-unfurl 1.1s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".lg-name": {
+    "n": 8,
+    "min": 22.7,
+    "max": 22.7
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 556
+   },
+   "onPages": 526346,
+   "share": 57.1,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "68-rand-8-1920x1080",
+  "title": "рандомайзер: результат, 8 команд, много игроков",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "68-rand-8",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg lobby-screen",
+  "density": "sparse",
+  "nodes": {
+   ".bk-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1024,
+      "y": 312,
+      "w": 640,
+      "h": 680,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 554,
+      "y": 110,
+      "w": 812,
+      "h": 146,
+      "visible": true
+     }
+    ]
+   },
+   ".groups-modal": {
+    "count": 1,
+    "items": [
+     {
+      "x": 790,
+      "y": 298,
+      "w": 880,
+      "h": 484,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 830,
+      "y": 337,
+      "w": 505,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   },
+   ".lobby-screen": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "visible": true
+     }
+    ]
+   },
+   ".bk-invite": {
+    "count": 1,
+    "items": [
+     {
+      "x": 394,
+      "y": 802,
+      "w": 330,
+      "h": 148,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [
+   {
+    "a": ".groups-modal[0]",
+    "b": ".bk-teams[0]",
+    "w": 640,
+    "h": 470
+   }
+  ],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "104px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "p-unfurl 1.1s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".lg-name": {
+    "n": 8,
+    "min": 34,
+    "max": 34
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 834
+   },
+   "onPages": 1184280,
+   "share": 57.1,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
   "externalHosts": []
  }
 ]
