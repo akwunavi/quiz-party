@@ -791,12 +791,12 @@
 /* карточка в таблицах (em-режим): высота = 1.55 em кегля таблицы (подгон кегля таблицы масштабирует и карточку), имя — одной строкой, длинное — мельче */
 .theme-ny_book .bk-tc-em { width: 100%; min-width: 12em; margin: .05em 0; } .theme-ny_book .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .38); white-space: nowrap; line-height: 1; } .theme-ny_book .bk-tc-em.is-long .bk-tc-name { font-size: calc(var(--tch) * .27); }
 .theme-ny_book .sb-table td:nth-child(2), .theme-ny_book .fin-table td:nth-child(2) { text-align: left; }
-.theme-ny_book .bk-at { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-width: calc(330 * var(--u)); }
+.theme-ny_book .bk-at { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-width: calc(400 * var(--u)); }
 .theme-ny_book .team-answer.bk-ta { display: grid; grid-template-columns: calc(270 * var(--u)) minmax(0, 1fr); align-items: center; gap: calc(12 * var(--u)); background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
 .theme-ny_book .bk-ta .text { font: 600 calc(28 * var(--u)) / 1.12 var(--bk-serif); color: var(--bk-ink); }
 .theme-ny_book .lg-name.bk-lg { width: 100%; flex: none; }
 .theme-ny_book .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .46) !important; } .theme-ny_book .bk-tc-em.is-long .bk-tc-name { font-size: calc(var(--tch) * .34) !important; }
-.theme-ny_book .team-answers .team-answer.bk-ta { display: grid !important; grid-template-columns: calc(270 * var(--u)) minmax(0, 1fr) !important; align-items: center; }
+.theme-ny_book .team-answers .team-answer.bk-ta { display: grid !important; grid-template-columns: calc(300 * var(--u)) minmax(0, 1fr) !important; align-items: center; }
 .theme-ny_book .answers-layout:has(.bk-ta) { grid-template-columns: minmax(0, 1fr) calc(620 * var(--u)) !important; column-gap: calc(70 * var(--u)); }
 .theme-ny_book .team-answers .team-answer.bk-ta > .text { grid-column: 2 !important; grid-row: 1 !important; position: static !important; margin: 0 !important; padding: 0 !important; max-width: none !important; width: auto !important; display: -webkit-box !important; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: calc(26 * var(--u)) !important; }
 .theme-ny_book .team-answers .team-answer.bk-ta > .bk-tc { grid-column: 1; grid-row: 1; }

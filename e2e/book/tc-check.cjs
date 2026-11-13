@@ -16,12 +16,12 @@ const VPS = [[1920, 1080], [1899, 905], [1366, 768], [1280, 720]]
     const m = await p.evaluate(() => [...document.querySelectorAll('.bk-tc')].map(c => {
       const cs = getComputedStyle(c), r = c.getBoundingClientRect(), nm = c.querySelector('.bk-tc-name'), nr = nm.getBoundingClientRect(), bw = parseFloat(cs.borderLeftWidth), br = parseFloat(cs.borderRightWidth)
       const k = r.height / 662, fs = parseFloat(getComputedStyle(nm).fontSize), box = nm.parentElement.getBoundingClientRect()
-      return { src: cs.borderImageSource.includes('team-card.webp'), h: r.height, w: r.width, left: bw / r.height, right: br / r.height, scale: r.width > 0 ? 1 : 0,
+      return { src: cs.borderImageSource.includes('team-card.webp'), h: r.height, w: r.width, left: bw, right: br, errL: Math.abs(bw - 480 * c.offsetHeight / 662), errR: Math.abs(br - 153 * c.offsetHeight / 662), scale: r.width > 0 ? 1 : 0,
         inZone: nr.left >= r.left + 480 * k - 2 && nr.right <= r.right - 153 * k + 2 && nr.top >= r.top + 100 * k - 2 && nr.bottom <= r.bottom - 222 * k + 2,
-        fits: nm.scrollHeight <= box.height + 2, fontPx: fs, lines: Math.round(nr.height / (fs * 1.1)), text: nm.textContent.slice(0, 30), fontMatch: /Garamond|PT Serif|Lora/.test(getComputedStyle(nm).fontFamily) } }))
+        fits: nm.offsetHeight <= nm.parentElement.clientHeight + 2, fontPx: fs, lines: Math.round(nr.height / (fs * 1.1)), text: nm.textContent.slice(0, 30), fontMatch: /Garamond|PT Serif|Lora/.test(getComputedStyle(nm).fontFamily) } }))
     await ctx.close(); const bad = []
     if (!m.length) bad.push('карточек нет'); if (!net.length || net.some(s => s !== 200 && s !== 304)) bad.push(`ассет по сети: ${net}`)
-    m.forEach((c, i) => { if (!c.src) bad.push(`#${i} нет border-image ассета`); if (Math.abs(c.left - 480 / 662) > .01 || Math.abs(c.right - 153 / 662) > .01) bad.push(`#${i} края деформированы (${c.left.toFixed(3)}/${c.right.toFixed(3)})`)
+    m.forEach((c, i) => { if (!c.src) bad.push(`#${i} нет border-image ассета`); if (c.errL > 1.2 || c.errR > 1.2) bad.push(`#${i} края деформированы (ошибка ${c.errL.toFixed(2)}/${c.errR.toFixed(2)} px)`)
       if (!c.inZone) bad.push(`#${i} «${c.text}» вне зоны пергамента`); if (!c.fits) bad.push(`#${i} «${c.text}» не помещается`); if (c.lines > 2) bad.push(`#${i} «${c.text}» ${c.lines} строк`) })
     const minF = m.length ? Math.min(...m.map(c => c.fontPx)) : 0
     rows.push({ id, vp: `${w}x${h}`, cards: m.length, net: net.length, minFont: Math.round(minF * 10) / 10, bad }); bad.forEach(x => fails.push(`${id} ${w}x${h}: ${x}`))

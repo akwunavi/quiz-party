@@ -1,0 +1,229 @@
+{
+ "rows": [
+  {
+   "id": "01-lobby-4",
+   "vp": "1920x1080",
+   "cards": 4,
+   "net": 1,
+   "minFont": 42,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-4",
+   "vp": "1899x905",
+   "cards": 4,
+   "net": 1,
+   "minFont": 42,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-4",
+   "vp": "1366x768",
+   "cards": 4,
+   "net": 1,
+   "minFont": 42,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-4",
+   "vp": "1280x720",
+   "cards": 4,
+   "net": 1,
+   "minFont": 42,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-8",
+   "vp": "1920x1080",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-8",
+   "vp": "1899x905",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-8",
+   "vp": "1366x768",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-8",
+   "vp": "1280x720",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-16",
+   "vp": "1920x1080",
+   "cards": 16,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-16",
+   "vp": "1899x905",
+   "cards": 16,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-16",
+   "vp": "1366x768",
+   "cards": 16,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-16",
+   "vp": "1280x720",
+   "cards": 16,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-names",
+   "vp": "1920x1080",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-names",
+   "vp": "1899x905",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-names",
+   "vp": "1366x768",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "01-lobby-names",
+   "vp": "1280x720",
+   "cards": 8,
+   "net": 1,
+   "minFont": 31.2,
+   "bad": []
+  },
+  {
+   "id": "09-answer-time",
+   "vp": "1920x1080",
+   "cards": 8,
+   "net": 1,
+   "minFont": 21,
+   "bad": []
+  },
+  {
+   "id": "09-answer-time",
+   "vp": "1899x905",
+   "cards": 8,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "09-answer-time",
+   "vp": "1366x768",
+   "cards": 8,
+   "net": 1,
+   "minFont": 15,
+   "bad": []
+  },
+  {
+   "id": "09-answer-time",
+   "vp": "1280x720",
+   "cards": 8,
+   "net": 1,
+   "minFont": 14,
+   "bad": []
+  },
+  {
+   "id": "11-revealed-plain",
+   "vp": "1920x1080",
+   "cards": 8,
+   "net": 1,
+   "minFont": 17.5,
+   "bad": []
+  },
+  {
+   "id": "11-revealed-plain",
+   "vp": "1899x905",
+   "cards": 8,
+   "net": 1,
+   "minFont": 14.5,
+   "bad": []
+  },
+  {
+   "id": "11-revealed-plain",
+   "vp": "1366x768",
+   "cards": 8,
+   "net": 1,
+   "minFont": 12.5,
+   "bad": []
+  },
+  {
+   "id": "11-revealed-plain",
+   "vp": "1280x720",
+   "cards": 8,
+   "net": 1,
+   "minFont": 11.5,
+   "bad": []
+  },
+  {
+   "id": "15-finale-8",
+   "vp": "1920x1080",
+   "cards": 8,
+   "net": 1,
+   "minFont": 19.4,
+   "bad": []
+  },
+  {
+   "id": "15-finale-8",
+   "vp": "1899x905",
+   "cards": 8,
+   "net": 1,
+   "minFont": 16,
+   "bad": []
+  },
+  {
+   "id": "15-finale-8",
+   "vp": "1366x768",
+   "cards": 8,
+   "net": 1,
+   "minFont": 13.8,
+   "bad": []
+  },
+  {
+   "id": "15-finale-8",
+   "vp": "1280x720",
+   "cards": 8,
+   "net": 1,
+   "minFont": 12.9,
+   "bad": []
+  }
+ ],
+ "fails": []
+}

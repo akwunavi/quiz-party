@@ -1713,7 +1713,7 @@ function AnswerTime({ pack, round, gameState }: {
             return (
               pack.theme === 'ny_book'
                 /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
-                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={58} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={74} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
                 : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
@@ -2001,7 +2001,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
             return (
               pack.theme === 'ny_book'
               ? <div key={a.id} className="team-answer bk-ta">
-                  <BookTeamCard name={team?.name ?? '—'} ch={50} color={team?.color} state={shown === true ? 'correct' : shown === false ? 'wrong' : 'normal'} />
+                  <BookTeamCard name={team?.name ?? '—'} ch={56} color={team?.color} state={shown === true ? 'correct' : shown === false ? 'wrong' : 'normal'} />
                   <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
                     {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
                 </div>
