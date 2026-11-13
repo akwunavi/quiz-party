@@ -6,11 +6,11 @@ import { BOOK, SAFE, SCENE, type Rect } from '../geometry'
 /** Ширина зоны сгиба, px сцены: контент (картинки, колонки) не заходит в ±FOLD_GAP/2 от центра разворота. */
 export const FOLD_GAP = 120
 /** Служебная полоса сверху (до y, px сцены): плашка «раунд, вопрос N/M» и таймер. Контент начинается ниже. */
-export const TOP_BAND = 180
+export const TOP_BAND = 208
 /** Диаметр таймера в шапке, px сцены (см. BookTimerSlot). */
-export const TIMER_D = 120
+export const TIMER_D = 150
 /** Верх слота таймера в сцене: 60 (страница книги начинается с y=50 — таймер не должен выходить на обрез), низ = TOP_BAND. */
-export const TOP_Y = 60
+export const TOP_Y = 56
 
 export interface Viewport { w: number; h: number }
 

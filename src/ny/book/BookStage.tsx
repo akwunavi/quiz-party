@@ -39,10 +39,11 @@ const DECOR: Place[] = [
   { id: 'tree-1', x: 1726, y: 1046 - 300, h: 300, on: ['sparse'], front: true, lamps: 5 },
   { id: 'tree-4', x: 40, y: 1040 - 360, h: 360, on: ['medium'], lamps: 5 },
   { id: 'tree-1', x: 1660, y: 1040 - 380, h: 380, on: ['medium'], lamps: 5 },
+  // игровые экраны (dense): заснеженные ёлки в нижних боковых областях разворота — за полями контента (x < 250 и x > 1670), текст не перекрывают
+  { id: 'tree-4', x: 34, y: 1040 - 330, h: 330, on: ['dense'], lamps: 5 },
+  { id: 'tree-1', x: 1700, y: 1042 - 340, h: 340, on: ['dense'], lamps: 5 },
   { id: 'corner-l', x: 36, y: 28, h: 250, on: ['sparse'] },
   { id: 'corner-r', x: 1600, y: 28, h: 260, on: ['sparse'] },
-  { id: 'sprig-cone', x: 70, y: 958, h: 110, on: ['dense'] },
-  { id: 'sprig-berries', x: 1640, y: 962, h: 104, on: ['dense'] },
 ]
 
 /** Лобби: утверждённые ассеты листа ведущего (домик с дымом, фонари, холм, забор — public/ny-book/*.webp, нарезка lobby-cut). Видны только при плотности `sparse`
