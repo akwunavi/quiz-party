@@ -356,6 +356,8 @@ export const SCENES = [
       sc('68-rand-8', 'рандомайзер: результат, 8 команд, много игроков', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'lobby', round_number: 0, question_index: 0, timer_started_at: null, reveal: false,
         random_groups: Array.from({ length: 8 }, (_, i) => [`Игрок ${i + 1}-1`, `Анастасия ${i + 1}-2`, `Иван ${i + 1}-3`, `Полина ${i + 1}-4`]) }) }, { ready: '.groups-modal', settle: 2500 }),
       sc('57-mel-reveal', 'мелодия: ответ и кто забрал баллы (reveal)', mel('reveal', ts => ({ wonTeam: ts[1].id, wonPts: 2, turn: 1 }))),
+      // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
+      ...Array.from({ length: 15 }, (_, r) => sc(`7${String(r).padStart(2, '0')}-rules-r${r}`.replace(/^7(\d)(\d)/, (m, a, b) => `7${a}${b}`), `правила: раунд ${r}`, async api => { await api.teams(6); await api.session({ pack_id: PK(r), phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
     ]
   })(),
 ]

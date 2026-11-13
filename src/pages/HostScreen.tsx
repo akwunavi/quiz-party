@@ -407,13 +407,17 @@ function HostInner({ gameState, pack }: {
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
             <CrosswordView grid={grid}
-              cellSize={Math.max(18, Math.min(44,
+              cellSize={pack.theme === 'ny_book'
+                ? Math.max(24, Math.min(68, Math.floor(Math.min(innerWidth * .3 / grid.cols, innerHeight * .55 / grid.rows))))
+                : Math.max(18, Math.min(44,
                 Math.floor(Math.min(innerWidth * .48 / grid.cols, innerHeight * .8 / grid.rows))))} />
             <div className="side">
               <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
               <Title theme={pack.theme} lines={round.title_lines} />
               <div className="meta-line" style={{ alignSelf: 'flex-start' }}>{metaLine(round)}</div>
-              {round.rules.map((r, i) => (
+              {pack.theme === 'ny_book'
+                ? (round.rules.length > 0 && <RulesFrame rules={round.rules} delay={i => 0.5 + i * 0.6} />)
+                : round.rules.map((r, i) => (
                 <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.5}s` }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>
