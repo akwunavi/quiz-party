@@ -1120,3 +1120,31 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay .jp-modal-head .mono-tag { font-size: calc(18 * var(--u)) !important; letter-spacing: .2em; }
 .theme-ny_book.mel-overlay .mel-modal > * { box-sizing: border-box; }
 .theme-ny_book.mel-overlay .mel-modal { padding-left: calc(var(--sc-h) * .2) !important; }
+
+/* ═══ «СКРЭМБЛ»: доска (плитки + ячейки ответа) ЦЕЛИКОМ на левой странице по центру, команды — на правой; ничего на сгибе. ═══
+   Левая страница — x 250…930u, правая — 1020…1670u. Размер плитки (--tw, число в u) считает AnagramRound.bookTileWidth по числу букв и длине слов. */
+.theme-ny_book .host-screen.an-screen, .theme-ny_book .host-screen.an-screen.has-teams { padding-left: calc(var(--bk-ox) + 250 * var(--u)) !important; padding-right: calc(var(--bk-ox) + 990 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-board-wrap { width: 100%; }
+.theme-ny_book .an-screen .an-tile { width: calc(var(--tw, 80) * var(--u)) !important; height: calc(var(--tw, 80) * 1.24 * var(--u)) !important; font-size: calc(var(--tw, 80) * .74 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-cell:not(.fixed) { width: calc(var(--cw, 80) * var(--u)) !important; height: calc(var(--cw, 80) * 1.24 * var(--u)) !important; font-size: calc(var(--cw, 80) * .74 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-cell.fixed { width: calc(var(--cw, 80) * .5 * var(--u)) !important; height: calc(var(--cw, 80) * 1.24 * var(--u)) !important; font-size: calc(var(--cw, 80) * .5 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-tiles, .theme-ny_book .an-screen .an-words { gap: calc(10 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-words { gap: calc(18 * var(--u)) calc(30 * var(--u)) !important; }
+.theme-ny_book .an-screen .an-board { gap: calc(46 * var(--u)); font-size: 1px !important; }
+.theme-ny_book .an-screen .an-result { max-width: 100%; }
+/* команды — правая страница на всю ширину: до 8 — один столбец (крупно), больше — два столбца */
+.theme-ny_book .an-teams { right: calc(var(--bk-ox) + 250 * var(--u)); top: calc(var(--bk-oy) + 236 * var(--u)); width: calc(650 * var(--u)); }
+.theme-ny_book .an-teams.dense { width: calc(650 * var(--u)); }
+.theme-ny_book .an-teams .an-team-name { font-size: calc(30 * var(--u)) !important; white-space: normal; line-height: 1.1; }
+.theme-ny_book .an-teams .an-team { padding: calc(8 * var(--u)) calc(14 * var(--u)); }
+.theme-ny_book .an-teams .an-team-st { font-size: calc(22 * var(--u)); }
+.theme-ny_book .an-teams.dense .an-team-name { font-size: calc(26 * var(--u)) !important; }
+.theme-ny_book .an-teams.dense .an-team { padding: calc(9 * var(--u)) calc(12 * var(--u)); }
+.theme-ny_book .an-teams.dense .an-team-st { display: block; font-size: calc(16 * var(--u)); }
+.theme-ny_book .an-teams.dense .an-team-top { flex-direction: column; gap: 0; align-items: flex-start; }
+.theme-ny_book .an-teams.dense .an-team-top { flex-direction: row; align-items: baseline; justify-content: space-between; }
+.theme-ny_book .an-teams.dense .an-team { padding: calc(5 * var(--u)) calc(10 * var(--u)); }
+.theme-ny_book .an-teams.dense .an-team-name { font-size: calc(24 * var(--u)) !important; }
+.theme-ny_book .an-teams.dense .an-team-st { font-size: calc(14 * var(--u)); }
+.theme-ny_book .an-teams.dense ul { gap: calc(6 * var(--u)) calc(10 * var(--u)); overflow: visible; }
+.theme-ny_book .an-teams { max-height: none; }

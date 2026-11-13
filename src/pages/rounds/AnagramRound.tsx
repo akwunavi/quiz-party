@@ -10,6 +10,7 @@
 //
 // Разметка — та же вложенность, что у обычного вопроса (host-topbar →
 // контент → host-actions), иначе не сработают проверенные правила высот.
+import type { CSSProperties } from 'react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AudioGate } from '../../components/AudioGate'
 import { FitImg } from '../../components/FitImg'
@@ -74,6 +75,15 @@ type BoardProps = {
 
 /** «Волшебный лес» на проекторе — утверждённая сцена «Семена над поляной» (src/forest/stage3); остальные темы и
  *  предпросмотр редактора — прежняя доска. Хуков здесь нет: выбор только между двумя компонентами. */
+/** «Книга»: ширина плитки/ячейки в единицах сцены (--u) так, чтобы буквы и самое длинное слово ответа помещались в ряд на ОДНОЙ странице (≈676u);
+ *  длинная фраза — до двух рядов плиток. Только число для CSS-переменной, в других темах не используется. */
+function bookTileWidth(n: number, words: { kind: string }[][]): { tw: number; cw: number } {
+  const fit = (k: number) => Math.max(30, Math.min(104, Math.floor((676 - 12 * (Math.max(k, 1) - 1)) / Math.max(k, 1))))
+  const perRow = n <= 8 ? n : Math.ceil(n / Math.ceil(n / 8))
+  const longest = Math.max(1, ...words.map(w => w.reduce((a, c) => a + (c.kind === 'fixed' ? 0.5 : 1), 0)))
+  return { tw: fit(perRow), cw: Math.min(fit(Math.ceil(longest)), 96) }
+}
+
 export function AnagramBoard(props: BoardProps) {
   return isForestTheme(props.pack.theme) && !props.preview ? <ForestAnagramBoard {...props} /> : <AnagramBoardClassic {...props} />
 }
@@ -331,7 +341,7 @@ function AnagramBoardClassic({
       )}
 
       <div className="an-board-wrap">
-        <div className={`an-board${allLanded ? ' done' : ''}`} ref={boardRef}>
+        <div className={`an-board${allLanded ? ' done' : ''}`} ref={boardRef} style={{ ...(({ tw, cw }) => ({ '--tw': tw, '--cw': cw }))(bookTileWidth(tiles.length, template.words)) } as CSSProperties}>
           <div className="an-tiles">
             {tiles.map((ch, p) => (
               <span key={p} data-p={p}
