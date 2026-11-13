@@ -24,10 +24,10 @@
 | 01-lobby-8-1366x768 | да | 0 | 0 | 0 | 0 |
 | 01-lobby-8-1899x905 | да | 0 | 0 | 0 | 0 |
 | 01-lobby-8-1920x1080 | да | 0 | 0 | 0 | 0 |
-| 01-lobby-8-groups-1280x720 | да | .groups-modal[0]×.bk-teams[0], .groups-modal[0]×.bk-qr[0] | 0 | 0 | 0 |
-| 01-lobby-8-groups-1366x768 | да | .groups-modal[0]×.bk-teams[0], .groups-modal[0]×.bk-qr[0] | 0 | 0 | 0 |
-| 01-lobby-8-groups-1899x905 | да | .groups-modal[0]×.bk-teams[0], .groups-modal[0]×.bk-qr[0], .groups-modal[0]×.bk-invite[0] | 0 | 0 | 0 |
-| 01-lobby-8-groups-1920x1080 | да | .groups-modal[0]×.bk-teams[0], .groups-modal[0]×.bk-qr[0] | 0 | 0 | 0 |
+| 01-lobby-8-groups-1280x720 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 01-lobby-8-groups-1366x768 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 01-lobby-8-groups-1899x905 | да | .groups-modal[0]×.neon-title[0], .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 01-lobby-8-groups-1920x1080 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
 | 01-lobby-names-1280x720 | да | 0 | 0 | 0 | 0 |
 | 01-lobby-names-1366x768 | да | 0 | 0 | 0 | 0 |
 | 01-lobby-names-1899x905 | да | 0 | 0 | 0 | 0 |
@@ -376,5 +376,13 @@
 | 66-tc-asset-1366x768 | да | 0 | 0 | 0 | 0 |
 | 66-tc-asset-1899x905 | да | 0 | 0 | 0 | 0 |
 | 66-tc-asset-1920x1080 | да | 0 | 0 | 0 | 0 |
+| 67-rand-2-1280x720 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 67-rand-2-1366x768 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 67-rand-2-1899x905 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 67-rand-2-1920x1080 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 68-rand-8-1280x720 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 68-rand-8-1366x768 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 68-rand-8-1899x905 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
+| 68-rand-8-1920x1080 | да | .groups-modal[0]×.bk-teams[0] | 0 | 0 | 0 |
 
-Кадров: 376; с замечаниями: 44
+Кадров: 384; с замечаниями: 52
