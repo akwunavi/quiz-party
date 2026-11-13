@@ -43,6 +43,7 @@ import { useImageSizes } from '../forest/stage1/gameHooks'
 import { NyLobby } from '../ny/NyLobby'
 import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
 import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
+import { BookTeamCard } from '../ny/book/BookTeamCard'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -313,7 +314,7 @@ function HostInner({ gameState, pack }: {
                 ведущим и возвращается кнопкой. Размер считает сетка внутри:
                 колонок тем больше, чем больше команд. */}
             {groupsShown && (
-              <GroupsModal groups={groups} onClose={() => setGroupsOpen(false)} />
+              <GroupsModal groups={groups} book={pack?.theme === 'ny_book'} onClose={() => setGroupsOpen(false)} />
             )}
             {groups.length > 0 && !groupsOpen && (
               <button className="ghost dark lobby-groups-btn"
@@ -896,7 +897,7 @@ function CyberPanel({ side }: { side: 'left' | 'right' }) {
 /** Модалка составов команд от рандомайзера.
  *  Закрывается крестиком, кликом по фону и Esc — ведущему может понадобиться
  *  показать что-то под ней, не перезапуская экран. */
-function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => void }) {
+function GroupsModal({ groups, onClose, book }: { groups: string[][]; onClose: () => void; book?: boolean }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -914,7 +915,8 @@ function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => v
         <div className="lg-list">
           {groups.map((g, i) => (
             <div key={i} className="lg-team">
-              <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>
+              {book ? <div className="lg-name bk-lg"><BookTeamCard name={`Команда ${i + 1}`} ch={54} color={teamColor(i)} /></div>
+              : <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>}
               <div className="lg-players">{g.join(' · ')}</div>
             </div>
           ))}
@@ -1709,7 +1711,10 @@ function AnswerTime({ pack, round, gameState }: {
             const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
             const done = got >= totalQ
             return (
-              <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
+              pack.theme === 'ny_book'
+                /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={58} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
             )
@@ -1994,7 +1999,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ? (a.is_correct ?? autocheck(q.answer, a.answer_text))
               : null
             return (
-              <div key={a.id} className="team-answer" style={{
+              pack.theme === 'ny_book'
+              ? <div key={a.id} className="team-answer bk-ta">
+                  <BookTeamCard name={team?.name ?? '—'} ch={50} color={team?.color} state={shown === true ? 'correct' : shown === false ? 'wrong' : 'normal'} />
+                  <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
+                    {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
+                </div>
+              : <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
@@ -2320,7 +2331,7 @@ function ScoreboardScreen({ pack, gameState }: {
                 ? <span className="sb-medal"><AwardMedal theme={pack.theme} place={place} /></span>
                 : place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
-                <span className="sb-name">{t.name}</span></td>
+                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
                   сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
                   все баллы на колонку влево */}
@@ -2638,7 +2649,7 @@ function Finale({ pack, gameId, gameState }: {
             <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
               <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color }}><span className="sb-name">{t.name}</span></td>
+              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}

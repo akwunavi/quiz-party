@@ -4,8 +4,8 @@
 // поверх игры (выше затемнения), как и раньше.
 import type { CSSProperties, ReactNode } from 'react'
 import type { NyTeam } from '../types'
-import { lobbyLayout, lobbyRowH } from './geometry'
-import { bookTeamVariant } from './copy'
+import { lobbyLayout } from './geometry'
+import { BookTeamCard } from './BookTeamCard'
 
 /** Команды на правой странице: 1–4 карточки, 5–8 список, 9+ колонки, «+N» только при нехватке места. */
 export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean }) {
@@ -21,23 +21,18 @@ export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean 
       </div>
     )
   }
-  const shown = l.hidden ? teams.slice(0, teams.length - l.hidden) : teams
+  // ОДОБРЕННАЯ карточка (BookTeamCard): размер зависит от числа команд — высота = область / строк; колонок 1 (≤8), 2 (≤16), 3 (17+)
+  const n = teams.length, cols = n <= 8 ? 1 : n <= 16 ? 2 : 3, rows = Math.ceil(n / cols), area = 600, gap = 8
+  const ch = Math.max(52, Math.min(150, Math.floor((area - gap * (rows - 1)) / rows)))
+  const shown = n > cols * 8 ? teams.slice(0, cols * 8 - 1) : teams, hidden = n - shown.length
   return (
-    <div className={`bk-teams is-${l.mode} bk-t${bookTeamVariant()}`}
-      style={{ '--cols': l.cols, '--per': l.perCol, '--fs': l.fontU, '--rh': lobbyRowH(l) } as CSSProperties}>
+    <div className={`bk-teams is-${l.mode} bk-tcards`} style={{ '--cols': cols, '--per': rows, '--ch': ch } as CSSProperties}>
       <div className="bk-teams-head"><span>КОМАНДЫ ЗА СТОЛОМ</span><b>{teams.length}</b></div>
-      <ol className="bk-teams-grid">
-        {shown.map((t, i) => {
-          const n = t.name.length
-          return (
-            <li key={t.id} className={`bk-team${t.alive ? '' : ' is-away'}${n > 22 ? ' is-long' : n > 14 ? ' is-mid' : ''}`}
-              style={{ '--tc': t.color, '--i': i } as CSSProperties}>
-              <span className="bk-team-num">{i + 1}</span>
-              <span className="bk-team-name">{t.icon && <i>{t.icon}</i>}{t.name}</span>
-            </li>
-          )
-        })}
-        {l.hidden > 0 && <li className="bk-team is-more"><span className="bk-team-name">+{l.hidden} ещё</span></li>}
+      <ol className="bk-teams-grid bk-tc-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridAutoFlow: 'row', gridTemplateRows: 'none', gap: `${gap}px 14px`, alignContent: 'start' }}>
+        {shown.map(t => (
+          <li key={t.id} className="bk-tc-item"><BookTeamCard scene name={t.name} ch={ch} color={t.color} icon={t.icon} away={!t.alive} /></li>
+        ))}
+        {hidden > 0 && <li className="bk-tc-item bk-tc-more">+{hidden} ещё</li>}
       </ol>
     </div>
   )

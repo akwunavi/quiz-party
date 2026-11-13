@@ -11,6 +11,7 @@ export const group = id => {
   if (/^1[56]/.test(id)) return 'Финал'
   if (/^17/.test(id)) return 'Плитки команд'
   if (/^18/.test(id)) return 'Типографика'
+  if (/^66-/.test(id)) return 'Карточка команды'
   if (/^3[0134]-|^32-/.test(id)) return 'Вступление, инфо, перерыв, табло'
   if (/^36-|^6[0-3]-|^02-|^03-/.test(id)) return 'Правила раунда и варианты оформления'
   if (/^35-/.test(id)) return '«120 секунд»'

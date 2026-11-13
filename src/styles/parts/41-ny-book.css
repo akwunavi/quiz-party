@@ -765,3 +765,42 @@
 .theme-ny_book .info-screen .info-body { display: flex !important; flex-direction: column; gap: calc(14 * var(--u)); grid-template: none !important; flex: 1 1 auto; min-height: 0; overflow: visible; }
 .theme-ny_book .info-screen .info-body .ib-label { flex: none; order: 1; } .theme-ny_book .info-screen .info-body .ib-meta-fit { order: 2; }
 .theme-ny_book .info-screen .info-stack .ib-rules-band { order: 3; flex: none; } .theme-ny_book .info-screen .info-stack .info-body { order: 2; }
+
+/* ═══ КАРТОЧКА КОМАНДЫ (утверждённый ассет public/ny-book/team-card.webp, BookTeamCard.tsx) ═══
+   border-image режет картинку на левый край (480 px: корешок, закладка со снежинкой, кисточка, хвоя), растягиваемую середину и правый край (153 px);
+   высота = --tch, поэтому края сохраняют пропорции (масштаб k = tch/662), а ширина — любая. Имя — HTML-слой в области пергамента (padding), не на краях. */
+.theme-ny_book .bk-tc { --k: calc(var(--tch) / 662); position: relative; box-sizing: border-box; display: block; width: 100%; height: var(--tch); min-width: 0;
+  border: solid transparent; border-width: 0 calc(153 * var(--k)) 0 calc(480 * var(--k));
+  border-image: url('/quiz-party/ny-book/team-card.webp') 0 153 0 480 fill / 0 calc(153 * var(--k)) 0 calc(480 * var(--k)) / 0 stretch;
+  padding: calc(100 * var(--k)) 0 calc(222 * var(--k)); transition: filter .2s, transform .2s; }
+.theme-ny_book .bk-tc-box { position: absolute; left: 0; right: 0; top: calc(100 * var(--k)); bottom: calc(222 * var(--k)); display: flex; align-items: center; gap: calc(14 * var(--k)); min-width: 0; padding: 0 calc(18 * var(--k)); }
+.theme-ny_book .bk-tc-text { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: center; }
+.theme-ny_book .bk-tc-name { display: block; width: 100%; font-family: var(--bk-name); font-weight: 600; line-height: 1.1; color: #2a1a10; text-align: left; overflow-wrap: break-word; text-wrap: balance; letter-spacing: 0; text-shadow: 0 calc(1 * var(--k)) 0 rgba(255, 244, 214, .6); }
+.theme-ny_book .bk-tc-dot { flex: none; width: calc(46 * var(--k)); height: calc(46 * var(--k)); border-radius: 50%; box-shadow: inset 0 0 0 calc(5 * var(--k)) rgba(255, 255, 255, .65), 0 0 0 calc(5 * var(--k)) rgba(138, 106, 36, .9); }
+.theme-ny_book .bk-tc-score { flex: none; font: 700 calc(150 * var(--k)) / 1 var(--bk-serif); color: var(--bk-red); font-variant-numeric: lining-nums tabular-nums; }
+.theme-ny_book .bk-tc-mark { flex: none; display: grid; place-items: center; width: calc(70 * var(--k)); height: calc(70 * var(--k)); border-radius: 50%; font: 700 calc(52 * var(--k)) / 1 var(--bk-serif); font-style: normal; color: #fff; }
+/* состояния: кожа и пергамент НЕ перекрашиваются — свечение по контуру карточки (drop-shadow следует за альфой) и маленький индикатор */
+.theme-ny_book .bk-tc.is-away { opacity: .45; }
+.theme-ny_book .bk-tc-selected { transform: translateY(calc(-6 * var(--k))) scale(1.03); filter: drop-shadow(0 0 calc(26 * var(--k)) rgba(255, 214, 110, .95)) drop-shadow(0 0 calc(8 * var(--k)) rgba(255, 236, 170, .9)); }
+.theme-ny_book .bk-tc-correct { filter: drop-shadow(0 0 calc(22 * var(--k)) rgba(47, 160, 80, .95)); } .theme-ny_book .bk-tc-correct .bk-tc-mark { background: #2f7d45; }
+.theme-ny_book .bk-tc-wrong { filter: drop-shadow(0 0 calc(22 * var(--k)) rgba(200, 40, 40, .95)); } .theme-ny_book .bk-tc-wrong .bk-tc-mark { background: #b3261e; }
+.theme-ny_book .bk-tc-none { filter: saturate(.55) brightness(.92); opacity: .72; } .theme-ny_book .bk-tc-none .bk-tc-mark { background: rgba(60, 40, 20, .35); }
+.theme-ny_book .bk-tcards .bk-tc-grid { display: grid; } .theme-ny_book .bk-tc-item { list-style: none; min-width: 0; }
+.theme-ny_book .bk-tc-more { align-self: center; text-align: center; font: italic 700 26px var(--bk-serif); color: var(--bk-muted); }
+
+/* карточка в таблицах (em-режим): высота = 1.55 em кегля таблицы (подгон кегля таблицы масштабирует и карточку), имя — одной строкой, длинное — мельче */
+.theme-ny_book .bk-tc-em { width: 100%; min-width: 12em; margin: .05em 0; } .theme-ny_book .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .38); white-space: nowrap; line-height: 1; } .theme-ny_book .bk-tc-em.is-long .bk-tc-name { font-size: calc(var(--tch) * .27); }
+.theme-ny_book .sb-table td:nth-child(2), .theme-ny_book .fin-table td:nth-child(2) { text-align: left; }
+.theme-ny_book .bk-at { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-width: calc(330 * var(--u)); }
+.theme-ny_book .team-answer.bk-ta { display: grid; grid-template-columns: calc(270 * var(--u)) minmax(0, 1fr); align-items: center; gap: calc(12 * var(--u)); background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.theme-ny_book .bk-ta .text { font: 600 calc(28 * var(--u)) / 1.12 var(--bk-serif); color: var(--bk-ink); }
+.theme-ny_book .lg-name.bk-lg { width: 100%; flex: none; }
+.theme-ny_book .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .46) !important; } .theme-ny_book .bk-tc-em.is-long .bk-tc-name { font-size: calc(var(--tch) * .34) !important; }
+.theme-ny_book .team-answers .team-answer.bk-ta { display: grid !important; grid-template-columns: calc(270 * var(--u)) minmax(0, 1fr) !important; align-items: center; }
+.theme-ny_book .answers-layout:has(.bk-ta) { grid-template-columns: minmax(0, 1fr) calc(620 * var(--u)) !important; column-gap: calc(70 * var(--u)); }
+.theme-ny_book .team-answers .team-answer.bk-ta > .text { grid-column: 2 !important; grid-row: 1 !important; position: static !important; margin: 0 !important; padding: 0 !important; max-width: none !important; width: auto !important; display: -webkit-box !important; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: calc(26 * var(--u)) !important; }
+.theme-ny_book .team-answers .team-answer.bk-ta > .bk-tc { grid-column: 1; grid-row: 1; }
+/* индикатор статуса — круглый значок на правом крае карточки (кожу не трогает) */
+.theme-ny_book .bk-tc-mark { position: absolute; right: calc(-34 * var(--k)); top: calc(70 * var(--k)); width: calc(150 * var(--k)); height: calc(150 * var(--k)); font-size: calc(104 * var(--k)); box-shadow: 0 0 0 calc(8 * var(--k)) #f6e8c8, 0 calc(6 * var(--k)) calc(10 * var(--k)) rgba(0, 0, 0, .35); z-index: 3; }
+.theme-ny_book .bk-tc-correct { filter: drop-shadow(0 0 calc(34 * var(--k)) rgba(47, 160, 80, 1)) drop-shadow(0 0 calc(10 * var(--k)) rgba(120, 230, 150, .9)); }
+.theme-ny_book .bk-tc-wrong { filter: drop-shadow(0 0 calc(34 * var(--k)) rgba(210, 40, 40, 1)) drop-shadow(0 0 calc(10 * var(--k)) rgba(255, 140, 130, .9)); }
