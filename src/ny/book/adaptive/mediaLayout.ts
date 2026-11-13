@@ -54,7 +54,7 @@ export interface Choice extends Scored { all: { name: string; score: number; val
 const P = (side: PaneSpec['side'], items: number[], arr: ArrKind): PaneSpec => ({ side, items, arr })
 
 /** Кандидаты по числу картинок. ПОРЯДОК важен только как тай-брейк при почти равных очках. */
-export function layoutCandidates(n: number, spansFold: boolean): Candidate[] {
+export function layoutCandidates(n: number, spansFold: boolean, ratios?: number[]): Candidate[] {
   if (n <= 0) return []
   if (n === 1) return [{ name: 'single', panes: [P('ALL', [0], 'one')] }]
   const out: Candidate[] = []
@@ -71,6 +71,7 @@ export function layoutCandidates(n: number, spansFold: boolean): Candidate[] {
       { name: 'L2col|R1', panes: [P('L', [0, 1], 'col'), P('R', [2], 'one')] },
       { name: 'L1|R2colEq', panes: [P('L', [0], 'one'), P('R', [1, 2], 'colEq')] },
       { name: 'L2colEq|R1', panes: [P('L', [0, 1], 'colEq'), P('R', [2], 'one')] })
+    out.push(...mixedStacks(n, spansFold, ratios))
     if (!spansFold) out.push({ name: 'row3', panes: [P('ALL', [0, 1, 2], 'row')] }, { name: 'row3eq', panes: [P('ALL', [0, 1, 2], 'rowEq')] })
     return out
   }
@@ -84,8 +85,21 @@ export function layoutCandidates(n: number, spansFold: boolean): Candidate[] {
     { name: 'pages-stack', panes: [P('L', [0, 1], 'col'), P('R', [2, 3], 'col')] },
     { name: 'hero-L', panes: [P('L', [0], 'one'), P('R', [1, 2, 3], 'col')] },
     { name: 'hero-R', panes: [P('L', [0, 1, 2], 'col'), P('R', [3], 'one')] })
+  out.push(...mixedStacks(n, spansFold, ratios))
   if (!spansFold) out.push({ name: 'row4all', panes: [P('ALL', [0, 1, 2, 3], 'row')] })
   return out
+}
+
+/** Смешанный набор: горизонтальные картинки друг под другом на одной странице, остальные — рядом на другой (кандидат, а не правило: побеждает только по оценке). */
+function mixedStacks(n: number, spansFold: boolean, ratios?: number[]): Candidate[] {
+  if (!spansFold || !ratios || ratios.length !== n) return []
+  const H = ratios.map((r, i) => (r >= 1.2 ? i : -1)).filter(i => i >= 0), O = ratios.map((r, i) => (r < 1.2 ? i : -1)).filter(i => i >= 0)
+  if (H.length < 2 || O.length < 1) return []
+  const arrO: ArrKind = O.length === 1 ? 'one' : 'row'
+  return [
+    { name: 'hstack-R', panes: [P('L', O, arrO), P('R', H, 'col')] },
+    { name: 'hstack-L', panes: [P('L', H, 'col'), P('R', O, arrO)] },
+  ]
 }
 
 interface PaneBox { x: number; y: number; w: number; h: number }
@@ -196,7 +210,7 @@ export function scoreCandidate(c: Candidate, o: LayoutInput): Scored {
 export function chooseLayout(o: LayoutInput): Choice | null {
   const n = o.ratios.length
   if (n === 0) return null
-  const scored = layoutCandidates(n, o.spansFold).map(c => scoreCandidate(c, o))
+  const scored = layoutCandidates(n, o.spansFold, o.ratios).map(c => scoreCandidate(c, o))
   let best = scored[0]
   for (const s of scored) if (s.valid && (!best.valid || s.score > best.score + EPS)) best = s
   if (o.prev) {

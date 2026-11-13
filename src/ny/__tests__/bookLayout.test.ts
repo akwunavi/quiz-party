@@ -161,3 +161,23 @@ describe('Подписи: зона на 3 строки, когда 2 не хва
     expect(three.placed.every(p => (p.caption?.h ?? 0) === 104)).toBe(true)
   })
 })
+
+describe('Смешанный набор: «горизонтальные друг под другом» — кандидат, а не правило', () => {
+  it('кандидаты hstack появляются только когда есть ≥2 горизонтальных и хотя бы одна не горизонтальная', () => {
+    const has = (r: number[]) => layoutCandidates(r.length, true, r).some(c => c.name.startsWith('hstack'))
+    expect(has([R.v, R.h, R.h, R.sq])).toBe(true)
+    expect(has([R.h, R.h, R.h, R.h])).toBe(false)
+    expect(has([R.v, R.sq, R.v, R.sq])).toBe(false)
+    expect(has([R.v, R.h, R.sq, R.c])).toBe(true)   // 16:9 и 4:3 — оба горизонтальные
+  })
+  it('участвует в оценке: размещён корректно (стопка в одной странице, на сгибе нет) и побеждает лишь при лучших очках', () => {
+    const r = [R.sq, R.h, R.h, R.sq]
+    const c = chooseLayout(base(r, { captionH: 0 }))!, s = c.all.find(x => x.name === 'hstack-R')!
+    expect(s.valid).toBe(true)
+    expect(c.score).toBeGreaterThanOrEqual(s.score - 0.1)
+    const hs = scoreCandidate(layoutCandidates(4, true, r).find(x => x.name === 'hstack-R')!, base(r))
+    const xs = [1, 2].map(i => hs.placed[i].photo)
+    expect(Math.abs(xs[0].x + xs[0].w / 2 - (xs[1].x + xs[1].w / 2))).toBeLessThan(1)
+    expect(xs[1].y).toBeGreaterThan(xs[0].y + xs[0].h - 1)
+  })
+})
