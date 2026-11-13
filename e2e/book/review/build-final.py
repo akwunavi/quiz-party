@@ -31,6 +31,22 @@ CURRENT = [
 ]
 PROPOSED = [('Правила всех раундов (галерея)', [f'7{r:02d}-rules-r{r}' for r in range(15)]),
             ('Доска мелодии и «Своей игры»: крупные обложки, ёлки не заходят на книги', ['13-melody-board-3x4', '37-jp-board'])]
+BASE = os.path.join(ROOT, 'docs-dev', 'book-redesign', 'shots', 'baseline')
+PAIRS = ['01-lobby-8', '04-q-0img-long', '09-answer-time', '11-revealed-plain', '14-melody-snippet', '15-finale-16']
+def bframe(sid):
+    f = os.path.join(BASE, f'{sid}-1920x1080.webp')
+    if not os.path.exists(f): return None
+    im = Image.open(f).convert('RGB'); im = im.resize((W, round(im.height * W / im.width)), Image.LANCZOS)
+    b = io.BytesIO(); im.save(b, 'WEBP', quality=Q, method=6); return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+def matrix_html():
+    rows = [l for l in open(os.path.join(ROOT, 'docs-dev', 'book-redesign', 'MATRIX.md'), encoding='utf-8').read().splitlines() if l.startswith('|')]
+    out = '<table class="mx">'
+    for i, l in enumerate(rows):
+        if set(l.replace('|', '').strip()) <= set('-: '): continue
+        cells = [c.strip().replace('`', '') for c in l.strip('|').split('|')]
+        tag = 'th' if i == 0 else 'td'
+        out += '<tr>' + ''.join(f'<{tag}>{c}</{tag}>' for c in cells) + '</tr>'
+    return out + '</table>'
 frames = {}
 def need(ids):
     for s in ids:
@@ -38,11 +54,17 @@ def need(ids):
             f = frame(s, r)
             if f: frames.setdefault(s, {})[r] = f
 for n, t, ids, c in CURRENT: need(ids)
+need(PAIRS)
+for sid in PAIRS:
+    bf = bframe(sid)
+    if bf: frames['b:' + sid] = {'1920x1080': bf}
 for t, ids in PROPOSED: need(ids)
 miss = [s for n, t, ids, c in CURRENT for s in ids if s not in frames]
 if miss: print('НЕТ кадров:', miss)
 def cards(ids): return ''.join(f'<figure data-id="{s}"><img alt="{s}"><figcaption>{s}</figcaption></figure>' for s in ids if s in frames)
 sec_cur = ''.join(f'<section class="it"><h3>{n}. {t}</h3><p class="n">{c}</p><div class="g">{cards(ids)}</div></section>' for n, t, ids, c in CURRENT)
+sec_cur += '<section class="it"><h3>Сравнение: до редизайна (baseline) / после</h3><p class="n">слева — состояние до редизайна «Книги», справа — сейчас (переключайте разрешение)</p><div class="g">' + ''.join(f'<figure data-id="b:{s_}"><img alt=""><figcaption></figcaption></figure><figure data-id="{s_}"><img alt=""><figcaption></figcaption></figure>' for s_ in PAIRS if 'b:' + s_ in frames) + '</div></section>'
+sec_cur = '<section class="it"><h3>Матрица «утверждённый экран → реальный компонент → что менялось»</h3><p class="n">полный текст — docs-dev/book-redesign/MATRIX.md</p>' + matrix_html() + '</section>' + sec_cur
 sec_cur += '<section class="it"><h3>12. Редактор компоновки — рабочий прототип</h3><p class="n">интерактивный HTML (не в боевой админке): перетаскивание, ресайз, авто/вручную, сброс, вопрос/ответ, сохранение в долях; подложка — реальные кадры</p><iframe data-b="led"></iframe></section>'
 sec_prop = ''.join(f'<section class="it"><h3>{t}</h3><div class="g">{cards(ids)}</div></section>' for t, ids in PROPOSED)
 sec_prop += '<section class="it"><h3>Перелистывание страницы: два варианта (A жёсткая / B с изгибом)</h3><p class="n">концепт на кадрах настоящих экранов; не подключён к игре</p><iframe data-b="flip"></iframe></section>'
@@ -54,7 +76,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui}hea
 button{background:var(--red);color:#fff;border:1px solid var(--gold);border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}button.on{background:var(--gold);color:#2a1a12}
 main{max-width:1500px;margin:0 auto;padding:12px 16px 60px}.it{margin:20px 0;padding:12px;border:1px solid rgba(201,161,74,.5);border-radius:8px;background:var(--card)}h3{margin:0 0 6px}.n{margin:0 0 8px;opacity:.8;font-size:13px}
 .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:10px}figure{margin:0}img{width:100%;height:auto;border-radius:4px;background:#000;display:block}figcaption{font-size:12px;opacity:.7;padding-top:2px}
-iframe{width:100%;height:min(80vh,720px);border:0;background:#000;border-radius:6px}.sec{display:none}.sec.on{display:block}.lead{opacity:.85}</style>'''
+table.mx{border-collapse:collapse;font-size:12px;width:100%}table.mx td,table.mx th{border:1px solid rgba(201,161,74,.4);padding:3px 6px;text-align:left;vertical-align:top}iframe{width:100%;height:min(80vh,720px);border:0;background:#000;border-radius:6px}.sec{display:none}.sec.on{display:block}.lead{opacity:.85}</style>'''
 data = json.dumps(frames, ensure_ascii=False)
 html = f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Книга — итоговый просмотр</title>{css}</head><body>
 <header><b>Книга — итоговый просмотр</b><span id="tabs"></span><span style="flex:1"></span><span>Экран:</span><span id="res"></span></header>
