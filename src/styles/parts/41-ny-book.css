@@ -956,15 +956,15 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 
 /* ═══ ЕДИНЫЙ ТАЙМЕР «Книги» (BookTimer.tsx): plash timer_face + кольцо timer_ring + дуга + цифры секунд. Слот — прежний квадрат; плашка вписана по высоте, пропорция 315:330 не искажается ═══ */
 .theme-ny_book .bk-timer-slot { display: grid; place-items: center; }
-.theme-ny_book .bk-tm { position: relative; height: 100%; aspect-ratio: 315 / 330; max-width: 100%; --d: calc(var(--bk-timer-d)); }
+.theme-ny_book .bk-tm { position: relative; height: 100%; aspect-ratio: 1 / 1; max-width: 100%; --d: calc(var(--bk-timer-d)); }
 .theme-ny_book .bk-tm > img { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
-.theme-ny_book .bk-tm .bk-tm-face { inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 calc(5 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
-.theme-ny_book .bk-tm .bk-tm-ring { left: 22%; top: 32.5%; width: 56%; height: 55%; transition: filter .4s; }
-.theme-ny_book .bk-tm .bk-tm-arc { position: absolute; left: 25.2%; top: 35.3%; width: 49.6%; height: 49.2%; border-radius: 50%;
-  background: conic-gradient(from 0deg, #b3263a calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%); mask: radial-gradient(circle, transparent 62%, #000 63%); }
-.theme-ny_book .bk-tm .bk-tm-num { position: absolute; left: 22%; top: 32.5%; width: 56%; height: 55%; display: grid; place-items: center; font: 700 calc(var(--bk-timer-d) * .36) / 1 var(--bk-serif); color: var(--bk-ink-2); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em; }
+.theme-ny_book .bk-tm .bk-tm-ring { inset: 0; width: 100%; height: 100%; transition: filter .4s; filter: drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
+/* дуга остатка — полоса внутри кольца (внутренний край кольца ≈ 4.8 % от диаметра), без диска под цифрами */
+.theme-ny_book .bk-tm .bk-tm-arc { position: absolute; inset: 5.4%; border-radius: 50%;
+  background: conic-gradient(from 0deg, #b3263a calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7.5%), #000 calc(100% - 7.5%)); mask: radial-gradient(farthest-side, transparent calc(100% - 7.5%), #000 calc(100% - 7.5%)); }
+.theme-ny_book .bk-tm .bk-tm-num { position: absolute; inset: 14%; display: grid; place-items: center; font: 700 calc(var(--bk-timer-d) * .4) / 1 var(--bk-serif); color: var(--bk-ink-2); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em; }
 .theme-ny_book .bk-tm.is-low .bk-tm-num { color: var(--bk-red-2); } .theme-ny_book .bk-tm.is-low .bk-tm-arc { background: conic-gradient(from 0deg, #d3322e calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); }
-.theme-ny_book .bk-tm.is-low .bk-tm-ring { filter: hue-rotate(-12deg) saturate(1.25); }
+.theme-ny_book .bk-tm.is-low .bk-tm-ring { filter: hue-rotate(-12deg) saturate(1.25) drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
 .theme-ny_book .bk-tm.is-zero .bk-tm-num { color: #a3261f; } .theme-ny_book .bk-tm.is-zero .bk-tm-ring { filter: hue-rotate(-18deg) saturate(1.4) brightness(.92); }
 .theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: bk-tm-tick 1s ease-in-out infinite; } @keyframes bk-tm-tick { 50% { transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: none; } }
@@ -1086,3 +1086,10 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .an-screen.has-teams .an-board-wrap { max-width: 100%; }
 .theme-ny_book .an-teams.dense { width: calc(520 * var(--u)); }
 .theme-ny_book .host-screen.an-screen.has-teams:has(.an-teams.dense) { padding-right: calc(var(--bk-ox) + 250 * var(--u) + 560 * var(--u)); }
+
+/* ═══ ПЛАШКА НОМЕРА РАУНДА: утверждённая плашка с колокольчиком (plaque-hi.webp, 1336×1416 ≈ 0.94 — почти квадрат, поэтому только под номер, не растягивается) ═══
+   Широкие ярлыки (.qnum «ВОПРОС 2 / 10», .mono-tag) остаются прежними: по пропорциям плашка к ним не подходит. */
+.theme-ny_book .host-screen.round-intro .round-badge { left: calc(var(--bk-ox) + 250 * var(--u)); top: calc(var(--bk-oy) + 60 * var(--u)); width: calc(170 * var(--u)); height: calc(180 * var(--u)); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(44 * var(--u)) 0 calc(14 * var(--u));
+  background: url('/quiz-party/ny-book/plaque-hi.webp') center / 100% 100% no-repeat !important; box-shadow: none !important; border: 0 !important; filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .35)); box-sizing: border-box; }
+.theme-ny_book .round-intro .round-badge .rb-word { font: 700 calc(15 * var(--u)) var(--bk-serif); letter-spacing: .26em; color: var(--bk-red); margin: 0; padding-left: .26em; }
+.theme-ny_book .round-intro .round-badge .rb-num { background: none !important; box-shadow: none !important; color: var(--bk-ink-2); font: 700 calc(84 * var(--u)) / .95 var(--bk-display); padding: 0; margin: 0; }

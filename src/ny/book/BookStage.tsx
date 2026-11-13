@@ -52,12 +52,12 @@ function LobbyScenery() {
   const b = import.meta.env.BASE_URL + 'ny-book/'
   return (
     <div className="bk-lobby-scenery" aria-hidden="true">
-      <img className="bk-ls-hill" src={b + 'snow_hill.webp'} alt="" draggable={false} />
-      <div className="bk-ls-house"><img src={b + 'house.webp'} alt="" draggable={false} />
-        <img className="bk-ls-smoke" src={b + 'smoke.webp'} alt="" draggable={false} /><img className="bk-ls-smoke s2" src={b + 'smoke.webp'} alt="" draggable={false} /><span className="bk-ls-glow" /></div>
-      <div className="bk-ls-lantern l1"><img src={b + 'lantern.webp'} alt="" draggable={false} /><span className="bk-ls-lglow" /></div>
-      <img className="bk-ls-fence" src={b + 'fence.webp'} alt="" draggable={false} />
-      <img className="bk-ls-fence f2" src={b + 'fence.webp'} alt="" draggable={false} />
+      <img className="bk-ls-hill" src={b + 'snow-hill-hi.webp'} alt="" draggable={false} />
+      <div className="bk-ls-house"><img src={b + 'house-hi.webp'} alt="" draggable={false} />
+        <img className="bk-ls-smoke" src={b + 'smoke-hi.webp'} alt="" draggable={false} /><img className="bk-ls-smoke s2" src={b + 'smoke-hi.webp'} alt="" draggable={false} /><span className="bk-ls-glow" /></div>
+      <div className="bk-ls-lantern l1"><img src={b + 'lantern-hi.webp'} alt="" draggable={false} /><span className="bk-ls-lglow" /></div>
+      <img className="bk-ls-fence" src={b + 'fence-hi.webp'} alt="" draggable={false} />
+      <img className="bk-ls-fence f2" src={b + 'fence-hi.webp'} alt="" draggable={false} />
     </div>
   )
 }
