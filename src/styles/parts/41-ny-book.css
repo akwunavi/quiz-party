@@ -1151,3 +1151,29 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* правила длинные — рамка растёт до низа страницы (не 62vh), кегль подгоняет useFitText; всё остаётся внутри правой страницы */
 .theme-ny_book .round-intro .rules-frame { max-height: calc(740 * var(--u)) !important; }
 .theme-ny_book .round-intro .rules-frame .rule-item { padding-block: .3em !important; }
+/* «Отвечайте» (замер: .answer-time-teams scrollWidth 870 > clientWidth 867 на 1280×720, 1305 > 1300 на 1920): карточка «выбрана» увеличивается на 3 % (.bk-tc-selected,
+   scale 1.03) и крайние колонки выпирали на 3–5 px за контейнер — внутренний отступ по краям гасит выступ, сами карточки не меняются */
+.theme-ny_book .answer-time-teams { padding-inline: 2%; box-sizing: border-box; }
+/* ФИНАЛ: useFitText только УМЕНЬШАЕТ кегль, поэтому стартовый кегль — «с запасом» по числу команд, а подгонка по высоте/ширине доводит до предела (замер: на 16 командах 1280×720 имена были ≈12 px при свободной высоте ≈30 px на строку) */
+.theme-ny_book .fin-screen .fin-table { font-size: calc(40 * var(--u)); }
+.theme-ny_book .fin-screen .fin-table.rows-7 { font-size: calc(36 * var(--u)); }
+.theme-ny_book .fin-screen .fin-table.rows-10, .theme-ny_book .fin-screen .fin-table.rows-12 { font-size: calc(34 * var(--u)); }
+.theme-ny_book .fin-screen .fin-table.rows-14, .theme-ny_book .fin-screen .fin-table.rows-16 { font-size: calc(32 * var(--u)); }
+
+/* ═══ ФИНАЛ, много команд (≥13): таблица — на ДВУХ страницах книги (места 1…N/2 слева, остальные справа), только место/медаль, команда, итог.
+   Только CSS поверх той же разметки: порядок строк, медали и падение от последнего места к первому (.is-in/.is-veiled) не тронуты.
+   Разбивка по раундам в этом режиме скрыта (на 1280×720 16 строк в одну колонку давали имена ≈12 px). ═══ */
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) { display: block; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) thead { display: none; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) tbody { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--half, 8), minmax(0, 1fr)); column-gap: calc(70 * var(--u)); row-gap: calc(5 * var(--u)); }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) tr { display: grid; grid-template-columns: calc(130 * var(--u)) minmax(0, 1fr) calc(110 * var(--u)); align-items: center; min-width: 0; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td:nth-child(n+3):not(:last-child) { display: none; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td { min-width: 0; }
+.theme-ny_book .fin-screen.bk-fin .fin-table.rows-14, .theme-ny_book .fin-screen.bk-fin .fin-table.rows-16 { font-size: calc(30 * var(--u)); }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td:nth-child(2) { overflow: hidden; padding-right: calc(10 * var(--u)); box-sizing: border-box; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td:last-child { padding-left: calc(8 * var(--u)); text-align: right; padding-right: calc(10 * var(--u)); }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc { max-width: 100%; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc-em { min-width: 0 !important; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td:nth-child(2) { overflow: visible; padding-left: calc(14 * var(--u)); padding-right: 0; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc-em.is-mid .bk-tc-name { font-size: .93em !important; }
+.theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc-em.is-long .bk-tc-name { font-size: .74em !important; }

@@ -2642,7 +2642,7 @@ function Finale({ pack, gameId, gameState }: {
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
       <div className="fin-table-wrap">
-      <table ref={fitFinTable} className={`fin-table${tableSize(rows.length)}`}>
+      <table ref={fitFinTable} className={`fin-table${tableSize(rows.length)}`} style={{ '--half': Math.ceil(rows.length / 2) } as CSSProperties}>
         {/* ДВЕ пустые колонки: место и название команды. Была одна —
             заголовки раундов съезжали влево на целый столбец. */}
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
