@@ -43,7 +43,7 @@ function q(roundId, pos, text, extra = {}) {
   return {
     id: `${roundId}-q${pos}`, round_id: roundId, position: pos, question_text: text,
     media: { question: [], ...(extra.media ?? {}) }, answer: extra.answer ?? free('ответ'),
-    answer_note: extra.note ?? null, service: {}, is_final_question: false, status: 'ready', hidden: false,
+    answer_note: extra.note ?? null, service: extra.service ?? {}, is_final_question: false, status: 'ready', hidden: false,
   }
 }
 
@@ -191,8 +191,8 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
         .map((t, i) => q(rid, i, t, { answer: free(['двенадцать / 12', 'Париж', 'семь / 7', 'белый', 'четыре / 4', 'Санта-Клаус / Дед Мороз', 'восемь / 8', 'Рождество'][i]) })), { teamSeconds: 60, timeoutPenalty: 10 }),
     round(id, 12, 'race', 'Скачки бульдогов', ['Ставки — на кличку бульдога', 'Выигрывает тот, кто прибежит первым'], () => [], { dogs: ['Рокки', 'Бублик', 'Пончик', 'Тайсон', 'Бусинка'], betSec: 30, courseSec: 42 }),
     round(id, 13, 'four_pics', '3 попытки', ['Фаза 1 — две картинки, фаза 2 — три, фаза 3 — четыре', 'Чем раньше угадали, тем больше баллов'], rid => [
-      q(rid, 0, '', { media: { question: [0, 1, 2, 3].map(i => m(`sa-${i}.jpg`)) }, answer: free('снежинка') }),
-      q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: free('подарок') })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
+      q(rid, 0, '', { media: { question: [0, 1, 2, 3].map(i => m(`sa-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'СНЕЖИНКА' }, service: { openLetters: [0, 4] } }),
+      q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
       q(rid, 0, 'Новогодняя героиня', { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
       q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),

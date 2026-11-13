@@ -884,3 +884,14 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .race-screen .host-topbar { position: static !important; top: auto !important; }
 .theme-ny_book .race-screen .host-topbar .qnum { font: 700 clamp(14px, 1.3vw, 22px) / 1 system-ui, sans-serif !important; letter-spacing: .12em; color: #aab6d8 !important; background: none !important; box-shadow: none !important; padding: 0 !important; text-transform: uppercase; }
 .theme-ny_book .race-screen .mono-tag { color: #aab6d8 !important; text-shadow: none !important; }
+
+/* ═══ «3 ПОПЫТКИ»: обязательные буквенные ячейки слова (по реальной механике: число букв, закрытые «?», открытые подсказкой, полное слово в разборе) ═══ */
+.theme-ny_book .rv-word-wrap { height: calc(150 * var(--u)); margin-top: calc(18 * var(--u)); }
+.theme-ny_book .rv-word { font-size: calc(92 * var(--u)); gap: calc(60 * var(--u)); font-family: var(--bk-serif); }
+.theme-ny_book .rv-group { gap: calc(10 * var(--u)); }
+.theme-ny_book .rv-cell { width: calc(84 * var(--u)); height: calc(112 * var(--u)); font: 700 calc(82 * var(--u)) / 1 var(--bk-display); border: 0; border-radius: calc(10 * var(--u)); text-transform: uppercase;
+  background: linear-gradient(180deg, #fffaf0, #efdcae); color: rgba(107, 78, 51, .38);
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold), inset 0 0 0 calc(8 * var(--u)) #f6e8c8, inset 0 calc(5 * var(--u)) calc(9 * var(--u)) rgba(90, 55, 20, .18), 0 calc(5 * var(--u)) 0 var(--bk-shade), 0 calc(9 * var(--u)) calc(12 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .rv-cell.open { color: var(--bk-red); background: linear-gradient(180deg, #fff6da, #f2d58c); text-shadow: 0 calc(2 * var(--u)) 0 rgba(255, 244, 214, .8);
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold-3), inset 0 0 0 calc(8 * var(--u)) #fff0c4, 0 calc(5 * var(--u)) 0 var(--bk-shade), 0 0 calc(24 * var(--u)) rgba(242, 213, 140, .85); }
+.theme-ny_book .rv-answer { font-family: var(--bk-display); font-weight: 700; color: var(--bk-ink-2); }
