@@ -2,7 +2,7 @@
 // Вынесено из HostScreen.tsx (9.51, объединение предпросмотра с боевым
 // экраном) — импорт оттуда тянул бы весь проектор в чужой чанк, а
 // предпросмотру в редакторе нужен ровно этот компонент, не копия.
-import { createPortal } from 'react-dom'
+import { ScrollModal } from '../../ny/book/ScrollModal'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { TileCard } from '../../components/TileCard'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
@@ -339,9 +339,8 @@ function useTileModal({ round, gameState, tile, tileIndex, replayNonce, origin, 
 function TileModal(props: TileProps) {
   const { theme, tile, onClose, packTheme, showAnswer, onShowAnswer, onReplay } = props
   const { modalRef, growVars, remaining, playing, teams, audioErr, localGrades, rows, grade } = useTileModal(props)
-  return createPortal(
-    <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
-      <div ref={modalRef} className={`jp-modal hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
+  return (
+    <ScrollModal theme={packTheme} kind="jp" load={rows.length > 5 ? 'l' : 'm'} modalRef={modalRef} className={`hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
         <div className="jp-modal-head">
           <div>
             <div className="jp-modal-theme">{theme.name}</div>
@@ -406,9 +405,7 @@ function TileModal(props: TileProps) {
           )}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
-      </div>
-    </div>,
-    document.body,
+    </ScrollModal>
   )
 }
 

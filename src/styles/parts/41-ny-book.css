@@ -999,7 +999,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    Свиток — фон-картинка фиксированной пропорции; тексты и кнопки — динамический HTML в полезной области пергамента внутри золотой рамки
    (слева 13 %, справа 16 %, сверху 20 %, снизу 20 %: бант и колокольчики справа сверху и ветка слева снизу НЕ перекрываются). Появление — разворачивание из рулона (clip-path + scaleY), при reduced-motion — просто проявление. */
 .theme-ny_book.mel-overlay .mel-modal.bk-scroll, .theme-ny_book.mel-overlay .mel-modal {
-  --sc-h: min(calc(980 * var(--u)), 94vh); width: calc(var(--sc-h) * 1230 / 1185); height: var(--sc-h); max-width: 96vw; box-sizing: border-box;
+  --sc-h: min(calc(900 * var(--u)), 94vh); width: calc(var(--sc-h) * 1230 / 1185); height: var(--sc-h); max-width: 96vw; box-sizing: border-box;
   padding: calc(var(--sc-h) * .205) calc(var(--sc-h) * .17 * 1.04) calc(var(--sc-h) * .205) calc(var(--sc-h) * .14 * 1.04);
   background: url('/quiz-party/ny-book/scroll.webp') center / 100% 100% no-repeat !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
   filter: drop-shadow(0 calc(26 * var(--u)) calc(30 * var(--u)) rgba(0, 0, 0, .55)); overflow: visible; justify-content: flex-start;
@@ -1093,3 +1093,30 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   background: url('/quiz-party/ny-book/plaque-hi.webp') center / 100% 100% no-repeat !important; box-shadow: none !important; border: 0 !important; filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .35)); box-sizing: border-box; }
 .theme-ny_book .round-intro .round-badge .rb-word { font: 700 calc(15 * var(--u)) var(--bk-serif); letter-spacing: .26em; color: var(--bk-red); margin: 0; padding-left: .26em; }
 .theme-ny_book .round-intro .round-badge .rb-num { background: none !important; box-shadow: none !important; color: var(--bk-ink-2); font: 700 calc(84 * var(--u)) / .95 var(--bk-display); padding: 0; margin: 0; }
+
+/* ═══ ЕДИНАЯ СВИТОК-МОДАЛКА (ScrollModal.tsx): размер по содержимому (m — обычный, l — длинные списки), «Своя игра» внутри того же свитка ═══ */
+.theme-ny_book.mel-overlay .mel-modal[data-load="l"] { --sc-h: min(calc(980 * var(--u)), 96vh); }
+.theme-ny_book.mel-overlay { background: rgba(28, 16, 10, .62) !important; }
+.theme-ny_book.mel-overlay .mel-modal { overflow: hidden; display: flex; flex-direction: column; }
+.theme-ny_book.mel-overlay .mel-modal[data-kind="jp"] { gap: calc(8 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-modal-head { display: flex; justify-content: space-between; align-items: center; gap: calc(14 * var(--u)); border-bottom: calc(2 * var(--u)) solid var(--bk-line); padding-bottom: calc(4 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-modal-theme { font: 700 calc(28 * var(--u)) / 1.1 var(--bk-display) !important; color: var(--bk-red) !important; }
+.theme-ny_book.mel-overlay .jp-count { font: 700 calc(40 * var(--u)) / 1 var(--bk-serif); color: var(--bk-ink-2); }
+.theme-ny_book.mel-overlay .jp-answers { flex: 1 1 0; min-height: 0; overflow: hidden auto; display: flex; flex-direction: column; gap: calc(4 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-answer { display: grid; grid-template-columns: auto minmax(0, .8fr) minmax(0, 1.2fr) auto auto; align-items: center; gap: calc(10 * var(--u)); padding: calc(3 * var(--u)) calc(8 * var(--u)); font: 600 calc(21 * var(--u)) var(--bk-name); background: rgba(255, 250, 235, .55); border-radius: calc(4 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-answer .txt { overflow-wrap: anywhere; font-family: var(--bk-serif); }
+.theme-ny_book.mel-overlay .jp-grade { width: calc(40 * var(--u)); height: calc(36 * var(--u)); padding: 0; font-size: calc(22 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-modal-foot { display: flex; flex-wrap: wrap; gap: calc(8 * var(--u)); justify-content: center; align-items: center; }
+.theme-ny_book.mel-overlay .jp-modal-foot button { font-size: calc(20 * var(--u)); padding: calc(7 * var(--u)) calc(16 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-modal .answer-reveal { padding: calc(8 * var(--u)) calc(14 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .jp-modal .answer-main { font-size: calc(36 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .mel-actions button, .theme-ny_book.mel-overlay .mel-escape { font-size: calc(20 * var(--u)); }
+.theme-ny_book.mel-overlay .jp-modal-head > div:first-child { display: flex; flex-direction: column; gap: calc(2 * var(--u)); min-width: 0; }
+.theme-ny_book.mel-overlay .jp-modal-head .mono-tag { position: static; margin: 0; }
+.theme-ny_book.mel-overlay .mel-modal .answer-reveal .answer-main { font-size: calc(32 * var(--u)) !important; line-height: 1.12; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .mel-modal .answer-reveal { max-height: 38%; overflow: hidden; }
+.theme-ny_book.mel-overlay .mel-modal[data-kind="jp"] { align-items: stretch; }
+.theme-ny_book.mel-overlay .mel-modal[data-kind="jp"] > * { align-self: stretch; width: auto; max-width: 100%; }
+.theme-ny_book.mel-overlay .jp-modal-head .mono-tag { font-size: calc(18 * var(--u)) !important; letter-spacing: .2em; }
+.theme-ny_book.mel-overlay .mel-modal > * { box-sizing: border-box; }
+.theme-ny_book.mel-overlay .mel-modal { padding-left: calc(var(--sc-h) * .2) !important; }

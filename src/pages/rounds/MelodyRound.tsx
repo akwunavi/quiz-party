@@ -15,7 +15,7 @@ import { usePlaybackActive } from '../../lib/playbackActive'
 import { BookMelodyCovers } from '../../ny/book/BookMelody'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
-import { createPortal } from 'react-dom'
+import { ScrollModal } from '../../ny/book/ScrollModal'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { TileCard } from '../../components/TileCard'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -573,9 +573,8 @@ function ClassicMelodyBoard(props: BoardProps) {
       {/* модалка появляется только с момента прослушивания, на барабане её нет */}
       {/* ПОРТАЛ в document.body: модалка физически не может стать «частью страницы»,
           какие бы transform/overflow ни появились у предков */}
-      {m.stage && !idle && m.stage !== 'spinning' && createPortal(
-        <div className={`mel-overlay theme-${pack.theme ?? 'classic'}`}>
-          <div className="mel-modal">
+      {m.stage && !idle && m.stage !== 'spinning' && (
+        <ScrollModal theme={pack.theme} kind="mel" load={teams.length > 6 ? 'l' : 'm'}>
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
               {/* На listen дедлайн декоративный (не синхронизирован с
@@ -680,24 +679,6 @@ function ClassicMelodyBoard(props: BoardProps) {
                   guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur))))}>К доске →</button>
               </div>}
             </>)}
-            {/* Аварийный выход. Доступен на любой стадии: интернет у команд
-                отваливается, ответы не долетают, и ведущему нужен способ
-                двигаться дальше, не перезапуская игру. Не рендерится в
-                предпросмотре — как и остальные кнопки, пишущие в игру. */}
-            {!preview && m.stage !== 'reveal' && m.stage !== 'done' && (
-              <button className="mel-escape" onClick={async () => {
-                if (!confirm('Закрыть трек и вернуться к доске?\n\n'
-                  + 'Баллы за него никто не получит.')) return
-                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
-                // трека, не конкретно та, что была на момент клика. confirm()
-                // может провисеть несколько секунд, за которые короткая
-                // цепочка автостадий (spinning→listen→bidding) переключится
-                // сама — проверка «та же стадия» после этого никогда бы не
-                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
-                const keyNow = m.key
-                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
-              }}>Закрыть</button>
-            )}
 
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
               <div className="mel-big" style={{ color: currentTeam?.color }}>
@@ -736,9 +717,25 @@ function ClassicMelodyBoard(props: BoardProps) {
                 </button>
               </div>}
             </>)}
-          </div>
-        </div>,
-        document.body,
+            {/* Аварийный выход. Доступен на любой стадии: интернет у команд
+                отваливается, ответы не долетают, и ведущему нужен способ
+                двигаться дальше, не перезапуская игру. Не рендерится в
+                предпросмотре — как и остальные кнопки, пишущие в игру. */}
+            {!preview && m.stage !== 'reveal' && m.stage !== 'done' && (
+              <button className="mel-escape" onClick={async () => {
+                if (!confirm('Закрыть трек и вернуться к доске?\n\n'
+                  + 'Баллы за него никто не получит.')) return
+                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
+                // трека, не конкретно та, что была на момент клика. confirm()
+                // может провисеть несколько секунд, за которые короткая
+                // цепочка автостадий (spinning→listen→bidding) переключится
+                // сама — проверка «та же стадия» после этого никогда бы не
+                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
+                const keyNow = m.key
+                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
+              }}>Закрыть</button>
+            )}
+        </ScrollModal>
       )}
     </div>
   )
