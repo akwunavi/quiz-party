@@ -1401,7 +1401,7 @@ function BlitzScreen({ pack, round, gameState }: {
 
   return (
     <>
-      <BlitzBoard teams={teams} state={state} bank={bank}
+      <BlitzBoard book={pack.theme === 'ny_book'} teams={teams} state={state} bank={bank}
         questionText={q?.question_text}
         verdict={cur?.verdict}
         reveal={reveal}

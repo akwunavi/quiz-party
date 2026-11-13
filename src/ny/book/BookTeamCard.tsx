@@ -39,7 +39,7 @@ export function BookTeamCard({ name, ch, scene = false, em = false, state = 'nor
   return (
     <div className={`bk-tc bk-tc-${state}${em ? ' bk-tc-em' : ''}${em && name.length > 20 ? ' is-long' : ''}${away ? ' is-away' : ''}${className ? ' ' + className : ''}`} data-state={state} style={{ '--tch': tch } as CSSProperties}>
       <span className="bk-tc-box">
-        {color && <i className="bk-tc-dot" style={{ background: color }} />}
+        {color && <i className="bk-tc-dot" style={{ '--dc': color } as CSSProperties} />}
         <span className="bk-tc-text"><span ref={em ? undefined : fit} className="bk-tc-name" data-bk-text="tc">{icon ? `${icon} ` : ''}{name}</span></span>
         {score != null && <b className="bk-tc-score">{score}</b>}
         {mark && <em className="bk-tc-mark" aria-label={state}>{mark}</em>}
