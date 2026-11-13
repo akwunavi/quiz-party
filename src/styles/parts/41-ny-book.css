@@ -681,3 +681,73 @@
 /* четыре картинки: заголовок над сеткой — фиксированная полоса, сетка 2×2 получает остальное; колонки разведены на сгиб */
 .theme-ny_book .host-screen.bk-ad-grid > div:has(> .q-text) { flex: 0 0 calc(var(--bk-band, 150) * var(--u)); min-height: 0; width: 100%; max-width: 100%; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
 .theme-ny_book .host-screen.bk-ad-grid > .bk-media { flex: 1 1 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+   РЕДИЗАЙН «КНИГИ»: оформление остальных механик (COVERAGE.md §2) — блиц, «120 секунд», перерыв/подсчёт. Только ny_book.
+   Блиц: базовая раскладка (.bz-row/.bz-block…) удалена из общих стилей коммитом 10.41 (HANDOFF) — для «Книги» она задана заново здесь.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════ */
+.theme-ny_book .bz-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: calc(22 * var(--u));
+  padding: calc(var(--bk-oy) + 190 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 140 * var(--u)); }
+.theme-ny_book .bz-screen > .host-topbar { position: absolute; top: calc(var(--bk-oy) + 60 * var(--u)); left: calc(var(--bk-ox) + 250 * var(--u)); right: calc(var(--bk-ox) + 250 * var(--u)); justify-content: space-between; }
+.theme-ny_book .bz-row { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: calc(20 * var(--u)); width: min(calc(1420 * var(--u)), 100%); margin: 0 auto; }
+.theme-ny_book .bz-row-top { width: min(calc(var(--cols, 1) * 330 * var(--u) + (var(--cols, 1) - 1) * 20 * var(--u)), 100%); }
+.theme-ny_book .bz-block { position: relative; min-width: 0; padding: calc(12 * var(--u)) calc(16 * var(--u)) calc(10 * var(--u)); text-align: center; border-top-color: var(--tc, var(--bk-gold)) !important; border-top-width: calc(9 * var(--u)) !important;
+  box-shadow: 0 calc(4 * var(--u)) 0 var(--bk-shade), 0 calc(8 * var(--u)) calc(12 * var(--u)) var(--bk-shadow); transition: transform .2s, box-shadow .2s; }
+.theme-ny_book .bz-block.on { transform: translateY(calc(-4 * var(--u))); box-shadow: 0 0 0 calc(3 * var(--u)) var(--bk-gold), 0 calc(10 * var(--u)) calc(18 * var(--u)) var(--bk-shadow); }
+.theme-ny_book .bz-block.low .bz-timer { color: var(--bk-red); }
+.theme-ny_book .bz-name { font: 700 calc(28 * var(--u)) / 1.15 var(--bk-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.theme-ny_book .bz-timer { font: 700 calc(66 * var(--u)) / 1 var(--bk-serif); font-variant-numeric: tabular-nums; }
+.theme-ny_book .bz-meta { display: flex; justify-content: center; gap: calc(14 * var(--u)); font: 400 calc(21 * var(--u)) / 1.2 var(--bk-serif); color: var(--bk-muted); }
+.theme-ny_book .bz-pts { color: var(--bk-ok); font-weight: 700; }
+.theme-ny_book .bz-turn { position: absolute; top: calc(-20 * var(--u)); left: 50%; transform: translateX(-50%); padding: calc(2 * var(--u)) calc(12 * var(--u)); font: 700 calc(16 * var(--u)) var(--bk-serif); letter-spacing: .14em; background: var(--bk-red); color: var(--bk-gold-2); border-radius: calc(3 * var(--u)); }
+.theme-ny_book .bz-question { width: min(calc(1420 * var(--u)), 100%); min-height: calc(210 * var(--u)); margin: 0 auto; padding: calc(18 * var(--u)) calc(40 * var(--u)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(6 * var(--u)); text-align: center;
+  background: none; box-shadow: none; border-top: calc(3 * var(--u)) double var(--bk-gold-3); border-bottom: calc(3 * var(--u)) double var(--bk-gold-3); }
+.theme-ny_book .bz-asking { font: 700 calc(21 * var(--u)) var(--bk-serif); letter-spacing: .16em; text-transform: uppercase; color: var(--bk-muted); }
+.theme-ny_book .bz-asking b { color: var(--tc, var(--bk-red)); font-family: var(--bk-name); letter-spacing: .02em; text-transform: none; font-size: 1.25em; }
+.theme-ny_book .bz-qtext { font: 700 calc(52 * var(--u)) / 1.18 var(--bk-serif); color: var(--bk-ink); text-wrap: balance; }
+.theme-ny_book .bz-verdict { font: 700 calc(34 * var(--u)) var(--bk-serif); letter-spacing: .08em; text-transform: uppercase; }
+.theme-ny_book .bz-verdict.ok { color: var(--bk-ok); } .theme-ny_book .bz-verdict.no { color: var(--bk-red-2); } .theme-ny_book .bz-right { color: var(--bk-muted); text-transform: none; letter-spacing: 0; }
+.theme-ny_book .bz-bank { display: inline-flex; align-items: center; justify-content: center; width: calc(84 * var(--u)); height: calc(84 * var(--u)); border-radius: 50%; font: 700 calc(34 * var(--u)) var(--bk-serif); color: var(--bk-red); border: calc(3 * var(--u)) double var(--bk-gold-3); background: var(--bk-paper); }
+.theme-ny_book .bz-dice-wrap { display: flex; flex-direction: column; align-items: center; gap: calc(16 * var(--u)); margin: auto; }
+.theme-ny_book .bz-dice { padding: calc(26 * var(--u)) calc(64 * var(--u)); font: 700 calc(84 * var(--u)) var(--bk-display); color: var(--bk-red); background: linear-gradient(180deg, #fbf1da, #ecdcb8); box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold), 0 calc(6 * var(--u)) 0 var(--bk-shade); border-radius: calc(10 * var(--u)); }
+.theme-ny_book .bz-dice.rolling { animation: bk-dice .22s steps(2) infinite; } @keyframes bk-dice { 50% { transform: rotate(-2deg) scale(.98); } }
+.theme-ny_book .bz-dice-cap { font: 700 calc(22 * var(--u)) var(--bk-serif); letter-spacing: .24em; text-transform: uppercase; color: var(--bk-muted); }
+@media (prefers-reduced-motion: reduce) { .theme-ny_book .bz-dice.rolling { animation: none; } }
+
+/* «120 секунд»: три колонки — вопросы слева, таймер по центру, вопросы справа; карточка-страничка с красным номером */
+.theme-ny_book .sprint-screen { padding: calc(var(--bk-oy) + 190 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 140 * var(--u)); gap: calc(40 * var(--u)); align-items: center; }
+.theme-ny_book .sprint-topbar { position: absolute; top: calc(var(--bk-oy) + 60 * var(--u)); left: calc(var(--bk-ox) + 250 * var(--u)); }
+.theme-ny_book .sprint-col { gap: calc(16 * var(--u)); } .theme-ny_book .sprint-center { min-width: calc(260 * var(--u)); }
+.theme-ny_book .sprint-card { display: grid; grid-template-columns: auto 1fr; gap: calc(16 * var(--u)); align-items: center; padding: calc(14 * var(--u)) calc(20 * var(--u)); background: linear-gradient(180deg, #fbf1da, #ecdcb8); border: 0; border-radius: calc(6 * var(--u)); box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--bk-gold), 0 calc(4 * var(--u)) 0 var(--bk-shade); }
+.theme-ny_book .sprint-num { display: grid; place-items: center; width: calc(52 * var(--u)); height: calc(52 * var(--u)); border-radius: 50%; font: 700 calc(30 * var(--u)) / 1 var(--bk-serif); color: var(--bk-paper); background: var(--bk-red); box-shadow: inset 0 0 0 calc(3 * var(--u)) rgba(242, 213, 140, .55); }
+.theme-ny_book .sprint-text { font: 700 calc(34 * var(--u)) / 1.18 var(--bk-serif); color: var(--bk-ink); } .theme-ny_book .sprint-screen.many .sprint-text { font-size: calc(30 * var(--u)); }
+.theme-ny_book .sprint-pre-num { font: 700 calc(110 * var(--u)) var(--bk-serif); color: var(--bk-red); }
+
+/* перерыв / подсчёт: книжный заголовок вместо экранного, цифры — серифные */
+.theme-ny_book .break-screen .break-timer { font: 700 calc(200 * var(--u)) / 1 var(--bk-serif); color: var(--bk-ink-2); letter-spacing: .02em; text-shadow: 0 calc(4 * var(--u)) 0 rgba(201, 161, 74, .5); font-variant-numeric: tabular-nums; }
+.theme-ny_book .break-screen .mono-tag { font: 700 calc(26 * var(--u)) var(--bk-serif); letter-spacing: .34em; color: var(--bk-red); }
+.theme-ny_book .counting-sub { font: italic 400 calc(34 * var(--u)) var(--bk-serif); color: var(--bk-muted); }
+.theme-ny_book .break-screen :is(h1, h2, .neon-title) { font-family: var(--bk-display) !important; font-weight: 700; color: var(--bk-ink-2) !important; text-shadow: 0 calc(4 * var(--u)) 0 rgba(201, 161, 74, .5); letter-spacing: .01em; }
+
+/* ═══ ПЕРЕКЛЮЧАТЕЛИ РЕДИЗАЙНА (прототип, copy.ts:bookFlags): ?bkfont=B · ?bkqn=B · ?bkrules=2 ═══ */
+/* типографика B «Печатная книга»: Lora (текст) + Philosopher (главы); по умолчанию A — PT Serif + Cormorant Garamond */
+:root[data-bk-font="B"] .theme-ny_book, :root[data-bk-font="B"] .theme-ny_book.mel-overlay { --bk-serif: 'Lora', Georgia, serif; --bk-display: 'Philosopher', 'Lora', Georgia, serif; --bk-name: 'Lora', Georgia, serif; --bk-num: 'Lora', Georgia, serif; }
+/* плашка номера B «закладка»: бордовая ленточка с ласточкиным хвостом, висит от верха страницы */
+:root[data-bk-qn="B"] .theme-ny_book .host-topbar .qnum { padding: .7em 1.1em 1.5em; background: linear-gradient(180deg, #a8283b, #7a1522 85%); color: var(--bk-gold-2); border-radius: 0; letter-spacing: .1em;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - .8em), 0 100%); box-shadow: none; filter: drop-shadow(0 calc(5 * var(--u)) calc(4 * var(--u)) var(--bk-shadow)); text-shadow: 0 1px 0 #3b0a11; }
+:root[data-bk-qn="B"] .theme-ny_book .host-topbar .qnum b { color: #fff3cf; }
+/* правила, вариант 2 «рамка-свиток»: золотая двойная рамка, золотые разделители, цифры дисплейным шрифтом */
+:root[data-bk-rules="2"] .theme-ny_book .rules-frame { padding: calc(28 * var(--u)) calc(36 * var(--u)); background: linear-gradient(180deg, #f8eed4, #ecdcb8); border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold), inset 0 0 0 calc(9 * var(--u)) #f4e5c3, inset 0 0 0 calc(11 * var(--u)) rgba(201, 161, 74, .7), 0 calc(12 * var(--u)) calc(24 * var(--u)) var(--bk-shadow); }
+:root[data-bk-rules="2"] .theme-ny_book .rule-item { border-left: 0; border-bottom: calc(1 * var(--u)) solid var(--bk-line); box-shadow: none; background: none; }
+:root[data-bk-rules="2"] .theme-ny_book .rule-item .idx { font: 700 1.5em var(--bk-display); color: var(--bk-red); background: none; box-shadow: none; }
+
+/* инфо-слайд пакета: заголовок главы сверху, правила, ниже сводка по раундам (раньше — сетка с огромным экранным заголовком и обрезанным списком) */
+.theme-ny_book .info-screen { padding: calc(var(--bk-oy) + 170 * var(--u)) calc(var(--bk-ox) + 250 * var(--u)) calc(var(--bk-oy) + 140 * var(--u)); }
+.theme-ny_book .info-screen .info-stack { display: flex; flex-direction: column; justify-content: flex-start; gap: calc(14 * var(--u)); width: 100%; height: 100%; }
+.theme-ny_book .info-screen .ib-label { order: 1; flex: none; padding: 0; background: none; border: 0; box-shadow: none; text-align: center; }
+.theme-ny_book .info-screen .ib-label-text { font: 700 calc(76 * var(--u)) / 1.05 var(--bk-display) !important; color: var(--bk-ink-2) !important; text-shadow: 0 calc(3 * var(--u)) 0 rgba(201, 161, 74, .45); letter-spacing: .01em; text-transform: none; }
+.theme-ny_book .info-screen .ib-rules-band { order: 2; flex: 0 1 auto; padding: calc(10 * var(--u)) calc(24 * var(--u)); background: none; box-shadow: none; border-top: calc(3 * var(--u)) double var(--bk-gold-3); border-bottom: calc(3 * var(--u)) double var(--bk-gold-3); }
+.theme-ny_book .info-screen .ib-meta { order: 3; flex: 0 0 auto; min-height: 0; overflow: visible; background: none; box-shadow: none; }
+.theme-ny_book .info-screen .info-round { font-size: calc(26 * var(--u)); } .theme-ny_book .info-screen .info-list li { font-size: calc(31 * var(--u)); }
+.theme-ny_book .scoreboard-title, .theme-ny_book .sb-title { font-family: var(--bk-display) !important; text-transform: none; }

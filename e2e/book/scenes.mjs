@@ -337,6 +337,11 @@ export const SCENES = [
       sc('54-mel-bids', 'мелодия: ставки собраны, очередь (bids)', mel('bids', () => ({}))),
       sc('55-mel-answering', 'мелодия: отвечает первая команда (answering)', mel('answering', () => ({ deadline: iso(now() + 22000) }))),
       sc('56-mel-passed', 'мелодия: ход передан второй (passed)', mel('passed', () => ({ turn: 1 }))),
+      // переключатели редизайна (copy.ts:bookFlags): типографика B, плашка B, правила 2 — те же состояния с ?bk…
+      { ...sc('60-var-fontB', 'типографика B (Lora + Philosopher): вопрос с вариантами', async api => { await api.teams(8); await api.session(Q(0, 7)) }), query: 'bkfont=B' },
+      { ...sc('61-var-qnB', 'плашка номера B (закладка): вопрос + 3 картинки', async api => { await api.teams(8); await api.session(Q(0, 3)) }), query: 'bkqn=B' },
+      { ...sc('62-var-rules2', 'правила, вариант 2 (рамка-свиток), R1', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'round_intro', round_number: 0, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 }), query: 'bkrules=2' },
+      sc('63-rules-1', 'правила, вариант 1 (по умолчанию), R1', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'round_intro', round_number: 0, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 }),
       sc('57-mel-reveal', 'мелодия: ответ и кто забрал баллы (reveal)', mel('reveal', ts => ({ wonTeam: ts[1].id, wonPts: 2, turn: 1 }))),
     ]
   })(),

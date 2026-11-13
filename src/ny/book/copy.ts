@@ -24,3 +24,12 @@ export function bookTeamVariant(): BookTeamVariant {
     return m ? (Number(m[1]) as BookTeamVariant) : 1
   } catch { return 1 }
 }
+
+/** ПРОТОТИП (только для согласования): переключатели редизайна из адреса проектора — `?bkfont=A|B` (типографика), `?bkqn=A|B` (плашка номера вопроса),
+ *  `?bkrules=1|2` (экран правил). По умолчанию A / A / 1. Применяются атрибутами `data-bk-*` на <html> (CSS: `:root[data-bk-font="B"] …`). После выбора — убрать. */
+export function bookFlags(): { font: 'A' | 'B'; qn: 'A' | 'B'; rules: '1' | '2' } {
+  try {
+    const h = typeof location !== 'undefined' ? location.href : ''
+    return { font: /[?&]bkfont=B/i.test(h) ? 'B' : 'A', qn: /[?&]bkqn=B/i.test(h) ? 'B' : 'A', rules: /[?&]bkrules=2/.test(h) ? '2' : '1' }
+  } catch { return { font: 'A', qn: 'A', rules: '1' } }
+}

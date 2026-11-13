@@ -10,6 +10,7 @@ import type { Density } from '../types'
 import { BOOK } from './geometry'
 import { BOOK_ASSETS, bookAssetUrl, type BookAssetId } from './assets'
 import { pageTurnKey, type TurnSnap } from './motion'
+import { bookFlags } from './copy'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -95,6 +96,12 @@ function BookSnow({ density }: { density: Density }) {
 
 /** Разворот книги: переплёт, толщина страниц, пергамент, сгиб, свет; декор и снег; слот контента. */
 export function BookPages({ decor, children }: { decor: Density; children?: ReactNode }) {
+  // ПРОТОТИП: флаги редизайна (?bkfont / ?bkqn / ?bkrules) → data-bk-* на <html>; при размонтировании убираются
+  useEffect(() => {
+    const f = bookFlags(), d = document.documentElement.dataset
+    d.bkFont = f.font; d.bkQn = f.qn; d.bkRules = f.rules
+    return () => { delete d.bkFont; delete d.bkQn; delete d.bkRules }
+  }, [])
   return (
     <div className="bk-scene" data-decor={decor}>
       <div className="bk-book" style={{ left: BOOK.x, top: BOOK.y, width: BOOK.w, height: BOOK.h }}>

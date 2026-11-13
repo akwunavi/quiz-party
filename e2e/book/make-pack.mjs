@@ -49,7 +49,7 @@ function round(packId, pos, mechanic, title, rules, questions, settings = {}, ex
   const id = `${packId}-r${pos}`
   return {
     id, pack_id: packId, position: pos, mechanic, title_lines: Array.isArray(title) ? title : [title], rules,
-    rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: false,
+    rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: pos >= 8,
     answers_reveal: extra.reveal ?? 'after_round', meta_line_override: null, status: 'ready',
     questions: questions(id),
   }
