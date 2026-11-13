@@ -1019,7 +1019,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay .mel-modal .mel-modal-theme { font-size: calc(26 * var(--u)) !important; }
 
 .theme-ny_book .mel-screen { padding-top: calc(var(--bk-oy) + 118 * var(--u)) !important; padding-bottom: calc(var(--bk-oy) + 110 * var(--u)) !important; }
-.theme-ny_book .mel-screen .mel-board:has(.bk-covs), .theme-ny_book .jp-screen .jp-board:has(.bk-covs) { margin-inline: calc(-120 * var(--u)); width: auto; }
+.theme-ny_book .mel-screen .mel-board:has(.bk-covs), .theme-ny_book .jp-screen .jp-board:has(.bk-covs) { margin-inline: calc(-4 * var(--u)); width: auto; }
 
 /* ═══ «120 СЕКУНД»: 8 вопросов в карточках на ОБЕИХ страницах разворота (4 + 4, равные высоты), нумерация — часть карточки, таймер в собственной безопасной зоне (верх-право, как на всех экранах) ═══ */
 .theme-ny_book .sprint-screen { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: calc(120 * var(--u)) !important; align-items: stretch !important;
@@ -1177,3 +1177,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) td:nth-child(2) { overflow: visible; padding-left: calc(14 * var(--u)); padding-right: 0; }
 .theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc-em.is-mid .bk-tc-name { font-size: .93em !important; }
 .theme-ny_book .fin-screen.bk-fin .fin-table:is(.rows-14, .rows-16) .bk-tc-em.is-long .bk-tc-name { font-size: .74em !important; }
+/* reduced-motion: бесконечный pulse счётчика плитки «Своей игры» (08-projector.css) не гасился (найдено reduced-check.cjs на реальной эмуляции) */
+@media (prefers-reduced-motion: reduce) { .theme-ny_book .jp-count.on, .theme-ny_book.mel-overlay .jp-count.on { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .theme-ny_book .answer-pulse, .theme-ny_book .host-screen .answer-pulse { animation: none !important; } }
