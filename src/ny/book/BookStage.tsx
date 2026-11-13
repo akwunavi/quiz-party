@@ -45,6 +45,21 @@ const DECOR: Place[] = [
   { id: 'sprig-berries', x: 1640, y: 962, h: 104, on: ['dense'] },
 ]
 
+/** Лобби: утверждённые ассеты листа ведущего (домик с дымом, фонари, холм, забор — public/ny-book/*.webp, нарезка lobby-cut). Видны только при плотности `sparse`
+ *  (лобби); лежат ПОД контентом, чтобы QR/логотип/команды не перекрывались. Дым — отдельный слой с мягким подъёмом и затуханием; фонари тёплым свечением мерцают. */
+function LobbyScenery() {
+  const b = import.meta.env.BASE_URL + 'ny-book/'
+  return (
+    <div className="bk-lobby-scenery" aria-hidden="true">
+      <img className="bk-ls-hill" src={b + 'snow_hill.webp'} alt="" draggable={false} />
+      <div className="bk-ls-house"><img src={b + 'house.webp'} alt="" draggable={false} />
+        <img className="bk-ls-smoke" src={b + 'smoke.webp'} alt="" draggable={false} /><img className="bk-ls-smoke s2" src={b + 'smoke.webp'} alt="" draggable={false} /><span className="bk-ls-glow" /></div>
+      <div className="bk-ls-lantern l1"><img src={b + 'lantern.webp'} alt="" draggable={false} /><span className="bk-ls-lglow" /></div>
+      <img className="bk-ls-fence" src={b + 'fence.webp'} alt="" draggable={false} />
+    </div>
+  )
+}
+
 /** Гирлянда: хвоя с лампочками, лампочки — DOM-узлы по координатам из манифеста (мерцание CSS). */
 function Garland({ id, x, y, w, on, lamps = 18 }: { id: BookAssetId; x: number; y: number; w: number; on: On; lamps?: number }) {
   const a = BOOK_ASSETS[id]
@@ -82,9 +97,11 @@ const sparkOn = (d: Density): On => ORDER.slice(ORDER.indexOf(d))
 
 const SNOW: Record<Density, number> = { sparse: 70, medium: 34, dense: 12 }
 const snowCfg = (n: number): SnowCfg => ({ layers: [
-  { count: n, size: [1.6, 3.2], speed: [22, 36], opacity: 0.75 },
-  { count: Math.round(n / 3), size: [3, 5], speed: [34, 52], opacity: 0.9 },
-], wind: 10, color: '#fffaf0' })
+  // три слоя глубины: дальний — мелкий, медленный и бледный; средний; ближний — крупный, быстрый (в лобби ближнего чуть больше)
+  { count: Math.round(n * 0.9), size: [1.2, 2.2], speed: [14, 24], opacity: 0.5 },
+  { count: n, size: [1.8, 3.4], speed: [24, 38], opacity: 0.78 },
+  { count: Math.round(n / 3), size: [3.6, 6], speed: [40, 62], opacity: 0.92 },
+], wind: 12, color: '#fffaf0' })
 
 /** Снег: canvas смонтирован ВСЕГДА, плотность меняется setSnow без пересоздания слоя. */
 function BookSnow({ density }: { density: Density }) {
@@ -113,6 +130,7 @@ export function BookPages({ decor, children }: { decor: Density; children?: Reac
         <div className="bk-light" />
       </div>
       <div className="bk-decor-back">{DECOR.filter(p => !p.front).map((p, i) => <Decor key={`${p.id}${i}`} p={p} i={i} />)}</div>
+      <LobbyScenery />
       <div className="bk-sparks">{SPARKS.map(([x, y, d], i) => <span key={i} className="bk-spark" data-on={sparkOn(d).join(' ')} style={{ left: x, top: y, '--i': i } as CSSProperties} />)}</div>
       <div className="bk-content" style={{ left: BOOK.x, top: BOOK.y, width: BOOK.w, height: BOOK.h }}>{children}</div>
       <div className="bk-decor-front">{DECOR.filter(p => p.front).map((p, i) => <Decor key={`${p.id}${i}`} p={p} i={i + 20} />)}</div>
