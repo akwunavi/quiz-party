@@ -1061,3 +1061,12 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .round-intro .cw-layout .side .neon-title { font-size: calc(70 * var(--u)) !important; text-align: left; }
 .theme-ny_book .round-intro .cw-layout .mono-tag { font: 700 calc(24 * var(--u)) var(--bk-serif); letter-spacing: .3em; color: var(--bk-red); }
 .theme-ny_book .round-intro .cw-layout .rules-frame { width: 100% !important; margin: 0 !important; }
+
+/* ═══ ЭКРАН ОТВЕТА С КАРТИНКОЙ: ответ и картинка рядом, картинка крупно (класс .bk-side ставит HostScreen, когда пояснение короткое или его нет); при длинном пояснении — прежняя колонка ═══ */
+.theme-ny_book .answers-main.revealed .answer-block.bk-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: calc(26 * var(--u)); row-gap: calc(10 * var(--u)); align-items: stretch; justify-items: stretch; padding: calc(44 * var(--u)) calc(34 * var(--u)) calc(26 * var(--u)); }
+.theme-ny_book .answer-block.bk-side > .answer-label { grid-column: 1; grid-row: 1; text-align: left; font-size: calc(20 * var(--u)) !important; letter-spacing: .14em; white-space: nowrap; padding: 0 !important; }
+.theme-ny_book .answers-main.revealed .answer-block.bk-side > .answer-main { grid-column: 1; grid-row: 2; align-self: center; text-align: left !important; font-size: calc(54 * var(--u)) !important; }
+.theme-ny_book .answers-main.revealed .answer-block.bk-side > .answer-media { grid-column: 2; grid-row: 1 / span 2; min-height: 0; height: 100%; max-height: none !important; width: 100%; align-self: stretch; }
+.theme-ny_book .answer-block.bk-side > .bk-note-box { grid-column: 1 / -1; grid-row: 3; }
+/* подпись не лезет под угловые «❖» */
+.theme-ny_book .answers-main.revealed .answer-block:not(.bk-side) > .answer-label { padding: 0 calc(40 * var(--u)); }
