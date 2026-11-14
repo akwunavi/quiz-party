@@ -48,16 +48,32 @@ const DECOR: Place[] = [
 
 /** Лобби: утверждённые ассеты листа ведущего (домик с дымом, фонари, холм, забор — public/ny-book/*.webp, нарезка lobby-cut). Видны только при плотности `sparse`
  *  (лобби); лежат ПОД контентом, чтобы QR/логотип/команды не перекрывались. Дым — отдельный слой с мягким подъёмом и затуханием; фонари тёплым свечением мерцают. */
+/** Сплошной снежный сугроб вдоль нижнего края ОБЕИХ страниц (ассет snow-hill-hi.webp 2000×245, пропорции не меняются): сегменты с перекрытием, каждый второй
+ *  отражён по горизонтали — швы и «провалы» у скошенных краёв ассета закрыты соседями; контейнер обрезан по полям страниц, под корешком разрыва нет.
+ *  back — под домиком/забором/фонарём, front — поверх их оснований (стоят «внутри снега»). */
+function SnowStrip({ b, kind }: { b: string; kind: 'back' | 'front' }) {
+  const n = kind === 'back' ? 3 : 5
+  return (
+    <div className={`bk-ls-snow ${kind}`}>
+      {Array.from({ length: n }, (_, i) => (
+        <img key={i} className={i % 2 ? 'm' : ''} style={{ left: `${(i / (n - 1)) * 100}%` }} src={b + 'snow-hill-hi.webp'} alt="" draggable={false} />
+      ))}
+      {kind === 'front' && <span className="bk-ls-gutter" />}
+    </div>
+  )
+}
+
 function LobbyScenery() {
   const b = import.meta.env.BASE_URL + 'ny-book/'
   return (
     <div className="bk-lobby-scenery" aria-hidden="true">
-      <img className="bk-ls-hill" src={b + 'snow-hill-hi.webp'} alt="" draggable={false} />
+      <SnowStrip b={b} kind="back" />
       <div className="bk-ls-house"><img src={b + 'house-hi.webp'} alt="" draggable={false} />
         <img className="bk-ls-smoke" src={b + 'smoke-hi.webp'} alt="" draggable={false} /><img className="bk-ls-smoke s2" src={b + 'smoke-hi.webp'} alt="" draggable={false} /><span className="bk-ls-glow" /></div>
       <div className="bk-ls-lantern l1"><img src={b + 'lantern-hi.webp'} alt="" draggable={false} /><span className="bk-ls-lglow" /></div>
       <img className="bk-ls-fence" src={b + 'fence-hi.webp'} alt="" draggable={false} />
       <img className="bk-ls-fence f2" src={b + 'fence-hi.webp'} alt="" draggable={false} />
+      <SnowStrip b={b} kind="front" />
     </div>
   )
 }

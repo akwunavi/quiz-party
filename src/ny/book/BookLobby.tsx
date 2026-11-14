@@ -40,15 +40,12 @@ export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean 
 
 /** Приглашение на левой странице (под QR; на бумаге — вместо QR). */
 export function BookInvite({ paper }: { paper: boolean }) {
+  // 14.11: подпись у QR («Наведите камеру… играем с телефонов») убрана по решению ведущего — только в «Книге»; на бумаге (нет QR) приглашение остаётся
+  if (!paper) return null
   return (
     <div className={`bk-invite${paper ? ' is-paper' : ''}`}>
-      {paper ? (<>
-        <p className="bk-invite-title">Добро пожаловать!</p>
-        <p className="bk-invite-text">Бланки — на столах. Впишите название команды и передайте ведущему.</p>
-      </>) : (<>
-        <p className="bk-invite-title">Наведите камеру</p>
-        <p className="bk-invite-text">и впишите название команды — играем с телефонов</p>
-      </>)}
+      <p className="bk-invite-title">Добро пожаловать!</p>
+      <p className="bk-invite-text">Бланки — на столах. Впишите название команды и передайте ведущему.</p>
     </div>
   )
 }
