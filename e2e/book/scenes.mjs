@@ -388,6 +388,12 @@ export const SCENES = [
       ...[1, 6].map(n => sc(`74-anagram-race-t${n}`, `Скрэмбл (гонка): показ ответа, ${n} команд`, async api => { const ts = await api.teams(n)
         await api.answers(ts.slice(0, Math.min(n, 3)).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 })),
+      sc('74-anagram-race-t16', 'Скрэмбл (гонка): показ ответа, 16 команд', async api => { const ts = await api.teams(16)
+        await api.answers(ts.slice(0, 5).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
+      sc('74-anagram-race-long', 'Скрэмбл (гонка): победитель с очень длинным названием', async api => { const ts = await api.teams(8, ['Ёлка', 'Самая длинная команда вечера номер один', 'К3', 'Дед Мороз и Снегурочка и Ко', 'Му', 'Тридцать первое декабря', 'Сто двадцать пять снеговиков', 'Команда №7'])
+        await api.answers([{ team_id: ts[1].id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: 'Снегурочка', is_correct: true }])
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
       ...Array.from({ length: 15 }, (_, r) => sc(`7${String(r).padStart(2, '0')}-rules-r${r}`.replace(/^7(\d)(\d)/, (m, a, b) => `7${a}${b}`), `правила: раунд ${r}`, async api => { await api.teams(6); await api.session({ pack_id: PK(r), phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
     ]

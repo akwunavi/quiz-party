@@ -1272,3 +1272,11 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .answers-main.revealed .answer-block > .answer-media.n2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
 .theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img img { background: none; box-shadow: none; border-radius: 0; filter: drop-shadow(0 calc(5 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .45)); }
 .theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img { overflow: visible; }
+/* итог «Скрэмбла», правка 3: подложка центрируется по вертикали вокруг 770u (растёт в обе стороны), имя команды переносится, а не вылезает; при ≥7 командах панель справа спускается ниже 770u,
+   поэтому подложка встаёт по центру ЛЕВОЙ страницы (иначе перекрывала бы панель) */
+.theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 770 * var(--u)); transform: translate(-50%, -50%); }
+.theme-ny_book .an-result .an-res-line { flex-wrap: wrap; justify-content: center; row-gap: calc(4 * var(--u)); }
+.theme-ny_book .an-result .an-res-team { white-space: normal; text-align: center; overflow-wrap: anywhere; }
+.theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 860 * var(--u)); }   /* до 6 команд панель справа кончается выше 780u — широкая подложка под ней, над сугробом */
+.theme-ny_book .host-screen.an-screen.many-teams > .an-result { top: calc(var(--bk-oy) + 770 * var(--u)); left: calc(var(--bk-ox) + 590 * var(--u)); width: calc(660 * var(--u)) !important; }   /* 7+ команд: панель длиннее — подложка по центру левой страницы */
+.theme-ny_book .host-screen.an-screen.many-teams > .an-result .an-res-line { font-size: calc(32 * var(--u)); }
