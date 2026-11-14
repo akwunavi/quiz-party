@@ -956,16 +956,20 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 
 /* ═══ ЕДИНЫЙ ТАЙМЕР «Книги» (BookTimer.tsx): plash timer_face + кольцо timer_ring + дуга + цифры секунд. Слот — прежний квадрат; плашка вписана по высоте, пропорция 315:330 не искажается ═══ */
 .theme-ny_book .bk-timer-slot { display: grid; place-items: center; }
-.theme-ny_book .bk-tm { position: relative; height: 100%; aspect-ratio: 1 / 1; max-width: 100%; --d: calc(var(--bk-timer-d)); }
+.theme-ny_book .bk-tm { position: relative; width: 100%; height: auto; max-height: 100%; aspect-ratio: 1010 / 990; --d: calc(var(--bk-timer-d)); }
 .theme-ny_book .bk-tm > img { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
-.theme-ny_book .bk-tm .bk-tm-ring { inset: 0; width: 100%; height: 100%; transition: filter .4s; filter: drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
-/* дуга остатка — полоса внутри кольца (внутренний край кольца ≈ 4.8 % от диаметра), без диска под цифрами */
-.theme-ny_book .bk-tm .bk-tm-arc { position: absolute; inset: 5.4%; border-radius: 50%;
-  background: conic-gradient(from 0deg, #b3263a calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7.5%), #000 calc(100% - 7.5%)); mask: radial-gradient(farthest-side, transparent calc(100% - 7.5%), #000 calc(100% - 7.5%)); }
-.theme-ny_book .bk-tm .bk-tm-num { position: absolute; inset: 14%; display: grid; place-items: center; font: 700 calc(var(--bk-timer-d) * .4) / 1 var(--bk-serif); color: var(--bk-ink-2); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em; }
-.theme-ny_book .bk-tm.is-low .bk-tm-num { color: var(--bk-red-2); } .theme-ny_book .bk-tm.is-low .bk-tm-arc { background: conic-gradient(from 0deg, #d3322e calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); }
-.theme-ny_book .bk-tm.is-low .bk-tm-ring { filter: hue-rotate(-12deg) saturate(1.25) drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 35, 12, .35)); }
-.theme-ny_book .bk-tm.is-zero .bk-tm-num { color: #a3261f; } .theme-ny_book .bk-tm.is-zero .bk-tm-ring { filter: hue-rotate(-18deg) saturate(1.4) brightness(.92); }
+/* основа — образец timer-sample-0049 без цифр и дуги (1010×990); пергаментный круг: центр (50.2 %, 48.3 %), диаметр ≈ 55 % ширины */
+.theme-ny_book .bk-tm .bk-tm-face { inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .4)); transition: filter .4s; }
+/* красная дуга остатка — тонкая полоса по окружности внутри золотой рамки, как в образце */
+.theme-ny_book .bk-tm .bk-tm-arc { position: absolute; left: 24.2%; top: 21.8%; width: 51.6%; height: 52.6%; border-radius: 50%;
+  background: conic-gradient(from 0deg, #8f1a22 calc(var(--f) * 360deg), rgba(120, 85, 40, .1) 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 12%), #000 calc(100% - 12%)); mask: radial-gradient(farthest-side, transparent calc(100% - 12%), #000 calc(100% - 12%));
+  filter: drop-shadow(0 0 calc(3 * var(--u)) rgba(255, 214, 150, .85)); }
+.theme-ny_book .bk-tm .bk-tm-num { position: absolute; left: 25%; top: 25%; width: 50.4%; height: 46%; display: grid; place-items: center; font: 700 calc(var(--bk-timer-d) * .29) / 1 var(--bk-serif); color: #5e0f14; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em; }
+.theme-ny_book .bk-tm .bk-tm-num[data-len="1"] { font-size: calc(var(--bk-timer-d) * .36); }
+.theme-ny_book .bk-tm .bk-tm-num[data-len="3"] { font-size: calc(var(--bk-timer-d) * .225); }
+.theme-ny_book .bk-tm.is-low .bk-tm-num { color: #b3131c; } .theme-ny_book .bk-tm.is-low .bk-tm-arc { background: conic-gradient(from 0deg, #d3322e calc(var(--f) * 360deg), rgba(120, 85, 40, .16) 0); }
+.theme-ny_book .bk-tm.is-low .bk-tm-face { filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .4)) drop-shadow(0 0 calc(10 * var(--u)) rgba(200, 40, 40, .55)); }
+.theme-ny_book .bk-tm.is-zero .bk-tm-num { color: #a3261f; } .theme-ny_book .bk-tm.is-zero .bk-tm-face { filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .4)) drop-shadow(0 0 calc(12 * var(--u)) rgba(200, 40, 40, .75)); }
 .theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: bk-tm-tick 1s ease-in-out infinite; } @keyframes bk-tm-tick { 50% { transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .theme-ny_book .bk-tm.is-low.is-run .bk-tm-num { animation: none; } }
 .theme-ny_book .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(210 * var(--u)); }
@@ -1005,7 +1009,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   filter: drop-shadow(0 calc(26 * var(--u)) calc(30 * var(--u)) rgba(0, 0, 0, .55)); overflow: visible; justify-content: flex-start;
   transform-origin: 50% 0; animation: bk-unroll .75s cubic-bezier(.3, .7, .25, 1) both; }
 .theme-ny_book.mel-overlay .mel-modal::before, .theme-ny_book.mel-overlay .mel-modal::after { display: none !important; }
-@keyframes bk-unroll { 0% { clip-path: inset(0 0 94% 0); transform: scaleY(.55); opacity: .2; } 100% { clip-path: inset(0 0 0 0); transform: none; opacity: 1; } }
+@keyframes bk-unroll { 0% { clip-path: inset(0 0 94% 0); transform: scaleY(.55); opacity: .2; } 100% { clip-path: inset(-150px -150px -150px -150px); transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .theme-ny_book.mel-overlay .mel-modal { animation: bk-fade .25s ease-out both; } @keyframes bk-fade { from { opacity: 0; } to { opacity: 1; } } }
 .theme-ny_book.mel-overlay .mel-modal > * { max-width: 100%; min-height: 0; }
 .theme-ny_book.mel-overlay .mel-modal .mel-modal-head { border-bottom: calc(2 * var(--u)) solid var(--bk-line); }
@@ -1035,7 +1039,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .sprint-screen { padding-left: 0 !important; padding-right: 0 !important; padding-top: calc(215 * var(--u) - 134 * var(--u)) !important; padding-bottom: 0 !important; }
 .theme-ny_book .sprint-screen .sprint-topbar { display: none; }
 .theme-ny_book .sprint-screen > .sprint-center { top: calc(var(--bk-oy) + 56 * var(--u)) !important; right: calc(var(--bk-ox) + 184 * var(--u)) !important; }
-.theme-ny_book .sprint-screen .bk-tm-num { font-size: calc(var(--bk-timer-d) * .3) !important; }
+.theme-ny_book .sprint-screen .bk-tm-num[data-len="3"] { font-size: calc(var(--bk-timer-d) * .225); }
 .theme-ny_book .sprint-screen > .sprint-center { top: calc(-78 * var(--u)) !important; right: calc(-66 * var(--u)) !important; z-index: 6; }
 
 /* БЛИЦ: утверждённая карточка команды (BookTeamCard) вместо текстовых плашек; цвет команды — глянцевый шарик-украшение внутри карточки */
@@ -1087,12 +1091,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .an-teams.dense { width: calc(520 * var(--u)); }
 .theme-ny_book .host-screen.an-screen.has-teams:has(.an-teams.dense) { padding-right: calc(var(--bk-ox) + 250 * var(--u) + 560 * var(--u)); }
 
-/* ═══ ПЛАШКА НОМЕРА РАУНДА: утверждённая плашка с колокольчиком (plaque-hi.webp, 1336×1416 ≈ 0.94 — почти квадрат, поэтому только под номер, не растягивается) ═══
-   Широкие ярлыки (.qnum «ВОПРОС 2 / 10», .mono-tag) остаются прежними: по пропорциям плашка к ним не подходит. */
-.theme-ny_book .host-screen.round-intro .round-badge { left: calc(var(--bk-ox) + 250 * var(--u)); top: calc(var(--bk-oy) + 60 * var(--u)); width: calc(170 * var(--u)); height: calc(180 * var(--u)); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(44 * var(--u)) 0 calc(14 * var(--u));
-  background: url('/quiz-party/ny-book/plaque-hi.webp') center / 100% 100% no-repeat !important; box-shadow: none !important; border: 0 !important; filter: drop-shadow(0 calc(5 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .35)); box-sizing: border-box; }
-.theme-ny_book .round-intro .round-badge .rb-word { font: 700 calc(15 * var(--u)) var(--bk-serif); letter-spacing: .26em; color: var(--bk-red); margin: 0; padding-left: .26em; }
-.theme-ny_book .round-intro .round-badge .rb-num { background: none !important; box-shadow: none !important; color: var(--bk-ink-2); font: 700 calc(84 * var(--u)) / .95 var(--bk-display); padding: 0; margin: 0; }
 
 /* ═══ ЕДИНАЯ СВИТОК-МОДАЛКА (ScrollModal.tsx): размер по содержимому (m — обычный, l — длинные списки), «Своя игра» внутри того же свитка ═══ */
 .theme-ny_book.mel-overlay .mel-modal[data-load="l"] { --sc-h: min(calc(980 * var(--u)), 96vh); }
@@ -1193,5 +1191,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bz-dice-card.rolling { animation: bk-dice .22s steps(2) infinite; }
 @media (prefers-reduced-motion: reduce) { .theme-ny_book .bz-dice-card.rolling { animation: none !important; } }
 /* таймер в свитке (мелодия/«Своя игра»): то же кольцо и цифры, что на экранах вопросов */
-.theme-ny_book.mel-overlay .bk-mel-timer { --bk-timer-d: calc(96 * var(--u)); width: var(--bk-timer-d); height: var(--bk-timer-d); flex: none; }
-.theme-ny_book.mel-overlay .bk-mel-timer .bk-tm { --bk-timer-d: calc(96 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-mel-timer { --bk-timer-d: calc(112 * var(--u)); width: var(--bk-timer-d); height: var(--bk-timer-d); flex: none; }
+.theme-ny_book.mel-overlay .bk-mel-timer .bk-tm { --bk-timer-d: calc(112 * var(--u)); }
+/* строки ставок/ответов в свитке — пергаментные плашки в тон свитку (были белые) */
+.theme-ny_book.mel-overlay .mel-bid-row { background: rgba(255, 250, 235, .6) !important; border-radius: calc(4 * var(--u)); box-shadow: inset 0 0 0 calc(1.5 * var(--u)) rgba(138, 106, 36, .55) !important; }
+.theme-ny_book.mel-overlay .mel-bid-row.win { background: rgba(242, 213, 140, .75) !important; }

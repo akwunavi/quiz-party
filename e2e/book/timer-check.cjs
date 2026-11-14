@@ -39,7 +39,7 @@ async function main() {
       const lin = el => { let M = new DOMMatrix(); for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const tr = getComputedStyle(n).transform; if (tr && tr !== 'none') M = new DOMMatrix(tr).multiply(M) }
         const sx = Math.hypot(M.a, M.b), sy = Math.hypot(M.c, M.d); return { sx, sy, skew: (M.a * M.c + M.b * M.d) / (sx * sy || 1) } }
       const R = e => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height } }
-      const slot = document.querySelector('[data-bk-slot="timer"]'), tm = slot.querySelector('.bk-tm'), ring = tm.querySelector('.bk-tm-ring'), arc = tm.querySelector('.bk-tm-arc'), num = tm.querySelector('.bk-tm-num')
+      const slot = document.querySelector('[data-bk-slot="timer"]'), tm = slot.querySelector('.bk-tm'), ring = tm.querySelector('.bk-tm-face'), arc = tm.querySelector('.bk-tm-arc'), num = tm.querySelector('.bk-tm-num')
       const rg = document.createRange(); rg.selectNodeContents(num); const dr = rg.getBoundingClientRect()
       const book = document.querySelector('.p-book')?.getBoundingClientRect(), q = document.querySelector('.host-topbar .qnum')?.getBoundingClientRect()
       return { slot: R(slot), tm: R(tm), tmo: [tm.offsetWidth, tm.offsetHeight], ring: R(ring), ringNat: ring.naturalWidth, arc: R(arc), digits: { x: dr.x, y: dr.y, w: dr.width, h: dr.height }, text: num.textContent, cls: tm.className,
@@ -48,14 +48,15 @@ async function main() {
     await ctx.close()
     const bad = [], near = (a, b, tol) => Math.abs(a - b) <= tol
     if (!near(m.slot.w, m.slot.h, 1)) bad.push(`слот ${m.slot.w.toFixed(1)}×${m.slot.h.toFixed(1)} не квадрат`)
-    if (!near(m.tmo[0], m.tmo[1], 1)) bad.push(`таймер ${m.tmo[0]}×${m.tmo[1]} не квадрат`)
-    if (!near(m.ring.w, m.ring.h, 1)) bad.push(`кольцо ${m.ring.w.toFixed(1)}×${m.ring.h.toFixed(1)} не квадрат`)
+    if (!near(m.tmo[0] / m.tmo[1], 1010 / 990, 0.01)) bad.push(`таймер ${m.tmo[0]}×${m.tmo[1]}: пропорция не 1010:990`)
+    if (!near(m.ring.w / m.ring.h, 1010 / 990, 0.01)) bad.push(`основа ${m.ring.w.toFixed(1)}×${m.ring.h.toFixed(1)}: пропорция не 1010:990`)
     if (!near(m.ring.w, m.tm.w, 1.5)) bad.push('кольцо ≠ размеру таймера')
     if (m.ringNat < 100) bad.push('ассет кольца не загружен')
-    if (m.ringNat < m.ring.w * 0.99 && w < 3000) bad.push(`кольцо растянуто: ${m.ringNat}px на ${m.ring.w.toFixed(0)}px`)
-    if (m.faceImg) bad.push('остался старый диск timer_face')
-    const cx = m.ring.x + m.ring.w / 2, cy = m.ring.y + m.ring.h / 2, rIn = m.ring.w * INNER / 2, d = m.digits
-    const far = Math.max(...[[d.x, d.y], [d.x + d.w, d.y], [d.x, d.y + d.h], [d.x + d.w, d.y + d.h]].map(([x, y]) => Math.hypot(x - cx, y - cy)))
+    if (m.ringNat < m.ring.w * 0.99 && w < 3800) bad.push(`кольцо растянуто: ${m.ringNat}px на ${m.ring.w.toFixed(0)}px`)
+    
+    const cx = m.ring.x + m.ring.w * 0.502, cy = m.ring.y + m.ring.h * 0.483, rIn = m.ring.w * 0.227, d = m.digits
+    const hy = d.h * 0.36, hx = d.w / 2, mx = d.x + hx, my = d.y + d.h / 2   // высота строки ≈ 1.3× высоты цифр: берём ink-бокс (72 % строки)
+    const far = Math.max(...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sy]) => Math.hypot(mx + sx * hx - cx, my + sy * hy - cy)))
     if (far > rIn) bad.push(`цифры «${m.text}» выходят за внутренний круг кольца (${far.toFixed(1)} > ${rIn.toFixed(1)})`)
     if (Math.abs(m.lin.sx / m.lin.sy - 1) > 0.005) bad.push(`масштаб X/Y = ${(m.lin.sx / m.lin.sy).toFixed(4)}`)
     if (Math.abs(m.lin.skew) > 0.005) bad.push(`скос ${m.lin.skew.toFixed(4)}`)

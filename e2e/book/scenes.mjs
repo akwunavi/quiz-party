@@ -355,6 +355,8 @@ export const SCENES = [
         random_groups: [['Анна Петрова', 'Игорь', 'Мария-Луиза Фон-Штольц', 'Сергей', 'Оля'], ['Борис', 'Катя', 'Дмитрий Александрович', 'Нина', 'Вова', 'Лёша']] }) }, { ready: '.groups-modal', settle: 2500 }),
       sc('68-rand-8', 'рандомайзер: результат, 8 команд, много игроков', async api => { await api.teams(8); await api.session({ pack_id: PACK_ONLINE, phase: 'lobby', round_number: 0, question_index: 0, timer_started_at: null, reveal: false,
         random_groups: Array.from({ length: 8 }, (_, i) => [`Игрок ${i + 1}-1`, `Анастасия ${i + 1}-2`, `Иван ${i + 1}-3`, `Полина ${i + 1}-4`]) }) }, { ready: '.groups-modal', settle: 2500 }),
+      sc('58-mel-listen', 'мелодия: слушаем 1 секунду (listen)', mel('listen', () => ({}), false)),
+      sc('59-mel-spin', 'мелодия: рулетка выбирает трек (spinning)', mel('spinning', () => ({ spinKey: '1-2', spinDeadline: now() + 9000, spinTotalMs: 9000 }), false)),
       sc('57-mel-reveal', 'мелодия: ответ и кто забрал баллы (reveal)', mel('reveal', ts => ({ wonTeam: ts[1].id, wonPts: 2, turn: 1 }))),
       ...[[1, '69-ans-1img', 'ответ: картинка вопроса рядом с ответом, 8 команд', 8], [3, '69-ans-3img', 'ответ: 3 картинки вопроса, 16 команд', 16], [4, '69-ans-4img', 'ответ: 4 картинки вопроса, 3 команды', 3]].map(([qi, id, title, n]) => sc(id, title, async api => { const ts = await api.teams(n)
         await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(0, qi), round_number: 0, answer_text: ['Звезда', 'ёлка', 'шар', 'снеговик'][i % 4], is_correct: i % 3 !== 1 })))
