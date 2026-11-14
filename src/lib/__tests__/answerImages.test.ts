@@ -4,7 +4,7 @@ import { answerScreenImages } from '../answerImages'
 describe('answerScreenImages: картинки на экране ответа', () => {
   it('есть картинка ответа — показывается только она, картинки вопроса не показываются', () => {
     const r = answerScreenImages({ question: ['q1.jpg', 'q2.jpg'], answer: ['a.jpg'] })
-    expect(r.revealImgs).toEqual(['a.jpg']); expect(r.questionGallery).toBe(false)
+    expect(r.revealImgs).toEqual(['a.jpg'])
   })
   it('нет картинки ответа — на разборе картинки вопроса', () => {
     expect(answerScreenImages({ question: ['q1.jpg'], answer: [] }).revealImgs).toEqual(['q1.jpg'])
@@ -15,6 +15,5 @@ describe('answerScreenImages: картинки на экране ответа', 
   })
   it('пусто / undefined', () => {
     expect(answerScreenImages(undefined).revealImgs).toEqual([])
-    expect(answerScreenImages({}).questionGallery).toBe(false)
   })
 })

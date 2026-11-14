@@ -20,8 +20,8 @@ import { WindText } from '../QuestionText'
 import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
 import { BookSingle } from '../../ny/book/adaptive/BookSingle'
 import { ManualLayout } from '../ManualLayout'
-import { screenLayout } from '../../lib/layoutRects'
-import { themeHasFold, themeHasLayoutArea } from '../../lib/layoutArea'
+import { layoutUnsupportedReason, screenLayout } from '../../lib/layoutRects'
+import { themeHasFold } from '../../lib/layoutArea'
 import { estFont, estLines } from '../../ny/book/adaptive/singleLayout'
 import { TEXT_ROLES, targetSize } from '../../ny/book/adaptive/fit'
 import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
@@ -179,7 +179,7 @@ function ClassicQuestionScreen({
   const hasMediaCls = !!imgs.length && !q.media.hidden
   const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
   // ручная компоновка (редактор → предпросмотр/проектор): только «Книга», только текст + картинки без вариантов/пар; битая или устаревшая → null → авто
-  const manual = themeHasLayoutArea(pack.theme) && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && !q.media.hidden
+  const manual = round.mechanic !== 'rebus' && layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
     ? screenLayout(q.service, 'question', imgs, themeHasFold(pack.theme)) : null
   const bkPlain = !manual && isBook && hasText && !hasMediaCls && !hasChoicesCls
   const bkSplit = !manual && isBook && split && imgs.length === 1 && q.answer.mode !== 'match'

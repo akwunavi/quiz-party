@@ -52,7 +52,7 @@ function round(packId, pos, mechanic, title, rules, questions, settings = {}, ex
   return {
     id, pack_id: packId, position: pos, mechanic, title_lines: Array.isArray(title) ? title : [title], rules,
     rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: pos >= 8 && !packId.endsWith('-all'),
-    answers_reveal: extra.reveal ?? 'after_round', meta_line_override: null, status: 'ready',
+    answers_reveal: extra.reveal ?? (process.env.QP_AQ ? 'after_question' : 'after_round'), meta_line_override: null, status: 'ready',
     questions: questions(id),
   }
 }

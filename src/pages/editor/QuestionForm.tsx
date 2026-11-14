@@ -1,5 +1,5 @@
 import { serviceForFormSave } from '../../lib/layoutStore'
-import { layoutStatus } from '../../lib/layoutRects'
+import { layoutStatus, mergeServiceKeepLayout } from '../../lib/layoutRects'
 import { useEffect, useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
@@ -45,7 +45,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
-  useEffect(() => setQ(original), [original])
+  // Перезагрузка пакета (в т.ч. после сохранения компоновки из предпросмотра) меняет identity original. Несохранённый буфер формы терять нельзя:
+  // тот же вопрос — подтягиваем только service.layout (mergeServiceKeepLayout), другой вопрос — заменяем буфер целиком.
+  useEffect(() => setQ(prev => prev.id !== original.id ? original : { ...prev, service: mergeServiceKeepLayout(prev.service, original.service) as Question['service'] }), [original])
 
   // Локальный буфер: НИЧЕГО не уходит в БД до кнопки «Сохранить».
   // Исключение: загрузка медиа-файлов сохраняется сразу (файл уже в Storage).

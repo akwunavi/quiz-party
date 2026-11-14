@@ -118,10 +118,11 @@ export function fallbackRects(imgs: string[], hasText: boolean, fold = true): Re
 
 const QUESTION_SCREEN_MECHANICS = new Set(['standard', 'test_stop', 'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword'])
 /** Можно ли настраивать компоновку вопроса: причина отказа текстом или null. Только «Книга»; только обычный экран «текст + картинки» (без вариантов/пар/ребуса/скрытого медиа). */
-export function layoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }): string | null {
+export function layoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean; question?: string[] } }): string | null {
   if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: вопрос рисуется её собственной сценой.'
   if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
   if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'У вопроса с вариантами, порядком или парами свой экран — компоновка вручную не предусмотрена.'
   if (q.media.hidden) return 'Медиа скрыто на экране — настраивать нечего.'
+  if ((q.media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m))) return 'У вопроса есть видео: его плеер живёт в потоке экрана — компоновка вручную не предусмотрена.'
   return null
 }

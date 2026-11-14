@@ -100,3 +100,15 @@ describe('layoutUnsupportedReason', () => {
     expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'free_text' }, media: { hidden: true } })).toMatch(/скрыто/)
   })
 })
+
+describe('защита буфера формы и видео', () => {
+  it('видео вопроса — ручная раскладка не поддерживается (общее условие для редактора и проектора)', () => {
+    expect(layoutUnsupportedReason('classic', 'standard', { answer: { mode: 'free_text' }, media: { question: ['a.mp4'] } })).toMatch(/видео/)
+    expect(layoutUnsupportedReason('classic', 'standard', { answer: { mode: 'free_text' }, media: { question: ['a.jpg'] } })).toBeNull()
+  })
+  it('сохранение компоновки при несохранённой форме: поля формы живы, layout — свежий', () => {
+    const lay = { question: good }
+    const m = mergeServiceKeepLayout({ word1: 'правка в форме' }, { word1: 'старое', layout: lay })
+    expect(m.word1).toBe('правка в форме'); expect(m.layout).toEqual(lay)
+  })
+})

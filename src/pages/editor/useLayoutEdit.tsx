@@ -70,7 +70,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
       return false
     } finally { setSaving(false) }
   }
-  const save = async () => { if (await persist(mode === 'manual' ? draft : null, 'Сохранено. На проекторе — то же самое.')) setOpen(false) }
+  const save = async () => { if (await persist(mode === 'manual' ? draft : null, 'Сохранено. Проектор подхватит при следующем раунде или после обновления страницы.')) setOpen(false) }
   const reset = async () => { await persist(null, 'Раскладка сброшена в авто.') }
 
   const button = q && themeHasLayoutArea(pack.theme) && !open ? (
