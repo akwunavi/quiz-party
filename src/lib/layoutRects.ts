@@ -9,7 +9,8 @@ import { FOLD_GAP, TOP_BAND } from '../ny/book/adaptive/safeArea'
 import { themeHasLayoutArea } from './layoutArea'
 
 export interface Rect { x: number; y: number; w: number; h: number }
-export interface Rects { v: 1; imgs: string[]; text?: Rect; images: Rect[] }
+/** text — текст вопроса (экран вопроса) или подложка «Правильный ответ» (экран ответа); note — пояснение к ответу (только экран ответа). */
+export interface Rects { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
 export type LayoutScreen = 'question' | 'answer'
 export interface QuestionLayout { question?: Rects; answer?: Rects }
 
@@ -56,8 +57,10 @@ export function validateRects(raw: unknown, imgs: string[], fold = true): Rects 
   for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(fold ? keepOffFold(x) : x) }
   let text: Rect | undefined
   if (r.text != null) { const t = readRect(r.text); if (!t) return null; text = t }
-  if (!text && images.length === 0) return null
-  return { v: 1, imgs: [...imgs], text, images }
+  let note: Rect | undefined
+  if (r.note != null) { const n = readRect(r.note); if (!n) return null; note = n }
+  if (!text && !note && images.length === 0) return null
+  return { v: 1, imgs: [...imgs], text, note, images }
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
@@ -117,12 +120,34 @@ export function fallbackRects(imgs: string[], hasText: boolean, fold = true): Re
 }
 
 const QUESTION_SCREEN_MECHANICS = new Set(['standard', 'test_stop', 'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword'])
+/** Механики, у которых ручная раскладка ВОПРОСА включается ещё и «3 попытками» (RevealBoard: картинки + блок текста; буквенные ячейки остаются в своей зоне). */
+const QUESTION_LAYOUT_EXTRA = new Set(['four_pics'])
 /** Можно ли настраивать компоновку вопроса: причина отказа текстом или null. Только «Книга»; только обычный экран «текст + картинки» (без вариантов/пар/ребуса/скрытого медиа). */
 export function layoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean; question?: string[] } }): string | null {
   if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: вопрос рисуется её собственной сценой.'
-  if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
+  if (mechanic === 'four_pics') return null
+  if (!QUESTION_SCREEN_MECHANICS.has(mechanic) && !QUESTION_LAYOUT_EXTRA.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
   if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'У вопроса с вариантами, порядком или парами свой экран — компоновка вручную не предусмотрена.'
   if (q.media.hidden) return 'Медиа скрыто на экране — настраивать нечего.'
   if ((q.media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m))) return 'У вопроса есть видео: его плеер живёт в потоке экрана — компоновка вручную не предусмотрена.'
   return null
+}
+
+/** Экран ПРАВИЛЬНОГО ОТВЕТА: причина отказа текстом или null. Поддержан обычный ответ «текст + картинки + пояснение» (свободный ответ, без вариантов/порядка/пар/ребуса/скрытого видео);
+ *  ответы команд и шары-статусы остаются штатными. Условие общее для редактора, предпросмотра и проектора. */
+export function answerLayoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }): string | null {
+  if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: ответ рисуется её собственной сценой.'
+  if (mechanic === 'four_pics') return null
+  if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой разбор — компоновка ответа вручную для неё не предусмотрена.'
+  if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'Разбор вариантов, порядка и пар идёт по шагам — компоновка вручную не предусмотрена.'
+  if (q.media.hidden) return 'Скрытое видео играет вместе с ответом — компоновка вручную не предусмотрена.'
+  return null
+}
+
+/** Стартовая раскладка ответа, если замер экрана недоступен: подложка слева-сверху, картинки справа, пояснение снизу. */
+export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = true): Rects {
+  const n = imgs.length
+  const images: Rect[] = []
+  for (let i = 0; i < n; i++) { const r = clampRect({ x: 0.04 + (i % 2) * 0.24, y: 0.4 + Math.floor(i / 2) * 0.28, w: 0.22, h: 0.26 }); images.push(fold ? keepOffFold(r) : r) }
+  return { v: 1, imgs: [...imgs], text: { x: 0.04, y: 0.04, w: 0.44, h: 0.3 }, note: hasNote ? { x: 0.04, y: 0.86, w: 0.44, h: 0.12 } : undefined, images }
 }

@@ -14,3 +14,12 @@ export function choicesLenClass(texts: (string | undefined)[]): string {
   if (n <= 95) return ' c-l'
   return ' c-xl'
 }
+
+/** Размер пояснения к ответу — по его длине: короткое читается крупно, длинное ужимается, чтобы влезть в блок под ответом. */
+export function noteClass(text: string): string {
+  const n = (text ?? '').trim().length
+  if (n <= 90) return ''
+  if (n <= 200) return ' n-m'
+  if (n <= 360) return ' n-l'
+  return ' n-xl'
+}

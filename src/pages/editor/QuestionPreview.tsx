@@ -26,6 +26,8 @@ import { previewTeams, previewAnswers, previewGameState, previewStages } from '.
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { serverNow } from '../../lib/serverClock'
 import { useLayoutEdit } from './useLayoutEdit'
+import { AnswerScreen } from '../../components/screens/AnswerScreen'
+import { autocheck } from '../../lib/autocheck'
 
 export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false, whyReadOnly, onSaved }: {
   /** права на правку пакета (lib/packRights) — для кнопки «Компоновка» */
@@ -38,14 +40,18 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
   onClose: () => void
 }) {
   const stages = previewStages(round.mechanic)
-  const [stageKey, setStageKey] = useState(stages[0]?.key)
+  const [stageState, setStageKey] = useState(stages[0]?.key)
+  const q0 = round.questions[qIndex]
+  const lay = useLayoutEdit({ pack, round, q: q0, canEdit, whyReadOnly, onSaved })
+  // «3 попытки» в режиме «Компоновка»: вкладка «Вопрос» показывает ВСЕ картинки (фаза 3), «Ответ» — разбор; вкладки фаз на это время не действуют
+  const stageKey = lay.open && round.mechanic === 'four_pics' ? (lay.screen === 'answer' ? 'review' : 'phase3') : stageState
+  // «3 попытки» получает раунд с подставленным черновиком компоновки (RevealBoard читает q из round.questions)
+  const roundView = round.mechanic === 'four_pics' && lay.qView ? { ...round, questions: round.questions.map((x, i) => (i === qIndex ? lay.qView! : x)) } : round
   const teams = previewTeams()
   const answers = previewAnswers(round, qIndex, stageKey, teams)
   const preview = { teams, answers }
   const roundIdx = Math.max(0, pack.rounds.findIndex(r => r.id === round.id))
   const gameState = previewGameState(pack, round, roundIdx, qIndex, stageKey)
-  const q0 = round.questions[qIndex]
-  const lay = useLayoutEdit({ pack, round, q: q0, canEdit, whyReadOnly, onSaved })
   const q = lay.qView
 
   return (
@@ -72,7 +78,7 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
               return <SprintBoard pack={pack} round={round} gameState={gameState} preview={preview}
                 timerNode={<Timer startedAt={null} seconds={round.timer_seconds} theme={pack.theme} />} />
             case 'four_pics':
-              return <RevealBoard pack={pack} round={round} gameState={gameState} preview={preview}
+              return <RevealBoard pack={pack} round={roundView} gameState={gameState} preview={preview}
                 timerNode={(seconds, key, chime) => <Timer key={key} startedAt={null}
                   seconds={seconds} theme={pack.theme} chime={chime} />} />
             case 'jeopardy':
@@ -103,6 +109,13 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
                 <div className="host-screen grid-bg">
                   <p style={{ opacity: .7 }}>В этом раунде нет вопросов — добавь их в редакторе</p>
                 </div>
+              )
+              // вкладка «Ответ» редактора компоновки: тот же AnswerScreen, что на проекторе (показан ответ, проверка выполнена)
+              if (lay.open && lay.screen === 'answer') return (
+                <AnswerScreen pack={pack} round={round} q={q} step={qIndex} total={round.questions.length} roundIdx={roundIdx} paper={false}
+                  rows={teams.map((t, i) => ({ id: `pv-ans-${i}`, team_id: t.id, game_id: '', question_ref: `q-${q.id}`, round_number: round.position, answer_text: ['ответ команды', 'почти', 'не знаем'][i % 3], stake: null, is_correct: null, updated_at: '', created_at: '' }))}
+                  teamOf={id => teams.find(t => t.id === id)} checked revealLive={false} shownOf={a => autocheck(q.answer, a.answer_text)}
+                  actions={<PreviewActions pack={pack} round={round} gameState={gameState} />} />
               )
               return (
                 <QuestionScreen pack={pack} round={round} roundIdx={roundIdx}

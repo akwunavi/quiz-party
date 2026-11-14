@@ -83,7 +83,9 @@ import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
-import { choicesLenClass } from '../lib/questionLayout'
+import { choicesLenClass, noteClass } from '../lib/questionLayout'
+import { AnswerScreen } from '../components/screens/AnswerScreen'
+import { answerLayoutUnsupportedReason } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
 import { serverNow } from '../lib/serverClock'
 
@@ -720,15 +722,7 @@ function BackBtn({ gameState }: { gameState: NonNullable<ReturnType<typeof useGa
     : <button className="ghost" onClick={() => void setPhase('round_intro', navFrom(gameState)).catch(quietStale)}>← К титулу</button>
 }
 
-/** Размер пояснения к ответу — по его длине: короткое читается крупно,
- *  длинное ужимается, чтобы влезть в блок под ответом. */
-export function noteClass(text: string): string {
-  const n = (text ?? '').trim().length
-  if (n <= 90) return ''
-  if (n <= 200) return ' n-m'
-  if (n <= 360) return ' n-l'
-  return ' n-xl'
-}
+export { noteClass }
 
 /** Класс размера по длине текста: чем короче вопрос, тем крупнее буквы. */
 
@@ -1891,6 +1885,14 @@ function ShowAnswers({ pack, round, q, gameState }: {
           <div className="answered-chip" role="status">Ответили <b>{answeredIds.size}</b> из <b>{teams.length}</b></div>}
       </>
     )
+  }
+
+  // Обычный ответ (свободный текст + картинки + пояснение): общий компонент AnswerScreen — тот же, что в предпросмотре редактора; логика (автораскрытие, автопроверка) остаётся выше.
+  if (answerLayoutUnsupportedReason(pack.theme, round.mechanic, q) === null && !q.media.hidden) {
+    return <AnswerScreen pack={pack} round={round} q={q} step={step} total={total} roundIdx={gameState.round_number} paper={paper}
+      rows={rows} teamOf={id => teams.find(t => t.id === id) ?? allTeams.find(t => t.id === id)} checked={checked} revealLive={revealLive}
+      shownOf={a => a.is_correct ?? autocheck(q.answer, a.answer_text)} actions={actions}
+      extra={answerAudio ? <AnswerAudio src={mediaUrl(answerAudio)} /> : null} />
   }
 
   return (

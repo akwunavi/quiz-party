@@ -32,6 +32,9 @@ import { isForestTheme } from '../../forest/config'
 import { ForestReveal } from '../../forest/rounds/ForestRounds'
 import { teamTone } from '../../forest/rounds/views'
 import { serverNow } from '../../lib/serverClock'
+import { ManualAnswer, ManualPics } from '../../components/ManualLayout'
+import { screenLayout, layoutUnsupportedReason } from '../../lib/layoutRects'
+import { themeHasFold } from '../../lib/layoutArea'
 
 export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -153,6 +156,10 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const phase = rv.phase ?? 1
   const shownImgs = revealVisibleIndices(imgs.length, phase).map(i => imgs[i])
+  // ручная раскладка (layout.question — фазы 1–3, layout.answer — разбор): раскладываются картинки и блок «ответ + пояснение»;
+  // буквенные ячейки и подписи фаз остаются штатными (привязаны к механике). Битый/устаревший layout → авто.
+  const manualOk = layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
+  const manualScreen = manualOk ? screenLayout(q.service, rv.phase === 'review' ? 'answer' : 'question', imgs, themeHasFold(pack.theme)) : null
   const letterGroups = revealGroups(word)
   const openLetters = q.service.openLetters
 
@@ -176,11 +183,15 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
           && timerNode(rv.phaseSec, `${rv.qid}-${rv.phase}`, rv.phase === 3)}
       </div>
 
-      <div className={shownImgs.length <= 3
+      {manualScreen
+        ? (rv.phase === 'review'
+            ? <ManualAnswer theme={pack.theme} answer={word} note={q.answer_note || null} urls={imgs.map(mediaUrl)} rects={manualScreen} />
+            : <ManualPics theme={pack.theme} rects={manualScreen} items={revealVisibleIndices(imgs.length, phase).map(i => ({ i, url: mediaUrl(imgs[i]) }))} />)
+        : <div className={shownImgs.length <= 3
         ? `q-media-grid n${shownImgs.length} eq-row` : 'q-media-grid rv-2x2'}
         style={mediaScaleVar(q)}>
         {shownImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
-      </div>
+      </div>}
 
       <div className="rv-word-wrap">
         <div className="rv-word" ref={groups}>
@@ -197,7 +208,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
         </div>
       </div>
 
-      {rv.phase === 'review' && (
+      {rv.phase === 'review' && !manualScreen && (
         <div className="rv-review">
           <div className="rv-answer">{word}</div>
           {q.answer_note && <div className="rv-note">{q.answer_note}</div>}

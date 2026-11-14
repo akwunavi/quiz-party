@@ -5,19 +5,19 @@ import { useRef } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { pctStyle } from '../../components/ManualLayout'
 import { layoutAreaCss, themeHasFold } from '../../lib/layoutArea'
-import { FOLD, clampRect, keepOffFold, fallbackRects, type Rect, type Rects } from '../../lib/layoutRects'
+import { FOLD, clampRect, keepOffFold, fallbackRects, fallbackAnswerRects, type Rect, type Rects } from '../../lib/layoutRects'
 
 type Mode = 'auto' | 'manual'
 
 /** Снять с экрана текущие положения текста и картинок (авто-раскладка) в долях рабочей области — стартовая точка ручной правки. */
-export function measureRects(theme: string | undefined, urls: string[], imgPaths: string[], hasText: boolean): Rects {
+export function measureRects(theme: string | undefined, mechanic: string, screen: 'question' | 'answer', urls: string[], imgPaths: string[], hasText: boolean, hasNote = false): Rects {
   const fold = themeHasFold(theme)
   const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect()
   const root = document.querySelector('.pv-backdrop .host-screen')
-  if (!area || area.width < 4) return fallbackRects(imgPaths, hasText, fold)
+  if (!area || area.width < 4) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
   const toRel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
   let text: Rect | undefined
-  const t = root?.querySelector<HTMLElement>('.q-text')
+  const t = root?.querySelector<HTMLElement>(screen === 'answer' ? (mechanic === 'four_pics' ? '.rv-answer' : '.answer-block') : '.q-text')
   if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }
   const images: Rect[] = []
   for (const url of urls) {
@@ -26,13 +26,15 @@ export function measureRects(theme: string | undefined, urls: string[], imgPaths
     const r = el.getBoundingClientRect(); if (r.width < 4) break
     const x = toRel(r); images.push(fold ? keepOffFold(x) : x)
   }
-  if (images.length !== urls.length || (hasText && !text)) return fallbackRects(imgPaths, hasText, fold)
-  return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, images }
+  let note: Rect | undefined
+  if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.answer-note, .bk-note-box, .rv-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
+  if (images.length !== urls.length || (hasText && !text)) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
+  return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }
 }
 
-type Target = { kind: 'text' } | { kind: 'img'; i: number }
-const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : r.images[t.i])
-const put = (r: Rects, t: Target, n: Rect, fold: boolean): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? (fold ? keepOffFold(clampRect(n)) : clampRect(n)) : x) }
+type Target = { kind: 'text' } | { kind: 'note' } | { kind: 'img'; i: number }
+const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : t.kind === 'note' ? r.note : r.images[t.i])
+const put = (r: Rects, t: Target, n: Rect, fold: boolean): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : t.kind === 'note' ? { ...r, note: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? (fold ? keepOffFold(clampRect(n)) : clampRect(n)) : x) }
 
 export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset }: {
   theme: string | undefined
@@ -70,8 +72,9 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   const up = () => { drag.current = null }
 
   const boxes: { t: Target; r: Rect; label: string }[] = []
-  if (mode === 'manual' && draft && screen === 'question') {
-    if (draft.text) boxes.push({ t: { kind: 'text' }, r: draft.text, label: 'Текст' })
+  if (mode === 'manual' && draft) {
+    if (draft.text) boxes.push({ t: { kind: 'text' }, r: draft.text, label: screen === 'answer' ? 'Ответ' : 'Текст' })
+    if (draft.note) boxes.push({ t: { kind: 'note' }, r: draft.note, label: 'Пояснение' })
     draft.images.forEach((r, i) => boxes.push({ t: { kind: 'img', i }, r, label: `Картинка ${i + 1}` }))
   }
 
@@ -80,21 +83,20 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
       {/* та же рабочая область темы, что у проектора (layoutAreaCss): рамки — в долях этого прямоугольника */}
       <div ref={areaRef} className="lay-ed-area" style={areaCss ?? undefined}>
         {boxes.map(b => (
-          <div key={b.t.kind === 'text' ? 't' : `i${b.t.i}`} className={`lay-box ${b.t.kind}`} style={pctStyle(b.r)}
+          <div key={b.t.kind === 'img' ? `i${b.t.i}` : b.t.kind} className={`lay-box ${b.t.kind}`} style={pctStyle(b.r)}
             onPointerDown={e => down(e, b.t, 'move')}>
             <span className="lay-tag">{b.label}</span>
             <i className="lay-handle" onPointerDown={e => down(e, b.t, 'resize')} />
           </div>
         ))}
-        {mode === 'manual' && screen === 'question' && fold && <div className="lay-fold" style={{ left: `${FOLD.from * 100}%`, width: `${(FOLD.to - FOLD.from) * 100}%` }} aria-hidden="true" />}
+        {mode === 'manual' && fold && <div className="lay-fold" style={{ left: `${FOLD.from * 100}%`, width: `${(FOLD.to - FOLD.from) * 100}%` }} aria-hidden="true" />}
       </div>
       <div className="lay-panel" role="toolbar" aria-label="Компоновка">
         <div className="lay-row">
           <b>Компоновка</b>
           <span className="lay-seg">
             <button type="button" className={screen === 'question' ? 'on' : ''} onClick={() => onScreen('question')}>Вопрос</button>
-            <button type="button" className={screen === 'answer' ? 'on' : ''}
-              onClick={() => { onScreen('question'); hint.show('Экран правильного ответа пока всегда в авто-раскладке: он собирается в игре из нескольких блоков (ответ, пояснение, ответы команд) и в предпросмотре не показывается.') }}>Ответ</button>
+            <button type="button" className={screen === 'answer' ? 'on' : ''} onClick={() => onScreen('answer')}>Ответ</button>
           </span>
           <span className="lay-seg">
             <button type="button" className={mode === 'auto' ? 'on' : ''} onClick={() => onMode('auto')}>Авто</button>
