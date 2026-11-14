@@ -33,7 +33,7 @@ async function main() {
   await dragBy('.lay-box.img', 0, 0, true)
   await dragBy('.lay-box.img .lay-handle', -60, -40, false)
   await p.screenshot({ path: `${OUT}/3-edited.png` })
-  res.checks.textInDom = await p.evaluate(() => !!document.querySelector('.pv-backdrop .bk-man-text .q-text'))
+  res.checks.textInDom = await p.evaluate(() => !!document.querySelector('.pv-backdrop .lay-text .q-text'))
   await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
   await p.screenshot({ path: `${OUT}/4-saved-preview.png` })
   // что записано в базе
@@ -47,7 +47,7 @@ async function main() {
     const c2 = await b.newContext({ viewport: { width: w, height: h }, serviceWorkers: 'block' }); const pg = await c2.newPage()
     await api.reset(); await api.teams(4); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: QI, timer_started_at: new Date().toISOString(), reveal: false })
     await pg.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await pg.waitForSelector('.host-screen', { timeout: 15000 }); await pg.waitForTimeout(3500)
-    res.checks[`projector${w}`] = await pg.evaluate(() => ({ manual: !!document.querySelector('.bk-manual'), text: !!document.querySelector('.bk-man-text .q-text'), imgs: document.querySelectorAll('.bk-man-img img').length }))
+    res.checks[`projector${w}`] = await pg.evaluate(() => ({ manual: !!document.querySelector('.lay-area'), text: !!document.querySelector('.lay-text .q-text'), imgs: document.querySelectorAll('.lay-img img').length }))
     await pg.screenshot({ path: `${OUT}/5-projector-${w}x${h}.png` }); await c2.close()
   }
   res.errs = errs; fs.writeFileSync(`${OUT}/result.json`, JSON.stringify(res, null, 1)); console.log(JSON.stringify(res)); await b.close(); process.exit(0)

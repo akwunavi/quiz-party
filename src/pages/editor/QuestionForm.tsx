@@ -114,7 +114,7 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
             <MediaScale value={media.scale}
               onChange={scale => save({ media: { ...media, scale } })} />
           )}
-          {pack.theme === 'ny_book' && layoutStatus(q.service, 'question', (media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))) === 'stale' && (
+          {layoutStatus(q.service, 'question', (media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m)), pack.theme === 'ny_book') === 'stale' && (
             <div className="ed-note" role="status">Ручная раскладка этого вопроса сброшена в авто: картинки или их порядок изменились. Настроить заново — в предпросмотре, кнопка «Компоновка».</div>
           )}
           {showVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}

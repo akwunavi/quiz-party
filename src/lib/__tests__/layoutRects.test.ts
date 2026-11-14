@@ -91,9 +91,10 @@ describe('layoutRects: геометрия', () => {
 import { layoutUnsupportedReason } from '../layoutRects'
 describe('layoutUnsupportedReason', () => {
   const free = { answer: { mode: 'free_text' }, media: {} }
-  it('поддерживается: «Книга», обычная механика, свободный ответ', () => { expect(layoutUnsupportedReason('ny_book', 'standard', free)).toBeNull() })
+  it('поддерживается: любая тема кроме Леса, обычная механика, свободный ответ', () => { expect(layoutUnsupportedReason('ny_book', 'standard', free)).toBeNull() })
   it('другие темы, механики и режимы — причина текстом', () => {
-    expect(layoutUnsupportedReason('classic', 'standard', free)).toMatch(/Книга/)
+    expect(layoutUnsupportedReason('enchanted_forest', 'standard', free)).toMatch(/лес/)
+    expect(layoutUnsupportedReason('classic', 'standard', free)).toBeNull()
     expect(layoutUnsupportedReason('ny_book', 'melody', free)).toMatch(/механики/)
     expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'choice' }, media: {} })).toMatch(/вариантами/)
     expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'free_text' }, media: { hidden: true } })).toMatch(/скрыто/)

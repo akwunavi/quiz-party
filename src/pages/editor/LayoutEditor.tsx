@@ -3,17 +3,19 @@
 // Черновик живёт в QuestionPreview и подставляется в q.service.layout — экран перерисовывается теми же компонентами, что и на проекторе.
 import { useRef } from 'react'
 import { Hint, useHint } from '../../components/Hint'
-import { bookOffset } from '../../ny/book/adaptive/safeArea'
-import { rectStyle } from '../../ny/book/BookManual'
-import { WORK, clampRect, keepOffFold, sceneToRect, fallbackRects, type Rect, type Rects } from '../../lib/layoutRects'
+import { pctStyle } from '../../components/ManualLayout'
+import { layoutAreaCss, themeHasFold } from '../../lib/layoutArea'
+import { FOLD, clampRect, keepOffFold, fallbackRects, type Rect, type Rects } from '../../lib/layoutRects'
 
 type Mode = 'auto' | 'manual'
 
 /** Снять с экрана текущие положения текста и картинок (авто-раскладка) в долях рабочей области — стартовая точка ручной правки. */
-export function measureRects(urls: string[], imgPaths: string[], hasText: boolean): Rects {
-  const v = { w: window.innerWidth, h: window.innerHeight }, { u, ox, oy } = bookOffset(v)
+export function measureRects(theme: string | undefined, urls: string[], imgPaths: string[], hasText: boolean): Rects {
+  const fold = themeHasFold(theme)
+  const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect()
   const root = document.querySelector('.pv-backdrop .host-screen')
-  const toRel = (r: DOMRect): Rect => sceneToRect({ x: (r.x - ox) / u, y: (r.y - oy) / u, w: r.width / u, h: r.height / u })
+  if (!area || area.width < 4) return fallbackRects(imgPaths, hasText, fold)
+  const toRel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
   let text: Rect | undefined
   const t = root?.querySelector<HTMLElement>('.q-text')
   if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }
@@ -22,17 +24,18 @@ export function measureRects(urls: string[], imgPaths: string[], hasText: boolea
     const el = [...(root?.querySelectorAll('img') ?? [])].find(i => i.getAttribute('src') === url)
     if (!el) break
     const r = el.getBoundingClientRect(); if (r.width < 4) break
-    images.push(keepOffFold(toRel(r)))
+    const x = toRel(r); images.push(fold ? keepOffFold(x) : x)
   }
-  if (images.length !== urls.length || (hasText && !text)) return fallbackRects(imgPaths, hasText)
+  if (images.length !== urls.length || (hasText && !text)) return fallbackRects(imgPaths, hasText, fold)
   return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, images }
 }
 
 type Target = { kind: 'text' } | { kind: 'img'; i: number }
 const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : r.images[t.i])
-const put = (r: Rects, t: Target, n: Rect): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? keepOffFold(clampRect(n)) : x) }
+const put = (r: Rects, t: Target, n: Rect, fold: boolean): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? (fold ? keepOffFold(clampRect(n)) : clampRect(n)) : x) }
 
-export function LayoutEditor({ screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset }: {
+export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset }: {
+  theme: string | undefined
   screen: 'question' | 'answer'; onScreen: (s: 'question' | 'answer') => void
   mode: Mode; onMode: (m: Mode) => void
   draft: Rects | null; onDraft: (r: Rects) => void
@@ -44,7 +47,9 @@ export function LayoutEditor({ screen, onScreen, mode, onMode, draft, onDraft, d
 }) {
   const hint = useHint()
   const drag = useRef<{ t: Target; kind: 'move' | 'resize'; sx: number; sy: number; r0: Rect } | null>(null)
-  const { u } = bookOffset({ w: window.innerWidth, h: window.innerHeight })
+  const areaRef = useRef<HTMLDivElement>(null)
+  const fold = themeHasFold(theme)
+  const areaCss = layoutAreaCss(theme)
 
   const down = (e: React.PointerEvent, t: Target, kind: 'move' | 'resize') => {
     if (!draft) return
@@ -55,11 +60,12 @@ export function LayoutEditor({ screen, onScreen, mode, onMode, draft, onDraft, d
   }
   const move = (e: React.PointerEvent) => {
     const d = drag.current; if (!d || !draft) return
-    const dx = (e.clientX - d.sx) / (WORK.w * u), dy = (e.clientY - d.sy) / (WORK.h * u)
+    const ar = areaRef.current?.getBoundingClientRect(); if (!ar || !ar.width) return
+    const dx = (e.clientX - d.sx) / ar.width, dy = (e.clientY - d.sy) / ar.height
     const n = d.kind === 'move'
       ? { ...d.r0, x: Math.min(1 - d.r0.w, Math.max(0, d.r0.x + dx)), y: Math.min(1 - d.r0.h, Math.max(0, d.r0.y + dy)) }
       : { ...d.r0, w: Math.min(1 - d.r0.x, Math.max(0.06, d.r0.w + dx)), h: Math.min(1 - d.r0.y, Math.max(0.06, d.r0.h + dy)) }
-    onDraft(put(draft, d.t, n))
+    onDraft(put(draft, d.t, n, fold))
   }
   const up = () => { drag.current = null }
 
@@ -71,14 +77,17 @@ export function LayoutEditor({ screen, onScreen, mode, onMode, draft, onDraft, d
 
   return (
     <div className="lay-ed" onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-      {boxes.map(b => (
-        <div key={b.t.kind === 'text' ? 't' : `i${b.t.i}`} className={`lay-box ${b.t.kind}`} style={rectStyle(b.r)}
-          onPointerDown={e => down(e, b.t, 'move')}>
-          <span className="lay-tag">{b.label}</span>
-          <i className="lay-handle" onPointerDown={e => down(e, b.t, 'resize')} />
-        </div>
-      ))}
-      {mode === 'manual' && screen === 'question' && <div className="lay-fold" aria-hidden="true" />}
+      {/* та же рабочая область темы, что у проектора (layoutAreaCss): рамки — в долях этого прямоугольника */}
+      <div ref={areaRef} className="lay-ed-area" style={areaCss ?? undefined}>
+        {boxes.map(b => (
+          <div key={b.t.kind === 'text' ? 't' : `i${b.t.i}`} className={`lay-box ${b.t.kind}`} style={pctStyle(b.r)}
+            onPointerDown={e => down(e, b.t, 'move')}>
+            <span className="lay-tag">{b.label}</span>
+            <i className="lay-handle" onPointerDown={e => down(e, b.t, 'resize')} />
+          </div>
+        ))}
+        {mode === 'manual' && screen === 'question' && fold && <div className="lay-fold" style={{ left: `${FOLD.from * 100}%`, width: `${(FOLD.to - FOLD.from) * 100}%` }} aria-hidden="true" />}
+      </div>
       <div className="lay-panel" role="toolbar" aria-label="Компоновка">
         <div className="lay-row">
           <b>Компоновка</b>

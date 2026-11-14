@@ -6,6 +6,7 @@
 // Любая проблема (битая структура, другая версия, диапазоны) → null → авто-раскладка; проектор не падает.
 import { SAFE, SCENE } from '../ny/book/geometry'
 import { FOLD_GAP, TOP_BAND } from '../ny/book/adaptive/safeArea'
+import { themeHasLayoutArea } from './layoutArea'
 
 export interface Rect { x: number; y: number; w: number; h: number }
 export interface Rects { v: 1; imgs: string[]; text?: Rect; images: Rect[] }
@@ -45,14 +46,14 @@ function readRect(v: unknown): Rect | null {
 }
 
 /** Проверить и нормализовать раскладку одного экрана. null — авто (нет данных / битая / устарела). */
-export function validateRects(raw: unknown, imgs: string[]): Rects | null {
+export function validateRects(raw: unknown, imgs: string[], fold = true): Rects | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   if (r.v !== 1) return null
   if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => p !== imgs[i])) return null
   if (!Array.isArray(r.images) || r.images.length !== imgs.length) return null
   const images: Rect[] = []
-  for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(keepOffFold(x)) }
+  for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(fold ? keepOffFold(x) : x) }
   let text: Rect | undefined
   if (r.text != null) { const t = readRect(r.text); if (!t) return null; text = t }
   if (!text && images.length === 0) return null
@@ -60,18 +61,18 @@ export function validateRects(raw: unknown, imgs: string[]): Rects | null {
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
-export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[]): Rects | null {
+export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[], fold = true): Rects | null {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   if (!l || typeof l !== 'object') return null
-  return validateRects((l as Record<string, unknown>)[screen], imgs)
+  return validateRects((l as Record<string, unknown>)[screen], imgs, fold)
 }
 
 /** 'manual' — применяется; 'stale' — есть, но картинки изменились/данные битые (покажем «раскладка сброшена»); 'auto' — нет. */
-export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[]): 'auto' | 'manual' | 'stale' {
+export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[], fold = true): 'auto' | 'manual' | 'stale' {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   const raw = l && typeof l === 'object' ? (l as Record<string, unknown>)[screen] : null
   if (raw == null) return 'auto'
-  return validateRects(raw, imgs) ? 'manual' : 'stale'
+  return validateRects(raw, imgs, fold) ? 'manual' : 'stale'
 }
 
 type Service = Record<string, unknown>
@@ -100,7 +101,7 @@ export const rectToScene = (r: Rect): Rect => ({ x: WORK.x + r.x * WORK.w, y: WO
 export const sceneToRect = (r: Rect): Rect => clampRect({ x: (r.x - WORK.x) / WORK.w, y: (r.y - WORK.y) / WORK.h, w: r.w / WORK.w, h: r.h / WORK.h })
 
 /** Начальная ручная раскладка, когда замер авто-вида недоступен: текст сверху, картинки рядом под ним (не на сгибе). */
-export function fallbackRects(imgs: string[], hasText: boolean): Rects {
+export function fallbackRects(imgs: string[], hasText: boolean, fold = true): Rects {
   const n = imgs.length
   const text: Rect | undefined = hasText ? { x: 0.05, y: 0.02, w: 0.9, h: n ? 0.3 : 0.9 } : undefined
   const images: Rect[] = []
@@ -109,7 +110,7 @@ export function fallbackRects(imgs: string[], hasText: boolean): Rects {
     const side = n === 1 ? [[0.55, 0.42]] : null
     for (let i = 0; i < n; i++) {
       const colW = 0.9 / n
-      images.push(keepOffFold(clampRect(side ? { x: side[0][0], y: top, w: side[0][1], h: hh } : { x: 0.05 + i * colW, y: top, w: colW - 0.02, h: hh })))
+      { const r = clampRect(side ? { x: side[0][0], y: top, w: side[0][1], h: hh } : { x: 0.05 + i * colW, y: top, w: colW - 0.02, h: hh }); images.push(fold ? keepOffFold(r) : r) }
     }
   }
   return { v: 1, imgs: [...imgs], text, images }
@@ -118,7 +119,7 @@ export function fallbackRects(imgs: string[], hasText: boolean): Rects {
 const QUESTION_SCREEN_MECHANICS = new Set(['standard', 'test_stop', 'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword'])
 /** Можно ли настраивать компоновку вопроса: причина отказа текстом или null. Только «Книга»; только обычный экран «текст + картинки» (без вариантов/пар/ребуса/скрытого медиа). */
 export function layoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }): string | null {
-  if (theme !== 'ny_book') return 'Ручная компоновка работает только в теме «Книга».'
+  if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: вопрос рисуется её собственной сценой.'
   if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
   if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'У вопроса с вариантами, порядком или парами свой экран — компоновка вручную не предусмотрена.'
   if (q.media.hidden) return 'Медиа скрыто на экране — настраивать нечего.'
