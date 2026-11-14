@@ -59,6 +59,7 @@ import { room } from '../lib/transport'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
+import { answerScreenImages } from '../lib/answerImages'
 import { RulesFrame } from '../components/RulesFrame'
 import { FinMedal } from '../components/FinMedal'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
@@ -1815,13 +1816,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
-  const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  const { answerImgs, questionImgs, revealImgs } = answerScreenImages(q.media)
   // Нет своей картинки у ответа — берём картинку вопроса: на разборе она
   // нужнее текста вопроса, который уже прозвучал.
   // Картинки вопроса показываем на разборе и тогда, когда во время вопроса
   // они были скрыты (media.hidden): на ответе прятать их уже незачем.
-  const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const revealImgs = answerImgs.length ? answerImgs : questionImgs
   // Видео, которое во время вопроса играло «как аудио» (media.hidden).
   // На разборе показываем его вместе с ответом — 10 секунд, см. RevealVideo.
   const hiddenVideo = q.media.hidden

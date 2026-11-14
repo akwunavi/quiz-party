@@ -200,7 +200,7 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
       q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
       q(rid, 0, 'Новогодняя героиня', { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
-      q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
+      q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: process.env.QP_AN_RACE ? 'race' : 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
   ]
   return {
     id, name: all ? 'Стенд «Книга» · все механики' : paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,
