@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { pctStyle } from '../../components/ManualLayout'
 import { layoutAreaCss, themeHasFold } from '../../lib/layoutArea'
-import { FOLD, clampRect, keepOffFold, fallbackRects, fallbackAnswerRects, type Rect, type Rects } from '../../lib/layoutRects'
+import { FOLD, clampRect, keepOffFold, fallbackRects, fallbackAnswerRects, fallbackGridRects, type Rect, type Rects } from '../../lib/layoutRects'
 
 type Mode = 'auto' | 'manual'
 
@@ -17,8 +17,14 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
   if (!area || area.width < 4) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
   const toRel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
   let text: Rect | undefined
-  const t = root?.querySelector<HTMLElement>(screen === 'answer' ? (mechanic === 'four_pics' ? '.rv-answer' : '.answer-block') : '.q-text')
-  if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }
+  if (screen === 'answer' && mechanic !== 'four_pics') {
+    // подложка ответа = «ПРАВИЛЬНЫЙ ОТВЕТ» + слово ответа (без картинок и пояснения внутри .answer-block)
+    const a = root?.querySelector<HTMLElement>('.answer-label')?.getBoundingClientRect(), m = root?.querySelector<HTMLElement>('.answer-main')?.getBoundingClientRect()
+    if (a && m) { const x = Math.min(a.x, m.x), y = Math.min(a.y, m.y), r = Math.max(a.right, m.right), b = Math.max(a.bottom, m.bottom); text = toRel(new DOMRect(x, y - 8, r - x, b - y + 16)) }
+  } else {
+    const t = root?.querySelector<HTMLElement>(screen === 'answer' ? '.rv-answer' : '.q-text')
+    if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }
+  }
   const images: Rect[] = []
   for (const url of urls) {
     const el = [...(root?.querySelectorAll('img') ?? [])].find(i => i.getAttribute('src') === url)
@@ -28,6 +34,7 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
   }
   let note: Rect | undefined
   if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.answer-note, .bk-note-box, .rv-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
+  if (mechanic === 'four_pics' && screen === 'question' && images.length !== urls.length) return fallbackGridRects(imgPaths, fold)
   if (images.length !== urls.length || (hasText && !text)) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
   return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }
 }

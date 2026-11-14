@@ -186,7 +186,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
       {manualScreen
         ? (rv.phase === 'review'
             ? <ManualAnswer theme={pack.theme} answer={word} note={q.answer_note || null} urls={imgs.map(mediaUrl)} rects={manualScreen} />
-            : <ManualPics theme={pack.theme} rects={manualScreen} items={revealVisibleIndices(imgs.length, phase).map(i => ({ i, url: mediaUrl(imgs[i]) }))} />)
+            : <ManualPics theme={pack.theme} rects={manualScreen} items={(preview?.showAllPics ? imgs.map((_, i) => i) : revealVisibleIndices(imgs.length, phase)).map(i => ({ i, url: mediaUrl(imgs[i]) }))} />)
         : <div className={shownImgs.length <= 3
         ? `q-media-grid n${shownImgs.length} eq-row` : 'q-media-grid rv-2x2'}
         style={mediaScaleVar(q)}>

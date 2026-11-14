@@ -151,3 +151,9 @@ export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = tru
   for (let i = 0; i < n; i++) { const r = clampRect({ x: 0.04 + (i % 2) * 0.24, y: 0.4 + Math.floor(i / 2) * 0.28, w: 0.22, h: 0.26 }); images.push(fold ? keepOffFold(r) : r) }
   return { v: 1, imgs: [...imgs], text: { x: 0.04, y: 0.04, w: 0.44, h: 0.3 }, note: hasNote ? { x: 0.04, y: 0.86, w: 0.44, h: 0.12 } : undefined, images }
 }
+
+/** «3 попытки»: стартовая раскладка картинок сеткой 2×2 по двум страницам (не на сгибе), без текста. */
+export function fallbackGridRects(imgs: string[], fold = true): Rects {
+  const images = imgs.map((_, i) => { const r = clampRect({ x: i % 2 ? 0.55 : 0.05, y: i < 2 ? 0.04 : 0.5, w: 0.4, h: 0.44 }); return fold ? keepOffFold(r) : r })
+  return { v: 1, imgs: [...imgs], images }
+}

@@ -112,3 +112,33 @@ describe('защита буфера формы и видео', () => {
     expect(m.word1).toBe('правка в форме'); expect(m.layout).toEqual(lay)
   })
 })
+
+import { answerLayoutUnsupportedReason, fallbackAnswerRects, fallbackGridRects } from '../layoutRects'
+describe('экран ответа и «3 попытки»', () => {
+  const free = { answer: { mode: 'free_text' }, media: {} }
+  it('ответ: поддержан свободный ответ обычной механики; Лес, варианты/порядок/пары, скрытое видео, чужие механики — нет', () => {
+    expect(answerLayoutUnsupportedReason('classic', 'standard', free)).toBeNull()
+    expect(answerLayoutUnsupportedReason('ny_book', 'four_pics', { answer: { mode: 'crossword_word' }, media: {} })).toBeNull()
+    expect(answerLayoutUnsupportedReason('enchanted_forest', 'standard', free)).toMatch(/лес/)
+    expect(answerLayoutUnsupportedReason('classic', 'standard', { answer: { mode: 'choice' }, media: {} })).toMatch(/вариант/)
+    expect(answerLayoutUnsupportedReason('classic', 'standard', { answer: { mode: 'free_text' }, media: { hidden: true } })).toMatch(/видео/)
+    expect(answerLayoutUnsupportedReason('classic', 'melody', free)).toMatch(/механики/)
+  })
+  it('«3 попытки» поддержаны для вопроса', () => { expect(layoutUnsupportedReason('classic', 'four_pics', { answer: { mode: 'crossword_word' }, media: {} })).toBeNull() })
+  it('note: проходит проверку, битая note → авто; раскладка только из note допустима', () => {
+    const r = { v: 1, imgs: [], note: { x: .1, y: .8, w: .5, h: .1 }, images: [] }
+    expect(validateRects(r, [])?.note).toEqual({ x: .1, y: .8, w: .5, h: .1 })
+    expect(validateRects({ ...r, note: { x: NaN, y: 0, w: .1, h: .1 } }, [])).toBeNull()
+  })
+  it('fallbackAnswerRects и fallbackGridRects проходят проверку для 0–4 картинок', () => {
+    for (let n = 0; n <= 4; n++) { const l = Array.from({ length: n }, (_, i) => `p${i}.jpg`)
+      expect(validateRects(fallbackAnswerRects(l, true), l)).not.toBeNull()
+      if (n) expect(validateRects(fallbackGridRects(l), l)).not.toBeNull() }
+  })
+  it('layout.answer не мешает layout.question: withScreenLayout пишет экраны независимо', () => {
+    const s1 = withScreenLayout({}, 'answer', fallbackAnswerRects(['a.jpg'], false))
+    const s2 = withScreenLayout(s1, 'question', good)
+    expect(Object.keys(s2.layout as object).sort()).toEqual(['answer', 'question'])
+    expect(Object.keys(withScreenLayout(s2, 'answer', null).layout as object)).toEqual(['question'])
+  })
+})

@@ -23,6 +23,8 @@ import { serverNow, serverIso } from './serverClock'
 export interface PreviewCtx {
   teams: Team[]
   answers: Answer[]
+  /** редактор компоновки «3 попыток»: показать ВСЕ картинки сразу (в игре по фазам они заменяют друг друга), чтобы двигать каждую рамку */
+  showAllPics?: boolean
 }
 
 /** Ровно 4 фиктивные команды — без переключателя количества (Р2, решено

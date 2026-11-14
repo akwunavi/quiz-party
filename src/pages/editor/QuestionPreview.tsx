@@ -49,7 +49,7 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
   const roundView = round.mechanic === 'four_pics' && lay.qView ? { ...round, questions: round.questions.map((x, i) => (i === qIndex ? lay.qView! : x)) } : round
   const teams = previewTeams()
   const answers = previewAnswers(round, qIndex, stageKey, teams)
-  const preview = { teams, answers }
+  const preview = { teams, answers, showAllPics: lay.open && lay.screen === 'question' }
   const roundIdx = Math.max(0, pack.rounds.findIndex(r => r.id === round.id))
   const gameState = previewGameState(pack, round, roundIdx, qIndex, stageKey)
   const q = lay.qView

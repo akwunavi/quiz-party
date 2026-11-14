@@ -14,7 +14,7 @@ async function main() {
   await ctx.addInitScript(([s]) => { localStorage.setItem('sb-127-auth-token', JSON.stringify(s)) }, [{ access_token: jwt, refresh_token: 'r', expires_in: 99999, expires_at: 4102444800, token_type: 'bearer', user }])
   await ctx.route('**/auth/v1/user', r => r.fulfill({ json: user })); await ctx.route('**/rest/v1/editor_roles*', r => r.fulfill({ json: { user_id: 'u1', role: 'owner', display_name: 'T', can_edit_all: true } }))
   const openPreview = async (roundIdx, qIdx) => {
-    await p.goto(`${ORIGIN}/quiz-party/#/editor`); await p.waitForTimeout(2200)
+    await p.goto('about:blank'); await p.goto(`${ORIGIN}/quiz-party/#/editor`); await p.waitForTimeout(2800)
     await p.locator('text=Стенд «Книга» · все механики').locator('xpath=ancestor::*[.//button[contains(.,"Открыть")]][1]').getByText('Открыть').first().click(); await p.waitForTimeout(1500)
     await p.locator('button[data-tip="Редактировать"]').nth(roundIdx).click(); await p.waitForTimeout(1500)
     await p.locator('button[data-tip="Предпросмотр"]').nth(qIdx).click(); await p.waitForSelector('.pv-backdrop .host-screen', { timeout: 15000 }); await p.waitForTimeout(2000)
@@ -26,6 +26,7 @@ async function main() {
   await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Ответ', exact: true }).click(); await p.waitForTimeout(700)
   await p.screenshot({ path: `${OUT}/a0-answer-auto.png` })
   await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(800)
+  res.dbg = await p.evaluate(() => { const b = document.querySelector('.pv-backdrop .lay-answer'), m = b && b.querySelector('.answer-main'); const R = e => e && (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); return b ? { box: R(b), main: R(m), fs: getComputedStyle(m).fontSize, inline: m.style.fontSize, fit: m.dataset.bkFit, cs: getComputedStyle(b).overflow + '|' + getComputedStyle(b).display } : null })
   res.answerBoxes = await p.locator('.lay-box').count(); await p.screenshot({ path: `${OUT}/a1-answer-manual.png` })
   await drag('.lay-box.text', 0, 40); await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
   res.answerSaved = !!(await qget('stand-book-all-r8-q16'))?.layout?.answer
@@ -34,8 +35,11 @@ async function main() {
   await openPreview(13, 0)
   await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(900)
   res.fpBoxes = await p.locator('.lay-box').count(); await p.screenshot({ path: `${OUT}/f0-fp-manual.png` })
-  await drag('.lay-box.img', 0, 30); await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
-  res.fpSaved = !!(await qget('stand-book-all-r13-q0'))?.layout?.question
+  await drag('.lay-box.img', 0, 30)
+  await p.getByRole('button', { name: 'Ответ', exact: true }).click(); await p.waitForTimeout(600); await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(900)
+  res.fpAnswerBoxes = await p.locator('.lay-box').count(); await p.screenshot({ path: `${OUT}/f1-fp-answer-manual.png` })
+  await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
+  { const sv = await qget('stand-book-all-r13-q0'); res.fpSaved = !!sv?.layout?.question; res.fpAnswerSaved = !!sv?.layout?.answer }
   await ctx.close()
   // проектор: ответ и «3 попытки» (фаза 3 и разбор)
   for (const [w, h] of [[1920, 1080], [1280, 720]]) {
@@ -45,6 +49,7 @@ async function main() {
       else await SCENES.find(s => s.id === setupId).setup(api)
       await pg.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await pg.waitForSelector('.host-screen', { timeout: 15000 }); await pg.waitForTimeout(4500)
       res[`${name}-${w}`] = await pg.evaluate(s => ({ manual: !!document.querySelector(s), imgs: document.querySelectorAll('.lay-img img').length, text: !!document.querySelector('.lay-text') }), sel)
+      if (name === 'answer') res[`dbg-${w}`] = await pg.evaluate(() => { const b = document.querySelector('.lay-answer'), m = b.querySelector('.answer-main'); const R = e => (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); const cs = getComputedStyle(b); return { box: R(b), main: R(m), fs: m.style.fontSize, pad: cs.paddingTop + '/' + cs.paddingBottom, mt: getComputedStyle(m).marginTop + '/' + getComputedStyle(m).marginBottom, lh: getComputedStyle(m).lineHeight, ch: b.clientHeight } })
       await pg.screenshot({ path: `${OUT}/p-${name}-${w}.png` }); await c2.close()
     }
   }
