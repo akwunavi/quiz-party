@@ -48,7 +48,7 @@ export function ManualAnswer({ theme, answer, note, urls, rects, noteNode }: { t
         </div>
       )}
       {rects.note && note && (
-        <div className="lay-note" data-lay="note" style={pctStyle(rects.note)}>{noteNode ? noteNode(note) : <div className="answer-note">{note}</div>}</div>
+        <div className="lay-anote" data-lay="note" style={pctStyle(rects.note)}>{noteNode ? noteNode(note) : <div className="answer-note">{note}</div>}</div>
       )}
       {urls.map((u, i) => rects.images[i] && (
         <div key={i} className="lay-img" data-lay="img" data-lay-i={i} style={pctStyle(rects.images[i])}><img src={u} alt="" draggable={false} /></div>

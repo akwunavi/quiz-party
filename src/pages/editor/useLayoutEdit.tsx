@@ -71,7 +71,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
     if (m === modes[screen]) return
     if (m === 'manual' && !drafts[screen]) {
       // замер текущего авто-вида на экране — стартовая точка; вручную двигаем уже от неё
-      setDrafts(d => ({ ...d, [screen]: measureRects(pack.theme, round.mechanic, screen, imgsOf(screen).map(mediaUrl), imgsOf(screen), screen === 'question' ? hasText : true, !!q?.answer_note?.trim()) }))
+      setDrafts(d => ({ ...d, [screen]: measureRects(pack.theme, round.mechanic, screen, imgsOf(screen).map(mediaUrl), imgsOf(screen), screen === 'question' ? hasText && round.mechanic !== 'four_pics' : true, !!q?.answer_note?.trim()) }))
     }
     setModes(x => ({ ...x, [screen]: m }))
   }

@@ -142,3 +142,30 @@ describe('экран ответа и «3 попытки»', () => {
     expect(Object.keys(withScreenLayout(s2, 'answer', null).layout as object)).toEqual(['question'])
   })
 })
+
+import { imgKey, answerUsesSharedScreen } from '../layoutRects'
+describe('ревью: утечка путей и делегирование ответа', () => {
+  const a = ['secret/answer-1.jpg', 'secret/answer-2.jpg']
+  it('layout.answer хранит хеши, не пути; layout.question — пути', () => {
+    const r: Rects = { v: 1, imgs: a, images: [{ x: .1, y: .1, w: .3, h: .3 }, { x: .5, y: .1, w: .3, h: .3 }] }
+    const s = withScreenLayout({}, 'answer', r); const stored = JSON.stringify(s)
+    expect(stored).not.toContain('secret'); expect((s.layout as { answer: Rects }).answer.imgs).toEqual(a.map(imgKey))
+    expect(JSON.stringify(withScreenLayout({}, 'question', r))).toContain('secret/answer-1.jpg')
+  })
+  it('валидация по хешам: число и порядок совпали — manual; изменился набор — авто/stale', () => {
+    const s = withScreenLayout({}, 'answer', { v: 1, imgs: a, images: [{ x: .1, y: .1, w: .3, h: .3 }, { x: .5, y: .1, w: .3, h: .3 }] })
+    expect(screenLayout(s, 'answer', a)).not.toBeNull()
+    expect(layoutStatus(s, 'answer', [a[1], a[0]])).toBe('stale'); expect(layoutStatus(s, 'answer', [a[0]])).toBe('stale')
+  })
+  it('старый layout.answer с путями читается; любое следующее сохранение переписывает его без путей', () => {
+    const old = { layout: { answer: { v: 1, imgs: a, images: [{ x: .1, y: .1, w: .3, h: .3 }, { x: .5, y: .1, w: .3, h: .3 }] }, question: undefined } }
+    expect(screenLayout(old, 'answer', a)).not.toBeNull()
+    expect(JSON.stringify(withScreenLayout(old, 'question', null))).not.toContain('secret')
+  })
+  it('AnswerScreen ведёт только РАСКРЫТЫЙ ответ; до раскрытия (в т.ч. anagram вне «Скрэмбла») — нет', () => {
+    const q = { answer: { mode: 'anagram' }, media: {} }
+    expect(answerUsesSharedScreen('classic', 'standard', q, false)).toBe(false)
+    expect(answerUsesSharedScreen('classic', 'standard', { answer: { mode: 'free_text' }, media: {} }, true)).toBe(true)
+    expect(answerUsesSharedScreen('classic', 'standard', { answer: { mode: 'free_text' }, media: {} }, false)).toBe(false)
+  })
+})

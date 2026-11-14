@@ -43,7 +43,7 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
   const [stageState, setStageKey] = useState(stages[0]?.key)
   const q0 = round.questions[qIndex]
   const lay = useLayoutEdit({ pack, round, q: q0, canEdit, whyReadOnly, onSaved })
-  // «3 попытки» в режиме «Компоновка»: вкладка «Вопрос» показывает ВСЕ картинки (фаза 3), «Ответ» — разбор; вкладки фаз на это время не действуют
+  // «3 попытки» в режиме «Компоновка»: вкладка «Вопрос» — фаза 3, но с preview.showAllPics (RevealBoard рисует все картинки сразу, и авто-замер видит каждую), «Ответ» — разбор; вкладки фаз на это время не действуют
   const stageKey = lay.open && round.mechanic === 'four_pics' ? (lay.screen === 'answer' ? 'review' : 'phase3') : stageState
   // «3 попытки» получает раунд с подставленным черновиком компоновки (RevealBoard читает q из round.questions)
   const roundView = round.mechanic === 'four_pics' && lay.qView ? { ...round, questions: round.questions.map((x, i) => (i === qIndex ? lay.qView! : x)) } : round

@@ -155,7 +155,8 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
 
   const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   const phase = rv.phase ?? 1
-  const shownImgs = revealVisibleIndices(imgs.length, phase).map(i => imgs[i])
+  // в редакторе компоновки (preview.showAllPics) авто-вид «3 попыток» показывает ВСЕ картинки сразу — чтобы замер дал реальные положения каждой; в игре — по фазам
+  const shownImgs = (preview?.showAllPics && rv.phase !== 'review' ? imgs : revealVisibleIndices(imgs.length, phase).map(i => imgs[i]))
   // ручная раскладка (layout.question — фазы 1–3, layout.answer — разбор): раскладываются картинки и блок «ответ + пояснение»;
   // буквенные ячейки и подписи фаз остаются штатными (привязаны к механике). Битый/устаревший layout → авто.
   const manualOk = layoutUnsupportedReason(pack.theme, round.mechanic, q) === null

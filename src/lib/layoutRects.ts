@@ -21,6 +21,15 @@ export const FOLD = { from: 0.5 - FOLD_GAP / 2 / WORK.w, to: 0.5 + FOLD_GAP / 2 
 export const MIN_SIDE = 0.06
 export const LAYOUT_KEY = 'layout'
 
+/** Ключ картинки для layout.answer: КОРОТКИЙ ХЕШ пути, а не сам путь (service целиком уходит на телефоны — имена файлов ответа утекать не должны). */
+export function imgKey(path: string): string {
+  if (/^#[0-9a-f]{8}$/.test(path)) return path
+  let h = 0x811c9dc5
+  for (let i = 0; i < path.length; i++) { h ^= path.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 }
+  return '#' + h.toString(16).padStart(8, '0')
+}
+const keyMatches = (stored: unknown, path: string) => stored === path || stored === imgKey(path)   // старые layout.answer с путями читаются без падения
+
 const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
 const c01 = (v: number) => Math.min(1, Math.max(0, v))
 
@@ -51,7 +60,7 @@ export function validateRects(raw: unknown, imgs: string[], fold = true): Rects 
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   if (r.v !== 1) return null
-  if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => p !== imgs[i])) return null
+  if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => !keyMatches(p, imgs[i]))) return null
   if (!Array.isArray(r.images) || r.images.length !== imgs.length) return null
   const images: Rect[] = []
   for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(fold ? keepOffFold(x) : x) }
@@ -85,7 +94,10 @@ const asService = (s: unknown): Service => (s && typeof s === 'object' && !Array
 export function withScreenLayout(service: unknown, screen: LayoutScreen, rects: Rects | null): Service {
   const out = asService(service)
   const cur = out[LAYOUT_KEY] && typeof out[LAYOUT_KEY] === 'object' ? { ...(out[LAYOUT_KEY] as Record<string, unknown>) } : {}
-  if (rects) cur[screen] = rects; else delete cur[screen]
+  // layout.answer хранит ХЕШИ картинок, не пути (утечка на телефон): пишем хеши, а ранее сохранённые пути переписываем при любом следующем сохранении
+  const strip = (r: unknown) => (r && typeof r === 'object' && Array.isArray((r as Rects).imgs) ? { ...(r as Rects), imgs: (r as Rects).imgs.map(x => (typeof x === 'string' ? imgKey(x) : x)) } : r)
+  if (rects) cur[screen] = screen === 'answer' ? strip(rects) : rects; else delete cur[screen]
+  if (cur.answer) cur.answer = strip(cur.answer)
   if (Object.keys(cur).length) out[LAYOUT_KEY] = cur; else delete out[LAYOUT_KEY]
   return out
 }
@@ -156,4 +168,9 @@ export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = tru
 export function fallbackGridRects(imgs: string[], fold = true): Rects {
   const images = imgs.map((_, i) => { const r = clampRect({ x: i % 2 ? 0.55 : 0.05, y: i < 2 ? 0.04 : 0.5, w: 0.4, h: 0.44 }); return fold ? keepOffFold(r) : r })
   return { v: 1, imgs: [...imgs], images }
+}
+
+/** Вёрстку ответа ведёт общий AnswerScreen? Только раскрытый ответ поддержанного вида (до раскрытия — экран вопроса, в т.ч. для answer.mode==='anagram' вне «Скрэмбла»). */
+export function answerUsesSharedScreen(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }, revealed: boolean): boolean {
+  return revealed && !q.media.hidden && answerLayoutUnsupportedReason(theme, mechanic, q) === null
 }
