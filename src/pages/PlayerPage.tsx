@@ -836,8 +836,6 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
                   {placement
                     ? <>№{placement.number} {placement.dir === 'across' ? 'ПО ГОРИЗОНТАЛИ' : 'ПО ВЕРТИКАЛИ'}</>
                     : <>ВОПРОС {i + 1}</>}
-                  {isCrossword && i === gameState.question_index && isUnlocked &&
-                    <span className="pl-live"> · сейчас читает ведущий</span>}
                   {!isUnlocked && <span className="dim"> · ещё не зачитан</span>}
                   {isLocked && <span className="err"> · 🔒</span>}
                 </span>

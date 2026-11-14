@@ -49,3 +49,16 @@
 .bk-turn-leaf > i + i::after { background: linear-gradient(270deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .5)); }
 @keyframes bk-turn-shade { 0% { opacity: 0; } 50% { opacity: .6; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .bk-turn-leaf > i::after { animation: none !important; } }
+
+/* ═══ перелистывание А на реальном содержимом (ny/book/pageTurn.tsx) ═══ */
+.bk-turn2 { position: fixed; inset: 0; z-index: 90; pointer-events: none; perspective: 2800px; }
+.bk-turn2-under { position: absolute; inset: 0; }
+.bk-turn2-leaf { position: absolute; transform-origin: 0 50%; transform-style: preserve-3d; will-change: transform; }
+.bk-turn2-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; background: linear-gradient(270deg, var(--bk-paper-3, #e9d9b3), var(--bk-paper, #f3e6c6) 30%, var(--bk-paper-2, #efe0bd)); box-shadow: 0 0 50px rgba(40, 20, 6, .35); }
+.bk-turn2-face.back { transform: rotateY(180deg); background: linear-gradient(90deg, var(--bk-paper-3, #e9d9b3), var(--bk-paper, #f3e6c6) 30%, var(--bk-paper-2, #efe0bd)); }
+.bk-turn2-shade { position: absolute; inset: 0; opacity: 0; background: linear-gradient(90deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .55)); }
+.bk-turn2-shade.r { background: linear-gradient(270deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .55)); }
+/* клоны — только картинка: ни анимаций, ни кнопок, ни звука */
+.bk-turn2 *, .bk-turn2 *::before, .bk-turn2 *::after { animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; animation-fill-mode: both !important; transition: none !important; }
+.bk-turn2 .host-actions, .bk-turn2 .link-badge, .bk-turn2 .lobby-qr-corner, .bk-turn2 .answered-chip { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .bk-turn2 { display: none !important; } }

@@ -403,7 +403,23 @@ function HostInner({ gameState, pack }: {
             .host-screen — попадает в оба списка :not() (14/15), иначе
             общий сброс position/z-index в потоке перебьёт position:absolute. */}
         {pack.theme === 'potter' && <div className="mg-veil" aria-hidden />}
-        {round.mechanic === 'crossword' && grid ? (
+        {round.mechanic === 'crossword' && grid && pack.theme === 'ny_book' ? (
+          // «Книга»: левая страница — номер раунда, название, характеристики и пустая сетка (целиком в пределах страницы), правая — правила
+          <div className="bk-cw">
+            <div className="bk-cw-left">
+              <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
+              <Title theme={pack.theme} lines={round.title_lines} />
+              <div className="meta-line">{metaLine(round)}</div>
+              <div className="bk-cw-grid">
+                <CrosswordView grid={grid} cellSize={(() => {
+                  const u = Math.min(innerWidth / 1920, innerHeight / 1080)
+                  return Math.max(10, Math.floor(Math.min(640 * u / grid.cols, 350 * u / grid.rows, 64 * u)))
+                })()} />
+              </div>
+            </div>
+            <div className="bk-cw-right">{round.rules.length > 0 && <RulesFrame rules={round.rules} minScale={0.3} delay={i => 0.5 + i * 0.6} />}</div>
+          </div>
+        ) : round.mechanic === 'crossword' && grid ? (
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
             <CrosswordView grid={grid}

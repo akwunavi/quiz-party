@@ -749,13 +749,13 @@
 .theme-ny_book .info-screen .ib-label-text { font: 700 calc(68 * var(--u)) / 1.05 var(--bk-display) !important; color: var(--bk-ink-2) !important; text-shadow: 0 calc(3 * var(--u)) 0 rgba(201, 161, 74, .45); letter-spacing: .01em; text-transform: none; }
 .theme-ny_book .info-screen .ib-rules-band { order: 2; flex: 0 1 auto; padding: calc(10 * var(--u)) calc(24 * var(--u)); background: none; box-shadow: none; border-top: calc(3 * var(--u)) double var(--bk-gold-3); border-bottom: calc(3 * var(--u)) double var(--bk-gold-3); }
 .theme-ny_book .info-screen .ib-meta { order: 3; flex: 0 0 auto; height: auto !important; max-height: none !important; min-height: 0; overflow: visible; background: none; box-shadow: none; }
-.theme-ny_book .info-screen .info-round { font-size: calc(24 * var(--u)) !important; } .theme-ny_book .info-screen .info-list li { font-size: calc(28 * var(--u)) !important; } .theme-ny_book .info-screen .info-rounds, .theme-ny_book .info-screen .info-stats { position: static !important; height: auto !important; }
+.theme-ny_book .info-screen .info-rounds, .theme-ny_book .info-screen .info-stats { position: static !important; height: auto !important; }
 .theme-ny_book .scoreboard-title, .theme-ny_book .sb-title { font-family: var(--bk-display) !important; text-transform: none; }
 
 /* Book Core: ЕДИНЫЙ дисплейный шрифт заголовков — Cormorant Garamond (в направлении B — Philosopher), а не тяжёлый Ruslan Display: переопределяем общий токен темы */
 .theme-ny_book, .theme-ny_book.mel-overlay { --font-display: var(--bk-display); }
 .theme-ny_book :is(.jp-theme, .answer-main, .mel-answer, .mel-big, .sb-title, .fin-title) { font-weight: 700; letter-spacing: .01em; }
-.theme-ny_book .info-screen .ib-meta-fit { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; gap: calc(40 * var(--u)); align-items: start; height: auto !important; font-size: calc(24 * var(--u)) !important; }
+.theme-ny_book .info-screen .ib-meta-fit { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; gap: calc(40 * var(--u)); align-items: start; height: auto !important; }
 .theme-ny_book .info-screen .info-rounds + .info-stats, .theme-ny_book .info-screen .info-stats { margin: 0; padding: 0 0 0 calc(30 * var(--u)); border: 0; border-left: calc(2 * var(--u)) solid var(--bk-line); list-style: none; font-size: calc(24 * var(--u)); line-height: 1.5; }
 .theme-ny_book .info-screen :is(.ib-meta, .ib-meta-fit, .ib-rules-band, .info-body) { container-type: normal !important; contain: none !important; }
 .theme-ny_book .info-screen .ib-meta { display: contents !important; }
@@ -1196,3 +1196,32 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* строки ставок/ответов в свитке — пергаментные плашки в тон свитку (были белые) */
 .theme-ny_book.mel-overlay .mel-bid-row { background: rgba(255, 250, 235, .6) !important; border-radius: calc(4 * var(--u)); box-shadow: inset 0 0 0 calc(1.5 * var(--u)) rgba(138, 106, 36, .55) !important; }
 .theme-ny_book.mel-overlay .mel-bid-row.win { background: rgba(242, 213, 140, .75) !important; }
+
+/* ═══ ИНФО-СЛАЙД «ПРАВИЛА» (InfoSlideView): две страницы книги — СЛЕВА заголовок + раунды + статистика, СПРАВА пункты правил; ничего не лежит на сгибе ═══
+   Замер (getBoundingClientRect) показал причину наложения: .ib-meta получал display: contents, а .info-body/.ib-rules-band — разные потоки flex-колонки с фиксированной
+   высотой стека; блок статистики вставал на те же y, что первые пункты, а ширина полос — на всю книгу (через корешок). Кегль ul/сводки задавал !important — подгонка useFitText не работала.
+   Теперь: сетка 2 колонки (680u | 650u, зазор 90u вокруг корешка), каждая колонка ограничена по высоте, кегль подгоняет useFitText (без !important). */
+.theme-ny_book .info-screen .info-stack { display: grid !important; grid-template-columns: calc(680 * var(--u)) calc(650 * var(--u)) !important; grid-template-rows: minmax(0, 1fr) !important; column-gap: calc(90 * var(--u)) !important; justify-content: center; width: 100%; height: 100%; align-items: stretch; align-content: stretch !important; min-height: 0; }
+.theme-ny_book .info-screen .info-stack > .info-body { grid-column: 1; grid-row: 1; order: 0 !important; display: flex !important; flex-direction: column; gap: calc(18 * var(--u)); min-height: 0; min-width: 0; overflow: hidden; justify-content: flex-start; }
+.theme-ny_book .info-screen .info-stack > .ib-rules-band { grid-column: 2; grid-row: 1; order: 0 !important; min-height: 0 !important; min-width: 0; height: 100% !important; display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding: calc(8 * var(--u)) 0; }
+.theme-ny_book .info-screen .info-stack > .ib-rules-band.solo { grid-column: 1 / -1; }
+.theme-ny_book .info-screen .info-list { font-size: calc(32 * var(--u)); line-height: 1.22; margin: 0; padding: 0; flex: 0 0 auto; }
+.theme-ny_book .info-screen .info-list li { font-size: 1em; margin-bottom: .5em; overflow-wrap: break-word; }
+.theme-ny_book .info-screen .info-body .ib-label { text-align: left; }
+.theme-ny_book .info-screen .info-body .ib-label-text { font-size: calc(72 * var(--u)) !important; }
+.theme-ny_book .info-screen .info-body .ib-meta { display: block !important; flex: 1 1 0; min-height: 0 !important; overflow: hidden !important; }
+.theme-ny_book .info-screen .info-body .ib-meta-fit { display: flex !important; flex-direction: column !important; gap: calc(18 * var(--u)); width: 100%; flex: none !important; height: auto !important; min-height: 0 !important; overflow: visible !important; font-size: calc(28 * var(--u)); }
+.theme-ny_book .info-screen .info-body .info-round { font-size: 1em; }
+.theme-ny_book .info-screen .info-body .info-stats { border-left: 0; padding: calc(12 * var(--u)) 0 0; border-top: calc(2 * var(--u)) solid var(--bk-line); font-size: 1em; line-height: 1.45; }
+.theme-ny_book .info-screen .info-body .info-rounds { flex: 0 1 auto; min-height: 0; }
+
+/* ═══ ЗАСТАВКА КРОССВОРДА: левая страница — РАУНД, название, характеристики, сетка (целиком, по центру); правая — правила. Ничего не пересекает сгиб и не лезет под гирлянду ═══ */
+.theme-ny_book .round-intro .bk-cw { display: grid; grid-template-columns: calc(680 * var(--u)) calc(650 * var(--u)); column-gap: calc(90 * var(--u)); justify-content: center; align-items: stretch; width: 100%; height: 100%; min-height: 0;
+  padding: calc(var(--bk-oy) + 215 * var(--u)) 0 calc(var(--bk-oy) + 130 * var(--u)); box-sizing: border-box; }
+.theme-ny_book .round-intro .bk-cw-left { display: flex; flex-direction: column; align-items: center; gap: calc(14 * var(--u)); min-height: 0; min-width: 0; text-align: center; }
+.theme-ny_book .round-intro .bk-cw-left .mono-tag { font: 700 calc(24 * var(--u)) var(--bk-serif); letter-spacing: .3em; color: var(--bk-red); position: static; }
+.theme-ny_book .round-intro .bk-cw-left .neon-title { font-size: calc(58 * var(--u)) !important; text-align: center; line-height: 1.05; hyphens: none; overflow-wrap: normal; word-break: normal; text-wrap: balance; }
+.theme-ny_book .round-intro .bk-cw-left .neon-title span { display: inline; }
+.theme-ny_book .round-intro .bk-cw-grid { flex: 1 1 0; min-height: 0; width: 100%; display: grid; place-items: center; padding: calc(10 * var(--u)); box-sizing: border-box; }
+.theme-ny_book .round-intro .bk-cw-right { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
+.theme-ny_book .round-intro .bk-cw-right .rules-frame { width: 100% !important; margin: 0 !important; }

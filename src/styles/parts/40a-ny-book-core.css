@@ -193,7 +193,13 @@
 .bk-lobby-scenery { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; }
 .bk-scene[data-decor="sparse"] .bk-lobby-scenery { opacity: 1; }
 .bk-lobby-scenery img { position: absolute; display: block; user-select: none; }
-.bk-ls-hill { left: 250px; top: 900px; width: 800px; height: auto; opacity: .92; } /* дальний/нижний план: длинный сугроб под всей левой страницей */
+.bk-ls-snow { position: absolute; left: 78px; width: 1764px; overflow: hidden; pointer-events: none; }
+.bk-ls-snow img { position: absolute; bottom: 0; height: auto; transform: translateX(-50%); }
+.bk-ls-snow img.m { transform: translateX(-50%) scaleX(-1); }
+/* back: высокий, 3 сегмента по 1300 (высота 159); front: ниже, 5 сегментов по 760 (высота 93) — перекрывает основания домика, забора и фонаря; нижние ~6 % ассета прозрачны — уводим их под срез */
+.bk-ls-snow.back { top: 862px; height: 172px; } .bk-ls-snow.back img { width: 1300px; bottom: -10px; }
+.bk-ls-snow.front { top: 940px; height: 94px; } .bk-ls-snow.front img { width: 760px; bottom: -6px; }
+.bk-ls-gutter { position: absolute; left: 50%; top: 0; bottom: 0; width: 70px; margin-left: -35px; background: linear-gradient(90deg, transparent, rgba(60, 35, 12, .22), transparent); } /* дальний/нижний план: длинный сугроб под всей левой страницей */
 .bk-ls-house { position: absolute; left: 586px; top: 718px; width: 370px; height: 234px; } /* средний план: домик 350×228 (родной 325×212 — увеличение 1.08×, на 1920×1080 ещё резко) */
 .bk-ls-house > img:first-child { left: 0; top: 0; width: 100%; height: 100%; filter: drop-shadow(0 8px 8px rgba(60, 35, 12, .3)); }
 .bk-ls-smoke { left: 178px; top: -100px; width: 110px; height: auto; opacity: 0; transform-origin: 50% 100%; animation: bk-smoke 7s ease-out infinite; }
@@ -211,3 +217,6 @@
 @media (prefers-reduced-motion: reduce) { .bk-ls-smoke { animation: none; opacity: .5; transform: translate(10px, -40px); } .bk-ls-glow, .bk-ls-lglow { animation: none; opacity: .85; } }
 .bk-ls-fence.f2 { left: 380px; top: 940px; width: 220px; opacity: .9; }
 .bk-invite .bk-invite-title { font-size: 30px; } .bk-invite .bk-invite-text { font-size: 21px; line-height: 1.25; }
+/* общий снежный пол на ВСЕХ экранах «Книги» (кроме лобби — там своя сцена с двумя слоями): ёлки стоят в снегу, красная закладка у корешка убрана */
+.bk-floor { position: absolute; inset: 0; pointer-events: none; }
+.bk-scene[data-decor="sparse"] .bk-floor { display: none; }
