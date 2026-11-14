@@ -144,10 +144,10 @@ export function BookPages({ decor, children }: { decor: Density; children?: Reac
         <div className="bk-edges" />
         <div className="bk-page bk-page-l" /><div className="bk-page bk-page-r" />
         <div className="bk-gutter" />
-        <div className="bk-mark" />
         <div className="bk-light" />
       </div>
       <div className="bk-decor-back">{DECOR.filter(p => !p.front).map((p, i) => <Decor key={`${p.id}${i}`} p={p} i={i} />)}</div>
+      <div className="bk-floor" aria-hidden="true"><SnowStrip b={BASE + 'ny-book/'} kind="front" /></div>
       <LobbyScenery />
       <div className="bk-sparks">{SPARKS.map(([x, y, d], i) => <span key={i} className="bk-spark" data-on={sparkOn(d).join(' ')} style={{ left: x, top: y, '--i': i } as CSSProperties} />)}</div>
       <div className="bk-content" style={{ left: BOOK.x, top: BOOK.y, width: BOOK.w, height: BOOK.h }}>{children}</div>

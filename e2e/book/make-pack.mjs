@@ -59,7 +59,7 @@ function round(packId, pos, mechanic, title, rules, questions, settings = {}, ex
 
 /** Кроссворд 7×10: СНЕГОВИК / САНИ / ВАЛЕНКИ / ИГЛА / КАТОК — пересечения сверены вручную. */
 export const CROSSWORD_GRID = {
-  rows: 7, cols: 10,
+  rows: process.env.QP_CW_BIG ? 15 : 7, cols: process.env.QP_CW_BIG ? 18 : 10,
   words: [
     { word: 'СНЕГОВИК', clue: 'Его лепят во дворе из трёх комов', number: 1, dir: 'across', row: 0, col: 0 },
     { word: 'САНИ', clue: 'На них катаются с горки', number: 1, dir: 'down', row: 0, col: 0 },
@@ -138,7 +138,7 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
       q(rid, 1, '', { media: { question: [m('rebus-b.jpg'), m('rebus-a.jpg')] }, answer: free('хлопушка') }),
     ]),
     // R4 — кроссворд с сеткой
-    round(id, 3, 'crossword', 'Зимний кроссворд', ['Каждый вопрос — одно слово сетки', 'Буквы на пересечениях помогают соседям'], rid =>
+    round(id, 3, 'crossword', process.env.QP_CW_BIG ? 'Кино-сериальный кроссворд' : 'Зимний кроссворд', ['Каждый вопрос — одно слово сетки', 'Буквы на пересечениях помогают соседям'], rid =>
       CROSSWORD_GRID.words.map((w, i) => q(rid, i, w.clue, { answer: { mode: 'crossword_word', word: w.word } })),
     { grid: CROSSWORD_GRID }),
     // R5 — мелодия 3 темы × 4 трека

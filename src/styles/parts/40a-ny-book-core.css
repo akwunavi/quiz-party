@@ -217,3 +217,6 @@
 @media (prefers-reduced-motion: reduce) { .bk-ls-smoke { animation: none; opacity: .5; transform: translate(10px, -40px); } .bk-ls-glow, .bk-ls-lglow { animation: none; opacity: .85; } }
 .bk-ls-fence.f2 { left: 380px; top: 940px; width: 220px; opacity: .9; }
 .bk-invite .bk-invite-title { font-size: 30px; } .bk-invite .bk-invite-text { font-size: 21px; line-height: 1.25; }
+/* общий снежный пол на ВСЕХ экранах «Книги» (кроме лобби — там своя сцена с двумя слоями): ёлки стоят в снегу, красная закладка у корешка убрана */
+.bk-floor { position: absolute; inset: 0; pointer-events: none; }
+.bk-scene[data-decor="sparse"] .bk-floor { display: none; }
