@@ -1257,7 +1257,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 
 /* ═══ «СКРЭМБЛ»: итог вопроса («БАЛЛ ПОЛУЧАЕТ … ЗА 00:44.997») — ШИРОКАЯ подложка ПОСЕРЕДИНЕ экрана (по решению ведущего), под доской и панелью команд, выше сугроба.
    Причина прежнего: подложка была в 650u колонки левой страницы, nowrap-строка не влезала и имя команды съедалось многоточием (замер). ═══ */
-.theme-ny_book .host-screen.an-screen > .an-result { position: absolute !important; left: 50%; transform: translateX(-50%); width: calc(1160 * var(--u)) !important; max-width: none !important; top: calc(var(--bk-oy) + 800 * var(--u)); z-index: 3;
+.theme-ny_book .host-screen.an-screen > .an-result { position: absolute !important; left: 50%; transform: translateX(-50%); width: calc(1160 * var(--u)) !important; max-width: none !important; top: calc(var(--bk-oy) + 765 * var(--u)); z-index: 3;
   padding: calc(14 * var(--u)) calc(36 * var(--u)); box-sizing: border-box; }
 .theme-ny_book .an-result .an-res-line { font-size: calc(40 * var(--u)); gap: calc(18 * var(--u)); flex-wrap: nowrap; align-items: baseline; }
 .theme-ny_book .an-result .an-res-line.wrap { flex-wrap: wrap; }
@@ -1265,3 +1265,13 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .an-result .an-res-label { font-size: .55em; letter-spacing: .2em; }
 .theme-ny_book .an-result .an-res-time { font-size: .8em; }
 .theme-ny_book .an-result .an-res-note { font-size: calc(24 * var(--u)); text-align: center; }
+
+/* ═══ ЭКРАН ОТВЕТА, 3-я итерация (14.11): с картинкой подложка занимает всю свободную высоту левой страницы (по центру, ниже вопроса, выше сугроба), картинки — на всё оставшееся место ═══ */
+.theme-ny_book .answers-main.revealed .answer-block:has(> .answer-media) { flex: 1 1 auto; height: calc(690 * var(--u)); max-height: calc(690 * var(--u)); margin-block: auto; justify-content: flex-start; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex: 1 1 0 !important; height: auto !important; min-height: calc(200 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 > .q-img:first-child { grid-row: 1 / span 2; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n4 { grid-template-rows: 1fr 1fr; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+.theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img img { background: none; box-shadow: none; border-radius: 0; filter: drop-shadow(0 calc(5 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .45)); }
+.theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img { overflow: visible; }
