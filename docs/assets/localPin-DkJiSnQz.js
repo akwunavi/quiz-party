@@ -1,0 +1,1 @@
+const e="qp-local-pin",o=()=>{try{return localStorage.getItem(e)??""}catch{return""}},a=t=>{try{t.trim()?localStorage.setItem(e,t.trim()):localStorage.removeItem(e)}catch{}},c=()=>{const t=o();return t?{"X-QP-PIN":t}:{}};export{o as g,c as l,a as s};
