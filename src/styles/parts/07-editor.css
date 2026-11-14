@@ -270,7 +270,7 @@
 .ed-blitz-pool-msg { font-size: 13px; color: var(--accent2); }
 
 /* ═══ Редактор компоновки (LayoutEditor.tsx): рамки поверх предпросмотра и панель ═══ */
-.lay-ed { position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+.lay-ed { position: fixed; inset: 0; z-index: 120; pointer-events: none; --u: min(calc(100vw / 1920), calc(100vh / 1080)); --bk-ox: max(0px, calc((100vw - 1920 * var(--u)) / 2)); --bk-oy: max(0px, calc((100vh - 1080 * var(--u)) / 2)); }
 .lay-box { position: absolute; pointer-events: auto; box-sizing: border-box; border: 2px dashed #c0392b; background: rgba(192, 57, 43, .08); cursor: move; touch-action: none; }
 .lay-box.img { border-color: #1f6fb2; background: rgba(31, 111, 178, .10); }
 .lay-tag { position: absolute; left: 0; top: 0; transform: translateY(-100%); font: 600 12px system-ui; background: #7a1f2b; color: #fff; padding: 1px 6px; border-radius: 3px 3px 0 0; white-space: nowrap; }

@@ -94,8 +94,8 @@ function fakeRest(store, req, res, url) {
     const pid = eqParam(sp, 'pack_id')
     rows = packs.filter(p => p.id === pid).flatMap(p => p.rounds.map(({ questions: _q, ...r }) => r))
   } else if (table === 'pack_questions') {
-    const ids = inParam(sp, 'round_id') ?? []
-    rows = packs.flatMap(p => p.rounds).filter(r => ids.includes(r.id)).flatMap(r => r.questions)
+    const ids = inParam(sp, 'round_id'), qid = eqParam(sp, 'id')
+    rows = packs.flatMap(p => p.rounds).filter(r => !ids || ids.includes(r.id)).flatMap(r => r.questions).filter(q => !qid || q.id === qid)
   } else if (table === 'teams') {
     rows = st.teams.map(t => ({ id: t.id, name: t.name, color: t.color }))
   }
@@ -143,6 +143,14 @@ export async function startStand({ noBuild = false, extra = null } = {}) {
     try { url = new URL(req.url, ORIGIN) } catch { res.writeHead(400); res.end(); return }
     if (url.pathname.startsWith('/review/') && req.method === 'GET') return serveReview(url.pathname, res)
     if (extra && url.pathname.startsWith('/review-api/')) return void extra(req, res, url)
+    // правка вопроса из редактора (ручная компоновка): PATCH pack_questions?id=eq.… — применяем в памяти стенда
+    if (url.pathname === '/sb/rest/v1/pack_questions' && req.method === 'PATCH') {
+      let body = ''; req.on('data', c => { body += c }); req.on('end', () => {
+        const id = eqParam(url.searchParams, 'id'); let n = 0
+        store.mutate('stand.patch-question', {}, () => { for (const p of Object.values(store.state().packs)) for (const r of p.rounds) for (const q of r.questions) if (q.id === id) { Object.assign(q, JSON.parse(body || '{}')); n++ } })
+        res.writeHead(n ? 204 : 404, { 'Content-Type': 'application/json' }); res.end(n ? '' : '{"message":"stand: нет вопроса"}')
+      }); return
+    }
     if (url.pathname.startsWith('/sb/rest/v1/')) return fakeRest(store, req, res, url)
     if (url.pathname.startsWith('/sb/')) { res.writeHead(401, { 'Content-Type': 'application/json' }); res.end('{"message":"stand: облака нет"}'); return }
     if (url.pathname === '/stand/reset' && req.method === 'POST') {

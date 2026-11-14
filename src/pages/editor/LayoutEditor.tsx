@@ -70,7 +70,7 @@ export function LayoutEditor({ screen, onScreen, mode, onMode, draft, onDraft, d
   }
 
   return (
-    <div className="theme-ny_book lay-ed" onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+    <div className="lay-ed" onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
       {boxes.map(b => (
         <div key={b.t.kind === 'text' ? 't' : `i${b.t.i}`} className={`lay-box ${b.t.kind}`} style={rectStyle(b.r)}
           onPointerDown={e => down(e, b.t, 'move')}>
