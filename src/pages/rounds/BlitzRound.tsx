@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { currentTeam, liveLeft, remainingCount, type BlitzState, type BlitzQuestion } from '../../lib/blitzState'
+import { BookTeamCard } from '../../ny/book/BookTeamCard'
 import type { Team } from '../../types/quiz'
 import { serverNow } from '../../lib/serverClock'
 
@@ -32,8 +33,8 @@ export function blockLayout(n: number): { topCount: number; cols: number } {
 // ряда быстрее, чем «1:00», и не путается с часами.
 const fmt = (ms: number) => String(Math.max(0, Math.ceil(ms / 1000)))
 
-function TeamBlock({ team, state, active, now }: {
-  team: Team; state: BlitzState; active: boolean; now: number
+function TeamBlock({ team, state, active, now, book }: {
+  team: Team; state: BlitzState; active: boolean; now: number; book?: boolean
 }) {
   const left = liveLeft(state, team.id, now)
   const pts = (state.correct[team.id] ?? 0) - (state.missed[team.id] ?? 0)
@@ -43,7 +44,7 @@ function TeamBlock({ team, state, active, now }: {
       style={{ ['--tc' as string]: team.color }}>
       {/* Метка хода: по одной подсветке рамкой было непонятно, кто играет */}
       {active && <span className="bz-turn">ХОД</span>}
-      <div className="bz-name">{team.name}</div>
+      {book ? <div className="bz-name bz-card"><BookTeamCard name={team.name} ch={74} color={team.color} /></div> : <div className="bz-name">{team.name}</div>}
       <div className={`bz-timer${low ? ' low' : ''}`}>{fmt(left)}</div>
       <div className="bz-meta">
         <span className="bz-pts">{pts > 0 ? `+${pts}` : pts}</span>
@@ -53,7 +54,9 @@ function TeamBlock({ team, state, active, now }: {
   )
 }
 
-export function BlitzBoard({ teams, state, bank, questionText, verdict, answerText, dice, reveal }: {
+export function BlitzBoard({ teams, state, bank, questionText, verdict, answerText, dice, reveal, book }: {
+  /** «Книга»: утверждённая карточка команды вместо текстовой плашки */
+  book?: boolean
   teams: Team[]
   state: BlitzState
   bank: BlitzQuestion[]
@@ -103,7 +106,7 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
       <div className={`bz-row${topCount > 0 && topCount < ordered.length ? ' bz-row-top' : ''}`}
         style={{ ['--cols' as string]: rowCols }}>
         {head.map(t => (
-          <TeamBlock key={t.id} team={t} state={state} active={t.id === active} now={now} />
+          <TeamBlock key={t.id} team={t} state={state} active={t.id === active} now={now} book={book} />
         ))}
       </div>
 
@@ -143,7 +146,7 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
 
       <div className="bz-row" style={{ ['--cols' as string]: Math.max(1, rest.length) }}>
         {rest.map(t => (
-          <TeamBlock key={t.id} team={t} state={state} active={t.id === active} now={now} />
+          <TeamBlock key={t.id} team={t} state={state} active={t.id === active} now={now} book={book} />
         ))}
       </div>
     </div>
@@ -152,8 +155,8 @@ export function BlitzBoard({ teams, state, bank, questionText, verdict, answerTe
 
 /** Кубик с названиями команд: крутится и останавливается на первой.
  *  Показывается один раз в начале раунда — дальше ходы идут по кругу. */
-export function BlitzDice({ teams, pickedId, rolling }: {
-  teams: Team[]; pickedId?: string; rolling: boolean
+export function BlitzDice({ teams, pickedId, rolling, book }: {
+  teams: Team[]; pickedId?: string; rolling: boolean; book?: boolean
 }) {
   const [face, setFace] = useState(0)
   useEffect(() => {
@@ -167,10 +170,12 @@ export function BlitzDice({ teams, pickedId, rolling }: {
     : teams.find(t => t.id === pickedId) ?? teams[0]
   return (
     <div className="bz-dice-wrap">
-      <div className={`bz-dice${rolling ? ' rolling' : ' done'}`}
-        style={{ ['--tc' as string]: shown?.color }}>
-        {shown?.name ?? '—'}
-      </div>
+      {book
+        ? <div className={`bz-dice-card${rolling ? ' rolling' : ' done'}`}><BookTeamCard name={shown?.name ?? '—'} ch={150} color={shown?.color} /></div>
+        : <div className={`bz-dice${rolling ? ' rolling' : ' done'}`}
+            style={{ ['--tc' as string]: shown?.color }}>
+            {shown?.name ?? '—'}
+          </div>}
       <div className="bz-dice-cap">{rolling ? 'кто начинает…' : 'начинает'}</div>
     </div>
   )

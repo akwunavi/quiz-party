@@ -2,7 +2,8 @@
 // Вынесено из HostScreen.tsx (9.51, объединение предпросмотра с боевым
 // экраном) — импорт оттуда тянул бы весь проектор в чужой чанк, а
 // предпросмотру в редакторе нужен ровно этот компонент, не копия.
-import { createPortal } from 'react-dom'
+import { BookTimer } from '../../ny/book/BookTimer'
+import { ScrollModal } from '../../ny/book/ScrollModal'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { TileCard } from '../../components/TileCard'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
@@ -126,6 +127,7 @@ function useJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   return { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose }
 }
 
+import { BookMelodyCovers } from '../../ny/book/BookMelody'
 function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   const { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose } = useJeopardyBoard({ pack, round, gameState, preview })
   if (themes.length === 0) return (
@@ -148,13 +150,25 @@ function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
         gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))`,
       }}>
         {saveErr && <div className="jp-save-err">⚠ {saveErr}</div>}
-      {themes.map((t, ti) => (
+      {pack.theme !== 'ny_book' && themes.map((t, ti) => (
           <div key={`h${ti}`} className="jp-theme-name" style={{ gridColumn: ti + 1, gridRow: 1 }}>
             {t.name || `Тема ${ti + 1}`}
             {t.hint && <span className="jp-theme-hint">{t.hint}</span>}
           </div>
         ))}
-        {themes.map((t, ti) => t.tiles.map((tile, i) => {
+        {pack.theme === 'ny_book' && <BookMelodyCovers themes={themes.map(t => ({ name: t.name, tracks: t.tiles }))} played={opened} highlighted={null}
+          labelOf={(ti, i) => themes[ti].tiles[i].value} hintOf={ti => themes[ti].hint}
+          onPick={preview ? undefined : key => {
+            const [ti, i] = key.split('-').map(Number)
+            const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+            openAt(flat, tileElRefs.current.get(flat)?.getBoundingClientRect())
+          }}
+          setRef={(key, el) => {
+            const [ti, i] = key.split('-').map(Number)
+            const flat = themes.slice(0, ti).reduce((s, x) => s + x.tiles.length, 0) + i
+            if (el) tileElRefs.current.set(flat, el); else tileElRefs.current.delete(flat)
+          }} />}
+        {pack.theme !== 'ny_book' && themes.map((t, ti) => t.tiles.map((tile, i) => {
           const done = opened.includes(`${ti}-${i}`)
           return (
             // data-c — номер темы для раскраски: у плиток мелодии цвет неона
@@ -326,15 +340,17 @@ function useTileModal({ round, gameState, tile, tileIndex, replayNonce, origin, 
 function TileModal(props: TileProps) {
   const { theme, tile, onClose, packTheme, showAnswer, onShowAnswer, onReplay } = props
   const { modalRef, growVars, remaining, playing, teams, audioErr, localGrades, rows, grade } = useTileModal(props)
-  return createPortal(
-    <div className={`jp-overlay theme-${packTheme ?? 'classic'}`}>
-      <div ref={modalRef} className={`jp-modal hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
+  const totalRef = useRef(0); if (remaining > totalRef.current) totalRef.current = remaining
+  return (
+    <ScrollModal theme={packTheme} kind="jp" load={rows.length > 5 ? 'l' : 'm'} modalRef={modalRef} className={`hud-frame${growVars ? ' qt-grow' : ''}`} style={growVars}>
         <div className="jp-modal-head">
           <div>
             <div className="jp-modal-theme">{theme.name}</div>
             <div className="mono-tag">ПЛИТКА · {tile.value}</div>
           </div>
-          <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>
+          {packTheme === 'ny_book'
+            ? <div className="jp-count bk-mel-timer"><BookTimer t={{ seconds: Math.max(remaining, totalRef.current), left: remaining, frac: totalRef.current ? Math.max(0, Math.min(1, remaining / totalRef.current)) : 0, low: remaining <= 5, zero: remaining <= 0, running: playing }} /></div>
+            : <div className={`jp-count${playing ? ' on' : ''}`}>{String(remaining).padStart(2, '0')}</div>}
         </div>
 
         {showAnswer && (
@@ -393,9 +409,7 @@ function TileModal(props: TileProps) {
           )}
           <button className="ghost dark" onClick={onClose}>Закрыть плитку</button>
         </div>
-      </div>
-    </div>,
-    document.body,
+    </ScrollModal>
   )
 }
 

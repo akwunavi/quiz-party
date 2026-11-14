@@ -1,0 +1,408 @@
+{
+ "q": 9,
+ "rows": [
+  {
+   "vp": "1920x1080",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1080",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1080",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1080",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1600x900",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "100.0×100.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1600x900",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "100.0×100.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1600x900",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "100.0×100.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1600x900",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "100.0×100.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1440x900",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "90.0×90.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1440x900",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "90.0×90.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1440x900",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "90.0×90.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1440x900",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "90.0×90.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1200",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1200",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1200",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1920x1200",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x1024",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x1024",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x1024",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x1024",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x720",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x720",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x720",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1280x720",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "80.0×80.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1899x905",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "100.5×100.5",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1899x905",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "100.5×100.5",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1899x905",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "100.5×100.5",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1899x905",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "100.5×100.5",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1366x768",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "85.3×85.3",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1366x768",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "85.3×85.3",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1366x768",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "85.3×85.3",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1366x768",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "85.3×85.3",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "2560x1080",
+   "left": 49,
+   "shown": "49",
+   "state": "normal",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "2560x1080",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "2560x1080",
+   "left": 5,
+   "shown": "5",
+   "state": "low",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "2560x1080",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "120.0×120.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1024x768",
+   "left": 49,
+   "shown": "50",
+   "state": "normal",
+   "slot": "64.0×64.0",
+   "size": "top",
+   "anims": [],
+   "bad": [],
+   "note": "показано 50, ожидалось 49"
+  },
+  {
+   "vp": "1024x768",
+   "left": 10,
+   "shown": "10",
+   "state": "low",
+   "slot": "64.0×64.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  },
+  {
+   "vp": "1024x768",
+   "left": 5,
+   "shown": "6",
+   "state": "low",
+   "slot": "64.0×64.0",
+   "size": "top",
+   "anims": [],
+   "bad": [],
+   "note": "показано 6, ожидалось 5"
+  },
+  {
+   "vp": "1024x768",
+   "left": 0,
+   "shown": "0",
+   "state": "zero",
+   "slot": "64.0×64.0",
+   "size": "top",
+   "anims": [],
+   "bad": []
+  }
+ ],
+ "fails": []
+}

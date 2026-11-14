@@ -1,0 +1,21 @@
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; background: #14100d; color: #eadcc0; font: 14px/1.35 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif }
+#app { display: grid; grid-template-columns: 270px 1fr; height: 100vh }
+body.fs-mode #app { grid-template-columns: 0 1fr } body.fs-mode #side, body.fs-mode #bar { display: none }
+#side { overflow: auto; background: #1d1712; border-right: 1px solid #3a2e22; padding: 10px 0 40px }
+#side h1 { font-size: 15px; margin: 4px 14px 10px; color: #f2d58c; letter-spacing: .02em }
+#side h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: #a58f6a; margin: 14px 14px 4px }
+#side a { display: block; padding: 5px 14px; color: #eadcc0; text-decoration: none; border-left: 3px solid transparent; cursor: pointer }
+#side a:hover { background: #2a2118 } #side a.on { background: #33271a; border-left-color: #c9a14a; color: #fff }
+#main { display: flex; flex-direction: column; min-width: 0 }
+#bar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 8px 12px; background: #1d1712; border-bottom: 1px solid #3a2e22 }
+.grp { display: flex; gap: 4px; align-items: center } .grp > span { color: #a58f6a; font-size: 12px; margin-right: 2px }
+button { background: #2e2418; color: #eadcc0; border: 1px solid #4a3a28; border-radius: 4px; padding: 4px 9px; cursor: pointer; font: inherit }
+button:hover { background: #3b2e1e } button.on { background: #c9a14a; color: #1a120a; border-color: #c9a14a; font-weight: 600 } button:disabled { opacity: .35; cursor: default }
+#title { padding: 6px 12px; font-size: 13px; color: #cdb88f; border-bottom: 1px solid #2a2118; min-height: 30px }
+#stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px; overflow: hidden; position: relative }
+.frame { position: relative; flex: none } .frame .cap { position: absolute; left: 0; top: -22px; font-size: 12px; color: #f2d58c }
+.frame iframe, .frame img { position: absolute; left: 0; top: 0; transform-origin: 0 0; border: 0; background: #000 }
+.frame .box { position: relative; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,.6) }
+#msg { position: absolute; right: 14px; bottom: 10px; background: #000a; padding: 4px 10px; border-radius: 4px; font-size: 12px; display: none }
+#help { color: #8a7656; font-size: 12px; margin-left: auto }

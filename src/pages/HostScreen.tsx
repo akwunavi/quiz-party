@@ -41,6 +41,10 @@ import { introKindOf } from '../forest/stage5/views'
 import { boardRowsFrom, mmss, playedCols, podiumSlots, rulesViewFrom, type BoardView } from '../forest/stage5/views'
 import { useImageSizes } from '../forest/stage1/gameHooks'
 import { NyLobby } from '../ny/NyLobby'
+import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
+import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
+import { BookTeamCard } from '../ny/book/BookTeamCard'
+import { BookNote } from '../ny/book/BookNote'
 import { LinkBadge } from '../components/LinkBadge'
 import { ScreenFx } from '../components/ScreenFx'
 import { AwardMedal } from '../components/AwardMedal'
@@ -127,7 +131,8 @@ export function HostScreen() {
     ? isPlainQuestion(pack.rounds[gameState.round_number]?.questions[gameState.question_index], pack.rounds[gameState.round_number]?.mechanic)
     : false
   return (
-    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme} paper={pack?.settings?.play_mode === 'paper'}>
+    <ThemeLayer theme={theme} isProjector phase={gameState?.phase} plain={plainForTheme} paper={pack?.settings?.play_mode === 'paper'}
+      turn={gameState ? { game_id: gameState.game_id, phase: gameState.phase, round_number: gameState.round_number, question_index: gameState.question_index } : null}>
       {theme === 'new_year' &&
         <SnowCurtain trigger={`${gameState?.phase}-${gameState?.round_number}-${gameState?.question_index}`} />}
       <HostInner gameState={gameState} pack={pack} />
@@ -310,7 +315,7 @@ function HostInner({ gameState, pack }: {
                 ведущим и возвращается кнопкой. Размер считает сетка внутри:
                 колонок тем больше, чем больше команд. */}
             {groupsShown && (
-              <GroupsModal groups={groups} onClose={() => setGroupsOpen(false)} />
+              <GroupsModal groups={groups} book={pack?.theme === 'ny_book'} onClose={() => setGroupsOpen(false)} />
             )}
             {groups.length > 0 && !groupsOpen && (
               <button className="ghost dark lobby-groups-btn"
@@ -402,13 +407,17 @@ function HostInner({ gameState, pack }: {
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
             <CrosswordView grid={grid}
-              cellSize={Math.max(18, Math.min(44,
+              cellSize={pack.theme === 'ny_book'
+                ? Math.max(24, Math.min(68, Math.floor(Math.min(innerWidth * .3 / grid.cols, innerHeight * .55 / grid.rows))))
+                : Math.max(18, Math.min(44,
                 Math.floor(Math.min(innerWidth * .48 / grid.cols, innerHeight * .8 / grid.rows))))} />
             <div className="side">
               <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
               <Title theme={pack.theme} lines={round.title_lines} />
               <div className="meta-line" style={{ alignSelf: 'flex-start' }}>{metaLine(round)}</div>
-              {round.rules.map((r, i) => (
+              {pack.theme === 'ny_book'
+                ? (round.rules.length > 0 && <RulesFrame rules={round.rules} minScale={0.3} delay={i => 0.5 + i * 0.6} />)
+                : round.rules.map((r, i) => (
                 <div key={i} className="rule-item" style={{ animationDelay: `${0.5 + i * 0.5}s` }}>
                   <span className="idx">{String(i + 1).padStart(2, '0')}</span>{r}
                 </div>
@@ -434,7 +443,7 @@ function HostInner({ gameState, pack }: {
           {/* Правила сбоку от заголовка: подпись на рамке не помещалась,
               а по центру рамка отжимала кнопки. Как в кроссворде — колонкой. */}
           {round.rules.length > 0 && (
-            <RulesFrame rules={round.rules}
+            <RulesFrame rules={round.rules} minScale={pack.theme === 'ny_book' ? 0.3 : 0.5}
               /* Cyberpunk (мокап v3, «Правила раунда»): скан-переход сначала отыгрывает заставку раунда, и только
                  затем — с паузой около секунды — проступают правила. Другие темы не трогаем — их тайминг
                  согласован раньше и отдельно. */
@@ -893,7 +902,7 @@ function CyberPanel({ side }: { side: 'left' | 'right' }) {
 /** Модалка составов команд от рандомайзера.
  *  Закрывается крестиком, кликом по фону и Esc — ведущему может понадобиться
  *  показать что-то под ней, не перезапуская экран. */
-function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => void }) {
+function GroupsModal({ groups, onClose, book }: { groups: string[][]; onClose: () => void; book?: boolean }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -911,7 +920,8 @@ function GroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => v
         <div className="lg-list">
           {groups.map((g, i) => (
             <div key={i} className="lg-team">
-              <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>
+              {book ? <div className="lg-name bk-lg"><BookTeamCard name={`Команда ${i + 1}`} ch={54} color={teamColor(i)} /></div>
+              : <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>}
               <div className="lg-players">{g.join(' · ')}</div>
             </div>
           ))}
@@ -1347,7 +1357,7 @@ function BlitzScreen({ pack, round, gameState }: {
     return (
       <div className="host-screen grid-bg bz-screen">
         <div className="host-topbar"><span className="mono-tag">БЛИЦ</span></div>
-        <BlitzDice teams={teams} rolling />
+        <BlitzDice teams={teams} rolling book={pack.theme === 'ny_book'} />
       </div>
     )
   }
@@ -1395,7 +1405,7 @@ function BlitzScreen({ pack, round, gameState }: {
 
   return (
     <>
-      <BlitzBoard teams={teams} state={state} bank={bank}
+      <BlitzBoard book={pack.theme === 'ny_book'} teams={teams} state={state} bank={bank}
         questionText={q?.question_text}
         verdict={cur?.verdict}
         reveal={reveal}
@@ -1405,7 +1415,7 @@ function BlitzScreen({ pack, round, gameState }: {
         answerText={cur?.verdict === 'ok'
           || (cur?.verdict === 'no' && cur.attempts + 1 >= MAX_ATTEMPTS)
           ? displayAnswer(q as Question) : undefined}
-        dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} /> : undefined}
+        dice={!started ? <BlitzDice teams={teams} rolling={false} pickedId={state.order[0]} book={pack.theme === 'ny_book'} /> : undefined}
       />
       {/* ── 5. Управление с проектора ──
           Те же действия, что в админке: ведущему не надо держать телефон,
@@ -1706,7 +1716,10 @@ function AnswerTime({ pack, round, gameState }: {
             const got = answers.filter(a => a.team_id === t.id && a.answer_text?.trim()).length
             const done = got >= totalQ
             return (
-              <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
+              pack.theme === 'ny_book'
+                /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={74} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
             )
@@ -1737,6 +1750,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const total = round.questions.length
   const step = gameState.question_index
+  // «Книга» (прототип этапа 2): анимация раскрытия — только если этот экран видел вопрос нераскрытым, а потом раскрытым
+  // (ny/book/motion.ts). Перезагрузка на раскрытом ответе и опрос раз в 2 с её не запускают. Хук — до ранних return
+  // (React #310). Класс bk-live правил в других темах не имеет.
+  const revealLiveRef = useRef(REVEAL_LIVE_INIT)
+  revealLiveRef.current = revealLiveStep(revealLiveRef.current, `${gameState.game_id}:${gameState.round_number}:${step}`, revealed)
+  const revealLive = revealLiveRef.current.live
+  const isBook = pack.theme === 'ny_book'
 
   // подстраховка из старого: авто-раскрытие через 3 сек
   // document.hidden здесь убран (FLOW-03): эффект срабатывает ОДИН раз на вопрос, и если в этот момент вкладка была
@@ -1895,9 +1915,15 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && q.answer.mode !== 'match' && q.question_text.trim() && (
             <p className={`q-recall${lenClass(q.question_text)}`}>{q.question_text}</p>
           )}
+          {/* «Книга»: у ответа своя картинка — картинки вопроса остаются компактной галереей (только ny_book) */}
+          {revealed && isBook && answerImgs.length > 0 && questionImgs.length > 0 && round.mechanic !== 'rebus' && (
+            <div className="answer-gallery is-recall">
+              {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+            </div>
+          )}
 
           {revealed && (
-            <div className="answer-block reveal-in">
+            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}${isBook && revealImgs.length === 1 && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && q.answer.mode !== 'order' && (q.answer_note ?? '').length <= 160 ? ' bk-side' : ''}`}>
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
@@ -1945,7 +1971,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${
                       revealImgs.length > 1 ? ' eq-row' : ''}${
-                      revealImgs.length > 4 ? ' wrap2' : ''}`}>
+                      revealImgs.length > 4 ? ' wrap2' : ''}${
+                      // is-own — своя картинка ответа (media.answer), is-recall — картинки вопроса вместо неё
+                      answerImgs.length ? ' is-own' : ' is-recall'}`}>
                     {revealImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
                   </div>
                 )}
@@ -1953,12 +1981,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
               {/* подсказка выходит ВМЕСТЕ с автопроверкой — когда ответ
                   показан целиком, включая сопоставление и порядок */}
-              {checked && q.answer_note &&
-                <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>}
+              {checked && q.answer_note && (isBook
+                ? <BookNote text={q.answer_note} className={noteClass(q.answer_note).trim()} />
+                : <div className={`answer-note${noteClass(q.answer_note)}`}>{q.answer_note}</div>)}
             </div>
           )}
         </div>
-        {!paper && <div className="team-answers">
+        {!paper && <div className="team-answers" data-n={rows.length}>
           {/* Пока ответ не показан — видно только СКОЛЬКО команд ответило.
               Иначе зал читает чужие ответы и интрига пропадает. */}
           <div className="mono-tag">
@@ -1976,7 +2005,16 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ? (a.is_correct ?? autocheck(q.answer, a.answer_text))
               : null
             return (
-              <div key={a.id} className="team-answer" style={{
+              pack.theme === 'ny_book'
+              ? <div key={a.id} className="team-answer bk-ta">
+                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
+                  <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
+                    {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
+                  {/* статус — новогодний шар: верно (галочка), неверно (красный крестик), нет ответа/ещё не проверено (нейтральный) */}
+                  <span className={`bk-ball is-${!a.answer_text?.trim() ? 'none' : shown === true ? 'ok' : shown === false ? 'no' : 'wait'}`} aria-hidden="true">
+                    <i>{!a.answer_text?.trim() ? '' : shown === true ? '✓' : shown === false ? '✗' : ''}</i></span>
+                </div>
+              : <div key={a.id} className="team-answer" style={{
                 borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
@@ -2302,7 +2340,7 @@ function ScoreboardScreen({ pack, gameState }: {
                 ? <span className="sb-medal"><AwardMedal theme={pack.theme} place={place} /></span>
                 : place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
-                <span className="sb-name">{t.name}</span></td>
+                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
                   сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
                   все баллы на колонку влево */}
@@ -2595,15 +2633,21 @@ function Finale({ pack, gameId, gameState }: {
     </>
   )
 
+  // «Книга» (прототип этапа 2): заголовок «Глава последняя. Наши победители», названия раундов в шапке, три варианта
+  // оформления (?bkfin=1|2|3 — только для согласования). Ранжирование не меняется.
+  const book = pack.theme === 'ny_book'
+  const finCls = book ? ` bk-fin bk-fin-v${bookFinaleVariant()}` : ''
+  const finTitle = book ? [...BOOK_FINALE_TITLE] : ['РЕЗУЛЬТАТЫ']
   const fullTable = (
     <div className="fin-breakdown">
       <div className="mono-tag">РАЗБИВКА ПО РАУНДАМ</div>
       <div className="fin-table-wrap">
-      <table ref={fitFinTable} className={`fin-table${tableSize(rows.length)}`}>
+      <table ref={fitFinTable} className={`fin-table${tableSize(rows.length)}`} style={{ '--half': Math.ceil(rows.length / 2) } as CSSProperties}>
         {/* ДВЕ пустые колонки: место и название команды. Была одна —
             заголовки раундов съезжали влево на целый столбец. */}
         <thead><tr><th /><th>Команда</th>{pack.rounds.map((r, i) => !r.off_scoreboard &&
-          <th key={r.id}>Р{displayRoundNumber(pack, i)}</th>)}<th>Σ</th></tr></thead>
+          <th key={r.id}>Р{displayRoundNumber(pack, i)}{book &&
+            <small className="fin-rname">{r.title_lines.join(' ').replace(/\s+/g, ' ').trim()}</small>}</th>)}<th>{book ? 'Итого' : 'Σ'}</th></tr></thead>
         <tbody>
           {/* Строки — ВСЕ и ВСЕГДА (та же причина, что у табло): подгон
               кегля меряет постоянную разметку, не растущую по одной
@@ -2614,7 +2658,7 @@ function Finale({ pack, gameId, gameState }: {
             <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
               <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color }}><span className="sb-name">{t.name}</span></td>
+              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}
@@ -2640,10 +2684,10 @@ function Finale({ pack, gameId, gameState }: {
     const places = [...new Set(rows.map(r => r.place))]
       .filter(p => p <= 3).sort((a, b) => b - a)
     if (step >= places.length) return (
-      <div className="host-screen grid-bg fin-screen">
+      <div className={`host-screen grid-bg fin-screen${finCls}`}>
         {fireworks}
         <div className="mono-tag">ИТОГИ ИГРЫ</div>
-        <Title ref={finTitleRef} theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+        <Title ref={finTitleRef} theme={pack.theme} lines={finTitle} />
         {fullTable}
         <div className="host-actions">
           <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>
@@ -2719,10 +2763,10 @@ function Finale({ pack, gameId, gameState }: {
   }
 
   return (
-    <div className="host-screen grid-bg fin-screen">
+    <div className={`host-screen grid-bg fin-screen${finCls}`}>
       {fireworks}
       <div className="mono-tag">ИТОГИ ИГРЫ</div>
-      <Title theme={pack.theme} lines={['РЕЗУЛЬТАТЫ']} />
+      <Title ref={book ? finTitleRef : undefined} theme={pack.theme} lines={finTitle} />
       {fullTable}
       <div className="host-actions">
         <button onClick={() => { if (confirm('Начать новую игру?')) void resetGame() }}>⟲ Новая игра</button>

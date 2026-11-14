@@ -1,0 +1,51 @@
+/* ═══ «Книга» (ny_book) — MOTION (ПРОТОТИП этапа 2) ═══
+   Анимации игрового слоя (вне сцены). Сцена (.nyl-stage: снег, лампочки, искры, команды лобби, QR) гасится общим правилом
+   40-ny-engine (reduced → конечный кадр). Правило CLAUDE.md §5: каждый «гаситель» в @media (prefers-reduced-motion)
+   копирует селектор анимации ДОСЛОВНО (тот же вес) + !important. Анимации зависят только от классов-событий (.bk-live). */
+
+/* ── B: раскрытие ответа — карточка разворачивается от верхней кромки (rotateX) + золотая вспышка по рамке ── */
+.theme-ny_book .answer-block.reveal-in.bk-live { transform-origin: 50% 0; animation: bk-unfold var(--bk-reveal-ms) cubic-bezier(.2, .85, .3, 1.05) both; }
+.theme-ny_book .answer-block.reveal-in.bk-live::after { content: ''; position: absolute; inset: calc(-4 * var(--u)); pointer-events: none; border-radius: 3px;
+  box-shadow: 0 0 0 calc(3 * var(--u)) var(--bk-gold-2), 0 0 calc(34 * var(--u)) calc(6 * var(--u)) rgba(242, 213, 140, .85);
+  opacity: 0; animation: bk-gold-flash 1.6s ease-out calc(var(--bk-reveal-ms) * .6) both; }
+.theme-ny_book .answer-block.reveal-in.bk-live .answer-main { animation: p-ink .8s ease-out calc(var(--bk-reveal-ms) * .5) both; }
+@keyframes bk-unfold { 0% { transform: perspective(1400px) rotateX(-88deg); opacity: 0; } 15% { opacity: 1; } 70% { transform: perspective(1400px) rotateX(6deg); } 100% { transform: none; opacity: 1; } }
+@keyframes bk-gold-flash { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ── перелистывание страницы при смене вопроса (лист в слое fx, ключ — ny/book/motion.ts:pageTurnKey) ── */
+.bk-turn { position: absolute; inset: 0; z-index: 95; pointer-events: none; perspective: 2800px; perspective-origin: 50% 40%; }
+.bk-turn-leaf { position: absolute; left: 50%; top: 0; width: 50%; height: 100%; transform-origin: 0 50%; transform-style: preserve-3d;
+  animation: bk-turn var(--bk-turn-ms) cubic-bezier(.5, .05, .3, 1) both; }
+.bk-turn-leaf > i { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 0 6px 6px 0;
+  background: linear-gradient(270deg, var(--bk-paper-3), var(--bk-paper) 30%, var(--bk-paper-2)); box-shadow: 0 0 50px rgba(40, 20, 6, .35); }
+.bk-turn-leaf > i + i { transform: rotateY(180deg); border-radius: 6px 0 0 6px; background: linear-gradient(90deg, var(--bk-paper-3), var(--bk-paper) 30%, var(--bk-paper-2)); }
+@keyframes bk-turn { 0% { transform: rotateY(0); opacity: 1; } 85% { opacity: 1; } 100% { transform: rotateY(-180deg); opacity: 0; } }
+
+/* ── мелодия: пластинка крутится ТОЛЬКО пока реально играет (класс is-spin от событий SharedPlayback) ── */
+.theme-ny_book .bk-vinyl.is-spin .bk-vinyl-disc { animation: bk-spin 1.8s linear infinite; }
+@keyframes bk-spin { to { transform: rotate(360deg); } }
+
+/* ═══ prefers-reduced-motion: те же селекторы (тот же вес) + !important ═══ */
+@media (prefers-reduced-motion: reduce) {
+  .theme-ny_book .answer-block.reveal-in.bk-live { animation: none !important; }
+  .theme-ny_book .answer-block.reveal-in.bk-live::after { animation: none !important; opacity: 0 !important; }
+  .theme-ny_book .answer-block.reveal-in.bk-live .answer-main { animation: none !important; }
+  .bk-turn-leaf { animation: none !important; display: none !important; }
+  .theme-ny_book .bk-vinyl.is-spin .bk-vinyl-disc { animation: none !important; }
+  .theme-ny_book .bk-vinyl-arm { transition: none !important; }
+}
+
+/* ── прежние анимации экранов «Книги», которые не гасились при reduced-motion (STAND §4): те же селекторы + !important ── */
+@media (prefers-reduced-motion: reduce) {
+  .theme-ny_book .neon-title { animation: none !important; }
+  .theme-ny_book .p-ros-num { animation: none !important; }
+  .theme-ny_book .choice-plate { animation: none !important; }
+  .theme-ny_book :is(.jp-modal, .mel-modal) { animation: none !important; }
+}
+
+/* тень на листе в движении (физика: лист темнеет, когда стоит ребром к свету) */
+.bk-turn-leaf > i { overflow: hidden; }
+.bk-turn-leaf > i::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .5)); opacity: 0; animation: bk-turn-shade var(--bk-turn-ms) ease-in-out both; }
+.bk-turn-leaf > i + i::after { background: linear-gradient(270deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .5)); }
+@keyframes bk-turn-shade { 0% { opacity: 0; } 50% { opacity: .6; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bk-turn-leaf > i::after { animation: none !important; } }

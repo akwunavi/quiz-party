@@ -12,6 +12,7 @@
 // в родителя. Работает на любом экране и с любым текстом, включая те, что
 // ведущий впишет завтра.
 import { useLayoutEffect, useRef, type RefObject } from 'react'
+import { fitFontSize, type FitRange } from '../ny/book/adaptive/fit'
 
 /** Насколько мельче исходного кегля разрешено опускаться. Ниже 45% текст
  *  в баре уже не читается — лучше пусть строка обрежется, чем зал будет
@@ -38,6 +39,10 @@ export type UseFitTextOpts = {
   /** CSS-селектор потомков, у которых кегль задан СВОИМИ правилами (например `.rule-item` с размером от темы):
    *  масштабируются они, а не сам элемент. Измеряется по-прежнему высота самого элемента (UI-01, 10.32). */
   items?: string
+  /** РЕЖИМ «Книги» (AdaptiveText, ADAPTIVE.md): вместо «ужимать от CSS-кегля» — бинарный поиск наибольшего кегля из [min, max] (px), при котором
+   *  текст помещается в родителя. Растёт И уменьшается (короткий текст — крупно), ждёт document.fonts.ready, первый подбор — синхронно до
+   *  отрисовки (без скачка). Результат — data-bk-fit="ok|overflow", data-bk-size. Функция вызывается на каждом замере (масштаб окна меняется). */
+  range?: () => FitRange
 }
 
 /**
@@ -60,6 +65,8 @@ export function useFitText<T extends HTMLElement>(
 ) {
   const ref = useRef<T | null>(null)
   const { minScale = MIN_SCALE, shrinkBefore, items } = opts
+  const rangeRef = useRef(opts.range)
+  rangeRef.current = opts.range
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -67,6 +74,35 @@ export function useFitText<T extends HTMLElement>(
     if (!el || !box) return
 
     let raf = 0
+    // ── режим диапазона (только «Книга»): подбор по реальному DOM, без transform ──
+    if (rangeRef.current) {
+      const fitsNow = () => {
+        const cs = getComputedStyle(box)
+        const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+        const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+        return el.offsetHeight <= availH + 1 && textWidth(el) <= availW + 1
+      }
+      let lastKey = ''
+      const run = () => {
+        const r = rangeRef.current?.(); if (!r) return
+        // пересчёт только по изменению входа/контейнера/шрифтов/масштаба: ключ — размер области + диапазон + текст
+        const key = `${box.clientWidth}x${box.clientHeight}|${r.min.toFixed(2)}-${r.max.toFixed(2)}|${el.textContent}`
+        if (key === lastKey) return
+        const res = fitFontSize(r, px => { el.style.fontSize = `${px}px`; return fitsNow() })
+        el.style.fontSize = `${res.size}px`
+        el.dataset.bkFit = res.overflow ? 'overflow' : 'ok'
+        el.dataset.bkSize = String(res.size)
+        lastKey = key
+      }
+      let alive = true
+      run()                                                             // до первой отрисовки
+      const again = () => { if (alive) { lastKey = ''; run() } }
+      void document.fonts?.ready?.then(again)                           // шрифты догрузились — метрики другие
+      document.fonts?.addEventListener?.('loadingdone', again)
+      const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run) })
+      ro.observe(box)
+      return () => { alive = false; cancelAnimationFrame(raf); ro.disconnect(); document.fonts?.removeEventListener?.('loadingdone', again) }
+    }
     const fit = () => {
       // Сброс: берём кегль, который назначил CSS для этого экрана, и от него
       // идём вниз. Без сброса подгон был бы «липким» — однажды уменьшив

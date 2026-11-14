@@ -50,8 +50,9 @@ export function Stage({ children, paused, reduced, className, style, fit = 'widt
   children: ReactNode; paused: boolean; reduced: boolean; className?: string; style?: CSSProperties
   /** width — лаборатория: сцена 16:9 по ширине контейнера. cover — боевой проектор:
    *  контейнер на весь экран, сцена масштабируется «с запасом» (без полей) и
-   *  центрируется; игровая вёрстка лежит поверх обычным DOM и сцены не касается. */
-  fit?: 'width' | 'cover'
+   *  центрируется; игровая вёрстка лежит поверх обычным DOM и сцены не касается.
+   *  contain — «Книга» (прототип этапа 2): сцена целиком в окне (масштаб = min, тот же, что --u вёрстки), по краям поля. */
+  fit?: 'width' | 'cover' | 'contain'
 }) {
   const wrap = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.5)
@@ -60,8 +61,9 @@ export function Stage({ children, paused, reduced, className, style, fit = 'widt
     const el = wrap.current
     if (!el) return
     const fitNow = () => {
-      if (fit === 'cover') {
-        const s = Math.max(0.05, Math.max(el.clientWidth / STAGE_W, el.clientHeight / STAGE_H))
+      if (fit === 'cover' || fit === 'contain') {
+        const pick = fit === 'cover' ? Math.max : Math.min
+        const s = Math.max(0.05, pick(el.clientWidth / STAGE_W, el.clientHeight / STAGE_H))
         setScale(s)
         setOff({ x: (el.clientWidth - STAGE_W * s) / 2, y: (el.clientHeight - STAGE_H * s) / 2 })
       } else {
@@ -77,7 +79,7 @@ export function Stage({ children, paused, reduced, className, style, fit = 'widt
   const kq = Math.round(k * 4) / 4               // не перерисовывать ели на каждый пиксель ресайза
   const clock = useClockSource(paused)
   const ctx = useMemo(() => ({ k: kq, paused, reduced, clock }), [kq, paused, reduced, clock])
-  const cover = fit === 'cover'
+  const cover = fit === 'cover' || fit === 'contain'
   // VIS-02 (10.37): `cover` обрезает сцену по краям, когда экран не 16:9. Рамке телевизора (она внутри сцены) нужно знать,
   // сколько обрезано с каждой стороны (в пикселях сцены), чтобы держаться видимого прямоугольника, а не краёв сцены.
   const crop = (cover && wrap.current ? (() => {

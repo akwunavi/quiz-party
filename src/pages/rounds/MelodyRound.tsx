@@ -11,9 +11,12 @@
 import { getRoomId } from '../../lib/room'
 import { createAudio, preloadAudio, preloadAudioAll } from '../../lib/audioSource'
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
+import { usePlaybackActive } from '../../lib/playbackActive'
+import { BookMelodyCovers } from '../../ny/book/BookMelody'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
-import { createPortal } from 'react-dom'
+import { BookTimer } from '../../ny/book/BookTimer'
+import { ScrollModal } from '../../ny/book/ScrollModal'
 import { MagicCircleTimer } from '../../components/MagicCircleTimer'
 import { TileCard } from '../../components/TileCard'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -125,6 +128,9 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const bgMusic = (round.settings as { bg_music?: string }).bg_music ?? pack.settings?.bg_music
   const [now, setNow] = useState(serverNow())
   useEffect(() => { const t = setInterval(() => setNow(serverNow()), 200); return () => clearInterval(t) }, [])
+  // (проигрыватель/пластинка из модалки убраны по ТЗ 13.11; usePlaybackActive остаётся — на него подписаны play-эффекты)
+  // прежнее назначение: пластинка крутилась только пока трек РЕАЛЬНО играет (события SharedPlayback)
+  const vinyl = usePlaybackActive()
 
   // Дедлайн записал ДРУГОЙ экран (пульт) по своим часам — сверяем с нашими (ADM-03, 10.27).
   const rawDeadline = m.deadline ? new Date(m.deadline).getTime() : 0
@@ -209,12 +215,14 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     // та же точка старта, что была на «слушаем 1 секунду» (m.startSec) —
     // не с начала трека, а именно оттуда, где уже был сюрприз-отрывок
     const h = playShared(mediaUrl(track.audio), { startAt: m.startSec ?? 0, keepTail: sec })
+    const unbindVinyl = vinyl.bind(h)
     let stop: number | undefined
     let advanced = false
     const advance = () => {
       if (advanced) return
       advanced = true
       h.stop()
+      unbindVinyl()
       void updateMelody(gameState, guardMelody(
         { key: m.key, stage: 'snippet' },
         cur => melodyAcceptAnswer(cur, s.answerSec ?? 30),
@@ -248,6 +256,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       // Явная отписка на случай, если эффект размонтируется раньше, чем
       // событие произошло.
       offPlaying()
+      unbindVinyl()
       h.stop()
     }
   }, [preview, m.stage, m.key, vt.snippet])
@@ -311,6 +320,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     // браузер успевал прыгнуть в конец и остановиться, и «1 секунда»
     // проходила в тишине (HANDOFF §3cf).
     const h = playShared(mediaUrl(track.audio), { startAt: requested, keepTail: MELODY_MAX_BID_SEC })
+    const unbindVinyl = vinyl.bind(h)
     let stop: number | undefined
     let advanced = false
     let started = false
@@ -325,6 +335,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       if (advanced) return
       advanced = true
       h.stop()
+      unbindVinyl()
       void updateMelody(gameState, guardMelody(
         { key: m.key, stage: 'listen' },
         cur => ({
@@ -348,6 +359,7 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
       if (stop) clearTimeout(stop)
       clearTimeout(guard)
       offPlaying()
+      unbindVinyl()
       // защита на будущее: штатно звук останавливает advance() ДО записи
       // новой стадии, но если эффект размонтируется/перезапустится другим
       // путём, трек не должен утечь в следующую стадию (bidding).
@@ -370,10 +382,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     if (document.hidden && !preview && m.stage === 'passed' && !m.deadline && track?.audio) skipped.current.add('passed')
     if (preview || m.stage !== 'passed' || m.deadline || !track?.audio || document.hidden) return
     const h = playShared(mediaUrl(track.audio))
+    const unbindVinyl = vinyl.bind(h)
     const off = h.on('ended', () => void updateMelody(gameState, guardMelody(
       { key: m.key, stage: 'passed' }, cur => (cur.deadline ? null : { ...cur, deadline: inSec(s.passAnswerSec ?? 10) }),
     )))
-    return () => { off(); h.stop() }
+    return () => { off(); unbindVinyl(); h.stop() }
   }, [preview, m.stage, vt.passed])
 
   // ── предзагрузка: трек качается ЗАРАНЕЕ, до того как он реально понадобится ──
@@ -561,9 +574,8 @@ function ClassicMelodyBoard(props: BoardProps) {
       {/* модалка появляется только с момента прослушивания, на барабане её нет */}
       {/* ПОРТАЛ в document.body: модалка физически не может стать «частью страницы»,
           какие бы transform/overflow ни появились у предков */}
-      {m.stage && !idle && m.stage !== 'spinning' && createPortal(
-        <div className={`mel-overlay theme-${pack.theme ?? 'classic'}`}>
-          <div className="mel-modal">
+      {m.stage && !idle && m.stage !== 'spinning' && (
+        <ScrollModal theme={pack.theme} kind="mel" load={teams.length > 6 ? 'l' : 'm'}>
             <div className="mel-modal-head">
               <div className="mel-modal-theme">{themes[ti]?.name} · трек {i + 1}</div>
               {/* На listen дедлайн декоративный (не синхронизирован с
@@ -571,13 +583,17 @@ function ClassicMelodyBoard(props: BoardProps) {
                   тут таймер совсем, не пытаться сделать его точным. */}
               {!!deadline && m.stage !== 'listen' && (
                 // те же часы, что у большого таймера: --r = доля остатка
-                <div className="mel-count">
+                pack.theme === 'ny_book'
+                  ? <div className="mel-count bk-mel-timer"><BookTimer t={{ seconds: total, left, frac: total ? Math.max(0, Math.min(1, left / total)) : 0, low: left <= 5, zero: left <= 0, running: true }} /></div>
+                  : <div className="mel-count">
                   {pack.theme === 'potter'
                     ? <MagicCircleTimer left={left} seconds={total} low={left <= 5} />
                     : left}
                 </div>
               )}
             </div>
+
+            {/* «Книга» (прототип этапа 2): проигрыватель — пластинка крутится только пока трек реально играет */}
 
             {m.stage === 'listen' && <div className="mel-big">СЛУШАЕМ 1 СЕКУНДУ…</div>}
 
@@ -666,24 +682,6 @@ function ClassicMelodyBoard(props: BoardProps) {
                   guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur))))}>К доске →</button>
               </div>}
             </>)}
-            {/* Аварийный выход. Доступен на любой стадии: интернет у команд
-                отваливается, ответы не долетают, и ведущему нужен способ
-                двигаться дальше, не перезапуская игру. Не рендерится в
-                предпросмотре — как и остальные кнопки, пишущие в игру. */}
-            {!preview && m.stage !== 'reveal' && m.stage !== 'done' && (
-              <button className="mel-escape" onClick={async () => {
-                if (!confirm('Закрыть трек и вернуться к доске?\n\n'
-                  + 'Баллы за него никто не получит.')) return
-                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
-                // трека, не конкретно та, что была на момент клика. confirm()
-                // может провисеть несколько секунд, за которые короткая
-                // цепочка автостадий (spinning→listen→bidding) переключится
-                // сама — проверка «та же стадия» после этого никогда бы не
-                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
-                const keyNow = m.key
-                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
-              }}>Закрыть</button>
-            )}
 
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
               <div className="mel-big" style={{ color: currentTeam?.color }}>
@@ -722,9 +720,25 @@ function ClassicMelodyBoard(props: BoardProps) {
                 </button>
               </div>}
             </>)}
-          </div>
-        </div>,
-        document.body,
+            {/* Аварийный выход. Доступен на любой стадии: интернет у команд
+                отваливается, ответы не долетают, и ведущему нужен способ
+                двигаться дальше, не перезапуская игру. Не рендерится в
+                предпросмотре — как и остальные кнопки, пишущие в игру. */}
+            {!preview && m.stage !== 'reveal' && m.stage !== 'done' && (
+              <button className="mel-escape" onClick={async () => {
+                if (!confirm('Закрыть трек и вернуться к доске?\n\n'
+                  + 'Баллы за него никто не получит.')) return
+                // 9.62 (находка 5): условие — ЛЮБАЯ активная стадия ТОГО ЖЕ
+                // трека, не конкретно та, что была на момент клика. confirm()
+                // может провисеть несколько секунд, за которые короткая
+                // цепочка автостадий (spinning→listen→bidding) переключится
+                // сама — проверка «та же стадия» после этого никогда бы не
+                // совпала, и кнопка молчала бы «устарела» вместо закрытия.
+                const keyNow = m.key
+                click(() => melodyClick(gameState, melodyEmergencyClose(keyNow)))
+              }}>Закрыть</button>
+            )}
+        </ScrollModal>
       )}
     </div>
   )
@@ -812,10 +826,13 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
       {theme === 'potter' && spinning && (
         <span ref={markerRef} className={`mg-wisp mel-marker${nearEnd ? ' flare' : ''}`} aria-hidden />
       )}
-      {themes.map((t, ti) => (
-        <div key={`h${ti}`} className="mel-theme">{t.name || `Тема ${ti + 1}`}</div>
+      {/* «Книга»: три объёмные обложки (утверждённый ассет) — вместо цветных колонок; плитки и названия внутри (BookMelodyCovers) */}
+      {theme === 'ny_book' && <BookMelodyCovers themes={themes} played={played} highlighted={highlighted ?? null} onPick={onPick}
+        setRef={(key, el) => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }} />}
+      {theme !== 'ny_book' && themes.map((t, ti) => (
+        <div key={`h${ti}`} className="mel-theme" style={undefined}>{t.name || `Тема ${ti + 1}`}</div>
       ))}
-      {themes.map((t, ti) => t.tracks.map((_, i) => {
+      {theme !== 'ny_book' && themes.map((t, ti) => t.tracks.map((_, i) => {
         const key = `${ti}-${i}`
         const done = played.includes(key)
         const hot = highlighted === key

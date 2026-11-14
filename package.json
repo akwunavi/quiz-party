@@ -18,7 +18,9 @@
     "lab:cine": "vite --open /quiz-party/labs/cine7/",
     "lab:cine:build": "node scripts/build-cine-lab.mjs",
     "lab:forest": "vite --open /quiz-party/labs/forest/",
-    "lab:forest:build": "node scripts/build-forest-lab.mjs"
+    "lab:forest:build": "node scripts/build-forest-lab.mjs",
+    "book:review": "node e2e/book/review/serve.mjs",
+    "book:adaptive-check": "node e2e/book/adaptive-check.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

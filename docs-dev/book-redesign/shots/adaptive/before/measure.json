@@ -1,0 +1,8950 @@
+[
+ {
+  "name": "20-ad-1img-1280x720",
+  "title": "адаптив: одно вертикальное изображение",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-1img",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 270,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 223,
+      "y": 316,
+      "w": 432,
+      "h": 112,
+      "visible": true
+     }
+    ]
+   },
+   ".q-split": {
+    "count": 1,
+    "items": [
+     {
+      "x": 186,
+      "y": 115,
+      "w": 909,
+      "h": 515,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 687,
+      "y": 115,
+      "w": 408,
+      "h": 515,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 687,
+      "y": 115,
+      "w": 408,
+      "h": 515,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 116,
+    "clientH": 112,
+    "scrollW": 432,
+    "clientW": 432,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "33.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 33.3,
+    "max": 33.3
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 515
+   },
+   "onPages": 487217,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 33.3,
+    "rect": {
+     "x": 223,
+     "y": 316,
+     "w": 431.7,
+     "h": 111.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 704,
+      "y": 124,
+      "w": 372,
+      "h": 496
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 269.9,
+    "h": 48.7
+   },
+   "emptyBelowPct": 1.8,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-1img-1366x768",
+  "title": "адаптив: одно вертикальное изображение",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-1img",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 287,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 238,
+      "y": 337,
+      "w": 460,
+      "h": 119,
+      "visible": true
+     }
+    ]
+   },
+   ".q-split": {
+    "count": 1,
+    "items": [
+     {
+      "x": 198,
+      "y": 122,
+      "w": 969,
+      "h": 549,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 733,
+      "y": 122,
+      "w": 435,
+      "h": 549,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 733,
+      "y": 122,
+      "w": 435,
+      "h": 549,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 123,
+    "clientH": 119,
+    "scrollW": 460,
+    "clientW": 460,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "35.5556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 35.6,
+    "max": 35.6
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 549
+   },
+   "onPages": 554346,
+   "share": 52.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 35.6,
+    "rect": {
+     "x": 238,
+     "y": 337,
+     "w": 460.4,
+     "h": 119.5
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 752,
+      "y": 132,
+      "w": 396.8,
+      "h": 529.1
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 286.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 1.8,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-1img-1899x905",
+  "title": "адаптив: одно вертикальное изображение",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-1img",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 335,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 425,
+      "y": 397,
+      "w": 539,
+      "h": 141,
+      "visible": true
+     }
+    ]
+   },
+   ".q-split": {
+    "count": 1,
+    "items": [
+     {
+      "x": 378,
+      "y": 144,
+      "w": 1142,
+      "h": 647,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1011,
+      "y": 144,
+      "w": 509,
+      "h": 647,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1011,
+      "y": 144,
+      "w": 509,
+      "h": 647,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 145,
+    "clientH": 141,
+    "scrollW": 539,
+    "clientW": 539,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "41.8981px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 41.9,
+    "max": 41.9
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 647
+   },
+   "onPages": 769760,
+   "share": 44.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 41.9,
+    "rect": {
+     "x": 425,
+     "y": 397,
+     "w": 538.7,
+     "h": 140.7
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 1032,
+      "y": 156,
+      "w": 467.6,
+      "h": 623.5
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 334.8,
+    "h": 53.4
+   },
+   "emptyBelowPct": 1.8,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-1img-1920x1080",
+  "title": "адаптив: одно вертикальное изображение",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-1img",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 396,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 334,
+      "y": 474,
+      "w": 647,
+      "h": 168,
+      "visible": true
+     }
+    ]
+   },
+   ".q-split": {
+    "count": 1,
+    "items": [
+     {
+      "x": 278,
+      "y": 172,
+      "w": 1363,
+      "h": 772,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1030,
+      "y": 172,
+      "w": 612,
+      "h": 772,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1030,
+      "y": 172,
+      "w": 612,
+      "h": 772,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 173,
+    "clientH": 168,
+    "scrollW": 647,
+    "clientW": 647,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "50px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 50,
+    "max": 50
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 772
+   },
+   "onPages": 1096240,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 50,
+    "rect": {
+     "x": 334,
+     "y": 474,
+     "w": 647.5,
+     "h": 168
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 1057,
+      "y": 186,
+      "w": 558,
+      "h": 744
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 396.3,
+    "h": 58
+   },
+   "emptyBelowPct": 1.8,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-3img-choices-1280x720",
+  "title": "адаптив: 3 картинки + варианты — таймер не деформируется [скриншот ведущего №2]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-3img-choices",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 290,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 242,
+      "y": 120,
+      "w": 795,
+      "h": 30,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 166,
+      "w": 947,
+      "h": 302,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 3,
+    "items": [
+     {
+      "x": 175,
+      "y": 166,
+      "w": 341,
+      "h": 302,
+      "visible": true
+     },
+     {
+      "x": 542,
+      "y": 166,
+      "w": 155,
+      "h": 302,
+      "visible": true
+     },
+     {
+      "x": 724,
+      "y": 166,
+      "w": 381,
+      "h": 302,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 484,
+      "w": 947,
+      "h": 140,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 167,
+      "y": 494,
+      "w": 467,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 646,
+      "y": 494,
+      "w": 467,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 167,
+      "y": 566,
+      "w": 467,
+      "h": 59,
+      "visible": true
+     },
+     {
+      "x": 646,
+      "y": 566,
+      "w": 467,
+      "h": 59,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 32,
+    "clientH": 30,
+    "scrollW": 795,
+    "clientW": 795,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "26.6667px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.6px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 26.7,
+    "max": 26.7
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 25.6,
+    "max": 25.6
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 515
+   },
+   "onPages": 487217,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 26.7,
+    "rect": {
+     "x": 242,
+     "y": 120,
+     "w": 795.3,
+     "h": 29.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 184,
+      "y": 196,
+      "w": 322.5,
+      "h": 241.9
+     },
+     "natural": [
+      1200,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 552,
+      "y": 196,
+      "w": 136,
+      "h": 241.9
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 733,
+      "y": 196,
+      "w": 362.8,
+      "h": 241.9
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 289.6,
+    "h": 48.7
+   },
+   "emptyBelowPct": 37.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-3img-choices-1366x768",
+  "title": "адаптив: 3 картинки + варианты — таймер не деформируется [скриншот ведущего №2]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-3img-choices",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 307,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 259,
+      "y": 128,
+      "w": 849,
+      "h": 32,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 177,
+      "w": 1010,
+      "h": 323,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 3,
+    "items": [
+     {
+      "x": 187,
+      "y": 177,
+      "w": 364,
+      "h": 323,
+      "visible": true
+     },
+     {
+      "x": 579,
+      "y": 177,
+      "w": 165,
+      "h": 323,
+      "visible": true
+     },
+     {
+      "x": 772,
+      "y": 177,
+      "w": 407,
+      "h": 323,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 516,
+      "w": 1010,
+      "h": 149,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 178,
+      "y": 527,
+      "w": 498,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 690,
+      "y": 527,
+      "w": 498,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 178,
+      "y": 603,
+      "w": 498,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 690,
+      "y": 603,
+      "w": 498,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 34,
+    "clientH": 32,
+    "scrollW": 849,
+    "clientW": 849,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "28.4444px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "27.32px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 28.4,
+    "max": 28.4
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 27.3,
+    "max": 27.3
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 549
+   },
+   "onPages": 554346,
+   "share": 52.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 28.4,
+    "rect": {
+     "x": 259,
+     "y": 128,
+     "w": 848.5,
+     "h": 31.8
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 197,
+      "y": 209,
+      "w": 344,
+      "h": 258
+     },
+     "natural": [
+      1200,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 589,
+      "y": 209,
+      "w": 145.1,
+      "h": 258
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 782,
+      "y": 209,
+      "w": 387,
+      "h": 258
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 306.6,
+    "h": 49.9
+   },
+   "emptyBelowPct": 37.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-3img-choices-1899x905",
+  "title": "адаптив: 3 картинки + варианты — таймер не деформируется [скриншот ведущего №2]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-3img-choices",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 355,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 444,
+      "y": 144,
+      "w": 1011,
+      "h": 38,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 202,
+      "w": 1190,
+      "h": 371,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 3,
+    "items": [
+     {
+      "x": 365,
+      "y": 202,
+      "w": 429,
+      "h": 371,
+      "visible": true
+     },
+     {
+      "x": 827,
+      "y": 202,
+      "w": 194,
+      "h": 371,
+      "visible": true
+     },
+     {
+      "x": 1055,
+      "y": 202,
+      "w": 480,
+      "h": 371,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 593,
+      "w": 1190,
+      "h": 198,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 355,
+      "y": 606,
+      "w": 585,
+      "h": 83,
+      "visible": true
+     },
+     {
+      "x": 959,
+      "y": 606,
+      "w": 585,
+      "h": 83,
+      "visible": true
+     },
+     {
+      "x": 355,
+      "y": 708,
+      "w": 585,
+      "h": 83,
+      "visible": true
+     },
+     {
+      "x": 959,
+      "y": 708,
+      "w": 585,
+      "h": 83,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 41,
+    "clientH": 38,
+    "scrollW": 1011,
+    "clientW": 1011,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "33.5185px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "37.98px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 33.5,
+    "max": 33.5
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 38,
+    "max": 38
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 647
+   },
+   "onPages": 769760,
+   "share": 44.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 33.5,
+    "rect": {
+     "x": 444,
+     "y": 144,
+     "w": 1011.1,
+     "h": 37.5
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 376,
+      "y": 235,
+      "w": 405.4,
+      "h": 304
+     },
+     "natural": [
+      1200,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 839,
+      "y": 235,
+      "w": 171,
+      "h": 304
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1067,
+      "y": 235,
+      "w": 456.1,
+      "h": 304
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 355.2,
+    "h": 53.4
+   },
+   "emptyBelowPct": 39.3,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-3img-choices-1920x1080",
+  "title": "адаптив: 3 картинки + варианты — таймер не деформируется [скриншот ведущего №2]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-3img-choices",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 417,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 363,
+      "y": 180,
+      "w": 1193,
+      "h": 45,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 249,
+      "w": 1420,
+      "h": 454,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 3,
+    "items": [
+     {
+      "x": 262,
+      "y": 249,
+      "w": 512,
+      "h": 454,
+      "visible": true
+     },
+     {
+      "x": 814,
+      "y": 249,
+      "w": 232,
+      "h": 454,
+      "visible": true
+     },
+     {
+      "x": 1086,
+      "y": 249,
+      "w": 572,
+      "h": 454,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 726,
+      "w": 1420,
+      "h": 210,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 250,
+      "y": 741,
+      "w": 700,
+      "h": 88,
+      "visible": true
+     },
+     {
+      "x": 970,
+      "y": 741,
+      "w": 700,
+      "h": 88,
+      "visible": true
+     },
+     {
+      "x": 250,
+      "y": 848,
+      "w": 700,
+      "h": 88,
+      "visible": true
+     },
+     {
+      "x": 970,
+      "y": 848,
+      "w": 700,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 48,
+    "clientH": 45,
+    "scrollW": 1193,
+    "clientW": 1193,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "40px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "38.4px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 40,
+    "max": 40
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 38.4,
+    "max": 38.4
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 772
+   },
+   "onPages": 1096240,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 40,
+    "rect": {
+     "x": 363,
+     "y": 180,
+     "w": 1193.5,
+     "h": 44.8
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 276,
+      "y": 294,
+      "w": 483.7,
+      "h": 362.8
+     },
+     "natural": [
+      1200,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 828,
+      "y": 294,
+      "w": 204.1,
+      "h": 362.8
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1100,
+      "y": 294,
+      "w": 544.2,
+      "h": 362.8
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 417.5,
+    "h": 58
+   },
+   "emptyBelowPct": 37.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-1280x720",
+  "title": "адаптив: 4 изображения (1:1, 9:16, 21:9, PNG α) [скриншот ведущего №1]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 270,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 115,
+      "w": 947,
+      "h": 87,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 217,
+      "w": 947,
+      "h": 412,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 175,
+      "y": 217,
+      "w": 455,
+      "h": 203,
+      "visible": true
+     },
+     {
+      "x": 650,
+      "y": 217,
+      "w": 455,
+      "h": 203,
+      "visible": true
+     },
+     {
+      "x": 175,
+      "y": 427,
+      "w": 455,
+      "h": 203,
+      "visible": true
+     },
+     {
+      "x": 650,
+      "y": 427,
+      "w": 455,
+      "h": 203,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 90,
+    "clientH": 87,
+    "scrollW": 947,
+    "clientW": 947,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "38.6667px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 38.7,
+    "max": 38.7
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 515
+   },
+   "onPages": 487217,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 38.7,
+    "rect": {
+     "x": 167,
+     "y": 115,
+     "w": 946.7,
+     "h": 86.6
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 309,
+      "y": 225,
+      "w": 186.7,
+      "h": 186.7
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 825,
+      "y": 225,
+      "w": 105,
+      "h": 186.7
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 185,
+      "y": 435,
+      "w": 435.6,
+      "h": 186.7
+     },
+     "natural": [
+      1680,
+      720
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 738,
+      "y": 435,
+      "w": 280,
+      "h": 186.7
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 269.9,
+    "h": 48.7
+   },
+   "emptyBelowPct": 1.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-1366x768",
+  "title": "адаптив: 4 изображения (1:1, 9:16, 21:9, PNG α) [скриншот ведущего №1]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 287,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 122,
+      "w": 1010,
+      "h": 92,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 232,
+      "w": 1010,
+      "h": 440,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 187,
+      "y": 232,
+      "w": 486,
+      "h": 216,
+      "visible": true
+     },
+     {
+      "x": 694,
+      "y": 232,
+      "w": 486,
+      "h": 216,
+      "visible": true
+     },
+     {
+      "x": 187,
+      "y": 455,
+      "w": 486,
+      "h": 216,
+      "visible": true
+     },
+     {
+      "x": 694,
+      "y": 455,
+      "w": 486,
+      "h": 216,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 96,
+    "clientH": 92,
+    "scrollW": 1010,
+    "clientW": 1010,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "41.2444px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 41.2,
+    "max": 41.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 549
+   },
+   "onPages": 554346,
+   "share": 52.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 41.2,
+    "rect": {
+     "x": 178,
+     "y": 122,
+     "w": 1009.8,
+     "h": 92.4
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 330,
+      "y": 240,
+      "w": 199.2,
+      "h": 199.2
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 881,
+      "y": 240,
+      "w": 112,
+      "h": 199.2
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 197,
+      "y": 464,
+      "w": 464.7,
+      "h": 199.2
+     },
+     "natural": [
+      1680,
+      720
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 787,
+      "y": 464,
+      "w": 298.8,
+      "h": 199.2
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 286.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 1.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-1899x905",
+  "title": "адаптив: 4 изображения (1:1, 9:16, 21:9, PNG α) [скриншот ведущего №1]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 335,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 144,
+      "w": 1190,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 273,
+      "w": 1190,
+      "h": 518,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 365,
+      "y": 273,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 273,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 365,
+      "y": 536,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 536,
+      "w": 572,
+      "h": 255,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 113,
+    "clientH": 109,
+    "scrollW": 1190,
+    "clientW": 1190,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "48.6019px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 48.6,
+    "max": 48.6
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 647
+   },
+   "onPages": 769760,
+   "share": 44.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 48.6,
+    "rect": {
+     "x": 355,
+     "y": 144,
+     "w": 1189.9,
+     "h": 108.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 533,
+      "y": 283,
+      "w": 234.7,
+      "h": 234.7
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1182,
+      "y": 283,
+      "w": 132,
+      "h": 234.7
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 377,
+      "y": 546,
+      "w": 547.6,
+      "h": 234.7
+     },
+     "natural": [
+      1680,
+      720
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1072,
+      "y": 546,
+      "w": 352,
+      "h": 234.7
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 334.8,
+    "h": 53.4
+   },
+   "emptyBelowPct": 1.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-1920x1080",
+  "title": "адаптив: 4 изображения (1:1, 9:16, 21:9, PNG α) [скриншот ведущего №1]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 396,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 172,
+      "w": 1420,
+      "h": 130,
+      "visible": true
+     }
+    ]
+   },
+   ".q-media-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 326,
+      "w": 1420,
+      "h": 618,
+      "visible": true
+     }
+    ]
+   },
+   ".q-img": {
+    "count": 4,
+    "items": [
+     {
+      "x": 262,
+      "y": 326,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 975,
+      "y": 326,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 262,
+      "y": 640,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     },
+     {
+      "x": 975,
+      "y": 640,
+      "w": 683,
+      "h": 304,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 135,
+    "clientH": 130,
+    "scrollW": 1420,
+    "clientW": 1420,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "58px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 58,
+    "max": 58
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 772
+   },
+   "onPages": 1096240,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 58,
+    "rect": {
+     "x": 250,
+     "y": 172,
+     "w": 1420,
+     "h": 129.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 463,
+      "y": 338,
+      "w": 280,
+      "h": 280
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1238,
+      "y": 338,
+      "w": 157.5,
+      "h": 280
+     },
+     "natural": [
+      720,
+      1280
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 277,
+      "y": 652,
+      "w": 653.4,
+      "h": 280
+     },
+     "natural": [
+      1680,
+      720
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1106,
+      "y": 652,
+      "w": 420.1,
+      "h": 280
+     },
+     "natural": [
+      1200,
+      800
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": true
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 396.3,
+    "h": 58
+   },
+   "emptyBelowPct": 1.6,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-caps-1280x720",
+  "title": "адаптив: 4 картинки-варианта с подписями (A–Г) на одном уровне",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img-caps",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 270,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 115,
+      "w": 947,
+      "h": 87,
+      "visible": true
+     }
+    ]
+   },
+   ".img-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 217,
+      "w": 947,
+      "h": 412,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 90,
+    "clientH": 87,
+    "scrollW": 947,
+    "clientW": 947,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "38.6667px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 38.7,
+    "max": 38.7
+   },
+   ".ia-text": {
+    "n": 4,
+    "min": 18.7,
+    "max": 18.7
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 515
+   },
+   "onPages": 487217,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 38.7,
+    "rect": {
+     "x": 167,
+     "y": 115,
+     "w": 946.7,
+     "h": 86.6
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 175,
+      "y": 387,
+      "w": 166.4,
+      "h": 166.4
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 377,
+      "y": 350,
+      "w": 120.8,
+      "h": 161.1
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 534,
+      "y": 380,
+      "w": 308.3,
+      "h": 173.4
+     },
+     "natural": [
+      1600,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 878,
+      "y": 383,
+      "w": 227.2,
+      "h": 170.4
+     },
+     "natural": [
+      1000,
+      750
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 269.9,
+    "h": 48.7
+   },
+   "emptyBelowPct": 14.8,
+   "caps": [
+    576.9,
+    533.9,
+    576.9,
+    576.9
+   ],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-caps-1366x768",
+  "title": "адаптив: 4 картинки-варианта с подписями (A–Г) на одном уровне",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img-caps",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 287,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 122,
+      "w": 1010,
+      "h": 92,
+      "visible": true
+     }
+    ]
+   },
+   ".img-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 232,
+      "w": 1010,
+      "h": 440,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 96,
+    "clientH": 92,
+    "scrollW": 1010,
+    "clientW": 1010,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "41.2444px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 41.2,
+    "max": 41.2
+   },
+   ".ia-text": {
+    "n": 4,
+    "min": 19.9,
+    "max": 19.9
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 549
+   },
+   "onPages": 554346,
+   "share": 52.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 41.2,
+    "rect": {
+     "x": 178,
+     "y": 122,
+     "w": 1009.8,
+     "h": 92.4
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 187,
+      "y": 414,
+      "w": 177.5,
+      "h": 177.5
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 403,
+      "y": 374,
+      "w": 128.9,
+      "h": 171.8
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 570,
+      "y": 406,
+      "w": 328.8,
+      "h": 185
+     },
+     "natural": [
+      1600,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 937,
+      "y": 410,
+      "w": 242.3,
+      "h": 181.8
+     },
+     "natural": [
+      1000,
+      750
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 286.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 14.7,
+   "caps": [
+    615.9,
+    570.1,
+    615.9,
+    615.9
+   ],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-caps-1899x905",
+  "title": "адаптив: 4 картинки-варианта с подписями (A–Г) на одном уровне",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img-caps",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 335,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 144,
+      "w": 1190,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".img-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 273,
+      "w": 1190,
+      "h": 518,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 113,
+    "clientH": 109,
+    "scrollW": 1190,
+    "clientW": 1190,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "48.6019px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 48.6,
+    "max": 48.6
+   },
+   ".ia-text": {
+    "n": 4,
+    "min": 23.5,
+    "max": 23.5
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 647
+   },
+   "onPages": 769760,
+   "share": 44.8,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 48.6,
+    "rect": {
+     "x": 355,
+     "y": 144,
+     "w": 1189.9,
+     "h": 108.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 365,
+      "y": 489,
+      "w": 209.2,
+      "h": 209.2
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 619,
+      "y": 442,
+      "w": 151.9,
+      "h": 202.5
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 816,
+      "y": 480,
+      "w": 387.5,
+      "h": 218
+     },
+     "natural": [
+      1600,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1249,
+      "y": 484,
+      "w": 285.6,
+      "h": 214.2
+     },
+     "natural": [
+      1000,
+      750
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 334.8,
+    "h": 53.4
+   },
+   "emptyBelowPct": 14.5,
+   "caps": [
+    727.2,
+    673.2,
+    727.2,
+    727.2
+   ],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-4img-caps-1920x1080",
+  "title": "адаптив: 4 картинки-варианта с подписями (A–Г) на одном уровне",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-4img-caps",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-media",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 396,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 172,
+      "w": 1420,
+      "h": 130,
+      "visible": true
+     }
+    ]
+   },
+   ".img-answers": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 326,
+      "w": 1420,
+      "h": 618,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 135,
+    "clientH": 130,
+    "scrollW": 1420,
+    "clientW": 1420,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "58px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 58,
+    "max": 58
+   },
+   ".ia-text": {
+    "n": 4,
+    "min": 28,
+    "max": 28
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 772
+   },
+   "onPages": 1096240,
+   "share": 52.9,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 58,
+    "rect": {
+     "x": 250,
+     "y": 172,
+     "w": 1420,
+     "h": 129.9
+    },
+    "fit": null
+   },
+   "imgs": [
+    {
+     "rect": {
+      "x": 262,
+      "y": 585,
+      "w": 249.6,
+      "h": 249.6
+     },
+     "natural": [
+      1000,
+      1000
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 566,
+      "y": 529,
+      "w": 181.2,
+      "h": 241.6
+     },
+     "natural": [
+      900,
+      1200
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 801,
+      "y": 575,
+      "w": 462.4,
+      "h": 260.1
+     },
+     "natural": [
+      1600,
+      900
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    },
+    {
+     "rect": {
+      "x": 1317,
+      "y": 579,
+      "w": 340.8,
+      "h": 255.6
+     },
+     "natural": [
+      1000,
+      750
+     ],
+     "ratioErr": 0,
+     "contain": true,
+     "alpha": false
+    }
+   ],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 396.3,
+    "h": 58
+   },
+   "emptyBelowPct": 14.3,
+   "caps": [
+    869.3,
+    804.9,
+    869.3,
+    869.3
+   ],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-long-1280x720",
+  "title": "адаптив: длинный текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-long",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 270,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 227,
+      "y": 164,
+      "w": 827,
+      "h": 238,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 777,
+    "clientH": 720,
+    "scrollW": 1280,
+    "clientW": 1280,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.2089px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 25.2,
+    "max": 25.2
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 540
+   },
+   "onPages": 511200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 25.2,
+    "rect": {
+     "x": 227,
+     "y": 164,
+     "w": 826.7,
+     "h": 237.9
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 269.9,
+    "h": 48.7
+   },
+   "emptyBelowPct": 44.7,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-long-1366x768",
+  "title": "адаптив: длинный текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-long",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 287,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 242,
+      "y": 175,
+      "w": 882,
+      "h": 254,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 828,
+    "clientH": 768,
+    "scrollW": 1366,
+    "clientW": 1366,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "26.8894px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 26.9,
+    "max": 26.9
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 576
+   },
+   "onPages": 581632,
+   "share": 55.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 26.9,
+    "rect": {
+     "x": 242,
+     "y": 175,
+     "w": 881.8,
+     "h": 253.8
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 286.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 44.7,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-long-1899x905",
+  "title": "адаптив: длинный текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-long",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 335,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 430,
+      "y": 208,
+      "w": 1039,
+      "h": 295,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 976,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "31.2685px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 31.3,
+    "max": 31.3
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 679
+   },
+   "onPages": 807650,
+   "share": 47,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 31.3,
+    "rect": {
+     "x": 430,
+     "y": 208,
+     "w": 1039.1,
+     "h": 295.1
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 334.8,
+    "h": 53.4
+   },
+   "emptyBelowPct": 45,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-long-1920x1080",
+  "title": "адаптив: длинный текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-long",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 396,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 340,
+      "y": 246,
+      "w": 1240,
+      "h": 357,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 359,
+    "clientH": 357,
+    "scrollW": 1240,
+    "clientW": 1240,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1165,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "37.8133px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 37.8,
+    "max": 37.8
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 810
+   },
+   "onPages": 1150200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 37.8,
+    "rect": {
+     "x": 340,
+     "y": 246,
+     "w": 1240,
+     "h": 356.9
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 396.3,
+    "h": 58
+   },
+   "emptyBelowPct": 44.7,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-match-1280x720",
+  "title": "адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-match",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 256,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 247,
+      "w": 946,
+      "h": 43,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 306,
+      "w": 947,
+      "h": 165,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 167,
+      "y": 321,
+      "w": 464,
+      "h": 66,
+      "visible": true
+     },
+     {
+      "x": 649,
+      "y": 321,
+      "w": 464,
+      "h": 66,
+      "visible": true
+     },
+     {
+      "x": 167,
+      "y": 405,
+      "w": 464,
+      "h": 66,
+      "visible": true
+     },
+     {
+      "x": 649,
+      "y": 405,
+      "w": 464,
+      "h": 66,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 47,
+    "clientH": 43,
+    "scrollW": 946,
+    "clientW": 946,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "38.6667px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "20.6667px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 38.7,
+    "max": 38.7
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 20.7,
+    "max": 20.7
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 540
+   },
+   "onPages": 511200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 38.7,
+    "rect": {
+     "x": 167,
+     "y": 247,
+     "w": 945.6,
+     "h": 43.3
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 255.8,
+    "h": 48.7
+   },
+   "emptyBelowPct": 66.5,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-match-1366x768",
+  "title": "адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-match",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 272,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 179,
+      "y": 266,
+      "w": 1009,
+      "h": 46,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 329,
+      "w": 1010,
+      "h": 172,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 178,
+      "y": 344,
+      "w": 495,
+      "h": 69,
+      "visible": true
+     },
+     {
+      "x": 693,
+      "y": 344,
+      "w": 495,
+      "h": 69,
+      "visible": true
+     },
+     {
+      "x": 178,
+      "y": 432,
+      "w": 495,
+      "h": 69,
+      "visible": true
+     },
+     {
+      "x": 693,
+      "y": 432,
+      "w": 495,
+      "h": 69,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 50,
+    "clientH": 46,
+    "scrollW": 1009,
+    "clientW": 1009,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "41.2444px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "22.0444px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 41.2,
+    "max": 41.2
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 22,
+    "max": 22
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 576
+   },
+   "onPages": 581632,
+   "share": 55.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 41.2,
+    "rect": {
+     "x": 179,
+     "y": 266,
+     "w": 1008.7,
+     "h": 46.2
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 271.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 66.2,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-match-1899x905",
+  "title": "адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-match",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 317,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 287,
+      "w": 1190,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 416,
+      "w": 1190,
+      "h": 201,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 355,
+      "y": 434,
+      "w": 583,
+      "h": 80,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 434,
+      "w": 583,
+      "h": 80,
+      "visible": true
+     },
+     {
+      "x": 355,
+      "y": 537,
+      "w": 583,
+      "h": 80,
+      "visible": true
+     },
+     {
+      "x": 962,
+      "y": 537,
+      "w": 583,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 113,
+    "clientH": 109,
+    "scrollW": 1190,
+    "clientW": 1190,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "48.6019px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "25.9769px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 48.6,
+    "max": 48.6
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 26,
+    "max": 26
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 679
+   },
+   "onPages": 807650,
+   "share": 47,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 48.6,
+    "rect": {
+     "x": 355,
+     "y": 287,
+     "w": 1189.9,
+     "h": 108.9
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 317,
+    "h": 53.4
+   },
+   "emptyBelowPct": 61.8,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-match-1920x1080",
+  "title": "адаптив: сопоставление (этап D, только фиксация) [скриншот ведущего №3]",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-match",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg has-choices",
+  "density": "dense",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 375,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 251,
+      "y": 377,
+      "w": 1419,
+      "h": 65,
+      "visible": true
+     }
+    ]
+   },
+   ".choices-grid": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 466,
+      "w": 1420,
+      "h": 235,
+      "visible": true
+     }
+    ]
+   },
+   ".choice-plate": {
+    "count": 4,
+    "items": [
+     {
+      "x": 250,
+      "y": 487,
+      "w": 698,
+      "h": 95,
+      "visible": true
+     },
+     {
+      "x": 972,
+      "y": 487,
+      "w": 698,
+      "h": 95,
+      "visible": true
+     },
+     {
+      "x": 250,
+      "y": 606,
+      "w": 698,
+      "h": 95,
+      "visible": true
+     },
+     {
+      "x": 972,
+      "y": 606,
+      "w": 698,
+      "h": 95,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 70,
+    "clientH": 65,
+    "scrollW": 1419,
+    "clientW": 1419,
+    "overflow": "visible/visible"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "58px",
+    "loaded": true
+   },
+   ".choice-plate": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "31px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".choice-plate": "ruleIn 0.45s",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 58,
+    "max": 58
+   },
+   ".choice-plate": {
+    "n": 4,
+    "min": 31,
+    "max": 31
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 810
+   },
+   "onPages": 1150200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 58,
+    "rect": {
+     "x": 251,
+     "y": 377,
+     "w": 1418.8,
+     "h": 65
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 375.2,
+    "h": 58
+   },
+   "emptyBelowPct": 65.7,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-short-1280x720",
+  "title": "адаптив: короткий текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-short",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 31,
+      "w": 947,
+      "h": 84,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 167,
+      "y": 48,
+      "w": 256,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 227,
+      "y": 208,
+      "w": 827,
+      "h": 149,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1019,
+      "y": 35,
+      "w": 80,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 156,
+    "clientH": 149,
+    "scrollW": 827,
+    "clientW": 827,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 777,
+    "clientH": 720,
+    "scrollW": 1280,
+    "clientW": 1280,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "66.6667px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 66.7,
+    "max": 66.7
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 20,
+    "max": 20
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 540
+   },
+   "onPages": 511200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": {
+    "fontPx": 66.7,
+    "rect": {
+     "x": 227,
+     "y": 208,
+     "w": 826.7,
+     "h": 149.3
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1019,
+     "y": 35,
+     "w": 80,
+     "h": 80
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 167,
+    "y": 48,
+    "w": 255.8,
+    "h": 48.7
+   },
+   "emptyBelowPct": 53.4,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-short-1366x768",
+  "title": "адаптив: короткий текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-short",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 33,
+      "w": 1010,
+      "h": 89,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 178,
+      "y": 52,
+      "w": 272,
+      "h": 50,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 242,
+      "y": 222,
+      "w": 882,
+      "h": 159,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1089,
+      "y": 37,
+      "w": 85,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 166,
+    "clientH": 159,
+    "scrollW": 882,
+    "clientW": 882,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 828,
+    "clientH": 768,
+    "scrollW": 1366,
+    "clientW": 1366,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "71.1111px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 71.1,
+    "max": 71.1
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 21.3,
+    "max": 21.3
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 576
+   },
+   "onPages": 581632,
+   "share": 55.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": {
+    "fontPx": 71.1,
+    "rect": {
+     "x": 242,
+     "y": 222,
+     "w": 881.8,
+     "h": 159.3
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1089,
+     "y": 37,
+     "w": 85.3,
+     "h": 85.3
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 178,
+    "y": 52,
+    "w": 271.7,
+    "h": 49.9
+   },
+   "emptyBelowPct": 53.4,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-short-1899x905",
+  "title": "адаптив: короткий текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-short",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 39,
+      "w": 1190,
+      "h": 105,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 355,
+      "y": 64,
+      "w": 317,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 430,
+      "y": 261,
+      "w": 1039,
+      "h": 188,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1430,
+      "y": 43,
+      "w": 101,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 3
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 196,
+    "clientH": 188,
+    "scrollW": 1039,
+    "clientW": 1039,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 976,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "83.7963px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 83.8,
+    "max": 83.8
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 25.1,
+    "max": 25.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 679
+   },
+   "onPages": 807650,
+   "share": 47,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": {
+    "fontPx": 83.8,
+    "rect": {
+     "x": 430,
+     "y": 261,
+     "w": 1039.1,
+     "h": 187.7
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1430,
+     "y": 43,
+     "w": 100.5,
+     "h": 100.5
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 355,
+    "y": 64,
+    "w": 317,
+    "h": 53.4
+   },
+   "emptyBelowPct": 53.4,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "20-ad-short-1920x1080",
+  "title": "адаптив: короткий текст (без картинок)",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "20-ad-short",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "sparse",
+  "nodes": {
+   ".host-topbar": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 46,
+      "w": 1420,
+      "h": 124,
+      "visible": true
+     }
+    ]
+   },
+   ".qnum": {
+    "count": 1,
+    "items": [
+     {
+      "x": 250,
+      "y": 79,
+      "w": 375,
+      "h": 58,
+      "visible": true
+     }
+    ]
+   },
+   ".q-text": {
+    "count": 1,
+    "items": [
+     {
+      "x": 340,
+      "y": 312,
+      "w": 1240,
+      "h": 224,
+      "visible": true
+     }
+    ]
+   },
+   ".p-ros": {
+    "count": 1,
+    "items": [
+     {
+      "x": 1536,
+      "y": 50,
+      "w": 120,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".host-topbar[0]",
+    "of": "pages",
+    "by": {
+     "top": 4
+    }
+   },
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".q-text[0]",
+    "scrollH": 234,
+    "clientH": 224,
+    "scrollW": 1240,
+    "clientW": 1240,
+    "overflow": "visible/visible"
+   },
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1165,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".q-text": {
+    "family": "\"PT Serif\", Georgia, \"Times New Roman\", serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".q-text": "none",
+   ".p-ros": "none",
+   ".p-ros-num": "p-flip 0.4s",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".q-text": {
+    "n": 1,
+    "min": 100,
+    "max": 100
+   },
+   ".qnum": {
+    "n": 1,
+    "min": 30,
+    "max": 30
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 810
+   },
+   "onPages": 1150200,
+   "share": 55.5,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": {
+    "fontPx": 100,
+    "rect": {
+     "x": 340,
+     "y": 312,
+     "w": 1240,
+     "h": 224
+    },
+    "fit": null
+   },
+   "imgs": [],
+   "timer": {
+    "art": {
+     "x": 1536,
+     "y": 50,
+     "w": 120,
+     "h": 120
+    },
+    "slot": null
+   },
+   "qnum": {
+    "x": 250,
+    "y": 79,
+    "w": 375.2,
+    "h": 58
+   },
+   "emptyBelowPct": 53.4,
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ }
+]

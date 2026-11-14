@@ -17,6 +17,13 @@ import { FitImg } from '../FitImg'
 import { FitAnswer } from '../FitAnswer'
 import { Icicles } from '../Icicles'
 import { WindText } from '../QuestionText'
+import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
+import { BookSingle } from '../../ny/book/adaptive/BookSingle'
+import { estFont, estLines } from '../../ny/book/adaptive/singleLayout'
+import { TEXT_ROLES, targetSize } from '../../ny/book/adaptive/fit'
+import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
+import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
+import { bookUnit } from '../../ny/book/adaptive/safeArea'
 import { mediaUrl, mediaScaleVar } from '../../lib/media'
 import { choicesLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
@@ -161,9 +168,27 @@ function ClassicQuestionScreen({
     (q.answer.mode === 'match' && q.answer.left.length === imgs.length))
   const revealMode = (pack.settings?.answers_reveal && round.answers_reveal === 'after_question'
     ? round.answers_reveal : round.answers_reveal) ?? 'after_round'
+  // «Книга» (ADAPTIVE.md, этап C): адаптивные раскладки для трёх случаев — текст без картинок, текст + одна картинка, четыре картинки.
+  // Остальные раскладки (варианты, 2–3 картинки, сопоставление) не трогаем. Хуки — до любых return (React #310).
+  const isBook = pack.theme === 'ny_book'
+  const rootRef = useRef<HTMLDivElement>(null)
+  useBookDiagnostics(rootRef, isBook)
+  const hasMediaCls = !!imgs.length && !q.media.hidden
+  const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
+  const bkPlain = isBook && hasText && !hasMediaCls && !hasChoicesCls
+  const bkSplit = isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
+  const bkGrid = isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
+  const bkCls = bkPlain ? ' bk-ad bk-ad-plain' : bkSplit ? ' bk-ad bk-ad-split' : bkGrid ? ' bk-ad bk-ad-grid' : ''
+  const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
+  const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight }), q.question_text.trim().length) : undefined
+
+  // «Книга», сетка картинок: полоса заголовка подстраивается под длину вопроса (оценка строк в единицах мокапа), а не фиксирована
+  const bkLen = q.question_text.trim().length
+  const bkBandF = estFont(bkLen, 1240, 250, targetSize('above', bkLen), TEXT_ROLES.above.min)
+  const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, 1240) * 1.16 * bkBandF + 28)))
 
   return (
-    <div className={`host-screen grid-bg${hasText ? '' : ' no-qtext'}${
+    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
       imgs.length && !q.media.hidden ? ' has-media' : ''}${
       (choices && !lettered) || (q.answer.mode === 'match'
         && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
@@ -175,7 +200,10 @@ function ClassicQuestionScreen({
         {timerSlot}
       </div>
 
-      {split ? (
+      {bkSplit ? (
+        /* «Книга»: вопрос + одна картинка — композицию выбирает оценка (singleLayout.ts) */
+        <BookSingle text={q.question_text} src={mediaUrl(imgs[0])} seed={q.id} />
+      ) : split ? (
         /* Картинка лежит РЯДОМ с рамкой вопроса, а не внутри неё.
            Пока она была вложена в рамку, экран выглядел так: рамка держит
            свою высоту, картинка тянется на 68vh и вылезает за её нижний
@@ -187,7 +215,7 @@ function ClassicQuestionScreen({
             {isNY && <Icicles seed={q.id} low={timeLow} />}
             {isCyber && <span className="cf-scan" aria-hidden="true" />}
             {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-            <WindText key={q.id} text={q.question_text} />
+            <WindText key={q.id} text={q.question_text} range={bkRange} role={bkRole ?? undefined} />
           </div>
           {imgs.length === 1
             ? <div className="q-media-grid n1" style={mediaScaleVar(q)}>
@@ -212,11 +240,17 @@ function ClassicQuestionScreen({
               {isNY && <Icicles seed={q.id} low={timeLow} />}
               {isCyber && <span className="cf-scan" aria-hidden="true" />}
               {isCyber && <span className="cf-hud-corner" aria-hidden="true">SYS.QUERY</span>}
-              <WindText key={q.id} text={q.question_text} />
+              <WindText key={q.id} text={q.question_text} range={bkRange} role={bkRole ?? undefined} />
             </div>
           )}
           {!q.media.hidden && imgs.length > 0 && (
-            lettered
+            bkGrid
+              /* «Книга»: 4 картинки — единая сетка 2×2 по реальным пропорциям, подписи (буквы вариантов) на одном уровне */
+              ? <AdaptiveMedia key={q.id} spansFold lettered={lettered}
+                  items={imgs.map((m, i) => ({ src: mediaUrl(m),
+                    marker: lettered ? (q.answer.mode === 'match' ? String(i + 1) : (choices?.[i]?.key ?? '')) : undefined,
+                    caption: lettered && q.answer.mode === 'choice' ? choices?.[i]?.text : undefined }))} />
+            : lettered
               /* картинки-варианты и сопоставление: подпись-буква/номер прямо на карточке */
               ? <div className={`img-answers n${Math.min(imgs.length, 6)}${
                     imgs.length > 1 ? ' eq-row' : ''}`}>

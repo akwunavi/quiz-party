@@ -18,14 +18,18 @@
 // проектор в чужой чанк (см. CLAUDE.md, раздел про разрез бандла) — тем же
 // приёмом, каким уже вынесены mediaUrl/lenClass/AfterRoundNav.
 import { useState, type CSSProperties, type ReactNode } from 'react'
+import { hasAlpha } from '../lib/imgAlpha'
 
 export function FitImg({ src, children }: { src: string; children?: ReactNode }) {
   const [ar, setAr] = useState(1.5)
+  // data-alpha — прозрачная картинка (lib/imgAlpha.ts): атрибут без правил в других темах, «Книга» снимает подложку
+  const [alpha, setAlpha] = useState(false)
   return (
-    <figure className="q-img" style={{ flexGrow: ar, flexBasis: 0 } as CSSProperties}>
+    <figure className="q-img" data-alpha={alpha ? '' : undefined} style={{ flexGrow: ar, flexBasis: 0, '--ar': ar } as CSSProperties}>
       <img src={src} alt="" onLoad={e => {
         const el = e.currentTarget
         if (el.naturalWidth && el.naturalHeight) setAr(el.naturalWidth / el.naturalHeight)
+        setAlpha(hasAlpha(el))
       }} />
       {children}
     </figure>

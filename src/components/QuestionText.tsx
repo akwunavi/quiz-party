@@ -5,15 +5,15 @@ import { lenClass } from '../lib/media'
 import { useFitText } from '../hooks/useFitText'
 
 /** Появление текста «ветром»: по словам с каскадной задержкой. */
-export function WindText({ text }: { text: string }) {
+export function WindText({ text, range, role }: { text: string; range?: () => { min: number; max: number }; role?: string }) {
   const words = text.split(/(\s+)/)
   let idx = 0
   // Кегль из CSS — это подгон под ширину ЭКРАНА. Дальше текст вписывается в
   // реально доступное место: вопрос на 440 знаков иначе наезжает на шапку,
   // на варианты или на кнопки ведущего — на каждом экране по-своему.
-  const fit = useFitText<HTMLParagraphElement>([text])
+  const fit = useFitText<HTMLParagraphElement>([text], range ? { range } : {})
   return (
-    <p ref={fit} className={`q-text${lenClass(text)}`}>
+    <p ref={fit} className={`q-text${lenClass(text)}`} data-bk-text={range ? role : undefined}>
       {words.map((w, i) => {
         if (/^\s+$/.test(w)) return w
         const delay = 0.12 * idx++
