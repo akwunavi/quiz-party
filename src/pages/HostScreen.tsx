@@ -1931,15 +1931,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && q.answer.mode !== 'match' && q.question_text.trim() && (
             <p className={`q-recall${lenClass(q.question_text)}`}>{q.question_text}</p>
           )}
-          {/* «Книга»: у ответа своя картинка — картинки вопроса остаются компактной галереей (только ny_book) */}
-          {revealed && isBook && answerImgs.length > 0 && questionImgs.length > 0 && round.mechanic !== 'rebus' && (
-            <div className="answer-gallery is-recall">
-              {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
-            </div>
-          )}
-
+          {/* Если у ответа есть своя картинка, картинки ВОПРОСА на экране ответа не показываем (revealImgs = answerImgs): они мешали и перекрывали ответ. */}
           {revealed && (
-            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}${isBook && revealImgs.length === 1 && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && q.answer.mode !== 'order' && (q.answer_note ?? '').length <= 160 ? ' bk-side' : ''}`}>
+            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}`}>
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
@@ -1982,7 +1976,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
                   })}
                 </div>
               ) : (<>
-                <div className="answer-main">{displayAnswer(q)}</div>
+                <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${

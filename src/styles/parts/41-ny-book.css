@@ -1233,3 +1233,24 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bk-man-text { padding: calc(6 * var(--u)) calc(10 * var(--u)); text-align: center; }
 .theme-ny_book .bk-man-text .q-text { margin: 0; max-width: 100%; font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink); line-height: 1.18; }
 .theme-ny_book .bk-man-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: calc(6 * var(--u)); box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgba(60, 35, 12, .35); background: #fff; padding: calc(6 * var(--u)); box-sizing: border-box; }
+
+/* ═══ ЭКРАН ОТВЕТА («Книга», 14.11): подложка по содержимому и по центру левой страницы; картинки ответа крупно ПОД текстом ответа (не рядом: рядом они налезали на длинный ответ — замер) ═══ */
+.theme-ny_book .answers-main.revealed .answer-block { flex: 0 1 auto; margin-block: auto; max-height: 100%; justify-content: center; }
+.theme-ny_book .answers-main.revealed .answer-main { max-width: 100%; overflow-wrap: break-word; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex: 0 1 auto; max-height: none; width: 100%; min-height: calc(150 * var(--u)); height: calc(330 * var(--u)); display: grid; gap: calc(14 * var(--u)); grid-template-columns: 1fr; grid-auto-rows: 1fr; align-items: stretch; justify-items: center; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n2 { grid-template-columns: 1fr 1fr; height: calc(300 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 { grid-template-columns: 1fr 1fr 1fr; height: calc(260 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n4 { grid-template-columns: 1fr 1fr; height: calc(400 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { flex: none !important; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; place-items: center; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.theme-ny_book .answers-main.revealed .answer-block > .bk-note-box { flex: 0 1 auto; min-height: 0; }
+.theme-ny_book .answers-main.revealed .answer-block { max-height: calc(630 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex-shrink: 1; min-height: calc(120 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { overflow: hidden; }
+/* длинный ответ — ступенью мельче (иначе съедал всё место картинок); картинка ответа — абсолютно в своей клетке (процентный max-height у img в grid-ячейке не определён → картинка вылезала из клетки, замер) */
+.theme-ny_book .answers-main.revealed .answer-main.am-l { font-size: calc(42 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-main.am-xl { font-size: calc(34 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { position: relative; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { background: none !important; box-shadow: none !important; padding: 0 !important; border: 0 !important; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { filter: drop-shadow(0 calc(5 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .4)); border-radius: calc(4 * var(--u)); }
