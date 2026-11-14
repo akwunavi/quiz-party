@@ -1,3 +1,5 @@
+import { serviceForFormSave } from '../../lib/layoutStore'
+import { layoutStatus } from '../../lib/layoutRects'
 import { useEffect, useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
@@ -54,6 +56,8 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
       const errs = questionErrors(q)
       const status = errs.length === 0 ? 'ready' as const : 'draft' as const
       const { id: _id, round_id: _r, position: _p, ...fields } = { ...q, status }
+      // layout (ручная компоновка) живёт в service, но пишется отдельно из предпросмотра: берём его из базы, а не из устаревшего снимка формы
+      fields.service = await serviceForFormSave(q.id, fields.service)
       await updateQuestion(q.id, fields)
       setErrors(errs)
       onChanged()
@@ -109,6 +113,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
           {(media.question ?? []).some(m => !/\.(mp4|webm|mp3|wav)$/i.test(m)) && (
             <MediaScale value={media.scale}
               onChange={scale => save({ media: { ...media, scale } })} />
+          )}
+          {pack.theme === 'ny_book' && layoutStatus(q.service, 'question', (media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))) === 'stale' && (
+            <div className="ed-note" role="status">Ручная раскладка этого вопроса сброшена в авто: картинки или их порядок изменились. Настроить заново — в предпросмотре, кнопка «Компоновка».</div>
           )}
           {showVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"

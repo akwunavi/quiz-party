@@ -1225,3 +1225,11 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .round-intro .bk-cw-grid { flex: 1 1 0; min-height: 0; width: 100%; display: grid; place-items: center; padding: calc(10 * var(--u)); box-sizing: border-box; }
 .theme-ny_book .round-intro .bk-cw-right { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
 .theme-ny_book .round-intro .bk-cw-right .rules-frame { width: 100% !important; margin: 0 !important; }
+
+/* ═══ РУЧНАЯ КОМПОНОВКА (BookManual.tsx): рамки по долям рабочей области; позиционируются в .host-screen ═══ */
+.theme-ny_book .host-screen:has(> .bk-manual) { position: relative; }
+.theme-ny_book .bk-manual { position: absolute !important; inset: 0; pointer-events: none; z-index: 2; }
+.theme-ny_book .bk-man-text, .theme-ny_book .bk-man-img { position: absolute; box-sizing: border-box; display: grid; place-items: center; min-width: 0; min-height: 0; overflow: hidden; }
+.theme-ny_book .bk-man-text { padding: calc(6 * var(--u)) calc(10 * var(--u)); text-align: center; }
+.theme-ny_book .bk-man-text .q-text { margin: 0; max-width: 100%; font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink); line-height: 1.18; }
+.theme-ny_book .bk-man-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: calc(6 * var(--u)); box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgba(60, 35, 12, .35); background: #fff; padding: calc(6 * var(--u)); box-sizing: border-box; }

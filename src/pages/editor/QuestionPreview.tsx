@@ -25,8 +25,11 @@ import { initBlitz, showQuestion } from '../../lib/blitzState'
 import { previewTeams, previewAnswers, previewGameState, previewStages } from '../../lib/previewState'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { serverNow } from '../../lib/serverClock'
+import { useLayoutEdit } from './useLayoutEdit'
 
-export function QuestionPreview({ pack, round, qIndex, onClose }: {
+export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false, whyReadOnly, onSaved }: {
+  /** права на правку пакета (lib/packRights) — для кнопки «Компоновка» */
+  canEdit?: boolean; whyReadOnly?: string | null; onSaved?: () => void
   pack: LoadedPack; round: LoadedRound
   /** Индекс вопроса в round.questions — не используется механиками без
    *  списка вопросов (jeopardy/melody/race), там доска/тема задаются
@@ -41,11 +44,15 @@ export function QuestionPreview({ pack, round, qIndex, onClose }: {
   const preview = { teams, answers }
   const roundIdx = Math.max(0, pack.rounds.findIndex(r => r.id === round.id))
   const gameState = previewGameState(pack, round, roundIdx, qIndex, stageKey)
-  const q = round.questions[qIndex]
+  const q0 = round.questions[qIndex]
+  const lay = useLayoutEdit({ pack, round, q: q0, canEdit, whyReadOnly, onSaved })
+  const q = lay.qView
 
   return (
     <div className="pv-backdrop">
       <button className="pv-close ico" data-tip="Закрыть" onClick={onClose}>✕</button>
+      {lay.button && <div className="pv-stages pv-lay">{lay.button}</div>}
+      {lay.overlay}
       {stages.length > 1 && (
         <div className="pv-stages">
           {stages.map(st => (
