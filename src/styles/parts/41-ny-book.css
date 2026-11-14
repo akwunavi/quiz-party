@@ -1225,3 +1225,58 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .round-intro .bk-cw-grid { flex: 1 1 0; min-height: 0; width: 100%; display: grid; place-items: center; padding: calc(10 * var(--u)); box-sizing: border-box; }
 .theme-ny_book .round-intro .bk-cw-right { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
 .theme-ny_book .round-intro .bk-cw-right .rules-frame { width: 100% !important; margin: 0 !important; }
+
+/* ручная компоновка: оформление текста и картинок в «Книге» (каркас — общий, 22-question.css `.lay-area`) */
+.theme-ny_book .lay-text { padding: calc(6 * var(--u)) calc(10 * var(--u)); }
+.theme-ny_book .lay-text .q-text { font-family: var(--bk-serif); font-weight: 700; color: var(--bk-ink); line-height: 1.18; }
+.theme-ny_book .lay-img img { border-radius: calc(6 * var(--u)); box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgba(60, 35, 12, .35); background: #fff; padding: calc(6 * var(--u)); box-sizing: border-box; }
+
+/* ═══ ЭКРАН ОТВЕТА («Книга», 14.11): подложка по содержимому и по центру левой страницы; картинки ответа крупно ПОД текстом ответа (не рядом: рядом они налезали на длинный ответ — замер) ═══ */
+.theme-ny_book .answers-main.revealed .answer-block { flex: 0 1 auto; margin-block: auto; max-height: 100%; justify-content: center; }
+.theme-ny_book .answers-main.revealed .answer-main { max-width: 100%; overflow-wrap: break-word; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex: 0 1 auto; max-height: none; width: 100%; min-height: calc(150 * var(--u)); height: calc(330 * var(--u)); display: grid; gap: calc(14 * var(--u)); grid-template-columns: 1fr; grid-auto-rows: 1fr; align-items: stretch; justify-items: center; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n2 { grid-template-columns: 1fr 1fr; height: calc(300 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 { grid-template-columns: 1fr 1fr 1fr; height: calc(260 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n4 { grid-template-columns: 1fr 1fr; height: calc(400 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { flex: none !important; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; place-items: center; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.theme-ny_book .answers-main.revealed .answer-block > .bk-note-box { flex: 0 1 auto; min-height: 0; }
+.theme-ny_book .answers-main.revealed .answer-block { max-height: calc(630 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex-shrink: 1; min-height: calc(120 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { overflow: hidden; }
+/* длинный ответ — ступенью мельче (иначе съедал всё место картинок); картинка ответа — абсолютно в своей клетке (процентный max-height у img в grid-ячейке не определён → картинка вылезала из клетки, замер) */
+.theme-ny_book .answers-main.revealed .answer-main.am-l { font-size: calc(42 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-main.am-xl { font-size: calc(34 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { position: relative; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img { background: none !important; box-shadow: none !important; padding: 0 !important; border: 0 !important; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media > .q-img img { filter: drop-shadow(0 calc(5 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .4)); border-radius: calc(4 * var(--u)); }
+
+/* ═══ «СКРЭМБЛ»: итог вопроса («БАЛЛ ПОЛУЧАЕТ … ЗА 00:44.997») — ШИРОКАЯ подложка ПОСЕРЕДИНЕ экрана (по решению ведущего), под доской и панелью команд, выше сугроба.
+   Причина прежнего: подложка была в 650u колонки левой страницы, nowrap-строка не влезала и имя команды съедалось многоточием (замер). ═══ */
+.theme-ny_book .host-screen.an-screen > .an-result { position: absolute !important; left: 50%; transform: translateX(-50%); width: calc(1160 * var(--u)) !important; max-width: none !important; top: calc(var(--bk-oy) + 765 * var(--u)); z-index: 3;
+  padding: calc(14 * var(--u)) calc(36 * var(--u)); box-sizing: border-box; }
+.theme-ny_book .an-result .an-res-line { font-size: calc(40 * var(--u)); gap: calc(18 * var(--u)); flex-wrap: nowrap; align-items: baseline; }
+.theme-ny_book .an-result .an-res-line.wrap { flex-wrap: wrap; }
+.theme-ny_book .an-result .an-res-team { overflow: visible; text-overflow: clip; max-width: none; flex: 0 1 auto; font-size: 1.1em; }
+.theme-ny_book .an-result .an-res-label { font-size: .55em; letter-spacing: .2em; }
+.theme-ny_book .an-result .an-res-time { font-size: .8em; }
+.theme-ny_book .an-result .an-res-note { font-size: calc(24 * var(--u)); text-align: center; }
+
+/* ═══ ЭКРАН ОТВЕТА, 3-я итерация (14.11): с картинкой подложка занимает всю свободную высоту левой страницы (по центру, ниже вопроса, выше сугроба), картинки — на всё оставшееся место ═══ */
+.theme-ny_book .answers-main.revealed .answer-block:has(> .answer-media) { flex: 1 1 auto; height: calc(690 * var(--u)); max-height: calc(690 * var(--u)); margin-block: auto; justify-content: flex-start; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media { flex: 1 1 0 !important; height: auto !important; min-height: calc(200 * var(--u)); }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n3 > .q-img:first-child { grid-row: 1 / span 2; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n4 { grid-template-rows: 1fr 1fr; }
+.theme-ny_book .answers-main.revealed .answer-block > .answer-media.n2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+.theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img img { background: none; box-shadow: none; border-radius: 0; filter: drop-shadow(0 calc(5 * var(--u)) calc(8 * var(--u)) rgba(60, 35, 12, .45)); }
+.theme-ny_book .host-screen .answers-main.revealed .answer-block > .answer-media > .q-img { overflow: visible; }
+/* итог «Скрэмбла», правка 3: подложка центрируется по вертикали вокруг 770u (растёт в обе стороны), имя команды переносится, а не вылезает; при ≥7 командах панель справа спускается ниже 770u,
+   поэтому подложка встаёт по центру ЛЕВОЙ страницы (иначе перекрывала бы панель) */
+.theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 770 * var(--u)); transform: translate(-50%, -50%); }
+.theme-ny_book .an-result .an-res-line { flex-wrap: wrap; justify-content: center; row-gap: calc(4 * var(--u)); }
+.theme-ny_book .an-result .an-res-team { white-space: normal; text-align: center; overflow-wrap: anywhere; }
+.theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 860 * var(--u)); }   /* до 6 команд панель справа кончается выше 780u — широкая подложка под ней, над сугробом */
+.theme-ny_book .host-screen.an-screen.many-teams > .an-result { top: calc(var(--bk-oy) + 770 * var(--u)); left: calc(var(--bk-ox) + 590 * var(--u)); width: calc(660 * var(--u)) !important; }   /* 7+ команд: панель длиннее — подложка по центру левой страницы */
+.theme-ny_book .host-screen.an-screen.many-teams > .an-result .an-res-line { font-size: calc(32 * var(--u)); }

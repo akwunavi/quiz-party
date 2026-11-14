@@ -708,3 +708,15 @@
   .host-screen.has-media.has-choices:not(.no-qtext) > .img-answers.n5,
   .host-screen.has-media.has-choices:not(.no-qtext) > .img-answers.n6 { min-height: min(12vh, 110px); }
 }
+
+/* ═══ РУЧНАЯ КОМПОНОВКА (components/ManualLayout.tsx, lib/layoutArea.ts) — каркас для ВСЕХ тем ═══
+   Контейнер — рабочая область темы, прямой ребёнок .host-screen. Ловушки CLAUDE.md §5: общий сброс `.grid-bg > *:not(...) { position: relative }` (15) и правила тем
+   перебивают обычный position — поэтому !important; контейнер монтируется ТОЛЬКО при валидном layout, без него разметка и вид экрана не меняются. */
+.host-screen:has(> .lay-area) { position: relative; }
+.host-screen > .lay-area { position: absolute !important; z-index: 5; pointer-events: none; margin: 0 !important; padding: 0 !important; transform: none !important; box-sizing: border-box; }
+.lay-area > .lay-text, .lay-area > .lay-img { position: absolute !important; box-sizing: border-box; display: grid; place-items: center; min-width: 0; min-height: 0; overflow: hidden; margin: 0 !important; }
+.lay-area > .lay-text { text-align: center; }
+.lay-area .q-text { margin: 0; max-width: 100%; }
+.lay-area > .lay-img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+/* ручная компоновка + показ ответа после вопроса: плашка ответа закреплена внизу рабочей области ПОВЕРХ рамок (не в потоке, не под ними) */
+.host-screen:has(> .lay-area) > .answer-reveal { position: absolute !important; left: 50%; bottom: 13vh; transform: translateX(-50%) !important; z-index: 8; width: min(60vw, 900px); max-height: 30vh; margin: 0 !important; overflow: hidden; box-sizing: border-box; }

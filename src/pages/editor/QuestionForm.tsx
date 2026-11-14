@@ -1,3 +1,5 @@
+import { serviceForFormSave } from '../../lib/layoutStore'
+import { layoutStatus, mergeServiceKeepLayout } from '../../lib/layoutRects'
 import { useEffect, useRef, useState } from 'react'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import { updateQuestion } from '../../lib/editorApi'
@@ -43,7 +45,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
-  useEffect(() => setQ(original), [original])
+  // Перезагрузка пакета (в т.ч. после сохранения компоновки из предпросмотра) меняет identity original. Несохранённый буфер формы терять нельзя:
+  // тот же вопрос — подтягиваем только service.layout (mergeServiceKeepLayout), другой вопрос — заменяем буфер целиком.
+  useEffect(() => setQ(prev => prev.id !== original.id ? original : { ...prev, service: mergeServiceKeepLayout(prev.service, original.service) as Question['service'] }), [original])
 
   // Локальный буфер: НИЧЕГО не уходит в БД до кнопки «Сохранить».
   // Исключение: загрузка медиа-файлов сохраняется сразу (файл уже в Storage).
@@ -54,6 +58,8 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
       const errs = questionErrors(q)
       const status = errs.length === 0 ? 'ready' as const : 'draft' as const
       const { id: _id, round_id: _r, position: _p, ...fields } = { ...q, status }
+      // layout (ручная компоновка) живёт в service, но пишется отдельно из предпросмотра: берём его из базы, а не из устаревшего снимка формы
+      fields.service = await serviceForFormSave(q.id, fields.service)
       await updateQuestion(q.id, fields)
       setErrors(errs)
       onChanged()
@@ -109,6 +115,9 @@ export function QuestionForm({ pack, round, qIdx, onBack, onChanged, onPreview }
           {(media.question ?? []).some(m => !/\.(mp4|webm|mp3|wav)$/i.test(m)) && (
             <MediaScale value={media.scale}
               onChange={scale => save({ media: { ...media, scale } })} />
+          )}
+          {layoutStatus(q.service, 'question', (media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m)), pack.theme === 'ny_book') === 'stale' && (
+            <div className="ed-note" role="status">Ручная раскладка этого вопроса сброшена в авто: картинки или их порядок изменились. Настроить заново — в предпросмотре, кнопка «Компоновка».</div>
           )}
           {showVoice && <MediaSlot label="Озвучка вопроса (mp3)" packId={pack.id}
             paths={media.voice ? [media.voice] : []} max={1} accept="audio/*"

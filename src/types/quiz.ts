@@ -277,7 +277,9 @@ export interface Question {
     /** «3 попытки»: индексы открытых с фазы 1 букв в ПЛОСКОМ списке букв
      *  ответа (пробелы между словами не индексируются, но сами сохраняются
      *  в слове — см. lib/reveal.ts:revealGroups). */
-    openLetters?: number[] }
+    openLetters?: number[]
+    /** «Книга»: ручная компоновка экрана вопроса/ответа (lib/layoutRects.ts); битое/устаревшее игнорируется → авто. Пишется ТОЧЕЧНО (lib/layoutStore.ts). */
+    layout?: unknown }
   is_final_question: boolean
   status: 'draft' | 'ready'
   hidden: boolean

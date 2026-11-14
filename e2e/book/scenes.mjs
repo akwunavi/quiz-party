@@ -370,6 +370,30 @@ export const SCENES = [
       ...[[1, 8, '1 картинка + короткое пояснение'], [14, 8, '2 картинки + короткое пояснение'], [2, 16, '4 картинки + длинное пояснение, 16 команд'], [13, 8, 'длинный вопрос + картинка + длинное пояснение'], [12, 3, '1 картинка без пояснения, 3 команды'], [9, 8, 'текст без картинок']].map(([qi, n, t]) => sc(`72-ans-r8q${qi}`, `ответ: ${t}`, async api => { const ts = await api.teams(n)
         await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, qi), round_number: 8, answer_text: ['Шкатулка', 'ёлка', 'Лапландия', 'не знаем', 'Финляндия, Рованиеми'][i % 5], is_correct: i % 3 !== 1 })))
         await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q16-t${n}`, 'ответ: q16 (1 картинка, длинный ответ), '+n+' команд', async api => { const ts = await api.teams(n)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 16), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 16, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q17-t${n}`, 'ответ: q17 (картинка вопроса + картинка ответа), '+n+' команд', async api => { const ts = await api.teams(n)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 17), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 17, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q18-t${n}`, 'ответ: q18 (2 картинки, длинный ответ), '+n+' команд', async api => { const ts = await api.teams(n)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 18), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 18, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q19-t${n}`, 'ответ: q19 (3 картинки, длинное пояснение), '+n+' команд', async api => { const ts = await api.teams(n)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 19), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 19, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q20-t${n}`, 'ответ: q20 (4 картинки), '+n+' команд', async api => { const ts = await api.teams(n)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 20), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 20, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      ...[1, 6].map(n => sc(`74-anagram-race-t${n}`, `Скрэмбл (гонка): показ ответа, ${n} команд`, async api => { const ts = await api.teams(n)
+        await api.answers(ts.slice(0, Math.min(n, 3)).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 })),
+      sc('74-anagram-race-t16', 'Скрэмбл (гонка): показ ответа, 16 команд', async api => { const ts = await api.teams(16)
+        await api.answers(ts.slice(0, 5).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
+      sc('74-anagram-race-long', 'Скрэмбл (гонка): победитель с очень длинным названием', async api => { const ts = await api.teams(8, ['Ёлка', 'Самая длинная команда вечера номер один', 'К3', 'Дед Мороз и Снегурочка и Ко', 'Му', 'Тридцать первое декабря', 'Сто двадцать пять снеговиков', 'Команда №7'])
+        await api.answers([{ team_id: ts[1].id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: 'Снегурочка', is_correct: true }])
+        await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
       ...Array.from({ length: 15 }, (_, r) => sc(`7${String(r).padStart(2, '0')}-rules-r${r}`.replace(/^7(\d)(\d)/, (m, a, b) => `7${a}${b}`), `правила: раунд ${r}`, async api => { await api.teams(6); await api.session({ pack_id: PK(r), phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
     ]

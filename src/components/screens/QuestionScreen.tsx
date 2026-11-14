@@ -19,6 +19,9 @@ import { Icicles } from '../Icicles'
 import { WindText } from '../QuestionText'
 import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
 import { BookSingle } from '../../ny/book/adaptive/BookSingle'
+import { ManualLayout } from '../ManualLayout'
+import { layoutUnsupportedReason, screenLayout } from '../../lib/layoutRects'
+import { themeHasFold } from '../../lib/layoutArea'
 import { estFont, estLines } from '../../ny/book/adaptive/singleLayout'
 import { TEXT_ROLES, targetSize } from '../../ny/book/adaptive/fit'
 import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
@@ -175,9 +178,12 @@ function ClassicQuestionScreen({
   useBookDiagnostics(rootRef, isBook)
   const hasMediaCls = !!imgs.length && !q.media.hidden
   const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
-  const bkPlain = isBook && hasText && !hasMediaCls && !hasChoicesCls
-  const bkSplit = isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
-  const bkGrid = isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
+  // ручная компоновка (редактор → предпросмотр/проектор): только «Книга», только текст + картинки без вариантов/пар; битая или устаревшая → null → авто
+  const manual = round.mechanic !== 'rebus' && layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
+    ? screenLayout(q.service, 'question', imgs, themeHasFold(pack.theme)) : null
+  const bkPlain = !manual && isBook && hasText && !hasMediaCls && !hasChoicesCls
+  const bkSplit = !manual && isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
+  const bkGrid = !manual && isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
   const bkCls = bkPlain ? ' bk-ad bk-ad-plain' : bkSplit ? ' bk-ad bk-ad-split' : bkGrid ? ' bk-ad bk-ad-grid' : ''
   const bkRole: TextRole | null = bkPlain ? 'plain' : bkSplit ? 'split' : bkGrid ? 'above' : null
   const bkRange = bkRole ? () => roleRange(bkRole, bookUnit({ w: window.innerWidth, h: window.innerHeight }), q.question_text.trim().length) : undefined
@@ -200,7 +206,9 @@ function ClassicQuestionScreen({
         {timerSlot}
       </div>
 
-      {bkSplit ? (
+      {manual ? (
+        <ManualLayout theme={pack.theme} text={q.question_text} urls={imgs.map(mediaUrl)} rects={manual} seed={q.id} />
+      ) : bkSplit ? (
         /* «Книга»: вопрос + одна картинка — композицию выбирает оценка (singleLayout.ts) */
         <BookSingle text={q.question_text} src={mediaUrl(imgs[0])} seed={q.id} />
       ) : split ? (

@@ -324,7 +324,7 @@ function AnagramBoardClassic({
   return (
     <>
     <div className={`host-screen grid-bg an-screen mode-${race ? 'race' : 'standard'}${
-      imgs.length ? ' has-media' : ''}${clue ? '' : ' no-clue'}${showTeams ? ' has-teams' : ''}`}>
+      imgs.length ? ' has-media' : ''}${clue ? '' : ' no-clue'}${showTeams ? ' has-teams' : ''}${teams.length > 6 ? ' many-teams' : ''}`}>
       <AudioGate />
       {effectsSlot}
       <div className="host-topbar">

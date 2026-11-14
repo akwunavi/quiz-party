@@ -59,6 +59,7 @@ import { room } from '../lib/transport'
 import { useTeams, isAlive } from '../hooks/useTeams'
 import { sortTeamsForLobby } from '../lib/teamOrder'
 import { useFitText } from '../hooks/useFitText'
+import { answerScreenImages } from '../lib/answerImages'
 import { RulesFrame } from '../components/RulesFrame'
 import { FinMedal } from '../components/FinMedal'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
@@ -1815,13 +1816,11 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const choices = q.answer.mode === 'choice' ? q.answer.choices : null
   const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
-  const answerImgs = (q.media.answer ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  const { answerImgs, questionImgs, revealImgs } = answerScreenImages(q.media)
   // Нет своей картинки у ответа — берём картинку вопроса: на разборе она
   // нужнее текста вопроса, который уже прозвучал.
   // Картинки вопроса показываем на разборе и тогда, когда во время вопроса
   // они были скрыты (media.hidden): на ответе прятать их уже незачем.
-  const questionImgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const revealImgs = answerImgs.length ? answerImgs : questionImgs
   // Видео, которое во время вопроса играло «как аудио» (media.hidden).
   // На разборе показываем его вместе с ответом — 10 секунд, см. RevealVideo.
   const hiddenVideo = q.media.hidden
@@ -1931,15 +1930,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {revealed && q.answer.mode !== 'match' && q.question_text.trim() && (
             <p className={`q-recall${lenClass(q.question_text)}`}>{q.question_text}</p>
           )}
-          {/* «Книга»: у ответа своя картинка — картинки вопроса остаются компактной галереей (только ny_book) */}
-          {revealed && isBook && answerImgs.length > 0 && questionImgs.length > 0 && round.mechanic !== 'rebus' && (
-            <div className="answer-gallery is-recall">
-              {questionImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
-            </div>
-          )}
-
+          {/* Если у ответа есть своя картинка, картинки ВОПРОСА на экране ответа не показываем (revealImgs = answerImgs): они мешали и перекрывали ответ. */}
           {revealed && (
-            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}${isBook && revealImgs.length === 1 && round.mechanic !== 'rebus' && !choices && q.answer.mode !== 'match' && q.answer.mode !== 'order' && (q.answer_note ?? '').length <= 160 ? ' bk-side' : ''}`}>
+            <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}`}>
               <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
               {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
               {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
@@ -1982,7 +1975,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
                   })}
                 </div>
               ) : (<>
-                <div className="answer-main">{displayAnswer(q)}</div>
+                <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${

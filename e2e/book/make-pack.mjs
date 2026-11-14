@@ -52,7 +52,7 @@ function round(packId, pos, mechanic, title, rules, questions, settings = {}, ex
   return {
     id, pack_id: packId, position: pos, mechanic, title_lines: Array.isArray(title) ? title : [title], rules,
     rules_audio: null, timer_seconds: extra.timer ?? 60, settings, off_scoreboard: pos >= 8 && !packId.endsWith('-all'),
-    answers_reveal: extra.reveal ?? 'after_round', meta_line_override: null, status: 'ready',
+    answers_reveal: extra.reveal ?? (process.env.QP_AQ ? 'after_question' : 'after_round'), meta_line_override: null, status: 'ready',
     questions: questions(id),
   }
 }
@@ -178,6 +178,11 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
       q(rid, 13, LONG_Q3, { media: { question: [m('ha-1.jpg')] }, note: NOTE_400 }),
       q(rid, 14, 'Что общего у этих двух снимков?', { media: { question: [0, 1].map(i => m(`ha-${i}.jpg`)) }, note: 'Оба сделаны в Лапландии.' }),
       q(rid, 15, 'Что общего у этих трёх снимков?', { media: { question: [0, 1, 2].map(i => m(`va-${i}.jpg`)) } }),
+      q(rid, 16, 'Кто это?', { media: { question: [], answer: [m('ans16x9.jpg')] }, answer: free('Медвежонок Умка и Дед Мороз из старого мультфильма про Новый год'), note: 'Короткое пояснение.' }),
+      q(rid, 17, 'Вопрос с картинкой: кто это?', { media: { question: [m('p1x1.jpg')], answer: [m('ans16x9.jpg')] }, answer: free('Умка') }),
+      q(rid, 18, 'Две картинки ответа', { media: { question: [], answer: [m('ans16x9.jpg'), m('p1x1.jpg')] }, answer: free('Медвежонок Умка и Дед Мороз из старого мультфильма про Новый год') }),
+      q(rid, 19, 'Три картинки ответа и длинное пояснение', { media: { question: [], answer: [m('ans16x9.jpg'), m('p1x1.jpg'), m('p3x4.jpg')] }, answer: free('Умка'), note: 'Пояснение к ответу длиной около четырёхсот знаков. Ёлку в домах стали ставить массово только в девятнадцатом веке, а до этого зелёные ветви вешали под потолком вверх ногами. Стеклянные шары придумали стеклодувы, когда не уродились яблоки, а мишуру поначалу делали из настоящего серебра, и она быстро темнела от свечей.' }),
+      q(rid, 20, 'Четыре картинки ответа', { media: { question: [], answer: [m('ans16x9.jpg'), m('p1x1.jpg'), m('p3x4.jpg'), m('p16x9.jpg')] }, answer: free('Умка') , note: 'Коротко.' }),
     ]),
     // R10–R16 — остальные механики (редизайн «Книги»: сцены 3x-*). Индексы раундов: 9 sprint, 10 jeopardy, 11 blitz, 12 race, 13 four_pics, 14 anagram
     round(id, 9, 'sprint', '120 секунд', ['Все вопросы — на одном слайде', 'За каждый верный ответ — 2 балла, все верные — бонус 5'], rid =>
@@ -195,7 +200,7 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
       q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
       q(rid, 0, 'Новогодняя героиня', { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
-      q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
+      q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: process.env.QP_AN_RACE ? 'race' : 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
   ]
   return {
     id, name: all ? 'Стенд «Книга» · все механики' : paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,

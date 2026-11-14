@@ -88,6 +88,7 @@ export function RoundScreen({ pack, roundIdx, user, onBack, onChanged }: {
       )}
       {previewIdx !== null && (noQuestions || round.questions[previewIdx]) && (
         <QuestionPreview pack={pack} round={round} qIndex={previewIdx}
+          canEdit={!readOnlyWhy} whyReadOnly={readOnlyWhy} onSaved={onChanged}
           onClose={() => setPreviewIdx(null)} />
       )}
       <div className="ed-crumb">
