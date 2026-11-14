@@ -413,7 +413,7 @@ function HostInner({ gameState, pack }: {
               <div className="bk-cw-grid">
                 <CrosswordView grid={grid} cellSize={(() => {
                   const u = Math.min(innerWidth / 1920, innerHeight / 1080)
-                  return Math.max(10, Math.floor(Math.min(640 * u / grid.cols, 400 * u / grid.rows, 64 * u)))
+                  return Math.max(10, Math.floor(Math.min(640 * u / grid.cols, 350 * u / grid.rows, 64 * u)))
                 })()} />
               </div>
             </div>

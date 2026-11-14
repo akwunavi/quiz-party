@@ -26,8 +26,8 @@ async function main() {
     await page.addInitScript(() => {
       window.__turn = { mounts: 0, max: 0, log: [] }
       const t0 = performance.now()
-      new MutationObserver(() => { const n = document.querySelectorAll('.bk-turn').length; const T = window.__turn
-        if (n > T.max) T.max = n; const cur = document.querySelector('.bk-turn'); const id = cur && (cur.__id ||= ++T.mounts); if (cur && cur.__logged !== true) { cur.__logged = true; T.log.push(Math.round(performance.now() - t0)) } })
+      new MutationObserver(() => { const n = document.querySelectorAll('.bk-turn2-leaf').length; const T = window.__turn
+        if (n > T.max) T.max = n; const cur = document.querySelector('.bk-turn2-leaf'); const id = cur && (cur.__id ||= ++T.mounts); if (cur && cur.__logged !== true) { cur.__logged = true; T.log.push(Math.round(performance.now() - t0)) } })
         .observe(document, { childList: true, subtree: true })
     })
     const Q = (qi, extra = {}) => ({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: qi, timer_started_at: new Date().toISOString(), reveal: false, ...extra })
@@ -43,7 +43,7 @@ async function main() {
     await api.session({ ...Q(6), phase: 'show_answers', timer_started_at: null, reveal: true }); await page.waitForTimeout(3500); let s5 = await snap(); step.reveal = s5.mounts - s4.mounts
     await api.session({ ...Q(7), phase: 'show_answers', timer_started_at: null, reveal: true }); await page.waitForTimeout(3500); let s6 = await snap(); step.nextAnswer = s6.mounts - s5.mounts
     step.controlsAlive = await page.evaluate(() => { const a = document.querySelector('.host-actions button'); return !!a && !a.disabled })
-    step.leafLeftBehind = await page.evaluate(() => document.querySelectorAll('.bk-turn').length)
+    step.leafLeftBehind = await page.evaluate(() => document.querySelectorAll('.bk-turn2-leaf').length)
     step.errors = errs
     await ctx.close()
     const vf = fs.readdirSync(vdir).find(f => f.endsWith('.webm')); fs.copyFileSync(path.join(vdir, vf), path.join(OUT, `flip-${reduced ? 'reduced' : 'normal'}.webm`))

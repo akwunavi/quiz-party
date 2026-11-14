@@ -1,6 +1,7 @@
 // ═══ Слой темы: обёртка с CSS-классом + снег для «Нового года» ═══
 // Снег — только на проекторе (isProjector), телефоны получают лишь палитру (ТЗ 8б).
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useRef } from 'react'
+import { useBookPageTurn } from '../ny/book/pageTurn'
 import type { ThemeKey } from '../types/quiz'
 import { NewYearScene } from './NewYearScene'
 import { NyBackdrop, NyFx } from '../ny/NyScene'
@@ -26,6 +27,9 @@ export function ThemeLayer({ theme, isProjector, phase, plain, paper, turn, chil
   children: React.ReactNode
 }) {
   const ny = isNyTheme(theme)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  useBookPageTurn(rootRef, stageRef, turn, theme === 'ny_book' && !!isProjector)
   // Лес на проекторе: всё содержимое живёт в кадре 1920×1080 с единым холстом леса (forest/shell.tsx)
   if (isForestTheme(theme) && isProjector) {
     return (
@@ -35,7 +39,7 @@ export function ThemeLayer({ theme, isProjector, phase, plain, paper, turn, chil
     )
   }
   return (
-    <div className={`theme-${theme}${ny && nyNavEnabled() ? ' ny-nav' : ''}`} data-ny-density={ny ? nyDensity(theme, phase, plain) : undefined}>
+    <div ref={rootRef} className={`theme-${theme}${ny && nyNavEnabled() ? ' ny-nav' : ''}`} data-ny-density={ny ? nyDensity(theme, phase, plain) : undefined}>
       {ny && isProjector && <NyBackdrop theme={theme} phase={phase} plain={plain} />}
       {theme === 'classic' && isProjector && <CyberScene />}
       {theme === 'new_year' && isProjector && <>
@@ -45,7 +49,8 @@ export function ThemeLayer({ theme, isProjector, phase, plain, paper, turn, chil
       </>}
       {theme === 'potter' && isProjector && <MagicScene phase={phase} />}
       {children}
-      {ny && isProjector && <NyFx theme={theme} phase={phase} plain={plain} turn={turn} />}
+      {ny && isProjector && <NyFx theme={theme} phase={phase} plain={plain} />}
+      {theme === 'ny_book' && isProjector && <div ref={stageRef} className="bk-turn2" aria-hidden="true" />}
     </div>
   )
 }
