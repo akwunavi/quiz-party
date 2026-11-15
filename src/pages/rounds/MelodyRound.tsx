@@ -797,7 +797,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
   /** Только для маркера-огонька Magic (шаг 11) — остальным темам не нужен. */
   theme?: ThemeKey
 }) {
-  const { highlighted } = useMelodySpin(themes, played, spinning, spinKey, spinDeadline, spinTotalMs)
+  const { highlighted, landed } = useMelodySpin(themes, played, spinning, spinKey, spinDeadline, spinTotalMs)
 
   // ── Magic: блуждающий огонёк, физически перелетающий на "горячую"
   // плитку барабана. Карта key→элемент — обычный ref (не state): позиции
@@ -827,7 +827,7 @@ function MelodyGrid({ themes, played, spinning, spinKey, spinDeadline, spinTotal
         <span ref={markerRef} className={`mg-wisp mel-marker${nearEnd ? ' flare' : ''}`} aria-hidden />
       )}
       {/* «Книга»: три объёмные обложки (утверждённый ассет) — вместо цветных колонок; плитки и названия внутри (BookMelodyCovers) */}
-      {theme === 'ny_book' && <BookMelodyCovers themes={themes} played={played} highlighted={highlighted ?? null} onPick={onPick}
+      {theme === 'ny_book' && <BookMelodyCovers themes={themes} played={played} highlighted={highlighted ?? null} onPick={onPick} spinning={spinning} landed={landed}
         setRef={(key, el) => { if (el) tileRefs.current.set(key, el); else tileRefs.current.delete(key) }} />}
       {theme !== 'ny_book' && themes.map((t, ti) => (
         <div key={`h${ti}`} className="mel-theme" style={undefined}>{t.name || `Тема ${ti + 1}`}</div>

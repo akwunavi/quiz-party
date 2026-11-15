@@ -8,11 +8,11 @@ const argv = process.argv.slice(2)
 const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d }
 const OUT = path.resolve(opt('--out', 'anim-frames'))
 const ONLY = (opt('--only', '') || '').split(',').filter(Boolean)
-const VP = [1280, 720]
+const VP = (opt('--vp', '1280x720')).split('x').map(Number)
 
 async function main() {
   const { startStand, ORIGIN, PIN } = await import('./stand.mjs')
-  const { SCENES, makeApi, PACK_ONLINE } = await import('./scenes.mjs')
+  const { SCENES, makeApi } = await import('./scenes.mjs'); const { PACK_ONLINE } = await import('./make-pack.mjs')
   fs.mkdirSync(OUT, { recursive: true })
   await startStand({ noBuild: argv.includes('--no-build') })
   const api = makeApi(ORIGIN, PIN)
@@ -26,6 +26,24 @@ async function main() {
       trigger: async () => { await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 0, question_index: 8, timer_started_at: null, reveal: true }) } },
     { id: 'scroll-unroll', scene: '14-melody-snippet', ready: '.mel-board, .mel-modal', ms: 6000, pre: 0, early: true },
     { id: 'finale', scene: '15-finale-8', ready: '.fin-table', ms: 22000, pre: 0, early: true },
+    // 10.69: рулетка мелодии «Бегущая гирлянда + свеча» — настоящий проектор; спин запускается через API (как кнопка «Рулетка» у ведущего)
+    ...[['roulette-3x4', 4, ['0-0', '2-1'], '1-2'], ['roulette-4x6', 5, ['0-0', '1-2', '3-5'], '2-3']].map(([id, round, played, key]) => ({
+      id, scene: '13-melody-board-3x4', ready: '.mel-board', ms: 8200, pre: 1500,
+      before: async () => { await api.reset(); await api.teams(6); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: round, question_index: 0, timer_started_at: null, reveal: false, melody: { stage: 'idle', played } }) },
+      trigger: async () => { await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: round, question_index: 0, timer_started_at: null, reveal: false, melody: { key, stage: 'spinning', deadline: new Date(Date.now() + 5700).toISOString(), spinMs: 5700, played } }) } })),
+    // быстрая серия: три подряд коротких рулетки без пауз — эффекты не должны копиться
+    { id: 'roulette-series', scene: '13-melody-board-3x4', ready: '.mel-board', ms: 1000, pre: 1200,
+      before: async () => { await api.reset(); await api.teams(6); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 5, question_index: 0, timer_started_at: null, reveal: false, melody: { stage: 'idle', played: [] } }) },
+      trigger: async () => {
+        const played = []
+        for (const key of ['0-1', '2-3', '3-0']) {
+          const sec = 3000
+          await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 5, question_index: 0, timer_started_at: null, reveal: false, melody: { key, stage: 'spinning', deadline: new Date(Date.now() + sec + 700).toISOString(), spinMs: sec + 700, played: [...played] } })
+          await new Promise(r => setTimeout(r, sec + 900)); played.push(key)
+          await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 5, question_index: 0, timer_started_at: null, reveal: false, melody: { stage: 'idle', played: [...played] } })
+          await new Promise(r => setTimeout(r, 400))
+        }
+      } },
   ]
   for (const d of DEMOS.filter(d => !ONLY.length || ONLY.includes(d.id))) {
     const vdir = path.join(OUT, 'v-' + d.id); fs.rmSync(vdir, { recursive: true, force: true })
