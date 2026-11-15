@@ -9,7 +9,8 @@ import { FOLD_GAP, TOP_BAND } from '../ny/book/adaptive/safeArea'
 import { themeHasLayoutArea } from './layoutArea'
 
 export interface Rect { x: number; y: number; w: number; h: number }
-export interface Rects { v: 1; imgs: string[]; text?: Rect; images: Rect[] }
+/** text — текст вопроса (экран вопроса) или подложка «Правильный ответ» (экран ответа); note — пояснение к ответу (только экран ответа). */
+export interface Rects { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
 export type LayoutScreen = 'question' | 'answer'
 export interface QuestionLayout { question?: Rects; answer?: Rects }
 
@@ -19,6 +20,15 @@ export const WORK = { x: SAFE.x, y: TOP_BAND, w: SCENE.w - 2 * SAFE.x, h: SCENE.
 export const FOLD = { from: 0.5 - FOLD_GAP / 2 / WORK.w, to: 0.5 + FOLD_GAP / 2 / WORK.w } as const
 export const MIN_SIDE = 0.06
 export const LAYOUT_KEY = 'layout'
+
+/** Ключ картинки для layout.answer: КОРОТКИЙ ХЕШ пути, а не сам путь (service целиком уходит на телефоны — имена файлов ответа утекать не должны). */
+export function imgKey(path: string): string {
+  if (/^#[0-9a-f]{8}$/.test(path)) return path
+  let h = 0x811c9dc5
+  for (let i = 0; i < path.length; i++) { h ^= path.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 }
+  return '#' + h.toString(16).padStart(8, '0')
+}
+const keyMatches = (stored: unknown, path: string) => stored === path || stored === imgKey(path)   // старые layout.answer с путями читаются без падения
 
 const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
 const c01 = (v: number) => Math.min(1, Math.max(0, v))
@@ -50,14 +60,16 @@ export function validateRects(raw: unknown, imgs: string[], fold = true): Rects 
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   if (r.v !== 1) return null
-  if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => p !== imgs[i])) return null
+  if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => !keyMatches(p, imgs[i]))) return null
   if (!Array.isArray(r.images) || r.images.length !== imgs.length) return null
   const images: Rect[] = []
   for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(fold ? keepOffFold(x) : x) }
   let text: Rect | undefined
   if (r.text != null) { const t = readRect(r.text); if (!t) return null; text = t }
-  if (!text && images.length === 0) return null
-  return { v: 1, imgs: [...imgs], text, images }
+  let note: Rect | undefined
+  if (r.note != null) { const n = readRect(r.note); if (!n) return null; note = n }
+  if (!text && !note && images.length === 0) return null
+  return { v: 1, imgs: [...imgs], text, note, images }
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
@@ -82,7 +94,10 @@ const asService = (s: unknown): Service => (s && typeof s === 'object' && !Array
 export function withScreenLayout(service: unknown, screen: LayoutScreen, rects: Rects | null): Service {
   const out = asService(service)
   const cur = out[LAYOUT_KEY] && typeof out[LAYOUT_KEY] === 'object' ? { ...(out[LAYOUT_KEY] as Record<string, unknown>) } : {}
-  if (rects) cur[screen] = rects; else delete cur[screen]
+  // layout.answer хранит ХЕШИ картинок, не пути (утечка на телефон): пишем хеши, а ранее сохранённые пути переписываем при любом следующем сохранении
+  const strip = (r: unknown) => (r && typeof r === 'object' && Array.isArray((r as Rects).imgs) ? { ...(r as Rects), imgs: (r as Rects).imgs.map(x => (typeof x === 'string' ? imgKey(x) : x)) } : r)
+  if (rects) cur[screen] = screen === 'answer' ? strip(rects) : rects; else delete cur[screen]
+  if (cur.answer) cur.answer = strip(cur.answer)
   if (Object.keys(cur).length) out[LAYOUT_KEY] = cur; else delete out[LAYOUT_KEY]
   return out
 }
@@ -117,12 +132,45 @@ export function fallbackRects(imgs: string[], hasText: boolean, fold = true): Re
 }
 
 const QUESTION_SCREEN_MECHANICS = new Set(['standard', 'test_stop', 'stakes_unique', 'stakes_free', 'thematic_x2', 'crossword'])
+/** Механики, у которых ручная раскладка ВОПРОСА включается ещё и «3 попытками» (RevealBoard: картинки + блок текста; буквенные ячейки остаются в своей зоне). */
+const QUESTION_LAYOUT_EXTRA = new Set(['four_pics'])
 /** Можно ли настраивать компоновку вопроса: причина отказа текстом или null. Только «Книга»; только обычный экран «текст + картинки» (без вариантов/пар/ребуса/скрытого медиа). */
 export function layoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean; question?: string[] } }): string | null {
   if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: вопрос рисуется её собственной сценой.'
-  if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
+  if (mechanic === 'four_pics') return null
+  if (!QUESTION_SCREEN_MECHANICS.has(mechanic) && !QUESTION_LAYOUT_EXTRA.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
   if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'У вопроса с вариантами, порядком или парами свой экран — компоновка вручную не предусмотрена.'
   if (q.media.hidden) return 'Медиа скрыто на экране — настраивать нечего.'
   if ((q.media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m))) return 'У вопроса есть видео: его плеер живёт в потоке экрана — компоновка вручную не предусмотрена.'
   return null
+}
+
+/** Экран ПРАВИЛЬНОГО ОТВЕТА: причина отказа текстом или null. Поддержан обычный ответ «текст + картинки + пояснение» (свободный ответ, без вариантов/порядка/пар/ребуса/скрытого видео);
+ *  ответы команд и шары-статусы остаются штатными. Условие общее для редактора, предпросмотра и проектора. */
+export function answerLayoutUnsupportedReason(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }): string | null {
+  if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: ответ рисуется её собственной сценой.'
+  if (mechanic === 'four_pics') return null
+  if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой разбор — компоновка ответа вручную для неё не предусмотрена.'
+  if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'Разбор вариантов, порядка и пар идёт по шагам — компоновка вручную не предусмотрена.'
+  if (q.media.hidden) return 'Скрытое видео играет вместе с ответом — компоновка вручную не предусмотрена.'
+  return null
+}
+
+/** Стартовая раскладка ответа, если замер экрана недоступен: подложка слева-сверху, картинки справа, пояснение снизу. */
+export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = true): Rects {
+  const n = imgs.length
+  const images: Rect[] = []
+  for (let i = 0; i < n; i++) { const r = clampRect({ x: 0.04 + (i % 2) * 0.24, y: 0.4 + Math.floor(i / 2) * 0.28, w: 0.22, h: 0.26 }); images.push(fold ? keepOffFold(r) : r) }
+  return { v: 1, imgs: [...imgs], text: { x: 0.04, y: 0.04, w: 0.44, h: 0.3 }, note: hasNote ? { x: 0.04, y: 0.86, w: 0.44, h: 0.12 } : undefined, images }
+}
+
+/** «3 попытки»: стартовая раскладка картинок сеткой 2×2 по двум страницам (не на сгибе), без текста. */
+export function fallbackGridRects(imgs: string[], fold = true): Rects {
+  const images = imgs.map((_, i) => { const r = clampRect({ x: i % 2 ? 0.55 : 0.05, y: i < 2 ? 0.04 : 0.5, w: 0.4, h: 0.44 }); return fold ? keepOffFold(r) : r })
+  return { v: 1, imgs: [...imgs], images }
+}
+
+/** Вёрстку ответа ведёт общий AnswerScreen? Только раскрытый ответ поддержанного вида (до раскрытия — экран вопроса, в т.ч. для answer.mode==='anagram' вне «Скрэмбла»). */
+export function answerUsesSharedScreen(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }, revealed: boolean): boolean {
+  return revealed && !q.media.hidden && answerLayoutUnsupportedReason(theme, mechanic, q) === null
 }
