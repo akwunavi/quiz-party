@@ -1285,3 +1285,45 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 
 /* разбор «3 попыток» (10.69): подсказку на левой странице «Книги» подгоняет сама BookNote (по высоте своей подложки) — общий потолок высоты не нужен */
 .theme-ny_book .rv-review-main > .rv-hint { max-height: none; }
+
+/* ═══ Аудит старых артефактов (10.69): «Скрэмбл» — панель команд на утверждённых карточках (BookTeamCard), без плоских плашек .an-team ═══
+   Строка = карточка (имя, цвет-точка, время справа, ✓/✗ после проверки; «думает» — приглушённая карточка) + текст ответа после показа. Прежние правила .an-team не задействованы (другой класс). */
+.theme-ny_book .an-teams ul.bk-an-list { gap: calc(8 * var(--u)); overflow: visible; }
+.theme-ny_book .an-teams.dense ul.bk-an-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: calc(6 * var(--u)) calc(10 * var(--u)); }
+.theme-ny_book .bk-an-row { list-style: none; min-width: 0; background: none; border: 0; padding: 0; }
+.theme-ny_book .bk-an-row .bk-tc { width: 100%; }
+.theme-ny_book .bk-an-text { margin: calc(2 * var(--u)) calc(14 * var(--u)) 0; font: italic 600 calc(22 * var(--u)) / 1.15 var(--bk-serif); color: var(--bk-ink); overflow-wrap: anywhere; }
+.theme-ny_book .an-teams.dense .bk-an-text { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; font-size: calc(17 * var(--u)); }
+.theme-ny_book .an-res-line .an-res-card { width: calc(330 * var(--u)); flex: 0 0 auto; }
+.theme-ny_book .an-res-line.wrap { align-items: center; gap: calc(10 * var(--u)) calc(14 * var(--u)); }
+
+/* «Угадай мелодию»: ставки команд в свитке — утверждённая карточка вместо плоской строки (10.69) */
+.theme-ny_book.mel-overlay .mel-bid-row:has(> .bk-tc) { background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; grid-template-columns: minmax(0, 1fr) auto auto; gap: calc(10 * var(--u)); }
+.theme-ny_book.mel-overlay .mel-bid-row:has(> .bk-tc).win .bk-tc { filter: drop-shadow(0 0 calc(10 * var(--u)) rgba(242, 213, 140, .95)); }
+.theme-ny_book.mel-overlay .mel-bid-row > .bk-tc { width: 100%; min-width: 0; }
+
+/* «Своя игра»: ответы команд в свитке — утверждённая карточка вместо текста имени (10.69) */
+.theme-ny_book.mel-overlay .jp-answer > .name { min-width: 0; }
+.theme-ny_book.mel-overlay .jp-answer > .name .bk-tc { width: 100%; }
+
+/* награждение / «вспоминаем игру» / победитель: имя команды — утверждённая карточка, а не плоская строка (10.69) */
+.theme-ny_book .bk-award-card { width: calc(860 * var(--u)); max-width: 92%; margin-inline: auto; background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; }
+.theme-ny_book .bk-award-card .bk-tc { width: 100%; }
+
+/* «Ответили N из M» — та же единая плашка, что номер вопроса и ярлыки шапки (вместо прежней красной двойной рамки с наклоном) (10.69) */
+.theme-ny_book .answered-chip { transform: none; border: 0; border-radius: 0; color: var(--nb-ink); background: var(--nb-card);
+  font: 700 max(calc(23 * var(--u)), 16.5px) / 1 var(--bk-serif); letter-spacing: .09em; text-transform: uppercase; padding: .42em .82em;
+  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--bk-line), 0 calc(2 * var(--u)) 0 var(--bk-shade), 0 calc(5 * var(--u)) calc(8 * var(--u)) var(--bk-shadow); }
+
+/* ═══ Промежуточные результаты (табло, .sb-screen): та же книжная типографика, что у итогового экрана (.bk-fin) — вместо старых цифр/заголовка «киберпанка» (10.69) ═══ */
+.theme-ny_book .sb-screen > .mono-tag { flex: none; background: none !important; box-shadow: none !important; padding: 0 !important; font: 700 calc(22 * var(--u)) / 1 var(--bk-serif) !important; letter-spacing: .42em; color: var(--bk-red); }
+.theme-ny_book .sb-screen > .mono-tag::before, .theme-ny_book .sb-screen > .mono-tag::after { content: '✦'; margin: 0 .8em; color: var(--bk-gold); letter-spacing: 0; }
+.theme-ny_book .sb-screen .sb-title { font-family: var(--bk-display) !important; font-weight: 700; color: var(--bk-ink-2) !important; text-shadow: none !important; letter-spacing: .02em; }
+.theme-ny_book .sb-screen .score-table { border-collapse: separate; border-spacing: 0 calc(4 * var(--u)); }
+.theme-ny_book .sb-screen .score-table th { font: 700 .8em / 1 var(--bk-serif); letter-spacing: .04em; color: var(--bk-ink-2); text-align: center; vertical-align: bottom; }
+.theme-ny_book .sb-screen .score-table th:last-child { color: var(--bk-red); }
+.theme-ny_book .sb-screen .score-table td { font-family: var(--bk-serif); font-weight: 600; color: var(--bk-ink); text-align: center; border-bottom: 2px solid var(--bk-shade); vertical-align: middle; }
+.theme-ny_book .sb-screen .score-table td.total { font: 700 1.15em / 1.05 var(--bk-serif); color: var(--bk-red); }
+.theme-ny_book .sb-screen .score-table td:first-child { color: var(--bk-muted); font-weight: 700; text-align: right; border-bottom-color: transparent; white-space: nowrap; }
+.theme-ny_book .sb-screen .score-table :is(th, td):nth-child(2) { text-align: left; }
+.theme-ny_book .sb-screen .sb-eq { font-family: var(--bk-serif); color: var(--bk-muted); }

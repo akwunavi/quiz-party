@@ -128,6 +128,7 @@ function useJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
 }
 
 import { BookMelodyCovers } from '../../ny/book/BookMelody'
+import { BookTeamCard } from '../../ny/book/BookTeamCard'
 function ClassicJeopardyBoard({ pack, round, gameState, preview }: BoardProps) {
   const { themes, openTile, opened, saveErr, clickOrigin, tileElRefs, jpTitleText, jpTitleScrambled, openAt, replayNonce, onShowAnswer, onReplay, onClose } = useJeopardyBoard({ pack, round, gameState, preview })
   if (themes.length === 0) return (
@@ -375,7 +376,8 @@ function TileModal(props: TileProps) {
                 borderLeft: `3px solid ${verdict === true ? 'var(--ok)' : verdict === false ? 'var(--danger)' : 'var(--dim)'}`,
               }}>
                 <span className="pos">#{pos + 1}</span>
-                <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
+                <span className="name" style={{ color: team?.color }}>
+                  {packTheme === 'ny_book' ? <BookTeamCard name={team?.name ?? '—'} icon={team?.icon} color={team?.color} ch={32} /> : (team?.name ?? '—')}</span>
                 {/* до нажатия «Показать ответ» видно только ФАКТ ответа:
                     иначе зал читает чужие ответы и интрига пропадает */}
                 <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>

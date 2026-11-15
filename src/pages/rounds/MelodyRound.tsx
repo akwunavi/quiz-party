@@ -13,6 +13,7 @@ import { createAudio, preloadAudio, preloadAudioAll } from '../../lib/audioSourc
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { usePlaybackActive } from '../../lib/playbackActive'
 import { BookMelodyCovers } from '../../ny/book/BookMelody'
+import { BookTeamCard } from '../../ny/book/BookTeamCard'
 import { afterRoundStep } from '../../lib/flow'
 import { showScoreboard, startBreak, finishGame } from '../../lib/gameActions'
 import { BookTimer } from '../../ny/book/BookTimer'
@@ -605,7 +606,7 @@ function ClassicMelodyBoard(props: BoardProps) {
                 {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => {
                   const b = bids.find(x => x.team_id === t.id)
                   return <div key={t.id} className={`mel-bid-row${b ? ' win' : ''}`}>
-                    <span style={{ color: t.color }}>{t.name}</span>
+                    {pack.theme === 'ny_book' ? <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={34} /> : <span style={{ color: t.color }}>{t.name}</span>}
                     <b>{b ? 'ставка принята ✓' : '…'}</b><span /></div>
                 })}
               </div>
@@ -619,7 +620,7 @@ function ClassicMelodyBoard(props: BoardProps) {
                   const b = bids.find(x => x.team_id === id)
                   return (
                     <div key={id} className={`mel-bid-row${pos === 0 ? ' win' : ''}`}>
-                      <span style={{ color: t?.color }}>{t?.name}</span>
+                      {pack.theme === 'ny_book' ? <BookTeamCard name={t?.name ?? '—'} icon={t?.icon} color={t?.color} ch={34} /> : <span style={{ color: t?.color }}>{t?.name}</span>}
                       <b>{b?.answer_text} сек</b>
                       {pos === 0 ? <span className="mel-win-tag">ИГРАЕТ</span> : <span />}
                     </div>
