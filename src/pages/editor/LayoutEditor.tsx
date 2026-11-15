@@ -22,7 +22,7 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
     const a = root?.querySelector<HTMLElement>('.answer-label')?.getBoundingClientRect(), m = root?.querySelector<HTMLElement>('.answer-main')?.getBoundingClientRect()
     if (a && m) { const x = Math.min(a.x, m.x), y = Math.min(a.y, m.y), r = Math.max(a.right, m.right), b = Math.max(a.bottom, m.bottom); text = toRel(new DOMRect(x, y - 8, r - x, b - y + 16)) }
   } else {
-    const t = root?.querySelector<HTMLElement>(screen === 'answer' ? '.rv-answer' : '.q-text')
+    const t = root?.querySelector<HTMLElement>(screen === 'answer' ? '.rv-review-main .rv-word-wrap' : '.q-text')
     if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }
   }
   const images: Rect[] = []
@@ -33,7 +33,7 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
     const x = toRel(r); images.push(fold ? keepOffFold(x) : x)
   }
   let note: Rect | undefined
-  if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.answer-note, .bk-note-box, .rv-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
+  if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.bk-note-box, .answer-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
   if (mechanic === 'four_pics' && screen === 'question' && images.length !== urls.length) return fallbackGridRects(imgPaths, fold)
   if (images.length !== urls.length || (hasText && !text)) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
   return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }

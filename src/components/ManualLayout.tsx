@@ -35,13 +35,18 @@ export function ManualLayout({ theme, text, urls, rects, seed }: { theme: string
 }
 
 /** Ручная раскладка ЭКРАНА ОТВЕТА: подложка «Правильный ответ» (text), картинки ответа, пояснение (note). Ответы команд и шары остаются штатными. */
-export function ManualAnswer({ theme, answer, note, urls, rects, noteNode }: { theme: string | undefined; answer: string; note: string | null; urls: string[]; rects: Rects; noteNode?: (text: string) => React.ReactNode }) {
+export function ManualAnswer({ theme, answer, note, urls, rects, noteNode, plate }: { theme: string | undefined; answer: string; note: string | null; urls: string[]; rects: Rects; noteNode?: (text: string) => React.ReactNode
+  /** «3 попытки»: вместо «ПРАВИЛЬНЫЙ ОТВЕТ» + слова в рамке `text` лежат буквенные ячейки ответа (RevealCells) */
+  plate?: React.ReactNode }) {
   const area = layoutAreaCss(theme)
   const fit = useFitText<HTMLDivElement>([answer, rects.text?.w, rects.text?.h], { range: () => { const vh = window.innerHeight; const h = rects.text ? rects.text.h * vh * 0.72 : 0; return { min: Math.max(14, vh * 0.02), max: Math.max(20, Math.min(h * 0.55, vh * 0.1)) } } })
   if (!area) return null
   return (
     <div className="lay-area lay-answer-area" data-lay-area="1" style={area}>
-      {rects.text && (
+      {rects.text && plate && (
+        <div className="lay-text lay-cells" data-lay="text" style={pctStyle(rects.text)}>{plate}</div>
+      )}
+      {rects.text && !plate && (
         <div className="lay-text lay-answer answer-block" data-lay="text" style={pctStyle(rects.text)}>
           <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
           <div className="answer-main" ref={fit}>{answer}</div>

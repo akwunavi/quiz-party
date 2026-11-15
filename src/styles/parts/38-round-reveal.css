@@ -53,22 +53,22 @@
   box-shadow: var(--glow);
 }
 
-/* разбор ответа */
-.rv-review {
-  display: flex; flex-direction: row; align-items: baseline;
-  gap: clamp(14px, 2vw, 40px);
-  flex: 0 0 auto; width: min(94%, 1600px); margin-inline: auto;
-}
-.rv-answer { color: var(--accent); font-size: clamp(26px, 3.2vw, 72px); font-family: var(--font-display); }
+/* разбор «3 попыток» (10.69): слева картинки + ячейки ответа + подсказка, справа штатная колонка «ОТВЕТЫ КОМАНД» (components/screens/TeamAnswers).
+   Каркас — общие .answers-layout/.answers-main/.team-answers экрана ответа; здесь только то, чего у него нет. `.rv-note` оставлен: им пользуется «Волшебный лес» (stage1.css). */
 .rv-note { color: var(--fg); opacity: .8; font-size: clamp(15px, 1.5vw, 30px); flex: 1 1 auto; min-width: 0; }
-.rv-teams {
-  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
-  font-family: var(--font-mono); font-size: clamp(16px, 1.5vw, 32px); color: var(--muted); margin-top: 10px;
+.rv-review-main { display: flex; flex-direction: column; gap: clamp(10px, 1.6vh, 24px); min-width: 0; min-height: 0; }
+.rv-review-main > .rv-pics-box { flex: 1 1 0; min-height: clamp(90px, 24vh, 300px); width: 100%; container-type: size; }
+.rv-pics-box > .q-media-grid.rv-pics { width: 100%; height: 100%; max-height: none; margin: 0; }
+/* четыре картинки: в широком окне — один ряд, в «квадратном» (левая страница «Книги») — 2×2, чтобы они были крупнее */
+@container (max-aspect-ratio: 5/2) {
+  .rv-pics-box.n4 > .q-media-grid.rv-pics.eq-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
 }
-
-@media (max-width: 1100px) {
-  .rv-review { flex-direction: column; }
-}
+.rv-review-main > .rv-word-wrap { flex: 0 0 auto; }
+.rv-review-main > .rv-hint { flex: 0 1 auto; min-height: 0; max-height: 30%; width: 100%; text-align: center; overflow: hidden; }
+.rv-review-main > .rv-hint .answer-note:not(.bk-note) { margin: 0; font-size: clamp(16px, 1.7vw, 44px); line-height: 1.25; }
+/* ручная раскладка: ячейки лежат в рамке `text` и занимают её целиком */
+.lay-area > .lay-cells { padding: 0; }
+.lay-area > .lay-cells > .rv-word-wrap { height: 100%; margin: 0; }
 
 /* FLOW-01: счётчик «Ответили N из M» на экране вопроса перед раскрытием (вне .grid-bg, поэтому свой fixed) */
 .answered-chip { position: fixed; left: 28px; bottom: 24px; z-index: 30; padding: 10px 18px; border-radius: 999px;

@@ -361,13 +361,9 @@
    Декоративный display-шрифт (Ruslan) на плитках и в слове ломал начертание («Л» → «Λ», мелкие строчные в ответе), а
    ответы команд шли мелким моно-шрифтом ЦВЕТОМ КОМАНДЫ на бумаге (жёлтая/голубая — почти не видны). Ориентир —
    плашки результата «Скрэмбла»: чернила на бумаге, цвет команды — только полоской/рамкой. */
-.theme-ny_book :is(.an-tile, .an-cell, .rv-word, .rv-cell, .rv-answer) { font-family: var(--nb-serif); font-weight: 800; text-transform: uppercase; }
+.theme-ny_book :is(.an-tile, .an-cell, .rv-word, .rv-cell) { font-family: var(--nb-serif); font-weight: 800; text-transform: uppercase; }
 .theme-ny_book .rv-cell { background: var(--nb-card); border-color: var(--nb-red); }
-.theme-ny_book .rv-answer { color: var(--nb-ink); font-size: calc(64 * var(--u)); }
 .theme-ny_book .rv-note { color: var(--muted); font-style: italic; font-size: calc(28 * var(--u)); }
-.theme-ny_book .rv-teams { gap: calc(14 * var(--u)); font-family: var(--nb-serif); font-weight: 700; font-size: calc(30 * var(--u)); margin-top: calc(14 * var(--u)); }
-.theme-ny_book .rv-teams > span { color: var(--nb-ink) !important; background: var(--nb-card); border: 2px solid var(--nb-shade);
-  border-left: calc(12 * var(--u)) solid var(--tc, var(--nb-ink)); border-radius: 6px; padding: calc(6 * var(--u)) calc(16 * var(--u)); box-shadow: 0 3px 0 var(--nb-shade); }
 .theme-ny_book .rv-word-wrap { margin-top: calc(14 * var(--u)); }
 /* «Скрэмбл»: имена команд — чернилами (цвет команды остаётся полоской/рамкой), подпись результата — читаемой гарнитурой */
 .theme-ny_book .an-team-name { color: var(--nb-ink) !important; }
@@ -885,16 +881,17 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .race-screen .host-topbar .qnum { font: 700 clamp(14px, 1.3vw, 22px) / 1 system-ui, sans-serif !important; letter-spacing: .12em; color: #aab6d8 !important; background: none !important; box-shadow: none !important; padding: 0 !important; text-transform: uppercase; }
 .theme-ny_book .race-screen .mono-tag { color: #aab6d8 !important; text-shadow: none !important; }
 
-/* ═══ «3 ПОПЫТКИ»: обязательные буквенные ячейки слова (по реальной механике: число букв, закрытые «?», открытые подсказкой, полное слово в разборе) ═══ */
+/* ═══ «3 ПОПЫТКИ»: обязательные буквенные ячейки слова (по реальной механике: число букв, закрытые «?», открытые подсказкой, полное слово в разборе) ═══
+   10.69: размеры ячейки — в em от кегля `.rv-word` (92u: ячейка 84×112u как и была), чтобы подгон useFitText (RevealCells) сжимал её целиком; кегль ячейки 0.8913em от `.rv-word` = 82u, размеры ячейки — в em от неё — иначе длинное слово
+   вылезало за левую страницу (ячейки были в u и от кегля не зависели). */
 .theme-ny_book .rv-word-wrap { height: calc(150 * var(--u)); margin-top: calc(18 * var(--u)); }
-.theme-ny_book .rv-word { font-size: calc(92 * var(--u)); gap: calc(60 * var(--u)); font-family: var(--bk-serif); }
-.theme-ny_book .rv-group { gap: calc(10 * var(--u)); }
-.theme-ny_book .rv-cell { width: calc(84 * var(--u)); height: calc(112 * var(--u)); font: 700 calc(82 * var(--u)) / 1 var(--bk-display); border: 0; border-radius: calc(10 * var(--u)); text-transform: uppercase;
+.theme-ny_book .rv-word { font-size: calc(92 * var(--u)); gap: 0.6522em; font-family: var(--bk-serif); }
+.theme-ny_book .rv-group { gap: 0.1087em; }
+.theme-ny_book .rv-cell { width: 1.0244em; height: 1.3659em; font: 700 0.8913em / 1 var(--bk-display); border: 0; border-radius: 0.122em; text-transform: uppercase;
   background: linear-gradient(180deg, #fffaf0, #efdcae); color: rgba(107, 78, 51, .38);
-  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold), inset 0 0 0 calc(8 * var(--u)) #f6e8c8, inset 0 calc(5 * var(--u)) calc(9 * var(--u)) rgba(90, 55, 20, .18), 0 calc(5 * var(--u)) 0 var(--bk-shade), 0 calc(9 * var(--u)) calc(12 * var(--u)) var(--bk-shadow); }
-.theme-ny_book .rv-cell.open { color: var(--bk-red); background: linear-gradient(180deg, #fff6da, #f2d58c); text-shadow: 0 calc(2 * var(--u)) 0 rgba(255, 244, 214, .8);
-  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--bk-gold-3), inset 0 0 0 calc(8 * var(--u)) #fff0c4, 0 calc(5 * var(--u)) 0 var(--bk-shade), 0 0 calc(24 * var(--u)) rgba(242, 213, 140, .85); }
-.theme-ny_book .rv-answer { font-family: var(--bk-display); font-weight: 700; color: var(--bk-ink-2); }
+  box-shadow: inset 0 0 0 0.0366em var(--bk-gold), inset 0 0 0 0.0976em #f6e8c8, inset 0 0.061em 0.1098em rgba(90, 55, 20, .18), 0 0.061em 0 var(--bk-shade), 0 0.1098em 0.1463em var(--bk-shadow); }
+.theme-ny_book .rv-cell.open { color: var(--bk-red); background: linear-gradient(180deg, #fff6da, #f2d58c); text-shadow: 0 0.0244em 0 rgba(255, 244, 214, .8);
+  box-shadow: inset 0 0 0 0.0366em var(--bk-gold-3), inset 0 0 0 0.0976em #fff0c4, 0 0.061em 0 var(--bk-shade), 0 0 0.2927em rgba(242, 213, 140, .85); }
 
 /* ═══ ПРАВИЛА РАУНДА: правая страница (ТЗ п.3) — всё внутри правой страницы (x ≥ 1020u), не через сгиб; левая (раунд + характеристики) без изменений ═══
    Вариант 1 (по умолчанию): текст набран прямо на странице — золотая нумерация дисплейным шрифтом, тонкие разделители. Вариант 2 (?bkrules=2): тонкая двойная золотая рамка и красные «печати» с цифрами. */
@@ -1285,3 +1282,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    раньше доска была выше зоны, центрировалась и обрезалась сверху (под подсказкой) и снизу (под сугробом), замер anagram-measure.cjs */
 .theme-ny_book .an-screen .an-board-wrap { flex: 0 0 auto !important; height: calc(556 * var(--u)); min-height: 0; }
 .theme-ny_book .an-screen .an-word { flex-wrap: nowrap; }
+
+/* разбор «3 попыток» (10.69): подсказку на левой странице «Книги» подгоняет сама BookNote (по высоте своей подложки) — общий потолок высоты не нужен */
+.theme-ny_book .rv-review-main > .rv-hint { max-height: none; }
