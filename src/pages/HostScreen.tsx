@@ -2714,8 +2714,10 @@ function Finale({ pack, gameId, gameState }: {
           <div className="fin-award-medal"><AwardMedal theme={pack.theme} place={place} /></div>
           {winners.length > 0
             ? winners.map(r => (
-                <div key={r.team.id} className="fin-award-name"
-                  style={{ color: r.team.color }}>{r.team.name}</div>
+                book
+                  ? <div key={r.team.id} className="fin-award-name bk-award-card"><BookTeamCard name={r.team.name} icon={r.team.icon} color={r.team.color} ch={104} /></div>
+                  : <div key={r.team.id} className="fin-award-name"
+                    style={{ color: r.team.color }}>{r.team.name}</div>
               ))
             : <div className="fin-award-name">—</div>}
         </div>
@@ -2734,9 +2736,11 @@ function Finale({ pack, gameId, gameState }: {
             Раунд {displayRoundNumber(pack, w.idx)} · {w.round.title_lines.join(' ')}
           </div>
           <div className="fin-slide-label">лучший результат</div>
-          <div className="fin-slide-team" style={{ color: w.team?.color }}>
-            {w.team?.name ?? '—'}
-          </div>
+          {book && w.team
+            ? <div className="fin-slide-team bk-award-card"><BookTeamCard name={w.team.name} icon={w.team.icon} color={w.team.color} ch={104} /></div>
+            : <div className="fin-slide-team" style={{ color: w.team?.color }}>
+              {w.team?.name ?? '—'}
+            </div>}
         </div>
         {/* полоска времени: видно, сколько осталось до следующего слайда */}
         <div className="fin-progress" key={step}><i style={{ animationDuration: '3s' }} /></div>
@@ -2760,8 +2764,10 @@ function Finale({ pack, gameId, gameState }: {
           <div className="fin-award-medal"><AwardMedal theme={pack.theme} place={1} /></div>
           {champs.length > 0
             ? champs.map(r => (
-                <div key={r.team.id} className="fin-award-name"
-                  style={{ color: r.team.color }}>{r.team.name}</div>
+                book
+                  ? <div key={r.team.id} className="fin-award-name bk-award-card"><BookTeamCard name={r.team.name} icon={r.team.icon} color={r.team.color} ch={104} /></div>
+                  : <div key={r.team.id} className="fin-award-name"
+                    style={{ color: r.team.color }}>{r.team.name}</div>
               ))
             : <div className="fin-award-name">—</div>}
           <div className="fin-award-score">{champs[0]?.total ?? 0}</div>

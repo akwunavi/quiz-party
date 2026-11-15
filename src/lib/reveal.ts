@@ -110,3 +110,28 @@ export function revealAllAnswered(
     return !!row && !!row.answer_text.trim()
   })
 }
+
+/** Фаза, в которой команда УЖЕ прислала ответ, — по двум источникам: своя отправка с этого телефона (ещё может лететь в очереди)
+ *  и строка в базе (`answers.stake` = фаза последней отправки; переживает перезагрузку страницы). Пустой ответ — не ответ. Нет ни того ни другого — null. */
+export function revealSentPhase(
+  local: number | null | undefined, row: { answer_text: string; stake: number | null } | null | undefined,
+): number | null {
+  const fromRow = row && row.answer_text.trim() && typeof row.stake === 'number' ? row.stake : null
+  const l = typeof local === 'number' ? local : null
+  if (l == null) return fromRow
+  if (fromRow == null) return l
+  return Math.max(l, fromRow)
+}
+
+/** Состояние формы ответа на телефоне («3 попытки»):
+ *  - `open` — можно отправлять/менять: ничего ещё не присылали ИЛИ присылали в ЭТОЙ ЖЕ фазе (правка внутри фазы разрешена, как и раньше);
+ *  - `locked` — ответ уже принят в прошлой фазе (`sentPhase`): в следующих фазах форма недоступна, команда ждёт разбор
+ *    (одна команда — один ответ на фазу; верный ответ оценивается по фазе, в которой он принят);
+ *  - `closed` — фазы нет (разбор или ещё не началась): отправлять нечего.
+ *  Команда, молчавшая в фазе 1, спокойно отвечает в фазе 2 или 3 — её `sentPhase` пуст. */
+export function revealFormState(
+  phase: 1 | 2 | 3 | 'review' | undefined, sentPhase: number | null,
+): 'open' | 'locked' | 'closed' {
+  if (phase !== 1 && phase !== 2 && phase !== 3) return 'closed'
+  return sentPhase == null || sentPhase === phase ? 'open' : 'locked'
+}

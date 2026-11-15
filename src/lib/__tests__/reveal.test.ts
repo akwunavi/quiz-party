@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   revealStart, revealNext, revealSwitchAt, revealDeadline, revealVisibleIndices,
-  revealGroups, revealLetterOpen, revealAllAnswered, revealPhaseSec,
+  revealGroups, revealLetterOpen, revealAllAnswered, revealPhaseSec, revealFormState, revealSentPhase,
   REVEAL_GRACE_MS, REVEAL_DEFAULTS,
 } from '../reveal'
 import type { RevealSettings } from '../../types/quiz'
@@ -166,5 +166,50 @@ describe('revealAllAnswered', () => {
   it('все ответили непустым текстом — true', () => {
     expect(revealAllAnswered(['a', 'b'],
       [{ team_id: 'a', answer_text: 'x' }, { team_id: 'b', answer_text: 'y' }])).toBe(true)
+  })
+})
+
+describe('revealFormState — кто может слать ответ в какой фазе', () => {
+  it('ничего не присылали — форма открыта в любой из трёх фаз (молчавшая в фазе 1 команда отвечает в 2 или 3)', () => {
+    for (const ph of [1, 2, 3] as const) expect(revealFormState(ph, null)).toBe('open')
+  })
+  it('ответ в этой же фазе — правка внутри фазы разрешена', () => {
+    for (const ph of [1, 2, 3] as const) expect(revealFormState(ph, ph)).toBe('open')
+  })
+  it('ответ принят в прошлой фазе — в следующих форма закрыта', () => {
+    expect(revealFormState(2, 1)).toBe('locked')
+    expect(revealFormState(3, 1)).toBe('locked')
+    expect(revealFormState(3, 2)).toBe('locked')
+  })
+  it('отстающий телефон (ответ из «будущей» фазы) — тоже закрыт, а не открыт', () => {
+    expect(revealFormState(1, 2)).toBe('locked')
+  })
+  it('разбор и «ещё не началось» — отправлять нечего', () => {
+    expect(revealFormState('review', null)).toBe('closed')
+    expect(revealFormState('review', 2)).toBe('closed')
+    expect(revealFormState(undefined, null)).toBe('closed')
+  })
+})
+
+describe('revealSentPhase — фаза уже присланного ответа', () => {
+  it('нет ни локальной отправки, ни строки — null', () => {
+    expect(revealSentPhase(null, undefined)).toBeNull()
+    expect(revealSentPhase(undefined, null)).toBeNull()
+  })
+  it('строка в базе: фаза = stake; пустой ответ не считается', () => {
+    expect(revealSentPhase(null, { answer_text: 'ёлка', stake: 2 })).toBe(2)
+    expect(revealSentPhase(null, { answer_text: '  ', stake: 2 })).toBeNull()
+    expect(revealSentPhase(null, { answer_text: 'ёлка', stake: null })).toBeNull()
+  })
+  it('своя отправка ещё в очереди (строки нет) — считается', () => {
+    expect(revealSentPhase(1, null)).toBe(1)
+  })
+  it('обе есть — берётся более поздняя фаза (перезагрузка не открывает форму заново)', () => {
+    expect(revealSentPhase(1, { answer_text: 'x', stake: 2 })).toBe(2)
+    expect(revealSentPhase(2, { answer_text: 'x', stake: 1 })).toBe(2)
+  })
+  it('вместе с revealFormState: ответил в 1-й — в 2-й закрыто, молчал — открыто', () => {
+    expect(revealFormState(2, revealSentPhase(null, { answer_text: 'x', stake: 1 }))).toBe('locked')
+    expect(revealFormState(2, revealSentPhase(null, undefined))).toBe('open')
   })
 })

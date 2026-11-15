@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 import { FitImg } from '../FitImg'
 import { ManualAnswer } from '../ManualLayout'
 import { BookNote } from '../../ny/book/BookNote'
-import { BookTeamCard } from '../../ny/book/BookTeamCard'
+import { TeamAnswers, type AnswerTeam } from './TeamAnswers'
 import { displayAnswer } from './QuestionScreen'
 import { lenClass, mediaUrl } from '../../lib/media'
 import { answerScreenImages } from '../../lib/answerImages'
@@ -17,7 +17,7 @@ import { noteClass } from '../../lib/questionLayout'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Answer, Question } from '../../types/quiz'
 
-export interface AnswerTeam { id: string; name: string; color: string }
+export type { AnswerTeam }
 
 export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, rows, teamOf, checked, revealLive, shownOf, actions, extra }: {
   pack: LoadedPack; round: LoadedRound; q: Question; step: number; total: number; roundIdx: number
@@ -61,28 +61,7 @@ export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, row
             </div>
           )}
         </div>
-        {!paper && <div className="team-answers" data-n={rows.length}>
-          <div className="mono-tag">ОТВЕТЫ КОМАНД</div>
-          {rows.length === 0 && <div style={{ color: 'var(--dim)' }}>нет ответов</div>}
-          {rows.map(a => {
-            const team = teamOf(a.team_id)
-            const shown = checked ? shownOf(a) : null
-            return isBook
-              ? <div key={a.id} className="team-answer bk-ta">
-                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
-                  <span className="text">{a.answer_text || '—'}
-                    {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
-                  <span className={`bk-ball is-${!a.answer_text?.trim() ? 'none' : shown === true ? 'ok' : shown === false ? 'no' : 'wait'}`} aria-hidden="true">
-                    <i>{!a.answer_text?.trim() ? '' : shown === true ? '✓' : shown === false ? '✗' : ''}</i></span>
-                </div>
-              : <div key={a.id} className="team-answer" style={{ borderLeft: `5px solid ${shown === true ? 'var(--ok)' : shown === false ? 'var(--danger)' : 'var(--dim)'}` }}>
-                  <span className="name" style={{ color: team?.color }}>{team?.name ?? '—'}</span>
-                  <span className="text">{a.answer_text || '—'}
-                    {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
-                  {shown != null && <span className="mark" style={{ color: shown ? 'var(--ok)' : 'var(--danger)' }}>{shown ? '✓' : '✗'}</span>}
-                </div>
-          })}
-        </div>}
+        {!paper && <TeamAnswers rows={rows} isBook={isBook} teamOf={teamOf} shownOf={shownOf} checked={checked} />}
       </div>
       {manual && <ManualAnswer theme={pack.theme} answer={displayAnswer(q)} note={checked ? q.answer_note : null} urls={revealImgs.map(mediaUrl)} rects={manual} noteNode={noteNode} />}
       {actions}

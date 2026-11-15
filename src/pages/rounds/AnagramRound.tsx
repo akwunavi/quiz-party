@@ -13,6 +13,7 @@
 import type { CSSProperties } from 'react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AudioGate } from '../../components/AudioGate'
+import { BookTeamCard } from '../../ny/book/BookTeamCard'
 import { FitImg } from '../../components/FitImg'
 import { useFitText } from '../../hooks/useFitText'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -23,7 +24,7 @@ import { mediaScaleVar, mediaUrl } from '../../lib/media'
 import {
   anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramHintTile, anagramMaxHints,
   anagramWinner, anagramStartIso, anagramElapsedMs, formatRaceTime, isAnagramCorrect, hashStr,
-  anagramFlightPlan, anagramTeamRows,
+  anagramFlightPlan, anagramTeamRows, anagramBookPlan, anagramWordSpecs,
 } from '../../lib/anagram'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { AnagramSettings, Answer, GameState, Question, Team } from '../../types/quiz'
@@ -75,15 +76,6 @@ type BoardProps = {
 
 /** «Волшебный лес» на проекторе — утверждённая сцена «Семена над поляной» (src/forest/stage3); остальные темы и
  *  предпросмотр редактора — прежняя доска. Хуков здесь нет: выбор только между двумя компонентами. */
-/** «Книга»: ширина плитки/ячейки в единицах сцены (--u) так, чтобы буквы и самое длинное слово ответа помещались в ряд на ОДНОЙ странице (≈676u);
- *  длинная фраза — до двух рядов плиток. Только число для CSS-переменной, в других темах не используется. */
-function bookTileWidth(n: number, words: { kind: string }[][]): { tw: number; cw: number } {
-  const fit = (k: number) => Math.max(30, Math.min(104, Math.floor((676 - 12 * (Math.max(k, 1) - 1)) / Math.max(k, 1))))
-  const perRow = n <= 8 ? n : Math.ceil(n / Math.ceil(n / 8))
-  const longest = Math.max(1, ...words.map(w => w.reduce((a, c) => a + (c.kind === 'fixed' ? 0.5 : 1), 0)))
-  return { tw: fit(perRow), cw: Math.min(fit(Math.ceil(longest)), 96) }
-}
-
 export function AnagramBoard(props: BoardProps) {
   return isForestTheme(props.pack.theme) && !props.preview ? <ForestAnagramBoard {...props} /> : <AnagramBoardClassic {...props} />
 }
@@ -150,19 +142,31 @@ function anagramOutcome(p: { rows: Answer[]; teams: Team[]; phrase: string; race
  *  зал не подсматривал. После показа — текст (длинные переносятся) и вердикт (когда доска собрана).
  *  Порядок — как у списка команд: строки не прыгают. Вне `.host-screen`: свой fixed, доску не двигает
  *  (экрану резервируется padding-right классом `.has-teams`). */
-function AnagramTeamsPanel({ teams, rows, start, phrase, reveal, verdicts }: {
+function AnagramTeamsPanel({ teams, rows, start, phrase, reveal, verdicts, book = false }: {
   teams: Team[]; rows: Answer[]; start: { iso: string | null; approx: boolean }
   phrase: string; reveal: boolean; verdicts: boolean
+  /** «Книга»: строки — утверждённая карточка команды (BookTeamCard) вместо плоских плашек */
+  book?: boolean
 }) {
   const list = anagramTeamRows(teams, rows, start.iso, phrase)
   const sent = list.filter(r => r.sent).length
   return (
     <aside className={`an-teams${teams.length > 8 ? ' dense' : ''}`} aria-label="Команды">
       <div className="an-teams-head">КОМАНДЫ <b>{sent}</b> / {teams.length}</div>
-      <ul>
+      <ul className={book ? 'bk-an-list' : undefined}>
         {teams.map((t, i) => {
           const r = list[i]
           const mark = reveal && verdicts && r.sent && r.verdict != null ? (r.verdict ? 'ok' : 'no') : ''
+          if (book) {
+            const when = r.sent ? (Number.isFinite(r.ms) && r.ms >= 0 ? `${start.approx ? '≈ ' : ''}${formatRaceTime(r.ms)}` : 'ответил') : null
+            return (
+              <li key={t.id} className={`bk-an-row${r.sent ? ' sent' : ''}${mark ? ' ' + mark : ''}`}>
+                <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={teams.length > 8 ? 40 : 54}
+                  state={mark === 'ok' ? 'correct' : mark === 'no' ? 'wrong' : 'normal'} score={when ?? 'думает…'} />
+                {reveal && r.sent && <div className="bk-an-text">{r.text}</div>}
+              </li>
+            )
+          }
           return (
             <li key={t.id} className={`an-team${r.sent ? ' sent' : ''}${mark ? ' ' + mark : ''}`}
               style={{ borderLeftColor: t.color }}>
@@ -197,6 +201,7 @@ function AnagramBoardClassic({
   const startedAt = gameState.timer_started_at
   const reveal = gameState.reveal
   const paperMode = pack.settings?.play_mode === 'paper'
+  const book = pack.theme === 'ny_book'
   const race = (s.mode ?? 'standard') === 'race' && !paperMode
 
   const hintedKey = hinted.join(',')
@@ -341,7 +346,7 @@ function AnagramBoardClassic({
       )}
 
       <div className="an-board-wrap">
-        <div className={`an-board${allLanded ? ' done' : ''}`} ref={boardRef} style={{ ...(({ tw, cw }) => ({ '--tw': tw, '--cw': cw }))(bookTileWidth(tiles.length, template.words)) } as CSSProperties}>
+        <div className={`an-board${allLanded ? ' done' : ''}`} ref={boardRef} style={{ ...(({ tw, cw }) => ({ '--tw': tw, '--cw': cw }))(anagramBookPlan(tiles.length, anagramWordSpecs(template.words))) } as CSSProperties}>
           <div className="an-tiles">
             {tiles.map((ch, p) => (
               <span key={p} data-p={p}
@@ -372,8 +377,10 @@ function AnagramBoardClassic({
             ? winnerTeam
               ? <div className="an-res-line">
                   <span className="an-res-label">БАЛЛ ПОЛУЧАЕТ</span>
-                  <span className="an-res-team" style={{ color: winnerTeam.color }}>
-                    {winnerTeam.icon ? `${winnerTeam.icon} ` : ''}{winnerTeam.name}</span>
+                  {book
+                    ? <BookTeamCard className="an-res-card" name={winnerTeam.name} icon={winnerTeam.icon} color={winnerTeam.color} ch={46} />
+                    : <span className="an-res-team" style={{ color: winnerTeam.color }}>
+                      {winnerTeam.icon ? `${winnerTeam.icon} ` : ''}{winnerTeam.name}</span>}
                   {Number.isFinite(winnerMs) && winnerMs >= 0 &&
                     <span className="an-res-time">{start.approx ? '≈ ' : ''}ЗА {formatRaceTime(winnerMs)}</span>}
                 </div>
@@ -381,10 +388,12 @@ function AnagramBoardClassic({
             : rightTeams.length
               ? <div className="an-res-line wrap">
                   <span className="an-res-label">УГАДАЛИ</span>
-                  {rightTeams.map(t => (
-                    <span key={t.id} className="an-res-chip" style={{ color: t.color, borderColor: t.color }}>
-                      {t.icon ? `${t.icon} ` : ''}{t.name}</span>
-                  ))}
+                  {rightTeams.map(t => book
+                    ? <BookTeamCard key={t.id} className="an-res-card" name={t.name} icon={t.icon} color={t.color} ch={40} />
+                    : (
+                      <span key={t.id} className="an-res-chip" style={{ color: t.color, borderColor: t.color }}>
+                        {t.icon ? `${t.icon} ` : ''}{t.name}</span>
+                    ))}
                 </div>
               : <div className="an-res-line"><span className="an-res-label">НИКТО НЕ УГАДАЛ</span></div>}
           {q.answer_note && <div className="an-res-note">{q.answer_note}</div>}
@@ -394,7 +403,7 @@ function AnagramBoardClassic({
       {actionsSlot}
     </div>
     {showTeams && <AnagramTeamsPanel teams={teams} rows={rows} start={start} phrase={phrase}
-      reveal={reveal} verdicts={allLanded} />}
+      reveal={reveal} verdicts={allLanded} book={book} />}
     </>
   )
 }
