@@ -359,3 +359,32 @@ describe('черновик: тот же ключ, другая длина (ре�
   })
 })
 
+
+import { anagramBookPlan, anagramCellRows, anagramWordSpecs } from '../anagram'
+describe('anagramBookPlan: размер плиток «Книги» по числу букв и зоне', () => {
+  const plan = (phrase: string, w = 676, h = 540) => { const t = anagramTemplate(phrase); return { t, p: anagramBookPlan(t.letters.length, anagramWordSpecs(t.words), w, h) } }
+  const heightOf = (t: ReturnType<typeof anagramTemplate>, p: ReturnType<typeof anagramBookPlan>) => {
+    const perRow = Math.max(1, Math.floor((676 + 10) / (p.tw + 10))); const tr = Math.ceil(t.letters.length / perRow)
+    const cr = anagramCellRows(anagramWordSpecs(t.words), p.cw, 676)!
+    return tr * 1.24 * p.tw + (tr - 1) * 10 + 46 + cr * 1.24 * p.cw + (cr - 1) * 18
+  }
+  it('короткое слово — крупные плитки, один ряд', () => { const { p } = plan('Ёлка'); expect(p.tw).toBe(104); expect(p.tileRows).toBe(1); expect(p.fits).toBe(true) })
+  it('фразы 1–5 слов (до 25 букв) помещаются в зону по высоте и ширине', () => {
+    for (const ph of ['Снегурочка', 'Новогодний хоровод', 'Дед Мороз и Снегурочка спешат', 'Подарки под ёлкой у камина всю ночь', 'Электрификация', 'Достопримечательность архитектуры']) {
+      const { t, p } = plan(ph); expect(p.fits, ph).toBe(true); expect(heightOf(t, p), ph).toBeLessThanOrEqual(540.5)
+      expect(p.tw).toBeGreaterThanOrEqual(28); expect(p.cw).toBeGreaterThanOrEqual(22)
+    }
+  })
+  it('чем длиннее фраза — тем мельче, но не ниже пола', () => {
+    expect(plan('Ёлка').p.tw).toBeGreaterThan(plan('Подарки под ёлкой у камина всю ночь').p.tw)
+    const huge = plan('Подарки под ёлкой у камина всю ночь и ещё много слов подряд до самого рассвета'); expect(huge.p.tw).toBeGreaterThanOrEqual(28)
+  })
+  it('слова переносятся целиком: ряд не превышает зону, слово шире зоны даёт null', () => {
+    const t = anagramTemplate('Дед Мороз и Снегурочка спешат'); const w = anagramWordSpecs(t.words)
+    expect(anagramCellRows(w, 50, 676)).toBeGreaterThan(1)
+    expect(anagramCellRows(anagramWordSpecs(anagramTemplate('Достопримечательность').words), 80, 676)).toBeNull()
+  })
+  it('знаки препинания — полклетки, слово с дефисом считается', () => {
+    expect(anagramWordSpecs(anagramTemplate('кто-то').words)).toEqual([{ cells: 6, units: 5.5 }])
+  })
+})
