@@ -197,7 +197,11 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
     round(id, 12, 'race', 'Скачки бульдогов', ['Ставки — на кличку бульдога', 'Выигрывает тот, кто прибежит первым'], () => [], { dogs: ['Рокки', 'Бублик', 'Пончик', 'Тайсон', 'Бусинка'], betSec: 30, courseSec: 42 }),
     round(id, 13, 'four_pics', '3 попытки', ['Фаза 1 — две картинки, фаза 2 — три, фаза 3 — четыре', 'Чем раньше угадали, тем больше баллов'], rid => [
       q(rid, 0, '', { media: { question: [0, 1, 2, 3].map(i => m(`sa-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'СНЕЖИНКА' }, service: { openLetters: [0, 4] } }),
-      q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
+      q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } }),
+      // 10.69: варианты для проверки разбора — 2 картинки + подсказка; 3 картинки + длинное слово; 4 картинки + фраза из трёх слов + длинная подсказка
+      q(rid, 2, '', { media: { question: [0, 1].map(i => m(`sa-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ЕЛОЧКА' }, note: 'Новогоднее дерево, которое наряжают игрушками и гирляндами.', service: { openLetters: [0] } }),
+      q(rid, 3, '', { media: { question: [0, 1, 2].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ЗАСНЕЖЕННОСТЬ' }, note: 'Длинное слово.', service: { openLetters: [1, 5] } }),
+      q(rid, 4, '', { media: { question: [0, 1, 2, 3].map(i => m(`sa-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ДЕД МОРОЗ И СНЕГУРОЧКА' }, note: 'Главные герои новогодней ночи приходят к детям с мешком подарков, а потом встречают гостей у ёлки и водят хоровод вместе со всеми, кто пришёл на праздник. '.repeat(2), service: { openLetters: [0] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
       q(rid, 0, 'Новогодняя героиня', { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
       q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: process.env.QP_AN_RACE ? 'race' : 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),

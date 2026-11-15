@@ -333,6 +333,11 @@ export const SCENES = [
       sc('44-race-running', 'скачки: забег идёт', async api => { await api.teams(6); await api.session(Q(12, 0, { timer_started_at: null, melody: { race: { stage: 'running', seed: 7, D: 42, startedAt: iso(now() - 15000), round: 12, game: GAME } } })) }, { settle: 2500, noPause: true }),
       sc('45-fp-1', '«3 попытки»: фаза 1 (2 картинки)', rv(1, 6000, 30)), sc('46-fp-2', '«3 попытки»: фаза 2 (3 картинки)', rv(2, 4000, 20)),
       sc('47-fp-3', '«3 попытки»: фаза 3 (4 картинки)', rv(3, 3000, 10)), sc('48-fp-review', '«3 попытки»: разбор', rv('review', 0, 0)),
+      // 10.69: разбор с ответами команд (разные вердикты) и вариантами вопросов
+      ...[['48a', 0, 6], ['48b', 2, 1], ['48c', 3, 6], ['48d', 4, 16], ['48e', 4, 6], ['48f', 1, 4]].map(([id, qi, n]) => sc(`${id}-fp-review-q${qi}-t${n}`, `«3 попытки»: разбор, вопрос ${qi}, команд ${n}`,
+        async api => { const ts = await api.teams(n); const TXT = ['снежинка', 'снежинка', 'Снегурочка', 'ёлочка в лесу очень длинный ответ команды', 'заснеженность', '', 'дед мороз', 'подарок']
+          await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: `q-${qid(13, qi)}`, round_number: 13, answer_text: TXT[i % TXT.length], stake: 1 + (i % 3), is_correct: i % 3 === 0 ? true : i % 3 === 1 ? false : null })))
+          await api.session(Q(13, qi, { timer_started_at: null, melody: { rv: { qid: qid(13, qi), phase: 'review', startedAt: iso(now()), phaseSec: 0 } } })) }, { ready: '.rv-review-screen' })),
       sc('49-anagram', 'Скрэмбл: доска плиток', async api => { await api.teams(6); await api.session(Q(14, 0, { timer_started_at: iso(now() - 12000) })) }),
       sc('50-anagram-reveal', 'Скрэмбл: показ ответа', async api => { await api.teams(6); await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }),
       sc('51-order', 'вопрос на расстановку (order)', async api => { await api.teams(8); await api.session(Q(1, 1)) }),

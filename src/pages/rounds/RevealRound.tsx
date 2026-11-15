@@ -8,7 +8,7 @@
 // Автопереход по таймеру — ТОЛЬКО здесь (на проекторе). Админка двигает
 // фазу вручную кнопкой — если бы оба экрана дёргали переход одновременно,
 // фаза могла бы перепрыгнуть.
-import { useEffect, useRef, type ReactNode, type CSSProperties } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { room } from '../../lib/transport'
 import { autocheck } from '../../lib/autocheck'
 import { gotoQuestion } from '../../lib/gameActions'
@@ -189,8 +189,10 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
         <div className="answers-layout revealed" style={{ marginTop: 60 }}>
           <div className="answers-main revealed rv-review-main" style={{ flex: 1.4, minHeight: 0 }}>
             {!manual && <>
-              <div className={`q-media-grid answer-media rv-pics n${Math.min(imgs.length, 4)}${imgs.length > 1 ? ' eq-row' : ''}`} style={mediaScaleVar(q)}>
-                {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+              <div className={`rv-pics-box n${Math.min(imgs.length, 4)}`}>
+                <div className={`q-media-grid rv-pics n${Math.min(imgs.length, 4)}${imgs.length > 1 ? ' eq-row' : ''}`} style={mediaScaleVar(q)}>
+                  {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+                </div>
               </div>
               {cells}
               {hint && <div className="rv-hint">{noteNode(hint)}</div>}
