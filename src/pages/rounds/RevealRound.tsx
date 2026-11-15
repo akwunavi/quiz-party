@@ -16,14 +16,13 @@ import { navFrom, quietStale } from '../../lib/navGuard'
 import { mediaScaleVar, mediaUrl } from '../../lib/media'
 import { FitImg } from '../../components/FitImg'
 import { AfterRoundNav } from '../../components/AfterRoundNav'
-import { useFitText } from '../../hooks/useFitText'
 import { useAnswers } from '../../hooks/useAnswers'
 import { useTeams } from '../../hooks/useTeams'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { saveReveal, clearReveal } from '../../lib/revealActions'
 import {
   revealStart, revealNext, revealSwitchAt, revealVisibleIndices, revealGroups,
-  revealLetterOpen, revealAllAnswered,
+  revealAllAnswered,
 } from '../../lib/reveal'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodyState, RevealSettings, RevealState } from '../../types/quiz'
@@ -33,6 +32,10 @@ import { ForestReveal } from '../../forest/rounds/ForestRounds'
 import { teamTone } from '../../forest/rounds/views'
 import { serverNow } from '../../lib/serverClock'
 import { ManualAnswer, ManualPics } from '../../components/ManualLayout'
+import { RevealCells } from '../../components/RevealCells'
+import { TeamAnswers } from '../../components/screens/TeamAnswers'
+import { BookNote } from '../../ny/book/BookNote'
+import { noteClass } from '../../lib/questionLayout'
 import { screenLayout, layoutUnsupportedReason } from '../../lib/layoutRects'
 import { themeHasFold } from '../../lib/layoutArea'
 
@@ -117,7 +120,6 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   useEffect(() => () => { if (!preview) void clearReveal(bagRef.current) }, [preview])
 
   const word = q?.answer.mode === 'crossword_word' ? q.answer.word : ''
-  const groups = useFitText<HTMLDivElement>([word, rv.phase])
 
   // «Волшебный лес» (проектор): рамы из ветвей и спилы с буквами. Фазы, автопереход, автопроверка — эффекты выше;
   // таймер рисунка — от того же melody.rv.startedAt/phaseSec, что у боевого Timer. В предпросмотре — прежний экран.
@@ -161,7 +163,6 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   // буквенные ячейки и подписи фаз остаются штатными (привязаны к механике). Битый/устаревший layout → авто.
   const manualOk = layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
   const manualScreen = manualOk ? screenLayout(q.service, rv.phase === 'review' ? 'answer' : 'question', imgs, themeHasFold(pack.theme)) : null
-  const letterGroups = revealGroups(word)
   const openLetters = q.service.openLetters
 
   const manualNext = () => {
@@ -172,68 +173,63 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
     void saveReveal(bag, revealNext(rv, s, false))
   }
 
-  let flat = -1
+  // ── РАЗБОР: только картинки вопроса, ответ буквенными ячейками, подсказка снизу и справа колонка «ОТВЕТЫ КОМАНД» — та же, что на экране ответа других раундов ──
+  if (rv.phase === 'review') {
+    const isBook = pack.theme === 'ny_book'
+    const hint = (q.answer_note ?? '').trim() ? q.answer_note! : null
+    const noteNode = (t: string) => isBook ? <BookNote text={t} className={noteClass(t).trim()} /> : <div className={`answer-note${noteClass(t)}`}>{t}</div>
+    const cells = <RevealCells word={word} open={openLetters} phase="review" />
+    const manual = manualScreen?.text ? manualScreen : null
+    return (
+      <div className={`host-screen grid-bg rv-review-screen${paperMode ? ' paper-answers' : ''}`} style={{ justifyContent: 'flex-start' }}>
+        <div className="host-topbar">
+          <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
+            <b>{gameState.question_index + 1}</b> / {round.questions.length}</span>
+        </div>
+        <div className="answers-layout revealed" style={{ marginTop: 60 }}>
+          <div className="answers-main revealed rv-review-main" style={{ flex: 1.4, minHeight: 0 }}>
+            {!manual && <>
+              <div className={`q-media-grid answer-media rv-pics n${Math.min(imgs.length, 4)}${imgs.length > 1 ? ' eq-row' : ''}`} style={mediaScaleVar(q)}>
+                {imgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
+              </div>
+              {cells}
+              {hint && <div className="rv-hint">{noteNode(hint)}</div>}
+            </>}
+          </div>
+          {!paperMode && <TeamAnswers rows={rows} isBook={isBook} checked
+            teamOf={id => teams.find(t => t.id === id)} shownOf={a => a.is_correct} showStake={false} />}
+        </div>
+        {manual && <ManualAnswer theme={pack.theme} answer={word} note={hint} urls={imgs.map(mediaUrl)} rects={manual} noteNode={noteNode} plate={cells} />}
+        {!preview && <div className="host-actions">
+          {isLast ? <AfterRoundNav pack={pack} gameState={gameState} /> : <button onClick={manualNext}>Дальше →</button>}
+        </div>}
+      </div>
+    )
+  }
 
   return (
     <div className="host-screen grid-bg has-media rv-screen">
       <div className="host-topbar">
         <span className="qnum">Р{displayRoundNumber(pack, gameState.round_number)} · ВОПРОС{' '}
           <b>{gameState.question_index + 1}</b> / {round.questions.length}
-          {rv.phase !== 'review' && <> · ФАЗА {phase}</>}</span>
-        {rv.phase !== 'review' && rv.phaseSec != null
-          && timerNode(rv.phaseSec, `${rv.qid}-${rv.phase}`, rv.phase === 3)}
+          {' '}· ФАЗА {phase}</span>
+        {rv.phaseSec != null && timerNode(rv.phaseSec, `${rv.qid}-${rv.phase}`, rv.phase === 3)}
       </div>
 
       {manualScreen
-        ? (rv.phase === 'review'
-            ? <ManualAnswer theme={pack.theme} answer={word} note={q.answer_note || null} urls={imgs.map(mediaUrl)} rects={manualScreen} />
-            : <ManualPics theme={pack.theme} rects={manualScreen} items={(preview?.showAllPics ? imgs.map((_, i) => i) : revealVisibleIndices(imgs.length, phase)).map(i => ({ i, url: mediaUrl(imgs[i]) }))} />)
+        ? <ManualPics theme={pack.theme} rects={manualScreen} items={(preview?.showAllPics ? imgs.map((_, i) => i) : revealVisibleIndices(imgs.length, phase)).map(i => ({ i, url: mediaUrl(imgs[i]) }))} />
         : <div className={shownImgs.length <= 3
         ? `q-media-grid n${shownImgs.length} eq-row` : 'q-media-grid rv-2x2'}
         style={mediaScaleVar(q)}>
         {shownImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
       </div>}
 
-      <div className="rv-word-wrap">
-        <div className="rv-word" ref={groups}>
-          {letterGroups.map((g, gi) => (
-            <span className="rv-group" key={gi}>
-              {g.map((ch, k) => {
-                flat++
-                const isOpen = revealLetterOpen(flat, openLetters, phase)
-                return <span key={k} className={`rv-cell${isOpen ? ' open' : ''}`}>
-                  {isOpen ? ch : '?'}</span>
-              })}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {rv.phase === 'review' && !manualScreen && (
-        <div className="rv-review">
-          <div className="rv-answer">{word}</div>
-          {q.answer_note && <div className="rv-note">{q.answer_note}</div>}
-        </div>
-      )}
-      {rv.phase === 'review' && (
-        <div className="rv-teams">
-          {rows.map(a => {
-            const team = teams.find(t => t.id === a.team_id)
-            return <span key={a.id} style={{ color: team?.color, '--tc': team?.color } as CSSProperties}>
-              {team?.name ?? '—'}: {a.answer_text || '—'}
-              {a.stake != null && ` · фаза ${a.stake}`}
-              {a.is_correct === true ? ' ✓' : a.is_correct === false ? ' ✗' : ''}
-            </span>
-          })}
-        </div>
-      )}
+      <RevealCells word={word} open={openLetters} phase={phase} />
 
       {/* Кнопки пишут в живую сессию (следующая фаза/следующий вопрос) —
           в предпросмотре не рендерятся вовсе (HANDOFF.md). */}
       {!preview && <div className="host-actions">
-        {rv.phase === 'review' && isLast
-          ? <AfterRoundNav pack={pack} gameState={gameState} />
-          : <button onClick={manualNext}>Дальше →</button>}
+        <button onClick={manualNext}>Дальше →</button>
       </div>}
     </div>
   )
