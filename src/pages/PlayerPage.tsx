@@ -15,6 +15,7 @@ import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme, RaceSettings } from '../types/quiz'
 import { revealPointsFor } from '../lib/scoring'
+import { revealFormState, revealSentPhase } from '../lib/reveal'
 import { spendsEdit } from '../lib/edits'
 import {
   anagramQuestion, anagramHintOrder, anagramHintsOpen, anagramMaxHints, applyHints, placeTile,
@@ -236,9 +237,9 @@ function JeopardyPlayer({ team, gameState, roundLabel, round }: {
   )
 }
 
-/** «3 попытки» у игрока: поле ответа, доступно на всех трёх фазах без
- *  ограничения правок (лимит max_edits тут не при чём — это отдельная
- *  механика со своей ценой ответа по фазе, а не обычный вопрос раунда). */
+/** «3 попытки» у игрока: поле ответа. Внутри ОДНОЙ фазы ответ можно менять (лимит max_edits тут не при чём — у механики своя цена ответа по фазе);
+ *  ответ, принятый в прошлой фазе, в следующих фазах менять нельзя — форма недоступна до разбора (`revealFormState`, lib/reveal.ts).
+ *  Источник «уже отвечали» — своя отправка (она ещё может лететь в очереди) ИЛИ строка в базе (переживает перезагрузку страницы). */
 function RevealPlayer({ team, gameState, round, roundLabel }: {
   team: Team; roundLabel: string
   round: LoadedRound
@@ -249,9 +250,11 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
   const rv = q && rawRv.qid === q.id ? rawRv : {}
   const [draft, setDraft] = useState('')
   const [sent, setSent] = useState<string | null>(null)
+  const [sentPhase, setSentPhase] = useState<number | null>(null)
+  const answers = useAnswers(gameState.game_id, gameState.round_number, 3000)
   // смена вопроса — сбрасываем черновик, иначе останется ответ на прошлый
   // (та же ловушка уже чинили в JeopardyPlayer)
-  useEffect(() => { setDraft(''); setSent(null) }, [q?.id])
+  useEffect(() => { setDraft(''); setSent(null); setSentPhase(null) }, [q?.id])
 
   if (!q) return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
 
@@ -268,6 +271,11 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
     </div>
   )
 
+  const mine = answers.find(a => a.team_id === team.id && a.question_ref === `q-${q.id}`)
+  const prevPhase = revealSentPhase(sentPhase, mine)
+  const shownAnswer = sent ?? (mine?.answer_text.trim() ? mine.answer_text : null)
+  const form = revealFormState(rv.phase, prevPhase)
+
   const send = () => {
     void enqueueAnswer({
       team_id: team.id, game_id: gameState.game_id, question_ref: `q-${q.id}`,
@@ -275,9 +283,10 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
       stake: typeof rv.phase === 'number' ? rv.phase : null,
     })
     setSent(draft.trim())
+    setSentPhase(typeof rv.phase === 'number' ? rv.phase : null)
   }
 
-  if (rv.phase === 'review') {
+  if (form === 'closed') {
     return (
       <div className="pl-root">
         <PlayerHeader team={team} round={roundLabel} />
@@ -285,7 +294,23 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
         <div className="pl-list">
           <div className="pl-notice acc">3 ПОПЫТКИ · РАЗБОР</div>
           <div className="pl-card"><div className="pl-card-body">
-            <div className="pl-sent">Ваш ответ: {sent ?? '—'}</div>
+            <div className="pl-sent">Ваш ответ: {shownAnswer ?? '—'}</div>
+          </div></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (form === 'locked') {
+    return (
+      <div className="pl-root">
+        <PlayerHeader team={team} round={roundLabel} />
+        <ConnectionDot />
+        <div className="pl-list">
+          <div className="pl-notice acc">3 ПОПЫТКИ · ФАЗА {rv.phase}</div>
+          <div className="pl-card"><div className="pl-card-body" data-testid="reveal-locked">
+            <div className="pl-sent">Ответ принят в фазе {prevPhase}: {shownAnswer ?? '—'}</div>
+            <div className="ed-hint">Менять ответ в следующих фазах нельзя — ждём разбор</div>
           </div></div>
         </div>
       </div>
@@ -299,15 +324,15 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
       <div className="pl-list">
         <div className="pl-notice acc">3 ПОПЫТКИ · ФАЗА {rv.phase}</div>
         <div className="pl-card">
-          <div className="pl-qlabel">ЗА ВЕРНЫЙ ОТВЕТ — {revealPointsFor(rv.phase)} БАЛЛА</div>
+          <div className="pl-qlabel">ЗА ВЕРНЫЙ ОТВЕТ — {revealPointsFor(typeof rv.phase === 'number' ? rv.phase : null)} БАЛЛА</div>
           <div className="pl-card-body">
             <div className="pl-input-col">
               <input value={draft} onChange={e => setDraft(e.target.value)} placeholder="Слово" />
-              <button className="pl-send" disabled={!draft.trim() || draft.trim() === sent}
-                onClick={send}>{sent ? 'Изменить ответ' : 'Отправить'}</button>
+              <button className="pl-send" disabled={!draft.trim() || draft.trim() === shownAnswer}
+                onClick={send}>{shownAnswer ? 'Изменить ответ' : 'Отправить'}</button>
             </div>
-            {sent && <div className="pl-sent">Отправлено: {sent}</div>}
-            <div className="ed-hint">Можно менять ответ сколько угодно раз, пока идёт вопрос</div>
+            {shownAnswer && <div className="pl-sent">Отправлено: {shownAnswer}</div>}
+            <div className="ed-hint">Ответ можно менять, пока идёт эта фаза; в следующей фазе он будет закрыт</div>
           </div>
         </div>
       </div>
