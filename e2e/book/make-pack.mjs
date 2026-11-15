@@ -199,7 +199,7 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
       q(rid, 0, '', { media: { question: [0, 1, 2, 3].map(i => m(`sa-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'СНЕЖИНКА' }, service: { openLetters: [0, 4] } }),
       q(rid, 1, '', { media: { question: [0, 1, 2, 3].map(i => m(`ha-${i}.jpg`)) }, answer: { mode: 'crossword_word', word: 'ПОДАРОК' }, service: { openLetters: [2] } })], { p1Sec: 30, p2Sec: 20, p3Sec: 10 }),
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
-      q(rid, 0, 'Новогодняя героиня', { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
+      q(rid, 0, 'Новогодняя героиня', process.env.QP_AN_PHRASE ? (() => { const ph = process.env.QP_AN_PHRASE; const n = [...ph].filter(c => /[A-Za-zА-Яа-яЁё]/.test(c)).length; const ord = Array.from({ length: n }, (_, i) => (i * 7 + 3) % n); const ok = new Set(ord).size === n; return { answer: { mode: 'anagram', phrase: ph, order: ok ? ord : Array.from({ length: n }, (_, i) => (i + 1) % n) } } })() : { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
       q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: process.env.QP_AN_RACE ? 'race' : 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
   ]
   return {

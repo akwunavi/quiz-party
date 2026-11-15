@@ -518,3 +518,44 @@ export function anagramAllAnswered(teams: readonly { id: string }[], answers: re
   const ids = new Set(answers.filter(a => a.question_ref === `q-${qid}` && (a.answer_text ?? '').trim() !== '').map(a => a.team_id))
   return teams.every(t => ids.has(t.id))
 }
+
+// ── «Книга»: размер плиток и ячеек по числу букв и зоне левой страницы ──
+const BOOK_ASPECT = 1.24     // высота плитки = 1.24 × ширина
+const BOOK_GAP = 10, BOOK_ROW_GAP = 18, BOOK_WORD_GAP = 30, BOOK_BOARD_GAP = 46
+
+export interface AnagramWordSpec { cells: number; units: number }
+/** Слова шаблона → число клеток и «ширина в клетках» (знак препинания — полклетки). */
+export function anagramWordSpecs(words: { kind: string }[][]): AnagramWordSpec[] {
+  return words.map(w => ({ cells: w.length, units: w.reduce((a, c) => a + (c.kind === 'fixed' ? 0.5 : 1), 0) }))
+}
+
+/** Сколько рядов займут слова ответа при ширине ячейки cw: слова не рвутся, переносятся ЦЕЛИКОМ. null — какое-то слово шире зоны. */
+export function anagramCellRows(words: AnagramWordSpec[], cw: number, zoneW: number): number | null {
+  let rows = 1, cur = 0
+  for (const w of words) {
+    const ww = w.units * cw + Math.max(0, w.cells - 1) * BOOK_GAP
+    if (ww > zoneW + 0.01) return null
+    if (cur > 0 && cur + BOOK_WORD_GAP + ww > zoneW) { rows++; cur = ww } else cur = cur > 0 ? cur + BOOK_WORD_GAP + ww : ww
+  }
+  return rows
+}
+
+/** Ширина плитки (tw) и ячейки ответа (cw) в единицах сцены: наибольшая, при которой ряды плиток + ряды слов + зазор помещаются в зону zoneW × zoneH
+ *  (левая страница «Книги»: ≈676 × 540). Слова переносятся между словами, не посреди слова; при очень длинной фразе размер падает до пола (плитка 28, ячейка 22). */
+export function anagramBookPlan(letterCount: number, words: AnagramWordSpec[], zoneW = 676, zoneH = 540): { tw: number; cw: number; tileRows: number; cellRows: number; fits: boolean } {
+  const n = Math.max(1, letterCount)
+  const TW_MAX = 104, CW_MAX = 96, TW_MIN = 28, CW_MIN = 22
+  let best = { tw: TW_MIN, cw: CW_MIN, tileRows: 1, cellRows: 1, fits: false }
+  for (let s = 1; s > 0.2; s *= 0.97) {
+    const tw = Math.max(TW_MIN, Math.floor(TW_MAX * s)), cw = Math.max(CW_MIN, Math.floor(CW_MAX * s))
+    const perRow = Math.max(1, Math.floor((zoneW + BOOK_GAP) / (tw + BOOK_GAP)))
+    const tileRows = Math.ceil(n / perRow)
+    const cellRows = anagramCellRows(words, cw, zoneW)
+    best = { tw, cw, tileRows, cellRows: cellRows ?? 1, fits: false }
+    if (cellRows === null) continue
+    const h = tileRows * BOOK_ASPECT * tw + (tileRows - 1) * BOOK_GAP + BOOK_BOARD_GAP + cellRows * BOOK_ASPECT * cw + (cellRows - 1) * BOOK_ROW_GAP
+    if (h <= zoneH) return { ...best, fits: true }
+    if (tw === TW_MIN && cw === CW_MIN) break
+  }
+  return best
+}

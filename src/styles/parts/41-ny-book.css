@@ -1280,3 +1280,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 860 * var(--u)); }   /* до 6 команд панель справа кончается выше 780u — широкая подложка под ней, над сугробом */
 .theme-ny_book .host-screen.an-screen.many-teams > .an-result { top: calc(var(--bk-oy) + 770 * var(--u)); left: calc(var(--bk-ox) + 590 * var(--u)); width: calc(660 * var(--u)) !important; }   /* 7+ команд: панель длиннее — подложка по центру левой страницы */
 .theme-ny_book .host-screen.an-screen.many-teams > .an-result .an-res-line { font-size: calc(32 * var(--u)); }
+
+/* «Скрэмбл», длинные фразы: зона доски фиксирована (левая страница между подсказкой и подложкой итога), размеры плиток/ячеек считает anagramBookPlan (lib/anagram.ts) —
+   раньше доска была выше зоны, центрировалась и обрезалась сверху (под подсказкой) и снизу (под сугробом), замер anagram-measure.cjs */
+.theme-ny_book .an-screen .an-board-wrap { flex: 0 0 auto !important; height: calc(556 * var(--u)); min-height: 0; }
+.theme-ny_book .an-screen .an-word { flex-wrap: nowrap; }
