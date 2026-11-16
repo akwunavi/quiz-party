@@ -36,3 +36,36 @@ export function layoutAreaPx(theme: string | undefined, vw: number, vh: number):
   }
   return { x: vw * GENERIC.l / 100, y: vh * GENERIC.t / 100, w: vw * (100 - GENERIC.l - GENERIC.r) / 100, h: vh * (100 - GENERIC.t - GENERIC.b) / 100 }
 }
+
+// ── v:2 — раскладка в долях ВСЕГО экрана (10.70) ──
+/** «Экран» раскладки v:2: Книга — вся сцена 1920×1080 (с полями contain-сцены --bk-ox/--bk-oy), остальные темы — всё окно. */
+export function sceneAreaCss(theme: string | undefined): AreaCss | null {
+  if (!themeHasLayoutArea(theme)) return null
+  if (theme === 'ny_book') return { left: 'var(--bk-ox)', top: 'var(--bk-oy)', width: `calc(${SCENE.w} * var(--u))`, height: `calc(${SCENE.h} * var(--u))` }
+  return { left: '0', top: '0', width: '100vw', height: '100vh' }
+}
+
+/** Рабочая область темы (прежний v:1) в долях ВСЕГО экрана v:2 — для чтения старых раскладок и стартовых рамок. */
+export function workAreaFractions(theme: string | undefined): AreaBox {
+  if (theme === 'ny_book') return { x: SAFE.x / SCENE.w, y: TOP_BAND / SCENE.h, w: (SCENE.w - 2 * SAFE.x) / SCENE.w, h: (SCENE.h - SAFE.b - TOP_BAND) / SCENE.h }
+  return { x: GENERIC.l / 100, y: GENERIC.t / 100, w: (100 - GENERIC.l - GENERIC.r) / 100, h: (100 - GENERIC.t - GENERIC.b) / 100 }
+}
+
+/** «Занятые» места экрана (доли экрана v:2): таймер/плашка, кнопки ведущего, сгиб, декор по краям. Рамки МОЖНО ставить поверх — редактор лишь предупреждает. */
+export interface BusyZone { id: 'timer' | 'buttons' | 'fold' | 'decor'; label: string; x: number; y: number; w: number; h: number }
+export function busyZones(theme: string | undefined): BusyZone[] {
+  if (theme === 'ny_book') {
+    const W = SCENE.w, H = SCENE.h
+    return [
+      { id: 'timer', label: 'таймер, плашка номера вопроса и гирлянда', x: 0, y: 0, w: 1, h: TOP_BAND / H },
+      { id: 'buttons', label: 'кнопки ведущего и сугроб', x: (W - 560) / W, y: (H - SAFE.b) / H, w: 560 / W, h: SAFE.b / H },
+      { id: 'fold', label: 'сгиб книги', x: (W / 2 - 60) / W, y: TOP_BAND / H, w: 120 / W, h: (H - TOP_BAND - SAFE.b) / H },
+      { id: 'decor', label: 'ёлки по краям', x: 0, y: TOP_BAND / H, w: SAFE.x * 0.7 / W, h: 1 - TOP_BAND / H },
+      { id: 'decor', label: 'ёлки по краям', x: 1 - SAFE.x * 0.7 / W, y: TOP_BAND / H, w: SAFE.x * 0.7 / W, h: 1 - TOP_BAND / H },
+    ]
+  }
+  return [
+    { id: 'timer', label: 'таймер и плашка номера вопроса', x: 0, y: 0, w: 1, h: GENERIC.t / 100 },
+    { id: 'buttons', label: 'кнопки ведущего', x: 0.62, y: 1 - GENERIC.b / 100, w: 0.38, h: GENERIC.b / 100 },
+  ]
+}

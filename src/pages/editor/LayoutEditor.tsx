@@ -4,17 +4,16 @@
 import { useRef } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { pctStyle } from '../../components/ManualLayout'
-import { layoutAreaCss, themeHasFold } from '../../lib/layoutArea'
-import { FOLD, clampRect, keepOffFold, fallbackRects, fallbackAnswerRects, fallbackGridRects, type Rect, type Rects } from '../../lib/layoutRects'
+import { sceneAreaCss, busyZones } from '../../lib/layoutArea'
+import { MIN_SIDE, clampRect, layoutWarnings, toV2, fallbackRects, fallbackAnswerRects, fallbackGridRects, type Rect, type Rects } from '../../lib/layoutRects'
 
 type Mode = 'auto' | 'manual'
 
-/** Снять с экрана текущие положения текста и картинок (авто-раскладка) в долях рабочей области — стартовая точка ручной правки. */
+/** Снять с экрана текущие положения текста и картинок (авто-раскладка) в долях ВСЕГО экрана темы (v:2) — стартовая точка ручной правки. */
 export function measureRects(theme: string | undefined, mechanic: string, screen: 'question' | 'answer', urls: string[], imgPaths: string[], hasText: boolean, hasNote = false): Rects {
-  const fold = themeHasFold(theme)
   const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect()
   const root = document.querySelector('.pv-backdrop .host-screen')
-  if (!area || area.width < 4) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
+  if (!area || area.width < 4) return toV2(screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, themeHasFoldLocal(theme)) : fallbackRects(imgPaths, hasText, themeHasFoldLocal(theme)), theme)
   const toRel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
   let text: Rect | undefined
   if (screen === 'answer' && mechanic !== 'four_pics') {
@@ -30,18 +29,20 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
     const el = [...(root?.querySelectorAll('img') ?? [])].find(i => i.getAttribute('src') === url)
     if (!el) break
     const r = el.getBoundingClientRect(); if (r.width < 4) break
-    const x = toRel(r); images.push(fold ? keepOffFold(x) : x)
+    images.push(toRel(r))
   }
   let note: Rect | undefined
   if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.bk-note-box, .answer-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
-  if (mechanic === 'four_pics' && screen === 'question' && images.length !== urls.length) return fallbackGridRects(imgPaths, fold)
-  if (images.length !== urls.length || (hasText && !text)) return screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, fold) : fallbackRects(imgPaths, hasText, fold)
-  return { v: 1, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }
+  if (mechanic === 'four_pics' && screen === 'question' && images.length !== urls.length) return toV2(fallbackGridRects(imgPaths, themeHasFoldLocal(theme)), theme)
+  if (images.length !== urls.length || (hasText && !text)) return toV2(screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, themeHasFoldLocal(theme)) : fallbackRects(imgPaths, hasText, themeHasFoldLocal(theme)), theme)
+  return { v: 2, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }
 }
 
 type Target = { kind: 'text' } | { kind: 'note' } | { kind: 'img'; i: number }
 const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : t.kind === 'note' ? r.note : r.images[t.i])
-const put = (r: Rects, t: Target, n: Rect, fold: boolean): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : t.kind === 'note' ? { ...r, note: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? (fold ? keepOffFold(clampRect(n)) : clampRect(n)) : x) }
+const put = (r: Rects, t: Target, n: Rect): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : t.kind === 'note' ? { ...r, note: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? clampRect(n) : x) }
+/** стартовые рамки по умолчанию держат картинки вне сгиба Книги (дальше рамки двигаются свободно) */
+const themeHasFoldLocal = (theme: string | undefined) => theme === 'ny_book'
 
 export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset }: {
   theme: string | undefined
@@ -57,8 +58,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   const hint = useHint()
   const drag = useRef<{ t: Target; kind: 'move' | 'resize'; sx: number; sy: number; r0: Rect } | null>(null)
   const areaRef = useRef<HTMLDivElement>(null)
-  const fold = themeHasFold(theme)
-  const areaCss = layoutAreaCss(theme)
+  const areaCss = sceneAreaCss(theme)
 
   const down = (e: React.PointerEvent, t: Target, kind: 'move' | 'resize') => {
     if (!draft) return
@@ -73,8 +73,13 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     const dx = (e.clientX - d.sx) / ar.width, dy = (e.clientY - d.sy) / ar.height
     const n = d.kind === 'move'
       ? { ...d.r0, x: Math.min(1 - d.r0.w, Math.max(0, d.r0.x + dx)), y: Math.min(1 - d.r0.h, Math.max(0, d.r0.y + dy)) }
-      : { ...d.r0, w: Math.min(1 - d.r0.x, Math.max(0.06, d.r0.w + dx)), h: Math.min(1 - d.r0.y, Math.max(0.06, d.r0.h + dy)) }
-    onDraft(put(draft, d.t, n, fold))
+      : (() => {
+          // угол ◢ тянет размер свободно; Shift у картинки — с сохранением пропорций
+          let w = Math.min(1 - d.r0.x, Math.max(MIN_SIDE, d.r0.w + dx)), h = Math.min(1 - d.r0.y, Math.max(MIN_SIDE, d.r0.h + dy))
+          if (e.shiftKey && d.t.kind === 'img') { const k = Math.max(w / d.r0.w, h / d.r0.h) , kk = Math.min(k, (1 - d.r0.x) / d.r0.w, (1 - d.r0.y) / d.r0.h); w = d.r0.w * kk; h = d.r0.h * kk }
+          return { ...d.r0, w, h }
+        })()
+    onDraft(put(draft, d.t, n))
   }
   const up = () => { drag.current = null }
 
@@ -96,7 +101,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
             <i className="lay-handle" onPointerDown={e => down(e, b.t, 'resize')} />
           </div>
         ))}
-        {mode === 'manual' && fold && <div className="lay-fold" style={{ left: `${FOLD.from * 100}%`, width: `${(FOLD.to - FOLD.from) * 100}%` }} aria-hidden="true" />}
+        {mode === 'manual' && busyZones(theme).map((z, i) => <div key={i} className={`lay-busy ${z.id}`} style={pctStyle(z)} aria-hidden="true"><span>{z.label}</span></div>)}
       </div>
       <div className="lay-panel" role="toolbar" aria-label="Компоновка">
         <div className="lay-row">
@@ -117,8 +122,9 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
           <button type="button" onClick={onCancel}>Отмена</button>
         </div>
         {status && <div className="lay-note">{status}</div>}
+        {mode === 'manual' && draft && layoutWarnings(draft, theme).map(w => <div key={w} className="lay-warn">⚠ {w} — можно оставить, если так задумано.</div>)}
         <Hint text={hint.text} />
-        <div className="lay-help">Перетаскивай рамку — двигается, угол ◢ — размер. Картинки не заходят на сгиб, текст — может. Размеры — доли страницы: на любом экране одинаково.</div>
+        <div className="lay-help">Перетаскивай рамку — двигается, угол ◢ — размер. Рамки можно ставить куда угодно в пределах экрана — и поверх сгиба, и поверх декора (штриховкой показаны таймер, кнопки, сгиб и ёлки: о перекрытии предупредим, но не запретим). Shift при растягивании картинки — сохранить пропорции. Размеры — доли всего экрана: на любом экране одинаково.</div>
       </div>
     </div>
   )

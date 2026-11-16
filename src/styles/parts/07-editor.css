@@ -286,3 +286,9 @@
 .lay-seg { display: inline-flex; gap: 0; } .lay-seg button { border-radius: 0; } .lay-seg button:first-child { border-radius: 6px 0 0 6px; } .lay-seg button:last-child { border-radius: 0 6px 6px 0; }
 .lay-note { font-size: 13px; color: #ffd59a; } .lay-help { font-size: 12px; opacity: .75; }
 .pv-stages.pv-lay { left: auto; right: 64px; }
+
+/* свободная раскладка v:2: «занятые» места экрана — подсказка, не запрет */
+.lay-busy { position: absolute; pointer-events: none; box-sizing: border-box; background: repeating-linear-gradient(45deg, rgba(120, 120, 120, .14) 0 6px, transparent 6px 12px); border: 1px dashed rgba(120, 120, 120, .45); font-size: 11px; color: rgba(60, 60, 60, .8); overflow: hidden; }
+.lay-busy span { position: absolute; left: 4px; top: 2px; background: rgba(255, 255, 255, .7); padding: 0 4px; border-radius: 3px; }
+.lay-busy.decor span, .lay-busy.fold span { display: none; }
+.lay-warn { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: #fff4d6; color: #7a5200; font-size: 12px; }

@@ -11,7 +11,6 @@ import { displayAnswer } from './QuestionScreen'
 import { lenClass, mediaUrl } from '../../lib/media'
 import { answerScreenImages } from '../../lib/answerImages'
 import { answerLayoutUnsupportedReason, screenLayout } from '../../lib/layoutRects'
-import { themeHasFold } from '../../lib/layoutArea'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { noteClass } from '../../lib/questionLayout'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -34,7 +33,7 @@ export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, row
   const isBook = pack.theme === 'ny_book'
   const { answerImgs, revealImgs } = answerScreenImages(q.media)
   const manual = answerLayoutUnsupportedReason(pack.theme, round.mechanic, q) === null
-    ? screenLayout(q.service, 'answer', revealImgs, themeHasFold(pack.theme)) : null
+    ? screenLayout(q.service, 'answer', revealImgs, pack.theme) : null
   const noteNode = (t: string) => isBook ? <BookNote text={t} className={noteClass(t).trim()} /> : <div className={`answer-note${noteClass(t)}`}>{t}</div>
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answers' : ''}`} style={{ justifyContent: 'flex-start' }}>

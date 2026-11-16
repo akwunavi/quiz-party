@@ -1,16 +1,19 @@
 // ═══ Ручная компоновка вопроса «Книги»: ЧИСТЫЕ функции (без DOM и сети) ═══
 // Хранение (БЕЗ миграции): существующий jsonb `pack_questions.service`, ключ `layout`:
-//   { question?: Rects, answer?: Rects }      Rects = { v: 1, imgs: string[], text?: Rect, images: Rect[] }
-// Rect — ДОЛИ рабочей области разворота (0…1), не пиксели: одна правка одинаково выглядит на любом окне.
+//   { question?: Rects, answer?: Rects }      Rects = { v: 2, imgs: string[], text?: Rect, note?: Rect, images: Rect[] }
+// v:2 (10.70) — Rect = ДОЛИ ВСЕГО ЭКРАНА (Книга: сцена 1920×1080; другие темы: окно), 0…1: рамки можно ставить куда угодно (поверх сгиба и декора). v:1 (доли рабочей области темы) читается
+// и переводится в v:2 по области темы; пишется только v:2.
 // `imgs` — пути картинок на момент настройки: если набор/порядок картинок изменился, раскладка считается устаревшей и применяется АВТО.
 // Любая проблема (битая структура, другая версия, диапазоны) → null → авто-раскладка; проектор не падает.
 import { SAFE, SCENE } from '../ny/book/geometry'
 import { FOLD_GAP, TOP_BAND } from '../ny/book/adaptive/safeArea'
-import { themeHasLayoutArea } from './layoutArea'
+import { themeHasLayoutArea, workAreaFractions, busyZones } from './layoutArea'
 
 export interface Rect { x: number; y: number; w: number; h: number }
 /** text — текст вопроса (экран вопроса) или подложка «Правильный ответ» (экран ответа); note — пояснение к ответу (только экран ответа). */
-export interface Rects { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
+export interface Rects { v: 2; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
+/** v:1 — прежний формат: доли РАБОЧЕЙ области темы (читается и переводится в v:2; пишется только v:2). */
+export interface RectsV1 { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
 export type LayoutScreen = 'question' | 'answer'
 export interface QuestionLayout { question?: Rects; answer?: Rects }
 
@@ -18,7 +21,7 @@ export interface QuestionLayout { question?: Rects; answer?: Rects }
 export const WORK = { x: SAFE.x, y: TOP_BAND, w: SCENE.w - 2 * SAFE.x, h: SCENE.h - SAFE.b - TOP_BAND } as const
 /** Зона сгиба в долях ширины рабочей области: картинки в неё не заходят (текст — может). */
 export const FOLD = { from: 0.5 - FOLD_GAP / 2 / WORK.w, to: 0.5 + FOLD_GAP / 2 / WORK.w } as const
-export const MIN_SIDE = 0.06
+export const MIN_SIDE = 0.03   // v:2: свободный размер, но рамка не должна потеряться (≈ 58 px на 1920)
 export const LAYOUT_KEY = 'layout'
 
 /** Ключ картинки для layout.answer: КОРОТКИЙ ХЕШ пути, а не сам путь (service целиком уходит на телефоны — имена файлов ответа утекать не должны). */
@@ -55,36 +58,47 @@ function readRect(v: unknown): Rect | null {
   return clampRect({ x: r.x, y: r.y, w: r.w, h: r.h })
 }
 
-/** Проверить и нормализовать раскладку одного экрана. null — авто (нет данных / битая / устарела). */
-export function validateRects(raw: unknown, imgs: string[], fold = true): Rects | null {
+/** Прямоугольник v:1 (доли рабочей области темы) → доли всего экрана (v:2). */
+export function rectV1ToV2(r: Rect, theme: string | undefined): Rect {
+  const a = workAreaFractions(theme)
+  return clampRect({ x: a.x + r.x * a.w, y: a.y + r.y * a.h, w: r.w * a.w, h: r.h * a.h })
+}
+/** Раскладка v:1 → v:2 (структура сохраняется; рамки пересчитываются по области темы). */
+export function toV2(r: RectsV1, theme: string | undefined): Rects {
+  return { v: 2, imgs: [...r.imgs], text: r.text && rectV1ToV2(r.text, theme), note: r.note && rectV1ToV2(r.note, theme), images: r.images.map(x => rectV1ToV2(x, theme)) }
+}
+
+/** Проверить и нормализовать раскладку одного экрана (v:1 переводится в v:2 по теме). null — авто (нет данных / битая / устарела). Сгиб и декор рамкам не мешают. */
+export function validateRects(raw: unknown, imgs: string[], theme?: string): Rects | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
-  if (r.v !== 1) return null
+  if (r.v !== 1 && r.v !== 2) return null
   if (!Array.isArray(r.imgs) || r.imgs.length !== imgs.length || r.imgs.some((p, i) => !keyMatches(p, imgs[i]))) return null
   if (!Array.isArray(r.images) || r.images.length !== imgs.length) return null
   const images: Rect[] = []
-  for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(fold ? keepOffFold(x) : x) }
+  for (const v of r.images) { const x = readRect(v); if (!x) return null; images.push(x) }
   let text: Rect | undefined
   if (r.text != null) { const t = readRect(r.text); if (!t) return null; text = t }
   let note: Rect | undefined
   if (r.note != null) { const n = readRect(r.note); if (!n) return null; note = n }
   if (!text && !note && images.length === 0) return null
-  return { v: 1, imgs: [...imgs], text, note, images }
+  const out: RectsV1 | Rects = { v: r.v as 1, imgs: [...imgs], text, note, images }
+  return r.v === 1 ? toV2(out as RectsV1, theme) : { ...(out as unknown as Rects), v: 2 }
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
-export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[], fold = true): Rects | null {
+export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string): Rects | null {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   if (!l || typeof l !== 'object') return null
-  return validateRects((l as Record<string, unknown>)[screen], imgs, fold)
+  return validateRects((l as Record<string, unknown>)[screen], imgs, theme)
 }
 
 /** 'manual' — применяется; 'stale' — есть, но картинки изменились/данные битые (покажем «раскладка сброшена»); 'auto' — нет. */
-export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[], fold = true): 'auto' | 'manual' | 'stale' {
+export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string): 'auto' | 'manual' | 'stale' {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   const raw = l && typeof l === 'object' ? (l as Record<string, unknown>)[screen] : null
   if (raw == null) return 'auto'
-  return validateRects(raw, imgs, fold) ? 'manual' : 'stale'
+  return validateRects(raw, imgs, theme) ? 'manual' : 'stale'
 }
 
 type Service = Record<string, unknown>
@@ -116,7 +130,7 @@ export const rectToScene = (r: Rect): Rect => ({ x: WORK.x + r.x * WORK.w, y: WO
 export const sceneToRect = (r: Rect): Rect => clampRect({ x: (r.x - WORK.x) / WORK.w, y: (r.y - WORK.y) / WORK.h, w: r.w / WORK.w, h: r.h / WORK.h })
 
 /** Начальная ручная раскладка, когда замер авто-вида недоступен: текст сверху, картинки рядом под ним (не на сгибе). */
-export function fallbackRects(imgs: string[], hasText: boolean, fold = true): Rects {
+export function fallbackRects(imgs: string[], hasText: boolean, fold = true): RectsV1 {
   const n = imgs.length
   const text: Rect | undefined = hasText ? { x: 0.05, y: 0.02, w: 0.9, h: n ? 0.3 : 0.9 } : undefined
   const images: Rect[] = []
@@ -157,7 +171,7 @@ export function answerLayoutUnsupportedReason(theme: string | undefined, mechani
 }
 
 /** Стартовая раскладка ответа, если замер экрана недоступен: подложка слева-сверху, картинки справа, пояснение снизу. */
-export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = true): Rects {
+export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = true): RectsV1 {
   const n = imgs.length
   const images: Rect[] = []
   for (let i = 0; i < n; i++) { const r = clampRect({ x: 0.04 + (i % 2) * 0.24, y: 0.4 + Math.floor(i / 2) * 0.28, w: 0.22, h: 0.26 }); images.push(fold ? keepOffFold(r) : r) }
@@ -165,7 +179,7 @@ export function fallbackAnswerRects(imgs: string[], hasNote: boolean, fold = tru
 }
 
 /** «3 попытки»: стартовая раскладка картинок сеткой 2×2 по двум страницам (не на сгибе), без текста. */
-export function fallbackGridRects(imgs: string[], fold = true): Rects {
+export function fallbackGridRects(imgs: string[], fold = true): RectsV1 {
   const images = imgs.map((_, i) => { const r = clampRect({ x: i % 2 ? 0.55 : 0.05, y: i < 2 ? 0.04 : 0.5, w: 0.4, h: 0.44 }); return fold ? keepOffFold(r) : r })
   return { v: 1, imgs: [...imgs], images }
 }
@@ -173,4 +187,22 @@ export function fallbackGridRects(imgs: string[], fold = true): Rects {
 /** Вёрстку ответа ведёт общий AnswerScreen? Только раскрытый ответ поддержанного вида (до раскрытия — экран вопроса, в т.ч. для answer.mode==='anagram' вне «Скрэмбла»). */
 export function answerUsesSharedScreen(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }, revealed: boolean): boolean {
   return revealed && !q.media.hidden && answerLayoutUnsupportedReason(theme, mechanic, q) === null
+}
+
+
+// ── мягкие предупреждения (v:2): рамка поверх занятого места — НЕ запрет, а подсказка редактору ──
+const inter = (a: Rect, b: Rect) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y))
+/** Предупреждения о перекрытии рамок с таймером/плашкой/гирляндой, кнопками ведущего, сгибом и декором. Пустой список — всё чисто. Порог: пересечение > 4% площади рамки. */
+export function layoutWarnings(rects: Rects, theme: string | undefined): string[] {
+  const items: { name: string; r: Rect }[] = []
+  if (rects.text) items.push({ name: 'Текст', r: rects.text })
+  if (rects.note) items.push({ name: 'Пояснение', r: rects.note })
+  rects.images.forEach((r, i) => items.push({ name: `Картинка ${i + 1}`, r }))
+  const zones = busyZones(theme), out: string[] = []
+  for (const it of items) {
+    const area = it.r.w * it.r.h; const hit = new Set<string>()
+    for (const z of zones) if (area > 0 && inter(it.r, z) / area > 0.04) hit.add(z.label)
+    if (hit.size) out.push(`${it.name} лежит поверх: ${[...hit].join(', ')}`)
+  }
+  return out
 }
