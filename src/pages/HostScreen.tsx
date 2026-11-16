@@ -408,9 +408,11 @@ function HostInner({ gameState, pack }: {
         {pack.theme === 'potter' && <div className="mg-veil" aria-hidden />}
         {round.mechanic === 'crossword' && grid && pack.theme === 'ny_book' ? (
           // «Книга»: левая страница — номер раунда, название, характеристики и пустая сетка (целиком в пределах страницы), правая — правила
+          <>
+          {/* номер раунда — только крупная цифра, как на остальных заставках (слово «РАУНД» убрано, 10.70) */}
+          <div className="round-badge"><span className="rb-num">{displayRoundNumber(pack, gameState.round_number)}</span></div>
           <div className="bk-cw">
             <div className="bk-cw-left">
-              <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
               <Title theme={pack.theme} lines={round.title_lines} />
               <div className="meta-line">{metaLine(round)}</div>
               <div className="bk-cw-grid">
@@ -422,6 +424,7 @@ function HostInner({ gameState, pack }: {
             </div>
             <div className="bk-cw-right">{round.rules.length > 0 && <RulesFrame rules={round.rules} minScale={0.3} delay={i => 0.5 + i * 0.6} />}</div>
           </div>
+          </>
         ) : round.mechanic === 'crossword' && grid ? (
           <div className="cw-layout">
             {/* только пустая сетка — без слов и определений */}
@@ -431,7 +434,7 @@ function HostInner({ gameState, pack }: {
                 : Math.max(18, Math.min(44,
                 Math.floor(Math.min(innerWidth * .48 / grid.cols, innerHeight * .8 / grid.rows))))} />
             <div className="side">
-              <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)}</div>
+              <div className="round-badge"><span className="rb-num">{displayRoundNumber(pack, gameState.round_number)}</span></div>
               <Title theme={pack.theme} lines={round.title_lines} />
               <div className="meta-line" style={{ alignSelf: 'flex-start' }}>{metaLine(round)}</div>
               {pack.theme === 'ny_book'
@@ -446,7 +449,6 @@ function HostInner({ gameState, pack }: {
         ) : (<>
           {/* номер раунда — крупно в левом верхнем углу, читается с дальних столов */}
           <div className="round-badge">
-            <span className="rb-word">РАУНД</span>
             <span className="rb-num">{displayRoundNumber(pack, gameState.round_number)}</span>
           </div>
           {/* Обёртка нужна ДЛЯ РАЗМЕРА ЗАГОЛОВКА: кегль считается от ширины

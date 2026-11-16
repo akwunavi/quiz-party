@@ -84,8 +84,6 @@
    бейдж вынесен в исключения там же, плюс дублируем здесь для надёжности */
 .host-screen .round-badge, .round-badge { position: absolute; left: clamp(28px, 3vw, 64px); top: clamp(22px, 3vh, 54px);
   display: flex; flex-direction: column; align-items: flex-start; line-height: .92; z-index: 3; }
-.rb-word { font-family: var(--font-digits), monospace; letter-spacing: .34em;
-  font-size: clamp(13px, 1.1vw, 20px); color: var(--dim); }
 .rb-num { font-family: var(--font-display); font-weight: 900;
   font-size: clamp(64px, 8vw, 168px); color: var(--accent);
   text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -165,10 +163,6 @@
 .answer-note.n-xl { font-size: clamp(17px, 1.75vw, 30px); line-height: 1.4; }
 /* пояснение сбоку (бумага, картинка справа) — тоже крупнее */
 
-/* ── п.3: «РАУНД» в теме ГП не читался — тонкая золотая надпись на тёмном ── */
-.theme-potter .rb-word { color: #f3e9cf; opacity: .95; font-weight: 700;
-  font-size: clamp(15px, 1.3vw, 24px); letter-spacing: .3em;
-  text-shadow: 0 2px 10px rgba(0,0,0,.85); }
 .theme-potter .rb-num { text-shadow: 0 0 44px rgba(211,166,37,.6), 0 3px 12px rgba(0,0,0,.8); }
 
 /* аварийный выход в «Угадай мелодию» */
