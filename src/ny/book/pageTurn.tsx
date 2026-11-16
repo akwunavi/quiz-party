@@ -13,6 +13,13 @@ const DUR = 900
 function cloneClean(src: HTMLElement): HTMLElement {
   const c = src.cloneNode(true) as HTMLElement
   c.style.clipPath = ''
+  // position:fixed в клоне на повёрнутом листе считался бы от листа (transform листа — containing block), а не от экрана: шапка и таймер «Книги» — fixed и уезжали
+  // (регресс 10.66+, найдено кадрами перелистывания 10.70). Обёртка клона и так равна экрану по размеру и началу координат, поэтому fixed → absolute даёт те же
+  // координаты. Клон клона (src отсоединён) уже без fixed: правка записана inline. Обёртку с transform для этого брать нельзя: растр картинок на листе запаздывает.
+  if (src.isConnected) {
+    const from = src.querySelectorAll<HTMLElement>('*'), to = c.querySelectorAll<HTMLElement>('*')
+    for (let i = 0; i < from.length && i < to.length; i++) if (getComputedStyle(from[i]).position === 'fixed') to[i].style.position = 'absolute'
+  }
   c.querySelectorAll('canvas, video, audio').forEach(e => e.remove())
   return c
 }
