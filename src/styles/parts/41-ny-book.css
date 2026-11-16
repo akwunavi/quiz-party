@@ -1327,3 +1327,30 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .sb-screen .score-table td:first-child { color: var(--bk-muted); font-weight: 700; text-align: right; border-bottom-color: transparent; white-space: nowrap; }
 .theme-ny_book .sb-screen .score-table :is(th, td):nth-child(2) { text-align: left; }
 .theme-ny_book .sb-screen .sb-eq { font-family: var(--bk-serif); color: var(--bk-muted); }
+
+/* ═══ Заголовок раунда в «Книге» (10.70): золотое тиснение + веточка с бантом + орнаментный разделитель; целиком на своей странице; глитч киберпанка отключён ═══ */
+/* глитч (RGB-сдвиг glitchRGB, 15-projector-interactive.css) и «сборка через помехи» в этой теме не нужны — остаётся статичный заголовок */
+.theme-ny_book .neon-title, .theme-ny_book .title-anim, .theme-ny_book .neon-title::before, .theme-ny_book .neon-title::after { animation: none !important; }
+.theme-ny_book .bk-rt { display: flex; flex-direction: column; align-items: center; gap: calc(16 * var(--u)); width: 100%; }
+.theme-ny_book .bk-rt-box { display: flex; align-items: center; justify-content: center; width: calc(600 * var(--u)); max-width: 100%; }
+.theme-ny_book .bk-rt-lg .bk-rt-box { height: calc(360 * var(--u)); }
+.theme-ny_book .bk-rt-sm .bk-rt-box { height: calc(130 * var(--u)); }
+.theme-ny_book .bk-rt-h { max-width: 100%; margin: 0; text-align: center; font-family: var(--bk-display); font-weight: 700; line-height: 1.04; letter-spacing: .01em;
+  hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; word-break: normal; text-wrap: balance;
+  color: transparent; background: linear-gradient(180deg, #ffe9a0 0%, #f2c14e 35%, #d9a22b 62%, #b9801b 100%); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-stroke: .014em var(--bk-gold-3); paint-order: stroke fill;
+  /* «тиснение»: тёмная нижняя кромка и светлый верх — на верхних гранях букв ложится лёгкая «снежная шапка» */
+  filter: drop-shadow(0 -.025em 0 rgba(255, 255, 255, .95)) drop-shadow(0 .05em 0 var(--bk-red-3)); }
+.theme-ny_book .bk-rt-orn { display: flex; align-items: center; justify-content: center; gap: calc(8 * var(--u)); height: calc(72 * var(--u)); }
+.theme-ny_book .bk-rt-sprig { flex: none; width: calc(150 * var(--u)); height: calc(70 * var(--u)); background: url('/quiz-party/ny-book/_tmp/sprig-berries.webp') center / contain no-repeat; }
+.theme-ny_book .bk-rt-sprig.r { transform: scaleX(-1); }
+.theme-ny_book .bk-rt-bow { flex: none; width: calc(92 * var(--u)); height: calc(54 * var(--u)); }
+.theme-ny_book .bk-rt-bow .lp { fill: var(--bk-red); stroke: var(--bk-red-3); stroke-width: 2; }
+.theme-ny_book .bk-rt-bow .tl { fill: var(--bk-red-2); stroke: var(--bk-red-3); stroke-width: 2; }
+.theme-ny_book .bk-rt-bow .kn { fill: var(--bk-red-3); stroke: var(--bk-gold); stroke-width: 2; }
+.theme-ny_book .bk-rt-rule { display: flex; align-items: center; gap: calc(14 * var(--u)); width: calc(440 * var(--u)); max-width: 90%; }
+.theme-ny_book .bk-rt-rule i { flex: 1; height: calc(2 * var(--u)); background: linear-gradient(90deg, transparent, var(--bk-gold)); }
+.theme-ny_book .bk-rt-rule i:last-child { transform: scaleX(-1); }
+.theme-ny_book .bk-rt-rule b { color: var(--bk-gold-3); font-size: calc(22 * var(--u)); line-height: 1; }
+.theme-ny_book .bk-rt-sm .bk-rt-orn { height: calc(44 * var(--u)); } .theme-ny_book .bk-rt-sm .bk-rt-sprig { width: calc(96 * var(--u)); height: calc(44 * var(--u)); } .theme-ny_book .bk-rt-sm .bk-rt-bow { width: calc(60 * var(--u)); height: calc(36 * var(--u)); }
+.theme-ny_book .bk-rt-sm .bk-rt-rule { display: none; }
