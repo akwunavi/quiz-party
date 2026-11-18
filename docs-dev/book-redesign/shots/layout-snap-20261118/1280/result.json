@@ -1,0 +1,77 @@
+{
+ "theme": "ny_book",
+ "checks": {
+  "panelDefaultCollapsed": true,
+  "panelCollapsedHeight": 50,
+  "tiles": 4,
+  "snapEdge": {
+   "guideLinesDuring": 3,
+   "dx": 0
+  },
+  "altNoSnap": {
+   "guideLinesDuring": 0,
+   "dx": -40
+  },
+  "snapCenter": {
+   "guideLinesDuring": 0,
+   "centerOffsetPx": -288.34
+  },
+  "snapSize": {
+   "eqBadgesDuring": 5,
+   "dw": 0,
+   "dh": 5.3
+  },
+  "selectedByShift": 3,
+  "panelExpanded": {
+   "opacity": "1",
+   "chip": "Выбрано: 3",
+   "stored": "{\"open\":true,\"dock\":\"bottom\"}",
+   "height": 208,
+   "bottomGap": 12,
+   "saveColor": "rgb(46, 139, 87)",
+   "cancelColor": "rgb(192, 57, 43)"
+  },
+  "align3": {
+   "lefts": [
+    166.66,
+    166.66,
+    166.66
+   ],
+   "heights": [
+    69.33,
+    69.33,
+    69.33
+   ],
+   "gaps": [
+    0.67,
+    0.67
+   ]
+  },
+  "marqueeDuring": 1,
+  "marqueeSelected": 4,
+  "arrows": {
+   "small": 2.55,
+   "big": 12.81,
+   "areaW": 1280
+  },
+  "saved": {
+   "v": 2,
+   "keys": [
+    "images",
+    "imgs",
+    "text",
+    "tiles",
+    "timer",
+    "v"
+   ],
+   "tileKeys": [
+    "h",
+    "w",
+    "x",
+    "y"
+   ],
+   "tiles": 4
+  },
+  "errs": []
+ }
+}

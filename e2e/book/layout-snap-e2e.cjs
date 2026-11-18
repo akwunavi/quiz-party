@@ -9,7 +9,7 @@ async function main() {
   const { startStand, ORIGIN } = await import('./stand.mjs')
   fs.mkdirSync(OUT, { recursive: true }); await startStand({ noBuild: argv.includes('--no-build') })
   const b = await chromium.launch(process.env.QP_CHROME ? { executablePath: process.env.QP_CHROME } : {}); const res = { theme: THEME, checks: {} }; const ck = res.checks
-  const ctx = await b.newContext({ viewport: { width: 1920, height: 1080 } }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => { if (!/localStorage/.test(String(e))) { errs.push(String(e)); console.error('PAGEERR', String(e).slice(0, 300)) } })
+  const ctx = await b.newContext({ viewport: { width: Number(process.env.QP_VW) || 1920, height: Number(process.env.QP_VH) || 1080 } }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => { if (!/localStorage/.test(String(e))) { errs.push(String(e)); console.error('PAGEERR', String(e).slice(0, 300)) } })
   const user = { id: 'u1', aud: 'authenticated', role: 'authenticated', email: 'e@x.y', app_metadata: {}, user_metadata: {}, created_at: '2026-01-01T00:00:00Z' }
   const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url'); const jwt = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: 'u1', exp: 4102444800, role: 'authenticated' })}.sig`
   await ctx.addInitScript(([s]) => { try { localStorage.setItem('sb-127-auth-token', JSON.stringify(s)) } catch { /* ok */ } }, [{ access_token: jwt, refresh_token: 'r', expires_in: 99999, expires_at: 4102444800, token_type: 'bearer', user }])
@@ -19,8 +19,11 @@ async function main() {
   await p.locator('button[data-tip="Редактировать"]').nth(0).click(); await p.waitForTimeout(1500)
   await p.locator('button[data-tip="Предпросмотр"]').nth(7).click(); await p.waitForSelector('.pv-backdrop .host-screen', { timeout: 15000 }); await p.waitForTimeout(2500)
   await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(800)
-  const panel = on => p.evaluate(v => { document.querySelector('.lay-panel').style.visibility = v ? 'visible' : 'hidden' }, on)   // панель по центру снизу закрывает рамки — на время жестов прячем
-  await panel(false)
+  // панель свёрнута по умолчанию (одна строка) — разворачиваем только для кнопок выравнивания; жесты идут при свёрнутой
+  const panel = async on => { const t = p.locator('.lay-toggle'); if ((await t.getAttribute('aria-expanded')) !== String(on)) await t.click(); await p.waitForTimeout(150) }
+  ck.panelDefaultCollapsed = (await p.locator('.lay-toggle').getAttribute('aria-expanded')) === 'false'
+  ck.panelCollapsedHeight = Math.round((await p.locator('.lay-panel').boundingBox()).height)
+  await p.screenshot({ path: `${OUT}/8-panel-collapsed.png` })
   const tile = i => p.locator('.lay-box.tile').nth(i)
   const bb = async i => tile(i).boundingBox()
   const area = await p.locator('.lay-ed-area').boundingBox()
@@ -54,7 +57,7 @@ async function main() {
   { const pt = await free(0); await p.mouse.click(pt.x, pt.y) }   // обычный клик — выбрана одна
   for (const i of [1, 3]) { const pt = await free(i); await p.keyboard.down('Shift'); await p.mouse.click(pt.x, pt.y); await p.keyboard.up('Shift') }
   ck.selectedByShift = await p.locator('.lay-box.sel').count()
-  await panel(true); await p.getByRole('button', { name: /Лево/ }).click(); await p.getByRole('button', { name: /= Высота/ }).click(); await p.getByRole('button', { name: /⇕ Распределить/ }).click(); await panel(false); await p.waitForTimeout(200)
+  await panel(true); await p.waitForTimeout(400); await p.screenshot({ path: `${OUT}/9-panel-expanded.png` }); ck.panelExpanded = { opacity: await p.locator('.lay-panel').evaluate(e => getComputedStyle(e).opacity), chip: await p.locator('.lay-chip').textContent(), stored: await p.evaluate(() => localStorage.getItem('qp-lay-panel')), height: Math.round((await p.locator('.lay-panel').boundingBox()).height), bottomGap: Math.round((Number(process.env.QP_VH) || 1080) - (await p.locator('.lay-panel').boundingBox()).y - (await p.locator('.lay-panel').boundingBox()).height), saveColor: await p.locator('.lay-btn.ok').evaluate(e => getComputedStyle(e).backgroundColor), cancelColor: await p.locator('.lay-btn.danger').evaluate(e => getComputedStyle(e).backgroundColor) }; await p.locator('button[title="По левому краю"]').click(); await p.locator('button[title^="Одинаковая высота"]').click(); await p.locator('button[title^="Равные промежутки по вертикали"]').click(); await panel(false); await p.waitForTimeout(200)
   { const r = []; for (const i of [0, 1, 3]) r.push(await bb(i)); r.sort((x, y) => x.y - y.y)
     ck.align3 = { lefts: r.map(x => +x.x.toFixed(2)), heights: r.map(x => +x.height.toFixed(2)), gaps: [+(r[1].y - r[0].y - r[0].height).toFixed(2), +(r[2].y - r[1].y - r[1].height).toFixed(2)] }
     await p.screenshot({ path: `${OUT}/6-aligned-three.png` }) }
@@ -67,7 +70,7 @@ async function main() {
   await p.keyboard.press('ArrowRight'); const k1 = await bb(0); await p.keyboard.press('Shift+ArrowRight'); const k2 = await bb(0)
   ck.arrows = { small: +(k1.x - k0.x).toFixed(2), big: +(k2.x - k1.x).toFixed(2), areaW: Math.round(area.width) }
   // 8) сохранение: формат v:2, рамки только x,y,w,h, без новых ключей
-  await panel(true); await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
+  await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
   const row = await p.evaluate(async id => (await fetch(`/sb/rest/v1/pack_questions?id=eq.${id}&select=service`, { headers: { apikey: 'x' } })).json(), 'stand-book-r0-q7').catch(() => null)
   const lay = row && row[0] && row[0].service && row[0].service.layout && row[0].service.layout.question
   ck.saved = lay ? { v: lay.v, keys: Object.keys(lay).sort(), tileKeys: [...new Set((lay.tiles || []).flatMap(t => Object.keys(t)))].sort(), tiles: (lay.tiles || []).length } : null

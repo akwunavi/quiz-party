@@ -1,6 +1,8 @@
 {
  "theme": "ny_book",
  "checks": {
+  "panelDefaultCollapsed": true,
+  "panelCollapsedHeight": 50,
   "tiles": 4,
   "snapEdge": {
    "guideLinesDuring": 4,
@@ -20,6 +22,15 @@
    "dh": 0
   },
   "selectedByShift": 3,
+  "panelExpanded": {
+   "opacity": "1",
+   "chip": "Выбрано: 3",
+   "stored": "{\"open\":true,\"dock\":\"bottom\"}",
+   "height": 208,
+   "bottomGap": 12,
+   "saveColor": "rgb(46, 139, 87)",
+   "cancelColor": "rgb(192, 57, 43)"
+  },
   "align3": {
    "lefts": [
     250,

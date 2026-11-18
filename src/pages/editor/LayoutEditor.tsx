@@ -3,6 +3,7 @@
 // Черновик живёт в QuestionPreview и подставляется в q.service.layout — экран перерисовывается теми же компонентами, что и на проекторе.
 import { useEffect, useRef, useState } from 'react'
 import { Hint, useHint } from '../../components/Hint'
+import { Ic } from './layoutIcons'
 import { pctStyle } from '../../components/ManualLayout'
 import { sceneAreaCss, busyZones, themeHasFold } from '../../lib/layoutArea'
 import { alignRects, bbox, distribute, nudge, pageLines, sameSize, snapMove, snapResize, SNAP_PX, type AlignMode, type GapMark, type GuideLine, type SnapCfg } from '../../lib/layoutSnap'
@@ -74,6 +75,12 @@ const keyOf = (t: Target): string => (t.kind === 'img' || t.kind === 'tile' ? `$
 type Box = { key: string; t: Target; r: Rect; label: string }
 /** Что рисуем поверх экрана во время жеста: направляющие, отрезки равных интервалов, метки «те же размеры». */
 interface Guides { lines: GuideLine[]; gaps: GapMark[]; eqs: { r: Rect; txt: string }[] }
+/** Состояние панели (свёрнута/развёрнута, сверху/снизу) помним между открытиями; localStorage может быть недоступен — тогда по умолчанию. */
+const PREFS_KEY = 'qp-lay-panel'
+interface PanelPrefs { open: boolean; dock: 'top' | 'bottom' }
+const readPrefs = (): PanelPrefs => {
+  try { const j = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); return { open: j.open === true, dock: j.dock === 'top' ? 'top' : 'bottom' } } catch { return { open: false, dock: 'bottom' } }
+}
 type Drag = { kind: 'move' | 'resize' | 'marquee'; keys: string[]; starts: Record<string, Rect>; sx: number; sy: number; base: string[] }
 
 export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset, tileKeys = [], hasTimer = false }: {
@@ -96,6 +103,10 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   const [sel, setSel] = useState<string[]>([])
   const [guides, setGuides] = useState<Guides | null>(null)
   const [marq, setMarq] = useState<Rect | null>(null)
+  const [prefs, setPrefsState] = useState<PanelPrefs>(readPrefs)
+  const [gest, setGest] = useState(false)   // идёт жест: панель не мешает рамкам (полупрозрачная, не ловит указатель)
+  const pOpen = prefs.open, dock = prefs.dock
+  const setPrefs = (p: Partial<PanelPrefs>) => setPrefsState(old => { const n = { ...old, ...p }; try { localStorage.setItem(PREFS_KEY, JSON.stringify(n)) } catch { /* без памяти — работаем дальше */ } return n })
 
   const boxes: Box[] = []
   const addBox = (t: Target, r: Rect, label: string) => boxes.push({ key: keyOf(t), t, r, label })
@@ -137,7 +148,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const starts: Record<string, Rect> = {}
     for (const k of keys) { const b = boxes.find(x => x.key === k); if (b) starts[k] = b.r }
-    drag.current = { kind, keys, starts, sx: e.clientX, sy: e.clientY, base: [] }
+    drag.current = { kind, keys, starts, sx: e.clientX, sy: e.clientY, base: [] }; setGest(true)
   }
   /** Рамка-выделение: тянем по пустому месту экрана. */
   const downBg = (e: React.PointerEvent) => {
@@ -146,7 +157,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const base = e.shiftKey || e.ctrlKey || e.metaKey ? selKeys : []
     if (!base.length) setSel([])
-    drag.current = { kind: 'marquee', keys: [], starts: {}, sx: e.clientX, sy: e.clientY, base }
+    drag.current = { kind: 'marquee', keys: [], starts: {}, sx: e.clientX, sy: e.clientY, base }; setGest(true)
   }
   const move = (e: React.PointerEvent) => {
     const d = drag.current; if (!d || !draft) return
@@ -185,7 +196,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     }
     setGuides(gd); onDraft(put(draft, t, n))
   }
-  const up = () => { drag.current = null; setGuides(null); setMarq(null) }
+  const up = () => { drag.current = null; setGuides(null); setMarq(null); setGest(false) }
 
   // стрелки двигают выбранные рамки: 0,2 % экрана (≈ 4 px на 1920), с Shift — 1 %
   useEffect(() => {
@@ -235,59 +246,82 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
         {guides?.eqs.map((q, i) => <div key={`e${i}`} className="lay-eq" style={{ left: `${(q.r.x + q.r.w / 2) * 100}%`, top: `${(q.r.y + q.r.h) * 100}%` }}>{q.txt}</div>)}
         {marq && <div className="lay-marq" style={pctStyle(marq)} />}
       </div>
-      <div className="lay-panel" role="toolbar" aria-label="Компоновка">
-        <div className="lay-row">
-          <b>Компоновка</b>
-          <span className="lay-seg">
-            <button type="button" className={screen === 'question' ? 'on' : ''} onClick={() => onScreen('question')}>Вопрос</button>
-            <button type="button" className={screen === 'answer' ? 'on' : ''} onClick={() => onScreen('answer')}>Ответ</button>
+      <div className={`lay-panel ${pOpen ? 'open' : 'min'} dock-${dock}${gest ? ' gesture' : ''}`} role="toolbar" aria-label="Компоновка">
+        <div className="lay-bar">
+          <button type="button" className="lay-ib lay-toggle" aria-expanded={pOpen} title={pOpen ? 'Свернуть панель: останется одна строка' : 'Развернуть панель: выравнивание, режимы, подсказки'} onClick={() => setPrefs({ open: !pOpen })}><Ic n={pOpen ? 'down' : 'up'} /></button>
+          <b className="lay-title">Компоновка</b>
+          <span className="lay-seg" role="group" aria-label="Какой экран правим">
+            <button type="button" className={screen === 'question' ? 'on' : ''} title="Правим экран вопроса" onClick={() => onScreen('question')}>Вопрос</button>
+            <button type="button" className={screen === 'answer' ? 'on' : ''} title="Правим экран ответа" onClick={() => onScreen('answer')}>Ответ</button>
           </span>
-          <span className="lay-seg">
-            <button type="button" className={mode === 'auto' ? 'on' : ''} onClick={() => onMode('auto')}>Авто</button>
-            <button type="button" className={mode === 'manual' ? 'on' : ''} onClick={() => onMode('manual')}>Вручную</button>
+          <span className="lay-seg" role="group" aria-label="Режим раскладки">
+            <button type="button" className={mode === 'auto' ? 'on' : ''} title="Авто: экран раскладывается сам" onClick={() => onMode('auto')}>Авто</button>
+            <button type="button" className={mode === 'manual' ? 'on' : ''} title="Вручную: рамки двигаешь сам" onClick={() => onMode('manual')}>Вручную</button>
           </span>
+          <span className="lay-grow" />
+          <button type="button" className="lay-btn" title="Сбросить этот экран в авто-раскладку" onClick={onReset}><Ic n="reset" /><span>Сбросить</span></button>
+          <button type="button" className={`lay-btn ok${dirty ? '' : ' idle'}`} disabled={saving} title="Сохранить раскладку вопроса и ответа"
+            onClick={() => (dirty ? onSave() : hint.show('Пока нечего сохранять: измени рамки или переключи режим.'))}><Ic n="save" /><span>{saving ? 'Сохраняю…' : 'Сохранить'}</span></button>
+          <button type="button" className="lay-btn danger" title="Закрыть без сохранения" onClick={onCancel}><Ic n="cancel" /><span>Отменить</span></button>
+          <button type="button" className="lay-ib" title={dock === 'bottom' ? 'Перенести панель наверх' : 'Перенести панель вниз'} onClick={() => setPrefs({ dock: dock === 'bottom' ? 'top' : 'bottom' })}><Ic n="dock" /></button>
         </div>
-        <div className="lay-row">
-          <button type="button" onClick={onReset}>Сбросить</button>
-          <button type="button" className="primary" disabled={saving}
-            onClick={() => (dirty ? onSave() : hint.show('Пока нечего сохранять: измени рамки или переключи режим.'))}>{saving ? 'Сохраняю…' : 'Сохранить'}</button>
-          <button type="button" onClick={onCancel}>Отмена</button>
-        </div>
-        {mode === 'manual' && draft && (tileKeys.length > 0 || hasTimer || screen === 'answer') && (
-          <div className="lay-row">
-            {tileKeys.length > 0 && (draft.tiles
-              ? <button type="button" onClick={() => onDraft({ ...draft, tiles: undefined })}>Варианты — авто</button>
-              : <button type="button" onClick={() => { const m = measureExtra(screen, tileKeys.length, false, 'tiles'); if (m.tiles) onDraft({ ...draft, tiles: m.tiles }); else hint.show('Не удалось снять положение плиток с экрана — закрой и открой компоновку.') }}>Варианты вручную</button>)}
-            {screen === 'question' && hasTimer && (draft.timer
-              ? <button type="button" onClick={() => onDraft({ ...draft, timer: undefined })}>Таймер — на месте</button>
-              : <button type="button" onClick={() => { const m = measureExtra('question', 0, true, 'timer'); if (m.timer) onDraft({ ...draft, timer: m.timer }); else hint.show('Не удалось снять положение таймера с экрана.') }}>Таймер вручную</button>)}
-            {screen === 'answer' && (draft.recall
-              ? <button type="button" onClick={() => onDraft({ ...draft, recall: undefined })}>Вопрос — на месте</button>
-              : <button type="button" onClick={() => { const m = measureExtra('answer', 0, false, 'recall'); if (m.recall) onDraft({ ...draft, recall: m.recall }); else hint.show('На этом экране нет текста вопроса.') }}>Вопрос вручную</button>)}
-            {screen === 'answer' && (draft.teams
-              ? <button type="button" onClick={() => onDraft({ ...draft, teams: undefined })}>Ответы команд — на месте</button>
-              : <button type="button" onClick={() => { const m = measureExtra('answer', 0, false, 'teams'); if (m.teams) onDraft({ ...draft, teams: m.teams }); else hint.show('Колонки команд на экране нет.') }}>Ответы команд вручную</button>)}
-          </div>
-        )}
-        {mode === 'manual' && draft && boxes.length > 1 && (
-          <div className="lay-row lay-align" role="group" aria-label="Выравнивание выбранных рамок">
-            <span className="lay-sub">Выбрано: {selKeys.length}</span>
-            <button type="button" title="По левому краю" onClick={() => al('left')}>⇤ Лево</button>
-            <button type="button" title="По центру (по горизонтали)" onClick={() => al('hcenter')}>↔ Центр</button>
-            <button type="button" title="По правому краю" onClick={() => al('right')}>⇥ Право</button>
-            <button type="button" title="По верху" onClick={() => al('top')}>⤒ Верх</button>
-            <button type="button" title="По середине (по вертикали)" onClick={() => al('vmiddle')}>↕ Середина</button>
-            <button type="button" title="По низу" onClick={() => al('bottom')}>⤓ Низ</button>
-            <button type="button" title="Одинаковая ширина — как у первой выбранной" onClick={() => arrange(2, rs => sameSize(rs, 'w'))}>= Ширина</button>
-            <button type="button" title="Одинаковая высота — как у первой выбранной" onClick={() => arrange(2, rs => sameSize(rs, 'h'))}>= Высота</button>
-            <button type="button" title="Равные промежутки по горизонтали (от трёх рамок)" onClick={() => arrange(3, rs => distribute(rs, 'x'))}>⇔ Распределить</button>
-            <button type="button" title="Равные промежутки по вертикали (от трёх рамок)" onClick={() => arrange(3, rs => distribute(rs, 'y'))}>⇕ Распределить</button>
-          </div>
-        )}
-        {status && <div className="lay-note">{status}</div>}
-        {mode === 'manual' && draft && layoutWarnings(draft, theme).map(w => <div key={w} className="lay-warn">⚠ {w} — можно оставить, если так задумано.</div>)}
         <Hint text={hint.text} />
-        <div className="lay-help">Перетаскивай рамку — двигается, угол ◢ — размер. Рамки можно ставить куда угодно в пределах экрана — и поверх сгиба, и поверх декора (штриховкой показаны таймер, кнопки, сгиб и ёлки: о перекрытии предупредим, но не запретим). Shift при растягивании картинки — сохранить пропорции. Рамки сами прилипают к краям и центрам соседей и к центру экрана (розовые линии), размер — к размеру соседа («= ширина»), а интервалы — к равным; Alt при жесте — без прилипания. Несколько рамок: Shift/Ctrl-клик или обведи мышью на пустом месте — потом кнопки выравнивания; стрелки сдвигают выбранные (Shift — крупнее). Размеры — доли всего экрана: на любом экране одинаково.</div>
+        {pOpen && (
+          <div className="lay-body">
+            {mode === 'manual' && draft && (
+              <div className="lay-tools">
+                <span className="lay-group" role="group" aria-label="Выравнивание выбранных рамок">
+                  <span className="lay-gl">Выравнивание</span>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По левому краю" onClick={() => al('left')}><Ic n="alignLeft" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По центру (по горизонтали)" onClick={() => al('hcenter')}><Ic n="alignCenter" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По правому краю" onClick={() => al('right')}><Ic n="alignRight" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По верху" onClick={() => al('top')}><Ic n="alignTop" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По середине (по вертикали)" onClick={() => al('vmiddle')}><Ic n="alignMiddle" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="По низу" onClick={() => al('bottom')}><Ic n="alignBottom" /></button>
+                </span>
+                <span className="lay-group" role="group" aria-label="Размеры выбранных рамок">
+                  <span className="lay-gl">Размер</span>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="Одинаковая ширина — как у первой выбранной рамки" onClick={() => arrange(2, rs => sameSize(rs, 'w'))}><Ic n="sameW" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 2 ? ' idle' : ''}`} title="Одинаковая высота — как у первой выбранной рамки" onClick={() => arrange(2, rs => sameSize(rs, 'h'))}><Ic n="sameH" /></button>
+                </span>
+                <span className="lay-group" role="group" aria-label="Распределение выбранных рамок">
+                  <span className="lay-gl">Промежутки</span>
+                  <button type="button" className={`lay-ib${selKeys.length < 3 ? ' idle' : ''}`} title="Равные промежутки по горизонтали (от трёх рамок)" onClick={() => arrange(3, rs => distribute(rs, 'x'))}><Ic n="distH" /></button>
+                  <button type="button" className={`lay-ib${selKeys.length < 3 ? ' idle' : ''}`} title="Равные промежутки по вертикали (от трёх рамок)" onClick={() => arrange(3, rs => distribute(rs, 'y'))}><Ic n="distV" /></button>
+                </span>
+                <span className="lay-chip" title="Сколько рамок выбрано: Shift/Ctrl-клик или обведи мышью на пустом месте">Выбрано: <b>{selKeys.length}</b></span>
+              </div>
+            )}
+            {mode === 'manual' && draft && (tileKeys.length > 0 || hasTimer || screen === 'answer') && (
+              <div className="lay-tools">
+                <span className="lay-group" role="group" aria-label="Что двигаем вручную">
+                  <span className="lay-gl">Вручную / авто</span>
+                  {tileKeys.length > 0 && <button type="button" className={`lay-btn sm${draft.tiles ? ' on' : ''}`} aria-pressed={!!draft.tiles} title={draft.tiles ? 'Варианты двигаются вручную. Нажми — вернуть на штатные места (авто)' : 'Варианты на штатных местах. Нажми — двигать каждую плитку вручную'}
+                    onClick={() => { if (draft.tiles) { onDraft({ ...draft, tiles: undefined }); return } const m = measureExtra(screen, tileKeys.length, false, 'tiles'); if (m.tiles) onDraft({ ...draft, tiles: m.tiles }); else hint.show('Не удалось снять положение плиток с экрана — закрой и открой компоновку.') }}><Ic n="tiles" /><span>Варианты</span></button>}
+                  {screen === 'question' && hasTimer && <button type="button" className={`lay-btn sm${draft.timer ? ' on' : ''}`} aria-pressed={!!draft.timer} title={draft.timer ? 'Таймер двигается вручную. Нажми — вернуть на место' : 'Таймер на своём месте. Нажми — двигать и менять размер вручную'}
+                    onClick={() => { if (draft.timer) { onDraft({ ...draft, timer: undefined }); return } const m = measureExtra('question', 0, true, 'timer'); if (m.timer) onDraft({ ...draft, timer: m.timer }); else hint.show('Не удалось снять положение таймера с экрана.') }}><Ic n="timer" /><span>Таймер</span></button>}
+                  {screen === 'answer' && <button type="button" className={`lay-btn sm${draft.recall ? ' on' : ''}`} aria-pressed={!!draft.recall} title={draft.recall ? 'Текст вопроса двигается вручную. Нажми — вернуть на место' : 'Текст вопроса на своём месте. Нажми — двигать вручную'}
+                    onClick={() => { if (draft.recall) { onDraft({ ...draft, recall: undefined }); return } const m = measureExtra('answer', 0, false, 'recall'); if (m.recall) onDraft({ ...draft, recall: m.recall }); else hint.show('На этом экране нет текста вопроса.') }}><Ic n="text" /><span>Вопрос</span></button>}
+                  {screen === 'answer' && <button type="button" className={`lay-btn sm${draft.teams ? ' on' : ''}`} aria-pressed={!!draft.teams} title={draft.teams ? 'Колонка ответов команд двигается вручную. Нажми — вернуть на место' : 'Колонка ответов команд на своём месте. Нажми — двигать вручную'}
+                    onClick={() => { if (draft.teams) { onDraft({ ...draft, teams: undefined }); return } const m = measureExtra('answer', 0, false, 'teams'); if (m.teams) onDraft({ ...draft, teams: m.teams }); else hint.show('Колонки команд на экране нет.') }}><Ic n="teams" /><span>Ответы команд</span></button>}
+                </span>
+              </div>
+            )}
+            {status && <div className="lay-note">{status}</div>}
+            {mode === 'manual' && draft && (() => { const ws = layoutWarnings(draft, theme); return ws.length > 0 && (
+              <details className="lay-warns"><summary><Ic n="warn" /> Перекрытия: {ws.length} — можно оставить, если так задумано</summary>
+                {ws.map(w => <div key={w} className="lay-warn">{w}</div>)}</details>) })()}
+            <details className="lay-helpbox"><summary><Ic n="help" /> Подсказки</summary>
+              <ul className="lay-help">
+                <li>Перетаскивай рамку — двигается, угол ◢ — размер. Ставить можно куда угодно, в том числе поверх сгиба и декора (штриховка): предупредим, но не запретим.</li>
+                <li>Рамки сами прилипают к краям и центрам соседей и к центру экрана (розовые линии), размер — к размеру соседа («= ширина»), интервалы — к равным.</li>
+                <li><b>Alt</b> во время жеста — без прилипания. <b>Shift</b> при растягивании картинки — сохранить пропорции.</li>
+                <li>Несколько рамок: <b>Shift/Ctrl-клик</b> или обведи мышью на пустом месте, потом кнопки выравнивания. Стрелки двигают выбранные, <b>Shift+стрелки</b> — крупнее.</li>
+                <li>Размеры — доли всего экрана: на любом экране одинаково.</li>
+              </ul>
+            </details>
+          </div>
+        )}
       </div>
     </div>
   )
