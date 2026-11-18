@@ -86,8 +86,8 @@ import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { noteClass } from '../lib/questionLayout'
 import { AnswerScreen } from '../components/screens/AnswerScreen'
-import { StagedChoices, MatchAnswer, OrderAnswer, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '../components/screens/AnswerBody'
-import { answerUsesSharedScreen, answerTileCount, screenLayout } from '../lib/layoutRects'
+import { stagedAnswerBody, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '../components/screens/AnswerBody'
+import { answerUsesSharedScreen, answerTileCount, isStagedAnswer, screenLayout } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
 import { serverNow } from '../lib/serverClock'
 
@@ -1793,8 +1793,6 @@ function ShowAnswers({ pack, round, q, gameState }: {
     })
   }, [checked, step, rows.length, rows.map(r => r.answer_text).join('|')])
 
-  const choices = q.answer.mode === 'choice' ? q.answer.choices : null
-  const imgChoices = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
   // на бумаге колонки «ответы команд» нет — освободившееся место отдаём контенту
   const { answerImgs, questionImgs, revealImgs } = answerScreenImages(q.media)
   // Нет своей картинки у ответа — берём картинку вопроса: на разборе она
@@ -1875,7 +1873,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
   // Обычный ответ (свободный текст + картинки + пояснение): общий компонент AnswerScreen — тот же, что в предпросмотре редактора; логика (автораскрытие, автопроверка) остаётся выше.
   // варианты / порядок / пары идут общим экраном только при ручной раскладке ответа (иначе — прежний экран ниже)
-  const manualAnswer = (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') && screenLayout(q.service, 'answer', revealImgs, pack.theme, answerTileCount(q)) !== null
+  const manualAnswer = (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') && screenLayout(q.service, 'answer', [], pack.theme, answerTileCount(q)) !== null
   if (answerUsesSharedScreen(pack.theme, round.mechanic, q, revealed, manualAnswer)) {
     return <AnswerScreen pack={pack} round={round} q={q} step={step} total={total} roundIdx={gameState.round_number} paper={paper}
       rows={rows} teamOf={id => teams.find(t => t.id === id) ?? allTeams.find(t => t.id === id)} checked={checked} revealLive={revealLive}
@@ -1944,14 +1942,8 @@ function ShowAnswers({ pack, round, q, gameState }: {
                     ))}
                   </div>
                 </>
-              ) : q.answer.mode === 'match' ? (
-                <MatchAnswer q={q} />
-              ) : choices && imgChoices.length === choices.length ? (
-                <StagedChoices q={q} choices={choices} imgs={imgChoices} theme={pack.theme} />
-              ) : choices ? (
-                <StagedChoices q={q} choices={choices} theme={pack.theme} />
-              ) : q.answer.mode === 'order' ? (
-                <OrderAnswer q={q} />
+              ) : isStagedAnswer(q) ? (
+                stagedAnswerBody(q, { theme: pack.theme })
               ) : (<>
                 <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}

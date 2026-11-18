@@ -180,3 +180,13 @@ export function OrderAnswer({ q, tileRects }: { q: Question; tileRects?: Rect[] 
     </div>
   )
 }
+
+/** Тело ответа для вариантов / порядка / пар — ОДИН выбор для проектора и общего AnswerScreen. null — у вопроса свободный ответ. */
+export function stagedAnswerBody(q: Question, o: { theme?: ThemeKey; tileRects?: Rect[]; final?: boolean }): React.ReactNode {
+  const a = q.answer
+  if (a.mode === 'match') return <MatchAnswer q={q} tileRects={o.tileRects} />
+  if (a.mode === 'order') return <OrderAnswer q={q} tileRects={o.tileRects} />
+  if (a.mode !== 'choice') return null
+  const pics = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
+  return <StagedChoices q={q} choices={a.choices} imgs={pics.length === a.choices.length ? pics : undefined} theme={o.theme} tileRects={o.tileRects} final={o.final} />
+}

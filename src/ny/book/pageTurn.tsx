@@ -15,6 +15,8 @@ const WARM = Number(new URLSearchParams(location.search).get('bkwarm') ?? 220)
 function cloneClean(src: HTMLElement): HTMLElement {
   const c = src.cloneNode(true) as HTMLElement
   c.style.clipPath = ''
+  // при быстрой второй смене страницы настоящий экран ещё скрыт (visibility:hidden, data-bk-turning) — клон обязан быть видимым
+  c.style.visibility = ''; c.removeAttribute('data-bk-turning')
   // position:fixed в клоне на повёрнутом листе считался бы от листа (transform листа — containing block), а не от экрана: шапка и таймер «Книги» — fixed и уезжали
   // (регресс 10.66+, найдено кадрами перелистывания 10.70). Обёртка клона и так равна экрану по размеру и началу координат, поэтому fixed → absolute даёт те же
   // координаты. Клон клона (src отсоединён) уже без fixed: правка записана inline. Обёртку с transform для этого брать нельзя: растр картинок на листе запаздывает.

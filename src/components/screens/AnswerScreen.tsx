@@ -9,9 +9,9 @@ import { BookNote } from '../../ny/book/BookNote'
 import { TeamAnswers, type AnswerTeam } from './TeamAnswers'
 import { displayAnswer } from './QuestionScreen'
 import { lenClass, mediaUrl } from '../../lib/media'
-import { answerScreenImages } from '../../lib/answerImages'
-import { answerLayoutUnsupportedReason, answerTileCount, screenLayout } from '../../lib/layoutRects'
-import { StagedChoices, MatchAnswer, OrderAnswer } from './AnswerBody'
+import { answerScreenImages, answerLayoutImgs } from '../../lib/answerImages'
+import { answerLayoutUnsupportedReason, answerTileCount, isStagedAnswer, screenLayout } from '../../lib/layoutRects'
+import { stagedAnswerBody } from './AnswerBody'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { noteClass } from '../../lib/questionLayout'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -36,17 +36,12 @@ export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, row
   const isBook = pack.theme === 'ny_book'
   const { answerImgs, revealImgs } = answerScreenImages(q.media)
   const manual = answerLayoutUnsupportedReason(pack.theme, round.mechanic, q) === null
-    ? screenLayout(q.service, 'answer', revealImgs, pack.theme, answerTileCount(q)) : null
+    ? screenLayout(q.service, 'answer', answerLayoutImgs(q.media, isStagedAnswer(q)), pack.theme, answerTileCount(q)) : null
   const noteNode = (t: string) => isBook ? <BookNote text={t} className={noteClass(t).trim()} /> : <div className={`answer-note${noteClass(t)}`}>{t}</div>
   // варианты / порядок / пары — то же тело, что на проекторе (AnswerBody), своё место в раскладке — по рамкам layout.answer.tiles
   const mode = q.answer.mode
-  const choices = mode === 'choice' ? q.answer.choices : null
-  const pics = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const imgChoices = choices && pics.length === choices.length ? pics : undefined
-  const staged = mode === 'choice' || mode === 'order' || mode === 'match'
-  const stagedBody = (tileRects?: import('../../lib/layoutRects').Rect[]) => mode === 'match' ? <MatchAnswer q={q} tileRects={tileRects} />
-    : choices ? <StagedChoices q={q} choices={choices} imgs={imgChoices} theme={pack.theme} tileRects={tileRects} final={final} />
-    : mode === 'order' ? <OrderAnswer q={q} tileRects={tileRects} /> : null
+  const staged = isStagedAnswer(q)
+  const stagedBody = (tileRects?: import('../../lib/layoutRects').Rect[]) => stagedAnswerBody(q, { theme: pack.theme, tileRects, final })
   const recallOn = !!q.question_text.trim() && mode !== 'match'
   const teamsNode = !paper ? <TeamAnswers rows={rows} isBook={isBook} teamOf={teamOf} shownOf={shownOf} checked={checked} /> : null
   return (
@@ -76,7 +71,7 @@ export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, row
         </div>
         {!paper && !manual?.teams && teamsNode}
       </div>
-      {manual && <ManualAnswer theme={pack.theme} answer={displayAnswer(q)} note={checked ? q.answer_note : null} urls={revealImgs.map(mediaUrl)} rects={manual} noteNode={noteNode}
+      {manual && <ManualAnswer theme={pack.theme} answer={displayAnswer(q)} note={checked ? q.answer_note : null} urls={isStagedAnswer(q) ? [] : revealImgs.map(mediaUrl)} rects={isStagedAnswer(q) ? { ...manual, text: undefined } : manual} noteNode={noteNode}
         recallText={recallOn ? q.question_text : undefined} recallCls={lenClass(q.question_text)} tiles={staged && manual.tiles ? stagedBody(manual.tiles) : undefined}
         teamsNode={teamsNode} teamsWidth={isBook ? 'calc(620 * var(--u))' : 'min(34vw, 420px)'} />}
       {actions}

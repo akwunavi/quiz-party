@@ -206,6 +206,16 @@ export function fallbackGridRects(imgs: string[], fold = true): RectsV1 {
   return { v: 1, imgs: [...imgs], images }
 }
 
+/** Ответ показывается ПЛИТКАМИ по ступеням (варианты/порядок/пары): текстового «правильного ответа» и свободных картинок в раскладке нет — картинки вариантов живут в плитках. */
+export const isStagedAnswer = (q: { answer: { mode: string } }): boolean => q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match'
+
+/** Запасные рамки плиток ответа (замер экрана недоступен): сетка 2 колонки по страницам, внутри рабочей области. */
+export function fallbackAnswerTiles(n: number): Rect[] {
+  const out: Rect[] = []
+  for (let i = 0; i < n; i++) out.push(clampRect({ x: i % 2 ? 0.53 : 0.08, y: 0.4 + Math.floor(i / 2) * 0.12, w: 0.39, h: 0.1 }))
+  return out
+}
+
 /** Сколько плиток на экране ОТВЕТА: варианты (текстом или картинками), строки порядка, пары сопоставления; у свободного ответа — 0. */
 export function answerTileCount(q: { answer: { mode: string; choices?: unknown[]; correct_order?: string; left?: unknown[] } }): number {
   const a = q.answer

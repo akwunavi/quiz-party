@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { pctStyle } from '../../components/ManualLayout'
 import { sceneAreaCss, busyZones, themeHasFold } from '../../lib/layoutArea'
-import { MIN_SIDE, clampRect, layoutWarnings, toV2, fallbackRects, fallbackAnswerRects, fallbackGridRects, type Rect, type Rects } from '../../lib/layoutRects'
+import { MIN_SIDE, clampRect, layoutWarnings, toV2, fallbackRects, fallbackAnswerRects, fallbackAnswerTiles, fallbackGridRects, type Rect, type Rects } from '../../lib/layoutRects'
 
 type Mode = 'auto' | 'manual'
 
@@ -13,6 +13,11 @@ type Mode = 'auto' | 'manual'
 export function measureRects(theme: string | undefined, mechanic: string, screen: 'question' | 'answer', urls: string[], imgPaths: string[], hasText: boolean, hasNote = false, nTiles = 0, hasTimer = false): Rects {
   const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect()
   const root = document.querySelector('.pv-backdrop .host-screen')
+  if (screen === 'answer' && nTiles > 0 && mechanic !== 'four_pics') {
+    // варианты/порядок/пары: текста «правильного ответа» и свободных картинок нет — только плитки (замеренные или запасная сетка), вопрос и команды
+    const ex = area && area.width >= 4 ? measureExtra('answer', nTiles, false) : {}
+    return { v: 2, imgs: [], images: [], note: hasNote ? fallbackAnswerRects([], true, false).note && toV2(fallbackAnswerRects([], true, themeHasFold(theme)), theme).note : undefined, tiles: ex.tiles ?? fallbackAnswerTiles(nTiles), ...(ex.recall ? { recall: ex.recall } : {}), ...(ex.teams ? { teams: ex.teams } : {}) }
+  }
   if (!area || area.width < 4) return toV2(screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, themeHasFold(theme)) : fallbackRects(imgPaths, hasText, themeHasFold(theme)), theme)
   const toRel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
   let text: Rect | undefined

@@ -5,9 +5,9 @@ import { useRef, useState, type ReactNode } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { LayoutEditor, measureRects } from './LayoutEditor'
 import { themeHasLayoutArea } from '../../lib/layoutArea'
-import { answerLayoutUnsupportedReason, answerTileCount, layoutStatus, layoutUnsupportedReason, screenLayout, tileCount, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
+import { answerLayoutUnsupportedReason, answerTileCount, isStagedAnswer, layoutStatus, layoutUnsupportedReason, screenLayout, tileCount, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
 import { saveScreenLayout } from '../../lib/layoutStore'
-import { answerScreenImages } from '../../lib/answerImages'
+import { answerLayoutImgs } from '../../lib/answerImages'
 import { mediaUrl } from '../../lib/media'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
@@ -32,7 +32,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
   const baselines = useRef<PerScreen<Rects | null>>({ question: null, answer: null })
 
   const qImgs = (q?.media.question ?? []).filter(isPic)
-  const imgsOf = (s: LayoutScreen) => (s === 'answer' && round.mechanic !== 'four_pics' ? (q ? answerScreenImages(q.media).revealImgs : []) : qImgs)
+  const imgsOf = (s: LayoutScreen) => (s === 'answer' && round.mechanic !== 'four_pics' ? (q ? answerLayoutImgs(q.media, isStagedAnswer(q)) : []) : qImgs)
   const nTilesOf = (s: LayoutScreen) => (!q || round.mechanic === 'four_pics' ? 0 : s === 'question' ? tileCount(q, qImgs.length) : answerTileCount(q))
   const hasTimer = round.mechanic !== 'four_pics' && round.mechanic !== 'jeopardy'
   const curService = service ?? q?.service
