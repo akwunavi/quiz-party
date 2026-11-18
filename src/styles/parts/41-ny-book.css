@@ -1379,3 +1379,18 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .choices-grid { align-items: center; }
 .theme-ny_book .host-screen .choices-grid.c-l .choice-plate { font-size: calc(26 * var(--u)); }
 .theme-ny_book .host-screen .choices-grid.c-xl .choice-plate { font-size: calc(21 * var(--u)); }
+.theme-ny_book .bk-rt-orn { display: none; }
+
+/* заставка кроссворда (10.71): блок прижат к верху и ограничен снизу — вся сетка целиком над снежным полом (раньше центрировался и сетка падала на снег/ёлки) */
+.theme-ny_book .round-intro .bk-cw { position: absolute !important; left: 0; right: 0; top: calc(var(--bk-oy) + 150 * var(--u)); bottom: auto; height: calc(730 * var(--u)); }
+.theme-ny_book .round-intro .bk-cw-grid { align-items: start; place-items: start center; }
+.theme-ny_book .round-intro .bk-cw { grid-template-rows: minmax(0, 1fr); align-content: stretch; }
+.theme-ny_book .round-intro .bk-cw-left { height: 100%; }
+.theme-ny_book .round-intro .bk-cw { padding: 0; }
+
+/* плашка «Р8 · ВОПРОС 5 / 6» (10.71): небольшой горизонтальный свиток (hscroll.webp), текст прямо на пергаменте; рулоны не перекрывают текст */
+.theme-ny_book .host-topbar :is(.qnum, .mono-tag) { --sh: calc(60 * var(--u)); display: inline-block; text-align: center; line-height: var(--sh) !important; min-height: var(--sh); box-sizing: border-box; white-space: pre;
+  padding: 0 calc(var(--sh) * .08) !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; clip-path: none !important;
+  border: solid transparent !important; border-width: 0 calc(var(--sh) * .85) !important; border-image: url('/quiz-party/ny-book/hscroll.webp') 0 196 0 196 fill / 0 calc(var(--sh) * .85) stretch !important;
+  filter: drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 30, 10, .32)); }
+.theme-ny_book .host-topbar .qnum b { color: var(--bk-red); }

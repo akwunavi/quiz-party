@@ -1,4 +1,4 @@
-// ═══ «Книга»: заголовок заставки раунда — золотое тиснение, хвойная веточка с бантом сверху, орнаментный разделитель снизу ═══
+// ═══ «Книга»: заголовок заставки раунда — золотое тиснение и орнаментный разделитель снизу (веточка с бантом сверху убрана — 10.71) ═══
 // Целиком в зоне ОДНОЙ страницы (ширина зоны меньше полустраницы — через сгиб не заходит). Кегль подбирается замером (useFitText, режим диапазона: наибольший, при котором
 // заголовок помещается в зону по ширине и высоте), длинные слова получают мягкие переносы по слогам (lib/softHyphen.ts), а не уменьшаются до мелких. Перенос — только
 // между словами или по слогам; одно слово не режется посреди слога. Анимаций нет (глитч киберпанка в «Книге» отключён), reduced-motion учитывать нечего.
@@ -19,12 +19,6 @@ export function BookRoundTitle({ lines, size = 'lg' }: { lines: string[]; size?:
   } })
   return (
     <div className={`bk-rt bk-rt-${size}`}>
-      <div className="bk-rt-orn" aria-hidden="true">
-        <i className="bk-rt-sprig l" /><svg className="bk-rt-bow" viewBox="0 0 120 70" focusable="false">
-          <path className="lp" d="M60 36 C40 4 8 6 8 28 C8 52 40 52 60 36Z" /><path className="lp" d="M60 36 C80 4 112 6 112 28 C112 52 80 52 60 36Z" />
-          <path className="tl" d="M54 40 L36 68 L50 62 L58 44Z" /><path className="tl" d="M66 40 L84 68 L70 62 L62 44Z" /><ellipse className="kn" cx="60" cy="37" rx="9" ry="10" />
-        </svg><i className="bk-rt-sprig r" />
-      </div>
       <div className="bk-rt-box">
         {/* не <h1 class="neon-title">: общие правила заставки раунда (кегль !important, глитч киберпанка) на этот заголовок не должны действовать */}
         <div ref={fit} className="bk-rt-h" role="heading" aria-level={1} lang="ru">
