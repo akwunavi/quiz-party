@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import type React from 'react'
 import { useFitText } from '../../hooks/useFitText'
 import { mediaUrl } from '../../lib/media'
-import { choicesLenClass } from '../../lib/questionLayout'
+import { choicesLenClass, plateLenClass } from '../../lib/questionLayout'
 import { pctStyle } from '../ManualLayout'
 import type { Rect } from '../../lib/layoutRects'
 import type { Question, ThemeKey } from '../../types/quiz'
@@ -110,7 +110,7 @@ export function StagedChoices({ q, choices, imgs, theme, tileRects, final }: {
     <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}
       style={{ width: '100%', marginTop: 0, paddingTop: 0 }}>
       {choices.map(c => (
-        <div key={c.key} className={`choice-plate${cls(c.key)}`}
+        <div key={c.key} className={`choice-plate${plateLenClass(c.text)}${cls(c.key)}`}
           style={{ animationDelay: `${delay(c.key)}s` }}>
           <span className="key">{c.key}</span>{c.text}
           {magicCheck && cls(c.key) === ' correct' && <MagicCheck />}

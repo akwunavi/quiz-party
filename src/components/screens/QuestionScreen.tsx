@@ -27,7 +27,7 @@ import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
 import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
 import { bookUnit } from '../../ny/book/adaptive/safeArea'
 import { mediaUrl, mediaScaleVar } from '../../lib/media'
-import { choicesLenClass } from '../../lib/questionLayout'
+import { choicesLenClass, plateLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -301,7 +301,7 @@ function ClassicQuestionScreen({
         <div className={`choices-grid${
           choicesLenClass((q.answer.right_labels ?? []) as string[])}`}>
           {q.answer.right.map((r, i) => (
-            <div key={r} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
+            <div key={r} className={`choice-plate${plateLenClass((q.answer as { right_labels?: string[] }).right_labels?.[i] ?? '')}`} style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
               <span className="key">{r}</span>{(q.answer as { right_labels?: string[] }).right_labels?.[i] ?? ''}
             </div>
           ))}
@@ -310,7 +310,7 @@ function ClassicQuestionScreen({
       {choices && !lettered && !manual?.tiles && (
         <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}>
           {choices.map((c, i) => (
-            <div key={c.key} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
+            <div key={c.key} className={`choice-plate${plateLenClass(c.text)}`} style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
               <span className="key">{c.key}</span>{c.text}
             </div>
           ))}

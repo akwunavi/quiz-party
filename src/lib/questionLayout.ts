@@ -23,3 +23,9 @@ export function noteClass(text: string): string {
   if (n <= 360) return ' n-l'
   return ' n-xl'
 }
+
+/** Класс длины ОДНОЙ плитки-варианта (10.71): у свитка «Книги» высота фиксирована, длинный текст не растягивает рулоны, а уменьшает кегль и идёт в 2–3 строки. */
+export function plateLenClass(text: string): string {
+  const n = (text ?? '').trim().length
+  return n > 110 ? ' pl-xxl' : n > 60 ? ' pl-xl' : n > 34 ? ' pl-l' : ''
+}

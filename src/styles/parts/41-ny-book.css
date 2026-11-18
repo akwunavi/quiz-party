@@ -1398,3 +1398,22 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .host-screen .lay-tile > .choice-plate { --sh: min(100cqh, 30cqw); font-size: calc(var(--sh) * .3); height: var(--sh); }
 /* узкая рамка: рулоны не съедают весь свиток (не больше 24 % ширины с каждой стороны) */
 .theme-ny_book .host-screen .lay-tile > .choice-plate { border-width: 0 min(calc(var(--sh) * .85), 24cqw); border-image-width: 0 min(calc(var(--sh) * .85), 24cqw); }
+
+/* ═══ Свитки-варианты, правка 2 (10.71): рулоны ВСЕГДА одного размера и пропорций; длинный текст — мельче кегль и 2–3 строки, а не рост свитка ═══
+   Высота фиксирована (не min-height) — border-image не растягивается по вертикали. Колонок всегда две (по странице), 5–6 вариантов — три ряда; зазор между колонками шире сгиба. */
+.theme-ny_book .choices-grid .choice-plate { height: var(--sh); min-height: 0 !important; overflow: visible; }
+.theme-ny_book .host-screen .choices-grid .choice-plate.pl-l { font-size: calc(26 * var(--u)); }
+.theme-ny_book .host-screen .choices-grid .choice-plate.pl-xl { font-size: calc(21 * var(--u)); line-height: 1.08; }
+.theme-ny_book .host-screen .choices-grid .choice-plate.pl-xxl { font-size: calc(17 * var(--u)); line-height: 1.05; }
+.theme-ny_book .host-screen .choices-grid .choice-plate.pl-l, .theme-ny_book .host-screen .choices-grid .choice-plate.pl-xl, .theme-ny_book .host-screen .choices-grid .choice-plate.pl-xxl { padding-block: 0 !important; }
+.theme-ny_book .host-screen > .choices-grid, .theme-ny_book .answer-block .choices-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: calc(70 * var(--u)); }
+.theme-ny_book .answer-block .choices-grid { column-gap: calc(14 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-l { font-size: calc(19 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xl { font-size: calc(15 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xxl { font-size: calc(12 * var(--u)); }
+/* узкая подложка «Правильный ответ»: варианты в ОДНУ колонку на всю ширину подложки — свиток широкий, текст не давится (10.71) */
+.theme-ny_book .answer-block .choices-grid { grid-template-columns: minmax(0, 1fr) !important; row-gap: calc(6 * var(--u)); }
+.theme-ny_book .answer-block .choices-grid .choice-plate { --sh: calc(52 * var(--u)); font-size: calc(21 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-l { font-size: calc(18 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xl { font-size: calc(15 * var(--u)); }
+.theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xxl { font-size: calc(13 * var(--u)); }
