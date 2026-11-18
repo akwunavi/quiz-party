@@ -400,6 +400,10 @@ export const SCENES = [
         await api.answers([{ team_id: ts[1].id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: 'Снегурочка', is_correct: true }])
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
+      // 10.71: варианты-свитки (2/3/5/6 вариантов, длинные тексты): вопрос и экран ответа
+      ...[1, 2, 3, 4].flatMap(qi => [['q', false], ['a', true]].map(([k, rev]) => sc(`76${qi}${k}-scroll-choices`, `свитки-варианты ${[2, 3, 5, 6][qi - 1]} (${k})`, async api => { const ts = await api.teams(6)
+        if (rev) await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: `q-${PACK_ALL}-r15-q${qi}`, round_number: 15, answer_text: 'АБВГ'[i % 4], is_correct: 'АБВГ'[i % 4] === 'Б' })))
+        await api.session({ pack_id: PACK_ALL, phase: rev ? 'show_answers' : 'question', round_number: 15, question_index: qi, timer_started_at: rev ? null : new Date().toISOString(), reveal: rev }) }, { ready: '.host-screen', settle: 5200 }))),
       // 10.70: заголовки раунда (длинное слово / три слова / короткое / длинная фраза / две строки)
       ...[[15, 'long-word'], [16, 'three-words'], [17, 'short'], [18, 'long-phrase'], [19, 'two-lines']].map(([r, nm]) => sc(`75${r - 15}-title-${nm}`, `заголовок раунда: ${nm}`, async api => { await api.teams(6); await api.session({ pack_id: PACK_ALL, phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
       ...Array.from({ length: 15 }, (_, r) => sc(`7${String(r).padStart(2, '0')}-rules-r${r}`.replace(/^7(\d)(\d)/, (m, a, b) => `7${a}${b}`), `правила: раунд ${r}`, async api => { await api.teams(6); await api.session({ pack_id: PK(r), phase: 'round_intro', round_number: r, question_index: 0, timer_started_at: null, reveal: false }) }, { ready: '.round-intro, .host-screen', settle: 4500 })),
