@@ -1701,7 +1701,7 @@ function AnswerTime({ pack, round, gameState }: {
   const lay = answeringLayout(paper ? 0 : teams.length)
   const bookVars = book && !paper ? {
     '--at-cols': lay.cols, '--at-title': `calc(${lay.title} * var(--u))`, '--at-timer': `calc(${lay.timer} * var(--u))`, '--at-w': `calc(${lay.width} * var(--u))`,
-  } as React.CSSProperties : undefined
+  } as CSSProperties : undefined
   return (
     <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`} style={bookVars} data-at-n={book && !paper ? teams.length : undefined}>
       {!book && <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>}

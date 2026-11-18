@@ -22,9 +22,9 @@ export function answeringLayout(n: number): AnsweringLayout {
   if (t === 0) return { cols: 1, ch: 0, timer: 330, title: 150, width: 0 }
   if (t <= 2) return { cols: t, ch: 100, timer: 300, title: 140, width: 300 * t + 40 }
   if (t <= 4) return { cols: t, ch: 96, timer: 290, title: 130, width: 1300 }
-  if (t <= 8) return { cols: 4, ch: 84, timer: 250, title: 120, width: 1300 }
-  if (t <= 12) return { cols: 4, ch: 72, timer: 220, title: 110, width: 1300 }
-  if (t <= 16) return { cols: 4, ch: 64, timer: 200, title: 100, width: 1300 }
-  if (t <= 24) return { cols: 4, ch: 56, timer: 160, title: 90, width: 1300 }
+  if (t <= 8) return { cols: 4, ch: 90, timer: 250, title: 120, width: 1300 }
+  if (t <= 12) return { cols: 4, ch: 80, timer: 230, title: 110, width: 1300 }
+  if (t <= 16) return { cols: 4, ch: 70, timer: 200, title: 100, width: 1300 }
+  if (t <= 24) return { cols: 4, ch: 62, timer: 170, title: 90, width: 1300 }
   return { cols: 6, ch: 52, timer: 150, title: 84, width: 1560 }
 }

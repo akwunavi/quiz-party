@@ -946,9 +946,10 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .fin-screen .fin-table.rows-7 td { padding-top: .22em; padding-bottom: .22em; }
 /* «Отвечайте»: карточки команд всегда внутри страницы — сетка 4 колонки, заголовок и таймер компактнее (самопроверка: 8 карточек на 1280×720 вылезали) */
 .theme-ny_book .host-screen:has(.answer-time-teams) { padding-top: calc(var(--bk-oy) + 150 * var(--u)); padding-bottom: calc(var(--bk-oy) + 150 * var(--u)); gap: calc(8 * var(--u)); justify-content: flex-start; }
-.theme-ny_book .host-screen:has(.answer-time-teams) :is(h1, .neon-title) { font-size: calc(120 * var(--u)) !important; line-height: 1; margin: 0; }
-.theme-ny_book .host-screen:has(.answer-time-teams) .p-ros.is-big, .theme-ny_book .host-screen:has(.answer-time-teams) .bk-timer-slot[data-size="big"] { --bk-timer-d: calc(230 * var(--u)); --d: calc(230 * var(--u)); }
-.theme-ny_book .answer-time-teams { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(6 * var(--u)) calc(14 * var(--u)); width: calc(1300 * var(--u)); max-width: 100%; margin: 0 auto; }
+.theme-ny_book .host-screen:has(.answer-time-teams) :is(h1, .neon-title) { font-size: var(--at-title, calc(120 * var(--u))) !important; line-height: 1; margin: 0; }
+.theme-ny_book .host-screen:has(.answer-time-teams) .p-ros.is-big, .theme-ny_book .host-screen:has(.answer-time-teams) .bk-timer-slot[data-size="big"] { --bk-timer-d: var(--at-timer, calc(230 * var(--u))); --d: var(--at-timer, calc(230 * var(--u))); }
+/* число колонок, ширина сетки, кегль заголовка и диаметр таймера задаёт ny/book/answeringLayout.ts через --at-* на .host-screen (по числу команд) */
+.theme-ny_book .answer-time-teams { display: grid !important; grid-template-columns: repeat(var(--at-cols, 4), minmax(0, 1fr)); gap: calc(6 * var(--u)) calc(14 * var(--u)); width: var(--at-w, calc(1300 * var(--u))); max-width: 100%; margin: 0 auto; }
 .theme-ny_book .answer-time-teams .bk-at { min-width: 0; }
 
 /* ═══ ЕДИНЫЙ ТАЙМЕР «Книги» (BookTimer.tsx): plash timer_face + кольцо timer_ring + дуга + цифры секунд. Слот — прежний квадрат; плашка вписана по высоте, пропорция 315:330 не искажается ═══ */
@@ -1417,3 +1418,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-l { font-size: calc(18 * var(--u)); }
 .theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xl { font-size: calc(15 * var(--u)); }
 .theme-ny_book .host-screen .answer-block .choices-grid .choice-plate.pl-xxl { font-size: calc(13 * var(--u)); }
+
+/* «Отвечайте!» (20.11): зелёное кольцо вокруг заголовка — это НЕ border/box-shadow правила (они выше уже гасятся), а АНИМАЦИЯ базовой темы
+   `.answer-pulse { animation: answerPulseRing }` (15-projector-interactive.css): кадры анимации перекрывают любой обычный box-shadow, поэтому `box-shadow: none`
+   не помогал. Гасим саму анимацию (вес не ниже базового — тема стоит позже в каскаде) и скругление/отступ рамки. */
+.theme-ny_book .host-screen .answer-pulse { animation: none; box-shadow: none; border-radius: 0; padding: 0; }
