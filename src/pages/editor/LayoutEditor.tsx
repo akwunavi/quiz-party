@@ -133,7 +133,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   const applyTo = (d: Rects, rects: Record<string, Rect>): Rects => boxes.reduce((acc, b) => (rects[b.key] ? put(acc, b.t, rects[b.key]) : acc), d)
 
   const down = (e: React.PointerEvent, key: string, kind: 'move' | 'resize') => {
-    if (!draft) return
+    if (!draft || e.button !== 0) return
     const bx = boxes.find(b => b.key === key); if (!bx) return
     e.preventDefault(); e.stopPropagation()
     let keys = [key]
@@ -161,6 +161,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   }
   const move = (e: React.PointerEvent) => {
     const d = drag.current; if (!d || !draft) return
+    if (e.buttons === 0) { up(); return } // кнопку отпустили вне окна/после контекстного меню — жест не залипает
     const ar = areaRef.current?.getBoundingClientRect(); if (!ar || !ar.width) return
     if (d.kind === 'marquee') {
       const a = { x: (d.sx - ar.x) / ar.width, y: (d.sy - ar.y) / ar.height }, b = { x: (e.clientX - ar.x) / ar.width, y: (e.clientY - ar.y) / ar.height }
@@ -228,7 +229,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
   const al = (m: AlignMode) => arrange(2, rs => alignRects(rs, m))
 
   return (
-    <div className="lay-ed" onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+    <div className="lay-ed" onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up}>
       {/* та же рабочая область темы, что у проектора (layoutAreaCss): рамки — в долях этого прямоугольника */}
       <div ref={areaRef} className="lay-ed-area" style={areaCss ?? undefined}>
         {mode === 'manual' && draft && <div className="lay-bg" data-lay-bg onPointerDown={downBg} />}
