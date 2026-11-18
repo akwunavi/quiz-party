@@ -5,7 +5,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { LayoutEditor, measureRects } from './LayoutEditor'
 import { themeHasLayoutArea } from '../../lib/layoutArea'
-import { answerLayoutUnsupportedReason, layoutStatus, layoutUnsupportedReason, screenLayout, tileCount, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
+import { answerLayoutUnsupportedReason, answerTileCount, layoutStatus, layoutUnsupportedReason, screenLayout, tileCount, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
 import { saveScreenLayout } from '../../lib/layoutStore'
 import { answerScreenImages } from '../../lib/answerImages'
 import { mediaUrl } from '../../lib/media'
@@ -33,7 +33,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
 
   const qImgs = (q?.media.question ?? []).filter(isPic)
   const imgsOf = (s: LayoutScreen) => (s === 'answer' && round.mechanic !== 'four_pics' ? (q ? answerScreenImages(q.media).revealImgs : []) : qImgs)
-  const nTilesOf = (s: LayoutScreen) => (s === 'question' && q && round.mechanic !== 'four_pics' ? tileCount(q, qImgs.length) : 0)
+  const nTilesOf = (s: LayoutScreen) => (!q || round.mechanic === 'four_pics' ? 0 : s === 'question' ? tileCount(q, qImgs.length) : answerTileCount(q))
   const hasTimer = round.mechanic !== 'four_pics' && round.mechanic !== 'jeopardy'
   const curService = service ?? q?.service
   const hasText = !!q?.question_text.trim()
@@ -118,7 +118,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
   const overlay = open ? (
     <LayoutEditor theme={pack.theme} screen={screen} onScreen={changeScreen} mode={modes[screen]} onMode={changeMode}
       draft={drafts[screen]} onDraft={setDraft} dirty={dirty} status={status} saving={saving}
-      tileKeys={q && nTilesOf('question') ? (q.answer.mode === 'match' ? q.answer.right : (q.answer.mode === 'choice' || q.answer.mode === 'order' ? q.answer.choices.map(c => c.key) : [])) : []} hasTimer={hasTimer && screen === 'question'}
+      tileKeys={q && nTilesOf(screen) ? (screen === 'answer' ? (q.answer.mode === 'match' ? q.answer.left : q.answer.mode === 'order' ? q.answer.correct_order.split('') : q.answer.mode === 'choice' ? q.answer.choices.map(c => c.key) : []) : q.answer.mode === 'match' ? q.answer.right : (q.answer.mode === 'choice' || q.answer.mode === 'order' ? q.answer.choices.map(c => c.key) : [])) : []} hasTimer={hasTimer && screen === 'question'}
       onSave={() => void save()} onCancel={() => setOpen(false)} onReset={() => void reset()} />
   ) : null
   return { qView, button, overlay, screen, open }

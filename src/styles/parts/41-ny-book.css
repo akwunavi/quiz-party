@@ -1394,3 +1394,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   border: solid transparent !important; border-width: 0 calc(var(--sh) * .85) !important; border-image: url('/quiz-party/ny-book/hscroll.webp') 0 196 0 196 fill / 0 calc(var(--sh) * .85) stretch !important;
   filter: drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 30, 10, .32)); }
 .theme-ny_book .host-topbar .qnum b { color: var(--bk-red); }
+/* плитка в своей рамке: размер свитка и кегль — от высоты рамки (перебивает фиксированные --sh/кегль плиток в потоке) */
+.theme-ny_book .host-screen .lay-tile > .choice-plate { --sh: min(100cqh, 30cqw); font-size: calc(var(--sh) * .3); height: var(--sh); }
+/* узкая рамка: рулоны не съедают весь свиток (не больше 24 % ширины с каждой стороны) */
+.theme-ny_book .host-screen .lay-tile > .choice-plate { border-width: 0 min(calc(var(--sh) * .85), 24cqw); border-image-width: 0 min(calc(var(--sh) * .85), 24cqw); }

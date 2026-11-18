@@ -65,7 +65,7 @@ import { RulesFrame } from '../components/RulesFrame'
 import { FinMedal } from '../components/FinMedal'
 import { useScrambleReveal } from '../hooks/useScrambleReveal'
 import { useAnswers } from '../hooks/useAnswers'
-import type { Pack, Question, CrosswordGrid, InfoSlide, ThemeKey } from '../types/quiz'
+import type { Pack, Question, CrosswordGrid, InfoSlide } from '../types/quiz'
 import { SprintBoard } from './rounds/SprintRound'
 import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
@@ -84,9 +84,10 @@ import { useQuestionShown } from '../hooks/useQuestionShown'
 import { Hint, useHint } from '../components/Hint'
 import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
-import { choicesLenClass, noteClass } from '../lib/questionLayout'
+import { noteClass } from '../lib/questionLayout'
 import { AnswerScreen } from '../components/screens/AnswerScreen'
-import { answerUsesSharedScreen } from '../lib/layoutRects'
+import { StagedChoices, MatchAnswer, OrderAnswer, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '../components/screens/AnswerBody'
+import { answerUsesSharedScreen, answerTileCount, screenLayout } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
 import { serverNow } from '../lib/serverClock'
 
@@ -800,19 +801,6 @@ function rebusCaption(word: string | undefined, isFirst: boolean) {
     : <><b className="rebus-hot">{hot}</b>{plain}</>
 }
 
-function shuffleStable<T>(arr: T[], seedStr: string): T[] {
-  let s = 0
-  for (const ch of seedStr) s = (s * 31 + ch.charCodeAt(0)) >>> 0
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    s = (s * 1664525 + 1013904223) >>> 0
-    const j = s % (i + 1)
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
-
 /* ── Сколько длится показ верного ответа ──────────────────────────────────
    Раньше автопроверка стояла на СВОЁМ таймере в 4200 мс, никак не связанном
    с анимацией. Для вариантов подсветка верного заканчивается позже: 3300 мс
@@ -824,9 +812,6 @@ function shuffleStable<T>(arr: T[], seedStr: string): T[] {
    тайминг показа — правь константу здесь, и проверка сдвинется сама. */
 /** Сколько держится один слайд повтора, если озвучки нет или она короче. */
 const RECAP_SLIDE_MS = 5000
-const CH_STAGE2_MS = 3300        // когда подсвечивается верный вариант
-const CH_STAGGER_MS = 500        // каскад по невыпавшим вариантам
-const CH_HIGHLIGHT_MS = 900      // сама подсветка
 const ITEM_FIRST_MS = 100        // первый элемент match/order
 const ITEM_STEP_MS = 600         // шаг между элементами (см. 18-patch-745.css)
 const ITEM_ANIM_MS = 500         // длительность появления элемента
@@ -1889,7 +1874,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
   }
 
   // Обычный ответ (свободный текст + картинки + пояснение): общий компонент AnswerScreen — тот же, что в предпросмотре редактора; логика (автораскрытие, автопроверка) остаётся выше.
-  if (answerUsesSharedScreen(pack.theme, round.mechanic, q, revealed)) {
+  // варианты / порядок / пары идут общим экраном только при ручной раскладке ответа (иначе — прежний экран ниже)
+  const manualAnswer = (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') && screenLayout(q.service, 'answer', revealImgs, pack.theme, answerTileCount(q)) !== null
+  if (answerUsesSharedScreen(pack.theme, round.mechanic, q, revealed, manualAnswer)) {
     return <AnswerScreen pack={pack} round={round} q={q} step={step} total={total} roundIdx={gameState.round_number} paper={paper}
       rows={rows} teamOf={id => teams.find(t => t.id === id) ?? allTeams.find(t => t.id === id)} checked={checked} revealLive={revealLive}
       shownOf={a => a.is_correct ?? autocheck(q.answer, a.answer_text)} actions={actions}
@@ -1964,19 +1951,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
               ) : choices ? (
                 <StagedChoices q={q} choices={choices} theme={pack.theme} />
               ) : q.answer.mode === 'order' ? (
-                <div className="order-answer">
-                  {q.answer.correct_order.split('').map((k, i) => {
-                    const c = (q.answer as { choices: { key: string; text: string }[] })
-                      .choices.find(x => x.key === k)
-                    return (
-                      <div key={i} className="oi">
-                        <b>{k}</b>
-                        <span className="oi-pos">{i + 1}</span>
-                        <span className="oi-text">{c?.text ?? ''}</span>
-                      </div>
-                    )
-                  })}
-                </div>
+                <OrderAnswer q={q} />
               ) : (<>
                 <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
@@ -2047,84 +2022,6 @@ function ShowAnswers({ pack, round, q, gameState }: {
 }
 
 /** Автопоказ ответа: как только таймер вышел — открываем ответ сам. */
-/** Показ вариантов с интригой (п.5):
- *  0 сек — на экране два ЗАВЕДОМО НЕВЕРНЫХ варианта;
- *  3 сек — доезжают оставшиеся (среди них правильный), но ещё без подсветки;
- *  5.5 сек — подсветка верного и приглушение неверных, плавно.
- *  Место под все варианты зарезервировано сразу (visibility), поэтому
- *  раскладка не дёргается и по позиции ничего не угадывается. */
-function StagedChoices({ q, choices, imgs, theme }: {
-  q: LoadedPack['rounds'][number]['questions'][number]
-  choices: { key: string; text: string }[]
-  imgs?: string[]
-  theme?: ThemeKey
-}) {
-  const [stage, setStage] = useState(0)
-  useEffect(() => {
-    setStage(0)
-    // Вторая пара и подсветка идут почти встык: как только оставшиеся два
-    // варианта на экране, ответ и так очевиден — тянуть паузу незачем.
-    const t1 = setTimeout(() => setStage(1), 2200)
-    const t2 = setTimeout(() => setStage(2), CH_STAGE2_MS)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [q.id])
-
-  const correctKey = (q.answer as { correct_choice?: string }).correct_choice ?? ''
-  const wrongs = choices.filter(c => c.key !== correctKey)
-  // первые двое неверных выбираются стабильно — одинаково на всех проекторах
-  const firstWave = new Set(shuffleStable(wrongs.map(c => c.key), q.id).slice(0, 2))
-
-  const cls = (key: string) => {
-    const shown = stage >= 1 || firstWave.has(key)
-    if (!shown) return ' hidden-yet'
-    if (stage < 2) return ''
-    return key === correctKey ? ' correct' : ' dimmed'
-  }
-  const delay = (key: string) => (firstWave.has(key) ? 0 : 0.25 * choices
-    .filter(c => !firstWave.has(c.key)).findIndex(c => c.key === key))
-
-  // Magic: галочка рисуется stroke-dashoffset — это SVG-свойство, псевдо-
-  // элементу такое не дать, поэтому реальный <svg> ребёнком, только у
-  // правильной ТЕКСТОВОЙ плитки (формат 1). У картинок (формат 3) и у
-  // одиночного текстового ответа (формат 2) галочки нет по решению плана.
-  const magicCheck = theme === 'potter'
-  if (imgs) return (
-    <div className="choice-imgs">
-      {choices.map((c, i) => (
-        <div key={c.key} className={`choice-img${cls(c.key)}`}
-          style={{ animationDelay: `${delay(c.key)}s` }}>
-          <img src={mediaUrl(imgs[i])} alt="" />
-          <span className="key">{c.key}{c.text ? ` — ${c.text}` : ''}</span>
-        </div>
-      ))}
-    </div>
-  )
-  return (
-    <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}
-      style={{ width: '100%', marginTop: 0, paddingTop: 0 }}>
-      {choices.map(c => (
-        <div key={c.key} className={`choice-plate${cls(c.key)}`}
-          style={{ animationDelay: `${delay(c.key)}s` }}>
-          <span className="key">{c.key}</span>{c.text}
-          {magicCheck && cls(c.key) === ' correct' && <MagicCheck />}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-/** Латунная галочка верного варианта (только Magic-тема) — рисуется
- *  обводкой (stroke-dashoffset), поэтому нужен настоящий <svg>, псевдо-
- *  элементу такую анимацию не дать. CSS — 35-magic-surfaces.css. */
-function MagicCheck() {
-  return (
-    <svg className="mg-check" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-      <path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" strokeWidth="3"
-        strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
 function AutoReveal({ enabled, startedAt, seconds, from }: {
   enabled: boolean; startedAt: string | null; seconds: number
   /** Откуда авто-раскрытие: если ведущий за это время уже раскрыл/ушёл дальше — ничего не пишем (GAME-03). */
@@ -2165,32 +2062,6 @@ function AutoAdvance({ round, gameState, isLast }: {
     return () => clearTimeout(t)
   }, [gameState.timer_started_at, gameState.question_index, sec])
   return null
-}
-
-/** Сопоставление на экране ответа: картинка №N с правильной буквой (перенос MatchAnswerGrid). */
-function MatchAnswer({ q }: { q: LoadedPack['rounds'][number]['questions'][number] }) {
-  if (q.answer.mode !== 'match') return null
-  const spec = q.answer
-  const imgs = (q.media.question ?? []).filter(m => !/\.(mp3|mp4|webm|wav)$/i.test(m))
-  const pairs = spec.correct_pairs
-  return (
-    <div className={`match-answer n${Math.min(spec.left.length, 6)}`}>
-      {spec.left.map((l, i) => {
-        const right = pairs.find(p => p.startsWith(l))?.slice(l.length) ?? '—'
-        // рядом с буквой показываем САМ вариант: одну букву зал не соотнесёт
-        const label = (spec.right_labels ?? [])[(spec.right ?? []).indexOf(right)] || right
-        return (
-          <div key={l} className="mi">
-            {imgs[i] && <img src={mediaUrl(imgs[i])} alt="" />}
-            <div className="mi-label">
-              <b>{l} → {right}</b>
-              {label && label !== right && <span className="mi-text">{label}</span>}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
 }
 
 // AfterRoundNav переехал в components/AfterRoundNav.tsx (8.62) — понадобился

@@ -15,7 +15,9 @@ export interface Rects { v: 2; imgs: string[]; text?: Rect; note?: Rect; images:
   /** плитки вариантов (А/Б/В/Г…, правая колонка «сопоставления», порядок) — каждая отдельно; нет — плитки идут авто (10.71) */
   tiles?: Rect[]
   /** таймер: положение и размер (масштаб) рамки; нет — таймер на своём месте в шапке (10.71) */
-  timer?: Rect }
+  timer?: Rect
+  /** экран ответа (10.71): текст вопроса сверху и колонка «ОТВЕТЫ КОМАНД» целиком — каждый своей рамкой; нет — на штатном месте */
+  recall?: Rect; teams?: Rect }
 /** v:1 — прежний формат: доли РАБОЧЕЙ области темы (читается и переводится в v:2; пишется только v:2). */
 export interface RectsV1 { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
 export type LayoutScreen = 'question' | 'answer'
@@ -89,10 +91,12 @@ export function validateRects(raw: unknown, imgs: string[], theme?: string, nTil
   let tiles: Rect[] | undefined
   if (r.v === 2 && nTiles > 0 && Array.isArray(r.tiles) && r.tiles.length === nTiles) { const t = r.tiles.map(readRect); if (t.every((x): x is Rect => !!x)) tiles = t }
   const timer = r.v === 2 && r.timer != null ? readRect(r.timer) ?? undefined : undefined
-  if (!text && !note && images.length === 0 && !tiles && !timer) return null
+  const recall = r.v === 2 && r.recall != null ? readRect(r.recall) ?? undefined : undefined
+  const teams = r.v === 2 && r.teams != null ? readRect(r.teams) ?? undefined : undefined
+  if (!text && !note && images.length === 0 && !tiles && !timer && !recall && !teams) return null
   const out: RectsV1 | Rects = { v: r.v as 1, imgs: [...imgs], text, note, images }
   if (r.v === 1) return toV2(out as RectsV1, theme)
-  return { ...(out as unknown as Rects), v: 2, ...(tiles ? { tiles } : {}), ...(timer ? { timer } : {}) }
+  return { ...(out as unknown as Rects), v: 2, ...(tiles ? { tiles } : {}), ...(timer ? { timer } : {}), ...(recall ? { recall } : {}), ...(teams ? { teams } : {}) }
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
@@ -183,7 +187,7 @@ export function answerLayoutUnsupportedReason(theme: string | undefined, mechani
   if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: ответ рисуется её собственной сценой.'
   if (mechanic === 'four_pics') return null
   if (!QUESTION_SCREEN_MECHANICS.has(mechanic)) return 'У этой механики свой разбор — компоновка ответа вручную для неё не предусмотрена.'
-  if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'Разбор вариантов, порядка и пар идёт по шагам — компоновка вручную не предусмотрена.'
+  // 10.71: варианты, порядок и пары тоже раскладываются вручную (плитки; ступени показа и подсветка верного остаются прежними)
   if (q.media.hidden) return 'Скрытое видео играет вместе с ответом — компоновка вручную не предусмотрена.'
   return null
 }
@@ -202,11 +206,21 @@ export function fallbackGridRects(imgs: string[], fold = true): RectsV1 {
   return { v: 1, imgs: [...imgs], images }
 }
 
-/** Вёрстку ответа ведёт общий AnswerScreen? Только раскрытый ответ поддержанного вида (до раскрытия — экран вопроса, в т.ч. для answer.mode==='anagram' вне «Скрэмбла»). */
-export function answerUsesSharedScreen(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }, revealed: boolean): boolean {
-  return revealed && !q.media.hidden && answerLayoutUnsupportedReason(theme, mechanic, q) === null
+/** Сколько плиток на экране ОТВЕТА: варианты (текстом или картинками), строки порядка, пары сопоставления; у свободного ответа — 0. */
+export function answerTileCount(q: { answer: { mode: string; choices?: unknown[]; correct_order?: string; left?: unknown[] } }): number {
+  const a = q.answer
+  if (a.mode === 'choice') return a.choices?.length ?? 0
+  if (a.mode === 'order') return (a.correct_order ?? '').length
+  if (a.mode === 'match') return a.left?.length ?? 0
+  return 0
 }
 
+/** Вёрстку ответа ведёт общий AnswerScreen? Только раскрытый ответ поддержанного вида (до раскрытия — экран вопроса, в т.ч. для answer.mode==='anagram' вне «Скрэмбла»).
+ *  Варианты/порядок/пары — только когда для них есть ручная раскладка (`manualAnswer`); без неё остаётся прежний экран ShowAnswers (авто-вид не меняется). */
+export function answerUsesSharedScreen(theme: string | undefined, mechanic: string, q: { answer: { mode: string }; media: { hidden?: boolean } }, revealed: boolean, manualAnswer = false): boolean {
+  const staged = q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match'
+  return revealed && !q.media.hidden && answerLayoutUnsupportedReason(theme, mechanic, q) === null && (!staged || manualAnswer)
+}
 
 // ── мягкие предупреждения (v:2): рамка поверх занятого места — НЕ запрет, а подсказка редактору ──
 const inter = (a: Rect, b: Rect) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y))
@@ -217,6 +231,8 @@ export function layoutWarnings(rects: Rects, theme: string | undefined): string[
   if (rects.note) items.push({ name: 'Пояснение', r: rects.note })
   rects.images.forEach((r, i) => items.push({ name: `Картинка ${i + 1}`, r }))
   rects.tiles?.forEach((r, i) => items.push({ name: `Вариант ${i + 1}`, r }))
+  if (rects.recall) items.push({ name: 'Вопрос', r: rects.recall })
+  if (rects.teams) items.push({ name: 'Ответы команд', r: rects.teams })
   const zones = busyZones(theme), out: string[] = []
   for (const it of items) {
     const area = it.r.w * it.r.h; const hit = new Set<string>()

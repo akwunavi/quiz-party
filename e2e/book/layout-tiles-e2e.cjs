@@ -33,6 +33,21 @@ async function main() {
     const row = await p.evaluate(async id => (await fetch(`/sb/rest/v1/pack_questions?id=eq.${id}&select=service`, { headers: { apikey: 'x' } })).json(), `stand-book-r${roundIdx}-q${qi}`).catch(() => null)
     const lay = row && row[0] && row[0].service && row[0].service.layout && row[0].service.layout.question
     c.saved = lay ? { v: lay.v, tiles: lay.tiles && lay.tiles.length, timer: !!lay.timer, tile0: lay.tiles && [+lay.tiles[0].x.toFixed(3), +lay.tiles[0].y.toFixed(3)] } : null
+    // ── экран ОТВЕТА: плитки, вопрос, колонка команд ──
+    await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Ответ', exact: true }).click(); await p.waitForTimeout(800)
+    await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(1200)
+    const a = { tileBoxes: await p.locator('.lay-box.tile').count(), recallBox: await p.locator('.lay-box.recall').count(), teamsBox: await p.locator('.lay-box.teams').count(), plateBox: await p.locator('.lay-box.text').count() }
+    await p.screenshot({ path: `${OUT}/${name}-4-answer-manual.png` })
+    const ar2 = await p.locator('.lay-ed-area').boundingBox()
+    { const tb = await p.locator('.lay-box.tile').nth(0).boundingBox(); await drag('.lay-box.tile >> nth=0', ar2.x + 6 - tb.x, ar2.y + ar2.height * 0.5 - tb.y) }
+    if (a.teamsBox) { const tm = await p.locator('.lay-box.teams').boundingBox(); await drag('.lay-box.teams', ar2.x + ar2.width * 0.45 - tm.x, ar2.y + 20 - tm.y) }
+    a.warnings = await p.locator('.lay-warn').allTextContents(); a.tileInDom = await p.locator('.pv-backdrop .lay-tile').count(); a.teamsInDom = await p.locator('.pv-backdrop .lay-teams').count()
+    await p.screenshot({ path: `${OUT}/${name}-5-answer-edited.png` })
+    await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
+    const row2 = await p.evaluate(async id => (await fetch(`/sb/rest/v1/pack_questions?id=eq.${id}&select=service`, { headers: { apikey: 'x' } })).json(), `stand-book-r${roundIdx}-q${qi}`).catch(() => null)
+    const la = row2 && row2[0] && row2[0].service && row2[0].service.layout && row2[0].service.layout.answer
+    a.saved = la ? { v: la.v, tiles: la.tiles && la.tiles.length, teams: !!la.teams, recall: !!la.recall, imgsAreHashes: (la.imgs || []).every(x => /^#[0-9a-f]{8}$/.test(x)) } : null
+    c.answer = a
     await ctx.close()
     c.projector = {}
     for (const [w, h] of [[1920, 1080], [1280, 720]]) {
@@ -43,7 +58,11 @@ async function main() {
         const t0 = tiles[0], tm = document.querySelector('.lay-timer'); const plate = t0 && t0.querySelector('.choice-plate'), tx = t0 && t0.querySelector('.lay-tile-tx')
         return { manual: !!document.querySelector('.lay-area'), tiles: tiles.length, gridInFlow: !!document.querySelector('.host-screen > .choices-grid'), tile0: R(t0), timerBox: R(tm), timerInner: R(tm && tm.querySelector('.lay-timer-in')), topbarTimer: !!document.querySelector('.host-topbar > :not(.qnum):last-child'),
           textFits: tx ? tx.getBoundingClientRect().right <= t0.getBoundingClientRect().right + 1 && tx.getBoundingClientRect().bottom <= t0.getBoundingClientRect().bottom + 1 : null, tileKeys: tiles.map(t => (t.querySelector('.key') || {}).textContent) } })
-      await pg.screenshot({ path: `${OUT}/${name}-3-projector-${w}.png` }); await c2.close()
+      await pg.screenshot({ path: `${OUT}/${name}-3-projector-${w}.png` })
+      await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: roundIdx, question_index: qi, timer_started_at: null, reveal: true }); await pg.waitForTimeout(7000)
+      c.projector[w].answer = await pg.evaluate(() => { const R = e => e && (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); const tl = [...document.querySelectorAll('.lay-tile')]
+        return { manual: !!document.querySelector('.lay-area'), tiles: tl.length, tile0: R(tl[0]), teams: R(document.querySelector('.lay-teams')), teamsInner: R(document.querySelector('.lay-teams .team-answers')), plate: R(document.querySelector('.lay-text')), dbg: [...document.querySelectorAll('.lay-tile')].map(t => { if (!t) return null; const pl = t.querySelector('.choice-plate'), tt = t.querySelector('.lay-tile-t'), tx = t.querySelector('.lay-tile-tx'); const W = e => e && Math.round(e.getBoundingClientRect().width); const cs = e => e && getComputedStyle(e); return { tile: W(t), plate: W(pl), t: W(tt), tx: W(tx), disp: pl && cs(pl).display, pad: pl && cs(pl).padding, bw: pl && cs(pl).borderLeftWidth, fs: (pl || t) && cs(pl || t).fontSize, sh: pl && cs(pl).getPropertyValue('--sh'), tflex: tt && cs(tt).flex, key: pl && W(pl.querySelector('.key')), fsx: tx && getComputedStyle(tx).fontSize, kids: pl && [...pl.children].map(c => c.className + ':' + Math.round(c.getBoundingClientRect().width)) } }), correct: document.querySelectorAll('.lay-tile .correct').length, dimmed: document.querySelectorAll('.lay-tile .dimmed').length, hidden: document.querySelectorAll('.lay-tile .hidden-yet').length } })
+      await pg.screenshot({ path: `${OUT}/${name}-6-answer-projector-${w}.png` }); await c2.close()
     }
     c.errs = errs; res.cases[name] = c
   }

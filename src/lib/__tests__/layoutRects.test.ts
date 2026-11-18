@@ -119,7 +119,7 @@ describe('экран ответа и «3 попытки»', () => {
     expect(answerLayoutUnsupportedReason('classic', 'standard', free)).toBeNull()
     expect(answerLayoutUnsupportedReason('ny_book', 'four_pics', { answer: { mode: 'crossword_word' }, media: {} })).toBeNull()
     expect(answerLayoutUnsupportedReason('enchanted_forest', 'standard', free)).toMatch(/лес/)
-    expect(answerLayoutUnsupportedReason('classic', 'standard', { answer: { mode: 'choice' }, media: {} })).toMatch(/вариант/)
+    expect(answerLayoutUnsupportedReason('classic', 'standard', { answer: { mode: 'choice' }, media: {} })).toBeNull()   // 10.71: варианты/порядок/пары — плитки
     expect(answerLayoutUnsupportedReason('classic', 'standard', { answer: { mode: 'free_text' }, media: { hidden: true } })).toMatch(/видео/)
     expect(answerLayoutUnsupportedReason('classic', 'melody', free)).toMatch(/механики/)
   })
@@ -270,5 +270,47 @@ describe('10.71: плитки вариантов и таймер в раскла
     const w = layoutWarnings({ ...base, tiles: [{ x: .3, y: .01, w: .2, h: .05 }], timer: { x: .8, y: .93, w: .1, h: .06 } } as Rects, 'ny_book').join(' ')
     expect(w).toMatch(/Вариант 1 лежит поверх: .*таймер/); expect(w).toMatch(/Таймер лежит поверх: кнопки/)
     expect(layoutWarnings({ ...base, text: { x: .8, y: .4, w: .1, h: .1 }, timer: { x: .8, y: .4, w: .1, h: .1 } } as Rects, 'classic').join(' ')).toMatch(/Текст лежит поверх: таймер/)
+  })
+})
+
+import { answerTileCount } from '../layoutRects'
+describe('10.71: экран ответа — плитки, вопрос, колонка команд', () => {
+  const base = { v: 2, imgs: [], text: { x: .1, y: .2, w: .5, h: .1 }, images: [] }
+  const t3 = [0, 1, 2].map(i => ({ x: .1 + i * .25, y: .6, w: .2, h: .1 }))
+  it('answerTileCount: варианты, строки порядка, пары; свободный ответ — 0', () => {
+    expect(answerTileCount({ answer: { mode: 'choice', choices: [1, 2, 3, 4] } })).toBe(4)
+    expect(answerTileCount({ answer: { mode: 'order', correct_order: 'БАВ' } })).toBe(3)
+    expect(answerTileCount({ answer: { mode: 'match', left: ['1', '2'] } })).toBe(2)
+    expect(answerTileCount({ answer: { mode: 'free_text' } })).toBe(0)
+  })
+  it('recall/teams читаются и клампятся; битые — на месте; старые v:1 их не знают', () => {
+    const r = validateRects({ ...base, recall: { x: .1, y: .05, w: .5, h: .1 }, teams: { x: .7, y: .1, w: .5, h: .9 } }, [], 'ny_book')!
+    expect(r.recall).toBeTruthy(); expect(r.teams!.x + r.teams!.w).toBeLessThanOrEqual(1 + 1e-9)
+    expect(validateRects({ ...base, teams: { x: 0, y: 0, w: 0, h: 0 } }, [])!.teams).toBeUndefined()
+    expect(validateRects({ ...base, v: 1, teams: { x: .1, y: .1, w: .2, h: .2 } }, [])!.teams).toBeUndefined()
+  })
+  it('раскладка только из плиток/вопроса/команд допустима', () => {
+    expect(validateRects({ v: 2, imgs: [], images: [], tiles: t3 }, [], 'ny_book', 3)).not.toBeNull()
+    expect(validateRects({ v: 2, imgs: [], images: [], recall: { x: .1, y: .1, w: .3, h: .1 } }, [])).not.toBeNull()
+    expect(validateRects({ v: 2, imgs: [], images: [], teams: { x: .6, y: .1, w: .3, h: .5 } }, [])).not.toBeNull()
+  })
+  it('ответ: плитки — по числу; запись layout.answer сохраняет их, пути заменены хешами', () => {
+    const rects = { ...base, imgs: ['x/secret.jpg'], images: [{ x: .1, y: .1, w: .2, h: .2 }], tiles: t3, teams: { x: .6, y: .1, w: .3, h: .5 } } as Rects
+    const svc = withScreenLayout({}, 'answer', rects)
+    expect(JSON.stringify(svc)).not.toContain('secret')
+    expect(screenLayout(svc, 'answer', ['x/secret.jpg'], 'classic', 3)!.tiles).toHaveLength(3)
+    expect(screenLayout(svc, 'answer', ['x/secret.jpg'], 'classic', 4)!.tiles).toBeUndefined()
+    expect(screenLayout(svc, 'answer', ['x/secret.jpg'], 'classic', 3)!.teams).toBeTruthy()
+  })
+  it('общий AnswerScreen для вариантов/порядка/пар — только при ручной раскладке; свободный ответ — как раньше', () => {
+    const ch = { answer: { mode: 'choice' }, media: {} }
+    expect(answerUsesSharedScreen('classic', 'standard', ch, true)).toBe(false)
+    expect(answerUsesSharedScreen('classic', 'standard', ch, true, true)).toBe(true)
+    expect(answerUsesSharedScreen('classic', 'standard', ch, false, true)).toBe(false)
+    expect(answerUsesSharedScreen('enchanted_forest', 'standard', ch, true, true)).toBe(false)
+  })
+  it('предупреждения: вопрос и колонка команд тоже проверяются', () => {
+    const w = layoutWarnings({ ...base, recall: { x: .3, y: .01, w: .3, h: .05 }, teams: { x: .45, y: .5, w: .1, h: .2 } } as Rects, 'ny_book').join(' ')
+    expect(w).toMatch(/Вопрос лежит поверх/); expect(w).toMatch(/Ответы команд лежит поверх: сгиб/)
   })
 })
