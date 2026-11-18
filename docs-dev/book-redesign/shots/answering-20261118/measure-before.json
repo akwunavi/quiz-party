@@ -1,0 +1,5474 @@
+[
+ {
+  "name": "09n00-answer-time-0-1280x720",
+  "title": "ожидание ответов: 0 команд, ответили 0+0 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n00-answer-time-0",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 396,
+      "y": 124,
+      "w": 488,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 287,
+      "y": 213,
+      "w": 706,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 207,
+      "y": 433,
+      "w": 867,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 374,
+      "y": 120,
+      "w": 532,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 485,
+      "y": 100,
+      "w": 310,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 520
+   },
+   "onPages": 492266,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n00-answer-time-0-1366x768",
+  "title": "ожидание ответов: 0 команд, ответили 0+0 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n00-answer-time-0",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 423,
+      "y": 132,
+      "w": 521,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 328,
+      "y": 227,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 221,
+      "y": 458,
+      "w": 924,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 401,
+      "y": 128,
+      "w": 565,
+      "h": 93,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 518,
+      "y": 107,
+      "w": 331,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "85.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 555
+   },
+   "onPages": 560090,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n00-answer-time-0-1899x905",
+  "title": "ожидание ответов: 0 команд, ответили 0+0 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n00-answer-time-0",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 643,
+      "y": 155,
+      "w": 614,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 266,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 405,
+      "y": 531,
+      "w": 1089,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 151,
+      "w": 658,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 126,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100.556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 654
+   },
+   "onPages": 777738,
+   "share": 45.3,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n00-answer-time-0-1920x1080",
+  "title": "ожидание ответов: 0 команд, ответили 0+0 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n00-answer-time-0",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 594,
+      "y": 184,
+      "w": 732,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 316,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 310,
+      "y": 624,
+      "w": 1300,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 572,
+      "y": 180,
+      "w": 776,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 150,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "120px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {},
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 780
+   },
+   "onPages": 1107600,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n04-answer-time-4-1280x720",
+  "title": "ожидание ответов: 4 команд, ответили 1+1 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n04-answer-time-4",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 396,
+      "y": 124,
+      "w": 488,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 287,
+      "y": 213,
+      "w": 706,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 207,
+      "y": 433,
+      "w": 867,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 4,
+    "items": [
+     {
+      "x": 226,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 645,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 854,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 374,
+      "y": 120,
+      "w": 532,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 485,
+      "y": 100,
+      "w": 310,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 4,
+    "min": 16,
+    "max": 16
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 520
+   },
+   "onPages": 492266,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n04-answer-time-4-1366x768",
+  "title": "ожидание ответов: 4 команд, ответили 1+1 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n04-answer-time-4",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 423,
+      "y": 132,
+      "w": 521,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 328,
+      "y": 227,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 221,
+      "y": 458,
+      "w": 924,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 4,
+    "items": [
+     {
+      "x": 241,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 688,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 401,
+      "y": 128,
+      "w": 565,
+      "h": 93,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 518,
+      "y": 107,
+      "w": 331,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "85.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 4,
+    "min": 17.1,
+    "max": 17.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 555
+   },
+   "onPages": 560090,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n04-answer-time-4-1899x905",
+  "title": "ожидание ответов: 4 команд, ответили 1+1 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n04-answer-time-4",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 643,
+      "y": 155,
+      "w": 614,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 266,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 405,
+      "y": 531,
+      "w": 1089,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 4,
+    "items": [
+     {
+      "x": 429,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 955,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 1219,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 151,
+      "w": 658,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 126,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100.556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 4,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 654
+   },
+   "onPages": 777738,
+   "share": 45.3,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n04-answer-time-4-1920x1080",
+  "title": "ожидание ответов: 4 команд, ответили 1+1 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n04-answer-time-4",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 594,
+      "y": 184,
+      "w": 732,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 316,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 310,
+      "y": 624,
+      "w": 1300,
+      "h": 74,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 4,
+    "items": [
+     {
+      "x": 338,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 967,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 1281,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 572,
+      "y": 180,
+      "w": 776,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 150,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "120px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 4,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 780
+   },
+   "onPages": 1107600,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n08-answer-time-8-1280x720",
+  "title": "ожидание ответов: 8 команд, ответили 3+2 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n08-answer-time-8",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 396,
+      "y": 124,
+      "w": 488,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 287,
+      "y": 213,
+      "w": 706,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 207,
+      "y": 433,
+      "w": 867,
+      "h": 103,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 226,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 645,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 854,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 226,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 374,
+      "y": 120,
+      "w": 532,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 485,
+      "y": 100,
+      "w": 310,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 16,
+    "max": 16
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 520
+   },
+   "onPages": 492266,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n08-answer-time-8-1366x768",
+  "title": "ожидание ответов: 8 команд, ответили 3+2 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n08-answer-time-8",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 423,
+      "y": 132,
+      "w": 521,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 328,
+      "y": 227,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 221,
+      "y": 458,
+      "w": 924,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 241,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 688,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 241,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 401,
+      "y": 128,
+      "w": 565,
+      "h": 93,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 518,
+      "y": 107,
+      "w": 331,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "85.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 17.1,
+    "max": 17.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 555
+   },
+   "onPages": 560090,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n08-answer-time-8-1899x905",
+  "title": "ожидание ответов: 8 команд, ответили 3+2 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n08-answer-time-8",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 643,
+      "y": 155,
+      "w": 614,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 266,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 405,
+      "y": 531,
+      "w": 1089,
+      "h": 129,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 429,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 955,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 1219,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 429,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 151,
+      "w": 658,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 126,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100.556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 654
+   },
+   "onPages": 777738,
+   "share": 45.3,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n08-answer-time-8-1920x1080",
+  "title": "ожидание ответов: 8 команд, ответили 3+2 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n08-answer-time-8",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 594,
+      "y": 184,
+      "w": 732,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 316,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 310,
+      "y": 624,
+      "w": 1300,
+      "h": 154,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 8,
+    "items": [
+     {
+      "x": 338,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 967,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 1281,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 338,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 572,
+      "y": 180,
+      "w": 776,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 150,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "120px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 8,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 780
+   },
+   "onPages": 1107600,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n16-answer-time-16-1280x720",
+  "title": "ожидание ответов: 16 команд, ответили 6+5 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n16-answer-time-16",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 396,
+      "y": 124,
+      "w": 488,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 287,
+      "y": 213,
+      "w": 706,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 207,
+      "y": 433,
+      "w": 867,
+      "h": 209,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 16,
+    "items": [
+     {
+      "x": 226,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 645,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 854,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 226,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 374,
+      "y": 120,
+      "w": 532,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 485,
+      "y": 100,
+      "w": 310,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 742,
+    "clientH": 720,
+    "scrollW": 1280,
+    "clientW": 1280,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 16,
+    "min": 16,
+    "max": 16
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 520
+   },
+   "onPages": 492266,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n16-answer-time-16-1366x768",
+  "title": "ожидание ответов: 16 команд, ответили 6+5 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n16-answer-time-16",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 423,
+      "y": 132,
+      "w": 521,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 328,
+      "y": 227,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 221,
+      "y": 458,
+      "w": 924,
+      "h": 223,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 16,
+    "items": [
+     {
+      "x": 241,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 688,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 241,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 401,
+      "y": 128,
+      "w": 565,
+      "h": 93,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 518,
+      "y": 107,
+      "w": 331,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 788,
+    "clientH": 768,
+    "scrollW": 1366,
+    "clientW": 1366,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "85.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 16,
+    "min": 17.1,
+    "max": 17.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 555
+   },
+   "onPages": 560090,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n16-answer-time-16-1899x905",
+  "title": "ожидание ответов: 16 команд, ответили 6+5 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n16-answer-time-16",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 643,
+      "y": 155,
+      "w": 614,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 266,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 405,
+      "y": 531,
+      "w": 1089,
+      "h": 263,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 16,
+    "items": [
+     {
+      "x": 429,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 955,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 1219,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 429,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 151,
+      "w": 658,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 126,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 920,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100.556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 16,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 654
+   },
+   "onPages": 777738,
+   "share": 45.3,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n16-answer-time-16-1920x1080",
+  "title": "ожидание ответов: 16 команд, ответили 6+5 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n16-answer-time-16",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 594,
+      "y": 184,
+      "w": 732,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 316,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 310,
+      "y": 624,
+      "w": 1300,
+      "h": 314,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 16,
+    "items": [
+     {
+      "x": 338,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 967,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 1281,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 338,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 572,
+      "y": 180,
+      "w": 776,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 150,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1088,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "120px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 16,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 780
+   },
+   "onPages": 1107600,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n24-answer-time-24-1280x720",
+  "title": "ожидание ответов: 24 команд, ответили 9+7 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n24-answer-time-24",
+  "viewport": "1280x720",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 396,
+      "y": 124,
+      "w": 488,
+      "h": 80,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 287,
+      "y": 213,
+      "w": 706,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 207,
+      "y": 433,
+      "w": 867,
+      "h": 316,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 24,
+    "items": [
+     {
+      "x": 226,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 645,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 854,
+      "y": 433,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 226,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     },
+     {
+      "x": 435,
+      "y": 486,
+      "w": 200,
+      "h": 49,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 374,
+      "y": 120,
+      "w": 532,
+      "h": 88,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 485,
+      "y": 100,
+      "w": 310,
+      "h": 15,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 41,
+     "top": 32
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "viewport",
+    "by": {
+     "bottom": 29
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "pages",
+    "by": {
+     "bottom": 55
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 849,
+    "clientH": 720,
+    "scrollW": 1280,
+    "clientW": 1280,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "80px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1280,
+    "h": 720
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(0.666667)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 25,
+    "y": 19,
+    "w": 1229,
+    "h": 696
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 43,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pageR": {
+    "x": 640,
+    "y": 33,
+    "w": 597,
+    "h": 660
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 43,
+    "y": 33,
+    "w": 1195,
+    "h": 660
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 24,
+    "min": 16,
+    "max": 16
+   }
+  },
+  "area": {
+   "content": {
+    "w": 947,
+    "h": 520
+   },
+   "onPages": 492266,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.667,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n24-answer-time-24-1366x768",
+  "title": "ожидание ответов: 24 команд, ответили 9+7 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n24-answer-time-24",
+  "viewport": "1366x768",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 423,
+      "y": 132,
+      "w": 521,
+      "h": 85,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 328,
+      "y": 227,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 221,
+      "y": 458,
+      "w": 924,
+      "h": 337,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 24,
+    "items": [
+     {
+      "x": 241,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 688,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 911,
+      "y": 458,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 241,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     },
+     {
+      "x": 464,
+      "y": 515,
+      "w": 214,
+      "h": 53,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 401,
+      "y": 128,
+      "w": 565,
+      "h": 93,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 518,
+      "y": 107,
+      "w": 331,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 44,
+     "top": 35
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "viewport",
+    "by": {
+     "bottom": 27
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "pages",
+    "by": {
+     "bottom": 56
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 902,
+    "clientH": 768,
+    "scrollW": 1366,
+    "clientW": 1366,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "85.3333px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1366,
+    "h": 768
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0.333333px, 0px) scale(0.711111)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 27,
+    "y": 20,
+    "w": 1311,
+    "h": 742
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 46,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pageR": {
+    "x": 683,
+    "y": 36,
+    "w": 637,
+    "h": 704
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 46,
+    "y": 36,
+    "w": 1274,
+    "h": 704
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 24,
+    "min": 17.1,
+    "max": 17.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1010,
+    "h": 555
+   },
+   "onPages": 560090,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.711,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n24-answer-time-24-1899x905",
+  "title": "ожидание ответов: 24 команд, ответили 9+7 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n24-answer-time-24",
+  "viewport": "1899x905",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 643,
+      "y": 155,
+      "w": 614,
+      "h": 101,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 595,
+      "y": 266,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 405,
+      "y": 531,
+      "w": 1089,
+      "h": 397,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 24,
+    "items": [
+     {
+      "x": 429,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 955,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 1219,
+      "y": 531,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 429,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     },
+     {
+      "x": 692,
+      "y": 598,
+      "w": 252,
+      "h": 62,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 621,
+      "y": 151,
+      "w": 658,
+      "h": 109,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 754,
+      "y": 126,
+      "w": 390,
+      "h": 18,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 197,
+     "top": 41
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "viewport",
+    "by": {
+     "bottom": 23
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "pages",
+    "by": {
+     "bottom": 57
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1054,
+    "clientH": 905,
+    "scrollW": 1899,
+    "clientW": 1899,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "100.556px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1899,
+    "h": 905
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(145.056px, 5.68434e-14px) scale(0.837963)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 177,
+    "y": 23,
+    "w": 1545,
+    "h": 875
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 199,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pageR": {
+    "x": 950,
+    "y": 42,
+    "w": 751,
+    "h": 830
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 199,
+    "y": 42,
+    "w": 1502,
+    "h": 830
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 24,
+    "min": 20.1,
+    "max": 20.1
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1190,
+    "h": 654
+   },
+   "onPages": 777738,
+   "share": 45.3,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 0.838,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ },
+ {
+  "name": "09n24-answer-time-24-1920x1080",
+  "title": "ожидание ответов: 24 команд, ответили 9+7 частично",
+  "ok": true,
+  "why": "",
+  "errors": [],
+  "media": [],
+  "scene": "09n24-answer-time-24",
+  "viewport": "1920x1080",
+  "reduced": false,
+  "phaseClasses": "host-screen grid-bg",
+  "density": "dense",
+  "nodes": {
+   ".host-actions": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".neon-title": {
+    "count": 1,
+    "items": [
+     {
+      "x": 594,
+      "y": 184,
+      "w": 732,
+      "h": 120,
+      "visible": true
+     }
+    ]
+   },
+   ".meta-line": {
+    "count": 1,
+    "items": [
+     {
+      "x": 605,
+      "y": 316,
+      "w": 709,
+      "h": 42,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-time-teams": {
+    "count": 1,
+    "items": [
+     {
+      "x": 310,
+      "y": 624,
+      "w": 1300,
+      "h": 474,
+      "visible": true
+     }
+    ]
+   },
+   ".at-team": {
+    "count": 24,
+    "items": [
+     {
+      "x": 338,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 967,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 1281,
+      "y": 624,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 338,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     },
+     {
+      "x": 653,
+      "y": 704,
+      "w": 300,
+      "h": 74,
+      "visible": true
+     }
+    ]
+   },
+   ".answer-pulse": {
+    "count": 1,
+    "items": [
+     {
+      "x": 572,
+      "y": 180,
+      "w": 776,
+      "h": 128,
+      "visible": true
+     }
+    ]
+   },
+   ".pack-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0,
+      "visible": false
+     }
+    ]
+   },
+   ".link-badge": {
+    "count": 1,
+    "items": [
+     {
+      "x": 2,
+      "y": 1,
+      "w": 56,
+      "h": 16,
+      "visible": true
+     }
+    ]
+   },
+   ".mono-tag": {
+    "count": 1,
+    "items": [
+     {
+      "x": 727,
+      "y": 150,
+      "w": 466,
+      "h": 22,
+      "visible": true
+     }
+    ]
+   }
+  },
+  "overlaps": [],
+  "outside": [
+   {
+    "node": ".link-badge[0]",
+    "of": "pages",
+    "by": {
+     "left": 62,
+     "top": 49
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "viewport",
+    "by": {
+     "bottom": 18
+    }
+   },
+   {
+    "node": ".answer-time-teams[0]",
+    "of": "pages",
+    "by": {
+     "bottom": 58
+    }
+   }
+  ],
+  "overflow": [
+   {
+    "node": ".host-screen[0]",
+    "scrollH": 1248,
+    "clientH": 1080,
+    "scrollW": 1920,
+    "clientW": 1920,
+    "overflow": "hidden/hidden"
+   }
+  ],
+  "fonts": {
+   ".neon-title": {
+    "family": "\"Cormorant Garamond\", \"PT Serif\", Georgia, serif",
+    "weight": "700",
+    "style": "normal",
+    "size": "120px",
+    "loaded": true
+   }
+  },
+  "fontMatch": null,
+  "book": {
+   "viewport": {
+    "w": 1920,
+    "h": 1080
+   },
+   "u": "min(calc(100vw / 1920), calc(100vh / 1080))",
+   "stageTransform": "translate(0px, 0px) scale(1)",
+   "stageCrop": "--cx0=0px --cx1=0px --cy0=0px --cy1=0px",
+   "cover": {
+    "x": 38,
+    "y": 28,
+    "w": 1844,
+    "h": 1044
+   },
+   "coverClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "pageL": {
+    "x": 64,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pageR": {
+    "x": 960,
+    "y": 50,
+    "w": 896,
+    "h": 990
+   },
+   "pagesClipped": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+   },
+   "visiblePages": {
+    "x": 64,
+    "y": 50,
+    "w": 1792,
+    "h": 990
+   }
+  },
+  "anim": {
+   ".neon-title": "none",
+   ".bk-lamp": "bk-twinkle 1.8s",
+   ".bk-spark": "bk-spark 3.6s"
+  },
+  "text": {
+   ".at-team": {
+    "n": 24,
+    "min": 24,
+    "max": 24
+   }
+  },
+  "area": {
+   "content": {
+    "w": 1420,
+    "h": 780
+   },
+   "onPages": 1107600,
+   "share": 53.4,
+   "offPages": 0
+  },
+  "geo": {
+   "u": 1,
+   "qtext": null,
+   "imgs": [],
+   "timer": null,
+   "qnum": null,
+   "emptyBelowPct": 123.6,
+   "caps": [],
+   "layout": {
+    "media": null,
+    "mediaScore": null,
+    "comp": null,
+    "compScore": null
+   },
+   "caption": [],
+   "diag": null,
+   "diagAttr": null
+  },
+  "vinylSpin": null,
+  "playing": [],
+  "fontFaces": [
+   "Cormorant Garamond 700",
+   "Cormorant Garamond 700",
+   "EB Garamond 600",
+   "EB Garamond 600",
+   "Inter 400",
+   "Inter 400",
+   "PT Serif 400",
+   "PT Serif 700",
+   "PT Serif 700",
+   "Russo One 400",
+   "Russo One 400",
+   "Share Tech Mono 400"
+  ],
+  "externalHosts": []
+ }
+]

@@ -155,6 +155,15 @@ export const SCENES = [
       await api.session({ pack_id: PACK_ONLINE, phase: 'answer_time', round_number: 0, question_index: 9, timer_started_at: iso(now() - 12000), reveal: false })
     },
   },
+  // 9b. «Отвечайте» по числу команд (20.11): n команд, done — сколько ответили на все вопросы, part — сколько на часть
+  ...[[0, 0, 0], [4, 1, 1], [8, 3, 2], [16, 6, 5], [24, 9, 7]].map(([n, done, part]) => ({
+    id: `09n${String(n).padStart(2, '0')}-answer-time-${n}`, title: `ожидание ответов: ${n} команд, ответили ${done}+${part} частично`, ready: '.answer-pulse', settle: 2500,
+    async setup(api) {
+      await api.reset(); const ts = n ? await api.teams(n) : []
+      await api.answers(ts.flatMap((t, i) => Array.from({ length: i < done ? 10 : i < done + part ? 1 + (i % 8) : 0 }, (_, qi) => ({ team_id: t.id, question_ref: qref(0, qi), round_number: 0, answer_text: 'ответ' }))))
+      await api.session({ pack_id: PACK_ONLINE, phase: 'answer_time', round_number: 0, question_index: 9, timer_started_at: iso(now() - 12000), reveal: false })
+    },
+  })),
   {
     id: '09p-answer-time-paper', title: 'ожидание ответов (бумага)', ready: '.answer-pulse', settle: 2500,
     async setup(api) { await api.reset(); await api.session({ pack_id: PACK_PAPER, phase: 'answer_time', round_number: 0, question_index: 9, timer_started_at: iso(now() - 12000), reveal: false }) },

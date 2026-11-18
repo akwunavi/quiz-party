@@ -1,0 +1,66 @@
+{
+ "theme": "classic",
+ "checks": {
+  "tiles": 4,
+  "snapEdge": {
+   "guideLinesDuring": 4,
+   "dx": 0
+  },
+  "altNoSnap": {
+   "guideLinesDuring": 0,
+   "dx": 3
+  },
+  "snapCenter": {
+   "guideLinesDuring": 1,
+   "centerOffsetPx": 0
+  },
+  "snapSize": {
+   "eqBadgesDuring": 4,
+   "dw": 0,
+   "dh": 1.91
+  },
+  "selectedByShift": 3,
+  "align3": {
+   "lefts": [
+    159.98,
+    159.98,
+    159.98
+   ],
+   "heights": [
+    84.63,
+    84.63,
+    84.63
+   ],
+   "gaps": [
+    -11.77,
+    -11.75
+   ]
+  },
+  "marqueeDuring": 1,
+  "marqueeSelected": 4,
+  "arrows": {
+   "small": 3.84,
+   "big": 19.2,
+   "areaW": 1920
+  },
+  "saved": {
+   "v": 2,
+   "keys": [
+    "images",
+    "imgs",
+    "text",
+    "tiles",
+    "timer",
+    "v"
+   ],
+   "tileKeys": [
+    "h",
+    "w",
+    "x",
+    "y"
+   ],
+   "tiles": 4
+  },
+  "errs": []
+ }
+}

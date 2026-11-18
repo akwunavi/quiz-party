@@ -44,6 +44,7 @@ import { NyLobby } from '../ny/NyLobby'
 import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
 import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
 import { BookTeamCard } from '../ny/book/BookTeamCard'
+import { answeringLayout } from '../ny/book/answeringLayout'
 import { BookRoundTitle } from '../ny/book/BookRoundTitle'
 import { BookNote } from '../ny/book/BookNote'
 import { LinkBadge } from '../components/LinkBadge'
@@ -1694,14 +1695,21 @@ function AnswerTime({ pack, round, gameState }: {
     </>
   )
 
+  // «Книга»: без подписей «РАУНД N :: ОЖИДАЮ ОТВЕТЫ» и «КАПИТАНЫ ОТПРАВЛЯЮТ…» (на экране только заголовок, таймер и карточки команд);
+  // размеры заголовка/таймера/карточек — по числу команд (ny/book/answeringLayout.ts). Хуков здесь нет — ранний return выше безопасен.
+  const book = pack.theme === 'ny_book'
+  const lay = answeringLayout(paper ? 0 : teams.length)
+  const bookVars = book && !paper ? {
+    '--at-cols': lay.cols, '--at-title': `calc(${lay.title} * var(--u))`, '--at-timer': `calc(${lay.timer} * var(--u))`, '--at-w': `calc(${lay.width} * var(--u))`,
+  } as CSSProperties : undefined
   return (
-    <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`}>
-      <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>
+    <div className={`host-screen grid-bg${paper ? ' paper-answer-time' : ''}`} style={bookVars} data-at-n={book && !paper ? teams.length : undefined}>
+      {!book && <div className="mono-tag">РАУНД {displayRoundNumber(pack, gameState.round_number)} :: ОЖИДАЮ ОТВЕТЫ</div>}
       <div className="answer-pulse"><Title theme={pack.theme}
         lines={[paper ? 'СДАВАЙТЕ БЛАНКИ' : 'ОТВЕЧАЙТЕ!']} /></div>
-      <div className="meta-line">{paper
+      {(!book || paper) && <div className="meta-line">{paper
         ? 'ПЕРЕДАЙТЕ БЛАНКИ ВЕДУЩЕМУ'
-        : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>
+        : 'КАПИТАНЫ ОТПРАВЛЯЮТ ОТВЕТЫ С ТЕЛЕФОНОВ'}</div>}
       <Timer startedAt={gameState.timer_started_at} seconds={seconds} theme={pack.theme} variant="ring" />
       {/* Список команд со счётчиком «сколько ответов долетело» нужен только
           при игре с телефонов: он показывает, кого ещё ждать. На бумаге
@@ -1715,7 +1723,7 @@ function AnswerTime({ pack, round, gameState }: {
             return (
               pack.theme === 'ny_book'
                 /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
-                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={74} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={lay.ch} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
                 : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
