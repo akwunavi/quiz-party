@@ -178,7 +178,8 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     let n: Rect = { ...r0, w, h }; let gd: Guides | null = null
     if (cfg && !prop) {
       const r = snapResize(n, others, cfg); n = r.rect
-      const eqs = [...r.sameW.map(i => ({ r: others[i], txt: '= ширина' })), ...r.sameH.map(i => ({ r: others[i], txt: '= высота' }))]
+      const idx = [...new Set([...r.sameW, ...r.sameH])]   // у одной рамки — одна метка («= ширина · = высота»)
+      const eqs = idx.map(i => ({ r: others[i], txt: [r.sameW.includes(i) ? '= ширина' : '', r.sameH.includes(i) ? '= высота' : ''].filter(Boolean).join(' · ') }))
       if (eqs.length) eqs.push({ r: n, txt: [r.sameW.length ? 'та же ширина' : '', r.sameH.length ? 'та же высота' : ''].filter(Boolean).join(' · ') })
       gd = { lines: r.lines, gaps: r.gaps, eqs }
     }

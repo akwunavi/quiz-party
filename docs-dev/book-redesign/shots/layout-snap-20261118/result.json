@@ -1,0 +1,66 @@
+{
+ "theme": "ny_book",
+ "checks": {
+  "tiles": 4,
+  "snapEdge": {
+   "guideLinesDuring": 4,
+   "dx": 0
+  },
+  "altNoSnap": {
+   "guideLinesDuring": 0,
+   "dx": 3
+  },
+  "snapCenter": {
+   "guideLinesDuring": 2,
+   "centerOffsetPx": 0
+  },
+  "snapSize": {
+   "eqBadgesDuring": 4,
+   "dw": 0,
+   "dh": 0
+  },
+  "selectedByShift": 3,
+  "align3": {
+   "lefts": [
+    250,
+    250,
+    250
+   ],
+   "heights": [
+    103.98,
+    103.98,
+    103.98
+   ],
+   "gaps": [
+    -32.89,
+    -32.88
+   ]
+  },
+  "marqueeDuring": 1,
+  "marqueeSelected": 4,
+  "arrows": {
+   "small": 3.83,
+   "big": 19.2,
+   "areaW": 1920
+  },
+  "saved": {
+   "v": 2,
+   "keys": [
+    "images",
+    "imgs",
+    "text",
+    "tiles",
+    "timer",
+    "v"
+   ],
+   "tileKeys": [
+    "h",
+    "w",
+    "x",
+    "y"
+   ],
+   "tiles": 4
+  },
+  "errs": []
+ }
+}
