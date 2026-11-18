@@ -292,3 +292,5 @@
 .lay-busy span { position: absolute; left: 4px; top: 2px; background: rgba(255, 255, 255, .7); padding: 0 4px; border-radius: 3px; }
 .lay-busy.decor span, .lay-busy.fold span { display: none; }
 .lay-warn { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: #fff4d6; color: #7a5200; font-size: 12px; }
+.lay-box.tile { border-color: #2f7a47; background: rgba(47, 122, 71, .10); } .lay-box.tile .lay-tag, .lay-box.tile .lay-handle { background: #2f7a47; }
+.lay-box.timer { border-color: #8a5a00; background: rgba(138, 90, 0, .12); } .lay-box.timer .lay-tag, .lay-box.timer .lay-handle { background: #8a5a00; }

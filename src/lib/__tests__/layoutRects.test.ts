@@ -95,7 +95,7 @@ describe('layoutUnsupportedReason', () => {
     expect(layoutUnsupportedReason('enchanted_forest', 'standard', free)).toMatch(/лес/)
     expect(layoutUnsupportedReason('classic', 'standard', free)).toBeNull()
     expect(layoutUnsupportedReason('ny_book', 'melody', free)).toMatch(/механики/)
-    expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'choice' }, media: {} })).toMatch(/вариантами/)
+    expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'choice' }, media: {} })).toBeNull()   // 10.71: варианты поддержаны (плитки — отдельные рамки)
     expect(layoutUnsupportedReason('ny_book', 'standard', { answer: { mode: 'free_text' }, media: { hidden: true } })).toMatch(/скрыто/)
   })
 })
@@ -221,5 +221,54 @@ describe('v:2 — доли всего экрана: чтение старых v:
     expect(sceneAreaCss('ny_book')!.width).toContain('1920'); expect(sceneAreaCss('classic')).toEqual({ left: '0', top: '0', width: '100vw', height: '100vh' })
     expect(sceneAreaCss('enchanted_forest')).toBeNull()
     expect(busyZones('ny_book').some(z => z.id === 'fold')).toBe(true); expect(busyZones('classic').some(z => z.id === 'fold')).toBe(false)
+  })
+})
+
+
+import { tileCount } from '../layoutRects'
+describe('10.71: плитки вариантов и таймер в раскладке', () => {
+  const base = { v: 2, imgs: [], text: { x: .1, y: .2, w: .5, h: .1 }, images: [] }
+  const tiles4 = [0, 1, 2, 3].map(i => ({ x: .1 + i * .2, y: .6, w: .18, h: .1 }))
+  it('tileCount: варианты, порядок, пары с подписями; подписи на картинках — плиток нет', () => {
+    const ch = (n: number) => Array.from({ length: n }, (_, i) => ({ key: 'АБВГДЕ'[i], text: 't' }))
+    expect(tileCount({ answer: { mode: 'choice', choices: ch(4) }, media: {} }, 0)).toBe(4)
+    expect(tileCount({ answer: { mode: 'choice', choices: ch(4) }, media: {} }, 4)).toBe(0)
+    expect(tileCount({ answer: { mode: 'choice', choices: ch(4) }, media: {} }, 1)).toBe(4)
+    expect(tileCount({ answer: { mode: 'order', choices: ch(3) }, media: {} }, 0)).toBe(3)
+    expect(tileCount({ answer: { mode: 'match', right: ['А', 'Б'], right_labels: ['x', 'y'] }, media: {} }, 2)).toBe(2)
+    expect(tileCount({ answer: { mode: 'match', right: ['А', 'Б'], right_labels: ['', ''] }, media: {} }, 2)).toBe(0)
+    expect(tileCount({ answer: { mode: 'free_text' }, media: {} }, 1)).toBe(0)
+  })
+  it('v:2 с плитками и таймером читается; рамки клампятся в экран', () => {
+    const r = validateRects({ ...base, tiles: tiles4, timer: { x: .9, y: .9, w: .3, h: .3 } }, [], 'ny_book', 4)!
+    expect(r.tiles).toHaveLength(4); expect(r.timer!.x + r.timer!.w).toBeLessThanOrEqual(1 + 1e-9)
+  })
+  it('старая раскладка без плиток/таймера читается: плитки и таймер — авто', () => {
+    const r = validateRects(base, [], 'ny_book', 4)!; expect(r.tiles).toBeUndefined(); expect(r.timer).toBeUndefined()
+  })
+  it('число плиток изменилось или битые → плитки авто, остальная раскладка живёт', () => {
+    expect(validateRects({ ...base, tiles: tiles4 }, [], 'ny_book', 3)!.tiles).toBeUndefined()
+    expect(validateRects({ ...base, tiles: [...tiles4.slice(0, 3), { x: NaN, y: 0, w: .1, h: .1 }] }, [], 'ny_book', 4)!.tiles).toBeUndefined()
+    expect(validateRects({ ...base, tiles: tiles4 }, [], 'ny_book', 3)!.text).toBeTruthy()
+  })
+  it('битый таймер → таймер на месте; v:1 плиток/таймера не знает', () => {
+    expect(validateRects({ ...base, timer: { x: 0, y: 0, w: 0, h: 0 } }, [], 'ny_book')!.timer).toBeUndefined()
+    expect(validateRects({ ...base, v: 1, tiles: tiles4, timer: { x: .1, y: .1, w: .1, h: .1 } }, [], 'ny_book', 4)!.tiles).toBeUndefined()
+  })
+  it('раскладка только из плиток/таймера допустима; пустая — нет', () => {
+    expect(validateRects({ v: 2, imgs: [], images: [], tiles: tiles4 }, [], 'ny_book', 4)).not.toBeNull()
+    expect(validateRects({ v: 2, imgs: [], images: [], timer: { x: .8, y: .02, w: .1, h: .1 } }, [])).not.toBeNull()
+    expect(validateRects({ v: 2, imgs: [], images: [] }, [])).toBeNull()
+  })
+  it('screenLayout/layoutStatus учитывают число плиток; запись сохраняет плитки и таймер', () => {
+    const svc = withScreenLayout({}, 'question', { ...base, tiles: tiles4, timer: { x: .8, y: .02, w: .1, h: .1 } } as Rects)
+    expect(screenLayout(svc, 'question', [], 'ny_book', 4)!.tiles).toHaveLength(4)
+    expect(screenLayout(svc, 'question', [], 'ny_book', 3)!.tiles).toBeUndefined()
+    expect(layoutStatus(svc, 'question', [], 'ny_book', 4)).toBe('manual')
+  })
+  it('предупреждения: плитка/таймер поверх занятых мест; рамка поверх таймера', () => {
+    const w = layoutWarnings({ ...base, tiles: [{ x: .3, y: .01, w: .2, h: .05 }], timer: { x: .8, y: .93, w: .1, h: .06 } } as Rects, 'ny_book').join(' ')
+    expect(w).toMatch(/Вариант 1 лежит поверх: .*таймер/); expect(w).toMatch(/Таймер лежит поверх: кнопки/)
+    expect(layoutWarnings({ ...base, text: { x: .8, y: .4, w: .1, h: .1 }, timer: { x: .8, y: .4, w: .1, h: .1 } } as Rects, 'classic').join(' ')).toMatch(/Текст лежит поверх: таймер/)
   })
 })

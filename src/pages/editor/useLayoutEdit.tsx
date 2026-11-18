@@ -5,7 +5,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { LayoutEditor, measureRects } from './LayoutEditor'
 import { themeHasLayoutArea } from '../../lib/layoutArea'
-import { answerLayoutUnsupportedReason, layoutStatus, layoutUnsupportedReason, screenLayout, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
+import { answerLayoutUnsupportedReason, layoutStatus, layoutUnsupportedReason, screenLayout, tileCount, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
 import { saveScreenLayout } from '../../lib/layoutStore'
 import { answerScreenImages } from '../../lib/answerImages'
 import { mediaUrl } from '../../lib/media'
@@ -33,6 +33,8 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
 
   const qImgs = (q?.media.question ?? []).filter(isPic)
   const imgsOf = (s: LayoutScreen) => (s === 'answer' && round.mechanic !== 'four_pics' ? (q ? answerScreenImages(q.media).revealImgs : []) : qImgs)
+  const nTilesOf = (s: LayoutScreen) => (s === 'question' && q && round.mechanic !== 'four_pics' ? tileCount(q, qImgs.length) : 0)
+  const hasTimer = round.mechanic !== 'four_pics' && round.mechanic !== 'jeopardy'
   const curService = service ?? q?.service
   const hasText = !!q?.question_text.trim()
   const dirtyOf = (s: LayoutScreen) => (modes[s] === 'auto' ? baselines.current[s] !== null : JSON.stringify(drafts[s]) !== JSON.stringify(baselines.current[s]))
@@ -55,8 +57,8 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
     const b: PerScreen<Rects | null> = { question: null, answer: null }; const m: PerScreen<Mode> = { question: 'auto', answer: 'auto' }
     const msgs: string[] = []
     for (const s of SCREENS) {
-      b[s] = screenLayout(curService, s, imgsOf(s), pack.theme); m[s] = b[s] ? 'manual' : 'auto'
-      if (layoutStatus(curService, s, imgsOf(s), pack.theme) === 'stale') msgs.push(s === 'question' ? 'вопроса' : 'ответа')
+      b[s] = screenLayout(curService, s, imgsOf(s), pack.theme, nTilesOf(s)); m[s] = b[s] ? 'manual' : 'auto'
+      if (layoutStatus(curService, s, imgsOf(s), pack.theme, nTilesOf(s)) === 'stale') msgs.push(s === 'question' ? 'вопроса' : 'ответа')
     }
     baselines.current = b; setDrafts(b); setModes(m); setScreen('question')
     setStatus(msgs.length ? `Прежняя раскладка ${msgs.join(' и ')} сброшена в авто: картинки или их порядок изменились.` : null)
@@ -70,7 +72,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
     if (m === modes[screen]) return
     if (m === 'manual' && !drafts[screen]) {
       // замер текущего авто-вида на экране — стартовая точка; вручную двигаем уже от неё
-      setDrafts(d => ({ ...d, [screen]: measureRects(pack.theme, round.mechanic, screen, imgsOf(screen).map(mediaUrl), imgsOf(screen), screen === 'question' ? hasText && round.mechanic !== 'four_pics' : true, !!q?.answer_note?.trim()) }))
+      setDrafts(d => ({ ...d, [screen]: measureRects(pack.theme, round.mechanic, screen, imgsOf(screen).map(mediaUrl), imgsOf(screen), screen === 'question' ? hasText && round.mechanic !== 'four_pics' : true, !!q?.answer_note?.trim(), nTilesOf(screen), screen === 'question' && hasTimer) }))
     }
     setModes(x => ({ ...x, [screen]: m }))
   }
@@ -116,6 +118,7 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
   const overlay = open ? (
     <LayoutEditor theme={pack.theme} screen={screen} onScreen={changeScreen} mode={modes[screen]} onMode={changeMode}
       draft={drafts[screen]} onDraft={setDraft} dirty={dirty} status={status} saving={saving}
+      tileKeys={q && nTilesOf('question') ? (q.answer.mode === 'match' ? q.answer.right : (q.answer.mode === 'choice' || q.answer.mode === 'order' ? q.answer.choices.map(c => c.key) : [])) : []} hasTimer={hasTimer && screen === 'question'}
       onSave={() => void save()} onCancel={() => setOpen(false)} onReset={() => void reset()} />
   ) : null
   return { qView, button, overlay, screen, open }

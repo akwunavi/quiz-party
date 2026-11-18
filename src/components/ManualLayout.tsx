@@ -2,7 +2,7 @@
 // Контейнер = ВЕСЬ экран темы (sceneAreaCss: Книга — сцена 1920×1080, остальные — окно; раскладка v:2) позиционируется абсолютно внутри .host-screen; рамки текста и картинок — в % контейнера.
 // Тот же компонент рисует проектор и предпросмотр редактора. Текст вписывается useFitText (режим диапазона: только уменьшение, без !important на кегле),
 // картинка — object-fit: contain в своей рамке, без растяжения. Внешний вид темы вне ручной раскладки не меняется: компонент монтируется ТОЛЬКО когда layout валиден.
-import type { CSSProperties } from 'react'
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { WindText } from './QuestionText'
 import { useFitText } from '../hooks/useFitText'
 import { sceneAreaCss } from '../lib/layoutArea'
@@ -10,7 +10,40 @@ import type { Rect, Rects } from '../lib/layoutRects'
 
 export const pctStyle = (r: Rect): CSSProperties => ({ left: `${r.x * 100}%`, top: `${r.y * 100}%`, width: `${r.w * 100}%`, height: `${r.h * 100}%` })
 
-export function ManualLayout({ theme, text, urls, rects, seed }: { theme: string | undefined; text: string; urls: string[]; rects: Rects; seed: string }) {
+/** Плитка варианта: та же разметка `.choice-plate`, что и в потоке экрана, но в своей рамке; кегль текста подгоняется под рамку (useFitText, диапазон). */
+function LayTile({ k, text, rect, i }: { k: string; text: string; rect: Rect; i: number }) {
+  const tile = useRef<HTMLDivElement>(null)
+  const fit = useFitText<HTMLSpanElement>([text, rect.w, rect.h], { range: () => { const h = tile.current?.clientHeight ?? 60; return { min: 9, max: Math.max(12, h * 0.4) } } })
+  return (
+    <div ref={tile} className="lay-tile" data-lay="tile" data-lay-i={i} style={pctStyle(rect)}>
+      <div className="choice-plate lay-plate"><span className="key">{k}</span><span className="lay-tile-t"><span ref={fit} className="lay-tile-tx">{text}</span></span></div>
+    </div>
+  )
+}
+
+/** Таймер в своей рамке: рисунок темы масштабируется, чтобы вписаться в рамку (положение и размер — как у остальных рамок). */
+function LayTimer({ rect, children }: { rect: Rect; children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null), inner = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const b = box.current, el = inner.current, area = b?.parentElement
+    if (!b || !el || !area) return
+    const fit = () => { const nw = el.offsetWidth, nh = el.offsetHeight; if (!nw || !nh) return
+      const k = Math.min(rect.w * area.clientWidth / nw, rect.h * area.clientHeight / nh); el.style.transform = `scale(${k})` }
+    fit(); const ro = new ResizeObserver(fit); ro.observe(area); ro.observe(el)
+    return () => ro.disconnect()
+  }, [rect.w, rect.h])
+  return <div ref={box} className="lay-timer" data-lay="timer" style={{ left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${rect.w * 100}%`, height: `${rect.h * 100}%` }}><div ref={inner} className="lay-timer-in">{children}</div></div>
+}
+
+export function ManualLayout({ theme, text, urls, rects, seed, tiles, timer, badges }: {
+  theme: string | undefined; text: string; urls: string[]; rects: Rects; seed: string
+  /** плитки вариантов (ключ + текст) — рисуются в рамках rects.tiles, если они заданы */
+  tiles?: { key: string; text: string }[]
+  /** готовый узел таймера — рисуется в рамке rects.timer, если она задана */
+  timer?: ReactNode
+  /** подписи-буквы/номера на картинках-вариантах и парах */
+  badges?: { mark: string; caption?: string }[]
+}) {
   const area = sceneAreaCss(theme)
   if (!area) return null
   const range = () => {
@@ -28,8 +61,12 @@ export function ManualLayout({ theme, text, urls, rects, seed }: { theme: string
       {urls.map((u, i) => rects.images[i] && (
         <div key={i} className="lay-img" data-lay="img" data-lay-i={i} style={pctStyle(rects.images[i])}>
           <img src={u} alt="" draggable={false} />
+          {badges?.[i]?.mark && <span className="ia-key lay-badge">{badges[i].mark}</span>}
+          {badges?.[i]?.caption && <span className="ia-text lay-cap">{badges[i].caption}</span>}
         </div>
       ))}
+      {rects.tiles && tiles && tiles.length === rects.tiles.length && tiles.map((t, i) => <LayTile key={t.key + i} k={t.key} text={t.text} rect={rects.tiles![i]} i={i} />)}
+      {rects.timer && timer && <LayTimer rect={rects.timer}>{timer}</LayTimer>}
     </div>
   )
 }

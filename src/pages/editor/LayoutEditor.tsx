@@ -10,7 +10,7 @@ import { MIN_SIDE, clampRect, layoutWarnings, toV2, fallbackRects, fallbackAnswe
 type Mode = 'auto' | 'manual'
 
 /** Снять с экрана текущие положения текста и картинок (авто-раскладка) в долях ВСЕГО экрана темы (v:2) — стартовая точка ручной правки. */
-export function measureRects(theme: string | undefined, mechanic: string, screen: 'question' | 'answer', urls: string[], imgPaths: string[], hasText: boolean, hasNote = false): Rects {
+export function measureRects(theme: string | undefined, mechanic: string, screen: 'question' | 'answer', urls: string[], imgPaths: string[], hasText: boolean, hasNote = false, nTiles = 0, hasTimer = false): Rects {
   const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect()
   const root = document.querySelector('.pv-backdrop .host-screen')
   if (!area || area.width < 4) return toV2(screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, themeHasFold(theme)) : fallbackRects(imgPaths, hasText, themeHasFold(theme)), theme)
@@ -35,15 +35,35 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
   if (screen === 'answer' && hasNote) { const n = root?.querySelector<HTMLElement>('.bk-note-box, .answer-note'); if (n) { const r = n.getBoundingClientRect(); if (r.width > 4) note = toRel(r) } }
   if (mechanic === 'four_pics' && screen === 'question' && images.length !== urls.length) return toV2(fallbackGridRects(imgPaths, themeHasFold(theme)), theme)
   if (images.length !== urls.length || (hasText && !text)) return toV2(screen === 'answer' ? fallbackAnswerRects(imgPaths, hasNote, themeHasFold(theme)) : fallbackRects(imgPaths, hasText, themeHasFold(theme)), theme)
-  return { v: 2, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images }
+  // плитки вариантов и таймер — отдельные рамки (только экран вопроса «обычных» механик)
+  const extra: { tiles?: Rect[]; timer?: Rect } = {}
+  if (screen === 'question' && mechanic !== 'four_pics') {
+    if (nTiles > 0) { const els = [...(root?.querySelectorAll<HTMLElement>('.choices-grid .choice-plate, .lay-tile .choice-plate') ?? [])]; if (els.length === nTiles) { const t = els.map(e => toRel((e.closest('.lay-tile') ?? e).getBoundingClientRect())); extra.tiles = t } }
+    if (hasTimer) { const tm = root?.querySelector<HTMLElement>('.host-topbar > :not(.qnum):last-child, .lay-timer-in > *'); if (tm) { const r = (tm.closest('.lay-timer') ?? tm).getBoundingClientRect(); if (r.width > 4) extra.timer = toRel(r) } }
+  }
+  return { v: 2, imgs: [...imgPaths], text: text ? clampRect(text) : undefined, note: note ? clampRect(note) : undefined, images, ...extra }
 }
 
-type Target = { kind: 'text' } | { kind: 'note' } | { kind: 'img'; i: number }
-const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : t.kind === 'note' ? r.note : r.images[t.i])
-const put = (r: Rects, t: Target, n: Rect): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : t.kind === 'note' ? { ...r, note: clampRect(n) } : { ...r, images: r.images.map((x, i) => i === t.i ? clampRect(n) : x) }
+type Target = { kind: 'text' } | { kind: 'note' } | { kind: 'img'; i: number } | { kind: 'tile'; i: number } | { kind: 'timer' }
+const get = (r: Rects, t: Target): Rect | undefined => (t.kind === 'text' ? r.text : t.kind === 'note' ? r.note : t.kind === 'timer' ? r.timer : t.kind === 'tile' ? r.tiles?.[t.i] : r.images[t.i])
+const put = (r: Rects, t: Target, n: Rect): Rects => t.kind === 'text' ? { ...r, text: clampRect(n) } : t.kind === 'note' ? { ...r, note: clampRect(n) } : t.kind === 'timer' ? { ...r, timer: clampRect(n) }
+  : t.kind === 'tile' ? { ...r, tiles: (r.tiles ?? []).map((x, i) => i === t.i ? clampRect(n) : x) } : { ...r, images: r.images.map((x, i) => i === t.i ? clampRect(n) : x) }
 /** стартовые рамки по умолчанию держат картинки вне сгиба Книги (дальше рамки двигаются свободно) */
 
-export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset }: {
+/** Снять положения плиток вариантов и таймера с экрана (авто-вид) — для кнопок «Варианты вручную» / «Таймер вручную» и для первого входа в ручной режим. */
+export function measureExtra(nTiles: number, hasTimer: boolean): { tiles?: Rect[]; timer?: Rect } {
+  const area = document.querySelector('.lay-ed-area')?.getBoundingClientRect(), root = document.querySelector('.pv-backdrop .host-screen')
+  if (!area || area.width < 4 || !root) return {}
+  const rel = (r: DOMRect): Rect => clampRect({ x: (r.x - area.x) / area.width, y: (r.y - area.y) / area.height, w: r.width / area.width, h: r.height / area.height })
+  const out: { tiles?: Rect[]; timer?: Rect } = {}
+  if (nTiles > 0) { const els = [...root.querySelectorAll<HTMLElement>('.choices-grid .choice-plate')]; if (els.length === nTiles) out.tiles = els.map(e => rel(e.getBoundingClientRect())) }
+  if (hasTimer) { const tm = root.querySelector<HTMLElement>('.host-topbar > :not(.qnum):last-child'); if (tm) { const r = tm.getBoundingClientRect(); if (r.width > 4) out.timer = rel(r) } }
+  return out
+}
+
+export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onDraft, dirty, status, saving, onSave, onCancel, onReset, tileKeys = [], hasTimer = false }: {
+  /** буквы плиток вариантов (подписи рамок) и есть ли у экрана таймер, который можно двигать */
+  tileKeys?: string[]; hasTimer?: boolean
   theme: string | undefined
   screen: 'question' | 'answer'; onScreen: (s: 'question' | 'answer') => void
   mode: Mode; onMode: (m: Mode) => void
@@ -87,6 +107,8 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
     if (draft.text) boxes.push({ t: { kind: 'text' }, r: draft.text, label: screen === 'answer' ? 'Ответ' : 'Текст' })
     if (draft.note) boxes.push({ t: { kind: 'note' }, r: draft.note, label: 'Пояснение' })
     draft.images.forEach((r, i) => boxes.push({ t: { kind: 'img', i }, r, label: `Картинка ${i + 1}` }))
+    draft.tiles?.forEach((r, i) => boxes.push({ t: { kind: 'tile', i }, r, label: `Вариант ${tileKeys[i] ?? i + 1}` }))
+    if (draft.timer) boxes.push({ t: { kind: 'timer' }, r: draft.timer, label: 'Таймер' })
   }
 
   return (
@@ -94,7 +116,7 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
       {/* та же рабочая область темы, что у проектора (layoutAreaCss): рамки — в долях этого прямоугольника */}
       <div ref={areaRef} className="lay-ed-area" style={areaCss ?? undefined}>
         {boxes.map(b => (
-          <div key={b.t.kind === 'img' ? `i${b.t.i}` : b.t.kind} className={`lay-box ${b.t.kind}`} style={pctStyle(b.r)}
+          <div key={b.t.kind === 'img' || b.t.kind === 'tile' ? `${b.t.kind}${b.t.i}` : b.t.kind} className={`lay-box ${b.t.kind}`} style={pctStyle(b.r)}
             onPointerDown={e => down(e, b.t, 'move')}>
             <span className="lay-tag">{b.label}</span>
             <i className="lay-handle" onPointerDown={e => down(e, b.t, 'resize')} />
@@ -120,6 +142,16 @@ export function LayoutEditor({ theme, screen, onScreen, mode, onMode, draft, onD
             onClick={() => (dirty ? onSave() : hint.show('Пока нечего сохранять: измени рамки или переключи режим.'))}>{saving ? 'Сохраняю…' : 'Сохранить'}</button>
           <button type="button" onClick={onCancel}>Отмена</button>
         </div>
+        {mode === 'manual' && draft && screen === 'question' && (tileKeys.length > 0 || hasTimer) && (
+          <div className="lay-row">
+            {tileKeys.length > 0 && (draft.tiles
+              ? <button type="button" onClick={() => onDraft({ ...draft, tiles: undefined })}>Варианты — авто</button>
+              : <button type="button" onClick={() => { const m = measureExtra(tileKeys.length, false); if (m.tiles) onDraft({ ...draft, tiles: m.tiles }); else hint.show('Не удалось снять положение плиток с экрана — закрой и открой компоновку.') }}>Варианты вручную</button>)}
+            {hasTimer && (draft.timer
+              ? <button type="button" onClick={() => onDraft({ ...draft, timer: undefined })}>Таймер — на месте</button>
+              : <button type="button" onClick={() => { const m = measureExtra(0, true); if (m.timer) onDraft({ ...draft, timer: m.timer }); else hint.show('Не удалось снять положение таймера с экрана.') }}>Таймер вручную</button>)}
+          </div>
+        )}
         {status && <div className="lay-note">{status}</div>}
         {mode === 'manual' && draft && layoutWarnings(draft, theme).map(w => <div key={w} className="lay-warn">⚠ {w} — можно оставить, если так задумано.</div>)}
         <Hint text={hint.text} />

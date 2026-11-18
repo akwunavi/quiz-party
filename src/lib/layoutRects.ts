@@ -11,7 +11,11 @@ import { themeHasLayoutArea, workAreaFractions, busyZones } from './layoutArea'
 
 export interface Rect { x: number; y: number; w: number; h: number }
 /** text — текст вопроса (экран вопроса) или подложка «Правильный ответ» (экран ответа); note — пояснение к ответу (только экран ответа). */
-export interface Rects { v: 2; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
+export interface Rects { v: 2; imgs: string[]; text?: Rect; note?: Rect; images: Rect[]
+  /** плитки вариантов (А/Б/В/Г…, правая колонка «сопоставления», порядок) — каждая отдельно; нет — плитки идут авто (10.71) */
+  tiles?: Rect[]
+  /** таймер: положение и размер (масштаб) рамки; нет — таймер на своём месте в шапке (10.71) */
+  timer?: Rect }
 /** v:1 — прежний формат: доли РАБОЧЕЙ области темы (читается и переводится в v:2; пишется только v:2). */
 export interface RectsV1 { v: 1; imgs: string[]; text?: Rect; note?: Rect; images: Rect[] }
 export type LayoutScreen = 'question' | 'answer'
@@ -69,7 +73,7 @@ export function toV2(r: RectsV1, theme: string | undefined): Rects {
 }
 
 /** Проверить и нормализовать раскладку одного экрана (v:1 переводится в v:2 по теме). null — авто (нет данных / битая / устарела). Сгиб и декор рамкам не мешают. */
-export function validateRects(raw: unknown, imgs: string[], theme?: string): Rects | null {
+export function validateRects(raw: unknown, imgs: string[], theme?: string, nTiles = 0): Rects | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   if (r.v !== 1 && r.v !== 2) return null
@@ -81,24 +85,29 @@ export function validateRects(raw: unknown, imgs: string[], theme?: string): Rec
   if (r.text != null) { const t = readRect(r.text); if (!t) return null; text = t }
   let note: Rect | undefined
   if (r.note != null) { const n = readRect(r.note); if (!n) return null; note = n }
-  if (!text && !note && images.length === 0) return null
+  // 10.71: плитки и таймер — только в v:2. Плитки с другим числом (набор вариантов изменился) или битые → плитки авто, остальная раскладка живёт; битый таймер → таймер на месте.
+  let tiles: Rect[] | undefined
+  if (r.v === 2 && nTiles > 0 && Array.isArray(r.tiles) && r.tiles.length === nTiles) { const t = r.tiles.map(readRect); if (t.every((x): x is Rect => !!x)) tiles = t }
+  const timer = r.v === 2 && r.timer != null ? readRect(r.timer) ?? undefined : undefined
+  if (!text && !note && images.length === 0 && !tiles && !timer) return null
   const out: RectsV1 | Rects = { v: r.v as 1, imgs: [...imgs], text, note, images }
-  return r.v === 1 ? toV2(out as RectsV1, theme) : { ...(out as unknown as Rects), v: 2 }
+  if (r.v === 1) return toV2(out as RectsV1, theme)
+  return { ...(out as unknown as Rects), v: 2, ...(tiles ? { tiles } : {}), ...(timer ? { timer } : {}) }
 }
 
 /** Раскладка экрана из service вопроса (валидная или null). */
-export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string): Rects | null {
+export function screenLayout(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string, nTiles = 0): Rects | null {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   if (!l || typeof l !== 'object') return null
-  return validateRects((l as Record<string, unknown>)[screen], imgs, theme)
+  return validateRects((l as Record<string, unknown>)[screen], imgs, theme, nTiles)
 }
 
 /** 'manual' — применяется; 'stale' — есть, но картинки изменились/данные битые (покажем «раскладка сброшена»); 'auto' — нет. */
-export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string): 'auto' | 'manual' | 'stale' {
+export function layoutStatus(service: unknown, screen: LayoutScreen, imgs: string[], theme?: string, nTiles = 0): 'auto' | 'manual' | 'stale' {
   const l = service && typeof service === 'object' ? (service as Record<string, unknown>)[LAYOUT_KEY] : null
   const raw = l && typeof l === 'object' ? (l as Record<string, unknown>)[screen] : null
   if (raw == null) return 'auto'
-  return validateRects(raw, imgs, theme) ? 'manual' : 'stale'
+  return validateRects(raw, imgs, theme, nTiles) ? 'manual' : 'stale'
 }
 
 type Service = Record<string, unknown>
@@ -153,10 +162,19 @@ export function layoutUnsupportedReason(theme: string | undefined, mechanic: str
   if (!themeHasLayoutArea(theme)) return 'Для темы «Волшебный лес» ручная компоновка не подключена: вопрос рисуется её собственной сценой.'
   if (mechanic === 'four_pics') return null
   if (!QUESTION_SCREEN_MECHANICS.has(mechanic) && !QUESTION_LAYOUT_EXTRA.has(mechanic)) return 'У этой механики свой экран — компоновка вручную для неё не предусмотрена.'
-  if (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') return 'У вопроса с вариантами, порядком или парами свой экран — компоновка вручную не предусмотрена.'
+  // 10.71: варианты, порядок и пары теперь тоже раскладываются вручную (плитки — каждая отдельно)
   if (q.media.hidden) return 'Медиа скрыто на экране — настраивать нечего.'
   if ((q.media.question ?? []).some(m => /\.(mp4|webm)$/i.test(m))) return 'У вопроса есть видео: его плеер живёт в потоке экрана — компоновка вручную не предусмотрена.'
   return null
+}
+
+/** Сколько плиток-вариантов на экране вопроса (каждой можно задать свою рамку): варианты и порядок текстом (если это не подписи на картинках), правая колонка «сопоставления» с подписями. */
+export function tileCount(q: { answer: { mode: string; choices?: unknown[]; right?: unknown[]; right_labels?: unknown[] }; media: { hidden?: boolean; question?: string[] } }, nImgs: number): number {
+  const a = q.answer
+  if (a.mode === 'choice') return Array.isArray(a.choices) && nImgs > 1 && !q.media.hidden && a.choices.length === nImgs ? 0 : (a.choices?.length ?? 0)
+  if (a.mode === 'order') return a.choices?.length ?? 0
+  if (a.mode === 'match') return (a.right_labels ?? []).some(Boolean) ? (a.right?.length ?? 0) : 0
+  return 0
 }
 
 /** Экран ПРАВИЛЬНОГО ОТВЕТА: причина отказа текстом или null. Поддержан обычный ответ «текст + картинки + пояснение» (свободный ответ, без вариантов/порядка/пар/ребуса/скрытого видео);
@@ -198,11 +216,15 @@ export function layoutWarnings(rects: Rects, theme: string | undefined): string[
   if (rects.text) items.push({ name: 'Текст', r: rects.text })
   if (rects.note) items.push({ name: 'Пояснение', r: rects.note })
   rects.images.forEach((r, i) => items.push({ name: `Картинка ${i + 1}`, r }))
+  rects.tiles?.forEach((r, i) => items.push({ name: `Вариант ${i + 1}`, r }))
   const zones = busyZones(theme), out: string[] = []
   for (const it of items) {
     const area = it.r.w * it.r.h; const hit = new Set<string>()
     for (const z of zones) if (area > 0 && inter(it.r, z) / area > 0.04) hit.add(z.label)
+    if (rects.timer && area > 0 && inter(it.r, rects.timer) / area > 0.04) hit.add('таймер')
     if (hit.size) out.push(`${it.name} лежит поверх: ${[...hit].join(', ')}`)
   }
+  // сам таймер: поверх кнопок ведущего — предупреждение; на своём штатном месте (шапка) — нет
+  if (rects.timer) { const bz = busyZones(theme).find(z => z.id === 'buttons'); if (bz && inter(rects.timer, bz) / (rects.timer.w * rects.timer.h) > 0.04) out.push('Таймер лежит поверх: кнопки ведущего и сугроб') }
   return out
 }

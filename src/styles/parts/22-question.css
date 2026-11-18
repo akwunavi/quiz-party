@@ -725,3 +725,14 @@
 .lay-area > .lay-answer .answer-main { max-width: 100%; text-align: center; }
 .lay-area > .lay-answer { padding-top: 2.6em !important; position: absolute !important; }
 .lay-area > .lay-answer .answer-label { position: absolute; top: .5em; left: 0; right: 0; margin: 0; text-align: center; }
+
+/* ═══ Ручная раскладка: плитки вариантов, таймер, подписи на картинках (10.71) ═══ */
+.lay-area > .lay-tile { position: absolute !important; box-sizing: border-box; container-type: size; min-width: 0; min-height: 0; margin: 0 !important; }
+.lay-tile > .choice-plate { --sh: 100cqh; width: 100%; height: 100%; min-height: 0 !important; margin: 0 !important; box-sizing: border-box; font-size: calc(30cqh); animation: none; opacity: 1; }
+.lay-tile-t { flex: 1 1 0; min-width: 0; align-self: stretch; display: flex; align-items: center; }
+.lay-tile-tx { display: block; max-width: 100%; text-align: left; overflow-wrap: anywhere; line-height: 1.12; }
+.lay-area > .lay-timer { position: absolute !important; box-sizing: border-box; margin: 0 !important; display: grid; place-items: center; pointer-events: none; z-index: 6; }
+.lay-timer-in { transform-origin: 50% 50%; width: max-content; height: max-content; }
+.lay-timer-in > * { position: relative !important; inset: auto !important; margin: 0 !important; }
+.lay-img > .lay-badge { position: absolute; left: 4%; top: 4%; z-index: 1; }
+.lay-img > .lay-cap { position: absolute; left: 4%; right: 4%; bottom: 3%; z-index: 1; text-align: center; font-size: clamp(11px, 1.3vw, 24px); background: rgba(255, 255, 255, .8); color: #222; border-radius: 6px; padding: 2px 6px; }
