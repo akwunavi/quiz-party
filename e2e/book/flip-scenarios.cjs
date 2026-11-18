@@ -35,6 +35,10 @@ async function main() {
     await p.addInitScript(() => { window.__t = { leaves: 0, max: 0, front: null, back: null, oldTxt: null }
       new MutationObserver(() => { const T = window.__t; const n = document.querySelectorAll('.bk-turn2-leaf').length; if (n > T.max) T.max = n
         const l = document.querySelector('.bk-turn2-leaf'); if (l && !l.__s) { l.__s = 1; T.leaves++ }
+        const host = document.querySelector('.theme-ny_book > .host-screen'); const st = document.querySelector('.bk-turn2')
+        if (l && st) { { const tt = (st.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 4000); (T.turnTexts ||= []); if (!T.turnTexts.includes(tt)) T.turnTexts.push(tt) }; T.hiddenSeen = (T.hiddenSeen || 0) + (host && getComputedStyle(host).visibility === 'hidden' ? 1 : 0); T.visibleSeen = (T.visibleSeen || 0) + (host && getComputedStyle(host).visibility !== 'hidden' ? 1 : 0) }
+        if (!l && T.had && !T.ended) { T.ended = true; T.endVis = host && getComputedStyle(host).visibility; T.endAnim = host ? host.getAnimations({ subtree: true }).filter(a => a.playState === 'running' && a.effect && a.effect.getComputedTiming().iterations !== Infinity).length : -1 }
+        if (l) T.had = true
         if (l) { const f = l.querySelector('.bk-turn2-face:not(.back)'), bk = l.querySelector('.bk-turn2-face.back'); T.front = (f && f.textContent || '').trim().slice(0, 200); T.back = (bk && bk.textContent || '').trim().slice(0, 200) } }).observe(document, { childList: true, subtree: true }) })
     await api.reset(); await api.teams(6); await api.session(a)
     await p.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await p.waitForSelector('.host-screen', { timeout: 20000 }); await p.waitForTimeout(3600)
@@ -60,8 +64,10 @@ async function main() {
     const T = await p.evaluate(() => ({ ...window.__t })); const newTxt = await p.evaluate(() => (document.querySelector('.host-screen')?.textContent || '').trim().slice(0, 200))
     const left = await p.evaluate(() => document.querySelectorAll('.bk-turn2-leaf, .bk-turn2-under').length)
     const clip = await p.evaluate(() => document.querySelector('.host-screen')?.style.clipPath || '')
-    const r = { title, want, leaves: T.leaves, max: T.max, frontHasOld: T.leaves ? (!!T.front && oldTxt.slice(0, 20) !== '' && T.front.includes(oldTxt.slice(0, 15))) : null, backHasNew: T.leaves ? (!!T.back && newTxt.slice(0, 15) !== '' && T.back.includes(newTxt.slice(0, 15))) : null, leftBehind: left, clipLeft: clip, errs, geom, flash, frames: frames.length }
-    r.ok = (want ? r.leaves === 1 : r.leaves === 0) && r.max <= 1 && r.leftBehind === 0 && r.clipLeft === '' && (!want || (r.frontHasOld && r.backHasNew && geom && Object.values(geom).every(g => g.same))) && (!want || flash.minOp >= 0.75) && errs.length === 0
+    const newWords = [...new Set((newTxt.match(/[А-Яа-яЁёA-Za-z0-9]{4,}/g) || []))].filter(w => !oldTxt.includes(w))
+    const leak = want ? newWords.filter(w => [...(T.turnTexts || [])].some(t => t.includes(w))) : []
+    const r = { title, want, leaves: T.leaves, newWords: newWords.length, leak, hiddenSeen: T.hiddenSeen, visibleSeen: T.visibleSeen, endVis: T.endVis, endAnim: T.endAnim, max: T.max, frontHasOld: T.leaves ? (!!T.front && oldTxt.slice(0, 20) !== '' && T.front.includes(oldTxt.slice(0, 15))) : null, backHasNew: T.leaves ? (!!T.back && newTxt.slice(0, 15) !== '' && T.back.includes(newTxt.slice(0, 15))) : null, leftBehind: left, clipLeft: clip, errs, geom, flash, frames: frames.length }
+    r.ok = (want ? r.leaves === 1 : r.leaves === 0) && r.max <= 1 && r.leftBehind === 0 && r.clipLeft === '' && (!want || (r.frontHasOld && !r.backHasNew && r.leak.length === 0 && r.visibleSeen === 0 && r.hiddenSeen > 0 && r.endVis === 'visible' && r.endAnim === 0 && geom && Object.values(geom).every(g => g.same))) && (!want || flash.minOp >= 0.75) && errs.length === 0
     res[id] = r; console.log(r.ok ? 'OK  ' : 'FAIL', id, JSON.stringify({ ...r, title: undefined })); fs.writeFileSync(path.join(OUT, `${id}-${VP[0]}.json`), JSON.stringify({ r, frames, oldTxt, newTxt, front: T.front, back: T.back })); await ctx.close()
   }
   fs.writeFileSync(path.join(OUT, `result-${VP[0]}.json`), JSON.stringify(res, null, 1)); await b.close(); const bad = Object.values(res).filter(r => !r.ok).length; console.log(bad ? `FAILED ${bad}` : 'ALL OK'); process.exit(bad ? 1 : 0)
