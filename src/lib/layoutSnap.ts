@@ -45,7 +45,6 @@ const P = (r: Rect, a: Axis) => (a === 'x' ? r.x : r.y)
 const S = (r: Rect, a: Axis) => (a === 'x' ? r.w : r.h)
 const Q = (r: Rect, a: Axis) => (a === 'x' ? r.y : r.x)       // начало по перпендикуляру
 const QS = (r: Rect, a: Axis) => (a === 'x' ? r.h : r.w)
-const other = (a: Axis): Axis => (a === 'x' ? 'y' : 'x')
 const withP = (r: Rect, a: Axis, v: number): Rect => (a === 'x' ? { ...r, x: v } : { ...r, y: v })
 const withS = (r: Rect, a: Axis, v: number): Rect => (a === 'x' ? { ...r, w: v } : { ...r, h: v })
 const overlapPerp = (a: Rect, b: Rect, ax: Axis) => Math.min(Q(a, ax) + QS(a, ax), Q(b, ax) + QS(b, ax)) - Math.max(Q(a, ax), Q(b, ax)) > EPS
