@@ -33,6 +33,14 @@ async function main() {
   await dragBy('.lay-box.img', 0, 0, true)
   await dragBy('.lay-box.img .lay-handle', -60, -40, false)
   await p.screenshot({ path: `${OUT}/3-edited.png` })
+  // 10.70 — СВОБОДНОЕ размещение (v:2): текст тянем к верхнему левому краю ВСЕГО экрана (за пределы прежней рабочей области, поверх таймера/плашки), картинку — через сгиб
+  const ar = await p.locator('.lay-ed-area').boundingBox(); const tb = await p.locator('.lay-box.text').boundingBox()
+  await dragBy('.lay-box.text', ar.x - tb.x + 2, ar.y - tb.y + 2)
+  { const ib = await p.locator('.lay-box.img').first().boundingBox(); await dragBy('.lay-box.img', ar.x + ar.width / 2 - (ib.x + ib.width / 2), 0) }
+  const tb2 = await p.locator('.lay-box.text').boundingBox()
+  res.checks.freeTextAtScreenEdge = Math.abs(tb2.x - ar.x) < 6 && Math.abs(tb2.y - ar.y) < 6
+  res.checks.warnings = await p.locator('.lay-warn').allTextContents()
+  await p.screenshot({ path: `${OUT}/3b-free.png` })
   res.checks.textInDom = await p.evaluate(() => !!document.querySelector('.pv-backdrop .lay-text .q-text'))
   await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
   await p.screenshot({ path: `${OUT}/4-saved-preview.png` })
@@ -40,6 +48,7 @@ async function main() {
   const qid = `stand-book-r0-q${QI}`
   const row = await p.evaluate(async id => (await fetch(`/sb/rest/v1/pack_questions?id=eq.${id}&select=service`, { headers: { apikey: 'x' } })).json(), qid).catch(() => null)
   res.checks.service = row
+  { const lay = row && row[0] && row[0].service && row[0].service.layout && row[0].service.layout.question; res.checks.savedV = lay && lay.v; res.checks.savedTextXY = lay && lay.text && [Number(lay.text.x.toFixed(3)), Number(lay.text.y.toFixed(3))] }
   await ctx.close()
   const vf = fs.readdirSync(vdir).find(f => f.endsWith('.webm')); if (vf) fs.copyFileSync(path.join(vdir, vf), path.join(OUT, 'editor-flow.webm'))
   // проектор: тот же вопрос
@@ -47,7 +56,9 @@ async function main() {
     const c2 = await b.newContext({ viewport: { width: w, height: h }, serviceWorkers: 'block' }); const pg = await c2.newPage()
     await api.reset(); await api.teams(4); await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: QI, timer_started_at: new Date().toISOString(), reveal: false })
     await pg.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await pg.waitForSelector('.host-screen', { timeout: 15000 }); await pg.waitForTimeout(3500)
-    res.checks[`projector${w}`] = await pg.evaluate(() => ({ manual: !!document.querySelector('.lay-area'), text: !!document.querySelector('.lay-text .q-text'), imgs: document.querySelectorAll('.lay-img img').length }))
+    res.checks[`projector${w}`] = await pg.evaluate(() => { const R = e => e && (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); const u = Math.min(innerWidth / 1920, innerHeight / 1080), ox = (innerWidth - 1920 * u) / 2
+      const lt = document.querySelector('.lay-text'), li = document.querySelector('.lay-img'); const fold = innerWidth / 2
+      return { manual: !!document.querySelector('.lay-area'), text: !!document.querySelector('.lay-text .q-text'), imgs: document.querySelectorAll('.lay-img img').length, textBox: R(lt), imgBox: R(li), sceneOx: Math.round(ox), imgCrossesFold: li ? (li.getBoundingClientRect().left < fold && li.getBoundingClientRect().right > fold) : null } })
     await pg.screenshot({ path: `${OUT}/5-projector-${w}x${h}.png` }); await c2.close()
   }
   res.errs = errs; fs.writeFileSync(`${OUT}/result.json`, JSON.stringify(res, null, 1)); console.log(JSON.stringify(res)); await b.close(); process.exit(0)

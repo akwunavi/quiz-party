@@ -205,6 +205,14 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
     round(id, 14, 'anagram', 'Скрэмбл', ['Соберите фразу из перемешанных букв', 'Режим гонки: балл получает первая команда'], rid => [
       q(rid, 0, 'Новогодняя героиня', process.env.QP_AN_PHRASE ? (() => { const ph = process.env.QP_AN_PHRASE; const n = [...ph].filter(c => /[A-Za-zА-Яа-яЁё]/.test(c)).length; const ord = Array.from({ length: n }, (_, i) => (i * 7 + 3) % n); const ok = new Set(ord).size === n; return { answer: { mode: 'anagram', phrase: ph, order: ok ? ord : Array.from({ length: n }, (_, i) => (i + 1) % n) } } })() : { answer: { mode: 'anagram', phrase: 'Снегурочка', order: [3, 7, 1, 9, 0, 5, 2, 8, 4, 6] } }),
       q(rid, 1, 'Главный волшебник зимы', { answer: { mode: 'anagram', phrase: 'Дед Мороз', order: [4, 7, 1, 5, 0, 3, 6, 2] } })], { mode: process.env.QP_AN_RACE ? 'race' : 'standard', hintIntervalSec: 10 }, { timer: 45, reveal: 'after_question' }),
+    // 10.70: заголовки заставки раунда для проверки (R15–R19): длинное слово, три слова, очень короткое, очень длинная фраза, две строки
+    ...(all ? [
+      round(id, 15, 'standard', 'ТЕМА: НОВОГОДНЕРОЖДЕСТВЕНСКАЯ', ['Правило раз', 'Правило два'], rid => [q(rid, 0, 'Вопрос?', {})]),
+      round(id, 16, 'standard', 'Танцы вокруг ёлки', ['Правило раз', 'Правило два'], rid => [q(rid, 0, 'Вопрос?', {})]),
+      round(id, 17, 'standard', 'ХИТЫ', ['Правило раз', 'Правило два'], rid => [q(rid, 0, 'Вопрос?', {})]),
+      round(id, 18, 'standard', 'Очень длинное название раунда про новогодние и рождественские традиции разных стран мира', ['Правило раз', 'Правило два'], rid => [q(rid, 0, 'Вопрос?', {})]),
+      round(id, 19, 'standard', ['МУЗЫКАЛЬНАЯ', 'ПРЕДНОВОГОДНЯЯ'], ['Правило раз', 'Правило два'], rid => [q(rid, 0, 'Вопрос?', {})]),
+    ] : []),
   ]
   return {
     id, name: all ? 'Стенд «Книга» · все механики' : paper ? 'Стенд «Книга» · бумага' : 'Стенд «Книга» · телефоны', status: 'ready', theme,

@@ -37,7 +37,6 @@ import { TeamAnswers } from '../../components/screens/TeamAnswers'
 import { BookNote } from '../../ny/book/BookNote'
 import { noteClass } from '../../lib/questionLayout'
 import { screenLayout, layoutUnsupportedReason } from '../../lib/layoutRects'
-import { themeHasFold } from '../../lib/layoutArea'
 
 export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   pack: LoadedPack; round: LoadedRound; gameState: GameState
@@ -162,7 +161,7 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   // ручная раскладка (layout.question — фазы 1–3, layout.answer — разбор): раскладываются картинки и блок «ответ + пояснение»;
   // буквенные ячейки и подписи фаз остаются штатными (привязаны к механике). Битый/устаревший layout → авто.
   const manualOk = layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
-  const manualScreen = manualOk ? screenLayout(q.service, rv.phase === 'review' ? 'answer' : 'question', imgs, themeHasFold(pack.theme)) : null
+  const manualScreen = manualOk ? screenLayout(q.service, rv.phase === 'review' ? 'answer' : 'question', imgs, pack.theme) : null
   const openLetters = q.service.openLetters
 
   const manualNext = () => {

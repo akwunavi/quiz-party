@@ -4,7 +4,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Hint, useHint } from '../../components/Hint'
 import { LayoutEditor, measureRects } from './LayoutEditor'
-import { themeHasFold, themeHasLayoutArea } from '../../lib/layoutArea'
+import { themeHasLayoutArea } from '../../lib/layoutArea'
 import { answerLayoutUnsupportedReason, layoutStatus, layoutUnsupportedReason, screenLayout, withScreenLayout, type LayoutScreen, type Rects } from '../../lib/layoutRects'
 import { saveScreenLayout } from '../../lib/layoutStore'
 import { answerScreenImages } from '../../lib/answerImages'
@@ -31,7 +31,6 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
   const [service, setService] = useState<Record<string, unknown> | null>(null)   // свежий service после сохранения (до перезагрузки пакета)
   const baselines = useRef<PerScreen<Rects | null>>({ question: null, answer: null })
 
-  const fold = themeHasFold(pack.theme)
   const qImgs = (q?.media.question ?? []).filter(isPic)
   const imgsOf = (s: LayoutScreen) => (s === 'answer' && round.mechanic !== 'four_pics' ? (q ? answerScreenImages(q.media).revealImgs : []) : qImgs)
   const curService = service ?? q?.service
@@ -56,8 +55,8 @@ export function useLayoutEdit({ pack, round, q, canEdit, whyReadOnly, onSaved }:
     const b: PerScreen<Rects | null> = { question: null, answer: null }; const m: PerScreen<Mode> = { question: 'auto', answer: 'auto' }
     const msgs: string[] = []
     for (const s of SCREENS) {
-      b[s] = screenLayout(curService, s, imgsOf(s), fold); m[s] = b[s] ? 'manual' : 'auto'
-      if (layoutStatus(curService, s, imgsOf(s), fold) === 'stale') msgs.push(s === 'question' ? 'вопроса' : 'ответа')
+      b[s] = screenLayout(curService, s, imgsOf(s), pack.theme); m[s] = b[s] ? 'manual' : 'auto'
+      if (layoutStatus(curService, s, imgsOf(s), pack.theme) === 'stale') msgs.push(s === 'question' ? 'вопроса' : 'ответа')
     }
     baselines.current = b; setDrafts(b); setModes(m); setScreen('question')
     setStatus(msgs.length ? `Прежняя раскладка ${msgs.join(' и ')} сброшена в авто: картинки или их порядок изменились.` : null)
