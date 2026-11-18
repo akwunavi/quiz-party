@@ -314,3 +314,31 @@ describe('10.71: экран ответа — плитки, вопрос, кол�
     expect(w).toMatch(/Вопрос лежит поверх/); expect(w).toMatch(/Ответы команд лежит поверх: сгиб/)
   })
 })
+
+import { isStagedAnswer, fallbackAnswerTiles } from '../layoutRects'
+import { answerLayoutImgs } from '../answerImages'
+describe('10.71 ревью: картинки и запасная раскладка ответа у плиточных ответов', () => {
+  const media = { question: ['a.jpg', 'b.jpg'], answer: ['ans.jpg'] }
+  it('isStagedAnswer: варианты/порядок/пары — да, свободный ответ — нет', () => {
+    for (const m of ['choice', 'order', 'match']) expect(isStagedAnswer({ answer: { mode: m } })).toBe(true)
+    expect(isStagedAnswer({ answer: { mode: 'free_text' } })).toBe(false)
+  })
+  it('answerLayoutImgs: у плиточных ответов свободных картинок в раскладке нет (картинки живут в плитках), иначе — картинки ответа/вопроса', () => {
+    expect(answerLayoutImgs(media, true)).toEqual([])
+    expect(answerLayoutImgs(media, false)).toEqual(['ans.jpg'])
+    expect(answerLayoutImgs({ question: ['a.jpg'] }, false)).toEqual(['a.jpg'])
+  })
+  it('раскладка плиточного ответа без images/text валидна; с чужими images (старая) — авто, а не двойные картинки', () => {
+    const t = fallbackAnswerTiles(4)
+    expect(t).toHaveLength(4)
+    expect(validateRects({ v: 2, imgs: [], images: [], tiles: t }, [], 'classic', 4)!.text).toBeUndefined()
+    expect(validateRects({ v: 2, imgs: ['x', 'y'], images: [t[0], t[1]], text: t[2], tiles: t }, [], 'classic', 4)).toBeNull()
+  })
+  it('запасные плитки: 2 колонки, внутри экрана, без наложений друг на друга', () => {
+    for (const n of [2, 3, 4, 5, 6]) {
+      const r = fallbackAnswerTiles(n)
+      for (const a of r) { expect(a.x + a.w).toBeLessThanOrEqual(1); expect(a.y + a.h).toBeLessThanOrEqual(1) }
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const A = r[i], B = r[j]; expect(A.x + A.w <= B.x + 1e-9 || B.x + B.w <= A.x + 1e-9 || A.y + A.h <= B.y + 1e-9 || B.y + B.h <= A.y + 1e-9).toBe(true) }
+    }
+  })
+})

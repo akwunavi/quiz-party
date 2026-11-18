@@ -32,13 +32,13 @@ async function main() {
     c.warnings = await p.locator('.lay-warn').allTextContents()
     c.tileInDom = await p.locator('.pv-backdrop .lay-tile').count(); c.timerInDom = await p.locator('.pv-backdrop .lay-timer').count()
     await p.screenshot({ path: `${OUT}/${name}-2-edited.png` })
-    if (isImg) await p.getByRole('button', { name: 'Отмена' }).click(); else await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500)
+    if (!isImg) { await p.getByRole('button', { name: 'Сохранить' }).click(); await p.waitForTimeout(1500) }
     const row = await p.evaluate(async id => (await fetch(`/sb/rest/v1/pack_questions?id=eq.${id}&select=service`, { headers: { apikey: 'x' } })).json(), `stand-book-r${roundIdx}-q${qi}`).catch(() => null)
     const lay = row && row[0] && row[0].service && row[0].service.layout && row[0].service.layout.question
     c.saved = lay ? { v: lay.v, tiles: lay.tiles && lay.tiles.length, timer: !!lay.timer, tile0: lay.tiles && [+lay.tiles[0].x.toFixed(3), +lay.tiles[0].y.toFixed(3)] } : null
     }
     // ── экран ОТВЕТА: плитки, вопрос, колонка команд ──
-    await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Ответ', exact: true }).click(); await p.waitForTimeout(800)
+    if (!isImg) await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Ответ', exact: true }).click(); await p.waitForTimeout(800)
     await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(1200)
     const a = { tileBoxes: await p.locator('.lay-box.tile').count(), recallBox: await p.locator('.lay-box.recall').count(), teamsBox: await p.locator('.lay-box.teams').count(), plateBox: await p.locator('.lay-box.text').count() }
     await p.screenshot({ path: `${OUT}/${name}-4-answer-manual.png` })
