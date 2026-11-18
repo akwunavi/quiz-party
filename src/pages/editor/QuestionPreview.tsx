@@ -112,7 +112,7 @@ export function QuestionPreview({ pack, round, qIndex, onClose, canEdit = false,
               )
               // вкладка «Ответ» редактора компоновки: тот же AnswerScreen, что на проекторе (показан ответ, проверка выполнена)
               if (lay.open && lay.screen === 'answer') return (
-                <AnswerScreen pack={pack} round={round} q={q} step={qIndex} total={round.questions.length} roundIdx={roundIdx} paper={false}
+                <AnswerScreen pack={pack} round={round} q={q} step={qIndex} total={round.questions.length} roundIdx={roundIdx} paper={false} final
                   rows={teams.map((t, i) => ({ id: `pv-ans-${i}`, team_id: t.id, game_id: '', question_ref: `q-${q.id}`, round_number: round.position, answer_text: ['ответ команды', 'почти', 'не знаем'][i % 3], stake: null, is_correct: null, updated_at: '', created_at: '' }))}
                   teamOf={id => teams.find(t => t.id === id)} checked revealLive={false} shownOf={a => autocheck(q.answer, a.answer_text)}
                   actions={<PreviewActions pack={pack} round={round} gameState={gameState} />} />

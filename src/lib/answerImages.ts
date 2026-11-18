@@ -8,3 +8,8 @@ export function answerScreenImages(media: { question?: string[]; answer?: string
   const revealImgs = answerImgs.length ? answerImgs : questionImgs
   return { answerImgs, questionImgs, revealImgs }
 }
+
+/** Картинки, которые участвуют в раскладке ЭКРАНА ОТВЕТА. Для вариантов/порядка/пар — никаких (картинки-варианты и пары рисуются внутри плиток по ступеням показа). */
+export function answerLayoutImgs(media: { question?: string[]; answer?: string[] } | undefined, staged: boolean): string[] {
+  return staged ? [] : answerScreenImages(media).revealImgs
+}

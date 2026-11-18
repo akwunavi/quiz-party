@@ -15,8 +15,10 @@ const OUT = path.resolve(opt('--out', 'title-out'))
       const m = await p.evaluate(() => { const R = e => e && (r => ({ l: r.left, r: r.right, t: r.top, b: r.bottom }))(e.getBoundingClientRect()); const u = Math.min(innerWidth / 1920, innerHeight / 1080), ox = (innerWidth - 1920 * u) / 2
         const fold = ox + 960 * u; const t = document.querySelector('.bk-rt-h'), rules = document.querySelector('.round-intro .rules-frame'), rg = document.createRange(); rg.selectNodeContents(t); const tr = rg.getBoundingClientRect()
         const rr = R(rules); const hit = rr && !(tr.right <= rr.l || tr.left >= rr.r || tr.bottom <= rr.t || tr.top >= rr.b)
-        return { fs: parseFloat(t.style.fontSize), fit: t.dataset.bkFit, textRight: Math.round(tr.right), fold: Math.round(fold), crossFold: tr.right > fold - 4 * u, hitRules: !!hit, u, glitchAnim: getComputedStyle(t).animationName } })
-      const ok = m.fit === 'ok' && !m.crossFold && !m.hitRules && m.glitchAnim === 'none'; if (!ok) bad++; res.push({ w, h, r, ...m, ok }); console.log(ok ? 'OK  ' : 'FAIL', w, h, 'r' + r, JSON.stringify(m))
+        return { fs: parseFloat(t.style.fontSize), fit: t.dataset.bkFit, textRight: Math.round(tr.right), fold: Math.round(fold), crossFold: tr.right > fold - 4 * u, hitRules: !!hit, u, glitchAnim: getComputedStyle(t).animationName,
+        // заставка кроссворда: вся сетка над снежным полом (снег начинается ~ y=900 сцены)
+        gridBottom: (g => g ? Math.round((g.getBoundingClientRect().bottom - (innerHeight - 1080 * u) / 2) / u) : null)(document.querySelector('.bk-cw-grid table, .bk-cw-grid > *')), gridTop: (g => g ? Math.round((g.getBoundingClientRect().top - (innerHeight - 1080 * u) / 2) / u) : null)(document.querySelector('.bk-cw-grid table, .bk-cw-grid > *')) } })
+      const ok = m.fit === 'ok' && !m.crossFold && !m.hitRules && m.glitchAnim === 'none' && (m.gridBottom == null || m.gridBottom <= 880); if (!ok) bad++; res.push({ w, h, r, ...m, ok }); console.log(ok ? 'OK  ' : 'FAIL', w, h, 'r' + r, JSON.stringify(m))
     }
   }
   fs.writeFileSync(path.join(OUT, 'title-check.json'), JSON.stringify(res, null, 1)); await b.close(); console.log(bad ? `FAILED ${bad}` : 'ALL OK'); process.exit(bad ? 1 : 0)

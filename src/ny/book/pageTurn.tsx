@@ -9,10 +9,14 @@ import { pageTurnKey, type TurnSnap } from './motion'
 import { BOOK } from './geometry'
 
 const DUR = 900
+/** прогрев растра невидимого листа перед стартом, мс (лист с клоном всей страницы рисуется не мгновенно) */
+const WARM = Number(new URLSearchParams(location.search).get('bkwarm') ?? 220)
 
 function cloneClean(src: HTMLElement): HTMLElement {
   const c = src.cloneNode(true) as HTMLElement
   c.style.clipPath = ''
+  // при быстрой второй смене страницы настоящий экран ещё скрыт (visibility:hidden, data-bk-turning) — клон обязан быть видимым
+  c.style.visibility = ''; c.removeAttribute('data-bk-turning')
   // position:fixed в клоне на повёрнутом листе считался бы от листа (transform листа — containing block), а не от экрана: шапка и таймер «Книги» — fixed и уезжали
   // (регресс 10.66+, найдено кадрами перелистывания 10.70). Обёртка клона и так равна экрану по размеру и началу координат, поэтому fixed → absolute даёт те же
   // координаты. Клон клона (src отсоединён) уже без fixed: правка записана inline. Обёртку с transform для этого брать нельзя: растр картинок на листе запаздывает.
@@ -69,13 +73,13 @@ export function useBookPageTurn(rootRef: RefObject<HTMLElement | null>, stageRef
     const cx = ox + (BOOK.x + BOOK.w / 2) * u, pw = (BOOK.w / 2) * u, py = oy + BOOK.y * u, ph = BOOK.h * u
     const timers: number[] = []
     let finished = false
-    // слой «под листом»: СТАРАЯ левая половина (настоящая левая спрятана clip-path)
+    // ЖЁСТКОЕ ПРАВИЛО (10.71): пока лист не перевернулся, НОВОГО содержимого на экране нет вообще — ни под листом, ни на нём. Настоящий (новый) экран скрыт целиком (visibility),
+    // под листом — СТАРАЯ левая страница, справа и на обороте листа — чистая бумага. Когда лист лёг, новый экран появляется сразу целиком: его анимации входа дорабатываются мгновенно
+    // (иначе они шли бы под листом, и после переворота элементы «въезжали» бы заново).
     const under = document.createElement('div'); under.className = 'bk-turn2-under'
-    under.style.clipPath = 'inset(0 50% 0 0)'
-    under.appendChild(wrap(p.node, 0, 0))
-    // лист
+    under.appendChild(wrap(p.node, 0, 0))          // до старта листа — старая страница ЦЕЛИКОМ
     const leaf = document.createElement('div'); leaf.className = 'bk-turn2-leaf'
-    leaf.style.cssText = `left:${cx}px;top:${py}px;width:${pw}px;height:${ph}px;`
+    leaf.style.cssText = `left:${cx}px;top:${py}px;width:${pw}px;height:${ph}px;opacity:.01;`   // невидим, но отрисовывается (прогрев растра)
     const front = document.createElement('div'); front.className = 'bk-turn2-face'
     front.appendChild(wrap(cloneClean(p.node), -cx, -py))
     const back = document.createElement('div'); back.className = 'bk-turn2-face back'
@@ -84,30 +88,36 @@ export function useBookPageTurn(rootRef: RefObject<HTMLElement | null>, stageRef
     leaf.append(front, back)
     stage.style.perspectiveOrigin = `${cx}px 40%`
     stage.append(under, leaf)
-    const prevClip = host.style.clipPath
-    host.style.clipPath = 'inset(0 0 0 50%)'
+    const prevVis = host.style.visibility
+    host.style.visibility = 'hidden'
+    host.setAttribute('data-bk-turning', '')
     const end = () => {
       if (finished) return; finished = true
       timers.forEach(clearTimeout)
-      host.style.clipPath = prevClip
       under.remove(); leaf.remove()
+      host.style.visibility = prevVis; host.removeAttribute('data-bk-turning')
+      // новый экран — сразу целиком: конечные анимации входа доигрываем до конца, бесконечные (мерцание декора) не трогаем
+      try { for (const an of host.getAnimations({ subtree: true })) { const it = an.effect?.getComputedTiming().iterations; if (it !== Infinity) an.finish() } } catch { /* не критично */ }
       if (stop.current === end) stop.current = null
     }
     stop.current = end
     const opts = { duration: DUR, easing: 'cubic-bezier(.5,.05,.3,1)', fill: 'forwards' as const }
     const a = leaf.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-180deg)' }], opts)
-    // затухание — на гранях, а не на листе: opacity < 1 на элементе с preserve-3d сплющивает его, и оборот листа показывал бы лицевую сторону зеркально
-    for (const f of [front, back]) f.animate([{ opacity: 1 }, { opacity: 1, offset: .9 }, { opacity: 0 }], { duration: DUR, fill: 'forwards' })
-    for (const s of [sh1, sh2]) s.animate([{ opacity: 0 }, { opacity: .5, offset: .5 }, { opacity: 0 }], { duration: DUR, fill: 'forwards' })
-    // оборот листа: НОВОЕ левое содержимое (снимаем, когда подгонка кегля уже отработала; оборот виден только после 90°)
-    timers.push(window.setTimeout(() => {
-      const live = realScreen(rootRef.current); if (!live || finished) return
-      back.insertBefore(wrap(cloneClean(live), -(cx - pw), -py), sh2)
-    }, 250))
-    // лист почти лёг: открываем настоящую левую половину, клон старой убираем (лист ещё прикрывает и растворяется)
-    timers.push(window.setTimeout(() => { host.style.clipPath = prevClip; under.remove() }, DUR * 0.78))
+    const anims = [a]
+    for (const s of [sh1, sh2]) anims.push(s.animate([{ opacity: 0 }, { opacity: .5, offset: .5 }, { opacity: 0 }], { duration: DUR, fill: 'forwards' }))
+    anims.forEach(x => x.pause())
+    // растр клона на лист готовится не сразу: ждём decode() картинок + 2 кадра + прогрев; старая страница под листом остаётся целой
+    let started = false
+    const go = () => {
+      if (finished || started) return; started = true
+      under.style.clipPath = 'inset(0 50% 0 0)'; leaf.style.opacity = ''
+      anims.forEach(x => x.play())
+      timers.push(window.setTimeout(end, DUR + 400))   // страховка
+    }
+    const decodes = [...leaf.querySelectorAll('img'), ...under.querySelectorAll('img')].map(i => (i.decode ? i.decode().catch(() => undefined) : Promise.resolve()))
+    void Promise.all(decodes).then(() => requestAnimationFrame(() => requestAnimationFrame(() => { timers.push(window.setTimeout(go, WARM)) })))
+    timers.push(window.setTimeout(go, 650))            // страховка: rAF не идёт (фон) / картинка не декодируется
     a.onfinish = end
-    timers.push(window.setTimeout(end, DUR + 400))        // страховка
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [k])
 }

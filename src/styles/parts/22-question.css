@@ -725,3 +725,30 @@
 .lay-area > .lay-answer .answer-main { max-width: 100%; text-align: center; }
 .lay-area > .lay-answer { padding-top: 2.6em !important; position: absolute !important; }
 .lay-area > .lay-answer .answer-label { position: absolute; top: .5em; left: 0; right: 0; margin: 0; text-align: center; }
+
+/* ═══ Ручная раскладка: плитки вариантов, таймер, подписи на картинках (10.71) ═══ */
+.lay-area .lay-tile { position: absolute !important; box-sizing: border-box; container-type: size; min-width: 0; min-height: 0; margin: 0 !important; }
+.lay-tile:has(> .choice-plate) { display: grid; place-items: center; }
+.lay-tile > .choice-plate { --sh: min(100cqh, 30cqw); width: 100%; height: var(--sh); min-height: 0 !important; margin: 0 !important; box-sizing: border-box; font-size: calc(var(--sh) * .3); animation: none; }
+.lay-tile > .choice-plate:not(.hidden-yet):not(.dimmed) { opacity: 1; }
+.host-screen .lay-tile > .choice-plate.dimmed { opacity: .32; }
+.lay-tile-t { flex: 1 1 0; min-width: 0; align-self: stretch; display: flex; align-items: center; }
+.lay-tile-tx { display: block; max-width: 100%; text-align: left; overflow-wrap: anywhere; line-height: 1.12; }
+.lay-area > .lay-timer { position: absolute !important; box-sizing: border-box; margin: 0 !important; display: grid; place-items: center; pointer-events: none; z-index: 6; }
+.lay-timer-in { transform-origin: 50% 50%; width: max-content; height: max-content; }
+.lay-timer-in > * { position: relative !important; inset: auto !important; margin: 0 !important; }
+.lay-img > .lay-badge { position: absolute; left: 4%; top: 4%; z-index: 1; }
+.lay-img > .lay-cap { position: absolute; left: 4%; right: 4%; bottom: 3%; z-index: 1; text-align: center; font-size: clamp(11px, 1.3vw, 24px); background: color-mix(in srgb, var(--bg2, #fff) 85%, transparent); color: var(--fg, #222); border-radius: 6px; padding: 2px 6px; }
+
+/* экран ответа в ручной раскладке (10.71): вопрос сверху, колонка команд, плитки порядка/пар/картинок-вариантов */
+.lay-contents { display: contents !important; }
+.lay-area > .lay-recall { position: absolute !important; box-sizing: border-box; display: grid; place-items: center; overflow: hidden; margin: 0 !important; min-width: 0; min-height: 0; }
+.lay-recall > .q-recall { margin: 0 !important; max-width: 100%; text-align: center; }
+.lay-area > .lay-teams { position: absolute !important; box-sizing: border-box; margin: 0 !important; display: grid; place-items: center; pointer-events: none; z-index: 6; }
+.lay-teams .team-answers { flex: none; width: 100%; min-width: 0; margin: 0; }
+.lay-area .lay-tile.mi, .lay-area .lay-tile.oi { box-sizing: border-box; overflow: hidden; margin: 0 !important; }
+.lay-tile > .choice-img { margin: 0; }
+.lay-tile > .choice-img > img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.lay-flow { width: 100%; }
+.lay-area .lay-tile.mi, .lay-area .lay-tile.oi { display: flex; align-items: center; gap: .4em; font-size: clamp(10px, 34cqh, 40px); line-height: 1.1; }
+.lay-area .lay-tile.mi img { max-height: 90%; width: auto; }

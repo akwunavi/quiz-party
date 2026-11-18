@@ -20,14 +20,14 @@ import { WindText } from '../QuestionText'
 import { AdaptiveMedia } from '../../ny/book/adaptive/AdaptiveMedia'
 import { BookSingle } from '../../ny/book/adaptive/BookSingle'
 import { ManualLayout } from '../ManualLayout'
-import { layoutUnsupportedReason, screenLayout } from '../../lib/layoutRects'
+import { layoutUnsupportedReason, screenLayout, tileCount } from '../../lib/layoutRects'
 import { estFont, estLines } from '../../ny/book/adaptive/singleLayout'
 import { TEXT_ROLES, targetSize } from '../../ny/book/adaptive/fit'
 import { useBookDiagnostics } from '../../ny/book/adaptive/diagnosticsDom'
 import { roleRange, type TextRole } from '../../ny/book/adaptive/fit'
 import { bookUnit } from '../../ny/book/adaptive/safeArea'
 import { mediaUrl, mediaScaleVar } from '../../lib/media'
-import { choicesLenClass } from '../../lib/questionLayout'
+import { choicesLenClass, plateLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
@@ -179,7 +179,7 @@ function ClassicQuestionScreen({
   const hasChoicesCls = (!!choices && !lettered) || (q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean))
   // ручная компоновка (редактор → предпросмотр/проектор): только «Книга», только текст + картинки без вариантов/пар; битая или устаревшая → null → авто
   const manual = round.mechanic !== 'rebus' && layoutUnsupportedReason(pack.theme, round.mechanic, q) === null
-    ? screenLayout(q.service, 'question', imgs, pack.theme) : null
+    ? screenLayout(q.service, 'question', imgs, pack.theme, tileCount(q, imgs.length)) : null
   const bkPlain = !manual && isBook && hasText && !hasMediaCls && !hasChoicesCls
   const bkSplit = !manual && isBook && split && imgs.length === 1 && q.answer.mode !== 'match'
   const bkGrid = !manual && isBook && !split && hasMediaCls && imgs.length >= 2 && imgs.length <= 4
@@ -202,11 +202,14 @@ function ClassicQuestionScreen({
       <div className="host-topbar">
         <span className="qnum">Р{displayRoundNumber(pack, roundIdx)} · ВОПРОС{' '}
           <b>{qIndex + 1}</b> / {qCount}</span>
-        {timerSlot}
+        {manual?.timer ? null : timerSlot}
       </div>
 
       {manual ? (
-        <ManualLayout theme={pack.theme} text={q.question_text} urls={imgs.map(mediaUrl)} rects={manual} seed={q.id} />
+        <ManualLayout theme={pack.theme} text={q.question_text} urls={imgs.map(mediaUrl)} rects={manual} seed={q.id}
+          timer={timerSlot}
+          tiles={manual.tiles ? (q.answer.mode === 'match' ? q.answer.right.map((r, i) => ({ key: r, text: (q.answer as { right_labels?: string[] }).right_labels?.[i] ?? '' })) : (choices ?? []).map(c => ({ key: c.key, text: c.text }))) : undefined}
+          badges={lettered ? imgs.map((_, i) => ({ mark: q.answer.mode === 'match' ? String(i + 1) : (choices?.[i]?.key ?? ''), caption: q.answer.mode === 'choice' ? choices?.[i]?.text : undefined })) : undefined} />
       ) : bkSplit ? (
         /* «Книга»: вопрос + одна картинка — композицию выбирает оценка (singleLayout.ts) */
         <BookSingle text={q.question_text} src={mediaUrl(imgs[0])} seed={q.id} />
@@ -294,20 +297,20 @@ function ClassicQuestionScreen({
             waitFor={!!q.media.voice} go={timerRunning} />
         : null)}
 
-      {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && (
+      {q.answer.mode === 'match' && (q.answer.right_labels ?? []).some(Boolean) && !manual?.tiles && (
         <div className={`choices-grid${
           choicesLenClass((q.answer.right_labels ?? []) as string[])}`}>
           {q.answer.right.map((r, i) => (
-            <div key={r} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
+            <div key={r} className={`choice-plate${plateLenClass((q.answer as { right_labels?: string[] }).right_labels?.[i] ?? '')}`} style={{ animationDelay: `${0.3 + i * 0.3}s` }}>
               <span className="key">{r}</span>{(q.answer as { right_labels?: string[] }).right_labels?.[i] ?? ''}
             </div>
           ))}
         </div>
       )}
-      {choices && !lettered && (
+      {choices && !lettered && !manual?.tiles && (
         <div className={`choices-grid${choicesLenClass(choices.map(c => c.text))}`}>
           {choices.map((c, i) => (
-            <div key={c.key} className="choice-plate" style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
+            <div key={c.key} className={`choice-plate${plateLenClass(c.text)}`} style={{ animationDelay: `${0.3 + i * 0.35}s` }}>
               <span className="key">{c.key}</span>{c.text}
             </div>
           ))}
