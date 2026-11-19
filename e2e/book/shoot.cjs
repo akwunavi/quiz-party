@@ -92,6 +92,8 @@ async function main() {
     if (save) await page.screenshot({ path: path.join(PNG_DIR, name + '.png') })
     const m = await measure(page, { scene: scene.id, reduced })
     m.playing = await page.evaluate(() => window.__qpPlaying ?? [])
+    // QP_EXTRA_MEASURE=<файл.js> — тело функции (возвращает объект), выполняется в странице; результат — m.extra (10.73: замеры декора свитков)
+    if (process.env.QP_EXTRA_MEASURE) m.extra = await page.evaluate(`(() => {${fs.readFileSync(process.env.QP_EXTRA_MEASURE, 'utf8')}})()`)
     // шрифты: какие начертания реально загружены (локально) + внешние хосты (должно быть пусто — никаких чужих CDN)
     m.fontFaces = await page.evaluate(() => [...document.fonts].filter(f => f.status === 'loaded').map(f => `${f.family.replace(/"/g, '')} ${f.weight}`).sort())
     m.externalHosts = [...ext]

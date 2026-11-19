@@ -1360,7 +1360,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    Картинки-варианты (.choice-img) и другие темы не затронуты. Края свитка (рулоны) не растягиваются — border-image, середина тянется по ширине; ширина плитки — колонка сетки внутри своей страницы. */
 .theme-ny_book :is(.choices-grid, .lay-tile) .choice-plate { --sh: calc(104 * var(--u));
   min-height: var(--sh); padding: calc(10 * var(--u)) calc(var(--sh) * .78) !important; box-sizing: border-box; align-items: center; gap: calc(14 * var(--u));
-  background: none !important; border: solid transparent; border-width: 0 calc(var(--sh) * .85); border-image: url('/quiz-party/ny-book/hscroll.webp') 0 196 0 196 fill / 0 calc(var(--sh) * .85) stretch;
+  background: none !important; border: solid transparent; border-width: 0 calc(var(--sh) * .9); border-image: url('/quiz-party/ny-book/hscroll-bow.webp') 0 211 0 211 fill / 0 calc(var(--sh) * 1.0446) / calc(var(--sh) * .2277) 0 calc(var(--sh) * .0941) 0 stretch;
   border-radius: 0; box-shadow: none !important; filter: drop-shadow(0 calc(6 * var(--u)) calc(7 * var(--u)) rgba(60, 30, 10, .32)); }
 .theme-ny_book :is(.choices-grid, .lay-tile) .choice-plate { padding-inline: calc(var(--sh) * .1) calc(var(--sh) * .16) !important; }
 .theme-ny_book :is(.choices-grid, .lay-tile) .choice-plate .key { box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(242, 213, 140, .7), 0 calc(3 * var(--u)) 0 rgba(0, 0, 0, .25); }
@@ -1396,9 +1396,9 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   filter: drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(60, 30, 10, .32)); }
 .theme-ny_book .host-topbar .qnum b { color: var(--bk-red); }
 /* плитка в своей рамке: размер свитка и кегль — от высоты рамки (перебивает фиксированные --sh/кегль плиток в потоке) */
-.theme-ny_book .host-screen .lay-tile > .choice-plate { --sh: min(100cqh, 30cqw); font-size: calc(var(--sh) * .3); height: var(--sh); }
+.theme-ny_book .host-screen .lay-tile > .choice-plate { --sh: min(calc(100cqh / 1.3218), 30cqw); font-size: calc(var(--sh) * .3); height: var(--sh); position: relative; top: calc(var(--sh) * .0668); }
 /* узкая рамка: рулоны не съедают весь свиток (не больше 24 % ширины с каждой стороны) */
-.theme-ny_book .host-screen .lay-tile > .choice-plate { border-width: 0 min(calc(var(--sh) * .85), 24cqw); border-image-width: 0 min(calc(var(--sh) * .85), 24cqw); }
+.theme-ny_book .host-screen .lay-tile > .choice-plate { border-width: 0 min(calc(var(--sh) * .9), 28cqw); border-image-width: 0 min(calc(var(--sh) * 1.0446), 32cqw); }
 
 /* ═══ Свитки-варианты, правка 2 (10.71): рулоны ВСЕГДА одного размера и пропорций; длинный текст — мельче кегль и 2–3 строки, а не рост свитка ═══
    Высота фиксирована (не min-height) — border-image не растягивается по вертикали. Колонок всегда две (по странице), 5–6 вариантов — три ряда; зазор между колонками шире сгиба. */
@@ -1423,3 +1423,11 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    `.answer-pulse { animation: answerPulseRing }` (15-projector-interactive.css): кадры анимации перекрывают любой обычный box-shadow, поэтому `box-shadow: none`
    не помогал. Гасим саму анимацию (вес не ниже базового — тема стоит позже в каскаде) и скругление/отступ рамки. */
 .theme-ny_book .host-screen .answer-pulse { animation: none; box-shadow: none; border-radius: 0; padding: 0; }
+
+/* ═══ Свитки с бантом (10.73): hscroll-bow.webp (scripts/ny-book/make-hscroll-bow.py, исходник docs-dev/book-redesign/assets-src/hscroll-bow.webp) ═══
+   Декор (хвоя/бант) выступает над лентой на .2277 высоты тела и под ней на .0941 (border-image-outset) — родитель не должен резать (overflow: visible),
+   зазоры между рядами/колонками не меньше суммы выступов. Тело ленты (--sh) и тексты — как в 10.71. */
+.theme-ny_book .host-screen > .choices-grid { overflow: visible; row-gap: calc(48 * var(--u)); }
+.theme-ny_book .answer-block .choices-grid { overflow: visible; row-gap: calc(26 * var(--u)); }
+/* с картинками над вариантами у экрана свой зазор (clamp 8–22px, 22-question) — декор соседних свитков заходил друг на друга и на сгиб */
+.theme-ny_book .host-screen.has-media.has-choices > .choices-grid { row-gap: calc(48 * var(--u)); column-gap: calc(70 * var(--u)); }
