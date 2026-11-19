@@ -34,4 +34,6 @@ export function prefetchBookAssets(base: string): void {
   for (const id of Object.keys(BOOK_ASSETS) as BookAssetId[]) {
     const im = new Image(); im.decoding = 'async'; im.src = bookAssetUrl(base, id)
   }
+  // свитки вариантов/плашек (border-image в CSS, не <img>): без прогрева пергамент появляется с задержкой после текста (10.73)
+  for (const f of ['hscroll-bow.webp', 'hscroll.webp']) { const im = new Image(); im.decoding = 'async'; im.src = `${base}ny-book/${f}` }
 }

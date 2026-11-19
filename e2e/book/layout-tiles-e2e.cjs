@@ -18,9 +18,18 @@ async function main() {
     await p.locator('text=Стенд «Книга» · телефоны').locator('xpath=ancestor::*[.//button[contains(.,"Открыть")]][1]').getByText('Открыть').first().click(); await p.waitForTimeout(1500)
     await p.locator('button[data-tip="Редактировать"]').nth(roundIdx).click(); await p.waitForTimeout(1500)
     await p.locator('button[data-tip="Предпросмотр"]').nth(qi).click(); await p.waitForSelector('.pv-backdrop .host-screen', { timeout: 15000 }); await p.waitForTimeout(2500)
-    await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(1000)
+    await p.getByRole('button', { name: 'Компоновка' }).click(); await p.waitForSelector('.lay-panel'); await p.waitForTimeout(600)
+    // 10.73: размер и кегль плитки в РУЧНОМ виде при рамке, снятой из авто-вида, == авто-вид (допуск 2 %): тело свитка = рамка, декор выступает за неё
+    const plateGeo = () => p.evaluate(() => [...document.querySelectorAll('.pv-backdrop .choice-plate')].filter(e => e.getBoundingClientRect().width > 0).map(e => { const r = e.getBoundingClientRect(); return { w: r.width, h: r.height, fs: parseFloat(getComputedStyle(e).fontSize), key: e.querySelector('.key')?.getBoundingClientRect().width } }))
+    const autoGeo = name !== 'imgchoices' ? await plateGeo() : []
+    await p.getByRole('button', { name: 'Вручную' }).click(); await p.waitForTimeout(1000)
+    const manGeo = name !== 'imgchoices' ? await plateGeo() : []
+    const rel = (a, b) => Math.abs(a - b) / Math.max(1, b)
+    const sizeCheck = autoGeo.map((g, i) => manGeo[i] ? { i, dw: +rel(manGeo[i].w, g.w).toFixed(3), dh: +rel(manGeo[i].h, g.h).toFixed(3), dfs: +rel(manGeo[i].fs, g.fs).toFixed(3) } : null)
+    // кегль подгоняется useFitText (только уменьшение) — для кегля допуск шире (вниз до 35 %, вверх — нельзя), размер тела — 2 %
+    const sizeOk = autoGeo.length === 0 || (autoGeo.length === manGeo.length && sizeCheck.every(x => x && x.dw <= 0.02 && x.dh <= 0.02 && manGeo[x.i].fs <= autoGeo[x.i].fs * 1.02 + 0.5))
     const isImg = name === 'imgchoices'
-    const c = { boxes: await p.locator('.lay-box').count(), tileBoxes: await p.locator('.lay-box.tile').count(), timerBox: await p.locator('.lay-box.timer').count() }
+    const c = { tileSizeAutoVsManual: { ok: sizeOk, sizeCheck }, boxes: await p.locator('.lay-box').count(), tileBoxes: await p.locator('.lay-box.tile').count(), timerBox: await p.locator('.lay-box.timer').count() }
     await p.screenshot({ path: `${OUT}/${name}-1-manual.png` })
     const drag = async (sel, dx, dy) => { const bb = await p.locator(sel).first().boundingBox(); const sx = bb.x + bb.width / 2, sy = bb.y + bb.height / 2; await p.mouse.move(sx, sy); await p.mouse.down(); await p.mouse.move(sx + dx, sy + dy, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(300) }
     let ar = null

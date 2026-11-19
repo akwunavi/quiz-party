@@ -6,7 +6,7 @@ const inter = (a, b) => { const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.
 const plates = [...document.querySelectorAll('.choice-plate')].filter(e => e.getBoundingClientRect().width > 0)
 const dec = plates.map((e, i) => {
   const r = e.getBoundingClientRect(), cs = getComputedStyle(e), o = cs.borderImageOutset.split(' ').map(parseFloat)
-  const [t, rr, b, l] = o.length === 4 ? o : o.length === 1 ? [o[0], o[0], o[0], o[0]] : [o[0], o[1], o[0], o[1]]
+  const [t, rr, b, l] = o.length === 4 ? o : o.length === 1 ? [o[0], o[0], o[0], o[0]] : o.length === 3 ? [o[0], o[1], o[2], o[1]] : [o[0], o[1], o[0], o[1]]
   const body = rc(r), d = { x: r.left - l, y: r.top - t, w: r.width + l + rr, h: r.height + t + b }
   const cell = [...e.children].find(c => !c.classList.contains('key') && c.tagName !== 'I' && getComputedStyle(c).display !== 'none') || e
   const rg = document.createRange(); rg.selectNodeContents(cell); const tr = rg.getBoundingClientRect(), key = e.querySelector('.key')?.getBoundingClientRect()
