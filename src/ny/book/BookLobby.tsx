@@ -38,6 +38,12 @@ export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean 
   )
 }
 
+/** Кожаная лента заголовка лобби (10.74, lobby-ribbon.webp). Лежит в слое сцены ПОД гирляндой с бантом (z 26), чтобы гирлянда была сверху и ничем не закрывалась;
+ *  надпись «QUIZ PARTY» — заголовок экрана (h1 в HostScreen) золотым тиснением поверх, по центру кожаной части. 9-slice: тянется только середина (CSS .bk-ribbon). */
+export function BookRibbon() {
+  return <div className="bk-ribbon" aria-hidden="true" />
+}
+
 /** Приглашение на левой странице (под QR; на бумаге — вместо QR). */
 export function BookInvite({ paper }: { paper: boolean }) {
   // 14.11: подпись у QR («Наведите камеру… играем с телефонов») убрана по решению ведущего — только в «Книге»; на бумаге (нет QR) приглашение остаётся
