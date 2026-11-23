@@ -31,6 +31,7 @@ import { TEAM_EMOJI_GROUPS } from '../lib/teamEmoji'
 import { BottomSheet } from '../components/BottomSheet'
 import { Hint, useHint } from '../components/Hint'
 import { serverNow } from '../lib/serverClock'
+import { TeamMark, TeamIcon } from '../components/TeamMark'
 
 // ═══ Экран игрока — механика перенесена из старого проекта ═══
 // Список ВСЕХ вопросов раунда карточками: открываются по мере зачитывания,
@@ -1297,7 +1298,7 @@ function RoundComment({ team, gameState }: {
 function PlayerHeader({ team, round }: { team: Team; round: string }) {
   return (
     <div className="pl-header">
-      <span style={{ color: team.color }}>{team.icon && <span className="pl-team-icon">{team.icon}</span>}{team.name}</span>
+      <span style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}</span>
       <span className="pl-round">РАУНД {round}</span>
     </div>
   )
@@ -1329,7 +1330,7 @@ function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: strin
           <span>Цвет</span>
         </button>
         <button type="button" className="pl-pick" onClick={() => setSheet('icon')}>
-          <span className="pl-pick-swatch pl-pick-emoji">{icon || '❔'}</span>
+          <span className="pl-pick-swatch pl-pick-emoji">{icon ? <TeamIcon icon={icon} /> : '❔'}</span>
           <span>Значок</span>
         </button>
       </div>
@@ -1365,7 +1366,7 @@ function Register({ onDone, gameId }: { onDone: (t: Team) => void; gameId: strin
                 <div className="pl-emoji-grid">
                   {g.items.map(e => (
                     <button key={e} type="button" className={`pl-emoji-cell${icon === e ? ' sel' : ''}`}
-                      onClick={() => { setIcon(e); setSheet(null) }}>{e}</button>
+                      onClick={() => { setIcon(e); setSheet(null) }}><TeamIcon icon={e} /></button>
                   ))}
                 </div>
               </div>
@@ -1382,7 +1383,7 @@ function Waiting({ message, sub, team }: { message: string; sub?: string; team?:
     <div className="pl-center">
       <ConnectionDot />
       {team && <div className="pl-team-badge" style={{ color: team.color }}>
-        {team.icon && <span className="pl-team-icon">{team.icon}</span>}{team.name}
+        {team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}
       </div>}
       <div className="pl-wait">{message}</div>
       {sub && <div className="pl-wait-sub">{sub}</div>}

@@ -9,6 +9,7 @@ import { DecoratedTree } from '../engine/DecoratedTree'
 import { Particles } from '../engine/stage'
 import type { SnowCfg } from '../engine/particles'
 import type { Density, NyTeam, NyTimer } from '../types'
+import { TeamMark } from '../../components/TeamMark'
 
 const BOOK = { x: 64, y: 50, w: 1792, h: 990 }
 const PAPER = ['#b3263a', '#d9a441', '#1f4a3a', '#f3ead8', '#2c4a7a', '#e46b4f']
@@ -158,7 +159,7 @@ export function Pennants({ teams }: { teams: NyTeam[] }) {
                 <div key={t.id} className={`p-flag-team${t.alive ? '' : ' is-away'}${n > 22 ? ' is-long' : n > 14 ? ' is-mid' : ''}`}
                   style={{ left: i * (FLAG_W + FLAG_GAP), top: 3 + y(f), width: FLAG_W, '--tc': t.color, '--ang': `${ang}deg`, '--rot': `${ang}deg`, '--i': r * 4 + i } as CSSProperties}>
                   <span className="p-flag-pin" />
-                  <span className="p-flag-name">{t.icon && <i>{t.icon}</i>}{t.name}</span>
+                  <span className="p-flag-name">{t.icon && <TeamMark className="p-flag-mark" icon={t.icon} color={t.color} />}{t.name}</span>
                 </div>
               )
             })}

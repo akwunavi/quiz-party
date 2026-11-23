@@ -5,6 +5,7 @@
 // Имя команды — отдельный HTML-слой строго в полезной области пергамента; кегль подбирает useFitText(range): одна строка крупно или две строки, без многоточия.
 import type { CSSProperties } from 'react'
 import { useFitText } from '../../hooks/useFitText'
+import { TeamMark } from '../../components/TeamMark'
 import { bookUnit } from './adaptive/safeArea'
 
 /** Геометрия ассета (пиксели 1453×662): левый край, правый край, полезная область по вертикали. */
@@ -23,7 +24,7 @@ export function BookTeamCard({ name, ch, scene = false, em = false, state = 'nor
   state?: TeamCardState
   /** очки справа (итоговые таблицы) */
   score?: string | number
-  /** цвет команды — маленькая точка слева от имени, кожу не перекрашивает */
+  /** цвет команды — кольцо жетона слева от имени (+ значок внутри), кожу не перекрашивает */
   color?: string
   icon?: string | null
   away?: boolean
@@ -39,8 +40,8 @@ export function BookTeamCard({ name, ch, scene = false, em = false, state = 'nor
   return (
     <div className={`bk-tc bk-tc-${state}${em ? ' bk-tc-em' : ''}${em && name.length > 20 ? ' is-long' : em && name.length > 14 ? ' is-mid' : ''}${away ? ' is-away' : ''}${className ? ' ' + className : ''}`} data-state={state} style={{ '--tch': tch } as CSSProperties}>
       <span className="bk-tc-box">
-        {color && <i className="bk-tc-dot" style={{ '--dc': color } as CSSProperties} />}
-        <span className="bk-tc-text"><span ref={em ? undefined : fit} className="bk-tc-name" data-bk-text="tc">{icon ? `${icon} ` : ''}{name}</span></span>
+        {(color || icon) && <TeamMark className="bk-tc-dot" icon={icon} color={color} />}
+        <span className="bk-tc-text"><span ref={em ? undefined : fit} className="bk-tc-name" data-bk-text="tc">{name}</span></span>
         {score != null && <b className="bk-tc-score">{score}</b>}
         {mark && <em className="bk-tc-mark" aria-label={state}>{mark}</em>}
       </span>

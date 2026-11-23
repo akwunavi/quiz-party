@@ -139,7 +139,7 @@
   filter: drop-shadow(0 8px 6px rgba(60,30,10,.28)); animation: p-hang 1s cubic-bezier(.2,.9,.3,1) calc(1.7s + var(--i) * .09s) backwards; }
 .p-flag-pin { position: absolute; left: 50%; top: -2px; width: 12px; height: 26px; margin-left: -6px; background: #d9a441; border-radius: 3px; box-shadow: 0 2px 2px rgba(0,0,0,.3); }
 .p-flag-name { font: 700 30px/1.08 var(--p-serif); color: var(--p-ink); text-wrap: balance; }
-.p-flag-name i { font-style: normal; margin-right: 8px; }
+.p-flag-name .tm { --tm-d: 1.45em; margin-right: 8px; }
 .p-flag-team.is-mid .p-flag-name { font-size: 24px; } .p-flag-team.is-long .p-flag-name { font-size: 20px; line-height: 1.08; }
 .p-flag-team.is-away { opacity: .4; }
 

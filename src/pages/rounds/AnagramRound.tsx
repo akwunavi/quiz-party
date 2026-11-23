@@ -34,6 +34,7 @@ import { useRealTimer } from '../../forest/useTimer'
 import { hueOf, tcol } from '../../forest/util'
 import type { PreviewCtx } from '../../lib/previewState'
 import { serverNow } from '../../lib/serverClock'
+import { TeamMark } from '../../components/TeamMark'
 
 /** Страховка посадки плитки, если `transitionend` не придёт (вкладка в
  *  фоне, переход отключён чужим правилом). Отсчёт — от `transitionstart`
@@ -171,7 +172,7 @@ function AnagramTeamsPanel({ teams, rows, start, phrase, reveal, verdicts, book 
             <li key={t.id} className={`an-team${r.sent ? ' sent' : ''}${mark ? ' ' + mark : ''}`}
               style={{ borderLeftColor: t.color }}>
               <div className="an-team-top">
-                <span className="an-team-name" style={{ color: t.color }}>{t.icon ? `${t.icon} ` : ''}{t.name}</span>
+                <span className="an-team-name" style={{ color: t.color }}>{t.icon && <TeamMark icon={t.icon} color={t.color} />}{t.name}</span>
                 <span className="an-team-st">
                   {r.sent
                     ? <>{Number.isFinite(r.ms) && r.ms >= 0 ? `${start.approx ? '≈ ' : ''}${formatRaceTime(r.ms)}` : 'ответил'}</>
@@ -380,7 +381,7 @@ function AnagramBoardClassic({
                   {book
                     ? <BookTeamCard className="an-res-card" name={winnerTeam.name} icon={winnerTeam.icon} color={winnerTeam.color} ch={46} />
                     : <span className="an-res-team" style={{ color: winnerTeam.color }}>
-                      {winnerTeam.icon ? `${winnerTeam.icon} ` : ''}{winnerTeam.name}</span>}
+                      {winnerTeam.icon && <TeamMark icon={winnerTeam.icon} color={winnerTeam.color} />}{winnerTeam.name}</span>}
                   {Number.isFinite(winnerMs) && winnerMs >= 0 &&
                     <span className="an-res-time">{start.approx ? '≈ ' : ''}ЗА {formatRaceTime(winnerMs)}</span>}
                 </div>
@@ -392,7 +393,7 @@ function AnagramBoardClassic({
                     ? <BookTeamCard key={t.id} className="an-res-card" name={t.name} icon={t.icon} color={t.color} ch={40} />
                     : (
                       <span key={t.id} className="an-res-chip" style={{ color: t.color, borderColor: t.color }}>
-                        {t.icon ? `${t.icon} ` : ''}{t.name}</span>
+                        {t.icon && <TeamMark icon={t.icon} color={t.color} />}{t.name}</span>
                     ))}
                 </div>
               : <div className="an-res-line"><span className="an-res-label">НИКТО НЕ УГАДАЛ</span></div>}
@@ -429,7 +430,7 @@ function ForestAnagramBoard({ pack, round, q, qIndex, qCount, gameState, effects
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const { winnerTeam, start, winnerMs, rightTeams } = anagramOutcome({ rows, teams, phrase, race, shown, qid: q.id, startedAt })
   const col = (c: string) => tcol(hueOf(c))
-  const chip = (t: Team) => <em key={t.id} style={{ color: col(t.color), borderColor: col(t.color) }}>{t.icon ? `${t.icon} ` : ''}{t.name}</em>
+  const chip = (t: Team) => <em key={t.id} style={{ color: col(t.color), borderColor: col(t.color) }}>{t.icon && <TeamMark icon={t.icon} color={t.color} />}{t.name}</em>
   const note = q.answer_note ? <span className="scA-note">{q.answer_note}</span> : null
   // на бумаге ответов в базе нет — результат зачитывает ведущий по бланкам
   const result = paperMode ? null : race

@@ -91,6 +91,7 @@ import { stagedAnswerBody, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '
 import { answerUsesSharedScreen, answerTileCount, isStagedAnswer, screenLayout } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
 import { serverNow } from '../lib/serverClock'
+import { TeamMark } from '../components/TeamMark'
 
 // ═══ Экран хоста (проектор) ═══
 // Правила экрана: без скроллов; все кнопки — справа внизу; имя пакета — мелко
@@ -338,7 +339,7 @@ function HostInner({ gameState, pack }: {
                 : lobbyTeams.map(t => (
                   <span key={t.id} className="lobby-team team-chip-fx"
                     style={{ ['--tc' as string]: t.color, opacity: isAlive(t) ? 1 : .4 }}>
-                    {t.icon && <span className="lobby-team-icon">{t.icon}</span>}{t.name}
+                    {t.icon && <TeamMark className="lobby-team-icon" icon={t.icon} color={t.color} />}{t.name}
                   </span>
                 ))}
             </div>

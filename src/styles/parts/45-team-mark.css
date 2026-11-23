@@ -1,0 +1,13 @@
+/* ═══ Значок команды (components/TeamMark.tsx) — одинаков на телефоне, в админке и на проекторе ═══
+   Размер ведёт --tm-d (по умолчанию 1.6em от кегля места). Цвет команды — заливка кольца, берётся как есть. */
+.ti { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -.2em; object-fit: contain; }
+.ti-txt { display: inline-block; }
+.tm { --tm-d: 1.6em; display: inline-flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box;
+  width: var(--tm-d); height: var(--tm-d); border-radius: 50%; vertical-align: middle; background: var(--tmc);
+  box-shadow: 0 0 0 .07em rgba(30, 18, 8, .85), 0 .06em .16em rgba(0, 0, 0, .4); }
+.tm.has-ico { padding: .11em; }
+.tm-in { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%;
+  background: #fffaf0; box-shadow: inset 0 0 0 .04em rgba(30, 18, 8, .35); }
+.tm-in .ti { width: 82%; height: 82%; vertical-align: top; }
+.tm-in .ti-txt { font-size: .8em; line-height: 1; }
+.pl-team-icon.tm, .lobby-team-icon.tm { margin-right: .45em; }
