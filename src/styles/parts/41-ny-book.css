@@ -1452,3 +1452,12 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)) .choice-plate { --sh: calc(44 * var(--u)); }
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)):has(> .choice-plate:nth-child(7)) .choice-plate { --sh: calc(40 * var(--u)); }
 .theme-ny_book .host-screen .answers-main.revealed .answer-block:has(.choices-grid:has(> .choice-plate:nth-child(5))) .bk-note-box .answer-note { font-size: calc(20 * var(--u)); line-height: 1.22; }
+
+/* ═══ 10.74: правила раунда — остатки киберпанка ═══
+   (1) База (.rule-item, 01-base) ставит `animation: ruleIn … forwards` БЕЗ заполнения «назад», а 23-answers возвращает
+   opacity: 1 — поэтому правило с задержкой (0.5s + i·0.7s) стояло на месте ПОЛНОСТЬЮ видимым, потом пропадало и заново
+   выезжало: мелькание «иногда» (видно на 2-м и далее пунктах, замер opacity 1.00 → 0.37 → 1.00). `both` держит первый кадр
+   (opacity 0) до старта. Вес 0,3,0 — выше базового 0,1,0.
+   (2) Киберпанк-амбиент фона экрана (.grid-bg: дрейф сетки, плавающие орбы, дыхание виньетки, 15-projector-interactive) в «Книге» не нужен. */
+.theme-ny_book .rules-frame .rule-item { animation-fill-mode: both; }
+.theme-ny_book .grid-bg, .theme-ny_book .grid-bg::before, .theme-ny_book .grid-bg::after { animation: none; }
