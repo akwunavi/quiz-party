@@ -19,7 +19,7 @@ export type TrackEnv = { env: number[]; durationSec: number }
 export type Decoder = (bytes: ArrayBuffer) => Promise<{ sampleRate: number; channels: Float32Array[] }>
 
 const DECODE_RATE = 8000          // речь и мелодия живут ниже 4 кГц; 8 кГц — в 5,5 раза меньше памяти
-const MAX_BYTES = 30 * 1024 * 1024 // файл больше — не трогаем (память слабого ТВ)
+const MAX_BYTES = 12 * 1024 * 1024 // файл больше — не трогаем (память слабого ТВ: decodeAudioData сперва раскладывает файл на родной частоте)
 
 export const defaultDecoder: Decoder = async bytes => {
   const w = globalThis as unknown as {

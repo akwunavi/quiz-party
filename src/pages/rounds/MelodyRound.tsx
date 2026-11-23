@@ -321,8 +321,8 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     // стадии не должен бросать кубик заново.
     const url = mediaUrl(track.audio)
     let pick = loudPick.current
-    if (!pick || pick.key !== m.key) {
-      pick = { key: m.key, start: loudStartFor(url, MELODY_MAX_BID_SEC) }
+    if (!pick || pick.key !== `${m.key}|${url}`) {
+      pick = { key: `${m.key}|${url}`, start: loudStartFor(url, MELODY_MAX_BID_SEC) }
       loudPick.current = pick
     }
     const requested = pick.start ?? m.startSec ?? 0
