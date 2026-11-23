@@ -1452,3 +1452,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)) .choice-plate { --sh: calc(44 * var(--u)); }
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)):has(> .choice-plate:nth-child(7)) .choice-plate { --sh: calc(40 * var(--u)); }
 .theme-ny_book .host-screen .answers-main.revealed .answer-block:has(.choices-grid:has(> .choice-plate:nth-child(5))) .bk-note-box .answer-note { font-size: calc(20 * var(--u)); line-height: 1.22; }
+
+/* 10.74: слайд «Правила»/инфо — плашка-свиток в шапке дублировала большой заголовок слева и закрывала бант гирлянды; когда большой заголовок (.ib-label) есть, плашку не показываем */
+.theme-ny_book .host-screen.info-screen:has(.ib-label) > .host-topbar .mono-tag { display: none; }
