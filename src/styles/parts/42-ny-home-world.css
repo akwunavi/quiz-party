@@ -194,7 +194,7 @@
 .h-cuff { position: relative; margin-top: 6px; min-height: calc(88px * var(--s)); padding: 10px 10px; display: grid; place-items: center; text-align: center; border-radius: 10px 10px 4px 4px;
   background: repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 5px, rgba(255,255,255,0) 5px 10px), #fff4dc; box-shadow: 0 4px 0 #d8c9a4, 0 8px 10px rgba(0,0,0,.35); }
 .h-cuff-name { font: 700 calc(26px * var(--s))/1.08 var(--h-body); color: #3a1d0e; text-wrap: balance; }
-.h-cuff-name i { font-style: normal; margin-right: 6px; }
+.h-cuff-name .tm { --tm-d: 1.45em; margin-right: 6px; }
 .h-sock.is-mid .h-cuff-name { font-size: calc(23px * var(--s)); }
 .h-sock.is-long .h-cuff-name { font-size: calc(20px * var(--s)); line-height: 1.1; }
 .h-leg { height: calc(120px * var(--s)); margin: -2px calc(18px * var(--s)) 0 calc(14px * var(--s)); background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(0,0,0,.18)), color-mix(in srgb, var(--tc) 72%, #2a1408);

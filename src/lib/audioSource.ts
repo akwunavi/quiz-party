@@ -112,6 +112,19 @@ function evictOldIfNeeded() {
 function cacheSet(url: string, blobUrl: string) {
   cache.set(url, blobUrl)
   evictOldIfNeeded()
+  cachedHooks.forEach(fn => { try { fn(url, blobUrl) } catch { /* подписчик не должен ронять загрузку */ } })
+}
+
+// Подписка «трек скачан в память» — для анализа громкости (loudAnalysis.ts,
+// 10.74): анализ идёт по УЖЕ скачанному файлу, своей загрузки не запускает.
+const cachedHooks = new Set<(url: string, blobUrl: string) => void>()
+export function onBlobCached(fn: (url: string, blobUrl: string) => void): () => void {
+  cachedHooks.add(fn)
+  return () => cachedHooks.delete(fn)
+}
+/** Локальная ссылка на уже скачанный трек (или `undefined`). */
+export function getCachedBlobUrl(url: string): string | undefined {
+  return cache.get(url)
 }
 
 // Скачивания, идущие ПРЯМО СЕЙЧАС — второй запрос на тот же url переиспользует

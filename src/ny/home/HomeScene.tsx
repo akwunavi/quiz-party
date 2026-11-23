@@ -6,6 +6,7 @@
 import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import { DecoratedTree } from '../engine/DecoratedTree'
 import { Particles } from '../engine/stage'
+import { TeamMark } from '../../components/TeamMark'
 import type { Density, NyTeam, NyTimer } from '../types'
 
 const BULBS = ['rgba(255,70,60,1)', 'rgba(255,196,60,1)', 'rgba(70,210,120,1)', 'rgba(80,150,255,1)', 'rgba(255,120,210,1)']
@@ -87,7 +88,7 @@ export function Stockings({ teams }: { teams: NyTeam[] }) {
                 <div key={t.id} className={`h-sock${t.alive ? '' : ' is-away'}${n > 22 ? ' is-long' : n > 14 ? ' is-mid' : ''}`}
                   style={{ '--tc': t.color, '--i': r * 4 + i } as CSSProperties}>
                   <span className="h-hook" />
-                  <div className="h-cuff"><span className="h-cuff-name">{t.icon && <i>{t.icon}</i>}{t.name}</span></div>
+                  <div className="h-cuff"><span className="h-cuff-name">{t.icon && <TeamMark className="h-cuff-mark" icon={t.icon} color={t.color} />}{t.name}</span></div>
                   <div className="h-leg" />
                 </div>
               )

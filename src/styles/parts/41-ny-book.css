@@ -40,18 +40,16 @@
   background: #f3ead8; border: 2px solid #b9a77f; border-radius: 3px; box-shadow: 0 3px 0 var(--nb-shade); opacity: .92; text-transform: none; letter-spacing: 0; }
 
 /* ── 01 ЛОББИ ── */
-.theme-ny_book .lobby-screen { justify-content: flex-start; padding-top: calc(var(--bk-oy) + 110 * var(--u)); }
-.theme-ny_book .lobby-screen .neon-title { position: relative; isolation: isolate; margin: 0; padding: calc(16 * var(--u)) calc(92 * var(--u)) calc(26 * var(--u));
-  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.18)), var(--bk-red-2);
-  box-shadow: inset 0 0 0 calc(3 * var(--u)) rgba(242, 213, 140, .55), 0 calc(14 * var(--u)) calc(18 * var(--u)) rgba(60, 20, 10, .3);
-  /* прототип этапа 2: книжный display (Cormorant 700), золото по бордо, меньше — хвосты не заходят на список команд */
-  font: 700 calc(104 * var(--u)) / 1 var(--bk-display); letter-spacing: .03em; color: var(--bk-gold-2); text-transform: none; text-shadow: 0 3px 0 var(--bk-red-3), 0 6px 14px rgba(40, 6, 10, .5);
-  animation: p-unfurl 1.1s cubic-bezier(.3, .85, .3, 1) .5s both; }
-.theme-ny_book .lobby-screen .neon-title::before, .theme-ny_book .lobby-screen .neon-title::after { content: ''; position: absolute; top: calc(26 * var(--u)); width: calc(120 * var(--u)); height: 100%; z-index: -1; background: #7a1424;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 26% 50%); }
-.theme-ny_book .lobby-screen .neon-title::before { left: calc(-84 * var(--u)); }
-.theme-ny_book .lobby-screen .neon-title::after { right: calc(-84 * var(--u)); transform: scaleX(-1); }
-.theme-ny_book .lobby-screen .neon-title span { display: block; color: inherit !important; }
+.theme-ny_book .lobby-screen { justify-content: flex-start; padding-top: calc(var(--bk-oy) + 151 * var(--u)); }
+/* 10.74: плоская красная лента с «хвостиками» заменена кожаной (lobby-ribbon.webp). САМА лента — .bk-ribbon в слое сцены (BookLobby/40a), ПОД гирляндой с бантом;
+   здесь только надпись: золотое тиснение (--bk-gold…) по центру кожаной части, высота = тело ленты (110u), ширина — между свёрнутыми концами (слайсы 108.5u с каждой стороны ленты 806u).
+   Тот же display-шрифт, что у заголовков темы. Градиент — на внутреннем span (background-clip: text), тень — drop-shadow на h1 (text-shadow с прозрачной заливкой не работает). */
+.theme-ny_book .lobby-screen .neon-title { position: relative; margin: 0; padding: 0; box-sizing: border-box; flex: none; align-self: center; width: calc(580 * var(--u)); height: calc(110 * var(--u));
+  display: flex; align-items: center; justify-content: center; background: none; border: 0; box-shadow: none; text-transform: none; white-space: nowrap;
+  font: 700 calc(82 * var(--u)) / 1 var(--bk-display); letter-spacing: .05em; filter: drop-shadow(0 calc(2 * var(--u)) 0 var(--bk-red-3)) drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(20, 2, 6, .65)); }
+.theme-ny_book .lobby-screen .neon-title::before, .theme-ny_book .lobby-screen .neon-title::after { content: none; }
+.theme-ny_book .lobby-screen .neon-title span { display: inline-block; padding: 0 .04em; color: transparent !important; -webkit-text-fill-color: transparent;
+  background: linear-gradient(180deg, #fff1c2 8%, var(--bk-gold-2) 30%, var(--bk-gold) 62%, var(--bk-gold-3) 100%); -webkit-background-clip: text; background-clip: text; }
 .theme-ny_book .lobby-screen .neon-title br { display: none; }
 
 /* окно составов: вкладыш справа от QR, QR слева остаётся виден */
@@ -772,7 +770,8 @@
 .theme-ny_book .bk-tc-box { position: absolute; left: 0; right: 0; top: calc(100 * var(--k)); bottom: calc(222 * var(--k)); display: flex; align-items: center; gap: calc(14 * var(--k)); min-width: 0; padding: 0 calc(18 * var(--k)); }
 .theme-ny_book .bk-tc-text { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: center; }
 .theme-ny_book .bk-tc-name { display: block; width: 100%; font-family: var(--bk-name); font-weight: 600; line-height: 1.1; color: #2a1a10; text-align: left; overflow-wrap: break-word; text-wrap: balance; letter-spacing: 0; text-shadow: 0 calc(1 * var(--k)) 0 rgba(255, 244, 214, .6); }
-.theme-ny_book .bk-tc-dot { flex: none; width: calc(46 * var(--k)); height: calc(46 * var(--k)); border-radius: 50%; box-shadow: inset 0 0 0 calc(5 * var(--k)) rgba(255, 255, 255, .65), 0 0 0 calc(5 * var(--k)) rgba(138, 106, 36, .9); }
+.theme-ny_book .bk-tc .tm.bk-tc-dot { font-size: calc(var(--tch) * .4); --tm-d: calc(380 * var(--k)); margin: 0 calc(-10 * var(--k)) 0 calc(-4 * var(--k)); box-shadow: 0 0 0 calc(7 * var(--k)) rgba(138, 106, 36, .95), 0 calc(6 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .4); }
+.theme-ny_book .bk-tc .tm.bk-tc-dot:not(.has-ico) { box-shadow: inset 0 0 0 calc(6 * var(--k)) rgba(255, 255, 255, .35), 0 0 0 calc(7 * var(--k)) rgba(138, 106, 36, .95), 0 calc(6 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .4); }
 .theme-ny_book .bk-tc-score { flex: none; font: 700 calc(150 * var(--k)) / 1 var(--bk-serif); color: var(--bk-red); font-variant-numeric: lining-nums tabular-nums; }
 .theme-ny_book .bk-tc-mark { flex: none; display: grid; place-items: center; width: calc(70 * var(--k)); height: calc(70 * var(--k)); border-radius: 50%; font: 700 calc(52 * var(--k)) / 1 var(--bk-serif); font-style: normal; color: #fff; }
 /* состояния: кожа и пергамент НЕ перекрашиваются — свечение по контуру карточки (drop-shadow следует за альфой) и маленький индикатор */
@@ -878,7 +877,10 @@
 html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { background: #070b16 !important; }
 .theme-ny_book .host-screen.race-screen { padding: clamp(10px, 1.6vh, 22px) clamp(14px, 2vw, 40px) !important; background: radial-gradient(ellipse at 50% 0, #14213f, #070b16 80%) !important; color: #eaf0ff; }
 .theme-ny_book .race-screen .host-topbar { position: static !important; top: auto !important; }
-.theme-ny_book .race-screen .host-topbar .qnum { font: 700 clamp(14px, 1.3vw, 22px) / 1 system-ui, sans-serif !important; letter-spacing: .12em; color: #aab6d8 !important; background: none !important; box-shadow: none !important; padding: 0 !important; text-transform: uppercase; }
+.theme-ny_book .race-screen .host-topbar { justify-content: center; max-width: 100%; }
+/* Шапка гонки — тот же книжный свиток (hscroll, 10.71), что на всех экранах: раньше здесь стоял светло-серый цвет «для тёмного фона» и системный кегль c line-height 1, а свиток (правило ниже по файлу, 10.71) остался —
+   надпись сливалась со светлым пергаментом и липла к верху. Теперь чернила пергамента, гарнитура и высота строки свитка (--sh), по центру; длинное название не вылезает за рулоны (многоточие). */
+.theme-ny_book .race-screen .host-topbar .qnum { font: 700 max(calc(23 * var(--u)), 16.5px) / var(--sh) var(--bk-serif) !important; letter-spacing: .09em; color: var(--nb-ink) !important; text-transform: uppercase; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .theme-ny_book .race-screen .mono-tag { color: #aab6d8 !important; text-shadow: none !important; }
 
 /* ═══ «3 ПОПЫТКИ»: обязательные буквенные ячейки слова (по реальной механике: число букв, закрытые «?», открытые подсказкой, полное слово в разборе) ═══
@@ -1046,9 +1048,9 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bz-block.on .bk-tc { filter: drop-shadow(0 0 calc(18 * var(--u)) rgba(255, 214, 110, .95)); transform: translateY(calc(-3 * var(--u))) scale(1.03); }
 .theme-ny_book .bz-row { gap: calc(22 * var(--u)) !important; }
 .theme-ny_book .bz-block .bz-timer { font-size: calc(50 * var(--u)); }
-.theme-ny_book .bz-card .bk-tc-dot { width: calc(215 * var(--k)) !important; height: calc(215 * var(--k)) !important; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .95) 0 12%, transparent 13%), radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--dc, #c0392b) 100%, white 22%), var(--dc, #c0392b) 58%, color-mix(in srgb, var(--dc, #c0392b) 100%, black 38%)) !important;
+.theme-ny_book .bz-card .bk-tc .tm.bk-tc-dot { width: calc(215 * var(--k)) !important; height: calc(215 * var(--k)) !important; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .95) 0 12%, transparent 13%), radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--tmc, #c0392b) 100%, white 22%), var(--tmc, #c0392b) 58%, color-mix(in srgb, var(--tmc, #c0392b) 100%, black 38%)) !important;
   box-shadow: 0 calc(8 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .45), 0 0 0 calc(8 * var(--k)) rgba(138, 106, 36, .85) !important; position: relative; }
-.theme-ny_book .bz-card .bk-tc-dot::before { content: ''; position: absolute; left: 36%; top: calc(-22 * var(--k)); width: 28%; height: calc(22 * var(--k)); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--k)) calc(2 * var(--k)) 0 0; }
+.theme-ny_book .bz-card .bk-tc .tm.bk-tc-dot::before { content: ''; position: absolute; left: 36%; top: calc(-22 * var(--k)); width: 28%; height: calc(22 * var(--k)); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--k)) calc(2 * var(--k)) 0 0; }
 .theme-ny_book .bz-block.on { background: none !important; box-shadow: none !important; }
 
 /* ═══ ПРАВИЛА — единый шаблон (COMPOSITION.md): левая страница — раунд и характеристики, правая — правила; заголовок не заходит за сгиб ═══ */
@@ -1452,3 +1454,14 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)) .choice-plate { --sh: calc(44 * var(--u)); }
 .theme-ny_book .answer-block:has(.bk-note-box) .choices-grid:has(> .choice-plate:nth-child(5)):has(> .choice-plate:nth-child(7)) .choice-plate { --sh: calc(40 * var(--u)); }
 .theme-ny_book .host-screen .answers-main.revealed .answer-block:has(.choices-grid:has(> .choice-plate:nth-child(5))) .bk-note-box .answer-note { font-size: calc(20 * var(--u)); line-height: 1.22; }
+
+/* 10.74: слайд «Правила»/инфо — плашка-свиток в шапке дублировала большой заголовок слева и закрывала бант гирлянды; когда большой заголовок (.ib-label) есть, плашку не показываем */
+.theme-ny_book .host-screen.info-screen:has(.ib-label) > .host-topbar .mono-tag { display: none; }
+/* ═══ 10.74: правила раунда — остатки киберпанка ═══
+   (1) База (.rule-item, 01-base) ставит `animation: ruleIn … forwards` БЕЗ заполнения «назад», а 23-answers возвращает
+   opacity: 1 — поэтому правило с задержкой (0.5s + i·0.7s) стояло на месте ПОЛНОСТЬЮ видимым, потом пропадало и заново
+   выезжало: мелькание «иногда» (видно на 2-м и далее пунктах, замер opacity 1.00 → 0.37 → 1.00). `both` держит первый кадр
+   (opacity 0) до старта. Вес 0,3,0 — выше базового 0,1,0.
+   (2) Киберпанк-амбиент фона экрана (.grid-bg: дрейф сетки, плавающие орбы, дыхание виньетки, 15-projector-interactive) в «Книге» не нужен. */
+.theme-ny_book .rules-frame .rule-item { animation-fill-mode: both; }
+.theme-ny_book .grid-bg, .theme-ny_book .grid-bg::before, .theme-ny_book .grid-bg::after { animation: none; }

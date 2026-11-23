@@ -1,0 +1,31 @@
+OK   1920x1080 online n=0 font=82.0 rib=806x159 qr=225 qr=ok 
+OK   1920x1080 online n=4 font=82.0 rib=806x159 qr=225 qr=ok 
+OK   1920x1080 online n=8 font=82.0 rib=806x159 qr=225 qr=ok 
+OK   1920x1080 online n=16 font=82.0 rib=806x159 qr=225 qr=ok 
+OK   1920x1080 online n=24 font=82.0 rib=806x159 qr=225 qr=ok 
+OK   1920x1080 paper n=8 font=82.0 rib=806x159 qr=-  
+OK   1366x768 online n=0 font=58.3 rib=573x113 qr=160 qr=ok 
+OK   1366x768 online n=4 font=58.3 rib=573x113 qr=160 qr=ok 
+OK   1366x768 online n=8 font=58.3 rib=573x113 qr=160 qr=ok 
+OK   1366x768 online n=16 font=58.3 rib=573x113 qr=160 qr=ok 
+OK   1366x768 online n=24 font=58.3 rib=573x113 qr=160 qr=ok 
+OK   1366x768 paper n=8 font=58.3 rib=573x113 qr=-  
+OK   1280x720 online n=0 font=54.7 rib=537x106 qr=150 qr=ok 
+OK   1280x720 online n=4 font=54.7 rib=537x106 qr=150 qr=ok 
+OK   1280x720 online n=8 font=54.7 rib=537x106 qr=150 qr=ok 
+OK   1280x720 online n=16 font=54.7 rib=537x106 qr=150 qr=ok 
+OK   1280x720 online n=24 font=54.7 rib=537x106 qr=150 qr=ok 
+OK   1280x720 paper n=8 font=54.7 rib=537x106 qr=-  
+OK   1899x905 online n=0 font=68.7 rib=675x133 qr=189 qr=ok 
+OK   1899x905 online n=4 font=68.7 rib=675x133 qr=189 qr=ok 
+OK   1899x905 online n=8 font=68.7 rib=675x133 qr=189 qr=ok 
+OK   1899x905 online n=16 font=68.7 rib=675x133 qr=189 qr=ok 
+OK   1899x905 online n=24 font=68.7 rib=675x133 qr=189 qr=ok 
+OK   1899x905 paper n=8 font=68.7 rib=675x133 qr=-  
+OK   3840x2160 online n=0 font=164.0 rib=1612x318 qr=450 qr=ok 
+OK   3840x2160 online n=4 font=164.0 rib=1612x318 qr=450 qr=ok 
+OK   3840x2160 online n=8 font=164.0 rib=1612x318 qr=450 qr=ok 
+OK   3840x2160 online n=16 font=164.0 rib=1612x318 qr=450 qr=ok 
+OK   3840x2160 online n=24 font=164.0 rib=1612x318 qr=450 qr=ok 
+OK   3840x2160 paper n=8 font=164.0 rib=1612x318 qr=-  
+ALL OK

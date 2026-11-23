@@ -4,7 +4,7 @@
 // лобби; рисуется в слотах сцены (NySlot), игровая вёрстка лобби остаётся только с
 // названием, окном составов и (по флагу) резервными кнопками.
 import QrCode from '../components/QrCode'
-import { BookInvite, BookQr, TeamsOnPage } from './book/BookLobby'
+import { BookInvite, BookQr, BookRibbon, TeamsOnPage } from './book/BookLobby'
 import { Stockings, TvQr } from './home/HomeScene'
 import { NySlot, NY_SLOT_BG, NY_SLOT_FX } from './NySlot'
 import type { NyThemeKey } from './density'
@@ -24,7 +24,7 @@ export function NyLobby({ theme, teams, playerUrl, showQr, lit }: {
   // карточке и приглашение; 0 команд — приглашение, а не пустые слоты.
   if (book) return (
     <>
-      <NySlot where={NY_SLOT_BG}><TeamsOnPage teams={teams} paper={!showQr} /><BookInvite paper={!showQr} /></NySlot>
+      <NySlot where={NY_SLOT_BG}><BookRibbon /><TeamsOnPage teams={teams} paper={!showQr} /><BookInvite paper={!showQr} /></NySlot>
       {showQr && (
         <NySlot where={NY_SLOT_FX}>
           <BookQr lit={lit}><QrCode value={playerUrl} quiet ink="#2a1a12" title="QR для подключения" className="ny-qr-svg" /></BookQr>

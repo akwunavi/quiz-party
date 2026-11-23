@@ -134,12 +134,18 @@
 .bk-invite.is-paper .bk-invite-title { font-size: 72px; }
 .bk-invite.is-paper .bk-invite-text { font-size: 34px; margin-top: 20px; }
 /* QR: наклонена только пергаментная подложка с золотой рамкой, код прямой с тихой зоной */
-.bk-qr { position: absolute; left: 250px; top: 300px; width: 380px; height: 430px; z-index: 6; }
-.bk-qr-card { position: absolute; inset: 0; transform: rotate(-2.5deg); border-radius: 6px;
-  background: radial-gradient(ellipse at 40% 30%, #fffaf0, var(--bk-paper-2)); box-shadow: 0 0 0 3px var(--bk-gold), 0 0 0 9px var(--bk-paper), 0 0 0 11px var(--bk-line), 0 18px 28px rgba(40, 20, 6, .45); }
-.bk-qr-tile { position: absolute; left: 40px; top: 40px; width: 300px; height: 300px; line-height: 0; background: #fff; box-shadow: 0 0 0 10px #fff; }
+.bk-qr { position: absolute; left: 270px; top: 330px; width: 285px; height: 322px; z-index: 6; }
+.bk-qr-card { position: absolute; inset: 0; transform: rotate(-2.5deg); border-radius: 5px;
+  background: radial-gradient(ellipse at 40% 30%, #fffaf0, var(--bk-paper-2)); box-shadow: 0 0 0 3px var(--bk-gold), 0 0 0 7px var(--bk-paper), 0 0 0 9px var(--bk-line), 0 14px 22px rgba(40, 20, 6, .45); }
+/* 10.74: карточка на четверть меньше (было 380×430, код 300) — код 225 px остаётся сканируемым (проверено декодером, см. HANDOFF) */
+.bk-qr-tile { position: absolute; left: 30px; top: 30px; width: 225px; height: 225px; line-height: 0; background: #fff; box-shadow: 0 0 0 8px #fff; }
 .bk-qr-tile svg { display: block; }
-.bk-qr::after { content: 'СКАНИРУЙТЕ'; position: absolute; left: 0; right: 0; bottom: 30px; text-align: center; font: 700 22px/1 var(--bk-serif); letter-spacing: .32em; color: var(--bk-red); }
+.bk-qr::after { content: 'СКАНИРУЙТЕ'; position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font: 700 17px/1 var(--bk-serif); letter-spacing: .32em; color: var(--bk-red); }
+/* 10.74: кожаная лента заголовка лобби. 9-slice: слайсы по краям (свёрнутые концы, 175 px рабочего файла 1300×256 → 108.5 px при масштабе .62) не растягиваются, тянется только середина.
+   Лента в слое сцены (z 20, ниже гирлянды z 26): гирлянда с бантом всегда сверху. Координаты — книга (ширина 1792): центр x=896, верх ленты y=98 (сцена 148, ниже основной массы гирлянды), низ свитков y=257 (сцена 307) — выше шапки списка команд (сцена 312). */
+.bk-ribbon { position: absolute; left: 493px; top: 98px; width: 806px; height: 159px; box-sizing: border-box; pointer-events: none;
+  border: solid transparent; border-width: 0 108.5px; border-image: url('/quiz-party/ny-book/lobby-ribbon.webp') 0 175 0 175 fill / 0 108.5px / 0 stretch;
+  filter: drop-shadow(0 8px 8px rgba(40, 14, 8, .38)); }
 .bk-qr.is-lit { z-index: 91; }
 .bk-qr.is-lit .bk-qr-card { box-shadow: 0 0 0 3px var(--bk-gold), 0 0 0 9px var(--bk-paper), 0 0 0 14px rgba(242, 213, 140, .9), 0 0 60px rgba(255, 214, 140, .55); }
 

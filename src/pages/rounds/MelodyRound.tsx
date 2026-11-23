@@ -10,6 +10,7 @@
 // → done (трек закрыт)
 import { getRoomId } from '../../lib/room'
 import { createAudio, preloadAudio, preloadAudioAll } from '../../lib/audioSource'
+import { loudStartFor, watchTracks } from '../../lib/loudAnalysis'
 import { unlockAudio, playShared, stopShared } from '../../lib/sharedAudio'
 import { usePlaybackActive } from '../../lib/playbackActive'
 import { BookMelodyCovers } from '../../ny/book/BookMelody'
@@ -309,18 +310,29 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     }
   }, [preview, expired, m.stage, answers, vt.expired])
 
+  const loudPick = useRef<{ key?: string; start: number | null } | null>(null)
   // ── 1 секунда трека на стадии listen — со случайной точки m.startSec ──
   useEffect(() => {
     if (document.hidden && !preview && m.stage === 'listen' && track?.audio) skipped.current.add('listen')
     if (preview || m.stage !== 'listen' || !track?.audio || document.hidden) return
-    const requested = m.startSec ?? 0
+    // 10.74: если трек уже проанализирован — случайная точка только среди
+    // ЗВУЧАЩИХ участков (lib/loudAnalysis.ts); нет анализа — как раньше,
+    // m.startSec. Выбор запоминается на трек: перезапуск эффекта посреди
+    // стадии не должен бросать кубик заново.
+    const url = mediaUrl(track.audio)
+    let pick = loudPick.current
+    if (!pick || pick.key !== `${m.key}|${url}`) {
+      pick = { key: `${m.key}|${url}`, start: loudStartFor(url, MELODY_MAX_BID_SEC) }
+      loudPick.current = pick
+    }
+    const requested = pick.start ?? m.startSec ?? 0
     // keepTail: после точки старта должно остаться место под самый длинный
     // отрывок по ставке. Точка подрезается по РЕАЛЬНОЙ длине файла ДО
     // запуска звука (audioSource.seekSafely, 9.83): раньше подрезка шла
     // через 400 мс после старта — если файл короче номинальной длины,
     // браузер успевал прыгнуть в конец и остановиться, и «1 секунда»
     // проходила в тишине (HANDOFF §3cf).
-    const h = playShared(mediaUrl(track.audio), { startAt: requested, keepTail: MELODY_MAX_BID_SEC })
+    const h = playShared(url, { startAt: requested, keepTail: MELODY_MAX_BID_SEC })
     const unbindVinyl = vinyl.bind(h)
     let stop: number | undefined
     let advanced = false
@@ -330,7 +342,11 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
     // с той же, уже проверенной точки.
     let correctedStart: number | undefined
     void h.result.then(r => {
-      if (r.ok && r.startAt != null && Math.abs(r.startAt - requested) > 0.01) correctedStart = r.startAt
+      // итоговая точка (после подрезки по реальной длине файла) уходит в
+      // мешок, если она не совпала с тем, что там лежит (m.startSec), —
+      // и громкая точка 10.74, и подрезка 9.83 едут одним путём
+      const finalStart = r.ok && r.startAt != null ? r.startAt : requested
+      if (Math.abs(finalStart - (m.startSec ?? 0)) > 0.01) correctedStart = finalStart
     })
     const advance = () => {
       if (advanced) return
@@ -408,7 +424,10 @@ function useMelodyBoard({ pack, round, gameState, preview }: BoardProps) {
   const trackSig = trackUrls.join('|')
   useEffect(() => {
     if (preview || trackUrls.length === 0) return
-    return preloadAudioAll(trackUrls, setLoadState)
+    // анализ громкости по мере скачивания — в фоне, по одному (10.74)
+    const stopWatch = watchTracks(trackUrls)
+    const stopLoad = preloadAudioAll(trackUrls, setLoadState)
+    return () => { stopWatch(); stopLoad() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preview, trackSig])
 
