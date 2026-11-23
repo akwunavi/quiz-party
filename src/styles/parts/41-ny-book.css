@@ -878,7 +878,10 @@
 html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { background: #070b16 !important; }
 .theme-ny_book .host-screen.race-screen { padding: clamp(10px, 1.6vh, 22px) clamp(14px, 2vw, 40px) !important; background: radial-gradient(ellipse at 50% 0, #14213f, #070b16 80%) !important; color: #eaf0ff; }
 .theme-ny_book .race-screen .host-topbar { position: static !important; top: auto !important; }
-.theme-ny_book .race-screen .host-topbar .qnum { font: 700 clamp(14px, 1.3vw, 22px) / 1 system-ui, sans-serif !important; letter-spacing: .12em; color: #aab6d8 !important; background: none !important; box-shadow: none !important; padding: 0 !important; text-transform: uppercase; }
+.theme-ny_book .race-screen .host-topbar { justify-content: center; max-width: 100%; }
+/* Шапка гонки — тот же книжный свиток (hscroll, 10.71), что на всех экранах: раньше здесь стоял светло-серый цвет «для тёмного фона» и системный кегль c line-height 1, а свиток (правило ниже по файлу, 10.71) остался —
+   надпись сливалась со светлым пергаментом и липла к верху. Теперь чернила пергамента, гарнитура и высота строки свитка (--sh), по центру; длинное название не вылезает за рулоны (многоточие). */
+.theme-ny_book .race-screen .host-topbar .qnum { font: 700 max(calc(23 * var(--u)), 16.5px) / var(--sh) var(--bk-serif) !important; letter-spacing: .09em; color: var(--nb-ink) !important; text-transform: uppercase; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .theme-ny_book .race-screen .mono-tag { color: #aab6d8 !important; text-shadow: none !important; }
 
 /* ═══ «3 ПОПЫТКИ»: обязательные буквенные ячейки слова (по реальной механике: число букв, закрытые «?», открытые подсказкой, полное слово в разборе) ═══

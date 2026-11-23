@@ -8,6 +8,7 @@ import { ButterflyManager } from './vendor/butterfly.mjs'
 import type { RaceV3, SelectionPlayer, SelectionFrame, Visual } from './v3types'
 import { ArenaRenderer, type ArenaOptions } from './arena/arena'
 import * as SK from './stageSkin'
+import { stableAnchor, type PawMetric } from './pawAnchor'
 
 export interface StageInput {
   race: { seed: number; D: number; startedMs: number | null } | null      // null — идёт выбор; startedMs — startedAt (мс, серверное время)
@@ -71,7 +72,7 @@ export class StageRenderer {
   }
   /** Уход с экрана: закрыть все ImageBitmap и ОТДАТЬ видеопамять canvas (размер 0) — иначе буфер 1920×1080 и временный холст живут до сборщика мусора. */
   destroy() {
-    this.dead = true; this.arena?.destroy(); this.arena = null; this.arenaCv = null; this.pool.release(); this.noseCache.clear(); this.pawCache.clear()
+    this.dead = true; this.arena?.destroy(); this.arena = null; this.arenaCv = null; this.pool.release(); this.noseCache.clear(); this.pawCache.clear(); this.anchorCache.clear()
     for (const c of [this.endSnap, this.podiumBg, this.pawCv]) if (c) { c.width = 0; c.height = 0 }; this.endSnap = null; this.podiumBg = null; this.pawCv = null; this.pawCtx = null
     this.canvas.width = 0; this.canvas.height = 0; this.tmp.width = 0; this.tmp.height = 0
   }
@@ -190,10 +191,19 @@ export class StageRenderer {
     const m = { bottom, cx: wide.length ? (x0 + x1) / 2 : cw / 2, span: Math.max(20, x1 - x0), paws: wide }; this.pawCache.set(key, m); return m
   }
   private pawCv: HTMLCanvasElement | null = null; private pawCtx: CanvasRenderingContext2D | null = null
-  /** Собака на тумбе: самая нижняя подошва ТЕКУЩЕГО кадра ложится на линию поверхности surfY; у КАЖДОЙ лапы (дальние выше, ближние ниже — перспектива спрайта) своя контактная тень прямо под подошвой, плюс мягкая общая тень тела. */
+  /** Постоянный якорь собаки на тумбе (pawAnchor.ts): по типичному кадру IDLE, один на собаку. null — лист IDLE ещё не декодирован (тогда запасные константы, без кеша). */
+  private anchorCache = new Map<number, PawMetric>()
+  private podiumAnchor(i: number): PawMetric | null {
+    const hit = this.anchorCache.get(i); if (hit) return hit
+    const d = this.dogs[i]; if (!d) return null
+    const n = d.sel.clips.idle?.count ?? 0; if (!n || !this.pool.peek(selectSheetUrl(DOG_IDS[i], d.sel.clips.idle.sheet))) return null
+    const ms: PawMetric[] = []; for (let k = 0; k < n; k += 2) { const m = this.pawMetrics(i, { clip: 'idle', index: k, kind: 'idle' }); if (m) ms.push(m) }
+    const a = stableAnchor(ms); if (a) this.anchorCache.set(i, a); return a
+  }
+  /** Собака на тумбе: подошва ТИПИЧНОГО положения (постоянная для собаки, не для кадра) ложится на линию поверхности surfY; у КАЖДОЙ лапы (дальние выше, ближние ниже — перспектива спрайта) своя контактная тень под подошвой, плюс мягкая общая тень тела — тени тоже постоянные. Координаты целые: дробный сдвиг спрайта при масштабе 1.5 даёт мерцание краёв. */
   private podiumDog(i: number, cx: number, surfY: number, k: number) {
-    const fr = this.podiumFrames[i], d = this.dogs[i]; if (!fr || !d) return; const m = this.pawMetrics(i, fr) ?? { bottom: PODIUM_PAW_ROW, cx: d.sel.cell[0] / 2, span: 100, paws: [] }
-    const c = this.ctx, w = m.span * k, ox = cx - m.cx * k, oy = surfY - m.bottom * k
+    const fr = this.podiumFrames[i], d = this.dogs[i]; if (!fr || !d) return; const m = this.podiumAnchor(i) ?? { bottom: PODIUM_PAW_ROW, cx: d.sel.cell[0] / 2, span: 100, paws: [] }
+    const c = this.ctx, w = m.span * k, ox = Math.round(cx - m.cx * k), oy = Math.round(surfY - m.bottom * k)
     const blob = (x: number, y: number, rx: number, ry: number, a: number) => { c.save(); c.translate(x, y); c.scale(1, ry / rx); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(14,8,36,${a})`); g.addColorStop(.55, `rgba(14,8,36,${a * .55})`); g.addColorStop(1, 'rgba(14,8,36,0)'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 7); c.fill(); c.restore() }
     blob(cx, surfY - 6, w * .8, w * .8 * .2, .45)                                                                 // общая тень тела на площадке
     for (const p of m.paws) { const px = ox + (p.x0 + p.x1) / 2 * k, py = oy + p.bottom * k, pw = (p.x1 - p.x0 + 14) * k; blob(px, py + 1, pw * .8, pw * .8 * .26, .62); blob(px, py, pw * .5, pw * .5 * .22, .8) }   // контакт под каждой лапой
