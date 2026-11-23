@@ -1,0 +1,5 @@
+Значки команд (эти SVG) — Twemoji, графика (c) Twitter, Inc. и контрибьюторы,
+лицензия CC-BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Источник: проект jdecked/twemoji, npm-пакет @twemoji/svg 15.0.0 (код пакета — MIT).
+Файлы не изменены; взяты только те эмодзи, что предлагаются при регистрации
+команды (src/lib/teamEmoji.ts). Имя файла = кодовые точки эмодзи без FE0F.

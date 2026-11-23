@@ -73,6 +73,7 @@ import {
   anagramFirst, anagramWasRun,
 } from '../lib/anagram'
 import { serverNow } from '../lib/serverClock'
+import { TeamMark } from '../components/TeamMark'
 
 // ═══ Админка (телефон ведущего) — перенос структуры старого AdminPage ═══
 // ВЕДУЩИЙ: шапка со ссылками → строка статуса → экран по фазе →
@@ -902,7 +903,7 @@ function AnswersView({ pack, round, gameState, answers, teams, onGrade }: {
           }}>
             <div className="adm-answer-top">
               <span style={{ color: team?.color, fontWeight: 700 }}>
-                {team?.icon && <span className="pl-team-icon">{team.icon}</span>}{team?.name ?? '—'}</span>
+                {team?.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team?.name ?? '—'}</span>
               <span className="adm-answer-text">{a.answer_text || '—'}
                 {a.stake != null && <span className="acc"> · ст.{a.stake}</span>}</span>
             </div>
@@ -1032,7 +1033,7 @@ function AnsweredIndicator({ round, gameState, answers, teams }: {
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 8, flexWrap: 'wrap' }}>
         {filled.map(({ team, done }) => (
           <span key={team.id} className={`adm-chip${done ? ' done' : ''}`}>
-            {done ? '✓ ' : ''}{team.name}
+            {done ? '✓ ' : ''}{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}
           </span>
         ))}
       </div>
@@ -1079,7 +1080,7 @@ function AnswerTimeBoard({ round, gameState, answers, teams, showTally }: {
         {tally.map(({ team, done }) => (
           <div key={team.id} style={{ display: 'flex', justifyContent: 'space-between',
             fontSize: 14, borderBottom: '1px solid #1c2740', paddingBottom: 6 }}>
-            <span style={{ color: team.color }}>{team.name}</span>
+            <span style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}</span>
             <span className="adm-dim">{done} / {total}</span>
           </div>
         ))}
@@ -1207,7 +1208,7 @@ function PaperScores({ pack, gameState, teams }: {
         const has = stored.has(t.id)
         return (
           <div key={t.id} className="paper-row">
-            <span style={{ color: t.color, flex: 1 }}>{t.name}</span>
+            <span style={{ color: t.color, flex: 1 }}>{t.icon && <TeamMark className="pl-team-icon" icon={t.icon} color={t.color} />}{t.name}</span>
             <input inputMode="numeric" className={has ? 'has' : ''}
               style={{ width: 80, textAlign: 'center' }}
               value={vals[t.id] ?? (has ? String(stored.get(t.id)) : '')}
@@ -1372,7 +1373,7 @@ function ResultsPanel({ pack, gameState, teams }: {
                   return (
                     <tr key={t.id}>
                       <td>{row.place}{row.shared && '='}</td>
-                      <td style={{ color: t.color }}>{t.name}</td>
+                      <td style={{ color: t.color }}>{t.icon && <TeamMark className="pl-team-icon" icon={t.icon} color={t.color} />}{t.name}</td>
                       {scored.map(r => <td key={r.id}>{all[pack.rounds.indexOf(r)] ?? 0}</td>)}
                       <td className="total">{totals.get(t.id) ?? 0}</td>
                     </tr>
@@ -1491,7 +1492,7 @@ function FinalePanel({ pack, gameId, teams, gameState }: {
             && !a.question_ref.endsWith('-bid')).length
           return (
             <div key={t.id} className="adm-why-row">
-              <span style={{ color: t.color }}>{t.name}</span>
+              <span style={{ color: t.color }}>{t.icon && <TeamMark className="pl-team-icon" icon={t.icon} color={t.color} />}{t.name}</span>
               <span className="adm-dim">
                 ответов {mine.length} · оценено {graded}
                 {pending > 0 && ` · НЕ ОЦЕНЕНО ${pending}`}
@@ -1859,7 +1860,7 @@ function AnagramControls({ pack, round, gameState, teams, answers }: {
                   style={{ borderLeftColor: team?.color ?? 'var(--dim)' }}>
                   <div className="adm-an-top">
                     <span className="adm-an-team" style={{ color: team?.color }}>
-                      {team?.icon && <span className="pl-team-icon">{team.icon}</span>}{team?.name ?? '—'}</span>
+                      {team?.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team?.name ?? '—'}</span>
                     <span className="adm-an-time">{start.approx && Number.isFinite(ms) && ms >= 0 ? '≈ ' : ''}{formatRaceTime(ms)}</span>
                   </div>
                   <div className="adm-an-text">{a.answer_text}
@@ -2190,7 +2191,7 @@ function MelodyControls({ round, gameState, onFinish }: {
           const b = bids.find(x => x.team_id === t.id)
           return (
             <div key={t.id} className="adm-tally">
-              <span style={{ color: t.color }}>{t.name}</span>
+              <span style={{ color: t.color }}>{t.icon && <TeamMark className="pl-team-icon" icon={t.icon} color={t.color} />}{t.name}</span>
               <span className={b ? 'ok' : 'adm-dim'}>{b ? 'ставка принята ✓' : '…'}</span>
             </div>
           )
