@@ -2,12 +2,14 @@
 // letters: заполнение клеток буквами своих ответов (телефон); null = пустая сетка (проектор).
 import type { CrosswordGrid } from '../types/quiz'
 
-export function CrosswordView({ grid, currentWordNumber, currentDir, letters, cellSize = 30 }: {
+export function CrosswordView({ grid, currentWordNumber, currentDir, letters, cellSize = 30, fontSize, onCell }: {
   grid: CrosswordGrid
   currentWordNumber?: number
   currentDir?: 'across' | 'down'
   letters?: Map<string, string>       // "r,c" → буква
   cellSize?: number
+  fontSize?: number                   // кегль букв (телефон: от размера клетки)
+  onCell?: (r: number, c: number) => void   // тап по непустой клетке (телефон)
 }) {
   const cells = new Map<string, { num?: number; current: boolean }>()
   for (const w of grid.words) {
@@ -24,14 +26,18 @@ export function CrosswordView({ grid, currentWordNumber, currentDir, letters, ce
     }
   }
   return (
-    <div className="cw-grid" style={{ gridTemplateColumns: `repeat(${grid.cols}, ${cellSize}px)` }}>
+    <div className="cw-grid" style={{
+      gridTemplateColumns: `repeat(${grid.cols}, ${cellSize}px)`,
+      ...(fontSize ? { ['--cw-num' as string]: `${Math.max(7, Math.round(fontSize * 0.5))}px` } : null),
+    }}>
       {Array.from({ length: grid.rows * grid.cols }, (_, i) => {
         const r = Math.floor(i / grid.cols), c = i % grid.cols
         const cell = cells.get(`${r},${c}`)
         if (!cell) return <div key={i} className="cw-cell empty" style={{ width: cellSize, height: cellSize }} />
         return (
           <div key={i} className={`cw-cell${cell.current ? ' current' : ''}`}
-            style={{ width: cellSize, height: cellSize }}>
+            style={{ width: cellSize, height: cellSize, ...(fontSize ? { fontSize } : null) }}
+            onClick={onCell ? () => onCell(r, c) : undefined}>
             {cell.num && <span className="num">{cell.num}</span>}
             {letters?.get(`${r},${c}`) ?? ''}
           </div>

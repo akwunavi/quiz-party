@@ -247,7 +247,7 @@ button.ghost.dark { background: rgba(0,0,0,.45); color: var(--muted);
 .cw-cell.empty { background: transparent; border: none; }
 .cw-cell.current { background: color-mix(in srgb, var(--accent) 28%, var(--bg2));
   border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
-.cw-cell .num { position: absolute; top: 0; left: 2px; font-size: 8px; font-weight: 400; opacity: .8; }
+.cw-cell .num { position: absolute; top: 0; left: 2px; font-size: var(--cw-num, 8px); font-weight: 400; opacity: .8; }
 .title-anim { animation: titleIn .9s cubic-bezier(.2,.9,.25,1.2) both; }
 @keyframes titleIn { from { transform: translateY(30px) scale(.92); opacity: 0; filter: blur(6px); }
   to { transform: none; opacity: 1; filter: none; } }
