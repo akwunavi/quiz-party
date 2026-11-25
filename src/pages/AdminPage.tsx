@@ -58,6 +58,7 @@ import { room } from '../lib/transport'
 import { listPacks } from '../lib/packLoader'
 import { usePackOffline } from '../hooks/usePackOffline'
 import { OfflineDownloadPanel } from '../components/OfflineDownload'
+import { VoiceStatusLine } from '../components/VoiceStatusLine'
 import {
   parseLocalExport, summarizeLocalImport, summaryText, importLocalGame,
 } from '../lib/importLocalGame'
@@ -144,6 +145,8 @@ export function AdminPage() {
           && round.mechanic !== 'melody' && round.mechanic !== 'jeopardy' && round.mechanic !== 'sprint'
           ? ` · ${gameState.question_index + 1}/${round.questions.length}` : ''}
       </div>
+
+      {gameState.pack_id && <VoiceStatusLine gameState={gameState} />}
 
       {!gameState.pack_id && <PackPicker />}
 
