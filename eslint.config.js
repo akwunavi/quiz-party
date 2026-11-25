@@ -33,7 +33,7 @@ export default tseslint.config(
   // не браузерный код src/, не деплоится и не идёт в бандл.
   { ignores: ['docs/**', '.claude/**', 'dist/**', 'dist-demo/**', 'node_modules/**', 'infra/**', 'local-server/**', 'scripts/**', 'public/sw.js', 'src/lib/bulldog/vendor/**', 'e2e/bulldog/*.cjs',
     // e2e/book/ — стенд «Книги» (Node + Playwright + Python, docs-dev/book-redesign/STAND.md), тот же случай, что scripts/
-    'e2e/book/**'] },
+    'e2e/book/**', 'e2e/player-crossword/*.cjs'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,

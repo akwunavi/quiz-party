@@ -11,7 +11,9 @@ import { enqueueAnswer, dropPending } from '../lib/answerQueue'
 import { jeopardyRef } from '../lib/jeopardyRef'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
-import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
+import { lettersFromAnswers } from '../components/CrosswordView'
+import { PlayerCrossword } from '../components/PlayerCrossword'
+import { pickWordAt } from '../lib/crosswordFit'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme, RaceSettings } from '../types/quiz'
 import { revealPointsFor } from '../lib/scoring'
@@ -836,11 +838,15 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       {gameState.phase === 'answer_time' &&
         <div className="pl-notice acc">ОЖИДАЮ ОТВЕТЫ — ПРОВЕРЬТЕ И ДОЗАПОЛНИТЕ</div>}
       {isCrossword && grid && (
-        <div className="pl-crossword">
-          <CrosswordView grid={grid} letters={cwLetters}
-            currentWordNumber={currentPlacement?.number} currentDir={currentPlacement?.dir}
-            cellSize={Math.min(26, Math.floor((Math.min(innerWidth, 460) - 40) / grid.cols))} />
-        </div>
+        <PlayerCrossword grid={grid} letters={cwLetters} current={currentPlacement}
+          onPickCell={(r, c) => {
+            // тап по клетке открывает карточку её слова (на пересечении второй тап — второе слово)
+            const w = pickWordAt(grid, r, c, currentPlacement)
+            if (!w) return
+            const qi = questions.findIndex(q => q.answer.mode === 'crossword_word' &&
+              q.answer.word.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, '') === w.word)
+            if (qi >= 0 && unlocked(qi)) pickOpen(qi)
+          }} />
       )}
       <div className="pl-list">
         <div className="pl-notice">Ответы можно вносить и править весь раунд</div>
