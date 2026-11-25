@@ -322,3 +322,5 @@
 .adm-audio-chip.ok { color: #6fdc8c; border-color: #6fdc8c; }
 .adm-audio-chip.wait { color: #ffd700; border-color: #ffd700; }
 .adm-audio-chip.bad { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, .08); }
+/* 10.75: приписка про остановки звука в строке «Озвучка» */
+.adm-voice-stall { margin-top: 3px; font-size: 12px; color: #ffd700; }

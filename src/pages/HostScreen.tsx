@@ -72,6 +72,10 @@ import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
 import { createAudio, stopAllAudio } from '../lib/audioSource'
+import { RulesAudio } from '../components/RulesAudio'
+import { voiceSrc, fallbackToStream, loadFailedFromMemory } from '../lib/voicePreload'
+import { watchStalls } from '../lib/audioStall'
+import { useVoicePreload } from '../hooks/useVoicePreload'
 import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -221,6 +225,8 @@ function HostInner({ gameState, pack }: {
   // Предзагрузка следующего вопроса. Хук стоит ЗДЕСЬ, до всех ранних
   // return: вызов внутри условия однажды уже дал падение React #310.
   usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
+  // Все озвучки пака — в память заранее + статус для пульта (10.75). Тоже до ранних return.
+  useVoicePreload(pack ?? null, gameState ?? null)
   const raceNear = pack?.rounds?.[gameState?.round_number ?? 0]?.mechanic === 'race' || pack?.rounds?.[(gameState?.round_number ?? 0) + 1]?.mechanic === 'race'
   useEffect(() => { if (raceNear) prefetchArena(import.meta.env.BASE_URL) }, [raceNear])                // арена «Скачек» — заранее, пока идут правила/раунд перед гонкой
 
@@ -393,7 +399,7 @@ function HostInner({ gameState, pack }: {
     // «Волшебный лес»: заставка раунда этапа 5 (эмблема механики, правила на листьях) — для всех механик, включая кроссворд
     if (isForestTheme(pack.theme)) return (
       <>
-        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {round.rules_audio && <RulesAudio key={round.rules_audio} path={round.rules_audio} />}
         <ForestRoundIntro kind={introKindOf(round.mechanic)} intro={{
           num: displayRoundNumber(pack, gameState.round_number), titleLines: round.title_lines,
           meta: metaLine(round), rules: round.rules,
@@ -403,7 +409,7 @@ function HostInner({ gameState, pack }: {
     )
     return (
       <div className="host-screen grid-bg round-intro">
-        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {round.rules_audio && <RulesAudio key={round.rules_audio} path={round.rules_audio} />}
         {/* Magic: заставка раунда в две фазы — вуаль золотого света
             рассеивается (фаза 1, показывает заголовок), затем проступают
             правила (фаза 2, задержка в тернарке ниже). Прямой ребёнок
@@ -964,7 +970,8 @@ function RecapSlides({ pack, round, gameState }: {
     // озвучка длиннее слайда — ждём её конца, а не таймер
     let cancelled = false
     const a = createAudio()
-    a.src = mediaUrl(voice)
+    a.src = voiceSrc(voice)
+    const unwatch = watchStalls(a, 'повтор вопросов')
     // play() асинхронный: pause() до его старта не делает ничего, а звук
     // всё равно заиграет — уже поверх следующего слайда (та же гонка, что
     // и с озвучкой вопроса и трека ответа, см. QuestionAudio/AnswerAudio).
@@ -978,7 +985,7 @@ function RecapSlides({ pack, round, gameState }: {
     const onEnd = () => { clearTimeout(timer); go() }
     a.addEventListener('ended', onEnd)
     return () => {
-      alive = false; cancelled = true; clearTimeout(timer)
+      alive = false; cancelled = true; clearTimeout(timer); unwatch()
       a.removeEventListener('ended', onEnd)
       try { a.pause(); a.src = '' } catch { /* уже остановлено */ }
     }
@@ -1058,6 +1065,9 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
     ]
     const nodes: HTMLElement[] = []
     for (const p of paths) {
+      // звук качает общий загрузчик озвучек целиком (useVoicePreload, 10.75) — второй
+      // запрос на тот же файл не нужен (нашлось стендом: 11 запросов на 10 файлов)
+      if (/\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i.test(p)) continue
       const url = mediaUrl(p)
       if (/\.(mp3|wav|m4a|aac|ogg|opus|flac|mp4|webm)$/i.test(p)) {
         const el = document.createElement(/\.(mp4|webm)$/i.test(p) ? 'video' : 'audio')
@@ -1509,7 +1519,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
       if (cancelled) return
       requested.current = true
       if (ownAudio) {
-        const a = createAudio(); a.src = mediaUrl(ownAudio)
+        const a = createAudio(); a.src = voiceSrc(ownAudio)
         audioRef.current = a
         a.play().catch(() => {})        // не смогли — таймер всё равно идёт
       }
@@ -1531,16 +1541,20 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     // Лечение: после того как play() действительно начался, проверяем, не
     // отменили ли нас, и глушим. И src обнуляем при отмене, чтобы
     // недокачанный файл не смог заиграть вовсе.
-    const v = createAudio(); v.src = mediaUrl(q.media.voice)
+    const voicePath = q.media.voice
+    const v = createAudio(); v.src = voiceSrc(voicePath)
     voiceRef.current = v
+    const unwatch = watchStalls(v, 'озвучка вопроса')
     v.onended = runQuestion
-    v.onerror = runQuestion            // нет файла — не зависаем
+    // нет файла — не зависаем; но если не пошёл blob из памяти — один раз пробуем прямой адрес
+    v.onerror = () => { if (!fallbackToStream(v, voicePath)) runQuestion() }
     v.play().then(() => {
       if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-    }).catch(runQuestion)              // запрет автозапуска — тоже
+    }).catch(e => { if (!loadFailedFromMemory(v, e)) runQuestion() })   // запрет автозапуска — тоже
 
     return () => {
       cancelled = true
+      unwatch()
       const old = voiceRef.current
       if (old) {
         old.onended = null; old.onerror = null
@@ -1564,24 +1578,28 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     const ownAudio = (q.media.question ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
     const playOwn = () => {
       if (cancelled || !ownAudio) return
-      const a = createAudio(); a.src = mediaUrl(ownAudio)
+      const a = createAudio(); a.src = voiceSrc(ownAudio)
       audioRef.current = a
       a.play().catch(() => {})
     }
+    let unwatch: (() => void) | null = null
     if (q.media.voice) {
-      const v = createAudio(); v.src = mediaUrl(q.media.voice)
+      const voicePath = q.media.voice
+      const v = createAudio(); v.src = voiceSrc(voicePath)
       voiceRef.current = v
+      unwatch = watchStalls(v, 'озвучка вопроса')
       v.onended = playOwn
-      v.onerror = playOwn
+      v.onerror = () => { if (!fallbackToStream(v, voicePath)) playOwn() }
       // play() асинхронный — та же гонка, что и в обычном режиме:
       // проверяем отмену уже после реального старта
       v.play().then(() => {
         if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-      }).catch(playOwn)
+      }).catch(e => { if (!loadFailedFromMemory(v, e)) playOwn() })
     } else playOwn()
 
     return () => {
       cancelled = true
+      unwatch?.()
       const old = voiceRef.current
       if (old) {
         old.onended = null; old.onerror = null

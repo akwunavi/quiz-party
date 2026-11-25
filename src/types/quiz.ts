@@ -302,6 +302,11 @@ export interface MelodyState {
    *  locked — браузер не дал звук (нужен один клик по экрану проектора);
    *  loading — треки раунда ещё скачиваются; ready — всё готово; error — часть не скачалась. */
   audio?: { state: 'locked' | 'loading' | 'ready' | 'error'; done?: number; failed?: number; total?: number }
+  /** Озвучки пака (10.75): сколько скачано в память проектора. Пишет ТОЛЬКО проектор
+   *  (не чаще раза в 2 с, при смене счётчиков), читает пульт; `retry` растит пульт
+   *  (кнопка «повторить»), проектор по его изменению перезапускает упавшие. */
+  voice?: { state: 'loading' | 'ready' | 'error'; done: number; failed: number; total: number
+    stalls?: number; maxStallSec?: number; retry?: number; by?: string; at?: string }
   spinMs?: number               // длительность барабана, записанная melodySpin (9.76) —
                                  // все экраны крутят ровно столько, сколько заложил нажавший
   snippetSec?: number           // сколько секунд играть интервал (ставка победителя)

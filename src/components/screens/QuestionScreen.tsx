@@ -30,6 +30,8 @@ import { mediaUrl, mediaScaleVar } from '../../lib/media'
 import { choicesLenClass, plateLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
+import { voiceSrcFromUrl, loadFailedFromMemory } from '../../lib/voicePreload'
+import { watchStalls } from '../../lib/audioStall'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
 
@@ -62,13 +64,18 @@ export function AnswerAudio({ src }: { src: string }) {
     if (document.hidden) return
     let cancelled = false
     const a = createAudio()
-    a.src = src
+    a.src = voiceSrcFromUrl(src)          // из памяти, если скачано заранее (10.75)
     a.loop = false
+    const unwatch = watchStalls(a, 'звук ответа')
     a.play().then(() => {
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-    }).catch(() => {})
+    }).catch(e => {
+      // blob из памяти не пошёл — один раз пробуем прямой адрес
+      if (!cancelled && loadFailedFromMemory(a, e)) { a.src = src; a.play().catch(() => {}) }
+    })
     return () => {
       cancelled = true
+      unwatch()
       try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
     }
   }, [src])

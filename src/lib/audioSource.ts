@@ -41,6 +41,14 @@ export const SUPERSEDED = { ok: false, reason: 'superseded' } as const
 // плитки: звук продолжал играть на следующем слайде.
 const live = new Set<HTMLAudioElement>()
 
+/** blob-URL сейчас стоит в src у живого плеера — отзывать его нельзя
+ *  (revoke на играющем элементе рвёт звук). Для кеша озвучек (voiceLoader). */
+export function isBlobInUse(blobUrl: string): boolean {
+  for (const a of live) if (a.src === blobUrl) return true
+  for (const el of document.querySelectorAll('audio')) if ((el as HTMLAudioElement).src === blobUrl) return true
+  return false
+}
+
 /** Создать плеер, о котором система будет знать. */
 export function createAudio(): HTMLAudioElement {
   const a = new Audio()
