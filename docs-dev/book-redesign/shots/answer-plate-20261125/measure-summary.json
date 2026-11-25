@@ -1,0 +1,1802 @@
+[
+ {
+  "name": "64-reveal-16-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 367,
+     "w": 447.2,
+     "h": 118.7
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 339.9,
+     "w": 447.2,
+     "h": 156.8
+    },
+    "sh": 118.7,
+    "outset": {
+     "t": 27,
+     "b": 11.2
+    },
+    "borderImageWidth": "0 123.959px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 291.2,
+     "y": 398.8,
+     "w": 212.1,
+     "h": 67.8
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 373.1,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 28,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "64-reveal-16-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 391.1,
+     "w": 477,
+     "h": 126.6
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 362.3,
+     "w": 477,
+     "h": 167.3
+    },
+    "sh": 126.6,
+    "outset": {
+     "t": 28.8,
+     "b": 11.9
+    },
+    "borderImageWidth": "0 132.223px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 312,
+     "y": 425.8,
+     "w": 223.5,
+     "h": 71.4
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 396.7,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 29.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "64-reveal-16-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 494.5,
+     "w": 562.2,
+     "h": 149.2
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 460.6,
+     "w": 562.2,
+     "h": 197.2
+    },
+    "sh": 149.2,
+    "outset": {
+     "t": 34,
+     "b": 14
+    },
+    "borderImageWidth": "0 155.81px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 513.3,
+     "y": 535.4,
+     "w": 261.3,
+     "h": 83.9
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 501.5,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 34.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "64-reveal-16-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 550.5,
+     "w": 674,
+     "h": 178
+    },
+    "decor": {
+     "x": 260,
+     "y": 509.9,
+     "w": 674,
+     "h": 235.3
+    },
+    "sh": 178,
+    "outset": {
+     "t": 40.5,
+     "b": 16.7
+    },
+    "borderImageWidth": "0 185.939px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 437.9,
+     "y": 599.3,
+     "w": 318.2,
+     "h": 102.2
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 558.1,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 42,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "65-reveal-short-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 304.6,
+     "w": 447.2,
+     "h": 100
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 281.8,
+     "w": 447.2,
+     "h": 132.2
+    },
+    "sh": 100,
+    "outset": {
+     "t": 22.8,
+     "b": 9.4
+    },
+    "borderImageWidth": "0 104.46px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 291.3,
+     "y": 331.8,
+     "w": 211.3,
+     "h": 59
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 309.6,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 44,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "65-reveal-short-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 324.9,
+     "w": 477,
+     "h": 106.7
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 300.6,
+     "w": 477,
+     "h": 141
+    },
+    "sh": 106.7,
+    "outset": {
+     "t": 24.3,
+     "b": 10
+    },
+    "borderImageWidth": "0 111.424px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 311.1,
+     "y": 354.3,
+     "w": 225.3,
+     "h": 62
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 329.3,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 46.9333,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "65-reveal-short-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 382.9,
+     "w": 562.2,
+     "h": 125.7
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 354.3,
+     "w": 562.2,
+     "h": 166.1
+    },
+    "sh": 125.7,
+    "outset": {
+     "t": 28.6,
+     "b": 11.8
+    },
+    "borderImageWidth": "0 131.3px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 511.6,
+     "y": 417.7,
+     "w": 264.9,
+     "h": 73
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 388.4,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 55.18,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "65-reveal-short-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 457,
+     "w": 674,
+     "h": 150
+    },
+    "decor": {
+     "x": 260,
+     "y": 422.8,
+     "w": 674,
+     "h": 198.3
+    },
+    "sh": 150,
+    "outset": {
+     "t": 34.2,
+     "b": 14.1
+    },
+    "borderImageWidth": "0 156.69px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 438.6,
+     "y": 498.8,
+     "w": 316.9,
+     "h": 88
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 463,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 66,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q16-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 206.5,
+     "w": 447.2,
+     "h": 128
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 177.4,
+     "w": 447.2,
+     "h": 169.2
+    },
+    "sh": 128,
+    "outset": {
+     "t": 29.1,
+     "b": 12
+    },
+    "borderImageWidth": "0 133.709px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 301.8,
+     "y": 237.3,
+     "w": 190.3,
+     "h": 80.8
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 213.2,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 17.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q16-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 220.3,
+     "w": 477,
+     "h": 136.5
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 189.2,
+     "w": 477,
+     "h": 180.5
+    },
+    "sh": 136.5,
+    "outset": {
+     "t": 31.1,
+     "b": 12.8
+    },
+    "borderImageWidth": "0 142.623px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 321.7,
+     "y": 253.6,
+     "w": 204.1,
+     "h": 85
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 226.5,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 18.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q16-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 259.5,
+     "w": 562.2,
+     "h": 160.9
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 222.9,
+     "w": 562.2,
+     "h": 212.6
+    },
+    "sh": 160.9,
+    "outset": {
+     "t": 36.6,
+     "b": 15.1
+    },
+    "borderImageWidth": "0 168.065px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 524.4,
+     "y": 297.8,
+     "w": 239.2,
+     "h": 101.6
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 267.2,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 22,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q16-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 309.7,
+     "w": 674,
+     "h": 192
+    },
+    "decor": {
+     "x": 260,
+     "y": 266,
+     "w": 674,
+     "h": 253.8
+    },
+    "sh": 192,
+    "outset": {
+     "t": 43.7,
+     "b": 18.1
+    },
+    "borderImageWidth": "0 200.563px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 452.9,
+     "y": 354.4,
+     "w": 288.1,
+     "h": 123.4
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 318.3,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 26.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q17-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 200.1,
+     "w": 447.2,
+     "h": 100
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 177.4,
+     "w": 447.2,
+     "h": 132.2
+    },
+    "sh": 100,
+    "outset": {
+     "t": 22.8,
+     "b": 9.4
+    },
+    "borderImageWidth": "0 104.46px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 340.9,
+     "y": 227.3,
+     "w": 112.1,
+     "h": 59
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 205.1,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 44,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q17-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 213.5,
+     "w": 477,
+     "h": 106.7
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 189.2,
+     "w": 477,
+     "h": 141
+    },
+    "sh": 106.7,
+    "outset": {
+     "t": 24.3,
+     "b": 10
+    },
+    "borderImageWidth": "0 111.424px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 363.9,
+     "y": 242.9,
+     "w": 119.6,
+     "h": 62
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 217.9,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 46.9333,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q17-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 251.5,
+     "w": 562.2,
+     "h": 125.7
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 222.9,
+     "w": 562.2,
+     "h": 166.1
+    },
+    "sh": 125.7,
+    "outset": {
+     "t": 28.6,
+     "b": 11.8
+    },
+    "borderImageWidth": "0 131.3px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 573.7,
+     "y": 286.3,
+     "w": 140.6,
+     "h": 73
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 257.1,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 55.18,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q17-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 300.2,
+     "w": 674,
+     "h": 150
+    },
+    "decor": {
+     "x": 260,
+     "y": 266,
+     "w": 674,
+     "h": 198.3
+    },
+    "sh": 150,
+    "outset": {
+     "t": 34.2,
+     "b": 14.1
+    },
+    "borderImageWidth": "0 156.69px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 512.9,
+     "y": 342,
+     "w": 168.2,
+     "h": 88
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 306.2,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 66,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q18-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 206.5,
+     "w": 447.2,
+     "h": 128
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 177.4,
+     "w": 447.2,
+     "h": 169.2
+    },
+    "sh": 128,
+    "outset": {
+     "t": 29.1,
+     "b": 12
+    },
+    "borderImageWidth": "0 133.709px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 301.8,
+     "y": 237.3,
+     "w": 190.3,
+     "h": 80.8
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 213.2,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 17.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q18-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 220.3,
+     "w": 477,
+     "h": 136.5
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 189.2,
+     "w": 477,
+     "h": 180.5
+    },
+    "sh": 136.5,
+    "outset": {
+     "t": 31.1,
+     "b": 12.8
+    },
+    "borderImageWidth": "0 142.623px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 321.7,
+     "y": 253.6,
+     "w": 204.1,
+     "h": 85
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 226.5,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 18.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q18-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 259.5,
+     "w": 562.2,
+     "h": 160.9
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 222.9,
+     "w": 562.2,
+     "h": 212.6
+    },
+    "sh": 160.9,
+    "outset": {
+     "t": 36.6,
+     "b": 15.1
+    },
+    "borderImageWidth": "0 168.065px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 524.4,
+     "y": 297.8,
+     "w": 239.2,
+     "h": 101.6
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 267.2,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 22,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q18-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 309.7,
+     "w": 674,
+     "h": 192
+    },
+    "decor": {
+     "x": 260,
+     "y": 266,
+     "w": 674,
+     "h": 253.8
+    },
+    "sh": 192,
+    "outset": {
+     "t": 43.7,
+     "b": 18.1
+    },
+    "borderImageWidth": "0 200.563px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 452.9,
+     "y": 354.4,
+     "w": 288.1,
+     "h": 123.4
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 318.3,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 26.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q19-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 224.7,
+     "w": 447.2,
+     "h": 100
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 201.9,
+     "w": 447.2,
+     "h": 132.2
+    },
+    "sh": 100,
+    "outset": {
+     "t": 22.8,
+     "b": 9.4
+    },
+    "borderImageWidth": "0 104.46px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 340.9,
+     "y": 251.9,
+     "w": 112.1,
+     "h": 59
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 229.7,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 44,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q19-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 239.6,
+     "w": 477,
+     "h": 106.7
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 215.3,
+     "w": 477,
+     "h": 141
+    },
+    "sh": 106.7,
+    "outset": {
+     "t": 24.3,
+     "b": 10
+    },
+    "borderImageWidth": "0 111.424px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 363.9,
+     "y": 269.1,
+     "w": 119.6,
+     "h": 62
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 244,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 46.9333,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q19-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 282.3,
+     "w": 562.2,
+     "h": 125.7
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 253.7,
+     "w": 562.2,
+     "h": 166.1
+    },
+    "sh": 125.7,
+    "outset": {
+     "t": 28.6,
+     "b": 11.8
+    },
+    "borderImageWidth": "0 131.3px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 573.7,
+     "y": 317.2,
+     "w": 140.6,
+     "h": 73
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 287.9,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 55.18,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q19-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 337,
+     "w": 674,
+     "h": 150
+    },
+    "decor": {
+     "x": 260,
+     "y": 302.8,
+     "w": 674,
+     "h": 198.3
+    },
+    "sh": 150,
+    "outset": {
+     "t": 34.2,
+     "b": 14.1
+    },
+    "borderImageWidth": "0 156.69px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 512.9,
+     "y": 378.8,
+     "w": 168.2,
+     "h": 88
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 343,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 66,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q20-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 200.1,
+     "w": 447.2,
+     "h": 100
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 177.4,
+     "w": 447.2,
+     "h": 132.2
+    },
+    "sh": 100,
+    "outset": {
+     "t": 22.8,
+     "b": 9.4
+    },
+    "borderImageWidth": "0 104.46px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 340.9,
+     "y": 227.3,
+     "w": 112.1,
+     "h": 59
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 205.1,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 44,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q20-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 213.5,
+     "w": 477,
+     "h": 106.7
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 189.2,
+     "w": 477,
+     "h": 141
+    },
+    "sh": 106.7,
+    "outset": {
+     "t": 24.3,
+     "b": 10
+    },
+    "borderImageWidth": "0 111.424px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 363.9,
+     "y": 242.9,
+     "w": 119.6,
+     "h": 62
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 217.9,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 46.9333,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q20-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 251.5,
+     "w": 562.2,
+     "h": 125.7
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 222.9,
+     "w": 562.2,
+     "h": 166.1
+    },
+    "sh": 125.7,
+    "outset": {
+     "t": 28.6,
+     "b": 11.8
+    },
+    "borderImageWidth": "0 131.3px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 573.7,
+     "y": 286.3,
+     "w": 140.6,
+     "h": 73
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 257.1,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 55.18,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q20-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 300.2,
+     "w": 674,
+     "h": 150
+    },
+    "decor": {
+     "x": 260,
+     "y": 266,
+     "w": 674,
+     "h": 198.3
+    },
+    "sh": 150,
+    "outset": {
+     "t": 34.2,
+     "b": 14.1
+    },
+    "borderImageWidth": "0 156.69px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 512.9,
+     "y": 342,
+     "w": 168.2,
+     "h": 88
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 306.2,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 66,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q21-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 377.6,
+     "w": 447.2,
+     "h": 100
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 354.9,
+     "w": 447.2,
+     "h": 132.2
+    },
+    "sh": 100,
+    "outset": {
+     "t": 22.8,
+     "b": 9.4
+    },
+    "borderImageWidth": "0 104.46px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 327.5,
+     "y": 404.9,
+     "w": 138.8,
+     "h": 59
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 382.6,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 44,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q21-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 402.8,
+     "w": 477,
+     "h": 106.7
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 378.5,
+     "w": 477,
+     "h": 141
+    },
+    "sh": 106.7,
+    "outset": {
+     "t": 24.3,
+     "b": 10
+    },
+    "borderImageWidth": "0 111.424px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 349.7,
+     "y": 432.3,
+     "w": 148,
+     "h": 62
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 407.2,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 46.9333,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q21-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 474.7,
+     "w": 562.2,
+     "h": 125.7
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 446,
+     "w": 562.2,
+     "h": 166.1
+    },
+    "sh": 125.7,
+    "outset": {
+     "t": 28.6,
+     "b": 11.8
+    },
+    "borderImageWidth": "0 131.3px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 557,
+     "y": 509.5,
+     "w": 174,
+     "h": 73
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 480.2,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 55.18,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q21-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 566.5,
+     "w": 674,
+     "h": 150
+    },
+    "decor": {
+     "x": 260,
+     "y": 532.3,
+     "w": 674,
+     "h": 198.3
+    },
+    "sh": 150,
+    "outset": {
+     "t": 34.2,
+     "b": 14.1
+    },
+    "borderImageWidth": "0 156.69px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 492.9,
+     "y": 608.3,
+     "w": 208.2,
+     "h": 88
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 572.5,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 66,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q22-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 372,
+     "w": 447.2,
+     "h": 136
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 341.1,
+     "w": 447.2,
+     "h": 179.8
+    },
+    "sh": 136,
+    "outset": {
+     "t": 31,
+     "b": 12.8
+    },
+    "borderImageWidth": "0 142.066px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 310.5,
+     "y": 400.7,
+     "w": 172.8,
+     "h": 92.2
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 379.2,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 13.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q22-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 396.9,
+     "w": 477,
+     "h": 145.1
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 363.8,
+     "w": 477,
+     "h": 191.7
+    },
+    "sh": 145.1,
+    "outset": {
+     "t": 33,
+     "b": 13.7
+    },
+    "borderImageWidth": "0 151.537px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 330.9,
+     "y": 427.3,
+     "w": 185.6,
+     "h": 98.7
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 403.6,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 14.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q22-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 467.6,
+     "w": 562.2,
+     "h": 170.9
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 428.7,
+     "w": 562.2,
+     "h": 225.9
+    },
+    "sh": 170.9,
+    "outset": {
+     "t": 38.9,
+     "b": 16.1
+    },
+    "borderImageWidth": "0 178.569px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 535.2,
+     "y": 503.2,
+     "w": 217.6,
+     "h": 116.4
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 475.9,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 17,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q22-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 558,
+     "w": 674,
+     "h": 204
+    },
+    "decor": {
+     "x": 260,
+     "y": 511.6,
+     "w": 674,
+     "h": 269.6
+    },
+    "sh": 204,
+    "outset": {
+     "t": 46.5,
+     "b": 19.2
+    },
+    "borderImageWidth": "0 213.098px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 465.8,
+     "y": 600.3,
+     "w": 262.4,
+     "h": 139.7
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 567.3,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 20.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q23-t6-1280x720",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 173.3,
+     "y": 232.9,
+     "w": 447.2,
+     "h": 136
+    },
+    "decor": {
+     "x": 173.3,
+     "y": 201.9,
+     "w": 447.2,
+     "h": 179.8
+    },
+    "sh": 136,
+    "outset": {
+     "t": 31,
+     "b": 12.8
+    },
+    "borderImageWidth": "0 142.066px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 311.8,
+     "y": 261.6,
+     "w": 170.3,
+     "h": 92.2
+    },
+    "подпись": {
+     "x": 318.2,
+     "y": 240,
+     "w": 157.4,
+     "h": 15
+    },
+    "fontPx": 13.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q23-t6-1366x768",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 185.2,
+     "y": 248.4,
+     "w": 477,
+     "h": 145.1
+    },
+    "decor": {
+     "x": 185.2,
+     "y": 215.3,
+     "w": 477,
+     "h": 191.7
+    },
+    "sh": 145.1,
+    "outset": {
+     "t": 33,
+     "b": 13.7
+    },
+    "borderImageWidth": "0 151.537px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 332.3,
+     "y": 278.8,
+     "w": 183,
+     "h": 98.7
+    },
+    "подпись": {
+     "x": 339.8,
+     "y": 255.1,
+     "w": 167.9,
+     "h": 17
+    },
+    "fontPx": 14.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q23-t6-1899x905",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 362.9,
+     "y": 292.7,
+     "w": 562.2,
+     "h": 170.9
+    },
+    "decor": {
+     "x": 362.9,
+     "y": 253.7,
+     "w": 562.2,
+     "h": 225.9
+    },
+    "sh": 170.9,
+    "outset": {
+     "t": 38.9,
+     "b": 16.1
+    },
+    "borderImageWidth": "0 178.569px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 533.6,
+     "y": 327.5,
+     "w": 220.8,
+     "h": 119.3
+    },
+    "подпись": {
+     "x": 545.1,
+     "y": 300.9,
+     "w": 197.8,
+     "h": 20
+    },
+    "fontPx": 17.5,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ },
+ {
+  "name": "73-ans-q23-t6-1920x1080",
+  "ok": true,
+  "violations": [],
+  "plates": [
+   {
+    "i": 0,
+    "body": {
+     "x": 260,
+     "y": 349.3,
+     "w": 674,
+     "h": 204
+    },
+    "decor": {
+     "x": 260,
+     "y": 302.8,
+     "w": 674,
+     "h": 269.6
+    },
+    "sh": 204,
+    "outset": {
+     "t": 46.5,
+     "b": 19.2
+    },
+    "borderImageWidth": "0 213.098px",
+    "src": "rty/ny-book/hscroll-bow.webp\")",
+    "ответ": {
+     "x": 464.5,
+     "y": 389.9,
+     "w": 265,
+     "h": 143.5
+    },
+    "подпись": {
+     "x": 478.9,
+     "y": 358.5,
+     "w": 236.1,
+     "h": 24
+    },
+    "fontPx": 21,
+    "fit": "ok",
+    "labelFits": true,
+    "neighbours": []
+   }
+  ]
+ }
+]

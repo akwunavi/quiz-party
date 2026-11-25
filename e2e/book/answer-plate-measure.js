@@ -42,8 +42,8 @@ plates.forEach((e, i) => {
   for (const [k2, sel] of [['q-recall', '.answers-main > .q-recall, .q-recall'], ['картинки', '.answer-media, .lay-img'], ['пояснение', '.bk-note-box, .lay-anote'], ['шапка', '.host-topbar .qnum, .host-topbar .mono-tag'], ['колонка команд', '.team-answers']])
     for (const n of document.querySelectorAll(sel)) { const nr = n.getBoundingClientRect(); if (nr.width < 2 || nr.height < 2) continue; const a = inter(decor, rc(nr)); if (a) { nb.push([k2, a]); bad(`#${i}: декор пересекает «${k2}» (${a} px²)`) } }
   rec.neighbours = nb
-  const foldX = innerWidth / 2
-  if (decor.x < foldX && decor.x + decor.w > foldX - 22 * k) bad(`#${i}: декор заходит на сгиб (правый край ${(decor.x + decor.w).toFixed(0)} ≥ ${(foldX - 22 * k).toFixed(0)})`)
+  const foldX = innerWidth / 2   // ±22 «пикселей мокапа» (u = масштаб сцены, а не CSS-px)
+  if (decor.x < foldX && decor.x + decor.w > foldX - 22 * Math.min(innerWidth / 1920, innerHeight / 1080)) bad(`#${i}: декор заходит на сгиб (правый край ${(decor.x + decor.w).toFixed(0)} ≥ ${(foldX - 22 * Math.min(innerWidth / 1920, innerHeight / 1080)).toFixed(0)})`)
   if (decor.x < 0 || decor.y < 0 || decor.x + decor.w > innerWidth || decor.y + decor.h > innerHeight) bad(`#${i}: декор за экраном`)
   for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) {
     const pc = getComputedStyle(p); if (!/hidden|clip|auto|scroll/.test(pc.overflowX + pc.overflowY)) continue
