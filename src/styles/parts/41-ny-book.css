@@ -1490,3 +1490,34 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bk-tc-name[data-bk-fit="overflow"] { overflow-wrap: anywhere; }
 /* «Отвечайте!»: у плитки со счётчиком «ответы N/M» значок статуса (…) закрывал счётчик — счётчик сам говорит всё */
 .theme-ny_book .bk-tc-score ~ .bk-tc-mark { display: none; }
+/* ═══ Плашка «ПРАВИЛЬНЫЙ ОТВЕТ» (10.75): горизонтальный свиток с бантом вместо бежевой карточки с золотой кромкой ═══
+   Разметка — components/screens/AnswerPlate.tsx (.answer-plate > .answer-label + .ap-fit > .answer-main), ступень высоты по длине ответа — ny/book/answerPlate.ts.
+   Рулоны не растягиваются (9-slice, как у плиток вариантов, но БЕЗ подложки под текстом — пергамент и есть сам свиток): высота фиксирована (--sh), растёт только середина по ширине.
+   Выступы декора (хвоя сверху .2277·--sh, низ рулона .0941·--sh) зарезервированы полями свитка — соседи (вопрос, картинки, пояснение) на них не наезжают. */
+.theme-ny_book .answer-plate { --sh: calc(150 * var(--u)); position: relative; flex: none; box-sizing: border-box; width: calc(100% - 20 * var(--u)); height: var(--sh);
+  margin: calc(var(--sh) * .2277) 0 calc(var(--sh) * .0941); padding: calc(var(--sh) * .06) calc(var(--sh) * .1) calc(var(--sh) * .07);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: none; box-shadow: none; border-radius: 0; border: solid transparent; border-width: 0 calc(var(--sh) * .9);
+  border-image: url('/quiz-party/ny-book/hscroll-bow.webp') 0 211 0 211 fill / 0 calc(var(--sh) * 1.0446) / calc(var(--sh) * .2277) 0 calc(var(--sh) * .0941) 0 stretch;
+  filter: drop-shadow(0 calc(6 * var(--u)) calc(7 * var(--u)) rgba(60, 30, 10, .32)); }
+/* подпись — мелкая красная разрядка (одна строка), ответ — крупно ниже */
+.theme-ny_book :is(.host-screen, .mel-overlay) .answer-plate > .answer-label { flex: none; margin: 0 0 calc(4 * var(--u)); padding: 0; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: clip;
+  font: 700 calc(18 * var(--u)) / 1.1 var(--bk-serif); letter-spacing: .14em; color: var(--bk-red); text-transform: uppercase; }
+.theme-ny_book .answer-plate > .ap-fit { flex: 1 1 0; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
+.theme-ny_book :is(.host-screen, .mel-overlay) .answer-plate .ap-fit > .answer-main { flex: none; max-width: 100%; margin: 0; padding: 0; font-family: var(--bk-serif); font-weight: 700; font-size: calc(var(--sh) * .36);
+  line-height: 1.1; color: var(--bk-ink-2); text-align: center; text-shadow: none; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+/* карточка-подложка «Книги» (бежевая, с золотой кромкой и ❖) снята: свиток/плитки стоят прямо на странице; поля блока остаются (по ним настроены плитки) */
+.theme-ny_book .answers-main.revealed .answer-block, .theme-ny_book .answers-main > .answer-block { background: none; box-shadow: none; border: 0; border-radius: 0; }
+.theme-ny_book .answers-main.revealed .answer-block::before, .theme-ny_book .answers-main.revealed .answer-block::after { content: none; }
+.theme-ny_book .answers-main.revealed .answer-block:has(> .answer-plate) { padding: 0; overflow: visible; }
+/* ручная рамка `text`: размер свитка — от рамки; тело свитка = рамка, хвоя и бант выступают за неё (мягкий декор, как у .lay-tile) */
+.theme-ny_book .lay-text.lay-aplate { container-type: size; overflow: visible; padding: 0; display: grid; place-items: center; }
+.theme-ny_book .lay-aplate > .answer-plate { --sh: min(100cqh, 28cqw); width: 100%; margin: 0; }
+/* экран вопроса с показом ответа сразу после вопроса (.answer-reveal > AnswerPlate): горчичная плита снята, свиток стоит на странице */
+.theme-ny_book .host-screen .answer-reveal:has(> .answer-plate) { background: none; box-shadow: none; border: 0; border-radius: 0; clip-path: none; padding: 0 !important; max-height: none !important; overflow: visible !important; animation: none; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+.theme-ny_book .host-screen .answer-reveal:has(> .answer-plate)::before, .theme-ny_book .host-screen .answer-reveal:has(> .answer-plate)::after { content: none; }
+/* окна «Своей игры»/«Угадай мелодию»: ответ лежит на большом свитке-окне, плоская горчичная плита (и уголки .hud-frame) убраны — подпись красной разрядкой + ответ тёмным шрифтом прямо на пергаменте */
+.theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal { background: none; box-shadow: none; border: 0; border-radius: 0; clip-path: none; color: var(--bk-ink); text-align: center; animation: none; }
+.theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::before, .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::after { content: none; }
+.theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-label { color: var(--bk-red); font: 700 calc(20 * var(--u)) var(--bk-serif); letter-spacing: .24em; }
+.theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-main { color: var(--bk-ink-2); font-family: var(--bk-serif); font-weight: 700; text-shadow: none; text-wrap: balance; }

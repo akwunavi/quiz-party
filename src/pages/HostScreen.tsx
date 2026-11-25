@@ -91,6 +91,7 @@ import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { noteClass } from '../lib/questionLayout'
 import { AnswerScreen } from '../components/screens/AnswerScreen'
+import { AnswerPlate } from '../components/screens/AnswerPlate'
 import { stagedAnswerBody, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '../components/screens/AnswerBody'
 import { answerUsesSharedScreen, answerTileCount, isStagedAnswer, screenLayout } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
@@ -1895,6 +1896,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
 
   // Обычный ответ (свободный текст + картинки + пояснение): общий компонент AnswerScreen — тот же, что в предпросмотре редактора; логика (автораскрытие, автопроверка) остаётся выше.
   // варианты / порядок / пары идут общим экраном только при ручной раскладке ответа (иначе — прежний экран ниже)
+  const answerFx = <>{hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}{answerAudio && <AnswerAudio src={mediaUrl(answerAudio)} />}</>
   const manualAnswer = (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') && screenLayout(q.service, 'answer', [], pack.theme, answerTileCount(q)) !== null
   if (answerUsesSharedScreen(pack.theme, round.mechanic, q, revealed, manualAnswer)) {
     return <AnswerScreen pack={pack} round={round} q={q} step={step} total={total} roundIdx={gameState.round_number} paper={paper}
@@ -1943,16 +1945,12 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {/* Если у ответа есть своя картинка, картинки ВОПРОСА на экране ответа не показываем (revealImgs = answerImgs): они мешали и перекрывали ответ. */}
           {revealed && (
             <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}`}>
-              <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
-              {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
-              {/* звук ответа — целиком, пока ведущий не перелистнёт слайд */}
-              {answerAudio && <AnswerAudio src={mediaUrl(answerAudio)} />}
-
+              {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек; звук ответа — целиком, пока ведущий не перелистнёт слайд.
+                  Подпись + слово — общая плашка AnswerPlate (в «Книге» свиток с бантом); у плиточных ответов подпись остаётся над плитками */}
               {round.mechanic === 'rebus' ? (
                 // у ребуса свой разбор: две картинки с подсветкой слогов
                 <>
-                  <div className="answer-main">{displayAnswer(q)}</div>
+                  <AnswerPlate book={isBook} answer={displayAnswer(q)} between={answerFx} />
                   <div className="rebus-answer">
                     {questionImgs.slice(0, 2).map((m, i) => (
                       <figure key={i} className="q-img">
@@ -1965,9 +1963,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
                   </div>
                 </>
               ) : isStagedAnswer(q) ? (
-                stagedAnswerBody(q, { theme: pack.theme })
+                <>
+                  <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+                  {answerFx}
+                  {stagedAnswerBody(q, { theme: pack.theme })}
+                </>
               ) : (<>
-                <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
+                <AnswerPlate book={isBook} answer={displayAnswer(q)} between={answerFx} />
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${

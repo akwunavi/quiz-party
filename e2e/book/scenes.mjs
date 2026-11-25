@@ -401,6 +401,13 @@ export const SCENES = [
       ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q20-t${n}`, 'ответ: q20 (4 картинки), '+n+' команд', async api => { const ts = await api.teams(n)
         await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 20), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
         await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 20, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      // 10.75: плашка «Правильный ответ» — короткое слово / 120 знаков / 150 знаков + картинка + пояснение (стенд R9: q21..q23)
+      ...[21, 22, 23].map(qi => sc(`73-ans-q${qi}-t6`, `ответ: q${qi} (плашка-свиток), 6 команд`, async api => { const ts = await api.teams(6)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, qi), round_id: 8, round_number: 8, answer_text: ['Сваты', 'мишка', 'Сваты!', 'не знаем', 'Ёлка', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      // 10.75: ответ сразу после вопроса (раунд answers_reveal=after_question — нужен QP_AQ=1 при запуске стенда): плашка на экране вопроса
+      ...[[0, 'aq-q0', 'длинный вопрос + пояснение'], [8, 'aq-q8', 'картинка ответа']].map(([qi, nm, ttl]) => sc(`77-${nm}`, `ответ сразу после вопроса: ${ttl}`, async api => { await api.teams(6)
+        await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.host-screen .qnum', settle: 3000 })),
       ...[1, 6].map(n => sc(`74-anagram-race-t${n}`, `Скрэмбл (гонка): показ ответа, ${n} команд`, async api => { const ts = await api.teams(n)
         await api.answers(ts.slice(0, Math.min(n, 3)).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 })),
