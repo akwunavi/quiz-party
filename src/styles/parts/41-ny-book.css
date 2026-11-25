@@ -437,11 +437,6 @@
 /* вопрос с картинками: шапка не наезжает на текст (замер baseline: пересечение 24–36 px) */
 .theme-ny_book .host-screen.has-media { padding-top: calc(var(--bk-oy) + 172 * var(--u)); }
 
-/* ── A: «Ответили N из M» — бумажный штамп в углу страницы (вне .grid-bg, fixed) ── */
-.theme-ny_book .answered-chip { left: calc(var(--bk-ox) + 250 * var(--u)); bottom: calc(var(--bk-oy) + 72 * var(--u)); border-radius: 2px; padding: calc(10 * var(--u)) calc(22 * var(--u));
-  font: 700 calc(26 * var(--u)) / 1.1 var(--bk-serif); letter-spacing: .06em; color: var(--bk-red); background: var(--bk-paper);
-  border: calc(3 * var(--u)) double var(--bk-red); box-shadow: 0 calc(4 * var(--u)) calc(10 * var(--u)) var(--bk-shadow); transform: rotate(-2deg); text-shadow: none; }
-.theme-ny_book .answered-chip b { color: var(--bk-ink); }
 
 /* ── B/C: разбор. Повтор вопроса — тот же шрифт, что вопрос (F4), целиком; карточка ответа; ответы команд вмещают 8+ ── */
 .theme-ny_book .answers-layout.revealed { min-height: 0; flex: 1 1 0; align-items: stretch; grid-template-rows: minmax(0, 1fr); padding-bottom: 0; }
@@ -1313,10 +1308,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bk-award-card { width: calc(860 * var(--u)); max-width: 92%; margin-inline: auto; background: none !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; }
 .theme-ny_book .bk-award-card .bk-tc { width: 100%; }
 
-/* «Ответили N из M» — та же единая плашка, что номер вопроса и ярлыки шапки (вместо прежней красной двойной рамки с наклоном) (10.69) */
-.theme-ny_book .answered-chip { transform: none; border: 0; border-radius: 0; color: var(--nb-ink); background: var(--nb-card);
-  font: 700 max(calc(23 * var(--u)), 16.5px) / 1 var(--bk-serif); letter-spacing: .09em; text-transform: uppercase; padding: .42em .82em;
-  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--bk-line), 0 calc(2 * var(--u)) 0 var(--bk-shade), 0 calc(5 * var(--u)) calc(8 * var(--u)) var(--bk-shadow); }
 
 /* ═══ Промежуточные результаты (табло, .sb-screen): та же книжная типографика, что у итогового экрана (.bk-fin) — вместо старых цифр/заголовка «киберпанка» (10.69) ═══ */
 .theme-ny_book .sb-screen > .mono-tag { flex: none; background: none !important; box-shadow: none !important; padding: 0 !important; font: 700 calc(22 * var(--u)) / 1 var(--bk-serif) !important; letter-spacing: .42em; color: var(--bk-red); }

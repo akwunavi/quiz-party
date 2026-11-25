@@ -60,7 +60,7 @@
 .bk-turn2-shade.r { background: linear-gradient(270deg, rgba(30, 15, 5, .05), rgba(30, 15, 5, .55)); }
 /* клоны — только картинка: ни анимаций, ни кнопок, ни звука */
 .bk-turn2 *, .bk-turn2 *::before, .bk-turn2 *::after { animation-duration: 1ms !important; animation-delay: -10s !important; animation-iteration-count: 1 !important; animation-fill-mode: both !important; transition: none !important; }
-.bk-turn2 .host-actions, .bk-turn2 .link-badge, .bk-turn2 .lobby-qr-corner, .bk-turn2 .answered-chip { display: none !important; }
+.bk-turn2 .host-actions, .bk-turn2 .link-badge, .bk-turn2 .lobby-qr-corner { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bk-turn2 { display: none !important; } }
 
 /* ═══ «Угадай мелодию», «Книга»: рулетка «Бегущая гирлянда + свеча» (10.69) ═══

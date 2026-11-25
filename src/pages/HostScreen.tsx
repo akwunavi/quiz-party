@@ -1864,19 +1864,14 @@ function ShowAnswers({ pack, round, q, gameState }: {
       video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
   }
 
-  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука), а вместо колонки команд —
-  // компактный счётчик «Ответили N из M». Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает
-  // (у него своя доска), лес рисует это сам (ForestAnswers выше).
+  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука). Игроки его уже видели, поэтому
+  // он появляется сразу, без эффектов входа (`quiet`), и без плашки «Ответили N из M» (убрана по слову ведущего, 10.75).
+  // Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает (у него своя доска), лес рисует это сам (ForestAnswers выше).
   if (!revealed && round.mechanic !== 'anagram' && q.answer.mode !== 'anagram') {
-    const answeredIds = new Set(rows.filter(a => a.answer_text !== '' && a.answer_text != null).map(a => a.team_id))
     return (
-      <>
-        <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
-          q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
-          timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
-        {!paper && teams.length > 0 &&
-          <div className="answered-chip" role="status">Ответили <b>{answeredIds.size}</b> из <b>{teams.length}</b></div>}
-      </>
+      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
+        timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
     )
   }
 

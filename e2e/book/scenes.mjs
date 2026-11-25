@@ -170,7 +170,7 @@ export const SCENES = [
   },
   // 10. повтор вопроса (A) и recap
   {
-    id: '10-recall-A', title: 'разбор до раскрытия (A): вопрос + «Ответили N из M»', ready: '.host-screen .qnum', settle: 1800,
+    id: '10-recall-A', title: 'разбор до раскрытия (A): вопрос без эффектов и без плашки (10.75)', ready: '.host-screen .qnum', settle: 1800,
     async setup(api) {
       await api.reset(); const ts = await api.teams(8)
       await api.answers(ts.slice(0, 5).map(t => ({ team_id: t.id, question_ref: qref(0, 4), round_number: 0, answer_text: 'звезда' })))

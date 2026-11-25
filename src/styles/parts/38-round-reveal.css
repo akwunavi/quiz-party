@@ -70,10 +70,12 @@
 .lay-area > .lay-cells { padding: 0; }
 .lay-area > .lay-cells > .rv-word-wrap { height: 100%; margin: 0; }
 
-/* FLOW-01: счётчик «Ответили N из M» на экране вопроса перед раскрытием (вне .grid-bg, поэтому свой fixed) */
-.answered-chip { position: fixed; left: 28px; bottom: 24px; z-index: 30; padding: 10px 18px; border-radius: 999px;
-  font-size: clamp(16px, 1.3vw, 30px); letter-spacing: .04em; color: var(--accent2, var(--accent));
-  background: rgba(0, 0, 0, .55); border: 1px solid var(--accent); box-shadow: 0 0 14px var(--glow);
-  transition: transform .2s, box-shadow .2s; }
-.answered-chip b { color: var(--accent); font-size: 1.15em; }
-.theme-potter .answered-chip, .theme-potter button.answered-chip { position: fixed; }
+
+/* ═══ 10.75: «вопрос перед зачитыванием ответа» (QuestionScreen quiet) появляется СРАЗУ, без эффектов входа ═══
+   Игроки этот вопрос уже видели. Раньше слова текста выезжали каскадом по 0.12 с (`.q-word`, windIn/blizzardIn),
+   и последняя строка длинного вопроса «допроявлялась» бледной на экране ещё секунду — на «Книге» это читалось как размытый
+   текст. Анимации гасятся ВСЕМ внутри экрана (включая ::before/::after), состояние покоя выставляется явно: слова и плашки
+   вариантов в покое имеют opacity 0 и держатся только на `animation-fill-mode: forwards`. Вес 0,3,0 + !important —
+   перебивает и тематические .q-word (0,3,0 у классики/ГП), и «Книгу». Класс вешает ClassicQuestionScreen при `quiet`. */
+.host-screen.qs-quiet *, .host-screen.qs-quiet *::before, .host-screen.qs-quiet *::after { animation: none !important; transition: none !important; }
+.host-screen.qs-quiet .q-word, .host-screen.qs-quiet .q-text, .host-screen.qs-quiet .choice-plate:not(.hidden-yet) { opacity: 1 !important; transform: none !important; filter: none !important; }
