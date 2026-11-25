@@ -1549,9 +1549,10 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     v.onended = runQuestion
     // нет файла — не зависаем; но если не пошёл blob из памяти — один раз пробуем прямой адрес
     v.onerror = () => { if (!fallbackToStream(v, voicePath)) runQuestion() }
+    const wasBlob = v.src.startsWith('blob:')
     v.play().then(() => {
       if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-    }).catch(e => { if (!loadFailedFromMemory(v, e)) runQuestion() })   // запрет автозапуска — тоже
+    }).catch(e => { if (!loadFailedFromMemory(v, e, wasBlob)) runQuestion() })   // запрет автозапуска — тоже
 
     return () => {
       cancelled = true
@@ -1593,9 +1594,10 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
       v.onerror = () => { if (!fallbackToStream(v, voicePath)) playOwn() }
       // play() асинхронный — та же гонка, что и в обычном режиме:
       // проверяем отмену уже после реального старта
+      const wasBlob = v.src.startsWith('blob:')
       v.play().then(() => {
         if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-      }).catch(e => { if (!loadFailedFromMemory(v, e)) playOwn() })
+      }).catch(e => { if (!loadFailedFromMemory(v, e, wasBlob)) playOwn() })
     } else playOwn()
 
     return () => {

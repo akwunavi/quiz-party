@@ -55,6 +55,7 @@ export function fallbackToStream(el: HTMLAudioElement, path: string): boolean {
 /** `play()` отклонён потому, что не загрузился blob из памяти (а не
  *  «автозапуск запрещён»): решать будет `onerror` — он переключит на поток.
  *  Иначе вопрос пошёл бы дальше при живой озвучке. */
-export function loadFailedFromMemory(el: HTMLAudioElement, err: unknown): boolean {
-  return el.src.startsWith('blob:') && err instanceof Error && err.name === 'NotSupportedError'
+export function loadFailedFromMemory(el: HTMLAudioElement, err: unknown, wasBlob: boolean = el.src.startsWith('blob:')): boolean {
+  // wasBlob запоминают ДО play(): к моменту отказа onerror мог уже переставить src на сетевой адрес
+  return wasBlob && err instanceof Error && err.name === 'NotSupportedError'
 }

@@ -1489,7 +1489,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 /* имя команды в плитке: перенос только по словам; слово длиннее строки на минимальном кегле — крайняя мера, ломаем (data-bk-fit="overflow" ставит useFitText) */
 .theme-ny_book .bk-tc-name[data-bk-fit="overflow"] { overflow-wrap: anywhere; }
 /* «Отвечайте!»: у плитки со счётчиком «ответы N/M» значок статуса (…) закрывал счётчик — счётчик сам говорит всё */
-.theme-ny_book .bk-tc-score ~ .bk-tc-mark { display: none; }
+.theme-ny_book .bk-at .bk-tc-score ~ .bk-tc-mark { display: none; }
 /* ═══ Плашка «ПРАВИЛЬНЫЙ ОТВЕТ» (10.75): горизонтальный свиток с бантом вместо бежевой карточки с золотой кромкой ═══
    Разметка — components/screens/AnswerPlate.tsx (.answer-plate > .answer-label + .ap-fit > .answer-main), ступень высоты по длине ответа — ny/book/answerPlate.ts.
    Рулоны не растягиваются (9-slice, как у плиток вариантов, но БЕЗ подложки под текстом — пергамент и есть сам свиток): высота фиксирована (--sh), растёт только середина по ширине.
