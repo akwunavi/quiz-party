@@ -1,7 +1,8 @@
 // ═══ «Книга»: карточка команды — геометрия нарезки совпадает с реальным ассетом ═══
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { TC, TC_INNER } from '../book/BookTeamCard'
+import { bookTileMark } from '../book/copy'
 
 /** Размер WebP из заголовка (VP8X / VP8L / VP8). */
 function webpSize(buf: Buffer): { w: number; h: number } {
@@ -19,5 +20,18 @@ describe('BookTeamCard: ассет и нарезка', () => {
     expect(TC.left + TC.right).toBeLessThan(TC.w * 0.5)
     expect(TC.top + TC.bottom).toBeLessThan(TC.h)
     expect(TC_INNER).toBeGreaterThan(0.4); expect(TC_INNER).toBeLessThan(0.7)
+  })
+})
+
+describe('значок команды в плитке: флаг ?bktm=1|2|3 (прототип 10.75)', () => {
+  afterEach(() => { vi.unstubAllGlobals() })
+  it('без флага и с мусором — вариант 1 («самоцвет»)', () => {
+    expect(bookTileMark()).toBe(1)   // в node нет location
+    vi.stubGlobal('location', { href: 'http://x/quiz-party/#/?room=a' }); expect(bookTileMark()).toBe(1)
+    vi.stubGlobal('location', { href: 'http://x/quiz-party/#/?room=a&bktm=9' }); expect(bookTileMark()).toBe(1)
+  })
+  it('bktm=2 и bktm=3 выбирают закладку и печать', () => {
+    vi.stubGlobal('location', { href: 'http://x/quiz-party/#/?room=a&bktm=2' }); expect(bookTileMark()).toBe(2)
+    vi.stubGlobal('location', { href: 'http://x/quiz-party/#/?bktm=3&room=a' }); expect(bookTileMark()).toBe(3)
   })
 })

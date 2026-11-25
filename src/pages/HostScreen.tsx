@@ -1724,7 +1724,7 @@ function AnswerTime({ pack, round, gameState }: {
             return (
               pack.theme === 'ny_book'
                 /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
-                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={lay.ch} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={lay.ch} color={t.color} icon={t.icon} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
                 : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
@@ -1749,9 +1749,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const revealed = gameState.reveal
   const teams = useTeams(gameState.game_id)
-  const [allTeams, setAllTeams] = useState<{ id: string; name: string; color: string }[]>([])
+  const [allTeams, setAllTeams] = useState<{ id: string; name: string; color: string; icon?: string | null }[]>([])
   useEffect(() => {
-    void supabase.from('teams').select('id,name,color').then(({ data }) => setAllTeams(data ?? []))
+    void supabase.from('teams').select('id,name,color,icon').then(({ data }) => setAllTeams(data ?? []))
   }, [])
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const total = round.questions.length
@@ -1995,7 +1995,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
             return (
               pack.theme === 'ny_book'
               ? <div key={a.id} className="team-answer bk-ta">
-                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
+                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 44 : rows.length > 8 ? 52 : 62} color={team?.color} icon={team?.icon} />
                   <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
                     {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
                   {/* статус — новогодний шар: верно (галочка), неверно (красный крестик), нет ответа/ещё не проверено (нейтральный) */}
@@ -2224,7 +2224,7 @@ function ScoreboardScreen({ pack, gameState }: {
                 ? <span className="sb-medal"><AwardMedal theme={pack.theme} place={place} /></span>
                 : place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
-                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
+                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} icon={t.icon} /> : <span className="sb-name">{t.name}</span>}</td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
                   сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
                   все баллы на колонку влево */}
@@ -2542,7 +2542,7 @@ function Finale({ pack, gameId, gameState }: {
             <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
               <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
+              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} icon={t.icon} /> : <span className="sb-name">{t.name}</span>}</td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}

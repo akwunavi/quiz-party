@@ -23,6 +23,8 @@ const PALETTE = (fs.readFileSync(path.join(ROOT, 'src/lib/teamColors.ts'), 'utf8
   .match(/#[0-9a-fA-F]{6}/g) ?? ['#ffd700']
 
 export const GAME = 'stand-game'
+// значки команд в стенде (10.75): каждая третья команда — без значка (проверка плитки без картинки)
+const ICONS = ['🎄', '❄️', '🎅', '🦌', '🎁', '🥂', '⛄', '🔔', '🧦', '🌟', '🦉', '🚀', '👑', '🔥', '🦄', '🏆']
 export const TEAM_NAMES = [
   'Ёлочки', 'Мандарины и шампанское', 'Снежный барс', 'Оливье навсегда', 'Дед Мороз и компания',
   'Северные олени', 'Хлопушки', 'Самая длинная команда вечера', 'Курантики', 'Ледяные сердца',
@@ -51,7 +53,7 @@ export function makeApi(origin, pin) {
       for (let i = 0; i < n; i++) {
         out.push(await call('/api/teams', 'POST', {
           name: names ? names[i] : TEAM_NAMES[i % TEAM_NAMES.length] + (i >= TEAM_NAMES.length ? ` ${Math.floor(i / TEAM_NAMES.length) + 1}` : ''),
-          color: PALETTE[i % PALETTE.length], icon: null, game_id: GAME,
+          color: PALETTE[i % PALETTE.length], icon: i % 3 === 2 ? null : ICONS[i % ICONS.length], game_id: GAME,
           // «живая» команда (isAlive: last_seen за 10 с) — ставим далёкое будущее, снимок не зависит от часов
           last_seen_at: '2099-01-01T00:00:00.000Z', created_at: iso(Date.UTC(2026, 10, 12, 18, 0, i)),
         }))

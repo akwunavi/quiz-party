@@ -769,10 +769,42 @@
   padding: calc(100 * var(--k)) 0 calc(222 * var(--k)); transition: filter .2s, transform .2s; }
 .theme-ny_book .bk-tc-box { position: absolute; left: 0; right: 0; top: calc(100 * var(--k)); bottom: calc(222 * var(--k)); display: flex; align-items: center; gap: calc(14 * var(--k)); min-width: 0; padding: 0 calc(18 * var(--k)); }
 .theme-ny_book .bk-tc-text { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: center; }
-.theme-ny_book .bk-tc-name { display: block; width: 100%; font-family: var(--bk-name); font-weight: 600; line-height: 1.1; color: #2a1a10; text-align: left; overflow-wrap: break-word; text-wrap: balance; letter-spacing: 0; text-shadow: 0 calc(1 * var(--k)) 0 rgba(255, 244, 214, .6); }
-.theme-ny_book .bk-tc .tm.bk-tc-dot { font-size: calc(var(--tch) * .4); --tm-d: calc(380 * var(--k)); margin: 0 calc(-10 * var(--k)) 0 calc(-4 * var(--k)); box-shadow: 0 0 0 calc(7 * var(--k)) rgba(138, 106, 36, .95), 0 calc(6 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .4); }
-.theme-ny_book .bk-tc .tm.bk-tc-dot:not(.has-ico) { box-shadow: inset 0 0 0 calc(6 * var(--k)) rgba(255, 255, 255, .35), 0 0 0 calc(7 * var(--k)) rgba(138, 106, 36, .95), 0 calc(6 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .4); }
-.theme-ny_book .bk-tc-score { flex: none; font: 700 calc(150 * var(--k)) / 1 var(--bk-serif); color: var(--bk-red); font-variant-numeric: lining-nums tabular-nums; }
+.theme-ny_book .bk-tc-name { display: block; width: 100%; font-family: var(--bk-name); font-weight: 600; line-height: 1.1; color: #2a1a10; text-align: left; overflow-wrap: normal; word-break: normal; hyphens: none; text-wrap: balance; letter-spacing: 0; text-shadow: 0 calc(1 * var(--k)) 0 rgba(255, 244, 214, .6); }
+/* ЦВЕТНОЙ ЗНАЧОК КОМАНДЫ в плитке (10.75, `?bktm=1|2|3`, BookTeamCard.tsx): НЕ в потоке с именем — не отнимает у текста ширину и не перекрывает его.
+   Координаты — в пикселях ассета 1453×662 → (X − 480)·k по горизонтали (начало padding-box) и Y·k по вертикали. Цвет команды берётся как выбрали игроки (--tmc);
+   смягчено только оформление: тёмная тонкая обводка, градиент и блик в стиле кожи/золота, пергаментная подложка значка вместо белой, без белых ободков. */
+.theme-ny_book .bk-tc .tm { font-size: calc(var(--tch) * .2); isolation: isolate; }
+.theme-ny_book .bk-tc .tm-in { background: radial-gradient(circle at 40% 30%, #fbf0d2, #e9d5a2 80%); box-shadow: inset 0 0 0 calc(3 * var(--k)) rgba(58, 34, 12, .45); }
+.theme-ny_book .bk-tc .tm::after { content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: radial-gradient(ellipse 55% 40% at 32% 20%, rgba(255, 244, 214, .38), transparent 72%); }
+/* вариант 1 — «самоцвет»: утоплен в золотую оправу, сидит на ремешке левого рулона (центр (148, 280) ассета, где раньше была снежинка).
+   Слои: сам .tm = золотая оправа; ::before (z −1, поверх фона .tm, под значком) = диск/кольцо цвета команды; .tm-in = пергаментная подложка значка; ::after = блик. */
+.theme-ny_book .bk-tc .tm.bk-tc-gem { --tm-d: calc(214 * var(--k)); position: absolute; left: calc((148 - 107 - 480) * var(--k)); top: calc((282 - 107) * var(--k)); margin: 0; z-index: 2;
+  background: linear-gradient(145deg, var(--bk-gold-2), var(--bk-gold) 45%, var(--bk-gold-3));
+  box-shadow: 0 0 0 calc(3 * var(--k)) rgba(42, 26, 10, .9), 0 calc(7 * var(--k)) calc(12 * var(--k)) rgba(30, 14, 4, .5); }
+.theme-ny_book .bk-tc .tm.bk-tc-gem.has-ico { padding: calc(34 * var(--k)); }
+.theme-ny_book .bk-tc .tm.bk-tc-gem::before { content: ''; position: absolute; inset: calc(14 * var(--k)); z-index: -1; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--tmc) 100%, white 16%), var(--tmc) 52%, color-mix(in srgb, var(--tmc) 100%, black 40%));
+  box-shadow: 0 0 0 calc(2.5 * var(--k)) rgba(58, 34, 12, .8), inset 0 0 calc(10 * var(--k)) rgba(0, 0, 0, .3); }
+.theme-ny_book .bk-tc.bk-tm-v1 .bk-tc-box, .theme-ny_book .bk-tc.bk-tm-v3 .bk-tc-box { left: calc(-70 * var(--k)); }
+/* вариант 2 — «закладка»: узкая вертикальная лента цвета команды у левого края пергамента, значок маленький — рядом с именем */
+.theme-ny_book .bk-tc .bk-tc-ribbon { position: absolute; left: calc((452 - 480) * var(--k)); top: calc(66 * var(--k)); width: calc(74 * var(--k)); height: calc(380 * var(--k)); z-index: 2; pointer-events: none;
+  filter: drop-shadow(calc(3 * var(--k)) calc(4 * var(--k)) calc(4 * var(--k)) rgba(30, 14, 4, .45)); }
+.theme-ny_book .bk-tc .bk-tc-ribbon::before, .theme-ny_book .bk-tc .bk-tc-ribbon i { content: ''; position: absolute; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%); }
+.theme-ny_book .bk-tc .bk-tc-ribbon::before { inset: 0; background: rgba(42, 26, 10, .92); }
+.theme-ny_book .bk-tc .bk-tc-ribbon i { inset: calc(4 * var(--k)) calc(4 * var(--k)) calc(5 * var(--k)); background: linear-gradient(90deg, color-mix(in srgb, var(--tmc) 100%, black 30%), var(--tmc) 38%, color-mix(in srgb, var(--tmc) 100%, white 12%) 62%, color-mix(in srgb, var(--tmc) 100%, black 34%)); }
+.theme-ny_book .bk-tc.bk-tm-v2 .bk-tc-box { padding-left: calc(72 * var(--k)); }
+.theme-ny_book .bk-tc .bk-tc-ico { flex: none; width: calc(128 * var(--k)); height: calc(128 * var(--k)); object-fit: contain; vertical-align: top; filter: drop-shadow(0 calc(2 * var(--k)) calc(2 * var(--k)) rgba(40, 20, 5, .35)); }
+.theme-ny_book .bk-tc .bk-tc-ico.ti-txt { font-size: calc(96 * var(--k)); line-height: 1; width: auto; }
+/* вариант 3 — «печать»: сургучная печать цвета команды на правом конце свитка, значок в центре */
+.theme-ny_book .bk-tc .bk-tc-seal { position: absolute; right: calc(-142 * var(--k)); top: calc((272 - 138) * var(--k)); width: calc(276 * var(--k)); height: calc(276 * var(--k)); z-index: 2; display: grid; place-items: center; pointer-events: none;
+  border-radius: 46% 54% 50% 50% / 52% 46% 54% 48%;
+  background: radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--tmc) 100%, white 14%), var(--tmc) 50%, color-mix(in srgb, var(--tmc) 100%, black 42%));
+  box-shadow: 0 0 0 calc(3 * var(--k)) rgba(42, 26, 10, .85), 0 calc(8 * var(--k)) calc(12 * var(--k)) rgba(30, 14, 4, .5), inset 0 calc(-8 * var(--k)) calc(14 * var(--k)) rgba(0, 0, 0, .28); }
+.theme-ny_book .bk-tc .bk-tc-seal::before { content: ''; position: absolute; inset: 13%; border-radius: 50%; box-shadow: inset 0 0 0 calc(5 * var(--k)) rgba(0, 0, 0, .22), 0 0 0 calc(2 * var(--k)) rgba(255, 244, 214, .16); }
+.theme-ny_book .bk-tc .bk-tc-seal .ti { position: relative; width: 52%; height: 52%; filter: drop-shadow(0 calc(3 * var(--k)) calc(3 * var(--k)) rgba(30, 10, 0, .5)); }
+.theme-ny_book .bk-tc .bk-tc-seal .ti-txt { position: relative; font-size: calc(110 * var(--k)); }
+.theme-ny_book .bk-tc.bk-tm-v3 .bk-tc-box { padding-right: calc(150 * var(--k)); }
+.theme-ny_book .bk-tc-score { flex: none; font: 700 calc(118 * var(--k)) / 1 var(--bk-serif); color: var(--bk-red); font-variant-numeric: lining-nums tabular-nums; }
 .theme-ny_book .bk-tc-mark { flex: none; display: grid; place-items: center; width: calc(70 * var(--k)); height: calc(70 * var(--k)); border-radius: 50%; font: 700 calc(52 * var(--k)) / 1 var(--bk-serif); font-style: normal; color: #fff; }
 /* состояния: кожа и пергамент НЕ перекрашиваются — свечение по контуру карточки (drop-shadow следует за альфой) и маленький индикатор */
 .theme-ny_book .bk-tc.is-away { opacity: .45; }
@@ -791,8 +823,8 @@
 .theme-ny_book .bk-ta .text { font: 600 calc(28 * var(--u)) / 1.12 var(--bk-serif); color: var(--bk-ink); }
 .theme-ny_book .lg-name.bk-lg { width: 100%; flex: none; }
 .theme-ny_book .bk-tc-em .bk-tc-name { font-size: calc(var(--tch) * .46) !important; } .theme-ny_book .bk-tc-em.is-long .bk-tc-name { font-size: calc(var(--tch) * .34) !important; }
-.theme-ny_book .team-answers .team-answer.bk-ta { display: grid !important; grid-template-columns: calc(300 * var(--u)) minmax(0, 1fr) !important; align-items: center; }
-.theme-ny_book .answers-layout:has(.bk-ta) { grid-template-columns: minmax(0, 1fr) calc(620 * var(--u)) !important; column-gap: calc(70 * var(--u)); }
+.theme-ny_book .team-answers .team-answer.bk-ta { display: grid !important; grid-template-columns: calc(340 * var(--u)) minmax(0, 1fr) !important; align-items: center; }
+.theme-ny_book .answers-layout:has(.bk-ta) { grid-template-columns: minmax(0, 1fr) calc(660 * var(--u)) !important; column-gap: calc(70 * var(--u)); }
 .theme-ny_book .team-answers .team-answer.bk-ta > .text { grid-column: 2 !important; grid-row: 1 !important; position: static !important; margin: 0 !important; padding: 0 !important; max-width: none !important; width: auto !important; display: -webkit-box !important; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: calc(26 * var(--u)) !important; }
 .theme-ny_book .team-answers .team-answer.bk-ta > .bk-tc { grid-column: 1; grid-row: 1; }
 /* индикатор статуса — круглый значок на правом крае карточки (кожу не трогает) */
@@ -1048,9 +1080,6 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bz-block.on .bk-tc { filter: drop-shadow(0 0 calc(18 * var(--u)) rgba(255, 214, 110, .95)); transform: translateY(calc(-3 * var(--u))) scale(1.03); }
 .theme-ny_book .bz-row { gap: calc(22 * var(--u)) !important; }
 .theme-ny_book .bz-block .bz-timer { font-size: calc(50 * var(--u)); }
-.theme-ny_book .bz-card .bk-tc .tm.bk-tc-dot { width: calc(215 * var(--k)) !important; height: calc(215 * var(--k)) !important; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .95) 0 12%, transparent 13%), radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--tmc, #c0392b) 100%, white 22%), var(--tmc, #c0392b) 58%, color-mix(in srgb, var(--tmc, #c0392b) 100%, black 38%)) !important;
-  box-shadow: 0 calc(8 * var(--k)) calc(14 * var(--k)) rgba(40, 20, 5, .45), 0 0 0 calc(8 * var(--k)) rgba(138, 106, 36, .85) !important; position: relative; }
-.theme-ny_book .bz-card .bk-tc .tm.bk-tc-dot::before { content: ''; position: absolute; left: 36%; top: calc(-22 * var(--k)); width: 28%; height: calc(22 * var(--k)); background: linear-gradient(180deg, #f2d58c, #a8812e); border-radius: calc(2 * var(--k)) calc(2 * var(--k)) 0 0; }
 .theme-ny_book .bz-block.on { background: none !important; box-shadow: none !important; }
 
 /* ═══ ПРАВИЛА — единый шаблон (COMPOSITION.md): левая страница — раунд и характеристики, правая — правила; заголовок не заходит за сгиб ═══ */
@@ -1465,3 +1494,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    (2) Киберпанк-амбиент фона экрана (.grid-bg: дрейф сетки, плавающие орбы, дыхание виньетки, 15-projector-interactive) в «Книге» не нужен. */
 .theme-ny_book .rules-frame .rule-item { animation-fill-mode: both; }
 .theme-ny_book .grid-bg, .theme-ny_book .grid-bg::before, .theme-ny_book .grid-bg::after { animation: none; }
+
+/* имя команды в плитке: перенос только по словам; слово длиннее строки на минимальном кегле — крайняя мера, ломаем (data-bk-fit="overflow" ставит useFitText) */
+.theme-ny_book .bk-tc-name[data-bk-fit="overflow"] { overflow-wrap: anywhere; }
+/* «Отвечайте!»: у плитки со счётчиком «ответы N/M» значок статуса (…) закрывал счётчик — счётчик сам говорит всё */
+.theme-ny_book .bk-tc-score ~ .bk-tc-mark { display: none; }

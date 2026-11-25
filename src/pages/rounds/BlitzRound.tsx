@@ -44,7 +44,7 @@ function TeamBlock({ team, state, active, now, book }: {
       style={{ ['--tc' as string]: team.color }}>
       {/* Метка хода: по одной подсветке рамкой было непонятно, кто играет */}
       {active && <span className="bz-turn">ХОД</span>}
-      {book ? <div className="bz-name bz-card"><BookTeamCard name={team.name} ch={74} color={team.color} /></div> : <div className="bz-name">{team.name}</div>}
+      {book ? <div className="bz-name bz-card"><BookTeamCard name={team.name} ch={88} color={team.color} icon={team.icon} /></div> : <div className="bz-name">{team.name}</div>}
       <div className={`bz-timer${low ? ' low' : ''}`}>{fmt(left)}</div>
       <div className="bz-meta">
         <span className="bz-pts">{pts > 0 ? `+${pts}` : pts}</span>
@@ -171,7 +171,7 @@ export function BlitzDice({ teams, pickedId, rolling, book }: {
   return (
     <div className="bz-dice-wrap">
       {book
-        ? <div className={`bz-dice-card${rolling ? ' rolling' : ' done'}`}><BookTeamCard name={shown?.name ?? '—'} ch={150} color={shown?.color} /></div>
+        ? <div className={`bz-dice-card${rolling ? ' rolling' : ' done'}`}><BookTeamCard name={shown?.name ?? '—'} ch={150} color={shown?.color} icon={shown?.icon} /></div>
         : <div className={`bz-dice${rolling ? ' rolling' : ' done'}`}
             style={{ ['--tc' as string]: shown?.color }}>
             {shown?.name ?? '—'}

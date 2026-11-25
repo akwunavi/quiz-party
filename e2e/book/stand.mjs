@@ -97,7 +97,7 @@ function fakeRest(store, req, res, url) {
     const ids = inParam(sp, 'round_id'), qid = eqParam(sp, 'id')
     rows = packs.flatMap(p => p.rounds).filter(r => !ids || ids.includes(r.id)).flatMap(r => r.questions).filter(q => !qid || q.id === qid)
   } else if (table === 'teams') {
-    rows = st.teams.map(t => ({ id: t.id, name: t.name, color: t.color }))
+    rows = st.teams.map(t => ({ id: t.id, name: t.name, color: t.color, icon: t.icon ?? null }))
   }
   if (rows === null) { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end('{"message":"stand: нет такой таблицы"}'); return }
   if (single) {

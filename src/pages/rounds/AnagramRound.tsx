@@ -162,7 +162,7 @@ function AnagramTeamsPanel({ teams, rows, start, phrase, reveal, verdicts, book 
             const when = r.sent ? (Number.isFinite(r.ms) && r.ms >= 0 ? `${start.approx ? '≈ ' : ''}${formatRaceTime(r.ms)}` : 'ответил') : null
             return (
               <li key={t.id} className={`bk-an-row${r.sent ? ' sent' : ''}${mark ? ' ' + mark : ''}`}>
-                <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={teams.length > 8 ? 40 : 54}
+                <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={teams.length > 8 ? 46 : 60}
                   state={mark === 'ok' ? 'correct' : mark === 'no' ? 'wrong' : 'normal'} score={when ?? 'думает…'} />
                 {reveal && r.sent && <div className="bk-an-text">{r.text}</div>}
               </li>
@@ -379,7 +379,7 @@ function AnagramBoardClassic({
               ? <div className="an-res-line">
                   <span className="an-res-label">БАЛЛ ПОЛУЧАЕТ</span>
                   {book
-                    ? <BookTeamCard className="an-res-card" name={winnerTeam.name} icon={winnerTeam.icon} color={winnerTeam.color} ch={46} />
+                    ? <BookTeamCard className="an-res-card" name={winnerTeam.name} icon={winnerTeam.icon} color={winnerTeam.color} ch={52} />
                     : <span className="an-res-team" style={{ color: winnerTeam.color }}>
                       {winnerTeam.icon && <TeamMark icon={winnerTeam.icon} color={winnerTeam.color} />}{winnerTeam.name}</span>}
                   {Number.isFinite(winnerMs) && winnerMs >= 0 &&
@@ -390,7 +390,7 @@ function AnagramBoardClassic({
               ? <div className="an-res-line wrap">
                   <span className="an-res-label">УГАДАЛИ</span>
                   {rightTeams.map(t => book
-                    ? <BookTeamCard key={t.id} className="an-res-card" name={t.name} icon={t.icon} color={t.color} ch={40} />
+                    ? <BookTeamCard key={t.id} className="an-res-card" name={t.name} icon={t.icon} color={t.color} ch={44} />
                     : (
                       <span key={t.id} className="an-res-chip" style={{ color: t.color, borderColor: t.color }}>
                         {t.icon && <TeamMark icon={t.icon} color={t.color} />}{t.name}</span>

@@ -60,6 +60,16 @@ function textWidth(el: HTMLElement): number {
   return w > 0 ? w : el.scrollWidth
 }
 
+/** Во сколько раз элемент уменьшен/увеличен трансформом предков (сцена «Книги» масштабируется под окно). `Range.getBoundingClientRect()` даёт ЭКРАННЫЕ пиксели,
+ *  а `clientWidth`/`offsetHeight` — пиксели вёрстки; без поправки на 1366×768 (масштаб ≈ 0.71) переполнение длинного слова занижалось в 1.4 раза и подгонка его
+ *  не замечала (10.75, плитка команды: «Хлопушки» вылезало за рамку). Только режим `range` («Книга»): в обычном режиме у элемента могут быть собственные анимации масштаба. */
+function layoutScale(el: HTMLElement): number {
+  const w = el.offsetWidth
+  if (!w) return 1
+  const k = el.getBoundingClientRect().width / w
+  return k > 0.05 && Number.isFinite(k) ? k : 1
+}
+
 export function useFitText<T extends HTMLElement>(
   deps: unknown[] = [], opts: UseFitTextOpts = {},
 ) {
@@ -80,7 +90,7 @@ export function useFitText<T extends HTMLElement>(
         const cs = getComputedStyle(box)
         const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
         const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-        return el.offsetHeight <= availH + 1 && textWidth(el) <= availW + 1
+        return el.offsetHeight <= availH + 1 && textWidth(el) / layoutScale(el) <= availW + 1
       }
       let lastKey = ''
       const run = () => {

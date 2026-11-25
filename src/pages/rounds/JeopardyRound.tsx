@@ -377,7 +377,7 @@ function TileModal(props: TileProps) {
               }}>
                 <span className="pos">#{pos + 1}</span>
                 <span className="name" style={{ color: team?.color }}>
-                  {packTheme === 'ny_book' ? <BookTeamCard name={team?.name ?? '—'} icon={team?.icon} color={team?.color} ch={32} /> : (team?.name ?? '—')}</span>
+                  {packTheme === 'ny_book' ? <BookTeamCard name={team?.name ?? '—'} icon={team?.icon} color={team?.color} ch={40} /> : (team?.name ?? '—')}</span>
                 {/* до нажатия «Показать ответ» видно только ФАКТ ответа:
                     иначе зал читает чужие ответы и интрига пропадает */}
                 <span className="txt">{showAnswer ? (a.answer_text || '—') : '• • •'}</span>

@@ -25,6 +25,18 @@ export function bookTeamVariant(): BookTeamVariant {
   } catch { return 1 }
 }
 
+export type BookTileMark = 1 | 2 | 3
+
+/** ПРОТОТИП (только для согласования): оформление цветового значка команды в плитке-свитке из адреса проектора `?bktm=1|2|3`
+ *  (1 — «самоцвет» в левом рулоне, 2 — «закладка» с малым значком у имени, 3 — «печать» на правом конце). По умолчанию 1.
+ *  После выбора ведущим флаг и лишние варианты убрать (HANDOFF §3fc). */
+export function bookTileMark(): BookTileMark {
+  try {
+    const m = typeof location !== 'undefined' ? /[?&]bktm=([123])/.exec(location.href) : null
+    return m ? (Number(m[1]) as BookTileMark) : 1
+  } catch { return 1 }
+}
+
 /** ПРОТОТИП (только для согласования): переключатели редизайна из адреса проектора — `?bkfont=A|B` (типографика), `?bkqn=A|B` (плашка номера вопроса),
  *  `?bkrules=1|2` (экран правил). По умолчанию A / A / 1. Применяются атрибутами `data-bk-*` на <html> (CSS: `:root[data-bk-font="B"] …`). После выбора — убрать. */
 export function bookFlags(): { font: 'A' | 'B'; qn: 'A' | 'B'; rules: '1' | '2' } {
