@@ -122,7 +122,8 @@ type QuestionScreenProps = {
   actionsSlot?: ReactNode
   /** Начало отсчёта таймера (gameState.timer_started_at) — для тем с собственным таймером («Волшебный лес»). */
   timerStartedAt?: string | null
-  /** Тихий режим (FLOW-01): тот же экран вопроса перед раскрытием ответа — без запуска видео/звука вопроса. */
+  /** Тихий режим (FLOW-01): тот же экран вопроса перед раскрытием ответа — без запуска видео/звука вопроса и БЕЗ эффектов появления
+   (игроки его уже видели): класс `.qs-quiet` гасит анимации входа (38-round-reveal.css), «Лес» перематывает сцену сразу в конец. */
   quiet?: boolean
 }
 
@@ -193,7 +194,7 @@ function ClassicQuestionScreen({
   const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, 1240) * 1.16 * bkBandF + 28)))
 
   return (
-    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
+    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${quiet ? ' qs-quiet' : ''}${bkCls}${hasText ? '' : ' no-qtext'}${
       imgs.length && !q.media.hidden ? ' has-media' : ''}${
       (choices && !lettered) || (q.answer.mode === 'match'
         && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>

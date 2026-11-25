@@ -24,7 +24,7 @@ export type ForestQ = {
   markers?: string[]
 }
 
-export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from, renderVideo, noTimer }: {
+export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, calm, from, instant, renderVideo, noTimer }: {
   q: ForestQ; roundName: string; qno: string
   startedAt: string | null; seconds: number
   /** ответ показан (gameState.reveal или экран разбора) */
@@ -33,6 +33,8 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   calm?: boolean
   /** с какой главы играть появление (повтор вопросов: слайд короткий — сразу «Открывается вопрос», без затихания леса) */
   from?: string
+  /** показать сцену сразу готовой (конец вступления), без анимации появления — вопрос перед зачитыванием ответа */
+  instant?: boolean
   /** плеер видимого видео — кладётся ровно на раму первой «картинки» */
   renderVideo?: (r: { x: number; y: number; w: number; h: number }) => ReactNode
   /** без таймера-одуванчика (экран ответа до показа верного ответа) */
@@ -64,11 +66,12 @@ export function ForestQuestion({ q, roundName, qno, startedAt, seconds, reveal, 
   const onReady = useCallback((a: SceneApi) => {
     api.current = a
     // ответ уже показан (обновили страницу / вернулись к вопросу) — сразу к последней главе, без повторного вступления
-    if (revealRef.current && a.tl.labels.E !== undefined) a.tl.play('E')
+    if (instant) a.tl.progress(1).pause()
+    else if (revealRef.current && a.tl.labels.E !== undefined) a.tl.play('E')
     else if (from && a.tl.labels[from] !== undefined) a.tl.play(from)
     else a.tl.restart()
     push()
-  }, [push, from])
+  }, [push, from, instant])
   const correct = useMemo(() => ({ key: q.correctKey, text: q.answerText }), [q.correctKey, q.answerText])
   if (!layout) return <div className="fr-root fr-wait" />
   const vr = q.video && renderVideo ? layout.frames[0]?.r : null
