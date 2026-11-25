@@ -1,0 +1,34 @@
+329 замеров, провалов 1
+шапка (высота без safe, safe): [(64, 0), (64, 59)]
+декор на iPhone15: [('anagram', False), ('blitz', False), ('break', True), ('choices', False), ('crossword', False), ('finale', True), ('jeopardy-open', False), ('jeopardy-wait', True), ('lobby', True), ('look-screen', True), ('match-order-stakes', False), ('melody-bid', False), ('race-bet', False), ('register', False), ('reveal-closed', True), ('reveal-input', False), ('reveal-wait', True), ('review', True), ('round-intro', True), ('scoreboard', True), ('text-answer', False)]
+max hscroll 0
+kb 35 {'inT': 179.953125, 'inB': 238.953125, 'vh': 532, 'btnT': 358.953125, 'btnB': 410.953125}
+min send h 48
+| экран | 360x800 | 384x854 | 412x915 | 430x932 | 440x956 | 393x852 | 402x874 |
+| register | ok | ok | ok | ok | ok | ok | ok |
+| register+kb | ok | ok | ok | ok | ok | ok | ok |
+| lobby | ok | ok | ok | ok | ok | ok | ok |
+| round-intro | ok | ok | ok | ok | ok | ok | ok |
+| scoreboard | ok | ok | ok | ok | ok | ok | ok |
+| break | ok | ok | ok | ok | ok | ok | ok |
+| finale | ok | ok | ok | ok | ok | ok | ok |
+| look-screen | ok | ok | ok | ok | ok | ok | ok |
+| review | ok | ok | ok | ok | ok | ok | ok |
+| jeopardy-wait | ok | ok | ok | ok | ok | ok | ok |
+| reveal-wait | ok | ok | ok | ok | ok | ok | ok |
+| reveal-closed | ok | ok | ok | ok | ok | ok | ok |
+| text-answer | ok | ok | ok | ok | ok | ok | ok |
+| text-answer+kb | FAIL | ok | ok | ok | ok | ok | ok |
+| choices | ok | ok | ok | ok | ok | ok | ok |
+| match-order-stakes | ok | ok | ok | ok | ok | ok | ok |
+| crossword | ok | ok | ok | ok | ok | ok | ok |
+| melody-bid | ok | ok | ok | ok | ok | ok | ok |
+| blitz | ok | ok | ok | ok | ok | ok | ok |
+| blitz+kb | ok | ok | ok | ok | ok | ok | ok |
+| jeopardy-open | ok | ok | ok | ok | ok | ok | ok |
+| jeopardy-open+kb | ok | ok | ok | ok | ok | ok | ok |
+| anagram | ok | ok | ok | ok | ok | ok | ok |
+| reveal-input | ok | ok | ok | ok | ok | ok | ok |
+| reveal-input+kb | ok | ok | ok | ok | ok | ok | ok |
+| race-bet | ok | ok | ok | ok | ok | ok | ok |
+(1 провал — text-answer+kb на 360x800: старая версия замера мерила поле и кнопку до/после разной прокрутки; после исправления замера клавиатурные сценарии text-answer/jeopardy-open/reveal-input/register/blitz x 7 устройств — 105 замеров, 0 провалов. Другие темы: classic/potter/new_year/ny_home, 21 экран каждая, до/после — кадры побайтно совпадают.)

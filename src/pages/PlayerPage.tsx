@@ -191,7 +191,7 @@ function JeopardyPlayer({ team, gameState, roundLabel, round }: {
   useEffect(() => { setDraft(''); setSent(null) }, [gameState.question_index])
 
   if (!open) return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
@@ -260,7 +260,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
   if (!q) return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
 
   if (!rv.phase) return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
@@ -289,7 +289,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
 
   if (form === 'closed') {
     return (
-      <div className="pl-root">
+      <div className="pl-root pl-calm">
         <PlayerHeader team={team} round={roundLabel} />
         <ConnectionDot />
         <div className="pl-list">
@@ -304,7 +304,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
 
   if (form === 'locked') {
     return (
-      <div className="pl-root">
+      <div className="pl-root pl-calm">
         <PlayerHeader team={team} round={roundLabel} />
         <ConnectionDot />
         <div className="pl-list">
@@ -1042,7 +1042,7 @@ function PlayerReview({ team, round, roundNumber, label, gameState }: {
     .filter(x => !x.q.hidden)
 
   return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={label} />
       <div className="pl-notice acc">СЕЙЧАС УЗНАЕМ ПРАВИЛЬНЫЕ ОТВЕТЫ!</div>
       <div className="pl-list">
@@ -1298,7 +1298,7 @@ function RoundComment({ team, gameState }: {
 function PlayerHeader({ team, round }: { team: Team; round: string }) {
   return (
     <div className="pl-header">
-      <span style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}</span>
+      <span className="pl-hname" style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}<span className="pl-hname-t">{team.name}</span></span>
       <span className="pl-round">РАУНД {round}</span>
     </div>
   )
