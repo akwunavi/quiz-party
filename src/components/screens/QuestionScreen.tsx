@@ -32,6 +32,7 @@ import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
+import { AnswerPlate } from './AnswerPlate'
 
 // «Волшебный лес»: свой экран вопроса, грузится отдельным куском и только на проекторе в этой теме
 const ForestQuestionScreen = lazy(() => import('../../forest/question/ForestQuestionScreen'))
@@ -319,8 +320,7 @@ function ClassicQuestionScreen({
 
       {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && reveal && (
         <div className="answer-reveal hud-frame">
-          <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-          <div className="answer-main">{displayAnswer(q)}</div>
+          <AnswerPlate book={isBook} answer={displayAnswer(q)} />
           {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
           {/* Раньше сюда как <img> уходило ВСЁ медиа ответа, включая mp3:
               звук не играл, а на экране висела битая картинка. Теперь

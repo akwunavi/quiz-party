@@ -25,8 +25,11 @@ export function measureRects(theme: string | undefined, mechanic: string, screen
   let text: Rect | undefined
   if (screen === 'answer' && mechanic !== 'four_pics') {
     // подложка ответа = «ПРАВИЛЬНЫЙ ОТВЕТ» + слово ответа (без картинок и пояснения внутри .answer-block)
+    // «Книга»: плашка — свиток (.answer-plate), рамка `text` = ТЕЛО свитка (хвоя и бант выступают за неё); иначе подпись + слово
+    const pl = root?.querySelector<HTMLElement>('.answer-plate')?.getBoundingClientRect()
     const a = root?.querySelector<HTMLElement>('.answer-label')?.getBoundingClientRect(), m = root?.querySelector<HTMLElement>('.answer-main')?.getBoundingClientRect()
-    if (a && m) { const x = Math.min(a.x, m.x), y = Math.min(a.y, m.y), r = Math.max(a.right, m.right), b = Math.max(a.bottom, m.bottom); text = toRel(new DOMRect(x, y - 8, r - x, b - y + 16)) }
+    if (pl && pl.width > 4) text = toRel(pl)
+    else if (a && m) { const x = Math.min(a.x, m.x), y = Math.min(a.y, m.y), r = Math.max(a.right, m.right), b = Math.max(a.bottom, m.bottom); text = toRel(new DOMRect(x, y - 8, r - x, b - y + 16)) }
   } else {
     const t = root?.querySelector<HTMLElement>(screen === 'answer' ? '.rv-review-main .rv-word-wrap' : '.q-text')
     if (hasText && t) { const r = t.getBoundingClientRect(); if (r.width > 4 && r.height > 4) text = toRel(r) }

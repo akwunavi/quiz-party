@@ -5,6 +5,7 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { WindText } from './QuestionText'
 import { useFitText } from '../hooks/useFitText'
+import { AnswerPlate } from './screens/AnswerPlate'
 import { sceneAreaCss } from '../lib/layoutArea'
 import type { Rect, Rects } from '../lib/layoutRects'
 
@@ -92,7 +93,11 @@ export function ManualAnswer({ theme, answer, note, urls, rects, noteNode, plate
       {rects.text && plate && (
         <div className="lay-text lay-cells" data-lay="text" style={pctStyle(rects.text)}>{plate}</div>
       )}
-      {rects.text && !plate && (
+      {rects.text && !plate && theme === 'ny_book' && (
+        // «Книга»: рамка `text` держит свиток-плашку; размер свитка — от рамки (cqh/cqw), текст подгоняет сам AnswerPlate
+        <div className="lay-text lay-aplate" data-lay="text" style={pctStyle(rects.text)}><AnswerPlate book frame answer={answer} /></div>
+      )}
+      {rects.text && !plate && theme !== 'ny_book' && (
         <div className="lay-text lay-answer answer-block" data-lay="text" style={pctStyle(rects.text)}>
           <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
           <div className="answer-main" ref={fit}>{answer}</div>
