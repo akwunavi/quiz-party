@@ -21,9 +21,10 @@ export function TeamsOnPage({ teams, paper }: { teams: NyTeam[]; paper: boolean 
       </div>
     )
   }
-  // ОДОБРЕННАЯ карточка (BookTeamCard): размер зависит от числа команд — высота = область / строк; колонок 1 (≤8), 2 (≤16), 3 (17+)
-  const n = teams.length, cols = n <= 8 ? 1 : n <= 16 ? 2 : 3, rows = Math.ceil(n / cols), area = 600, gap = 8
-  const ch = Math.max(52, Math.min(150, Math.floor((area - gap * (rows - 1)) / rows)))
+  // ОДОБРЕННАЯ карточка (BookTeamCard): размер зависит от числа команд — высота = область / строк; колонок 1 (≤4), 2 (≤16), 3 (17+)
+  const n = teams.length, cols = n <= 4 ? 1 : n <= 16 ? 2 : 3, rows = Math.ceil(n / cols), area = 600, gap = 8
+  // 10.75: плитки крупнее — 5–8 команд теперь в две колонки (было одна колонка по 68); в две колонки потолок 120 (иначе текстовая область уже 190u)
+  const ch = Math.max(52, Math.min(cols === 1 ? 150 : 120, Math.floor((area - gap * (rows - 1)) / rows)))
   const shown = n > cols * 8 ? teams.slice(0, cols * 8 - 1) : teams, hidden = n - shown.length
   return (
     <div className={`bk-teams is-${l.mode} bk-tcards`} style={{ '--cols': cols, '--per': rows, '--ch': ch } as CSSProperties}>
