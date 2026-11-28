@@ -27,7 +27,7 @@ async function main() {
     await p.clock.install({ time: X })
     await p.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await p.waitForSelector('.an-screen', { timeout: 15000 })
     await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(2500)
-    const t = await p.evaluate(() => Date.now()); await p.clock.pauseAt(t + 20)
+    const t = await p.evaluate(() => Date.now()); await p.clock.pauseAt(t + 1500)
     await p.evaluate(() => document.getAnimations().forEach(a => { const it = a.effect?.getComputedTiming?.().iterations; if (Number.isFinite(it) && a.playState !== 'finished') { try { a.finish() } catch { /* */ } } }))
     await p.waitForTimeout(250)
     const r = await p.evaluate(() => {

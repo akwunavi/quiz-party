@@ -1543,3 +1543,7 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
   .theme-ny_book .bk-an-c.set { animation: bk-an-set .5s cubic-bezier(.2, .9, .3, 1.2) both; }
   .theme-ny_book .bk-an-board.revealed .bk-an-c.set { animation-delay: calc(var(--k, 0) * 45ms); }
 }
+/* зона доски без кучи плиток ниже прежней (420u против 556u): снизу остаётся место подложке итога («БАЛЛ ПОЛУЧАЕТ…»; при 7+ командах её верх на ≈740u), замер 28.11 */
+.theme-ny_book .an-screen.an-inplace .an-board-wrap { height: calc(420 * var(--u)); margin-bottom: auto; }   /* margin-bottom:auto — группа «подсказка + доска» прижата кверху (flex-колонка центрировала её и опускала доску на подложку итога) */
+.theme-ny_book .an-screen.an-inplace .an-clue { margin-top: calc(56 * var(--u)); }
+.theme-ny_book .an-screen.an-inplace.no-clue:not(.has-media) .an-board-wrap { margin-top: calc(110 * var(--u)); }   /* без подсказки доска не лезет под шапку «РАУНД» */

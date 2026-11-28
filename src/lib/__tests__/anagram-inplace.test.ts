@@ -99,16 +99,16 @@ describe('anagramWordScramble (перепутанные буквы в клетк
 })
 
 describe('anagramBookCellPlan (размер клетки без кучи плиток)', () => {
-  const plan = (p: string, zw = 676, zh = 540) => anagramBookCellPlan(anagramWordSpecs(anagramTemplate(p).words), zw, zh)
+  const plan = (p: string, zw = 676, zh = 420) => anagramBookCellPlan(anagramWordSpecs(anagramTemplate(p).words), zw, zh)
   it('короткая фраза — крупно, но не больше потолка', () => {
-    expect(plan('Дед Мороз').cw).toBeLessThanOrEqual(118)
+    expect(plan('Дед Мороз').cw).toBeLessThanOrEqual(104)
     expect(plan('Дед Мороз').cw).toBeGreaterThan(60)
   })
   it('длинная фраза: влезает в зону по высоте и ширине, слова переносятся', () => {
     const p = plan('Сто лет тому вперёд и ещё немного сверху для длины фразы 40+ знаков')
     expect(p.fits).toBe(true)
     expect(p.rows).toBeGreaterThan(1)
-    expect(p.rows * 1.24 * p.cw + (p.rows - 1) * 24).toBeLessThanOrEqual(540)
+    expect(p.rows * 1.24 * p.cw + (p.rows - 1) * 24).toBeLessThanOrEqual(420)
   })
   it('больше, чем при куче плиток: плитки больше не отнимают высоту', () => {
     expect(plan('Новый год у ёлки с подарками').cw).toBeGreaterThanOrEqual(40)

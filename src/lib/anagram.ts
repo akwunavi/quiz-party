@@ -640,9 +640,9 @@ function bookCellRows(words: AnagramWordSpec[], cw: number, zoneW: number): numb
   return rows
 }
 
-/** Размер клетки (ширина cw, в единицах сцены) для доски «Книги» без кучи плиток: наибольший, при котором слова вместе влезают в зону. Пол — 22 (как у `anagramBookPlan`), потолок — 118: слово из 3–4 букв не раздувается во весь лист. */
-export function anagramBookCellPlan(words: AnagramWordSpec[], zoneW = 676, zoneH = 540): { cw: number; rows: number; fits: boolean } {
-  const CW_MAX = 118, CW_MIN = 22
+/** Размер клетки (ширина cw, в единицах сцены) для доски «Книги» без кучи плиток: наибольший, при котором слова вместе влезают в зону. Пол — 22 (как у `anagramBookPlan`), потолок — 104: слово из 3–4 букв не раздувается во весь лист. */
+export function anagramBookCellPlan(words: AnagramWordSpec[], zoneW = 676, zoneH = 420): { cw: number; rows: number; fits: boolean } {
+  const CW_MAX = 104, CW_MIN = 22
   for (let cw = CW_MAX; cw >= CW_MIN; cw--) {
     const rows = bookCellRows(words, cw, zoneW)
     if (rows === null) continue
