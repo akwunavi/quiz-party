@@ -23,6 +23,8 @@ const PALETTE = (fs.readFileSync(path.join(ROOT, 'src/lib/teamColors.ts'), 'utf8
   .match(/#[0-9a-fA-F]{6}/g) ?? ['#ffd700']
 
 export const GAME = 'stand-game'
+// значки команд в стенде (10.75): каждая третья команда — без значка (проверка плитки без картинки)
+const ICONS = ['🎄', '❄️', '🎅', '🦌', '🎁', '🥂', '⛄', '🔔', '🧦', '🌟', '🦉', '🚀', '👑', '🔥', '🦄', '🏆']
 export const TEAM_NAMES = [
   'Ёлочки', 'Мандарины и шампанское', 'Снежный барс', 'Оливье навсегда', 'Дед Мороз и компания',
   'Северные олени', 'Хлопушки', 'Самая длинная команда вечера', 'Курантики', 'Ледяные сердца',
@@ -51,7 +53,7 @@ export function makeApi(origin, pin) {
       for (let i = 0; i < n; i++) {
         out.push(await call('/api/teams', 'POST', {
           name: names ? names[i] : TEAM_NAMES[i % TEAM_NAMES.length] + (i >= TEAM_NAMES.length ? ` ${Math.floor(i / TEAM_NAMES.length) + 1}` : ''),
-          color: PALETTE[i % PALETTE.length], icon: null, game_id: GAME,
+          color: PALETTE[i % PALETTE.length], icon: i % 3 === 2 ? null : ICONS[i % ICONS.length], game_id: GAME,
           // «живая» команда (isAlive: last_seen за 10 с) — ставим далёкое будущее, снимок не зависит от часов
           last_seen_at: '2099-01-01T00:00:00.000Z', created_at: iso(Date.UTC(2026, 10, 12, 18, 0, i)),
         }))
@@ -170,7 +172,7 @@ export const SCENES = [
   },
   // 10. повтор вопроса (A) и recap
   {
-    id: '10-recall-A', title: 'разбор до раскрытия (A): вопрос + «Ответили N из M»', ready: '.host-screen .qnum', settle: 1800,
+    id: '10-recall-A', title: 'разбор до раскрытия (A): вопрос без эффектов и без плашки (10.75)', ready: '.host-screen .qnum', settle: 1800,
     async setup(api) {
       await api.reset(); const ts = await api.teams(8)
       await api.answers(ts.slice(0, 5).map(t => ({ team_id: t.id, question_ref: qref(0, 4), round_number: 0, answer_text: 'звезда' })))
@@ -399,6 +401,13 @@ export const SCENES = [
       ...[6, 3].slice(0, 1).map(n => sc(`73-ans-q20-t${n}`, 'ответ: q20 (4 картинки), '+n+' команд', async api => { const ts = await api.teams(n)
         await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, 20), round_id: 8, round_number: 8, answer_text: ['Умка', 'мишка', 'Медвежонок', 'не знаем', 'Умка!', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
         await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: 20, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      // 10.75: плашка «Правильный ответ» — короткое слово / 120 знаков / 150 знаков + картинка + пояснение (стенд R9: q21..q23)
+      ...[21, 22, 23].map(qi => sc(`73-ans-q${qi}-t6`, `ответ: q${qi} (плашка-свиток), 6 команд`, async api => { const ts = await api.teams(6)
+        await api.answers(ts.map((tm, i) => ({ team_id: tm.id, question_ref: qref(8, qi), round_id: 8, round_number: 8, answer_text: ['Сваты', 'мишка', 'Сваты!', 'не знаем', 'Ёлка', 'Дед'][i % 6], is_correct: i % 2 === 0 })))
+        await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 8, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.answers-layout.revealed', settle: 1500, runFor: 9000 })),
+      // 10.75: ответ сразу после вопроса (раунд answers_reveal=after_question — нужен QP_AQ=1 при запуске стенда): плашка на экране вопроса
+      ...[[0, 'aq-q0', 'длинный вопрос + пояснение'], [8, 'aq-q8', 'картинка ответа']].map(([qi, nm, ttl]) => sc(`77-${nm}`, `ответ сразу после вопроса: ${ttl}`, async api => { await api.teams(6)
+        await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 0, question_index: qi, timer_started_at: null, reveal: true }) }, { ready: '.host-screen .qnum', settle: 3000 })),
       ...[1, 6].map(n => sc(`74-anagram-race-t${n}`, `Скрэмбл (гонка): показ ответа, ${n} команд`, async api => { const ts = await api.teams(n)
         await api.answers(ts.slice(0, Math.min(n, 3)).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: i === 0 ? 'Снегурочка' : 'снегурка', is_correct: i === 0 })))
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 })),

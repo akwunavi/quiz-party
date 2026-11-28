@@ -72,6 +72,10 @@ import { MagicCircleTimer } from '../components/MagicCircleTimer'
 import { rankTeams } from '../lib/ranking'
 import { teamColor } from '../lib/teamColors'
 import { createAudio, stopAllAudio } from '../lib/audioSource'
+import { RulesAudio } from '../components/RulesAudio'
+import { voiceSrc, fallbackToStream, loadFailedFromMemory } from '../lib/voicePreload'
+import { watchStalls } from '../lib/audioStall'
+import { useVoicePreload } from '../hooks/useVoicePreload'
 import { IntroScreen } from '../components/IntroScreen'
 import { FinalCinematic } from '../components/FinalCinematic'
 import { MelodyBoard } from './rounds/MelodyRound'
@@ -87,6 +91,7 @@ import { JeopardyBoard } from './rounds/JeopardyRound'
 import { Timer } from '../components/Timer'
 import { noteClass } from '../lib/questionLayout'
 import { AnswerScreen } from '../components/screens/AnswerScreen'
+import { AnswerPlate } from '../components/screens/AnswerPlate'
 import { stagedAnswerBody, CH_STAGE2_MS, CH_STAGGER_MS, CH_HIGHLIGHT_MS } from '../components/screens/AnswerBody'
 import { answerUsesSharedScreen, answerTileCount, isStagedAnswer, screenLayout } from '../lib/layoutRects'
 import { QuestionScreen, AnswerAudio, displayAnswer } from '../components/screens/QuestionScreen'
@@ -221,6 +226,8 @@ function HostInner({ gameState, pack }: {
   // Предзагрузка следующего вопроса. Хук стоит ЗДЕСЬ, до всех ранних
   // return: вызов внутри условия однажды уже дал падение React #310.
   usePreloadNext(pack?.rounds?.[gameState?.round_number ?? 0], gameState?.question_index ?? 0)
+  // Все озвучки пака — в память заранее + статус для пульта (10.75). Тоже до ранних return.
+  useVoicePreload(pack ?? null, gameState ?? null)
   const raceNear = pack?.rounds?.[gameState?.round_number ?? 0]?.mechanic === 'race' || pack?.rounds?.[(gameState?.round_number ?? 0) + 1]?.mechanic === 'race'
   useEffect(() => { if (raceNear) prefetchArena(import.meta.env.BASE_URL) }, [raceNear])                // арена «Скачек» — заранее, пока идут правила/раунд перед гонкой
 
@@ -393,7 +400,7 @@ function HostInner({ gameState, pack }: {
     // «Волшебный лес»: заставка раунда этапа 5 (эмблема механики, правила на листьях) — для всех механик, включая кроссворд
     if (isForestTheme(pack.theme)) return (
       <>
-        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {round.rules_audio && <RulesAudio key={round.rules_audio} path={round.rules_audio} />}
         <ForestRoundIntro kind={introKindOf(round.mechanic)} intro={{
           num: displayRoundNumber(pack, gameState.round_number), titleLines: round.title_lines,
           meta: metaLine(round), rules: round.rules,
@@ -403,7 +410,7 @@ function HostInner({ gameState, pack }: {
     )
     return (
       <div className="host-screen grid-bg round-intro">
-        {round.rules_audio && <audio autoPlay src={mediaUrl(round.rules_audio)} />}
+        {round.rules_audio && <RulesAudio key={round.rules_audio} path={round.rules_audio} />}
         {/* Magic: заставка раунда в две фазы — вуаль золотого света
             рассеивается (фаза 1, показывает заголовок), затем проступают
             правила (фаза 2, задержка в тернарке ниже). Прямой ребёнок
@@ -964,7 +971,8 @@ function RecapSlides({ pack, round, gameState }: {
     // озвучка длиннее слайда — ждём её конца, а не таймер
     let cancelled = false
     const a = createAudio()
-    a.src = mediaUrl(voice)
+    a.src = voiceSrc(voice)
+    const unwatch = watchStalls(a, 'повтор вопросов')
     // play() асинхронный: pause() до его старта не делает ничего, а звук
     // всё равно заиграет — уже поверх следующего слайда (та же гонка, что
     // и с озвучкой вопроса и трека ответа, см. QuestionAudio/AnswerAudio).
@@ -978,7 +986,7 @@ function RecapSlides({ pack, round, gameState }: {
     const onEnd = () => { clearTimeout(timer); go() }
     a.addEventListener('ended', onEnd)
     return () => {
-      alive = false; cancelled = true; clearTimeout(timer)
+      alive = false; cancelled = true; clearTimeout(timer); unwatch()
       a.removeEventListener('ended', onEnd)
       try { a.pause(); a.src = '' } catch { /* уже остановлено */ }
     }
@@ -1058,6 +1066,9 @@ function usePreloadNext(round: LoadedPack['rounds'][number] | undefined, index: 
     ]
     const nodes: HTMLElement[] = []
     for (const p of paths) {
+      // звук качает общий загрузчик озвучек целиком (useVoicePreload, 10.75) — второй
+      // запрос на тот же файл не нужен (нашлось стендом: 11 запросов на 10 файлов)
+      if (/\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i.test(p)) continue
       const url = mediaUrl(p)
       if (/\.(mp3|wav|m4a|aac|ogg|opus|flac|mp4|webm)$/i.test(p)) {
         const el = document.createElement(/\.(mp4|webm)$/i.test(p) ? 'video' : 'audio')
@@ -1509,7 +1520,7 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
       if (cancelled) return
       requested.current = true
       if (ownAudio) {
-        const a = createAudio(); a.src = mediaUrl(ownAudio)
+        const a = createAudio(); a.src = voiceSrc(ownAudio)
         audioRef.current = a
         a.play().catch(() => {})        // не смогли — таймер всё равно идёт
       }
@@ -1531,16 +1542,21 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     // Лечение: после того как play() действительно начался, проверяем, не
     // отменили ли нас, и глушим. И src обнуляем при отмене, чтобы
     // недокачанный файл не смог заиграть вовсе.
-    const v = createAudio(); v.src = mediaUrl(q.media.voice)
+    const voicePath = q.media.voice
+    const v = createAudio(); v.src = voiceSrc(voicePath)
     voiceRef.current = v
+    const unwatch = watchStalls(v, 'озвучка вопроса')
     v.onended = runQuestion
-    v.onerror = runQuestion            // нет файла — не зависаем
+    // нет файла — не зависаем; но если не пошёл blob из памяти — один раз пробуем прямой адрес
+    v.onerror = () => { if (!fallbackToStream(v, voicePath)) runQuestion() }
+    const wasBlob = v.src.startsWith('blob:')
     v.play().then(() => {
       if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-    }).catch(runQuestion)              // запрет автозапуска — тоже
+    }).catch(e => { if (!loadFailedFromMemory(v, e, wasBlob)) runQuestion() })   // запрет автозапуска — тоже
 
     return () => {
       cancelled = true
+      unwatch()
       const old = voiceRef.current
       if (old) {
         old.onended = null; old.onerror = null
@@ -1564,24 +1580,29 @@ function QuestionAudio({ q, round, timerRunning, pack, startedAt, seconds, manua
     const ownAudio = (q.media.question ?? []).find(m => /\.(mp3|wav|m4a|ogg)$/i.test(m))
     const playOwn = () => {
       if (cancelled || !ownAudio) return
-      const a = createAudio(); a.src = mediaUrl(ownAudio)
+      const a = createAudio(); a.src = voiceSrc(ownAudio)
       audioRef.current = a
       a.play().catch(() => {})
     }
+    let unwatch: (() => void) | null = null
     if (q.media.voice) {
-      const v = createAudio(); v.src = mediaUrl(q.media.voice)
+      const voicePath = q.media.voice
+      const v = createAudio(); v.src = voiceSrc(voicePath)
       voiceRef.current = v
+      unwatch = watchStalls(v, 'озвучка вопроса')
       v.onended = playOwn
-      v.onerror = playOwn
+      v.onerror = () => { if (!fallbackToStream(v, voicePath)) playOwn() }
       // play() асинхронный — та же гонка, что и в обычном режиме:
       // проверяем отмену уже после реального старта
+      const wasBlob = v.src.startsWith('blob:')
       v.play().then(() => {
         if (cancelled) { try { v.pause(); v.src = '' } catch { /* уже мёртв */ } }
-      }).catch(playOwn)
+      }).catch(e => { if (!loadFailedFromMemory(v, e, wasBlob)) playOwn() })
     } else playOwn()
 
     return () => {
       cancelled = true
+      unwatch?.()
       const old = voiceRef.current
       if (old) {
         old.onended = null; old.onerror = null
@@ -1724,7 +1745,7 @@ function AnswerTime({ pack, round, gameState }: {
             return (
               pack.theme === 'ny_book'
                 /* «Книга»: утверждённая карточка команды; «ответила» — золотое свечение, счётчик справа */
-                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={lay.ch} color={t.color} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
+                ? <div key={t.id} className="at-team bk-at"><BookTeamCard name={t.name} ch={lay.ch} color={t.color} icon={t.icon} score={`${got}/${totalQ}`} state={done ? 'selected' : got === 0 ? 'none' : 'normal'} /></div>
                 : <div key={t.id} className={`at-team${done ? ' done' : ''}`}>
                 <span style={{ color: t.color }}>{t.name}</span> · {got}/{totalQ}
               </div>
@@ -1749,9 +1770,9 @@ function ShowAnswers({ pack, round, q, gameState }: {
   const answers = useAnswers(gameState.game_id, gameState.round_number)
   const revealed = gameState.reveal
   const teams = useTeams(gameState.game_id)
-  const [allTeams, setAllTeams] = useState<{ id: string; name: string; color: string }[]>([])
+  const [allTeams, setAllTeams] = useState<{ id: string; name: string; color: string; icon?: string | null }[]>([])
   useEffect(() => {
-    void supabase.from('teams').select('id,name,color').then(({ data }) => setAllTeams(data ?? []))
+    void supabase.from('teams').select('id,name,color,icon').then(({ data }) => setAllTeams(data ?? []))
   }, [])
   const rows = answers.filter(a => a.question_ref === `q-${q.id}`)
   const total = round.questions.length
@@ -1864,24 +1885,20 @@ function ShowAnswers({ pack, round, q, gameState }: {
       video={revealed && hiddenVideo ? <RevealVideo src={mediaUrl(hiddenVideo)} /> : undefined} actions={actions} />
   }
 
-  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука), а вместо колонки команд —
-  // компактный счётчик «Ответили N из M». Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает
-  // (у него своя доска), лес рисует это сам (ForestAnswers выше).
+  // FLOW-01: до раскрытия ответа — тот же экран вопроса (без таймера и звука). Игроки его уже видели, поэтому
+  // он появляется сразу, без эффектов входа (`quiet`), и без плашки «Ответили N из M» (убрана по слову ведущего, 10.75).
+  // Ответ и чужие ответы не показываются. «Скрэмбл» сюда не попадает (у него своя доска), лес рисует это сам (ForestAnswers выше).
   if (!revealed && round.mechanic !== 'anagram' && q.answer.mode !== 'anagram') {
-    const answeredIds = new Set(rows.filter(a => a.answer_text !== '' && a.answer_text != null).map(a => a.team_id))
     return (
-      <>
-        <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
-          q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
-          timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
-        {!paper && teams.length > 0 &&
-          <div className="answered-chip" role="status">Ответили <b>{answeredIds.size}</b> из <b>{teams.length}</b></div>}
-      </>
+      <QuestionScreen pack={pack} round={round} roundIdx={gameState.round_number}
+        q={q} qIndex={step} qCount={total} timeLow={false} reveal={false} timerRunning={false}
+        timerStartedAt={null} quiet timerSlot={null} effectsSlot={null} actionsSlot={actions} />
     )
   }
 
   // Обычный ответ (свободный текст + картинки + пояснение): общий компонент AnswerScreen — тот же, что в предпросмотре редактора; логика (автораскрытие, автопроверка) остаётся выше.
   // варианты / порядок / пары идут общим экраном только при ручной раскладке ответа (иначе — прежний экран ниже)
+  const answerFx = <>{hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}{answerAudio && <AnswerAudio src={mediaUrl(answerAudio)} />}</>
   const manualAnswer = (q.answer.mode === 'choice' || q.answer.mode === 'order' || q.answer.mode === 'match') && screenLayout(q.service, 'answer', [], pack.theme, answerTileCount(q)) !== null
   if (answerUsesSharedScreen(pack.theme, round.mechanic, q, revealed, manualAnswer)) {
     return <AnswerScreen pack={pack} round={round} q={q} step={step} total={total} roundIdx={gameState.round_number} paper={paper}
@@ -1930,16 +1947,12 @@ function ShowAnswers({ pack, round, q, gameState }: {
           {/* Если у ответа есть своя картинка, картинки ВОПРОСА на экране ответа не показываем (revealImgs = answerImgs): они мешали и перекрывали ответ. */}
           {revealed && (
             <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}`}>
-              <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек */}
-              {hiddenVideo && <RevealVideo src={mediaUrl(hiddenVideo)} />}
-              {/* звук ответа — целиком, пока ведущий не перелистнёт слайд */}
-              {answerAudio && <AnswerAudio src={mediaUrl(answerAudio)} />}
-
+              {/* скрытое видео вопроса — появляется ВМЕСТЕ с ответом, 10 сек; звук ответа — целиком, пока ведущий не перелистнёт слайд.
+                  Подпись + слово — общая плашка AnswerPlate (в «Книге» свиток с бантом); у плиточных ответов подпись остаётся над плитками */}
               {round.mechanic === 'rebus' ? (
                 // у ребуса свой разбор: две картинки с подсветкой слогов
                 <>
-                  <div className="answer-main">{displayAnswer(q)}</div>
+                  <AnswerPlate book={isBook} answer={displayAnswer(q)} between={answerFx} />
                   <div className="rebus-answer">
                     {questionImgs.slice(0, 2).map((m, i) => (
                       <figure key={i} className="q-img">
@@ -1952,9 +1965,13 @@ function ShowAnswers({ pack, round, q, gameState }: {
                   </div>
                 </>
               ) : isStagedAnswer(q) ? (
-                stagedAnswerBody(q, { theme: pack.theme })
+                <>
+                  <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
+                  {answerFx}
+                  {stagedAnswerBody(q, { theme: pack.theme })}
+                </>
               ) : (<>
-                <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>
+                <AnswerPlate book={isBook} answer={displayAnswer(q)} between={answerFx} />
                 {/* картинка ответа (или вопроса, если своей нет) — под ответом */}
                 {revealImgs.length > 0 && (
                   <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${
@@ -1995,7 +2012,7 @@ function ShowAnswers({ pack, round, q, gameState }: {
             return (
               pack.theme === 'ny_book'
               ? <div key={a.id} className="team-answer bk-ta">
-                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
+                  <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 44 : rows.length > 8 ? 52 : 62} color={team?.color} icon={team?.icon} />
                   <span className="text">{revealed ? (a.answer_text || '—') : '• • •'}
                     {a.stake != null && a.stake !== 0 && <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span>}</span>
                   {/* статус — новогодний шар: верно (галочка), неверно (красный крестик), нет ответа/ещё не проверено (нейтральный) */}
@@ -2224,7 +2241,7 @@ function ScoreboardScreen({ pack, gameState }: {
                 ? <span className="sb-medal"><AwardMedal theme={pack.theme} place={place} /></span>
                 : place}{row?.shared && <span className="sb-eq">=</span>}</td>
               <td style={{ color: t.color, fontFamily: 'var(--font-display)' }}>
-                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
+                {pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} icon={t.icon} /> : <span className="sb-name">{t.name}</span>}</td>
               {/* perRound индексируется по ВСЕМ раундам, а колонок столько,
                   сколько зачётных: без пересчёта индекса разогрев (Р0) сдвигал
                   все баллы на колонку влево */}
@@ -2542,7 +2559,7 @@ function Finale({ pack, gameId, gameState }: {
             <tr key={t.id} style={{ '--tc': t.color } as CSSProperties} className={`fin-row${place <= 3 ? ' top3' : ''}${
               place === 1 ? ' fin-first' : ''}${isIn ? ' is-in' : ' is-veiled'}`}>
               <td className="fin-pos">{place <= 3 && <FinMedal place={place as 1 | 2 | 3} />}{place}{shared && <span className="sb-eq">=</span>}</td>
-              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} /> : <span className="sb-name">{t.name}</span>}</td>
+              <td style={{ color: t.color }}>{pack.theme === 'ny_book' ? <BookTeamCard em ch={1.9} name={t.name} color={t.color} icon={t.icon} /> : <span className="sb-name">{t.name}</span>}</td>
               {pack.rounds.map((r, ri) => !r.off_scoreboard && (
                 <td key={r.id}>{roundScores.get(t.id)?.[ri] ?? 0}</td>
               ))}

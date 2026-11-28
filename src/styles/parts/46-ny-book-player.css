@@ -1,0 +1,126 @@
+/* ═══ «Книга» (ny_book) на ТЕЛЕФОНЕ ИГРОКА (10.75, HANDOFF §3fc) ═══
+   Только при теме пакета ny_book: другие темы этого файла не видят (все селекторы под .theme-ny_book).
+   Что здесь: пергаментный фон страницы, книжная типографика (--bk-display/--bk-name/--bk-serif — те же шрифты, что на проекторе),
+   шапка-свиток с закладкой «РАУНД N», лёгкий статичный декор (гирлянда сверху, снежный бугор с ёлкой снизу) ТОЛЬКО на экранах
+   ожидания/разбора (.pl-center и .pl-root.pl-calm) — на экранах ввода ответа декора нет. Файл идёт ПОСЛЕ 41-ny-book (равный вес — выигрывает он).
+   Картинки — фоном псевдоэлементов: грузятся только когда такой экран реально показан (ленивая загрузка, по одному запросу на файл). */
+.theme-ny_book {
+  --pl-safe-t: env(safe-area-inset-top, 0px);
+  --pl-safe-b: env(safe-area-inset-bottom, 0px);
+  --pl-hdr: 64px;               /* высота шапки без safe-area: 8 + плашка 48 + 8 */
+}
+
+/* ── фон: тёплый пергамент (градиенты + крошечная шумовая плитка 160 px; никаких тяжёлых картинок) ── */
+.theme-ny_book:has(> .pl-root, > .pl-register, > .pl-center, > .pl-blitz, > .pl-wait) {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .24 0 0 0 0 .1 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(130% 60% at 50% 0%, rgba(255, 252, 240, .9), rgba(255, 252, 240, 0) 70%),
+    radial-gradient(120% 90% at 50% 50%, rgba(138, 106, 36, 0) 58%, rgba(138, 106, 36, .2) 100%),
+    linear-gradient(180deg, var(--bk-paper), var(--bk-paper-2));
+  background-color: var(--bk-paper-2);
+}
+.theme-ny_book > .pl-root, .theme-ny_book > .pl-register, .theme-ny_book > .pl-center { font-family: var(--bk-serif); color: var(--fg); }
+.theme-ny_book > .pl-root { background: none; }
+
+/* ── шапка: плашка-свиток с командой слева, красная закладка «РАУНД N» справа ── */
+.theme-ny_book .pl-header {
+  position: relative; z-index: 3; box-sizing: border-box; min-height: calc(var(--pl-hdr) + var(--pl-safe-t));
+  padding: calc(8px + var(--pl-safe-t)) 26px 8px 6px; gap: 10px;
+  margin-bottom: 8px; background: none; border-bottom: 0; box-shadow: none; font-family: var(--bk-name);
+}
+.theme-ny_book .pl-hname {
+  --sh: 48px; flex: 0 1 auto; display: flex; align-items: center; min-width: 0; max-width: calc(100% - 100px); height: var(--sh); box-sizing: border-box;
+  padding: 0 2px; font: 600 20px / 1 var(--bk-name); letter-spacing: .005em; color: var(--fg);
+  border: solid transparent; border-width: 0 calc(var(--sh) * .85);
+  border-image: url('/quiz-party/ny-book/hscroll.webp') 0 196 0 196 fill / 0 calc(var(--sh) * .85) stretch;
+  filter: drop-shadow(0 2px 3px rgba(60, 30, 10, .3));
+}
+.theme-ny_book .pl-hname .pl-team-icon.tm { --tm-d: 28px; margin-right: 8px; flex: none; }
+.theme-ny_book .pl-hname-t { min-width: 0; font-size: 18px; line-height: 1.04; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.theme-ny_book .pl-round {
+  position: relative; z-index: 2; flex: none; align-self: flex-start; box-sizing: border-box;
+  margin-top: calc(-8px - var(--pl-safe-t)); height: calc(var(--pl-safe-t) + 70px); margin-bottom: -14px; min-width: 78px; padding: 0 9px 18px;
+  display: flex; align-items: flex-end; justify-content: center; text-align: center; white-space: nowrap;
+  font: 700 14px / 1 var(--bk-display); letter-spacing: .14em; font-variant-numeric: lining-nums; color: #fbf3e2;
+  background: linear-gradient(90deg, var(--bk-red-3), var(--bk-red) 20%, var(--bk-red-2) 50%, var(--bk-red) 80%, var(--bk-red-3));
+  border: solid var(--bk-gold); border-width: 0 2px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 9px), 0 100%);
+}
+
+/* ── типографика: заголовки — Cormorant (как на проекторе), имена — EB Garamond, текст — PT Serif ── */
+.theme-ny_book .pl-register h1, .theme-ny_book .pl-wait {
+  font-family: var(--bk-display); font-weight: 700; font-variant-numeric: lining-nums; letter-spacing: .02em; line-height: 1.1;
+  font-size: clamp(30px, 9vw, 44px); text-wrap: balance; opacity: 1; /* 25-results.css гасит .pl-wait до .7 — на бумаге это даёт AA-провал */
+}
+.theme-ny_book .pl-register h1 { color: var(--bk-red); }
+.theme-ny_book .pl-center .pl-wait { color: var(--bk-red); }
+.theme-ny_book .pl-card .pl-wait { font-size: clamp(24px, 7vw, 32px); color: var(--bk-ink-2); }
+.theme-ny_book .pl-team-badge { font: 600 22px / 1.1 var(--bk-name); color: var(--fg) !important; display: inline-flex; align-items: center; max-width: 100%; }
+.theme-ny_book .pl-wait-sub { font-family: var(--bk-serif); font-size: 16px; color: var(--bk-muted); }
+.theme-ny_book .pl-notice, .theme-ny_book .pl-qlabel {
+  font: 700 14px / 1.25 var(--bk-display); letter-spacing: .16em; font-variant-numeric: lining-nums; color: var(--bk-red); text-transform: uppercase;
+}
+.theme-ny_book .pl-notice.acc { font-size: 15px; }
+/* подписи карточек («№1 ПО ГОРИЗОНТАЛИ · ЕЩЁ НЕ ЗАЧИТАН») — уже, чтобы список кроссворда не раздувался в две строки */
+.theme-ny_book .pl-qlabel { font-size: 13px; letter-spacing: .07em; }
+.theme-ny_book .pl-choices button, .theme-ny_book .pl-stakes button, .theme-ny_book .pl-match button {
+  font-family: var(--bk-display); font-weight: 700; font-variant-numeric: lining-nums; font-size: 22px; touch-action: manipulation;
+}
+.theme-ny_book .pl-review-row .txt, .theme-ny_book .pl-preview { font-family: var(--bk-serif); }
+.theme-ny_book .pl-send:disabled, .theme-ny_book .pl-bz-send:disabled { opacity: .7; }
+.theme-ny_book .pl-send { font-family: var(--bk-display); font-weight: 700; font-size: 18px; letter-spacing: .04em; min-height: 48px; }
+.theme-ny_book .pl-register > button:not(.pl-pick) {
+  min-height: 52px; padding: 0 36px; font: 700 22px / 1 var(--bk-display); letter-spacing: .06em; clip-path: none; border: 0; border-radius: 3px;
+  background: var(--bk-red); color: #fbf3e2; box-shadow: 0 4px 0 var(--bk-red-3);
+}
+.theme-ny_book .pl-register > button:not(.pl-pick):disabled { opacity: .55; }
+
+/* ставка мелодии: цифры — прямые (lining), как в остальной «Книге»; выбранная — красная */
+.theme-ny_book .mel-keys button { font-family: var(--bk-display); font-weight: 700; font-size: 26px; font-variant-numeric: lining-nums; color: var(--bk-ink); }
+.theme-ny_book .mel-keys button.sel { background: var(--bk-red); color: #fbf3e2; border-color: var(--bk-red-3); }
+.theme-ny_book .mel-points-hint { font-family: var(--bk-serif); }
+
+/* ── ЭКРАНЫ ОЖИДАНИЯ/РАЗБОРА: декор (без анимации, pointer-events: none). Сюда НЕ входят экраны ввода ответа. ── */
+.theme-ny_book > .pl-center, .theme-ny_book > .pl-root.pl-calm { position: relative; min-height: 100vh; min-height: 100dvh; overflow-x: clip; box-sizing: border-box; }
+.theme-ny_book > .pl-center { padding: calc(var(--pl-safe-t) + 70px) 20px calc(var(--pl-safe-b) + 120px); }
+/* гирлянда: цепочка «фестонов» по ширине, фестон с бантом точно по центру (repeat-x от центра), высота 44 px */
+.theme-ny_book > .pl-center::before, .theme-ny_book > .pl-calm > .pl-header::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 44px; pointer-events: none; z-index: 1;
+  background: url('/quiz-party/ny-book/player-garland.webp') repeat-x center top / auto 100%;
+}
+.theme-ny_book > .pl-center::before { top: calc(var(--pl-safe-t) - 2px); }
+.theme-ny_book > .pl-calm > .pl-header::after { top: calc(100% - 2px); }
+/* снежный бугор с ёлкой: в самом низу страницы (не поверх прокручиваемого текста — внизу списка оставлен запас) */
+.theme-ny_book > .pl-center::after, .theme-ny_book > .pl-calm::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 92px; pointer-events: none; z-index: 0;
+  background:
+    url('/quiz-party/ny-book/player-tree.webp') no-repeat left 7% bottom 14px / auto 80px,
+    url('/quiz-party/ny-book/player-hill.webp') no-repeat center bottom / 100% auto;
+}
+.theme-ny_book > .pl-calm > .pl-list { padding-top: 44px; padding-bottom: calc(var(--pl-safe-b) + 104px); position: relative; z-index: 2; }
+.theme-ny_book > .pl-calm > .pl-notice { position: relative; z-index: 2; margin-top: 50px; padding: 0 16px; text-align: center; }
+.theme-ny_book > .pl-calm > .pl-notice ~ .pl-list { padding-top: 14px; }
+/* контент поверх декора */
+.theme-ny_book > .pl-center > * { position: relative; z-index: 2; }
+.theme-ny_book > .pl-center > .pl-team-badge { flex-wrap: wrap; justify-content: center; }
+@media (min-width: 520px) {
+  .theme-ny_book > .pl-center::after, .theme-ny_book > .pl-calm::after { height: 110px; background-size: auto 96px, 100% auto; }
+}
+
+/* ── блиц на телефоне: своей шапки у него нет (PlayerHeader не рисуется), экран лежал на тёмном фоне корня; теперь — тот же пергамент; декора нет (ввод ответа) ── */
+.theme-ny_book > .pl-blitz, .theme-ny_book > .pl-wait { box-sizing: border-box; font-family: var(--bk-serif); color: var(--fg); padding-top: calc(16px + var(--pl-safe-t)); padding-bottom: calc(16px + var(--pl-safe-b)); }
+.theme-ny_book > .pl-wait { text-align: center; color: var(--bk-red); padding-top: calc(40px + var(--pl-safe-t)); }
+.theme-ny_book > .pl-blitz.waiting { color: var(--bk-muted); }
+.theme-ny_book .pl-bz-head { font: 700 clamp(26px, 8vw, 34px) / 1.1 var(--bk-display); color: var(--bk-red); font-variant-numeric: lining-nums; }
+.theme-ny_book .pl-blitz.waiting .pl-bz-head { color: var(--bk-muted); }
+.theme-ny_book .pl-blitz.waiting.ready .pl-bz-head { color: var(--bk-red); }
+.theme-ny_book .pl-bz-dim { color: var(--bk-muted); font-size: 16px; }
+.theme-ny_book .pl-bz-q { color: var(--fg); font-family: var(--bk-serif); font-size: clamp(19px, 5.2vw, 26px); }
+.theme-ny_book .pl-blitz input { background: #fffdf6; border: 2px solid #b9a77f; border-radius: 3px; color: var(--bk-ink); font-family: var(--bk-serif); font-size: 18px; }
+.theme-ny_book .pl-bz-send { min-height: 52px; font: 700 20px / 1 var(--bk-display); letter-spacing: .05em; clip-path: none; border: 0; border-radius: 3px; background: var(--bk-red); color: #fbf3e2; box-shadow: 0 4px 0 var(--bk-red-3); }
+.theme-ny_book .pl-bz-state { color: var(--bk-muted); border: 1px solid #b9a77f; border-radius: 3px; background: rgba(255, 250, 240, .6); }
+.theme-ny_book .pl-bz-state.sent { color: var(--bk-ok); border-color: var(--bk-ok); background: rgba(47, 107, 63, .1); }
+.theme-ny_book .pl-bz-state.bad { color: var(--bk-red-2); border-color: var(--bk-red-2); background: rgba(179, 38, 58, .08); }
+.theme-ny_book .pl-bz-skip { min-height: 48px; color: var(--bk-muted); border: 1px dashed var(--bk-muted); border-radius: 3px; font-family: var(--bk-serif); }
+.theme-ny_book .pl-bz-verdict { border-radius: 3px; }
+.theme-ny_book .pl-review-row .num { color: var(--bk-muted); font-family: var(--bk-num); }

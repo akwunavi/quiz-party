@@ -11,7 +11,9 @@ import { enqueueAnswer, dropPending } from '../lib/answerQueue'
 import { jeopardyRef } from '../lib/jeopardyRef'
 import { ConnectionDot } from '../components/ConnectionDot'
 import { ThemeLayer } from '../components/ThemeLayer'
-import { CrosswordView, lettersFromAnswers } from '../components/CrosswordView'
+import { lettersFromAnswers } from '../components/CrosswordView'
+import { PlayerCrossword } from '../components/PlayerCrossword'
+import { pickWordAt } from '../lib/crosswordFit'
 import { supabase } from '../lib/supabase'
 import type { AnswerSpec, Team, CrosswordGrid, Answer, JeopardyTheme, RaceSettings } from '../types/quiz'
 import { revealPointsFor } from '../lib/scoring'
@@ -191,7 +193,7 @@ function JeopardyPlayer({ team, gameState, roundLabel, round }: {
   useEffect(() => { setDraft(''); setSent(null) }, [gameState.question_index])
 
   if (!open) return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
@@ -260,7 +262,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
   if (!q) return <Waiting team={team} message="СМОТРИ НА ЭКРАН" />
 
   if (!rv.phase) return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={roundLabel} />
       <ConnectionDot />
       <div className="pl-list">
@@ -289,7 +291,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
 
   if (form === 'closed') {
     return (
-      <div className="pl-root">
+      <div className="pl-root pl-calm">
         <PlayerHeader team={team} round={roundLabel} />
         <ConnectionDot />
         <div className="pl-list">
@@ -304,7 +306,7 @@ function RevealPlayer({ team, gameState, round, roundLabel }: {
 
   if (form === 'locked') {
     return (
-      <div className="pl-root">
+      <div className="pl-root pl-calm">
         <PlayerHeader team={team} round={roundLabel} />
         <ConnectionDot />
         <div className="pl-list">
@@ -836,11 +838,15 @@ function AnswerForm({ team, round, gameState, roundLabel }: {
       {gameState.phase === 'answer_time' &&
         <div className="pl-notice acc">ОЖИДАЮ ОТВЕТЫ — ПРОВЕРЬТЕ И ДОЗАПОЛНИТЕ</div>}
       {isCrossword && grid && (
-        <div className="pl-crossword">
-          <CrosswordView grid={grid} letters={cwLetters}
-            currentWordNumber={currentPlacement?.number} currentDir={currentPlacement?.dir}
-            cellSize={Math.min(26, Math.floor((Math.min(innerWidth, 460) - 40) / grid.cols))} />
-        </div>
+        <PlayerCrossword grid={grid} letters={cwLetters} current={currentPlacement}
+          onPickCell={(r, c) => {
+            // тап по клетке открывает карточку её слова (на пересечении второй тап — второе слово)
+            const w = pickWordAt(grid, r, c, currentPlacement)
+            if (!w) return
+            const qi = questions.findIndex(q => q.answer.mode === 'crossword_word' &&
+              q.answer.word.toUpperCase().replace(/Ё/g, 'Е').replace(/[^А-ЯA-Z0-9]/g, '') === w.word)
+            if (qi >= 0 && unlocked(qi)) pickOpen(qi)
+          }} />
       )}
       <div className="pl-list">
         <div className="pl-notice">Ответы можно вносить и править весь раунд</div>
@@ -1042,7 +1048,7 @@ function PlayerReview({ team, round, roundNumber, label, gameState }: {
     .filter(x => !x.q.hidden)
 
   return (
-    <div className="pl-root">
+    <div className="pl-root pl-calm">
       <PlayerHeader team={team} round={label} />
       <div className="pl-notice acc">СЕЙЧАС УЗНАЕМ ПРАВИЛЬНЫЕ ОТВЕТЫ!</div>
       <div className="pl-list">
@@ -1298,7 +1304,7 @@ function RoundComment({ team, gameState }: {
 function PlayerHeader({ team, round }: { team: Team; round: string }) {
   return (
     <div className="pl-header">
-      <span style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}{team.name}</span>
+      <span className="pl-hname" style={{ color: team.color }}>{team.icon && <TeamMark className="pl-team-icon" icon={team.icon} color={team.color} />}<span className="pl-hname-t">{team.name}</span></span>
       <span className="pl-round">РАУНД {round}</span>
     </div>
   )

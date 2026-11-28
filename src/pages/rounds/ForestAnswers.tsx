@@ -81,7 +81,7 @@ export function ForestAnswers({ round, q, step, answers, teams, allTeams, reveal
   const pre = (revealed ? preOn : true) && (
     <div className={`fo-x ${revealed ? 'fo-xout' : ''}`}>
       <ForestQuestion q={fq} roundName={round.title_lines.join(' ').replace(/\s+/g, ' ').trim()} qno={`Вопрос ${step + 1} из ${round.questions.length}`}
-        startedAt={null} seconds={round.timer_seconds} reveal={false} calm from="E" noTimer />
+        startedAt={null} seconds={round.timer_seconds} reveal={false} calm instant noTimer />
     </div>)
   if (!revealed) return <>{effects}{pre}{actions}</>
   return (

@@ -625,7 +625,7 @@ function ClassicMelodyBoard(props: BoardProps) {
                 {[...teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => {
                   const b = bids.find(x => x.team_id === t.id)
                   return <div key={t.id} className={`mel-bid-row${b ? ' win' : ''}`}>
-                    {pack.theme === 'ny_book' ? <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={34} /> : <span style={{ color: t.color }}>{t.name}</span>}
+                    {pack.theme === 'ny_book' ? <BookTeamCard name={t.name} icon={t.icon} color={t.color} ch={teams.length <= 4 ? 50 : 36} /> : <span style={{ color: t.color }}>{t.name}</span>}
                     <b>{b ? 'ставка принята ✓' : '…'}</b><span /></div>
                 })}
               </div>
@@ -639,7 +639,7 @@ function ClassicMelodyBoard(props: BoardProps) {
                   const b = bids.find(x => x.team_id === id)
                   return (
                     <div key={id} className={`mel-bid-row${pos === 0 ? ' win' : ''}`}>
-                      {pack.theme === 'ny_book' ? <BookTeamCard name={t?.name ?? '—'} icon={t?.icon} color={t?.color} ch={34} /> : <span style={{ color: t?.color }}>{t?.name}</span>}
+                      {pack.theme === 'ny_book' ? <BookTeamCard name={t?.name ?? '—'} icon={t?.icon} color={t?.color} ch={(m.order ?? []).length <= 4 ? 50 : 36} /> : <span style={{ color: t?.color }}>{t?.name}</span>}
                       <b>{b?.answer_text} сек</b>
                       {pos === 0 ? <span className="mel-win-tag">ИГРАЕТ</span> : <span />}
                     </div>

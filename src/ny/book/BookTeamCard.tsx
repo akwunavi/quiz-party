@@ -2,10 +2,13 @@
 // Ассет: public/ny-book/team-card.webp (обрезан без потерь из assets-src/team-card-approved.webp, 1453×662, альфа). Не рисуется CSS: это настоящая картинка,
 // разрезанная border-image на три части по горизонтали — левый край (корешок, закладка со снежинкой, кисточка, хвоя и ягоды), растягиваемая середина
 // (пергамент и золотые линии — тянутся ТОЛЬКО вдоль) и правый край (скошенный угол). Высота карточки задана, ширина — любая, края не деформируются.
+// Цветной значок команды (`?bktm=1|2|3`, прототип): самоцвет в левом рулоне / закладка + малый значок у имени / сургучная печать справа — он НЕ в потоке с именем,
+// поэтому не отнимает у текста ширину и не перекрывает его (10.75, HANDOFF §3fc).
 // Имя команды — отдельный HTML-слой строго в полезной области пергамента; кегль подбирает useFitText(range): одна строка крупно или две строки, без многоточия.
 import type { CSSProperties } from 'react'
 import { useFitText } from '../../hooks/useFitText'
-import { TeamMark } from '../../components/TeamMark'
+import { TeamMark, TeamIcon } from '../../components/TeamMark'
+import { bookTileMark } from './copy'
 import { bookUnit } from './adaptive/safeArea'
 
 /** Геометрия ассета (пиксели 1453×662): левый край, правый край, полезная область по вертикали. */
@@ -33,14 +36,20 @@ export function BookTeamCard({ name, ch, scene = false, em = false, state = 'nor
   const unit = () => (scene ? 1 : bookUnit({ w: window.innerWidth, h: window.innerHeight }))
   const fit = useFitText<HTMLSpanElement>([name, ch, scene, score, em], { range: () => {
     const inner = ch * unit() * TC_INNER
-    return { min: Math.max(9, inner / 2.3), max: Math.max(12, inner / 1.12) }
+    return { min: Math.max(9, inner / 3.2), max: Math.max(12, inner / 1.12) }
   } })
   const tch = em ? `${ch}em` : scene ? `${ch}px` : `calc(${ch} * var(--u))`
+  const v = bookTileMark()
+  const hasMark = !!(color || icon)
+  const tmc = { '--tmc': color || '#c0392b' } as CSSProperties
   const mark = state === 'correct' ? '✓' : state === 'wrong' ? '✗' : state === 'none' ? '…' : null
   return (
-    <div className={`bk-tc bk-tc-${state}${em ? ' bk-tc-em' : ''}${em && name.length > 20 ? ' is-long' : em && name.length > 14 ? ' is-mid' : ''}${away ? ' is-away' : ''}${className ? ' ' + className : ''}`} data-state={state} style={{ '--tch': tch } as CSSProperties}>
+    <div className={`bk-tc bk-tc-${state} bk-tm-v${v}${em ? ' bk-tc-em' : ''}${em && name.length > 20 ? ' is-long' : em && name.length > 14 ? ' is-mid' : ''}${away ? ' is-away' : ''}${className ? ' ' + className : ''}`} data-state={state} style={{ '--tch': tch } as CSSProperties}>
+      {hasMark && v === 1 && <TeamMark className="bk-tc-gem" icon={icon} color={color} />}
+      {hasMark && v === 2 && <span className="bk-tc-ribbon" style={tmc} aria-hidden="true"><i /></span>}
+      {hasMark && v === 3 && <span className="bk-tc-seal" style={tmc} aria-hidden="true">{icon && <TeamIcon icon={icon} />}</span>}
       <span className="bk-tc-box">
-        {(color || icon) && <TeamMark className="bk-tc-dot" icon={icon} color={color} />}
+        {hasMark && v === 2 && icon && <TeamIcon className="bk-tc-ico" icon={icon} />}
         <span className="bk-tc-text"><span ref={em ? undefined : fit} className="bk-tc-name" data-bk-text="tc">{name}</span></span>
         {score != null && <b className="bk-tc-score">{score}</b>}
         {mark && <em className="bk-tc-mark" aria-label={state}>{mark}</em>}

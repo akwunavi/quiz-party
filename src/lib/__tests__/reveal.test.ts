@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   revealStart, revealNext, revealSwitchAt, revealDeadline, revealVisibleIndices,
-  revealGroups, revealLetterOpen, revealAllAnswered, revealPhaseSec, revealFormState, revealSentPhase,
+  revealGroups, revealLetterOpen, revealAllAnswered, revealPhaseSec, revealFormState, revealSentPhase, revealMusicSrc,
   REVEAL_GRACE_MS, REVEAL_DEFAULTS,
 } from '../reveal'
 import type { RevealSettings } from '../../types/quiz'
@@ -211,5 +211,29 @@ describe('revealSentPhase — фаза уже присланного ответ�
   it('вместе с revealFormState: ответил в 1-й — в 2-й закрыто, молчал — открыто', () => {
     expect(revealFormState(2, revealSentPhase(null, { answer_text: 'x', stake: 1 }))).toBe('locked')
     expect(revealFormState(2, revealSentPhase(null, undefined))).toBe('open')
+  })
+})
+
+describe('revealMusicSrc (музыка «3 попыток», HANDOFF §3fc)', () => {
+  const rv = (phase: 1 | 2 | 3 | 'review', qid = 'q1') => ({ qid, phase })
+  it('играет на фазах 1–3 и молчит на разборе', () => {
+    expect(revealMusicSrc(rv(1), 'q1', 'r.mp3', 'p.mp3')).toBe('r.mp3')
+    expect(revealMusicSrc(rv(3), 'q1', 'r.mp3', undefined)).toBe('r.mp3')
+    expect(revealMusicSrc(rv('review'), 'q1', 'r.mp3', 'p.mp3')).toBeNull()
+  })
+  it('значение одно и то же на фазах 1→2→3 — трек не перезапускается', () => {
+    const a = revealMusicSrc(rv(1), 'q1', 'r.mp3', undefined)
+    expect(revealMusicSrc(rv(2), 'q1', 'r.mp3', undefined)).toBe(a)
+    expect(revealMusicSrc(rv(3), 'q1', 'r.mp3', undefined)).toBe(a)
+  })
+  it('нет трека раунда — общий пакета; нет обоих — тишина', () => {
+    expect(revealMusicSrc(rv(1), 'q1', undefined, 'p.mp3')).toBe('p.mp3')
+    expect(revealMusicSrc(rv(1), 'q1', '', 'p.mp3')).toBe('p.mp3')
+    expect(revealMusicSrc(rv(1), 'q1', undefined, undefined)).toBeNull()
+  })
+  it('фаза чужого вопроса или фаза не стартовала (бумага до «ПРОЧИТАЛ») — тишина', () => {
+    expect(revealMusicSrc(rv(1, 'q0'), 'q1', 'r.mp3', undefined)).toBeNull()
+    expect(revealMusicSrc({}, 'q1', 'r.mp3', undefined)).toBeNull()
+    expect(revealMusicSrc(rv(1), undefined, 'r.mp3', undefined)).toBeNull()
   })
 })

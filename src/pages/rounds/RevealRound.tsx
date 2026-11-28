@@ -22,7 +22,7 @@ import { displayRoundNumber } from '../../lib/roundMeta'
 import { saveReveal, clearReveal } from '../../lib/revealActions'
 import {
   revealStart, revealNext, revealSwitchAt, revealVisibleIndices, revealGroups,
-  revealAllAnswered,
+  revealAllAnswered, revealMusicSrc,
 } from '../../lib/reveal'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { GameState, MelodyState, RevealSettings, RevealState } from '../../types/quiz'
@@ -31,6 +31,7 @@ import { isForestTheme } from '../../forest/config'
 import { ForestReveal } from '../../forest/rounds/ForestRounds'
 import { teamTone } from '../../forest/rounds/views'
 import { serverNow } from '../../lib/serverClock'
+import { createAudio } from '../../lib/audioSource'
 import { ManualAnswer, ManualPics } from '../../components/ManualLayout'
 import { RevealCells } from '../../components/RevealCells'
 import { TeamAnswers } from '../../components/screens/TeamAnswers'
@@ -117,6 +118,23 @@ export function RevealBoard({ pack, round, gameState, timerNode, preview }: {
   // предпросмотра в редакторе. Без гарда закрытие предпросмотра молча
   // затирало бы melody.rv ЖИВОЙ игры на другом экране (HANDOFF.md).
   useEffect(() => () => { if (!preview) void clearReveal(bagRef.current) }, [preview])
+
+  // ── фоновая музыка: играет на фазах 1–3, глохнет на разборе и при смене вопроса ──
+  // Зависимость — сам трек (null на разборе/до старта), а не фаза: при 1→2→3 строка та же,
+  // эффект не пересоздаётся и трек не перезапускается. Хук стоит ДО ранних return (React #310).
+  const musicSrc = preview ? null : revealMusicSrc(rv, q?.id,
+    (round.settings as { bg_music?: string }).bg_music, pack.settings?.bg_music)
+  useEffect(() => {
+    if (!musicSrc || document.hidden) return
+    let cancelled = false
+    const a = createAudio(); a.src = mediaUrl(musicSrc)
+    a.loop = true; a.volume = 0.6
+    // play() асинхронный: pause() до его старта не делает ничего (CLAUDE.md §5)
+    a.play().then(() => {
+      if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+    }).catch(() => {})
+    return () => { cancelled = true; try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
+  }, [musicSrc, q?.id])
 
   const word = q?.answer.mode === 'crossword_word' ? q.answer.word : ''
 

@@ -4,7 +4,7 @@
 import { BookTeamCard } from '../../ny/book/BookTeamCard'
 import type { Answer } from '../../types/quiz'
 
-export interface AnswerTeam { id: string; name: string; color: string }
+export interface AnswerTeam { id: string; name: string; color: string; icon?: string | null }
 
 export function TeamAnswers({ rows, isBook, teamOf, shownOf, checked, showStake = true }: {
   rows: Answer[]; isBook: boolean
@@ -27,7 +27,7 @@ export function TeamAnswers({ rows, isBook, teamOf, shownOf, checked, showStake 
           ? <span style={{ color: 'var(--accent)', fontSize: '.7em' }}> · {a.stake}</span> : null
         return isBook
           ? <div key={a.id} className="team-answer bk-ta">
-              <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 40 : rows.length > 8 ? 46 : 56} color={team?.color} />
+              <BookTeamCard name={team?.name ?? '—'} ch={rows.length > 12 ? 44 : rows.length > 8 ? 52 : 62} color={team?.color} icon={team?.icon} />
               <span className="text">{a.answer_text || '—'}{stake}</span>
               <span className={`bk-ball is-${!a.answer_text?.trim() ? 'none' : shown === true ? 'ok' : shown === false ? 'no' : 'wait'}`} aria-hidden="true">
                 <i>{!a.answer_text?.trim() ? '' : shown === true ? '✓' : shown === false ? '✗' : ''}</i></span>

@@ -30,8 +30,11 @@ import { mediaUrl, mediaScaleVar } from '../../lib/media'
 import { choicesLenClass, plateLenClass } from '../../lib/questionLayout'
 import { displayRoundNumber } from '../../lib/roundMeta'
 import { createAudio } from '../../lib/audioSource'
+import { voiceSrcFromUrl, loadFailedFromMemory } from '../../lib/voicePreload'
+import { watchStalls } from '../../lib/audioStall'
 import type { LoadedPack, LoadedRound } from '../../lib/packLoader'
 import type { Question } from '../../types/quiz'
+import { AnswerPlate } from './AnswerPlate'
 
 // «Волшебный лес»: свой экран вопроса, грузится отдельным куском и только на проекторе в этой теме
 const ForestQuestionScreen = lazy(() => import('../../forest/question/ForestQuestionScreen'))
@@ -62,13 +65,18 @@ export function AnswerAudio({ src }: { src: string }) {
     if (document.hidden) return
     let cancelled = false
     const a = createAudio()
-    a.src = src
+    a.src = voiceSrcFromUrl(src)          // из памяти, если скачано заранее (10.75)
     a.loop = false
+    const unwatch = watchStalls(a, 'звук ответа')
     a.play().then(() => {
       if (cancelled) { try { a.pause(); a.src = '' } catch { /* уже мёртв */ } }
-    }).catch(() => {})
+    }).catch(e => {
+      // blob из памяти не пошёл — один раз пробуем прямой адрес
+      if (!cancelled && loadFailedFromMemory(a, e)) { a.src = src; a.play().catch(() => {}) }
+    })
     return () => {
       cancelled = true
+      unwatch()
       try { a.pause(); a.src = '' } catch { /* уже мёртв */ }
     }
   }, [src])
@@ -122,7 +130,8 @@ type QuestionScreenProps = {
   actionsSlot?: ReactNode
   /** Начало отсчёта таймера (gameState.timer_started_at) — для тем с собственным таймером («Волшебный лес»). */
   timerStartedAt?: string | null
-  /** Тихий режим (FLOW-01): тот же экран вопроса перед раскрытием ответа — без запуска видео/звука вопроса. */
+  /** Тихий режим (FLOW-01): тот же экран вопроса перед раскрытием ответа — без запуска видео/звука вопроса и БЕЗ эффектов появления
+   (игроки его уже видели): класс `.qs-quiet` гасит анимации входа (38-round-reveal.css), «Лес» перематывает сцену сразу в конец. */
   quiet?: boolean
 }
 
@@ -193,7 +202,7 @@ function ClassicQuestionScreen({
   const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, 1240) * 1.16 * bkBandF + 28)))
 
   return (
-    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${bkCls}${hasText ? '' : ' no-qtext'}${
+    <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${quiet ? ' qs-quiet' : ''}${bkCls}${hasText ? '' : ' no-qtext'}${
       imgs.length && !q.media.hidden ? ' has-media' : ''}${
       (choices && !lettered) || (q.answer.mode === 'match'
         && (q.answer.right_labels ?? []).some(Boolean)) ? ' has-choices' : ''}`}>
@@ -319,8 +328,7 @@ function ClassicQuestionScreen({
 
       {(revealMode === 'after_question' || round.mechanic === 'jeopardy') && reveal && (
         <div className="answer-reveal hud-frame">
-          <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-          <div className="answer-main">{displayAnswer(q)}</div>
+          <AnswerPlate book={isBook} answer={displayAnswer(q)} />
           {q.answer_note && <div style={{ opacity: .75 }}>{q.answer_note}</div>}
           {/* Раньше сюда как <img> уходило ВСЁ медиа ответа, включая mp3:
               звук не играл, а на экране висела битая картинка. Теперь

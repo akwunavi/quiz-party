@@ -135,3 +135,17 @@ export function revealFormState(
   if (phase !== 1 && phase !== 2 && phase !== 3) return 'closed'
   return sentPhase == null || sentPhase === phase ? 'open' : 'locked'
 }
+
+/** Фоновая музыка «3 попыток»: какой трек должен играть СЕЙЧАС (или null).
+ *  Играет на фазах 1–3 текущего вопроса, на разборе и пока фаза не стартовала
+ *  (на бумаге — до «▶ ПРОЧИТАЛ») молчит. Свой трек раунда, иначе общий пакета.
+ *  Возвращаемое значение не меняется при переходе 1→2→3 — поэтому эффект,
+ *  зависящий от него, НЕ перезапускает трек на каждой фазе (HANDOFF §3fc). */
+export function revealMusicSrc(
+  rv: RevealState, qid: string | undefined, roundMusic: string | undefined, packMusic: string | undefined,
+): string | null {
+  const src = roundMusic || packMusic
+  if (!src || !qid || rv.qid !== qid) return null
+  if (rv.phase !== 1 && rv.phase !== 2 && rv.phase !== 3) return null
+  return src
+}

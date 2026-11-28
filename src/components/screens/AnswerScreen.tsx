@@ -8,6 +8,7 @@ import { ManualAnswer } from '../ManualLayout'
 import { BookNote } from '../../ny/book/BookNote'
 import { TeamAnswers, type AnswerTeam } from './TeamAnswers'
 import { displayAnswer } from './QuestionScreen'
+import { AnswerPlate } from './AnswerPlate'
 import { lenClass, mediaUrl } from '../../lib/media'
 import { answerScreenImages, answerLayoutImgs } from '../../lib/answerImages'
 import { answerLayoutUnsupportedReason, answerTileCount, isStagedAnswer, screenLayout } from '../../lib/layoutRects'
@@ -57,9 +58,7 @@ export function AnswerScreen({ pack, round, q, step, total, roundIdx, paper, row
             <>{extra}{staged && !manual.tiles && <div className="answer-block reveal-in lay-flow">{stagedBody()}</div>}</>
           ) : (
             <div className={`answer-block reveal-in${revealLive ? ' bk-live' : ''}${isBook && (q.answer_note ?? '').length <= 160 ? ' bk-shortnote' : ''}`}>
-              <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-              {extra}
-              {staged ? stagedBody() : <div className={`answer-main${displayAnswer(q).length > 70 ? ' am-xl' : displayAnswer(q).length > 36 ? ' am-l' : ''}`}>{displayAnswer(q)}</div>}
+              {staged ? <><div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>{extra}{stagedBody()}</> : <AnswerPlate book={isBook} answer={displayAnswer(q)} between={extra} />}
               {!staged && revealImgs.length > 0 && (
                 <div className={`q-media-grid answer-media n${Math.min(revealImgs.length, 4)}${revealImgs.length > 1 ? ' eq-row' : ''}${revealImgs.length > 4 ? ' wrap2' : ''}${answerImgs.length ? ' is-own' : ' is-recall'}`}>
                   {revealImgs.map((m, i) => <FitImg key={i} src={mediaUrl(m)} />)}
