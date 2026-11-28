@@ -1,0 +1,272 @@
+media: 27 картинок, 24 треков (mp3) → /tmp/claude-0/-home-user-quiz-party/32f8ecfe-7b77-5373-8c6d-c1e5a6cf01d8/scratchpad/sm/after/book-data/media/book
+[stand] vite build → /tmp/claude-0/-home-user-quiz-party/32f8ecfe-7b77-5373-8c6d-c1e5a6cf01d8/scratchpad/sm/after/book-app
+
+/quiz-party/fonts/russo-one-400-normal-cyrillic.woff2 referenced in /quiz-party/fonts/russo-one-400-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/russo-one-400-normal-latin-ext.woff2 referenced in /quiz-party/fonts/russo-one-400-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/russo-one-400-normal-latin.woff2 referenced in /quiz-party/fonts/russo-one-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-500-normal-latin-ext.woff2 referenced in /quiz-party/fonts/rajdhani-500-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-500-normal-latin.woff2 referenced in /quiz-party/fonts/rajdhani-500-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-600-normal-latin-ext.woff2 referenced in /quiz-party/fonts/rajdhani-600-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-600-normal-latin.woff2 referenced in /quiz-party/fonts/rajdhani-600-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-700-normal-latin-ext.woff2 referenced in /quiz-party/fonts/rajdhani-700-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/rajdhani-700-normal-latin.woff2 referenced in /quiz-party/fonts/rajdhani-700-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/orbitron-500-normal-latin.woff2 referenced in /quiz-party/fonts/orbitron-500-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/orbitron-700-normal-latin.woff2 referenced in /quiz-party/fonts/orbitron-700-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/orbitron-900-normal-latin.woff2 referenced in /quiz-party/fonts/orbitron-900-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/share-tech-mono-400-normal-latin.woff2 referenced in /quiz-party/fonts/share-tech-mono-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-400-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/inter-400-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-400-normal-cyrillic.woff2 referenced in /quiz-party/fonts/inter-400-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-400-normal-latin-ext.woff2 referenced in /quiz-party/fonts/inter-400-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-400-normal-latin.woff2 referenced in /quiz-party/fonts/inter-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-500-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/inter-500-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-500-normal-cyrillic.woff2 referenced in /quiz-party/fonts/inter-500-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-500-normal-latin-ext.woff2 referenced in /quiz-party/fonts/inter-500-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-500-normal-latin.woff2 referenced in /quiz-party/fonts/inter-500-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-600-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/inter-600-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-600-normal-cyrillic.woff2 referenced in /quiz-party/fonts/inter-600-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-600-normal-latin-ext.woff2 referenced in /quiz-party/fonts/inter-600-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/inter-600-normal-latin.woff2 referenced in /quiz-party/fonts/inter-600-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-400-normal-cyrillic.woff2 referenced in /quiz-party/fonts/eb-garamond-400-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-400-normal-latin.woff2 referenced in /quiz-party/fonts/eb-garamond-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-500-normal-cyrillic.woff2 referenced in /quiz-party/fonts/eb-garamond-500-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-500-normal-latin.woff2 referenced in /quiz-party/fonts/eb-garamond-500-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-600-normal-cyrillic.woff2 referenced in /quiz-party/fonts/eb-garamond-600-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/eb-garamond-600-normal-latin.woff2 referenced in /quiz-party/fonts/eb-garamond-600-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/unifrakturmaguntia-400-normal-latin.woff2 referenced in /quiz-party/fonts/unifrakturmaguntia-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cinzel-decorative-700-normal-latin-ext.woff2 referenced in /quiz-party/fonts/cinzel-decorative-700-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cinzel-decorative-700-normal-latin.woff2 referenced in /quiz-party/fonts/cinzel-decorative-700-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cinzel-decorative-900-normal-latin-ext.woff2 referenced in /quiz-party/fonts/cinzel-decorative-900-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cinzel-decorative-900-normal-latin.woff2 referenced in /quiz-party/fonts/cinzel-decorative-900-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-500-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-500-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-500-normal-cyrillic.woff2 referenced in /quiz-party/fonts/cormorant-garamond-500-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-500-normal-latin-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-500-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-500-normal-latin.woff2 referenced in /quiz-party/fonts/cormorant-garamond-500-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-600-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-600-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-600-normal-cyrillic.woff2 referenced in /quiz-party/fonts/cormorant-garamond-600-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-600-normal-latin-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-600-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-600-normal-latin.woff2 referenced in /quiz-party/fonts/cormorant-garamond-600-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-700-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-700-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-700-normal-cyrillic.woff2 referenced in /quiz-party/fonts/cormorant-garamond-700-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-700-normal-latin-ext.woff2 referenced in /quiz-party/fonts/cormorant-garamond-700-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/cormorant-garamond-700-normal-latin.woff2 referenced in /quiz-party/fonts/cormorant-garamond-700-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-cyrillic-400-normal.woff2 referenced in /quiz-party/fonts/pt-serif-cyrillic-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-latin-400-normal.woff2 referenced in /quiz-party/fonts/pt-serif-latin-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-cyrillic-700-normal.woff2 referenced in /quiz-party/fonts/pt-serif-cyrillic-700-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-latin-700-normal.woff2 referenced in /quiz-party/fonts/pt-serif-latin-700-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-cyrillic-400-italic.woff2 referenced in /quiz-party/fonts/pt-serif-cyrillic-400-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-latin-400-italic.woff2 referenced in /quiz-party/fonts/pt-serif-latin-400-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-cyrillic-700-italic.woff2 referenced in /quiz-party/fonts/pt-serif-cyrillic-700-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/pt-serif-latin-700-italic.woff2 referenced in /quiz-party/fonts/pt-serif-latin-700-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/ruslan-display-cyrillic-400-normal.woff2 referenced in /quiz-party/fonts/ruslan-display-cyrillic-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/ruslan-display-latin-400-normal.woff2 referenced in /quiz-party/fonts/ruslan-display-latin-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-cyrillic-400-normal.woff2 referenced in /quiz-party/fonts/lora-cyrillic-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-latin-400-normal.woff2 referenced in /quiz-party/fonts/lora-latin-400-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-cyrillic-600-normal.woff2 referenced in /quiz-party/fonts/lora-cyrillic-600-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-latin-600-normal.woff2 referenced in /quiz-party/fonts/lora-latin-600-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-cyrillic-700-normal.woff2 referenced in /quiz-party/fonts/lora-cyrillic-700-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-latin-700-normal.woff2 referenced in /quiz-party/fonts/lora-latin-700-normal.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-cyrillic-400-italic.woff2 referenced in /quiz-party/fonts/lora-cyrillic-400-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/lora-latin-400-italic.woff2 referenced in /quiz-party/fonts/lora-latin-400-italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-400-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/philosopher-400-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-400-normal-cyrillic.woff2 referenced in /quiz-party/fonts/philosopher-400-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-400-normal-latin-ext.woff2 referenced in /quiz-party/fonts/philosopher-400-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-400-normal-latin.woff2 referenced in /quiz-party/fonts/philosopher-400-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-700-normal-cyrillic-ext.woff2 referenced in /quiz-party/fonts/philosopher-700-normal-cyrillic-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-700-normal-cyrillic.woff2 referenced in /quiz-party/fonts/philosopher-700-normal-cyrillic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-700-normal-latin-ext.woff2 referenced in /quiz-party/fonts/philosopher-700-normal-latin-ext.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/fonts/philosopher-700-normal-latin.woff2 referenced in /quiz-party/fonts/philosopher-700-normal-latin.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/lobby-ribbon.webp referenced in /quiz-party/ny-book/lobby-ribbon.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/_tmp/sprig-berries.webp referenced in /quiz-party/ny-book/_tmp/sprig-berries.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/team-card.webp referenced in /quiz-party/ny-book/team-card.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/scroll.webp referenced in /quiz-party/ny-book/scroll.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/hscroll-bow.webp referenced in /quiz-party/ny-book/hscroll-bow.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/hscroll.webp referenced in /quiz-party/ny-book/hscroll.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/player-garland.webp referenced in /quiz-party/ny-book/player-garland.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/player-tree.webp referenced in /quiz-party/ny-book/player-tree.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/quiz-party/ny-book/player-hill.webp referenced in /quiz-party/ny-book/player-hill.webp didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[stand] http://127.0.0.1:7411/quiz-party/#/?room=stand  · PIN 000000 · пакеты stand-book, stand-book-paper, stand-book-all · данные /tmp/claude-0/-home-user-quiz-party/32f8ecfe-7b77-5373-8c6d-c1e5a6cf01d8/scratchpad/sm/after/book-data
+✓ 80-sm-listen-1920x1080 k=1 fill=34% center=0% gaps=[20] minFont=20 
+✓ 80-sm-listen-1366x768 k=1 fill=36% center=0% gaps=[14.2] minFont=14.2 
+✓ 80-sm-listen-1280x720 k=1 fill=36% center=0% gaps=[13.3] minFont=13.3 
+✓ 80-sm-listen-1899x905 k=1 fill=35% center=0% gaps=[16.8] minFont=16.8 
+✓ 80-sm-bidding-1920x1080 k=0.82 fill=94% center=0% gaps=[16.4,16.4,16.4] minFont=14.5 
+✓ 80-sm-bidding-1366x768 k=0.82 fill=96% center=0% gaps=[11.7,11.7,11.7] minFont=11 
+✓ 80-sm-bidding-1280x720 k=0.82 fill=96% center=0% gaps=[10.9,10.9,10.9] minFont=10 
+✓ 80-sm-bidding-1899x905 k=0.82 fill=95% center=0% gaps=[13.7,13.7,13.7] minFont=13 
+✓ 80-sm-bids-1920x1080 k=1 fill=91% center=0% gaps=[20,20,20] minFont=18 
+✓ 80-sm-bids-1366x768 k=1 fill=93% center=0% gaps=[14.2,14.2,14.2] minFont=12.8 
+✓ 80-sm-bids-1280x720 k=1 fill=94% center=0% gaps=[13.3,13.3,13.3] minFont=12 
+✓ 80-sm-bids-1899x905 k=1 fill=92% center=0% gaps=[16.8,16.8,16.8] minFont=15.1 
+✓ 80-sm-bids-long-1920x1080 k=1 fill=91% center=0% gaps=[20,20,20] minFont=15.5 
+✓ 80-sm-bids-long-1366x768 k=1 fill=93% center=0% gaps=[14.2,14.2,14.2] minFont=11 
+✓ 80-sm-bids-long-1280x720 k=1 fill=94% center=0% gaps=[13.3,13.3,13.3] minFont=10 
+✓ 80-sm-bids-long-1899x905 k=1 fill=92% center=0% gaps=[16.8,16.8,16.8] minFont=13 
+✓ 80-sm-snippet-1920x1080 k=1 fill=73% center=0% gaps=[20,20,20] minFont=20 
+✓ 80-sm-snippet-1366x768 k=1 fill=75% center=0% gaps=[14.2,14.2,14.2] minFont=14.2 
+✓ 80-sm-snippet-1280x720 k=1 fill=75% center=0% gaps=[13.3,13.3,13.3] minFont=13.3 
+✓ 80-sm-snippet-1899x905 k=1 fill=74% center=0% gaps=[16.8,16.8,16.8] minFont=16.8 
+✓ 80-sm-snippet-long-1920x1080 k=1 fill=73% center=0% gaps=[20,20,20] minFont=20 
+✓ 80-sm-snippet-long-1366x768 k=1 fill=75% center=0% gaps=[14.2,14.2,14.2] minFont=14.2 
+✓ 80-sm-snippet-long-1280x720 k=1 fill=75% center=0% gaps=[13.3,13.3,13.3] minFont=13.3 
+✓ 80-sm-snippet-long-1899x905 k=1 fill=74% center=0% gaps=[16.8,16.8,16.8] minFont=16.8 
+✓ 80-sm-answering-wait-1920x1080 k=1 fill=84% center=0% gaps=[20,20,20,20] minFont=20 
+✓ 80-sm-answering-wait-1366x768 k=1 fill=85% center=0% gaps=[14.2,14.2,14.2,14.2] minFont=14.2 
+✓ 80-sm-answering-wait-1280x720 k=1 fill=86% center=0% gaps=[13.3,13.3,13.3,13.3] minFont=13.3 
+✓ 80-sm-answering-wait-1899x905 k=1 fill=84% center=0% gaps=[16.8,16.8,16.8,16.8] minFont=16.8 
+✓ 80-sm-answering-txt-1920x1080 k=1 fill=84% center=0% gaps=[20,20,20,20] minFont=20 
+✓ 80-sm-answering-txt-1366x768 k=1 fill=85% center=0% gaps=[14.2,14.2,14.2,14.2] minFont=14.2 
+✓ 80-sm-answering-txt-1280x720 k=1 fill=86% center=0% gaps=[13.3,13.3,13.3,13.3] minFont=13.3 
+✓ 80-sm-answering-txt-1899x905 k=1 fill=84% center=0% gaps=[16.8,16.8,16.8,16.8] minFont=16.8 
+✓ 80-sm-answering-long-1920x1080 k=1 fill=98% center=0% gaps=[20,20,20,20] minFont=20 
+✓ 80-sm-answering-long-1366x768 k=1 fill=100% center=0% gaps=[14.2,14.2,14.2,14.2] minFont=14.2 
+✓ 80-sm-answering-long-1280x720 k=1 fill=100% center=0% gaps=[13.3,13.3,13.3,13.3] minFont=13.3 
+✓ 80-sm-answering-long-1899x905 k=1 fill=99% center=0% gaps=[16.8,16.8,16.8,16.8] minFont=16.8 
+✓ 80-sm-answering-ok-1920x1080 k=0.82 fill=94% center=0% gaps=[16.4,16.4,16.4,16.4,16.4,16.4] minFont=16.4 
+✓ 80-sm-answering-ok-1366x768 k=0.82 fill=96% center=0% gaps=[11.7,11.7,11.7,11.7,11.7,11.7] minFont=11.7 
+✓ 80-sm-answering-ok-1280x720 k=0.82 fill=97% center=0% gaps=[10.9,10.9,10.9,10.9,10.9,10.9] minFont=10.9 
+✓ 80-sm-answering-ok-1899x905 k=0.82 fill=95% center=0% gaps=[13.7,13.7,13.7,13.7,13.7,13.7] minFont=13.7 
+✓ 80-sm-answering-no-1920x1080 k=0.88 fill=94% center=0% gaps=[17.6,17.6,17.6,17.6,17.6,17.6] minFont=17.6 
+✓ 80-sm-answering-no-1366x768 k=0.88 fill=97% center=0% gaps=[12.5,12.5,12.5,12.5,12.5,12.5] minFont=12.5 
+✓ 80-sm-answering-no-1280x720 k=0.88 fill=97% center=0% gaps=[11.7,11.7,11.7,11.7,11.7,11.7] minFont=11.7 
+✓ 80-sm-answering-no-1899x905 k=0.88 fill=96% center=0% gaps=[14.7,14.7,14.7,14.7,14.7,14.7] minFont=14.7 
+✓ 80-sm-passed-1920x1080 k=0.94 fill=91% center=0% gaps=[18.8,18.8,18.8,18.8,18.8] minFont=18.8 
+✓ 80-sm-passed-1366x768 k=0.94 fill=93% center=0% gaps=[13.4,13.4,13.4,13.4,13.4] minFont=13.4 
+✓ 80-sm-passed-1280x720 k=0.94 fill=94% center=0% gaps=[12.5,12.5,12.5,12.5,12.5] minFont=12.5 
+✓ 80-sm-passed-1899x905 k=0.94 fill=92% center=0% gaps=[15.8,15.8,15.8,15.8,15.8] minFont=15.8 
+✓ 80-sm-passed-no-1920x1080 k=0.82 fill=99% center=0% gaps=[16.4,16.4,16.4,16.4,16.4,16.4,16.4] minFont=16.4 
+✓ 80-sm-passed-no-1366x768 k=0.76 fill=94% center=0% gaps=[10.8,10.8,10.8,10.8,10.8,10.8,10.8] minFont=10.8 
+✓ 80-sm-passed-no-1280x720 k=0.76 fill=95% center=0% gaps=[10.1,10.1,10.1,10.1,10.1,10.1,10.1] minFont=10.1 
+✓ 80-sm-passed-no-1899x905 k=0.82 fill=100% center=0% gaps=[13.7,13.7,13.7,13.7,13.7,13.7,13.7] minFont=13.7 
+✓ 80-sm-reveal-2-1920x1080 k=1 fill=75% center=0% gaps=[20,20,20,20,20] minFont=19 
+✓ 80-sm-reveal-2-1366x768 k=1 fill=75% center=0% gaps=[14.2,14.2,14.2,14.2,14.2] minFont=13.5 
+✓ 80-sm-reveal-2-1280x720 k=1 fill=75% center=0% gaps=[13.3,13.3,13.3,13.3,13.3] minFont=12.7 
+✓ 80-sm-reveal-2-1899x905 k=1 fill=75% center=0% gaps=[16.8,16.8,16.8,16.8,16.8] minFont=15.9 
+✓ 80-sm-reveal-1-1920x1080 k=1 fill=75% center=0% gaps=[20,20,20,20,20] minFont=19 
+✓ 80-sm-reveal-1-1366x768 k=1 fill=75% center=0% gaps=[14.2,14.2,14.2,14.2,14.2] minFont=13.5 
+✓ 80-sm-reveal-1-1280x720 k=1 fill=75% center=0% gaps=[13.3,13.3,13.3,13.3,13.3] minFont=12.7 
+✓ 80-sm-reveal-1-1899x905 k=1 fill=75% center=0% gaps=[16.8,16.8,16.8,16.8,16.8] minFont=15.9 
+✓ 80-sm-reveal-05-1920x1080 k=1 fill=75% center=0% gaps=[20,20,20,20,20] minFont=19 
+✓ 80-sm-reveal-05-1366x768 k=1 fill=75% center=0% gaps=[14.2,14.2,14.2,14.2,14.2] minFont=13.5 
+✓ 80-sm-reveal-05-1280x720 k=1 fill=75% center=0% gaps=[13.3,13.3,13.3,13.3,13.3] minFont=12.7 
+✓ 80-sm-reveal-05-1899x905 k=1 fill=75% center=0% gaps=[16.8,16.8,16.8,16.8,16.8] minFont=15.9 
+✓ 80-sm-reveal-long-1920x1080 k=1 fill=94% center=0% gaps=[20,20,20,20,20] minFont=19 
+✓ 80-sm-reveal-long-1366x768 k=1 fill=93% center=0% gaps=[14.2,14.2,14.2,14.2,14.2] minFont=13.5 
+✓ 80-sm-reveal-long-1280x720 k=1 fill=93% center=0% gaps=[13.3,13.3,13.3,13.3,13.3] minFont=12.7 
+✓ 80-sm-reveal-long-1899x905 k=1 fill=93% center=0% gaps=[16.8,16.8,16.8,16.8,16.8] minFont=15.9 
+✓ 80-sm-reveal-empty-1920x1080 k=1 fill=58% center=0% gaps=[20,20,20,20] minFont=19 
+✓ 80-sm-reveal-empty-1366x768 k=1 fill=57% center=0% gaps=[14.2,14.2,14.2,14.2] minFont=13.5 
+✓ 80-sm-reveal-empty-1280x720 k=1 fill=57% center=0% gaps=[13.3,13.3,13.3,13.3] minFont=12.7 
+✓ 80-sm-reveal-empty-1899x905 k=1 fill=57% center=0% gaps=[16.8,16.8,16.8,16.8] minFont=15.9 
+✓ 80-sm-reveal-nobody-1920x1080 k=1 fill=73% center=0% gaps=[20,20,20,20,20] minFont=23 
+✓ 80-sm-reveal-nobody-1366x768 k=1 fill=73% center=0% gaps=[14.2,14.2,14.2,14.2,14.2] minFont=16.4 
+✓ 80-sm-reveal-nobody-1280x720 k=1 fill=73% center=0% gaps=[13.3,13.3,13.3,13.3,13.3] minFont=15.3 
+✓ 80-sm-reveal-nobody-1899x905 k=1 fill=73% center=0% gaps=[16.8,16.8,16.8,16.8,16.8] minFont=19.3 
+✓ 81-sm-jp-listen-1920x1080 k=1 fill=59% center=0% gaps=[12,12] minFont=16 
+✓ 81-sm-jp-listen-1366x768 k=1 fill=61% center=0% gaps=[8.5,8.5] minFont=14.9 
+✓ 81-sm-jp-listen-1280x720 k=1 fill=61% center=0% gaps=[8,8] minFont=14 
+✓ 81-sm-jp-listen-1899x905 k=1 fill=60% center=0% gaps=[10,10] minFont=16 
+✓ 81-sm-jp-masked-1920x1080 k=0.94 fill=97% center=0% gaps=[11.3,11.3] minFont=12 
+✓ 81-sm-jp-masked-1366x768 k=0.94 fill=97% center=0% gaps=[8,8] minFont=12 
+✓ 81-sm-jp-masked-1280x720 k=0.94 fill=97% center=0% gaps=[7.5,7.5] minFont=12 
+✓ 81-sm-jp-masked-1899x905 k=0.94 fill=97% center=0% gaps=[9.4,9.4] minFont=12 
+✓ 81-sm-jp-graded-1920x1080 k=0.76 fill=99% center=0% gaps=[9.1,9.1,9.1,9.1] minFont=12 
+✓ 81-sm-jp-graded-1366x768 k=0.76 fill=99% center=0% gaps=[6.5,6.5,6.5,6.5] minFont=11 
+✓ 81-sm-jp-graded-1280x720 k=0.76 fill=99% center=0% gaps=[6.1,6.1,6.1,6.1] minFont=10 
+✓ 81-sm-jp-graded-1899x905 k=0.76 fill=99% center=0% gaps=[7.6,7.6,7.6,7.6] minFont=12 
+✓ 81-sm-jp-six-1920x1080 k=0.7 fill=97% center=0% gaps=[8.4,8.4,8.4,8.4] minFont=12 
+✓ 81-sm-jp-six-1366x768 k=0.7 fill=97% center=0% gaps=[6,6,6,6] minFont=10 
+✓ 81-sm-jp-six-1280x720 k=0.7 fill=97% center=0% gaps=[5.6,5.6,5.6,5.6] minFont=9.8 
+✓ 81-sm-jp-six-1899x905 k=0.7 fill=97% center=0% gaps=[7,7,7,7] minFont=12 
+✓ 81-sm-jp-noans-1920x1080 k=1 fill=63% center=0% gaps=[12,12,12,12] minFont=16 
+✓ 81-sm-jp-noans-1366x768 k=1 fill=65% center=0% gaps=[8.5,8.5,8.5,8.5] minFont=14.9 
+✓ 81-sm-jp-noans-1280x720 k=1 fill=65% center=0% gaps=[8,8,8,8] minFont=14 
+✓ 81-sm-jp-noans-1899x905 k=1 fill=64% center=0% gaps=[10,10,10,10] minFont=16 
+
+ИТОГО: 96/96 зелёных

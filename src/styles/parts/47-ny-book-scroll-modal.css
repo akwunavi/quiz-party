@@ -57,6 +57,9 @@
 .theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner .nm { font: 700 calc(36 * var(--u)) / 1.12 var(--bk-display); color: var(--bk-ink-2); min-width: 0; flex: 0 1 auto; overflow-wrap: anywhere; }
 .theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner[data-n="m"] .nm { font-size: calc(28 * var(--u)); }
 .theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner:is([data-n="l"], [data-n="xl"]) .nm { font-size: calc(26 * var(--u)); }
+/* очень длинное имя (>30 знаков) в одну строку с подписью не помещается — имя строками по центру, подпись под ним */
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner:is([data-n="l"], [data-n="xl"]) { flex-direction: column; align-items: center; row-gap: calc(6 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner:is([data-n="l"], [data-n="xl"]) .nm { text-align: center; text-wrap: balance; }
 .theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner .lab { flex: none; white-space: nowrap; font: 700 calc(19 * var(--u)) / 1.12 var(--bk-display); letter-spacing: .16em; text-transform: uppercase; color: var(--bk-red); text-shadow: none; }
 .theme-ny_book.mel-overlay .bk-sm-in :is(.bk-sm-sub, .mel-points-hint, .mel-reveal-track, .jp-theme-hint) {
   margin: 0; font: 500 calc(26 * var(--u)) / 1.25 var(--bk-name); letter-spacing: .02em; text-transform: none; color: var(--ink-soft); font-style: normal; text-wrap: balance; }
