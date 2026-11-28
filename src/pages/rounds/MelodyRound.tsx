@@ -75,6 +75,12 @@ const inSec = (s: number) => new Date(serverNow() + s * 1000).toISOString()
  *  15_000 в двух местах — не расходится, потому что теперь оно одно. */
 const REVEAL_TRACK_MS = 15_000
 
+/** Ступень длины названия (для кегля акцента на свитке «Книги»): чем длиннее исполнитель, тем мельче — иначе 100 знаков не уместятся. */
+function lenStep(s: string | undefined): 's' | 'm' | 'l' | 'xl' {
+  const n = (s ?? '').length
+  return n <= 14 ? 's' : n <= 30 ? 'm' : n <= 60 ? 'l' : 'xl'
+}
+
 /** Трек на показе ответа: ровно 15 секунд с начала.
  *  Длину держим фиксированной, а не «до конца файла»: полноразмерная песня
  *  растянула бы раунд, а короткий отрывок доиграет и остановится сам.
@@ -669,9 +675,14 @@ function ClassicMelodyBoard(props: BoardProps) {
             </>)}
 
             {m.stage === 'snippet' && (<>
-              <div className="mel-big" style={{ color: currentTeam?.color }}>
-                {currentTeam?.name} · играет {bidSec} сек
-              </div>
+              {pack.theme === 'ny_book'
+                ? <>
+                    <div className="mel-big bk-sm-main">{currentTeam?.name}</div>
+                    <div className="bk-sm-sub">♪ играет {bidSec} сек</div>
+                  </>
+                : <div className="mel-big" style={{ color: currentTeam?.color }}>
+                    {currentTeam?.name} · играет {bidSec} сек
+                  </div>}
               {/* если звук не пошёл — ведущий переводит стадию руками */}
               {!preview && <div className="mel-actions">
                 <button onClick={() => click(() => melodyClick(gameState, guardMelody(
@@ -684,8 +695,8 @@ function ClassicMelodyBoard(props: BoardProps) {
             {m.stage === 'reveal' && (<>
               <div className="answer-reveal" style={{ padding: '18px 28px' }}>
                 {/* 9.76: никто не угадал — ответ всё равно показываем */}
-                <div className="answer-label">{m.wonTeam ? `ВЕРНО ✓ · +${m.wonPts ?? 0}` : 'ПРАВИЛЬНЫЙ ОТВЕТ'}</div>
-                <div className="answer-main">{track?.correct}</div>
+                <div className={`answer-label${m.wonTeam ? ' is-stamp ok' : ''}`}>{m.wonTeam ? `ВЕРНО ✓ · +${m.wonPts ?? 0}` : 'ПРАВИЛЬНЫЙ ОТВЕТ'}</div>
+                <div className="answer-main" data-n={lenStep(track?.correct)}>{track?.correct}</div>
               </div>
               {/* Дослушать трек: 15 секунд с начала, вместе с показом ответа.
                   Раньше музыка обрывалась в момент угадывания, и зал не
@@ -693,10 +704,16 @@ function ClassicMelodyBoard(props: BoardProps) {
                   play() асинхронный, «запустить и заглушить» не работает
                   (HANDOFF.md), а надпись про 15 секунд не нужна редактору. */}
               {!preview && track?.audio && <RevealTrack src={mediaUrl(track.audio)} />}
-              <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
-                {m.wonTeam ? `${teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы`
-                  : 'Никто не угадал'}
-              </div>
+              {pack.theme === 'ny_book'
+                ? <div className="mel-big bk-sm-winner" data-n={lenStep(teams.find(t => t.id === m.wonTeam)?.name)}>
+                    {m.wonTeam
+                      ? <><span className="nm">{teams.find(t => t.id === m.wonTeam)?.name ?? '—'}</span><span className="lab">забирает баллы</span></>
+                      : <span className="nm">Никто не угадал</span>}
+                  </div>
+                : <div className="mel-big" style={{ color: teams.find(t => t.id === m.wonTeam)?.color }}>
+                    {m.wonTeam ? `${teams.find(t => t.id === m.wonTeam)?.name ?? '—'} забирает баллы`
+                      : 'Никто не угадал'}
+                  </div>}
               {!preview && <div className="mel-actions">
                 <button onClick={() => click(() => melodyClick(gameState,
                   guardMelody({ key: m.key, stage: 'reveal' }, cur => melodyToBoard(cur))))}>К доске →</button>
@@ -704,9 +721,14 @@ function ClassicMelodyBoard(props: BoardProps) {
             </>)}
 
             {(m.stage === 'answering' || m.stage === 'passed') && (<>
-              <div className="mel-big" style={{ color: currentTeam?.color }}>
-                {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
-              </div>
+              {pack.theme === 'ny_book'
+                ? <>
+                    {m.stage === 'passed' && <div className="bk-stamp is-pass">ХОД ПЕРЕДАН</div>}
+                    <div className="mel-big bk-sm-main">{currentTeam?.name ?? '—'}</div>
+                  </>
+                : <div className="mel-big" style={{ color: currentTeam?.color }}>
+                    {m.stage === 'passed' ? 'ХОД ПЕРЕДАН · ' : ''}{currentTeam?.name ?? '—'}
+                  </div>}
               <div className="mel-points-hint">
                 {m.stage === 'passed' ? 'за верный ответ — 0.5 балла'
                   : `ставка ${bidSec} сек → за верный ответ ${bidSec <= 5 ? 2 : 1} балла`}
@@ -717,16 +739,22 @@ function ClassicMelodyBoard(props: BoardProps) {
               </div>
               {ans?.is_correct === true && (
                 <div className="answer-reveal hud-frame">
-                  <div className="answer-label">ВЕРНО ✓</div>
-                  <div className="answer-main">{track?.correct}</div>
+                  <div className="answer-label is-stamp ok">ВЕРНО ✓</div>
+                  <div className="answer-main" data-n={lenStep(track?.correct)}>{track?.correct}</div>
                 </div>
               )}
               {ans?.is_correct === false && (
-                <div className="mel-wrong">
-                  {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
-                    ? '✗ НЕВЕРНО · ответ не раскрываем — передайте ход второй команде'
-                    : '✗ НЕВЕРНО · дальше — правильный ответ'}
-                </div>
+                pack.theme === 'ny_book'
+                  ? <>
+                      <div className="mel-wrong is-stamp no">✗ НЕВЕРНО</div>
+                      <div className="bk-sm-sub">{(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
+                        ? 'ответ не раскрываем — передайте ход второй команде' : 'дальше — правильный ответ'}</div>
+                    </>
+                  : <div className="mel-wrong">
+                      {(m.turn ?? 0) === 0 && (m.order?.length ?? 0) > 1
+                        ? '✗ НЕВЕРНО · ответ не раскрываем — передайте ход второй команде'
+                        : '✗ НЕВЕРНО · дальше — правильный ответ'}
+                    </div>
               )}
               {/* 9.62 (находка 6): grade/passMelody теперь тоже могут бросить
                   «кнопка устарела» (Р2, updateMelodyBag) — обёрнуты через

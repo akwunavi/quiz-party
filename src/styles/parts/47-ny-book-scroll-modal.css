@@ -1,0 +1,104 @@
+/* ═══ «Книга»: СОДЕРЖИМОЕ модалок на свитке (10.76) — единая иерархия по центру пергамента ═══
+   Разметка: .bk-scroll > .bk-sm-in > (голова, акцент, вторичное, кнопки). Свиток и его рамка — 41-ny-book.css; здесь только то, что ВНУТРИ.
+   Ужим: ScrollModal.tsx ставит --k (1…0.64) — единица --u внутри .bk-sm-in уменьшается, помещается всё (кегль, отступы, плитки разом).
+   Все селекторы под .theme-ny_book.mel-overlay .bk-scroll: другие темы не затронуты. Вес выше старых !important-правил 41-ny-book.css. */
+.theme-ny_book.mel-overlay .bk-scroll { --u-parent: var(--u); }
+.theme-ny_book.mel-overlay .bk-scroll .bk-sm-in {
+  --u: calc(var(--u-parent) * var(--k, 1)); --g: calc(20 * var(--u));
+  --ink-soft: rgba(31, 42, 68, .68);
+  flex: 1 1 0; min-height: 0; width: 100%; box-sizing: border-box; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--g); text-align: center;
+}
+.theme-ny_book.mel-overlay .bk-scroll .bk-sm-in > * { align-self: center; max-width: 100%; margin: 0; flex: 0 0 auto; }
+
+/* 1. ГОЛОВА: контекст по центру (красная разрядка, мелко) + золотой разделитель с ромбиком; таймер — справа, центр не сдвигает */
+.theme-ny_book.mel-overlay .bk-sm-in > :is(.mel-modal-head, .jp-modal-head) {
+  display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; justify-items: center; row-gap: calc(8 * var(--u)); width: 100%; border: 0; padding: 0; position: relative; }
+.theme-ny_book.mel-overlay .bk-sm-in > :is(.mel-modal-head, .jp-modal-head):has(:is(.mel-count, .jp-count)) { grid-template-columns: minmax(calc(84 * var(--u)), 1fr) auto minmax(calc(84 * var(--u)), 1fr); }
+.theme-ny_book.mel-overlay .bk-sm-in > :is(.mel-modal-head, .jp-modal-head)::after {
+  content: '◆'; grid-column: 1 / -1; width: 100%; height: calc(16 * var(--u)); line-height: calc(16 * var(--u)); font-size: calc(13 * var(--u)); color: var(--bk-gold-3); text-align: center;
+  background: linear-gradient(90deg, transparent, var(--bk-gold) 70%) left center / calc(50% - 16 * var(--u)) calc(2 * var(--u)) no-repeat,
+              linear-gradient(270deg, transparent, var(--bk-gold) 70%) right center / calc(50% - 16 * var(--u)) calc(2 * var(--u)) no-repeat; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-modal-theme {
+  grid-column: 1 / -1; font: 700 calc(23 * var(--u)) / 1.2 var(--bk-display) !important; letter-spacing: .16em; text-transform: uppercase; color: var(--bk-red) !important; text-wrap: balance; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-modal-head, .jp-modal-head):has(:is(.mel-count, .jp-count)) .mel-modal-theme { grid-column: 2; }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-modal-head > div:first-child { grid-column: 1 / -1; display: flex; flex-flow: row wrap; justify-content: center; align-items: baseline; column-gap: calc(14 * var(--u)); row-gap: 0; text-align: center; }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-modal-head:has(.jp-count) > div:first-child { grid-column: 2; }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-modal-theme { font: 700 calc(23 * var(--u)) / 1.2 var(--bk-display) !important; letter-spacing: .16em; text-transform: uppercase; color: var(--bk-red) !important; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-modal-head .mono-tag { font: 600 calc(21 * var(--u)) / 1.2 var(--bk-display) !important; letter-spacing: .16em; color: var(--ink-soft); }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-count, .jp-count) { grid-column: 3; justify-self: end; align-self: center; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.bk-mel-timer, .bk-mel-timer .bk-tm) { --bk-timer-d: calc(84 * var(--u)); width: calc(84 * var(--u)); height: calc(84 * var(--u)); }
+
+/* 2. АКЦЕНТ: заголовок стадии / команда / ответ — крупно, чернилами с лёгким тиснением */
+.theme-ny_book.mel-overlay .bk-sm-in .mel-big {
+  font: 700 calc(38 * var(--u)) / 1.12 var(--bk-display) !important; color: var(--bk-ink-2) !important; text-shadow: 0 calc(1.5 * var(--u)) 0 rgba(255, 244, 212, .9); text-wrap: balance; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-big.bk-sm-main { font-size: calc(54 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-reveal {
+  display: flex; flex-direction: column; align-items: center; gap: var(--g); width: 100%; padding: 0 !important; max-height: none; overflow: visible; background: none; border: 0; box-shadow: none; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-reveal .answer-main {
+  font: 700 calc(64 * var(--u)) / 1.08 var(--bk-display) !important; color: var(--bk-ink-2); text-shadow: 0 calc(2 * var(--u)) 0 rgba(255, 244, 212, .95), 0 calc(-1 * var(--u)) 0 rgba(138, 106, 36, .35);
+  text-wrap: balance; overflow-wrap: anywhere; hyphens: auto; max-width: 100%; margin: 0; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-main[data-n="m"] { font-size: calc(52 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-main[data-n="l"] { font-size: calc(40 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-main[data-n="xl"] { font-size: calc(32 * var(--u)) !important; line-height: 1.14 !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .answer-main:empty { display: none; }
+/* подпись ответа без вердикта («ПРАВИЛЬНЫЙ ОТВЕТ») — красная разрядка, мелко */
+.theme-ny_book.mel-overlay .bk-sm-in .answer-reveal > .answer-label { font: 700 calc(23 * var(--u)) / 1.2 var(--bk-display); letter-spacing: .2em; color: var(--bk-red); margin: 0; }
+/* ШТАМП вердикта: мягкий, не неоновый (ВЕРНО ✓ · +1 / ✗ НЕВЕРНО / ХОД ПЕРЕДАН) */
+.theme-ny_book.mel-overlay .bk-sm-in :is(.is-stamp, .bk-stamp) {
+  display: inline-block; padding: calc(7 * var(--u)) calc(22 * var(--u)); border-radius: calc(6 * var(--u)); border: calc(2 * var(--u)) solid currentColor; outline: calc(1 * var(--u)) solid currentColor; outline-offset: calc(3 * var(--u));
+  font: 700 calc(27 * var(--u)) / 1.1 var(--bk-display) !important; letter-spacing: .2em; text-transform: uppercase; text-shadow: none; margin: 0; }
+.theme-ny_book.mel-overlay .bk-sm-in .is-stamp.ok { color: var(--bk-ok) !important; background: rgba(47, 107, 63, .09); }
+.theme-ny_book.mel-overlay .bk-sm-in .is-stamp.no { color: var(--bk-red) !important; background: rgba(143, 29, 44, .08); }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-stamp.is-pass { color: var(--bk-gold-3); background: rgba(201, 161, 74, .14); }
+
+/* 3. ВТОРИЧНОЕ: одна строка — имя команды крупно + подпись красной разрядкой на одной базовой линии; подсказки — читаемо, чернила .68 */
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner { display: flex; flex-flow: row nowrap; justify-content: center; align-items: baseline; column-gap: calc(14 * var(--u)); row-gap: 0; }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner .nm { font: 700 calc(36 * var(--u)) / 1.12 var(--bk-display); color: var(--bk-ink-2); min-width: 0; flex: 0 1 auto; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner[data-n="m"] .nm { font-size: calc(28 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner:is([data-n="l"], [data-n="xl"]) .nm { font-size: calc(26 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in .bk-sm-winner .lab { flex: none; white-space: nowrap; font: 700 calc(19 * var(--u)) / 1.12 var(--bk-display); letter-spacing: .16em; text-transform: uppercase; color: var(--bk-red); text-shadow: none; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.bk-sm-sub, .mel-points-hint, .mel-reveal-track, .jp-theme-hint) {
+  margin: 0; font: 500 calc(26 * var(--u)) / 1.25 var(--bk-name); letter-spacing: .02em; text-transform: none; color: var(--ink-soft); font-style: normal; text-wrap: balance; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-answer { font: 500 calc(30 * var(--u)) / 1.2 var(--bk-name); color: var(--bk-ink-2); text-wrap: balance; overflow-wrap: anywhere; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-answer b { font-weight: 700; font-family: var(--bk-serif); }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-answer span { color: var(--ink-soft); opacity: 1 !important; }
+.theme-ny_book.mel-overlay .bk-sm-in > .mono-tag { font: 700 calc(22 * var(--u)) / 1.2 var(--bk-display) !important; letter-spacing: .22em; color: var(--bk-red); margin: 0; position: static; }
+/* списки ставок / ответов */
+.theme-ny_book.mel-overlay .bk-sm-in .mel-bids { width: 100%; max-height: none; gap: calc(6 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-bid-row b { font: 700 calc(26 * var(--u)) var(--bk-display); color: var(--bk-ink-2); white-space: nowrap; }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-win-tag { font: 700 calc(18 * var(--u)) var(--bk-display); letter-spacing: .16em; color: var(--bk-ok); }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-answers { flex: 0 0 auto; width: 100%; max-height: none; overflow: visible; align-items: stretch; text-align: left; gap: calc(5 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-answer { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto auto; padding: calc(4 * var(--u)) calc(10 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-answer .txt { font: 700 calc(26 * var(--u)) / 1.15 var(--bk-display); text-align: right; color: var(--bk-ink-2); }
+/* «Своя игра»: содержимого больше (список ответов) — зазор между блоками уже, ответ мельче */
+.theme-ny_book.mel-overlay .bk-scroll[data-kind="jp"] .bk-sm-in { --g: calc(12 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-scroll[data-kind="jp"] .bk-sm-in .answer-reveal .answer-main { font-size: calc(46 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-scroll[data-kind="jp"] .bk-sm-in .answer-main[data-n="m"] { font-size: calc(40 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-scroll[data-kind="jp"] .bk-sm-in .answer-main[data-n="l"] { font-size: calc(34 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-scroll[data-kind="jp"] .bk-sm-in .answer-main[data-n="xl"] { font-size: calc(28 * var(--u)) !important; }
+.theme-ny_book.mel-overlay .bk-sm-in .jp-answers > .mono-tag { text-align: center; font: 700 calc(21 * var(--u)) / 1.2 var(--bk-display) !important; letter-spacing: .2em; color: var(--bk-red); }
+
+/* 4. КНОПКИ: кожано-бордовая с золотой кромкой и скруглением; вторая — пергаментная с золотой окантовкой */
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) { display: flex; flex-flow: row wrap; justify-content: center; align-items: center; gap: calc(14 * var(--u)); width: 100%; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade) {
+  clip-path: none; border-radius: calc(10 * var(--u)); padding: calc(11 * var(--u)) calc(26 * var(--u)); min-height: calc(52 * var(--u));
+  font: 700 calc(23 * var(--u)) / 1.1 var(--bk-display); letter-spacing: .08em; text-transform: uppercase; color: var(--bk-gold-2); text-shadow: 0 calc(1 * var(--u)) 0 rgba(0, 0, 0, .45);
+  background: linear-gradient(180deg, #a52a3c 0%, var(--bk-red) 48%, var(--bk-red-3) 100%); border: calc(2.5 * var(--u)) solid var(--bk-gold);
+  box-shadow: inset 0 calc(1.5 * var(--u)) 0 rgba(255, 220, 170, .35), inset 0 calc(-3 * var(--u)) calc(6 * var(--u)) rgba(0, 0, 0, .3), 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .35);
+  transition: transform .15s, box-shadow .15s, filter .15s; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button.ghost:not(.jp-grade) {
+  color: var(--bk-ink); text-shadow: none; background: linear-gradient(180deg, rgba(255, 250, 235, .9), rgba(243, 224, 179, .85)); border-color: var(--bk-gold-3);
+  box-shadow: inset 0 calc(1.5 * var(--u)) 0 rgba(255, 255, 255, .7), 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(60, 35, 12, .25); }
+@media (hover: hover) and (pointer: fine) {
+  .theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade):hover { filter: brightness(1.1); transform: translateY(calc(-1.5 * var(--u))); box-shadow: inset 0 calc(1.5 * var(--u)) 0 rgba(255, 220, 170, .4), 0 calc(6 * var(--u)) calc(12 * var(--u)) rgba(60, 35, 12, .4), 0 0 calc(12 * var(--u)) rgba(242, 213, 140, .55); }
+  .theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button.ghost:not(.jp-grade):hover { color: var(--bk-red); border-color: var(--bk-gold); }
+}
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade):focus-visible { outline: calc(3 * var(--u)) solid var(--bk-gold-2); outline-offset: calc(3 * var(--u)); }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade):active { transform: translateY(calc(1.5 * var(--u))); filter: brightness(.94); box-shadow: inset 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(0, 0, 0, .4); }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade):disabled { opacity: .5; transform: none; filter: grayscale(.4); }
+.theme-ny_book.mel-overlay .bk-sm-in .mel-escape { margin-top: calc(-8 * var(--u)); font: 600 calc(20 * var(--u)) var(--bk-display); letter-spacing: .14em; color: var(--ink-soft); opacity: .8; }
+.theme-ny_book.mel-overlay .bk-sm-in :is(.jp-ungraded, .jp-audio-err) { font: 500 calc(22 * var(--u)) var(--bk-name); color: var(--bk-red); border: 0; background: none; padding: 0; margin: 0; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) {
+  .theme-ny_book.mel-overlay .bk-sm-in :is(.mel-actions, .jp-modal-foot) button:not(.jp-grade) { transition: none; }
+}

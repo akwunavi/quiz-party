@@ -357,7 +357,7 @@ function TileModal(props: TileProps) {
         {showAnswer && (
           <div className="answer-reveal hud-frame" style={{ padding: '12px 18px' }}>
             <div className="answer-label">ПРАВИЛЬНЫЙ ОТВЕТ</div>
-            <div className="answer-main" style={{ fontSize: 'clamp(24px,3vw,40px)' }}>{tile.correct}</div>
+            <div className="answer-main" data-n={(tile.correct ?? '').length <= 14 ? 's' : (tile.correct ?? '').length <= 30 ? 'm' : (tile.correct ?? '').length <= 60 ? 'l' : 'xl'} style={{ fontSize: 'clamp(24px,3vw,40px)' }}>{tile.correct}</div>
           </div>
         )}
 

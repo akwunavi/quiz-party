@@ -33,7 +33,13 @@ export function ScrollModal({ theme, kind, load = 'm', modalRef, className = '',
   useLayoutEffect(() => {
     const el = inRef.current
     if (!el) return
-    const need = (k: number) => { el.style.setProperty('--k', String(k)); return el.scrollHeight }
+    // высота ПО РАМКАМ детей, а не scrollHeight: при justify-content: center лишнее вылезает и вверх, а scrollHeight верх не считает
+    const need = (k: number) => {
+      el.style.setProperty('--k', String(k))
+      let t = Infinity, b = -Infinity
+      for (const c of Array.from(el.children)) { const r = c.getBoundingClientRect(); if (r.height) { t = Math.min(t, r.top); b = Math.max(b, r.bottom) } }
+      return b > t ? b - t : 0
+    }
     const k = pickFitStep(need, el.clientHeight)
     el.style.setProperty('--k', String(k))
     el.dataset.fit = String(k)

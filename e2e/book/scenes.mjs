@@ -432,7 +432,7 @@ export const SCENES = [
           await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 4, question_index: 0, timer_started_at: null, reveal: false,
             melody: { key, stage, order: ts.slice(0, 4).map(t => t.id), turn: o.turn ?? 0, snippetSec: 5, startSec: 2, played: ['0-0'], ...extra(ts) } }) }
         void ans
-        const S = (id, title, setup, o = {}) => sc(id, title, setup, { ready: '.mel-modal', settle: 2200, ...o })
+        const S = (id, title, setup, o = {}) => sc(id, title, setup, { ready: '.mel-modal', settle: 2200, noPause: true, ...o })
         const dl = ms => iso(now() + ms)
         const mm = [
           S('80-sm-listen', 'модалка мелодии: слушаем (listen)', mk('1-2', 'listen', () => ({}), { bids: false })),
