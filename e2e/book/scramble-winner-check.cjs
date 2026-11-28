@@ -67,7 +67,9 @@ async function main() {
     const winners = RACE ? 1 : (id === 'many' ? 4 : 2)
     await api.answers(ts.slice(0, winners + 1).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + QID, round_number: 14, answer_text: i < winners ? 'Снегурочка' : 'снегурка', is_correct: i < winners })))
     await api.session({ pack_id: PK, phase: 'question', round_number: 14, question_index: 0, timer_started_at: new Date(Date.now() - ms).toISOString(), reveal: true })
-    await p.goto(`${ORIGIN}/quiz-party/#/?room=stand`); await p.waitForSelector('.host-screen.an-screen > .an-result', { timeout: 20000 }); await p.waitForTimeout(2500)
+    await p.goto(`${ORIGIN}/quiz-party/#/?room=stand`); p.on('pageerror', e => console.error('pageerror', String(e).slice(0, 200)))
+    try { await p.waitForSelector('.host-screen.an-screen > .an-result', { timeout: 20000 }) } catch (e) { await p.screenshot({ path: `${OUT}/FAIL-${id}-${w}x${h}.png` }); throw e }
+    await p.waitForTimeout(2500)
     const r = await p.evaluate(MEASURE)
     const tag = `${TAG}-${RACE ? 'race' : 'std'}-${id}-${w}x${h}`
     if (SHOTS) await p.screenshot({ path: `${OUT}/${tag}.png` })
