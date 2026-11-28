@@ -12,6 +12,7 @@ const argv = process.argv.slice(2)
 const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d }
 const VPS = opt('--vp', '1920x1080,1366x768,1280x720,1899x905').split(',').map(s => s.split('x').map(Number))
 const ONLY = (opt('--only', '') || '').split(',').filter(Boolean)
+const BEFORE = argv.includes('--before')   // кадры «до»: плашка на прежнем месте (--bk-qn-left: 250)
 const OUT = opt('--out', ''), SHOTS = opt('--shots', ''), ASSERT = argv.includes('--assert')
 const REF_SCENE = '05-q-1img'
 // сцены показа вопроса с таймером; «Отвечайте» (09n*, --at-timer по числу команд) и мелодия идут со своим размером — для них размер не сверяется с эталоном
@@ -24,7 +25,7 @@ const SCENE_IDS = [
   '09n04-answer-time-4', '09n08-answer-time-8', '09n24-answer-time-24',
 ]
 const KEY_SHOTS = new Set(['05-q-1img', '08-q-4img', '08d-q-text-choices', '41-blitz-turn', '35-sprint', '52-crossword-q', '49-anagram', '47-fp-3', '55-mel-answering', '14-melody-snippet'])
-const NO_REF = /^(09n|53|55|58|59|14|13)/   // «Отвечайте» (--at-timer) и мелодия: свой размер
+const NO_REF = /^(09n|35|37|38|40|41|42|53|55|58|59|14|13)/   // НЕ трогаем (решение ведущего): «Отвечайте», «120 секунд», «Своя игра», блиц, «Угадай мелодию» — свой размер
 
 const PAGE_FN = () => {
   const book = document.querySelector('.bk-book'); if (!book) return { noBook: true }
@@ -98,6 +99,7 @@ async function main() {
       await scene.setup(api)
       await page.clock.install()
       await page.goto(scene.query ? url + '&' + scene.query : url)
+      if (BEFORE) await page.addStyleTag({ content: 'html{--bk-qn-left:250}' })
       let m = null, why = ''
       try {
         await page.waitForSelector(scene.ready, { timeout: 15000 })
