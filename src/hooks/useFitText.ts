@@ -155,7 +155,12 @@ export function useFitText<T extends HTMLElement>(
         // раскладке блока (offsetHeight: трансформы и абсолютный декор
         // её не раздувают), ширина — по границам текста (Range), чтобы
         // длинное неразрывное слово всё равно ловилось.
-        return el.offsetHeight <= availH + 1 && textWidth(el) <= availW + 1
+        // Режим `items` (правила раунда): пункты выезжают каскадом `ruleIn` (translateX −26px с задержкой), и Range-ширина блока ВО ВРЕМЯ каскада шире
+        // его реальной ширины на разницу сдвигов (замер: 664 против 638) — перерасчёт посреди каскада (догрузка шрифта, ResizeObserver) ложно
+        // «не влезало по ширине» и прижимал кегль к minScale (14px вместо 28px на живом экране, 10.76). Ширину меряем по раскладке самих пунктов
+        // (scrollWidth/clientWidth не зависят от transform): длинное слово без пробелов всё равно ловится.
+        const widthOk = kids ? kids.every(k => k.scrollWidth <= k.clientWidth + 1) : textWidth(el) <= availW + 1
+        return el.offsetHeight <= availH + 1 && widthOk
       }
       if (fits()) return
 
