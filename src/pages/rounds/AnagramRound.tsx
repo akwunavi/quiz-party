@@ -419,7 +419,7 @@ function BookResultName({ name }: { name: string }) {
   return <span className="bk-res-nbox"><span ref={fit} className="bk-res-name">{name}</span></span>
 }
 
-/** Нижняя панель итога «Скрэмбла» в «Книге» (10.76): ОДНА строка на ОДНОЙ базовой линии — подпись · имя команды · время (или «УГАДАЛИ» · имена через «·»).
+/** Нижняя панель итога «Скрэмбла» в «Книге» (10.76): ОДНА строка на ОДНОЙ базовой линии — подпись · имя команды · время (или «УГАДАЛИ» · имена через широкий просвет).
  *  Никаких плиток в панели (плитка в плашке — дубль); выравнивание проверяет e2e/book/scramble-winner-check.cjs. */
 function BookResultLine({ race, winnerTeam, rightTeams, time }: {
   race: boolean; winnerTeam: Team | undefined; rightTeams: Team[]; time: string | null
@@ -429,12 +429,7 @@ function BookResultLine({ race, winnerTeam, rightTeams, time }: {
   return (
     <div className={`bk-res-line${race ? '' : ' multi'}`}>
       <span className="bk-res-label">{race ? 'БАЛЛ ПОЛУЧАЕТ' : 'УГАДАЛИ'}</span>
-      {names.map((t, i) => (
-        <span key={t.id} className="bk-res-item">
-          {i > 0 && <span className="bk-res-sep" aria-hidden="true">·</span>}
-          <BookResultName name={t.name} />
-        </span>
-      ))}
+      {names.map(t => <span key={t.id} className="bk-res-item"><BookResultName name={t.name} /></span>)}
       {race && time && <span className="bk-res-time">{time}</span>}
     </div>
   )

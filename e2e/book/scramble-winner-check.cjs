@@ -33,18 +33,24 @@ const MEASURE = `(() => {
     out[k] = { text: e.textContent.trim(), base: +baseline(e).toFixed(2), fs: +parseFloat(cs.fontSize).toFixed(1), lh: +lh.toFixed(1), font: cs.fontFamily.split(',')[0], color: cs.color, tnum: cs.fontVariantNumeric, text_r: t,
       lines: Math.max(1, Math.round(t.h / lh)) } }
   const names = [...document.querySelectorAll('.bk-res-name, .an-res-card .bk-tc-name')]
-  const bases = Object.values(out).map(o => o.base); const spread = +(Math.max(...bases) - Math.min(...bases)).toFixed(2)
-  // стандартный режим: ВСЕ имена в ряду на одной линии с подписью
-  const allBases = [baseline(label), ...names.map(baseline)]; const spreadAll = +(Math.max(...allBases) - Math.min(...allBases)).toFixed(2)
+  // подпись и первое имя на ОДНОЙ строке → базовая линия общая; если длинное имя заняло строку целиком и подпись стоит над ним — это перенос по словам, не расхождение
+  const sameRow = !out.team || Math.abs(out.label.text_r.y - out.team.text_r.y) < 12 || !!out.time
+  const bases = Object.values(out).map(o => o.base); const spread = sameRow ? +(Math.max(...bases) - Math.min(...bases)).toFixed(2) : 0
+  // стандартный режим: имена одного ряда делят базовую линию друг с другом, первый ряд — ещё и с подписью (перенос на второй ряд — норма)
+  const nb = names.map(n => ({ b: baseline(n), y: textRect(n).y })); const rowsN = []
+  for (const n of nb.sort((a, c) => a.y - c.y)) { const g = rowsN.find(r => Math.abs(r.y - n.y) < 12); g ? g.bs.push(n.b) : rowsN.push({ y: n.y, bs: [n.b] }) }
+  const lb = baseline(label); const first = rowsN[0] && Math.abs(rowsN[0].bs[0] - lb) < 12 ? rowsN[0] : null
+  const spreadAll = +Math.max(0, ...rowsN.map((r, i) => { const a = i === 0 && first ? [lb, ...r.bs] : r.bs; return Math.max(...a) - Math.min(...a) })).toFixed(2)
   const pr = R(panel), tr = Object.values(out).map(o => o.text_r)
   const inside = tr.every(t => t.x >= pr.x - 1 && t.r <= pr.r + 1 && t.y >= pr.y - 1 && t.b <= pr.b + 1)
   const hit = (a, o) => a.x < o.r - 0.5 && a.r > o.x + 0.5 && a.y < o.b - 0.5 && a.b > o.y + 0.5
-  let blockOverlap = 0; for (let i = 0; i < tr.length; i++) for (let j = i + 1; j < tr.length; j++) if (hit(tr[i], tr[j])) blockOverlap++
+  let blockOverlap = 0; // рамка текста (Range) выше самих букв на пару px (ascent+descent) — пересечением считаем наложение глубже 30% меньшей высоты
+  for (let i = 0; i < tr.length; i++) for (let j = i + 1; j < tr.length; j++) { const a = tr[i], o = tr[j]; const dy = Math.min(a.b, o.b) - Math.max(a.y, o.y), dx = Math.min(a.r, o.r) - Math.max(a.x, o.x); if (dx > 0.5 && dy > 0.3 * Math.min(a.h, o.h)) blockOverlap++ }
   const others = ['.an-board-wrap .an-word', '.an-board-wrap .an-tile', '.an-teams', '.host-topbar', '.host-actions', '.an-clue'].flatMap(s => [...document.querySelectorAll(s)].map(e => [s, R(e)]))
   const cross = [...new Set(others.filter(([, r]) => r.w && hit(textRect(panel), r)).map(([s]) => s))]
   const crossText = [...new Set(others.filter(([, r]) => r.w && tr.some(t => hit(t, r))).map(([s]) => s))]
   const nameRows = new Set(names.map(n => Math.round(textRect(n).y / 4))).size
-  return { ...out, spread, spreadAll, nNames: names.length, inside, blockOverlap, panelCross: cross, textCross: crossText, panel: pr, inWindow: pr.x >= 0 && pr.r <= innerWidth + 1 && pr.y >= 0 && pr.b <= innerHeight + 1, nameRows }
+  return { ...out, rects: Object.fromEntries(Object.entries(out).map(([k, o]) => [k, [o.text_r.x, o.text_r.y, o.text_r.r, o.text_r.b].map(Math.round)])), spread, spreadAll, nNames: names.length, inside, blockOverlap, panelCross: cross, textCross: crossText, panel: pr, inWindow: pr.x >= 0 && pr.r <= innerWidth + 1 && pr.y >= 0 && pr.b <= innerHeight + 1, nameRows }
 })()`
 
 async function main() {
@@ -67,7 +73,7 @@ async function main() {
     if (SHOTS) await p.screenshot({ path: `${OUT}/${tag}.png` })
     const okRow = !r.err && r.spread <= 1 && r.spreadAll <= 1 && r.blockOverlap === 0 && r.inside && r.textCross.length === 0 && r.inWindow && !r.panelCross.length
     if (!okRow) bad++
-    rows.push({ vp: `${w}x${h}`, id, ok: okRow, spread: r.spread, spreadAll: r.spreadAll, fs: [r.label?.fs, r.team?.fs, r.time?.fs], lines: [r.label?.lines, r.team?.lines, r.time?.lines], inside: r.inside, overlap: r.blockOverlap, panelCross: r.panelCross, textCross: r.textCross, inWindow: r.inWindow, texts: [r.label?.text, r.team?.text, r.time?.text], err: r.err })
+    rows.push({ vp: `${w}x${h}`, id, ok: okRow, spread: r.spread, spreadAll: r.spreadAll, fs: [r.label?.fs, r.team?.fs, r.time?.fs], lines: [r.label?.lines, r.team?.lines, r.time?.lines], inside: r.inside, overlap: r.blockOverlap, panelCross: r.panelCross, textCross: r.textCross, inWindow: r.inWindow, texts: [r.label?.text, r.team?.text, r.time?.text], err: r.err, rects: r.rects })
     await ctx.close()
   }
   for (const r of rows) console.log(JSON.stringify(r)); console.log(`ИТОГ ${TAG}: ${rows.length - bad}/${rows.length} в норме`)

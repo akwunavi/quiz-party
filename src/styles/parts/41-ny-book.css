@@ -1528,13 +1528,14 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    Общая line-height и align-items: baseline; замер — e2e/book/scramble-winner-check.cjs (разброс базовых линий ≤ 1 px). */
 .theme-ny_book .host-screen.an-screen > .an-result { background: none; box-shadow: none; border-radius: 0; padding: calc(18 * var(--u)) calc(36 * var(--u)) calc(6 * var(--u)); width: calc(1240 * var(--u)) !important; gap: calc(6 * var(--u)); }
 .theme-ny_book .host-screen.an-screen > .an-result::before { content: ''; position: absolute; left: 6%; right: 6%; top: 0; height: calc(3 * var(--u)); background: linear-gradient(90deg, transparent, var(--bk-gold) 18%, var(--bk-gold-3) 50%, var(--bk-gold) 82%, transparent); border-radius: calc(2 * var(--u)); }
-.theme-ny_book .host-screen.an-screen.many-teams > .an-result { width: calc(900 * var(--u)) !important; }
+.theme-ny_book .host-screen.an-screen > .an-result { top: calc(var(--bk-oy) + 800 * var(--u)); transform: translate(-50%, 0); }   /* растёт ВНИЗ от разделителя: сверху — список команд справа (до 6 команд кончается выше 770u) */
+.theme-ny_book .host-screen.an-screen.many-teams > .an-result { width: calc(900 * var(--u)) !important; top: calc(var(--bk-oy) + 770 * var(--u)); transform: translate(-50%, -50%); }
 .theme-ny_book .bk-res-line { display: flex; align-items: baseline; justify-content: center; flex-wrap: nowrap; gap: 0 calc(26 * var(--u)); width: 100%; min-width: 0; line-height: 1.1; font-size: calc(52 * var(--u)); }
-.theme-ny_book .bk-res-line.multi { flex-wrap: wrap; row-gap: calc(4 * var(--u)); }
+.theme-ny_book .bk-res-line.multi { flex-wrap: wrap; gap: calc(2 * var(--u)) calc(44 * var(--u)); }
+.theme-ny_book .bk-res-line.multi .bk-res-nbox { font-size: calc(46 * var(--u)); }
 .theme-ny_book .bk-res-label, .theme-ny_book .bk-res-time { flex: 0 0 auto; font-family: var(--nb-serif); font-weight: 700; font-size: calc(28 * var(--u)); line-height: 1.1; white-space: nowrap; }
 .theme-ny_book .bk-res-label { letter-spacing: .26em; color: var(--nb-red); }
 .theme-ny_book .bk-res-time { font-variant-numeric: tabular-nums lining-nums; letter-spacing: .08em; color: transparent; background: linear-gradient(180deg, #b8923a, var(--bk-gold-3) 70%); -webkit-background-clip: text; background-clip: text; }
 .theme-ny_book .bk-res-item { display: inline-flex; align-items: baseline; min-width: 0; max-width: 100%; flex: 0 1 auto; }
-.theme-ny_book .bk-res-sep { margin: 0 calc(16 * var(--u)); font: 700 calc(52 * var(--u)) / 1.1 var(--bk-name); color: var(--bk-gold-3); }
 .theme-ny_book .bk-res-nbox { display: block; min-width: 0; max-width: 100%; font-size: calc(52 * var(--u)); line-height: 1.1; max-height: calc(52 * 1.1 * 2 * var(--u)); text-align: center; }
 .theme-ny_book .bk-res-name { display: block; font-family: var(--bk-name); font-weight: 600; line-height: 1.1; color: var(--bk-ink); overflow-wrap: normal; word-break: normal; hyphens: none; text-wrap: balance; letter-spacing: 0; text-shadow: 0 calc(1 * var(--u)) 0 rgba(255, 244, 214, .6); }
