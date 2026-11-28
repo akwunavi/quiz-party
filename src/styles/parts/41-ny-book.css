@@ -1521,3 +1521,25 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::before, .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::after { content: none; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-label { color: var(--bk-red); font: 700 calc(20 * var(--u)) var(--bk-serif); letter-spacing: .24em; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-main { color: var(--bk-ink-2); font-family: var(--bk-serif); font-weight: 700; text-shadow: none; text-wrap: balance; }
+
+/* ═══ «Скрэмбл» в «Книге» (28.11.2026): перепутанные буквы ПРЯМО В КЛЕТКАХ слов, без кучи плиток (AnagramBoardBook) ═══
+   Песочная клетка с пунктирной золотой кромкой + чернила темы = «перепутано»; подсказка встаёт на место золотой клеткой с красной
+   буквой (.set; после показа ответа .set — все клетки). Размер клетки считает anagramBookCellPlan (--cw в единицах сцены), зона —
+   .an-board-wrap (556u, см. выше). Разрыв слов (44u) в 5 раз больше разрыва букв (8u); кегль и высота у всех клеток одинаковые. */
+.theme-ny_book .bk-an-board { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: calc(24 * var(--u)) calc(44 * var(--u)); font-size: 1px; line-height: 1; text-shadow: none; }
+.theme-ny_book .bk-an-word { display: inline-flex; flex-wrap: nowrap; gap: calc(8 * var(--u)); }
+.theme-ny_book .bk-an-c { box-sizing: border-box; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: calc(var(--cw, 80) * var(--u)); height: calc(var(--cw, 80) * 1.24 * var(--u)); border-radius: calc(var(--cw, 80) * .1 * var(--u));
+  font: 700 calc(var(--cw, 80) * .74 * var(--u)) / 1 var(--bk-display); text-transform: uppercase; }
+.theme-ny_book .bk-an-c.mix { background: linear-gradient(180deg, #f6ecd0, #e6d3a4); color: var(--bk-ink);
+  border: calc(max(2, var(--cw, 80) * .035) * var(--u)) dashed var(--bk-gold-3);
+  box-shadow: inset 0 calc(4 * var(--u)) calc(8 * var(--u)) rgba(90, 55, 20, .16), 0 calc(4 * var(--u)) 0 var(--bk-shade); }
+.theme-ny_book .bk-an-c.set { background: linear-gradient(180deg, #fff6da, #f2d58c); color: var(--bk-red);
+  border: calc(max(2, var(--cw, 80) * .035) * var(--u)) solid var(--bk-gold-3);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) #fff3c8, 0 calc(4 * var(--u)) 0 var(--bk-shade), 0 0 calc(14 * var(--u)) rgba(242, 213, 140, .85); }
+.theme-ny_book .bk-an-c.fixed { width: calc(var(--cw, 80) * .5 * var(--u)); background: none; border: 0; box-shadow: none; color: var(--bk-muted); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes bk-an-set { 0% { transform: scale(.82); } 55% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  .theme-ny_book .bk-an-c.set { animation: bk-an-set .5s cubic-bezier(.2, .9, .3, 1.2) both; }
+  .theme-ny_book .bk-an-board.revealed .bk-an-c.set { animation-delay: calc(var(--k, 0) * 45ms); }
+}

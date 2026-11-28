@@ -559,3 +559,94 @@ export function anagramBookPlan(letterCount: number, words: AnagramWordSpec[], z
   }
   return best
 }
+
+// ── «Книга»: перепутанные буквы ПРЯМО В КЛЕТКАХ слов (без кучи плиток) ──
+//
+// Только то, что рисует экран. Игровая логика НЕ задета: `order` вопроса, проверка
+// (`isAnagramCorrect`), подсказки (`anagramHintOrder`/`anagramHintsOpen` — какие
+// буквы и когда), победитель гонки и подсчёт очков остаются теми же. Эта
+// раскладка нигде не пишется и не сравнивается с ответом; детерминирована
+// (сид — id вопроса), значит любой экран нарисует то же самое.
+
+/** Клетка слова в «Книге»: знак на своём месте, буква — перепутанная или (подсказка/показ ответа) правильная. */
+export type AnagramScrambledCell =
+  | { kind: 'fixed'; ch: string }
+  | { kind: 'letter'; idx: number; ch: string; set: boolean }
+
+/** Слова фразы с перепутанными ВНУТРИ слова буквами. `hinted` — индексы букв, открытых подсказками (в порядке открытия): на своём месте стоит правильная буква (`set`), остальные клетки слова держат перепутанные оставшиеся буквы. `reveal` — все буквы на местах.
+ *  Гарантии: набор букв слова не меняется; без подсказок слово из 2+ разных букв не бывает в правильном порядке; новая подсказка меняет местами только две клетки слова (экран не «перемешивается заново»). */
+export function anagramWordScramble(template: AnagramTemplate, hinted: readonly number[], seed: number,
+  reveal = false): AnagramScrambledCell[][] {
+  const hintSet = new Set(hinted)
+  return template.words.map((cells, wi) => {
+    const lets = cells.filter((c): c is { kind: 'letter'; idx: number } => c.kind === 'letter')
+    const want = lets.map(c => template.letters[c.idx])
+    const m = want.length
+    // базовое перемешивание слова: из 60 попыток — не равное слову, с наименьшим числом букв «на своём месте»
+    const rand = rng((seed + Math.imul(wi + 1, 0x9e3779b1)) >>> 0)
+    let disp = want.slice()
+    if (new Set(want).size > 1) {
+      let bestFixed = Infinity
+      for (let t = 0; t < 60; t++) {
+        const cand = shuffleInPlace(want.slice(), rand)
+        const fixed = cand.reduce((a, ch, k) => a + (ch === want[k] ? 1 : 0), 0)
+        if (fixed === m) continue
+        if (fixed < bestFixed) { bestFixed = fixed; disp = cand }
+        if (fixed === 0) break
+      }
+    }
+    // подсказки по порядку открытия: буква встаёт на место обменом с клеткой, где она лежала
+    const done = new Set<number>()
+    for (const h of hinted) {
+      const k = lets.findIndex(c => c.idx === h)
+      if (k < 0) continue
+      done.add(k)
+      if (disp[k] === want[k]) continue
+      let j = -1
+      for (let x = 0; x < m; x++) {
+        if (x === k || done.has(x) || disp[x] !== want[k]) continue
+        if (j < 0) j = x
+        if (disp[k] !== want[x]) { j = x; break }   // лучше обмен, после которого клетка x НЕ окажется на месте
+      }
+      if (j >= 0) { const t = disp[k]; disp[k] = disp[j]; disp[j] = t }
+    }
+    // остаток случайно сложился в правильное слово — разводим первую пару разных букв
+    const rest = want.map((_, k) => k).filter(k => !done.has(k))
+    if (rest.length > 1 && rest.every(k => disp[k] === want[k])) {
+      outer: for (const a of rest) for (const b of rest) {
+        if (a < b && want[a] !== want[b]) { const t = disp[a]; disp[a] = disp[b]; disp[b] = t; break outer }
+      }
+    }
+    let li = 0
+    return cells.map((c): AnagramScrambledCell => {
+      if (c.kind === 'fixed') return { kind: 'fixed', ch: c.ch }
+      const k = li++
+      const set = reveal || hintSet.has(c.idx)
+      return { kind: 'letter', idx: c.idx, ch: set ? want[k] : disp[k], set }
+    })
+  })
+}
+
+const BK_C_GAP = 8, BK_C_WORD_GAP = 44, BK_C_ROW_GAP = 24
+
+/** Ряды слов при ширине клетки cw: слова переносятся целиком; null — слово шире зоны. */
+function bookCellRows(words: AnagramWordSpec[], cw: number, zoneW: number): number | null {
+  let rows = 1, cur = 0
+  for (const w of words) {
+    const ww = w.units * cw + Math.max(0, w.cells - 1) * BK_C_GAP
+    if (ww > zoneW + 0.01) return null
+    if (cur > 0 && cur + BK_C_WORD_GAP + ww > zoneW) { rows++; cur = ww } else cur = cur > 0 ? cur + BK_C_WORD_GAP + ww : ww
+  }
+  return rows
+}
+
+/** Размер клетки (ширина cw, в единицах сцены) для доски «Книги» без кучи плиток: наибольший, при котором слова вместе влезают в зону. Пол — 22 (как у `anagramBookPlan`), потолок — 118: слово из 3–4 букв не раздувается во весь лист. */
+export function anagramBookCellPlan(words: AnagramWordSpec[], zoneW = 676, zoneH = 540): { cw: number; rows: number; fits: boolean } {
+  const CW_MAX = 118, CW_MIN = 22
+  for (let cw = CW_MAX; cw >= CW_MIN; cw--) {
+    const rows = bookCellRows(words, cw, zoneW)
+    if (rows === null) continue
+    if (rows * BOOK_ASPECT * cw + (rows - 1) * BK_C_ROW_GAP <= zoneH) return { cw, rows, fits: true }
+  }
+  return { cw: CW_MIN, rows: bookCellRows(words, CW_MIN, zoneW) ?? 1, fits: false }
+}
