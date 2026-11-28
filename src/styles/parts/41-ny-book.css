@@ -1521,3 +1521,13 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::before, .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::after { content: none; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-label { color: var(--bk-red); font: 700 calc(20 * var(--u)) var(--bk-serif); letter-spacing: .24em; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-main { color: var(--bk-ink-2); font-family: var(--bk-serif); font-weight: 700; text-shadow: none; text-wrap: balance; }
+
+/* ═══ 10.76: плашка «Р1 · ВОПРОС N / M» не накрывает гирлянду (timer-size-20261128) ═══
+   Гирлянда (garland-long: x 440–1480, y −46…161 сцены) на своём левом конце спускается до y≈90 (x 530), до y≈107–131 (x 550–720) —
+   плашка (y 101–161) раньше начиналась с x=250 и правым рулоном заходила на хвою. Теперь шапка с плашкой начинается с x = --bk-qn-left (135u:
+   правый край самой частой плашки 358u → 493u < 530u, хвоя там выше плашки; левее — уголок переплёта x 30–120). Только плашки .qnum в шапке экранов вопроса/разбора:
+   блиц/«120 секунд»/скачки/инфо (.mono-tag, свои шапки) не трогаем. Таймер крепится к правому краю (right) — не двигается.
+   Вес (0,5,0) выше базового .theme-ny_book .host-topbar (0,2,0). */
+.theme-ny_book .host-screen:not(.race-screen):not(.bz-screen):not(.info-screen) > .host-topbar:has(> .qnum) { left: calc(var(--bk-ox) + var(--bk-qn-left, 135) * var(--u)); }
+/* длинный ярлык «3 попытки» («Р14 · ВОПРОС 1 / 5 · ФАЗА 3», 480u): кегль чуть меньше, чтобы правый край не доходил до хвои */
+.theme-ny_book .rv-screen > .host-topbar .qnum { font-size: max(calc(18.5 * var(--u)), 13px); letter-spacing: .05em; }
