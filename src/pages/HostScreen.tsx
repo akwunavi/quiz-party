@@ -44,6 +44,7 @@ import { NyLobby } from '../ny/NyLobby'
 import { REVEAL_LIVE_INIT, revealLiveStep } from '../ny/book/motion'
 import { BOOK_FINALE_TITLE, bookFinaleVariant } from '../ny/book/copy'
 import { BookTeamCard } from '../ny/book/BookTeamCard'
+import { BookGroupsModal } from '../ny/book/BookGroupsModal'
 import { answeringLayout } from '../ny/book/answeringLayout'
 import { BookRoundTitle } from '../ny/book/BookRoundTitle'
 import { BookNote } from '../ny/book/BookNote'
@@ -914,6 +915,7 @@ function GroupsModal({ groups, onClose, book }: { groups: string[][]; onClose: (
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+  if (book) return <BookGroupsModal groups={groups} onClose={onClose} />
   const players = groups.reduce((n, g) => n + g.length, 0)
   return (
     <div className="groups-overlay" onClick={onClose}>
@@ -926,8 +928,7 @@ function GroupsModal({ groups, onClose, book }: { groups: string[][]; onClose: (
         <div className="lg-list">
           {groups.map((g, i) => (
             <div key={i} className="lg-team">
-              {book ? <div className="lg-name bk-lg"><BookTeamCard name={`Команда ${i + 1}`} ch={54} color={teamColor(i)} /></div>
-              : <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>}
+              <div className="lg-name" style={{ color: teamColor(i) }}>Команда {i + 1}</div>
               <div className="lg-players">{g.join(' · ')}</div>
             </div>
           ))}

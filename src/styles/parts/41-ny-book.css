@@ -1521,3 +1521,31 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::before, .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal::after { content: none; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-label { color: var(--bk-red); font: 700 calc(20 * var(--u)) var(--bk-serif); letter-spacing: .24em; }
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-main { color: var(--bk-ink-2); font-family: var(--bk-serif); font-weight: 700; text-shadow: none; text-wrap: balance; }
+
+/* ═══ МОДАЛКА «СОСТАВЫ КОМАНД» (рандомайзер) на большом свитке (10.76; BookGroupsModal → ScrollModal kind 'grp') ═══
+   Тот же ассет scroll.webp, что у «Своей игры»/«Угадай мелодию», но растянут по горизонтали в 1.4 раза (сетка 4×2 и 6×4 карточек на квадратном свитке не помещается;
+   бант и рулоны при таком растяжении остаются узнаваемыми). Высота — до 1010u (≈ 94 % сцены), ширина ≈ 1414u (≈ 74 % сцены). Полезная область — внутри золотой рамки:
+   слева 15 %, справа 17,5 %, сверху 22,5 %, снизу 24,5 % — бант справа сверху и ветка слева снизу не перекрываются. Анимация разворачивания и reduced-motion — общие (.mel-modal). */
+.theme-ny_book.mel-overlay .mel-modal.grp-modal {
+  --sc-h: min(calc(1010 * var(--u)), 96vh); --sc-w: min(calc(var(--sc-h) * 1.4), 94vw);
+  width: var(--sc-w); height: var(--sc-h); max-width: 94vw; align-items: stretch; gap: calc(var(--sc-h) * .012);
+  padding: calc(var(--sc-h) * .2) calc(var(--sc-w) * .175) calc(var(--sc-h) * .245) calc(var(--sc-w) * .15) !important; }
+.theme-ny_book .bk-gm-head { position: relative; flex: none; display: flex; justify-content: center; padding-bottom: calc(var(--sc-h) * .008); border-bottom: calc(3 * var(--u)) double var(--bk-gold-3); }
+.theme-ny_book .bk-gm-titles { display: flex; flex-direction: column; align-items: center; gap: calc(2 * var(--u)); }
+.theme-ny_book .bk-gm-title { margin: 0; font: 700 calc(var(--sc-h) * .04) / 1.05 var(--bk-display); letter-spacing: .2em; padding-left: .2em; color: var(--bk-red);
+  text-shadow: 0 calc(1.5 * var(--u)) 0 var(--bk-gold-2), 0 calc(-1 * var(--u)) 0 rgba(58, 30, 8, .35); }
+.theme-ny_book .bk-gm-sum { font: 600 italic calc(var(--sc-h) * .0215) / 1.1 var(--bk-serif); letter-spacing: .06em; color: var(--bk-muted); }
+.theme-ny_book .bk-gm-close { position: absolute; right: 0; top: 72%; transform: translateY(-50%); width: calc(var(--sc-h) * .05); height: calc(var(--sc-h) * .05); padding: 0; display: grid; place-items: center;
+  font: 700 calc(var(--sc-h) * .024) / 1 var(--bk-serif); color: var(--bk-red-3); cursor: pointer; border-radius: 50%; border: calc(2 * var(--u)) solid var(--bk-gold-3);
+  background: radial-gradient(circle at 40% 30%, #fbf0d2, #ecd7a0 80%); box-shadow: 0 calc(2 * var(--u)) 0 var(--bk-shade), inset 0 0 0 calc(2 * var(--u)) rgba(255, 244, 214, .7); transition: color .15s, background .15s, transform .15s; }
+.theme-ny_book .bk-gm-close:hover { color: #fbf0d2; background: radial-gradient(circle at 40% 30%, var(--bk-red-2), var(--bk-red-3)); transform: translateY(-50%) scale(1.06); }
+.theme-ny_book .bk-gm-scroll { flex: 1 1 0; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; scrollbar-width: none; padding: calc(var(--sc-h) * .006) calc(2 * var(--u)); }
+.theme-ny_book .bk-gm-scroll::-webkit-scrollbar { display: none; }
+.theme-ny_book .bk-gm-scroll[data-over="1"] { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 38 * var(--u)), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 38 * var(--u)), transparent); }
+.theme-ny_book .bk-gm-grid { display: grid; grid-template-columns: repeat(var(--gm-cols), minmax(0, var(--gm-cw, 1fr))); justify-content: center; gap: calc(14 * var(--u)) calc(16 * var(--u)); margin-block: auto; align-items: stretch; }
+.theme-ny_book .bk-gm-team { min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: calc(6 * var(--u)); padding: calc(8 * var(--u)) calc(7 * var(--u)) calc(10 * var(--u));
+  background: linear-gradient(180deg, rgba(255, 248, 226, .62), rgba(244, 226, 183, .5)); border-radius: calc(5 * var(--u)); box-shadow: inset 0 0 0 calc(1.5 * var(--u)) rgba(168, 128, 52, .75); }
+.theme-ny_book .bk-gm-players { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: calc(1 * var(--u)) .9em; text-align: center; font: 500 calc(var(--gm-fs) * var(--gm-k, 1) * var(--u)) / 1.2 var(--bk-serif); color: var(--bk-ink); overflow-wrap: normal; word-break: normal; hyphens: none; }
+.theme-ny_book .bk-gm-p { min-width: 0; max-width: 100%; text-wrap: balance; overflow-wrap: anywhere; }   /* имя — одним куском; не влезает в ячейку — переносится по словам внутри себя */
+.theme-ny_book .bk-gm-players.is-empty { display: block; }
+.theme-ny_book .bk-gm-players.is-empty { font-style: italic; color: var(--bk-muted); opacity: .8; }

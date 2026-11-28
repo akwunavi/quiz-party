@@ -5,9 +5,9 @@
 import type { CSSProperties, ReactNode, Ref } from 'react'
 import { createPortal } from 'react-dom'
 
-export type ScrollKind = 'mel' | 'jp'
+export type ScrollKind = 'mel' | 'jp' | 'grp'
 
-export function ScrollModal({ theme, kind, load = 'm', modalRef, className = '', style, children }: {
+export function ScrollModal({ theme, kind, load = 'm', modalRef, className = '', style, onClose, children }: {
   theme: string | undefined
   kind: ScrollKind
   load?: 'm' | 'l'
@@ -15,14 +15,16 @@ export function ScrollModal({ theme, kind, load = 'm', modalRef, className = '',
   /** классы прежнего каркаса (hud-frame, qt-grow…) — в «Книге» не нужны */
   className?: string
   style?: CSSProperties
+  /** клик по затемнению (только «Книга») закрывает модалку; клик внутри свитка не всплывает */
+  onClose?: () => void
   children: ReactNode
 }) {
   const book = theme === 'ny_book'
   const th = `theme-${theme ?? 'classic'}`
   return createPortal(
     book
-      ? <div className={`${kind}-overlay mel-overlay bk-scroll-overlay ${th}`}>
-          <div ref={modalRef} className={`${kind}-modal mel-modal bk-scroll`} data-load={load} data-kind={kind}>{children}</div>
+      ? <div className={`${kind}-overlay mel-overlay bk-scroll-overlay ${th}`} onClick={onClose}>
+          <div ref={modalRef} className={`${kind}-modal mel-modal bk-scroll`} data-load={load} data-kind={kind} onClick={onClose ? e => e.stopPropagation() : undefined}>{children}</div>
         </div>
       : <div className={`${kind}-overlay ${th}`}>
           <div ref={modalRef} className={`${kind}-modal ${className}`.trim()} style={style}>{children}</div>
