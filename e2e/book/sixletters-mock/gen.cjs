@@ -2,7 +2,7 @@
 // Подложка — настоящий кадр проектора «Книги» (assets/bd-*.jpg, scripts/backdrops.cjs); шрифты и свиток hscroll-bow — настоящие файлы public/.
 // usage: node gen.cjs
 const fs = require('fs'), path = require('path')
-const OUT = path.join(__dirname, '..', 'html')
+const OUT = path.join(path.join(__dirname, '..', '..', '..', 'docs-dev', 'book-redesign', 'mockups-20261128', 'sixletters'), 'html')
 fs.mkdirSync(OUT, { recursive: true })
 const PUB = '../../../../../public'   // html/ → корень репозитория
 

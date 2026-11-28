@@ -5,7 +5,7 @@ import os, math, random
 from PIL import Image, ImageDraw, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-A = os.path.join(HERE, '..', 'assets')
+A = os.path.join(HERE, '..', '..', '..', 'docs-dev', 'book-redesign', 'mockups-20261128', 'sixletters', 'assets')
 
 # подложки: PNG стенда → JPEG q88, PNG удаляется (в git — только лёгкие файлы)
 for f in sorted(os.listdir(A)):

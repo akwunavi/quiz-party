@@ -7,7 +7,7 @@ const path = require('path')
 const O = `http://127.0.0.1:${process.env.QP_BOOK_PORT || 7461}`, H = { 'Content-Type': 'application/json', 'X-QP-PIN': '000000' }
 const call = async (p, m = 'GET', b) => { const r = await fetch(O + p, { method: m, headers: H, body: b ? JSON.stringify(b) : undefined }); const t = await r.text(); return t ? JSON.parse(t) : null }
 const GAME = 'stand-game', PACK = 'stand-book'
-const OUT = path.join(__dirname, '..', 'assets')
+const OUT = path.join(path.join(__dirname, '..', '..', '..', 'docs-dev', 'book-redesign', 'mockups-20261128', 'sixletters'), 'assets')
 const TEAMS = ['Ёлочки', 'Мандарины и шампанское', 'Снежный барс', 'Оливье навсегда']
 async function setup(answers, session) {
   await call(`/stand/reset?game=${GAME}`, 'POST')

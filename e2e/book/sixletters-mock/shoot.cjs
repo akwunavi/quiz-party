@@ -2,7 +2,8 @@
 // usage: NODE_PATH=/opt/node22/lib/node_modules PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node shoot.cjs [имя1,имя2]
 const { chromium } = require('playwright')
 const fs = require('fs'), path = require('path')
-const HTML = path.join(__dirname, '..', 'html'), PNG = path.join(__dirname, '..', 'png')
+const DEST = path.join(__dirname, '..', '..', '..', 'docs-dev', 'book-redesign', 'mockups-20261128', 'sixletters')
+const HTML = path.join(DEST, 'html'), PNG = path.join(DEST, 'png')
 fs.mkdirSync(PNG, { recursive: true })
 const only = (process.argv[2] || '').split(',').filter(Boolean)
 
@@ -78,6 +79,6 @@ function measure() {
     console.log(n.padEnd(10), 'вне области:', m.bounds.length, ' пересечений:', m.overlaps.length, ' текст вне плитки:', m.textOutside.length, ' сгиб:', m.fold.length, ' baseline max:', Math.max(0, ...m.baselines.map(x => +x.spread || 0), ...m.tileBaselines.map(x => x.spread)), ' шрифты:', m.fontsOk.join(','))
     await p.close()
   }
-  fs.writeFileSync(path.join(__dirname, '..', 'measure.json'), JSON.stringify(res, null, 1))
+  fs.writeFileSync(path.join(DEST, 'measure.json'), JSON.stringify(res, null, 1))
   await b.close()
 })()

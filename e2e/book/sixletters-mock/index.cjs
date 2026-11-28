@@ -1,6 +1,6 @@
 // Галерея макетов: ../index.html (картинки png/*.jpg, исходники html/*.html, сводка замеров из ../measure.json)
 const fs = require('fs'), path = require('path')
-const ROOT = path.join(__dirname, '..')
+const ROOT = path.join(__dirname, '..', '..', '..', 'docs-dev', 'book-redesign', 'mockups-20261128', 'sixletters')
 const M = JSON.parse(fs.readFileSync(path.join(ROOT, 'measure.json'), 'utf8'))
 const sum = n => { const v = M[n]; if (!v) return ''; const bl = [...v.baselines.map(x => +x.spread || 0), ...v.tileBaselines.map(x => x.spread)]
   return `замер: вне области ${v.bounds.length}, пересечений ${v.overlaps.length}, текст вне плитки ${v.textOutside.length}, заход на сгиб ${v.fold.length}, рядов на одной базовой линии ${v.baselines.filter(x => typeof x.spread === 'number').length + v.tileBaselines.length}, макс. расхождение ${Math.max(0, ...bl)} px` }
