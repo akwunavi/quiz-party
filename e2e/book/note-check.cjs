@@ -18,7 +18,7 @@ const IDS = (opt('--only', '72-ans-r8q1,72-ans-r8q2,72-ans-r8q13,72-ans-r8q14,73
       const sc = SCENES.find(s => s.id === id); if (!sc) { console.log('нет сцены', id); continue }
       // «checked» разбора включается через несколько секунд реального времени (StagedChoices) — ждём появления блока пояснения
       await sc.setup(api); await p.goto('about:blank'); await p.goto(`${ORIGIN}/quiz-party/#/?room=stand`)
-      try { await p.waitForSelector('.bk-note-box', { timeout: 45000 }); await p.waitForTimeout((sc.settle ?? 2000) + 1500) } catch (e) { console.log('FAIL', w, h, id, 'нет .bk-note-box'); await p.screenshot({ path: path.join(OUT, 'fail-' + id + '.png') }); bad++; continue }
+      try { await p.waitForSelector('.bk-note-box', { timeout: 45000 }); await p.waitForTimeout((sc.settle ?? 2000) + 1500) } catch (e) { console.log('FAIL', w, h, id, 'нет .bk-note-box', JSON.stringify(await api.call('/api/session').catch(e => String(e))).slice(0, 300)); await p.screenshot({ path: path.join(OUT, 'fail-' + id + '.png') }); bad++; continue }
       const m = await p.evaluate(() => {
         const u = Math.min(innerWidth / 1920, innerHeight / 1080), ox = (innerWidth - 1920 * u) / 2, oy = (innerHeight - 1080 * u) / 2
         const R = e => { const r = e.getBoundingClientRect(); return { l: +((r.left - ox) / u).toFixed(1), r: +((r.right - ox) / u).toFixed(1), t: +((r.top - oy) / u).toFixed(1), b: +((r.bottom - oy) / u).toFixed(1) } }
