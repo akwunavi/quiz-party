@@ -39,6 +39,10 @@ import { AnswerPlate } from './AnswerPlate'
 // «Волшебный лес»: свой экран вопроса, грузится отдельным куском и только на проекторе в этой теме
 const ForestQuestionScreen = lazy(() => import('../../forest/question/ForestQuestionScreen'))
 
+/** «Книга», сетка картинок: ширина заголовка над сеткой (u сцены). Было 1240; 1100 (x 410–1510) — чтобы строки заголовка не заходили под увеличенный таймер
+ *  (его левый край 1524u, 10.76). Тот же размер — в CSS `.bk-ad-grid .q-text`. */
+const BK_HEAD_W = 1100
+
 /** Правильный ответ вопроса одной строкой — для экрана разбора и предпросмотра.
  *  Общая функция: ShowAnswers/RecapSlides/BlitzScreen в HostScreen.tsx и
  *  TileModal читают её же, чтобы формулировка не разъезжалась между экранами. */
@@ -198,8 +202,8 @@ function ClassicQuestionScreen({
 
   // «Книга», сетка картинок: полоса заголовка подстраивается под длину вопроса (оценка строк в единицах мокапа), а не фиксирована
   const bkLen = q.question_text.trim().length
-  const bkBandF = estFont(bkLen, 1240, 250, targetSize('above', bkLen), TEXT_ROLES.above.min)
-  const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, 1240) * 1.16 * bkBandF + 28)))
+  const bkBandF = estFont(bkLen, BK_HEAD_W, 250, targetSize('above', bkLen), TEXT_ROLES.above.min)
+  const bkBand = Math.round(Math.max(100, Math.min(250, estLines(bkLen, bkBandF, BK_HEAD_W) * 1.16 * bkBandF + 28)))
 
   return (
     <div ref={rootRef} style={bkGrid ? ({ '--bk-band': bkBand } as React.CSSProperties) : undefined} className={`host-screen grid-bg${quiet ? ' qs-quiet' : ''}${bkCls}${hasText ? '' : ' no-qtext'}${

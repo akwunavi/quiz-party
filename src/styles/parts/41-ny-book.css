@@ -627,6 +627,7 @@
 .theme-ny_book .host-screen.bk-ad-plain:not(.has-media):not(.has-choices) > div:has(> .q-text)::before { display: none; }
 .theme-ny_book .host-screen.bk-ad .q-text { margin: 0 auto; max-width: calc(1240 * var(--u)); text-align: center; line-height: 1.16; text-wrap: balance; text-shadow: none; }
 .theme-ny_book .host-screen.bk-ad-split .q-text { max-width: 100%; }
+.theme-ny_book .host-screen.bk-ad-grid .q-text { max-width: calc(1100 * var(--u)); }   /* = BK_HEAD_W в QuestionScreen.tsx: не заходит под таймер 260u (10.76) */
 
 /* AdaptiveMedia: контейнер = свободное место; ячейки и рамки задаёт planMedia в px; подложка — рамка на самой картинке */
 .theme-ny_book .bk-media { position: relative; flex: 1 1 0; min-height: 0; min-width: 0; width: 100%; }
@@ -1538,3 +1539,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
    мелодия/«Своя игра» (.bk-mel-timer), блиц (нет таймера-венка), ручную раскладку (.lay-timer — размер задаёт ведущий). */
 .theme-ny_book .host-screen:not(.race-screen):not(.bz-screen):not(.info-screen) > .host-topbar:has(> .qnum) { right: calc(var(--bk-ox) + var(--bk-tm-right, 136) * var(--u)); top: calc(var(--bk-oy) + var(--bk-tm-top, 44) * var(--u)); align-items: flex-start; }
 .theme-ny_book .host-screen > .host-topbar > .bk-timer-slot { --bk-timer-d: calc(var(--bk-tm-d, 260) * var(--u)); }
+/* контент под увеличенным таймером: низ банта таймера = 44 + 255 ≈ 300u. Экранам, где картинка стоит В ПРАВОМ ВЕРХНЕМ углу (одна картинка рядом с текстом, ребус,
+   «3 попытки»), верх контента — 300u (раньше 172–208). Экраны, где вверху по центру заголовок/текст (сетка картинок, варианты, обычный текст), и так не задеваются. */
+.theme-ny_book .host-screen:has(> .host-topbar > .bk-timer-slot):is(.bk-ad-split, .rv-screen, .bk-ad-grid.no-qtext, .has-media:not(.bk-ad)) { padding-top: calc(var(--bk-oy) + var(--bk-tm-bottom, 300) * var(--u)); }
+/* плашка остаётся на своей высоте (верх 101u, как до правки): выше она заходит на хвою гирлянды (низ хвои y≈85 при x 495, до 131 при x 700) */
+.theme-ny_book .host-screen:not(.race-screen):not(.bz-screen):not(.info-screen) > .host-topbar > .qnum { margin-top: calc((101 - var(--bk-tm-top, 44)) * var(--u)); }
