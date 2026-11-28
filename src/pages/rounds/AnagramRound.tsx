@@ -14,6 +14,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AudioGate } from '../../components/AudioGate'
 import { BookTeamCard } from '../../ny/book/BookTeamCard'
+import { bookUnit } from '../../ny/book/adaptive/safeArea'
 import { FitImg } from '../../components/FitImg'
 import { useFitText } from '../../hooks/useFitText'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -374,14 +375,15 @@ function AnagramBoardClassic({
 
       {showResult && (
         <div className="an-result">
-          {race
+          {book
+            ? <BookResultLine race={race} winnerTeam={winnerTeam} rightTeams={rightTeams}
+                time={Number.isFinite(winnerMs) && winnerMs >= 0 ? `${start.approx ? '≈ ' : ''}ЗА ${formatRaceTime(winnerMs)}` : null} />
+            : race
             ? winnerTeam
               ? <div className="an-res-line">
                   <span className="an-res-label">БАЛЛ ПОЛУЧАЕТ</span>
-                  {book
-                    ? <BookTeamCard className="an-res-card" name={winnerTeam.name} icon={winnerTeam.icon} color={winnerTeam.color} ch={52} />
-                    : <span className="an-res-team" style={{ color: winnerTeam.color }}>
-                      {winnerTeam.icon && <TeamMark icon={winnerTeam.icon} color={winnerTeam.color} />}{winnerTeam.name}</span>}
+                  <span className="an-res-team" style={{ color: winnerTeam.color }}>
+                    {winnerTeam.icon && <TeamMark icon={winnerTeam.icon} color={winnerTeam.color} />}{winnerTeam.name}</span>
                   {Number.isFinite(winnerMs) && winnerMs >= 0 &&
                     <span className="an-res-time">{start.approx ? '≈ ' : ''}ЗА {formatRaceTime(winnerMs)}</span>}
                 </div>
@@ -389,9 +391,7 @@ function AnagramBoardClassic({
             : rightTeams.length
               ? <div className="an-res-line wrap">
                   <span className="an-res-label">УГАДАЛИ</span>
-                  {rightTeams.map(t => book
-                    ? <BookTeamCard key={t.id} className="an-res-card" name={t.name} icon={t.icon} color={t.color} ch={44} />
-                    : (
+                  {rightTeams.map(t => (
                       <span key={t.id} className="an-res-chip" style={{ color: t.color, borderColor: t.color }}>
                         {t.icon && <TeamMark icon={t.icon} color={t.color} />}{t.name}</span>
                     ))}
@@ -406,6 +406,37 @@ function AnagramBoardClassic({
     {showTeams && <AnagramTeamsPanel teams={teams} rows={rows} start={start} phrase={phrase}
       reveal={reveal} verdicts={allLanded} book={book} />}
     </>
+  )
+}
+
+/** Имя команды в нижней панели итога «Книги»: чернилами, без плитки/рамки; кегль подгоняет useFitText (длинное имя — переносится по словам, максимум в две строки,
+ *  потом уменьшается). Коробка `.bk-res-nbox` держит размер и предел высоты, сам текст — `.bk-res-name`. */
+function BookResultName({ name }: { name: string }) {
+  const fit = useFitText<HTMLSpanElement>([name], { range: () => {
+    const u = bookUnit({ w: window.innerWidth, h: window.innerHeight })
+    return { min: 20 * u, max: 52 * u }
+  } })
+  return <span className="bk-res-nbox"><span ref={fit} className="bk-res-name">{name}</span></span>
+}
+
+/** Нижняя панель итога «Скрэмбла» в «Книге» (10.76): ОДНА строка на ОДНОЙ базовой линии — подпись · имя команды · время (или «УГАДАЛИ» · имена через «·»).
+ *  Никаких плиток в панели (плитка в плашке — дубль); выравнивание проверяет e2e/book/scramble-winner-check.cjs. */
+function BookResultLine({ race, winnerTeam, rightTeams, time }: {
+  race: boolean; winnerTeam: Team | undefined; rightTeams: Team[]; time: string | null
+}) {
+  const names = race ? (winnerTeam ? [winnerTeam] : []) : rightTeams
+  if (!names.length) return <div className="bk-res-line"><span className="bk-res-label">НИКТО НЕ УГАДАЛ</span></div>
+  return (
+    <div className={`bk-res-line${race ? '' : ' multi'}`}>
+      <span className="bk-res-label">{race ? 'БАЛЛ ПОЛУЧАЕТ' : 'УГАДАЛИ'}</span>
+      {names.map((t, i) => (
+        <span key={t.id} className="bk-res-item">
+          {i > 0 && <span className="bk-res-sep" aria-hidden="true">·</span>}
+          <BookResultName name={t.name} />
+        </span>
+      ))}
+      {race && time && <span className="bk-res-time">{time}</span>}
+    </div>
   )
 }
 
