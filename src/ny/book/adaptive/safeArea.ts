@@ -5,12 +5,18 @@ import { BOOK, SAFE, SCENE, type Rect } from '../geometry'
 
 /** Ширина зоны сгиба, px сцены: контент (картинки, колонки) не заходит в ±FOLD_GAP/2 от центра разворота. */
 export const FOLD_GAP = 120
-/** Служебная полоса сверху (до y, px сцены): плашка «раунд, вопрос N/M» и таймер. Контент начинается ниже. */
+/** Служебная полоса сверху (до y, px сцены): плашка «раунд, вопрос N/M». Контент начинается ниже. Таймер (260u) ниже этой полосы по высоте, но стоит в УГЛУ
+ *  (x ≥ 1524): экраны с картинкой в правом верхнем углу опускают контент до TIMER_BOTTOM сами (CSS 41-ny-book.css, 10.76). TOP_BAND не менялся: от него считаются
+ *  сохранённые ручные раскладки (layoutRects.WORK) — сдвиг рабочей области сдвинул бы их все. */
 export const TOP_BAND = 208
-/** Диаметр таймера в шапке, px сцены (см. BookTimerSlot). */
-export const TIMER_D = 150
-/** Верх слота таймера в сцене: 60 (страница книги начинается с y=50 — таймер не должен выходить на обрез), низ = TOP_BAND. */
-export const TOP_Y = 56
+/** Диаметр таймера в шапке, px сцены (10.76: 260 — размер со скрина ведущего, венок ≈ 253u; было 150). В CSS — `--bk-tm-d`. */
+export const TIMER_D = 260
+/** Верх слота таймера в сцене (10.76: 44; страница книги с y=50, венок выступает над ней, как на скрине ведущего). В CSS — `--bk-tm-top`. */
+export const TOP_Y = 44
+/** Правый край слота таймера, px сцены от правого края сцены (10.76: 136 → x = 1784). В CSS — `--bk-tm-right`. */
+export const TIMER_RIGHT = 136
+/** Низ банта таймера (≈ 44 + 255): ниже этой линии контент правого верхнего угла уже не задевает таймер. В CSS — `--bk-tm-bottom`. */
+export const TIMER_BOTTOM = 300
 
 export interface Viewport { w: number; h: number }
 
@@ -46,7 +52,7 @@ export function pageAreas(v: Viewport): { left: Rect; right: Rect } {
 
 /** Зона таймера (резервируется всегда, не зависит от раскладки вопроса). */
 export const timerZone = (v: Viewport): Rect =>
-  sceneRect(v, { x: SCENE.w - SAFE.x - TIMER_D, y: TOP_Y, w: TIMER_D, h: TIMER_D })
+  sceneRect(v, { x: SCENE.w - TIMER_RIGHT - TIMER_D, y: TOP_Y, w: TIMER_D, h: TIMER_D })
 
 export const rectRight = (r: Rect) => r.x + r.w
 export const rectBottom = (r: Rect) => r.y + r.h

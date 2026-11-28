@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { fitFontSize, roleRange, TEXT_ROLES } from '../book/adaptive/fit'
 import { BALANCE_MAX, containBox, gridShape, planMedia } from '../book/adaptive/mediaPlan'
-import { FOLD_GAP, bookRect, bookUnit, contentArea, crossesFold, inside, overlapArea, pageAreas, timerZone } from '../book/adaptive/safeArea'
+import { FOLD_GAP, TIMER_BOTTOM, TIMER_D, TOP_Y, bookRect, bookUnit, contentArea, crossesFold, inside, overlapArea, pageAreas, timerZone } from '../book/adaptive/safeArea'
 import { diagnoseLayout, type DiagInput } from '../book/adaptive/diagnostics'
 
 describe('AdaptiveText: fitFontSize', () => {
@@ -105,11 +105,14 @@ describe('BookSafeArea', () => {
       expect(left.w).toBeCloseTo(right.w, 6)
     }
   })
-  it('зона таймера — квадрат внутри книги и не пересекает контентную область', () => {
+  it('зона таймера (10.76): квадрат 260u со скрина ведущего внутри книги (венок выступает над страницей не больше 8u); с контентной областью делит только угол — его экраны опускают контент до TIMER_BOTTOM', () => {
     for (const v of VPS) {
-      const t = timerZone(v)
-      expect(t.w).toBeCloseTo(t.h, 6); expect(inside(t, bookRect(v), 0.5)).toBe(true)
-      expect(overlapArea(t, contentArea(v))).toBe(0)
+      const t = timerZone(v), b = bookRect(v), u = bookUnit(v)
+      expect(t.w).toBeCloseTo(t.h, 6); expect(t.w).toBeCloseTo(TIMER_D * u, 6)
+      expect(t.y).toBeGreaterThanOrEqual(b.y - 8 * u); expect(t.x + t.w).toBeLessThanOrEqual(b.x + b.w); expect(t.y + t.h).toBeLessThanOrEqual(b.y + b.h)
+      expect(TOP_Y + TIMER_D * 990 / 1010).toBeLessThanOrEqual(TIMER_BOTTOM)           // низ банта не ниже линии, под которую CSS опускает контент
+      // пересечение с контентной областью — только угол справа сверху: не больше (1670−1524) × (TOP_Y+TIMER_D−208) u
+      expect(overlapArea(t, contentArea(v))).toBeLessThanOrEqual(146 * (TOP_Y + TIMER_D - 208) * u * u + 1)
     }
   })
   it('1899×905: книга целиком и масштаб = 905/1080', () => {
