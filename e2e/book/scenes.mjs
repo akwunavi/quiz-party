@@ -417,6 +417,10 @@ export const SCENES = [
       sc('74-anagram-race-long', 'Скрэмбл (гонка): победитель с очень длинным названием', async api => { const ts = await api.teams(8, ['Ёлка', 'Самая длинная команда вечера номер один', 'К3', 'Дед Мороз и Снегурочка и Ко', 'Му', 'Тридцать первое декабря', 'Сто двадцать пять снеговиков', 'Команда №7'])
         await api.answers([{ team_id: ts[1].id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: 'Снегурочка', is_correct: true }])
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
+      // 10.76: пояснение (≈400 знаков) на плашке результата «Скрэмбла» в «Книге»
+      ...[6, 16].map(n => sc(n === 6 ? '78-anagram-note' : `78-anagram-note-t${n}`, `Скрэмбл: показ ответа с пояснением (400 знаков), ${n} команд`, async api => { const ts = await api.teams(n)
+        await api.answers(ts.slice(0, 3).map((tm, i) => ({ team_id: tm.id, question_ref: 'q-' + qid(14, 1), round_number: 14, answer_text: i === 0 ? 'Дед Мороз' : 'дед мороз', is_correct: true })))
+        await api.session(Q(14, 1, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 })),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
       // 10.71: варианты-свитки (2/3/5/6 вариантов, длинные тексты): вопрос и экран ответа
       ...[1, 2, 3, 4, 5, 6, 7, 8, 9].flatMap(qi => [['q', false], ['a', true]].map(([k, rev]) => sc(`76${qi}${k}-scroll-choices`, `свитки-варианты ${['2', '3', '5', '6', '7', '8', '6 + длинное пояснение', '3 картинки + 5', '3 картинки + 6'][qi - 1]} (${k})`, async api => { const ts = await api.teams(6)

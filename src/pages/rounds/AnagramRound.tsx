@@ -14,6 +14,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AudioGate } from '../../components/AudioGate'
 import { BookTeamCard } from '../../ny/book/BookTeamCard'
+import { BookNoteStatic } from '../../ny/book/BookNote'
 import { FitImg } from '../../components/FitImg'
 import { useFitText } from '../../hooks/useFitText'
 import { useAnswers } from '../../hooks/useAnswers'
@@ -397,7 +398,7 @@ function AnagramBoardClassic({
                     ))}
                 </div>
               : <div className="an-res-line"><span className="an-res-label">НИКТО НЕ УГАДАЛ</span></div>}
-          {q.answer_note && <div className="an-res-note">{q.answer_note}</div>}
+          {q.answer_note && (book ? <BookNoteStatic text={q.answer_note} /> : <div className="an-res-note">{q.answer_note}</div>)}
         </div>
       )}
 
