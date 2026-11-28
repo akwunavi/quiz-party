@@ -136,6 +136,8 @@ export function buildPack({ paper = false, audioExt = 'mp3', theme = 'ny_book', 
     round(id, 2, 'rebus', 'Ребусы из старой открытки', ['Две картинки — одно слово', 'Правило 3+3: три попытки, три подсказки'], rid => [
       q(rid, 0, '', { media: { question: [m('rebus-a.jpg'), m('rebus-b.jpg')] }, answer: free('снежинка') }),
       q(rid, 1, '', { media: { question: [m('rebus-b.jpg'), m('rebus-a.jpg')] }, answer: free('хлопушка') }),
+      // 28.11.2026 (диагностика «6 букв»): настоящее правило 3+3 — ОПАЛ + ТУСОВКА → ПАЛТУС; квадрат и 16:9 (как на проде)
+      q(rid, 2, '', { media: { question: [m('p1x1.jpg'), m('p16x9.jpg')] }, answer: free('палтус'), service: { word1: 'опал', word2: 'тусовка' } }),
     ]),
     // R4 — кроссворд с сеткой
     round(id, 3, 'crossword', process.env.QP_CW_BIG ? 'Кино-сериальный кроссворд' : 'Зимний кроссворд', ['Каждый вопрос — одно слово сетки', 'Буквы на пересечениях помогают соседям'], rid =>

@@ -147,6 +147,13 @@ export const SCENES = [
   questionScene('08e-q-3img-choices', '3 картинки + 4 варианта текстом', 9),
   questionScene('08f-q-match', 'сопоставление (match, right_labels)', 0, { round: 1 }),
   questionScene('08g-q-rebus', 'ребус (2 картинки, без текста)', 0, { round: 2 }),
+  questionScene('08g2-q-rebus-ar', 'ребус «6 букв»: квадрат + 16:9 (как на проде)', 2, { round: 2 }),
+  { id: '08h-a-rebus', title: 'ребус: экран ответа (свиток + подписи слогов + картинки)', ready: '.answers-layout.revealed', settle: 1500, runFor: 9000,
+    async setup(api) { await api.reset(); const ts = await api.teams(4); await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(2, 2), round_number: 2, answer_text: ['палтус', '42', 'ПАЛТУС', 'палтус'][i], is_correct: [true, false, true, true][i] })))
+      await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 2, question_index: 2, timer_started_at: null, reveal: true }) } },
+  { id: '08i-a-order', title: 'порядок: экран ответа (плитки)', ready: '.answers-layout.revealed', settle: 1500, runFor: 12000,
+    async setup(api) { await api.reset(); const ts = await api.teams(4); await api.answers(ts.map((t, i) => ({ team_id: t.id, question_ref: qref(1, 1), round_number: 1, answer_text: ['БВГА', 'БГВА', 'БВАГ', 'БВГА'][i], is_correct: [true, false, false, true][i] })))
+      await api.session({ pack_id: PACK_ONLINE, phase: 'show_answers', round_number: 1, question_index: 1, timer_started_at: null, reveal: true }) } },
   questionScene('08p-q-4img-paper', 'бумага: вопрос + 4 картинки, таймер не запущен', 4, { paper: true }),
   // 9. ожидание ответов
   {
