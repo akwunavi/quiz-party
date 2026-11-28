@@ -11,16 +11,16 @@ describe('groupsLayout', () => {
       prev = l
     }
   })
-  it('1–24 команд: колонок ≥ 1, плитка ≥ 44u, список ≥ 15u; ширина под имя плитки (колонка − 0,96·ch) ≥ 80u при области 930u', () => {
+  it('1–24 команд: колонок ≥ 1, плитка ≥ 44u, список ≥ 15u; ширина под имя плитки (колонка − 0,96·ch) ≥ 80u при области 1050u', () => {
     for (let n = 1; n <= 24; n++) {
       const l = groupsLayout(n)
       expect(l.cols).toBeGreaterThanOrEqual(1); expect(l.ch).toBeGreaterThanOrEqual(44); expect(l.fs).toBeGreaterThanOrEqual(15)
-      const col = l.cell || (930 - 16 * (l.cols - 1)) / l.cols
+      const col = l.cell || (1050 - 16 * (l.cols - 1)) / l.cols
       expect(col - 14 - 0.96 * l.ch).toBeGreaterThanOrEqual(80)
     }
   })
-  it('предел ширины ячейки: сетка с пределом не шире области 930u', () => {
-    for (let n = 1; n <= 24; n++) { const l = groupsLayout(n); if (l.cell) expect(l.cell * l.cols + 16 * (l.cols - 1)).toBeLessThanOrEqual(930) }
+  it('предел ширины ячейки: сетка с пределом не шире области 1050u', () => {
+    for (let n = 1; n <= 24; n++) { const l = groupsLayout(n); if (l.cell) expect(l.cell * l.cols + 16 * (l.cols - 1)).toBeLessThanOrEqual(1050) }
   })
   it('не больше 6 колонок; 0 и дробь не ломают функцию', () => {
     expect(groupsLayout(0).cols).toBe(1); expect(groupsLayout(100).cols).toBeLessThanOrEqual(6); expect(groupsLayout(4.9).cols).toBe(2)

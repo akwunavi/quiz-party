@@ -65,6 +65,13 @@ const inter = (a, b) => { const w = Math.min(a.r, b.r) - Math.max(a.l, b.l), h =
         for (let j = i + 1; j < r.teams.length; j++) if (inter(t.box, r.teams[j].box)) errs.push(`карточки ${i + 1} и ${j + 1} пересекаются`)
       })
       if (r.over === '1' && r.scrollH <= r.clientH + 2) errs.push('data-over=1, но прокрутки нет')
+      // ВСЕ карточки целиком в пергаментной области и выше нижнего рулона (рулон начинается ≈ .80 высоты свитка) — без прокрутки; обязательно для состава ≈ 4 игрока (norm) до 24 команд
+      if (prof === 'norm') {
+        if (r.over === '1') errs.push('состав 4 игрока на команду потребовал прокрутки (на проекторе без мыши недопустимо)')
+        const last = Math.max(...r.teams.map(t => t.box.b)), first = Math.min(...r.teams.map(t => t.box.t))
+        if (last > r.scr.b + 0.5 || first < r.scr.t - 0.5) errs.push(`карточки не все внутри области: ${first.toFixed(0)}..${last.toFixed(0)} при области ${r.scr.t.toFixed(0)}..${r.scr.b.toFixed(0)}`)
+        if (last > S.t + S.h * 0.80) errs.push(`нижняя карточка (${last.toFixed(0)}) заходит на нижний рулон (от ${(S.t + S.h * 0.8).toFixed(0)})`)
+      }
       if (r.over !== '1' && r.scrollH > r.clientH + 2) errs.push('содержимое не помещается, а data-over не стоит')
       if (errs.length) { bad++; console.log(`✗ ${tag}: ${errs.slice(0, 6).join('; ')}${errs.length > 6 ? ` (+${errs.length - 6})` : ''}`) }
       else console.log(`✓ ${tag}: свиток ${(S.w / r.vw * 100).toFixed(0)}%×${(S.h / r.vh * 100).toFixed(0)}% окна, прокрутка ${r.over === '1' ? 'да' : 'нет'}, имя ≥${Math.min(...r.teams.map(t => t.nameFs)).toFixed(1)} px, список ${Math.min(...r.teams.map(t => t.plFs)).toFixed(1)} px, «${r.sum}» anim=${r.anim}${info.size ? ' [' + [...info].join('; ') + ']' : ''}`)

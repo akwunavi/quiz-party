@@ -11,14 +11,14 @@ import { teamColor } from '../../lib/teamColors'
 export function BookGroupsModal({ groups, onClose }: { groups: string[][]; onClose: () => void }) {
   const players = groups.reduce((n, g) => n + g.length, 0)
   const lay = groupsLayout(groups.length)
-  // Состав не поместился — сначала ужимаем кегль списка (--gm-k, не мельче 13u: проектор без мыши, прокрутить нечем),
+  // Состав не поместился — сначала ужимаем кегль списка (--gm-k, не мельче 11u: проектор без мыши, прокрутить нечем),
   // и только если и так не влезает — внутри свитка включается прокрутка, а низ мягко гаснет (data-over).
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = scrollRef.current
     const grid = el?.firstElementChild as HTMLElement | null
     if (!el || !grid) return
-    const floor = Math.max(0.6, 13 / lay.fs)
+    const floor = Math.max(0.5, 11 / lay.fs)
     const fit = () => {
       let k = 1
       grid.style.setProperty('--gm-k', '1')
@@ -41,7 +41,7 @@ export function BookGroupsModal({ groups, onClose }: { groups: string[][]; onClo
         <button className="bk-gm-close" onClick={onClose} aria-label="Закрыть">✕</button>
       </div>
       <div className="bk-gm-scroll" ref={scrollRef}>
-        <div className="bk-gm-grid" data-count={groups.length} style={{ '--gm-cols': lay.cols, '--gm-fs': lay.fs, '--gm-cw': lay.cell ? `calc(${lay.cell} * var(--u))` : '1fr' } as CSSProperties}>
+        <div className="bk-gm-grid" data-count={groups.length} style={{ '--gm-cols': lay.cols, '--gm-fs': lay.fs, '--gm-cw': lay.cell ? `calc(${lay.cell} * var(--u))` : '1fr', ...(lay.tight ? { '--gm-gy': 8, '--gm-in': 4, '--gm-pb': 6 } : {}) } as CSSProperties}>
           {groups.map((g, i) => (
             <div key={i} className="bk-gm-team">
               <BookTeamCard name={`Команда ${i + 1}`} ch={lay.ch} color={teamColor(i)} />

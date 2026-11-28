@@ -1523,11 +1523,11 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book.mel-overlay :is(.jp-modal, .mel-modal) .answer-reveal > .answer-main { color: var(--bk-ink-2); font-family: var(--bk-serif); font-weight: 700; text-shadow: none; text-wrap: balance; }
 
 /* ═══ МОДАЛКА «СОСТАВЫ КОМАНД» (рандомайзер) на большом свитке (10.76; BookGroupsModal → ScrollModal kind 'grp') ═══
-   Тот же ассет scroll.webp, что у «Своей игры»/«Угадай мелодию», но растянут по горизонтали в 1.4 раза (сетка 4×2 и 6×4 карточек на квадратном свитке не помещается;
-   бант и рулоны при таком растяжении остаются узнаваемыми). Высота — до 1010u (≈ 94 % сцены), ширина ≈ 1414u (≈ 74 % сцены). Полезная область — внутри золотой рамки:
+   Тот же ассет scroll.webp, что у «Своей игры»/«Угадай мелодию», но растянут по горизонтали в 1.55 раза (сетка 4×2 и 6×4 карточек на квадратном свитке не помещается;
+   бант и рулоны при таком растяжении остаются узнаваемыми). Высота — до 1010u (≈ 94 % сцены), ширина ≈ 1565u (≈ 81 % сцены). Полезная область — внутри золотой рамки:
    слева 15 %, справа 17,5 %, сверху 22,5 %, снизу 24,5 % — бант справа сверху и ветка слева снизу не перекрываются. Анимация разворачивания и reduced-motion — общие (.mel-modal). */
 .theme-ny_book.mel-overlay .mel-modal.grp-modal {
-  --sc-h: min(calc(1010 * var(--u)), 96vh); --sc-w: min(calc(var(--sc-h) * 1.4), 94vw);
+  --sc-h: min(calc(1010 * var(--u)), 96vh); --sc-w: min(calc(var(--sc-h) * 1.55), 94vw);
   width: var(--sc-w); height: var(--sc-h); max-width: 94vw; align-items: stretch; gap: calc(var(--sc-h) * .012);
   padding: calc(var(--sc-h) * .2) calc(var(--sc-w) * .175) calc(var(--sc-h) * .245) calc(var(--sc-w) * .15) !important; }
 .theme-ny_book .bk-gm-head { position: relative; flex: none; display: flex; justify-content: center; padding-bottom: calc(var(--sc-h) * .008); border-bottom: calc(3 * var(--u)) double var(--bk-gold-3); }
@@ -1542,8 +1542,8 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .bk-gm-scroll { flex: 1 1 0; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; scrollbar-width: none; padding: calc(var(--sc-h) * .006) calc(2 * var(--u)); }
 .theme-ny_book .bk-gm-scroll::-webkit-scrollbar { display: none; }
 .theme-ny_book .bk-gm-scroll[data-over="1"] { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 38 * var(--u)), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 38 * var(--u)), transparent); }
-.theme-ny_book .bk-gm-grid { display: grid; grid-template-columns: repeat(var(--gm-cols), minmax(0, var(--gm-cw, 1fr))); justify-content: center; gap: calc(14 * var(--u)) calc(16 * var(--u)); margin-block: auto; align-items: stretch; }
-.theme-ny_book .bk-gm-team { min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: calc(6 * var(--u)); padding: calc(8 * var(--u)) calc(7 * var(--u)) calc(10 * var(--u));
+.theme-ny_book .bk-gm-grid { display: grid; grid-template-columns: repeat(var(--gm-cols), minmax(0, var(--gm-cw, 1fr))); justify-content: center; gap: calc(var(--gm-gy, 14) * var(--u)) calc(14 * var(--u)); margin-block: auto; align-items: stretch; }
+.theme-ny_book .bk-gm-team { min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: calc(var(--gm-in, 6) * var(--u)); padding: calc(var(--gm-in, 6) * var(--u)) calc(7 * var(--u)) calc(var(--gm-pb, 10) * var(--u));
   background: linear-gradient(180deg, rgba(255, 248, 226, .62), rgba(244, 226, 183, .5)); border-radius: calc(5 * var(--u)); box-shadow: inset 0 0 0 calc(1.5 * var(--u)) rgba(168, 128, 52, .75); }
 .theme-ny_book .bk-gm-players { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: calc(1 * var(--u)) .9em; text-align: center; font: 500 calc(var(--gm-fs) * var(--gm-k, 1) * var(--u)) / 1.2 var(--bk-serif); color: var(--bk-ink); overflow-wrap: normal; word-break: normal; hyphens: none; }
 .theme-ny_book .bk-gm-p { min-width: 0; max-width: 100%; text-wrap: balance; overflow-wrap: anywhere; }   /* имя — одним куском; не влезает в ячейку — переносится по словам внутри себя */

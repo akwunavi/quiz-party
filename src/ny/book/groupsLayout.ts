@@ -12,6 +12,8 @@ export interface GroupsLayout {
   fs: number
   /** предел ширины ячейки (--u): при 1–4 командах карточки не растягиваются на весь свиток; 0 — без предела */
   cell: number
+  /** плотная сетка (13–24 команды): меньше отступы между и внутри карточек, всё обязано поместиться без прокрутки */
+  tight?: boolean
 }
 
 export function groupsLayout(n: number): GroupsLayout {
@@ -24,8 +26,8 @@ export function groupsLayout(n: number): GroupsLayout {
   if (t <= 8) return { cols: 4, ch: 76, fs: 22, cell: 0 }
   if (t === 9) return { cols: 3, ch: 66, fs: 21, cell: 0 }
   if (t <= 12) return { cols: 4, ch: 62, fs: 20, cell: 0 }
-  if (t <= 18) return { cols: 6, ch: 46, fs: 17, cell: 0 }
-  return { cols: 6, ch: 44, fs: 15, cell: 0 }
+  if (t <= 18) return { cols: 6, ch: 50, fs: 19, cell: 0, tight: true }
+  return { cols: 6, ch: 44, fs: 17, cell: 0, tight: true }
 }
 
 /** «1 команда · 2–4 команды · 5+ команд» */
