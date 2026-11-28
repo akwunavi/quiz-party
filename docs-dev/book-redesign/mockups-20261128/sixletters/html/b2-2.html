@@ -1,0 +1,81 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Б2 · одна высота, рамка по картинке · 2 картинки</title><style>@font-face{font-family:'PT Serif';font-style:normal;font-weight:400;font-display:block;src:url(../../../../../public/fonts/pt-serif-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Serif';font-style:normal;font-weight:400;font-display:block;src:url(../../../../../public/fonts/pt-serif-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'PT Serif';font-style:normal;font-weight:700;font-display:block;src:url(../../../../../public/fonts/pt-serif-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Serif';font-style:normal;font-weight:700;font-display:block;src:url(../../../../../public/fonts/pt-serif-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'PT Serif';font-style:italic;font-weight:400;font-display:block;src:url(../../../../../public/fonts/pt-serif-cyrillic-400-italic.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Serif';font-style:italic;font-weight:400;font-display:block;src:url(../../../../../public/fonts/pt-serif-latin-400-italic.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'PT Serif';font-style:italic;font-weight:700;font-display:block;src:url(../../../../../public/fonts/pt-serif-cyrillic-700-italic.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Serif';font-style:italic;font-weight:700;font-display:block;src:url(../../../../../public/fonts/pt-serif-latin-700-italic.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:block;src:url(../../../../../public/fonts/cormorant-garamond-600-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:block;src:url(../../../../../public/fonts/cormorant-garamond-600-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:700;font-display:block;src:url(../../../../../public/fonts/cormorant-garamond-700-normal-cyrillic.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:700;font-display:block;src:url(../../../../../public/fonts/cormorant-garamond-700-normal-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+:root{--paper:#f8eedb;--paper2:#efe0c1;--ink:#2a1f17;--ink2:#1f2a44;--muted:#6b4e33;--red:#8f1d2c;--red3:#5e101b;--gold:#c9a14a;--gold2:#f2d58c;--gold3:#8a6a24;--shade:#d9c59c;--line:rgba(138,106,36,.55);--shadow:rgba(60,35,12,.28);
+ --serif:'PT Serif',Georgia,serif;--display:'Cormorant Garamond','PT Serif',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#1a0f0a}
+body{position:relative;font-family:var(--serif);color:var(--ink);background-repeat:no-repeat;background-size:1920px 1080px}
+.abs{position:absolute!important}
+.bl{display:inline-block;width:0;height:0;vertical-align:baseline}            /* маркер базовой линии для замера */
+/* ── свиток-плашка (настоящий hscroll-bow, 9-slice как в 41-ny-book.css) ── */
+.scroll{--sh:150px;position:relative;flex:none;height:var(--sh);margin:calc(var(--sh)*.2277) 0 calc(var(--sh)*.0941);display:flex;align-items:center;justify-content:center;text-align:center;
+ border:solid transparent;border-width:0 calc(var(--sh)*.9);border-image:url(../../../../../public/ny-book/hscroll-bow.webp) 0 211 0 211 fill / 0 calc(var(--sh)*1.0446) / calc(var(--sh)*.2277) 0 calc(var(--sh)*.0941) 0 stretch;
+ filter:drop-shadow(0 6px 7px rgba(60,30,10,.32))}
+.scroll>.ap{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-width:0}
+.ap .lab{font:700 18px/1.1 var(--serif);letter-spacing:.14em;color:var(--red);text-transform:uppercase;margin:0 0 4px;white-space:nowrap}
+.ap .word{font:700 calc(var(--sh)*.42)/1.05 var(--serif);color:var(--ink2);white-space:nowrap}
+/* ── плитки-буквы (как «Скрэмбл» в «Книге»: пергамент, золотая кромка, Cormorant 700) ── */
+.tiles{display:flex;gap:8px;justify-content:center;align-items:flex-end}
+.tile{--tw:72px;width:var(--tw);height:calc(var(--tw)*1.24);border-radius:calc(var(--tw)*.12);display:grid;place-items:center;font:700 calc(var(--tw)*.74)/1 var(--display);text-transform:uppercase;position:relative;flex:none}
+.tile.off{background:rgba(255,250,235,.5);color:rgba(107,78,51,.5);box-shadow:inset 0 0 0 2.5px rgba(138,106,36,.38),inset 0 5px 8px rgba(90,55,20,.12)}
+.tile.on{background:linear-gradient(180deg,#fff6da 0%,#f6dd96 55%,#e3b95a 100%);color:var(--red3);
+ box-shadow:inset 0 0 0 3px var(--gold3),inset 0 0 0 7px rgba(255,248,222,.75),0 5px 0 var(--shade),0 9px 12px var(--shadow)}
+.cap{font:italic 400 21px/1.2 var(--serif);color:var(--muted);text-align:center;white-space:nowrap}
+.cap b{font-style:normal;font-weight:700;color:var(--red)}
+.badge{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;font:700 22px/1 var(--serif);color:var(--red3);background:linear-gradient(180deg,#fff1c4,#e6bd62);box-shadow:inset 0 0 0 2px var(--gold3),0 2px 0 var(--shade),0 4px 6px var(--shadow)}
+/* ── фото: рамка на самом <img> (как .q-img img в «Книге»), ячейка прозрачна ── */
+.cell{display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.cell>img{display:block;width:auto;height:auto;object-fit:contain;background:#fffdf6;box-shadow:0 0 0 9px #fffdf6,0 0 0 10.5px var(--line),0 10px 20px 9px rgba(60,35,12,.3)}
+.cell>.badge{position:absolute;left:-6px;top:-6px;z-index:2}
+/* паспарту (б1): РАМКА — сама ячейка, картинка внутри без своей рамки (плашка в плашку не вкладываем) */
+.mat{display:flex;align-items:center;justify-content:center;position:relative;flex:none;background:#fffdf6;border-radius:3px;box-shadow:0 0 0 1.5px var(--line),0 10px 20px rgba(60,35,12,.3)}
+.mat>img{display:block;width:auto;height:auto;object-fit:contain;box-shadow:0 0 0 1px rgba(138,106,36,.45)}
+.mat>.badge{position:absolute;left:-10px;top:-10px;z-index:2}
+/* ── порядок: свитки-варианты ── */
+.opl{--sh:80px;position:relative;flex:none;height:var(--sh);margin:calc(var(--sh)*.2277) 0 calc(var(--sh)*.0941);display:flex;align-items:center;justify-content:flex-start;
+ border:solid transparent;border-width:0 calc(var(--sh)*.9);border-image:url(../../../../../public/ny-book/hscroll-bow.webp) 0 211 0 211 fill / 0 calc(var(--sh)*1.0446) / calc(var(--sh)*.2277) 0 calc(var(--sh)*.0941) 0 stretch;
+ padding:0 calc(var(--sh)*.12) 0 calc(var(--sh)*.06);filter:drop-shadow(0 6px 7px rgba(60,30,10,.32));font:700 calc(var(--sh)*.31)/1.12 var(--serif);color:var(--ink);overflow:visible}
+.opl .txt{min-width:0;flex:1 1 0;text-wrap:pretty}
+.opl .row{display:flex;align-items:baseline;width:100%;gap:calc(var(--sh)*.16)}
+.orow{display:flex;align-items:baseline;gap:14px;flex:none}
+.opl .key{width:calc(var(--sh)*.62);height:calc(var(--sh)*.62);border-radius:50%;display:inline-grid;place-items:center;flex:none;background:var(--red);color:#f8eedb;font:700 calc(var(--sh)*.34)/1 var(--serif);box-shadow:inset 0 0 0 2px rgba(242,213,140,.7),0 3px 0 rgba(0,0,0,.25)}
+.opl .pl{flex:none;font:700 calc(var(--sh)*.5)/1 var(--serif);color:var(--gold3);text-shadow:0 1px 0 #fbeec8,0 -1px 0 rgba(94,16,27,.18);min-width:.62em;text-align:center}
+.opl.long{font-size:calc(var(--sh)*.3);line-height:1.1}
+.med{flex:none;width:calc(var(--sh)*.7);height:calc(var(--sh)*.7);border-radius:50%;display:grid;place-items:center;font:700 calc(var(--sh)*.44)/1 var(--serif);color:var(--red3);background:linear-gradient(180deg,#fff1c4,#e6bd62);box-shadow:inset 0 0 0 2px var(--gold3),0 3px 0 var(--shade),0 5px 8px var(--shadow)}
+.lbl{font:700 20px/1.1 var(--serif);letter-spacing:.2em;color:var(--red);text-transform:uppercase;text-align:center;white-space:nowrap}
+.div{display:flex;align-items:center;gap:14px;width:100%;color:var(--gold3);margin:6px 0 0}
+.div i{flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--gold) 15%,var(--gold) 85%,transparent)}
+.div s{text-decoration:none;font:400 16px/1 var(--serif)}
+.recall{font:400 25px/1.28 var(--serif);color:var(--muted);text-align:center;text-wrap:balance;margin:0}
+.note{font:italic 400 23px/1.3 var(--serif);color:var(--muted);text-align:left;margin:8px 0 0;text-wrap:pretty}
+.stack{position:absolute;display:flex;flex-direction:column;align-items:center}
+.stack>*{flex:none}
+/* ── редактор компоновки (оверлей как в LayoutEditor) ── */
+.fr{position:absolute;border:2px dashed #1f9d55;background:rgba(31,157,85,.07);z-index:20}
+.fr.red{border-color:#d6372b;background:rgba(214,55,43,.05)}
+.fr>em{position:absolute;left:-2px;top:-22px;font:700 12px/1 system-ui,sans-serif;font-style:normal;color:#fff;background:#1f9d55;padding:3px 7px;border-radius:3px 3px 0 0;white-space:nowrap}
+.fr.red>em{background:#d6372b}
+.fr>b{position:absolute;right:-6px;bottom:-6px;width:12px;height:12px;background:#1f9d55;border-radius:2px}
+.fr.red>b{background:#d6372b}
+.hatch{position:absolute;pointer-events:none;background:repeating-linear-gradient(135deg,rgba(255,255,255,.18) 0 6px,rgba(0,0,0,.05) 6px 12px)}
+.panel{position:absolute;z-index:30;left:1212px;top:760px;width:456px;background:#1c1411f2;color:#f1e6d0;border-radius:8px;padding:12px 14px;font:12.5px/1.35 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.panel .r{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;align-items:center}
+.panel .b{border:1px solid #6b5538;border-radius:5px;padding:4px 9px;background:#2d2219;color:#f1e6d0}
+.panel .b.on{background:#c9a14a;color:#2a1f17;border-color:#c9a14a;font-weight:700}
+.panel .w{background:#f6e8c0;color:#4a3410;border-radius:4px;padding:5px 8px;margin:0 0 6px}
+.panel h4{margin:0 8px 0 0;font:700 13px system-ui}
+
+body{background-image:url(../assets/bd-question.jpg)}
+</style></head><body data-title="Б2 · одна высота, рамка по картинке · 2 картинки">
+<div class="cell abs" style="left:530px;top:389px;width:360px;height:360px"><span class="badge">1</span><img src="../assets/ph1.jpg" style="width:340px;height:340px"></div><div class="cell abs" style="left:1030px;top:389px;width:640px;height:360px"><span class="badge">2</span><img src="../assets/ph2.jpg" style="width:620px;height:340px"></div>
+</body></html>

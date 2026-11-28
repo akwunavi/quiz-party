@@ -1,0 +1,486 @@
+{
+ "a1-2": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 2,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   },
+   {
+    "row": "arow",
+    "n": 5,
+    "spread": 0
+   },
+   {
+    "row": "arow",
+    "n": 8,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [
+   {
+    "n": 4,
+    "spread": 0
+   },
+   {
+    "n": 7,
+    "spread": 0
+   }
+  ],
+  "fold": []
+ },
+ "a1-4": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 2,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   },
+   {
+    "row": "arow",
+    "n": 5,
+    "spread": 0
+   },
+   {
+    "row": "arow",
+    "n": 8,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [
+   {
+    "n": 4,
+    "spread": 0
+   },
+   {
+    "n": 7,
+    "spread": 0
+   }
+  ],
+  "fold": []
+ },
+ "a2-2": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 2,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   }
+  ],
+  "tileBaselines": [
+   {
+    "n": 4,
+    "spread": 0
+   },
+   {
+    "n": 7,
+    "spread": 0
+   }
+  ],
+  "fold": []
+ },
+ "a2-4": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 2,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   }
+  ],
+  "tileBaselines": [
+   {
+    "n": 4,
+    "spread": 0
+   },
+   {
+    "n": 7,
+    "spread": 0
+   }
+  ],
+  "fold": []
+ },
+ "b1-2": {
+  "fontsOk": [
+   false,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "b1-3": {
+  "fontsOk": [
+   false,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "b1-4": {
+  "fontsOk": [
+   false,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "b2-2": {
+  "fontsOk": [
+   false,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "b3-a": {
+  "fontsOk": [
+   true,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 2,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   }
+  ],
+  "tileBaselines": [
+   {
+    "n": 4,
+    "spread": 0
+   },
+   {
+    "n": 7,
+    "spread": 0
+   }
+  ],
+  "fold": []
+ },
+ "b3-q": {
+  "fontsOk": [
+   false,
+   false,
+   false
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v1-4": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v1-6": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v1-6long": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "opl long",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl long",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl long",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "opl",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v2-4": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 1,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v2-6": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 1,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ },
+ "v2-6long": {
+  "fontsOk": [
+   true,
+   false,
+   true
+  ],
+  "bounds": [],
+  "overlaps": [],
+  "textOutside": [],
+  "baselines": [
+   {
+    "row": "scroll ap",
+    "n": 1,
+    "spread": "вертикальный стек (две строки: подпись/слово) — не ряд"
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   },
+   {
+    "row": "orow",
+    "n": 3,
+    "spread": 0
+   }
+  ],
+  "tileBaselines": [],
+  "fold": []
+ }
+}
