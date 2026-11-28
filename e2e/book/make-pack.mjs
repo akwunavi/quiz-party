@@ -69,10 +69,16 @@ export const CROSSWORD_GRID = {
   ],
 }
 
+// 10.76 (стенд модалок на свитке): ключи '<треков в теме>:<тема>-<трек>' — разные длины «ответа» (исполнитель): короткий, 85 знаков, пустой
+const MEL_CORRECT = {
+  '4:1-2': 'Coldplay',
+  '4:2-0': 'Фрэнк Синатра и оркестр Каунта Бэйси — Let It Snow! Let It Snow! Let It Snow! (концертная запись 1965 года)',
+  '4:2-1': '',
+}
 function melodyThemes(names, perTheme, ext) {
   return names.map((name, t) => ({
     name,
-    tracks: Array.from({ length: perTheme }, (_, k) => ({ audio: m(`mel-${t}-${k}.${ext}`), correct: `${name}: трек ${k + 1} — исполнитель «Длинное название группы»` })),
+    tracks: Array.from({ length: perTheme }, (_, k) => ({ audio: m(`mel-${t}-${k}.${ext}`), correct: MEL_CORRECT[`${perTheme}:${t}-${k}`] ?? `${name}: трек ${k + 1} — исполнитель «Длинное название группы»` })),
   }))
 }
 

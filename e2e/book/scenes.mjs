@@ -417,6 +417,52 @@ export const SCENES = [
       sc('74-anagram-race-long', 'Скрэмбл (гонка): победитель с очень длинным названием', async api => { const ts = await api.teams(8, ['Ёлка', 'Самая длинная команда вечера номер один', 'К3', 'Дед Мороз и Снегурочка и Ко', 'Му', 'Тридцать первое декабря', 'Сто двадцать пять снеговиков', 'Команда №7'])
         await api.answers([{ team_id: ts[1].id, question_ref: 'q-' + qid(14, 0), round_number: 14, answer_text: 'Снегурочка', is_correct: true }])
         await api.session(Q(14, 0, { timer_started_at: iso(now() - 45000), reveal: true })) }, { settle: 3000 }),
+      // 10.76: контент модалок на свитке — все стадии «Угадай мелодию» и «Своей игры» (ключ трека: '1-2' — «Coldplay», '2-0' — 100+ знаков, '2-1' — пустой исполнитель)
+      ...(() => {
+        const LONGT = ['Ёлочки', 'Самая длинная команда вечера и ещё немножко сверху, чтобы не влезло', 'Снежный барс', 'Оливье навсегда', 'Дед Мороз и компания', 'Северные олени']
+        const mk = (key, stage, extra = () => ({}), { bids = true, names, order = 4 } = {}) => async api => { const ts = await api.teams(6, names)
+          if (bids) await api.answers(ts.slice(0, order).map((t, i) => ({ team_id: t.id, question_ref: `q-mel-${key}-bid`, round_number: 4, answer_text: String([5, 7, 9, 10][i]) })))
+          await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 4, question_index: 0, timer_started_at: null, reveal: false,
+            melody: { key, stage, order: ts.slice(0, order).map(t => t.id), turn: 0, snippetSec: 5, startSec: 2, played: ['0-0'], ...extra(ts) } }) }
+        const ans = (key, text, ok) => ts => ({ ...{}, _a: [{ team_id: ts[0].id, question_ref: `q-mel-${key}`, round_number: 4, answer_text: text, is_correct: ok }] })
+        // ответ команды кладётся отдельной записью до сессии
+        const mkA = (key, stage, text, ok, extra = () => ({}), o = {}) => async api => { const ts = await api.teams(6, o.names)
+          await api.answers([...ts.slice(0, 4).map((t, i) => ({ team_id: t.id, question_ref: `q-mel-${key}-bid`, round_number: 4, answer_text: String([5, 7, 9, 10][i]) })),
+            ...(text != null ? [{ team_id: ts[o.cur ?? 0].id, question_ref: `q-mel-${key}`, round_number: 4, answer_text: text, is_correct: ok }] : [])])
+          await api.session({ pack_id: PACK_ONLINE, phase: 'question', round_number: 4, question_index: 0, timer_started_at: null, reveal: false,
+            melody: { key, stage, order: ts.slice(0, 4).map(t => t.id), turn: o.turn ?? 0, snippetSec: 5, startSec: 2, played: ['0-0'], ...extra(ts) } }) }
+        void ans
+        const S = (id, title, setup, o = {}) => sc(id, title, setup, { ready: '.mel-modal', settle: 2200, ...o })
+        const dl = ms => iso(now() + ms)
+        const mm = [
+          S('80-sm-listen', 'модалка мелодии: слушаем (listen)', mk('1-2', 'listen', () => ({}), { bids: false })),
+          S('80-sm-bidding', 'модалка мелодии: ставки идут (bidding, 6 команд, 4 ставки)', mk('1-2', 'bidding', () => ({ deadline: dl(8000) }))),
+          S('80-sm-bids', 'модалка мелодии: ставки собраны (bids, 4)', mk('1-2', 'bids')),
+          S('80-sm-bids-long', 'модалка мелодии: ставки, длинные имена', mk('1-2', 'bids', () => ({}), { names: LONGT })),
+          S('80-sm-snippet', 'модалка мелодии: играет отрывок (snippet)', mk('1-2', 'snippet', () => ({ deadline: dl(5000) }))),
+          S('80-sm-snippet-long', 'модалка мелодии: отрывок, длинное имя команды, длинная рубрика', mk('2-0', 'snippet', () => ({ deadline: dl(5000) }), { names: LONGT })),
+          S('80-sm-answering-wait', 'модалка мелодии: ждём ответ (answering)', mkA('1-2', 'answering', null, null, () => ({ deadline: dl(22000) }))),
+          S('80-sm-answering-txt', 'модалка мелодии: ответ команды получен', mkA('1-2', 'answering', 'Coldplay — Yellow', null, () => ({ deadline: dl(22000) }))),
+          S('80-sm-answering-long', 'модалка мелодии: длинный ответ и длинное имя', mkA('1-2', 'answering', 'Это же Фрэнк Синатра, песня Let It Snow, запись пятидесятых годов, точно помню, мы её дома слушали', null, () => ({ deadline: dl(22000) }), { names: LONGT })),
+          S('80-sm-answering-ok', 'модалка мелодии: вердикт верно (ответ раскрыт)', mkA('1-2', 'answering', 'Coldplay', true, () => ({ deadline: dl(22000) }))),
+          S('80-sm-answering-no', 'модалка мелодии: вердикт неверно (ход ещё можно передать)', mkA('1-2', 'answering', 'Queen', false, () => ({ deadline: dl(22000) }))),
+          S('80-sm-passed', 'модалка мелодии: ход передан (passed)', mkA('1-2', 'passed', null, null, () => ({ turn: 1, deadline: dl(12000) }), { cur: 1 })),
+          S('80-sm-passed-no', 'модалка мелодии: второй команде неверно', mkA('1-2', 'passed', 'Muse', false, () => ({ turn: 1, deadline: dl(12000) }), { cur: 1 })),
+          ...[['2', 2, '1-2'], ['1', 1, '1-2'], ['05', 0.5, '1-2'], ['long', 2, '2-0'], ['empty', 1, '2-1']].map(([nm, pts, key]) =>
+            S(`80-sm-reveal-${nm}`, `модалка мелодии: итог трека, +${pts}${nm === 'long' ? ', 100+ знаков, длинное имя' : nm === 'empty' ? ', пустой исполнитель' : ''}`, mk(key, 'reveal', ts => ({ wonTeam: ts[1].id, wonPts: pts, turn: 1 }), { names: nm === 'long' ? LONGT : undefined }))),
+          S('80-sm-reveal-nobody', 'модалка мелодии: итог трека, никто не угадал', mk('1-2', 'reveal', () => ({ wonTeam: null, wonPts: 0 }))),
+        ]
+        const jpS = (id, title, tile, answer, rows) => S(id, title, async api => { const ts = await api.teams(6)
+          if (rows) await api.answers(ts.slice(0, rows).map((t, i) => ({ team_id: t.id, question_ref: `q-t10-${tile}`, round_number: 10, answer_text: ['Coldplay', 'Queen', 'ABBA — Happy New Year и ещё длинное дополнение ответа команды', 'не знаем', 'Muse', 'Мадонна'][i], is_correct: answer ? [true, false, null, false, true, null][i] : null })))
+          await api.session(Q(10, 0, { timer_started_at: null, melody: { jp: { tile, answer, replay: 1 } } })) }, { ready: '.jp-modal' })
+        return [...mm,
+          jpS('81-sm-jp-listen', 'модалка «Своей игры»: слушаем, ответов ещё нет', 5, false, 0),
+          jpS('81-sm-jp-masked', 'модалка «Своей игры»: ответили 4, ответы скрыты', 5, false, 4),
+          jpS('81-sm-jp-graded', 'модалка «Своей игры»: ответ показан, вердикты', 5, true, 4),
+          jpS('81-sm-jp-six', 'модалка «Своей игры»: ответ показан, 6 команд', 5, true, 6),
+          jpS('81-sm-jp-noans', 'модалка «Своей игры»: ответ показан, ответов нет', 6, true, 0),
+        ]
+      })(),
       // галерея правил: заставка каждого раунда пакетов (ONLINE 0–8, ALL 9–14)
       // 10.71: варианты-свитки (2/3/5/6 вариантов, длинные тексты): вопрос и экран ответа
       ...[1, 2, 3, 4, 5, 6, 7, 8, 9].flatMap(qi => [['q', false], ['a', true]].map(([k, rev]) => sc(`76${qi}${k}-scroll-choices`, `свитки-варианты ${['2', '3', '5', '6', '7', '8', '6 + длинное пояснение', '3 картинки + 5', '3 картинки + 6'][qi - 1]} (${k})`, async api => { const ts = await api.teams(6)
