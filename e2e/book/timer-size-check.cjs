@@ -50,7 +50,7 @@ const PAGE_FN = () => {
     // кольцо таймера прозрачно по краям — берём рамку без 4% полей
     const rr = { left: t.r.left + t.r.width * .04, right: t.r.right - t.r.width * .04, top: t.r.top + t.r.height * .04, bottom: t.r.bottom - t.r.height * .04 }
     t.hit = content.filter(c => inter(rr, c.r) > 4).map(c => `${c.k} ${(inter(rr, c.r) / u / u).toFixed(0)}u²`).slice(0, 4)
-    t.inBook = t.r.left >= br.left + 8 * u && t.r.right <= br.right - 8 * u && t.r.top >= br.top + 4 * u && t.r.bottom <= br.bottom
+    t.inBook = t.r.left >= br.left + 8 * u && t.r.right <= br.right - 8 * u && t.r.top >= br.top - 8 * u && t.r.bottom <= br.bottom
     delete t.r
   }
   // плашка шапки против декора по альфе

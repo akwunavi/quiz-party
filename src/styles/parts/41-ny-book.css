@@ -1531,3 +1531,10 @@ html:has(.theme-ny_book .race-screen), body:has(.theme-ny_book .race-screen) { b
 .theme-ny_book .host-screen:not(.race-screen):not(.bz-screen):not(.info-screen) > .host-topbar:has(> .qnum) { left: calc(var(--bk-ox) + var(--bk-qn-left, 135) * var(--u)); }
 /* длинный ярлык «3 попытки» («Р14 · ВОПРОС 1 / 5 · ФАЗА 3», 480u): кегль чуть меньше, чтобы правый край не доходил до хвои */
 .theme-ny_book .rv-screen > .host-topbar .qnum { font-size: max(calc(18.5 * var(--u)), 13px); letter-spacing: .05em; }
+
+/* ═══ 10.76: таймер вопроса — размер и место со скрина ведущего (34.webp, 1591×895: венок ≈ 210 px = 253u, правый край x≈1784u, верх y≈46u) ═══
+   Слот 260u (венок занимает ≈ 97 % ширины слота), правый край слота 1784u (right: 136u), верх 44u; плашка — с тем же верхом. Только таймер в шапке
+   экранов вопроса (.host-topbar > .bk-timer-slot: вопрос, «Скрэмбл», «3 попытки»). НЕ трогаем: «Отвечайте!» (ring/--at-timer), спринт (.sprint-timer),
+   мелодия/«Своя игра» (.bk-mel-timer), блиц (нет таймера-венка), ручную раскладку (.lay-timer — размер задаёт ведущий). */
+.theme-ny_book .host-screen:not(.race-screen):not(.bz-screen):not(.info-screen) > .host-topbar:has(> .qnum) { right: calc(var(--bk-ox) + var(--bk-tm-right, 136) * var(--u)); top: calc(var(--bk-oy) + var(--bk-tm-top, 44) * var(--u)); align-items: flex-start; }
+.theme-ny_book .host-screen > .host-topbar > .bk-timer-slot { --bk-timer-d: calc(var(--bk-tm-d, 260) * var(--u)); }
